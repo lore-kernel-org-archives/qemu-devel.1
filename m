@@ -2,107 +2,73 @@ Return-Path: <SRS0=MTtZ=AN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5510CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EC2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B33420760
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:24:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B33420760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7657A20771
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jul 2020 17:25:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="dwAo23Gx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7657A20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jr2x6-0002Eu-BT
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:24:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39082)
+	id 1jr2xQ-00031A-Ol
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 13:25:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
- id 1jr2W0-00074F-LN
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:56:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35066)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jr2wQ-0001oF-SS
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:24:07 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:36209)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
- id 1jr2Vy-0005sn-76
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 12:56:48 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 062GVi8R172341; Thu, 2 Jul 2020 12:56:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 320s23fwmb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 02 Jul 2020 12:56:42 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 062GXQJ2177284;
- Thu, 2 Jul 2020 12:56:42 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 320s23fwky-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 02 Jul 2020 12:56:42 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 062Gu4or002855;
- Thu, 2 Jul 2020 16:56:41 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma04dal.us.ibm.com with ESMTP id 31wwr9mdpp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 02 Jul 2020 16:56:41 +0000
-Received: from b03ledav002.gho.boulder.ibm.com
- (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 062GudlD27132300
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 2 Jul 2020 16:56:39 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D8D17136059;
- Thu,  2 Jul 2020 16:56:39 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B1B313604F;
- Thu,  2 Jul 2020 16:56:39 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
- by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu,  2 Jul 2020 16:56:39 +0000 (GMT)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jr2wO-0003XD-Fn
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 13:24:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=noqrcHnElbnc1ITBkAEW9OJn0u3aj8lhMULqMbSVTDc=; b=dwAo23Gx11GPkpP0VJyc1suUT1
+ /m94buCS8CqLkBtGjBXZerOuofhbcguMeB7KnPrG/GDWt4COIUBq3ca1yveWdcM74r16ME7nXQpQR
+ /8yEoqwJykjGY0N/7TyJwyCgLRQZn6ILOv+0PwHXS76yjfgMOlVmtHeRZUY5Bq2uRGQxvuNwQlVpj
+ /dx8JyDF6+ECp/hlCP9QcQPk0fr59KgmU0068jnj5TQtDU59df7vJwFFpUj+7fywQfj+7071BCDrR
+ PgrruAJXSlY5kp1u6GmkApL+ZxTh42S5cr7mxilmxDSPZg+1/VjL7/VY8b5lCHLzm1xcH29+o6JlN
+ aQUPLhC17B3Pny5Auqgd0KWujLBkNwA1zNVHTlebIhN7Du8K7HODFc77TGjTftBGxOATZFYSL0zAg
+ JeIY8l37nxxPZu+FbZ0rinCWB1hXdnTjhNK024TEMKnXflbs/aOVwmRL00DGFzoVzo3eKNsCCVp/D
+ LHJjK6t8Euws2tOMyD3ltJDh0UZFHpWapO+32MUM62yA5i+oulMqv/aAI6cFjD9d4jymSk9bMnc7K
+ 4TNcRm8GAyzPvCV2poPuAnL7ctX+sQqzJFb8hbon2nCTcuKtZ6uQSkghHmbMS1hh9LX9pA+riN7Qi
+ 5cXJAmi1agI5RT/rLn+vmM+n/j44esNpNzVURZrUA=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
+Date: Thu, 02 Jul 2020 19:23:35 +0200
+Message-ID: <5261112.usFQB0EGfy@silver>
+In-Reply-To: <20200702173500.27f2b0a5@bahia.lan>
+References: <cover.1587309014.git.qemu_oss@crudebyte.com>
+ <1814766.vrYqd63b1M@silver> <20200702173500.27f2b0a5@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Thu, 02 Jul 2020 12:56:39 -0400
-From: tobin <tobin@linux.vnet.ibm.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 1/1] SEV: QMP support for Inject-Launch-Secret
-In-Reply-To: <20200702155240.GD14863@work-vm>
-References: <20200630134102.46777-1-tobin@linux.vnet.ibm.com>
- <20200630134102.46777-2-tobin@linux.vnet.ibm.com>
- <20200702155240.GD14863@work-vm>
-Message-ID: <7880f4b376d4f6afe29288673575f20a@linux.vnet.ibm.com>
-X-Sender: tobin@linux.vnet.ibm.com
-User-Agent: Roundcube Webmail/1.0.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-02_09:2020-07-02,
- 2020-07-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 mlxlogscore=999
- bulkscore=0 impostorscore=0 suspectscore=2 adultscore=0 lowpriorityscore=0
- cotscore=-2147483648 spamscore=0 mlxscore=0 clxscore=1011 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2007020111
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=tobin@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 12:56:44
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=5.189.157.229;
+ envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 13:24:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,303 +81,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
- tobin@ibm.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-07-02 11:53, Dr. David Alan Gilbert wrote:
-> * Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
->> From: Tobin Feldman-Fitzthum <tobin@ibm.com>
->> 
->> AMD SEV allows a guest owner to inject a secret blob
->> into the memory of a virtual machine. The secret is
->> encrypted with the SEV Transport Encryption Key and
->> integrity is guaranteed with the Transport Integrity
->> Key. Although QEMU faciliates the injection of the
->> launch secret, it cannot access the secret.
->> 
->> Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
->> ---
->>  include/monitor/monitor.h |  3 ++
->>  include/sysemu/sev.h      |  2 ++
->>  monitor/misc.c            |  8 ++---
->>  qapi/misc-target.json     | 18 +++++++++++
->>  target/i386/monitor.c     |  9 ++++++
->>  target/i386/sev-stub.c    |  5 +++
->>  target/i386/sev.c         | 66 
->> +++++++++++++++++++++++++++++++++++++++
->>  target/i386/trace-events  |  1 +
->>  8 files changed, 108 insertions(+), 4 deletions(-)
->> 
->> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
->> index 1018d754a6..bf049c5b00 100644
->> --- a/include/monitor/monitor.h
->> +++ b/include/monitor/monitor.h
->> @@ -4,6 +4,7 @@
->>  #include "block/block.h"
->>  #include "qapi/qapi-types-misc.h"
->>  #include "qemu/readline.h"
->> +#include "include/exec/hwaddr.h"
->> 
->>  extern __thread Monitor *cur_mon;
->>  typedef struct MonitorHMP MonitorHMP;
->> @@ -36,6 +37,8 @@ void monitor_flush(Monitor *mon);
->>  int monitor_set_cpu(int cpu_index);
->>  int monitor_get_cpu_index(void);
->> 
->> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
->> **errp);
->> +
->>  void monitor_read_command(MonitorHMP *mon, int show_prompt);
->>  int monitor_read_password(MonitorHMP *mon, ReadLineFunc 
->> *readline_func,
->>                            void *opaque);
->> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
->> index 98c1ec8d38..b279b293e8 100644
->> --- a/include/sysemu/sev.h
->> +++ b/include/sysemu/sev.h
->> @@ -18,4 +18,6 @@
->> 
->>  void *sev_guest_init(const char *id);
->>  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
->> +int sev_inject_launch_secret(const char *hdr, const char *secret,
->> +                             uint64_t gpa);
->>  #endif
->> diff --git a/monitor/misc.c b/monitor/misc.c
->> index 89bb970b00..b9ec8ba410 100644
->> --- a/monitor/misc.c
->> +++ b/monitor/misc.c
->> @@ -674,10 +674,10 @@ static void hmp_physical_memory_dump(Monitor 
->> *mon, const QDict *qdict)
->>      memory_dump(mon, count, format, size, addr, 1);
->>  }
->> 
->> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
->> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
->> **errp)
->>  {
->>      MemoryRegionSection mrs = memory_region_find(get_system_memory(),
->> -                                                 addr, 1);
->> +                                                 addr, size);
->> 
->>      if (!mrs.mr) {
->>          error_setg(errp, "No memory is mapped at address 0x%" 
->> HWADDR_PRIx, addr);
->> @@ -701,7 +701,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict 
->> *qdict)
->>      MemoryRegion *mr = NULL;
->>      void *ptr;
->> 
->> -    ptr = gpa2hva(&mr, addr, &local_err);
->> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
->>      if (local_err) {
->>          error_report_err(local_err);
->>          return;
->> @@ -777,7 +777,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict 
->> *qdict)
->>      void *ptr;
->>      uint64_t physaddr;
->> 
->> -    ptr = gpa2hva(&mr, addr, &local_err);
->> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
->>      if (local_err) {
->>          error_report_err(local_err);
->>          return;
->> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
->> index dee3b45930..d145f916b3 100644
->> --- a/qapi/misc-target.json
->> +++ b/qapi/misc-target.json
->> @@ -200,6 +200,24 @@
->>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
->>    'if': 'defined(TARGET_I386)' }
->> 
->> +##
->> +# @sev-inject-launch-secret:
->> +#
->> +# This command injects a secret blob into memory of SEV guest.
->> +#
->> +# @packet-header: the launch secret packet header encoded in base64
->> +#
->> +# @secret: the launch secret data to be injected encoded in base64
->> +#
->> +# @gpa: the guest physical address where secret will be injected.
->> +#
->> +# Since: 5.1
->> +#
->> +##
->> +{ 'command': 'sev-inject-launch-secret',
->> +  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa': 'uint64' 
->> },
->> +  'if': 'defined(TARGET_I386)' }
->> +
->>  ##
->>  # @dump-skeys:
->>  #
->> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
->> index 27ebfa3ad2..42bcfe6dc0 100644
->> --- a/target/i386/monitor.c
->> +++ b/target/i386/monitor.c
->> @@ -736,3 +736,12 @@ SevCapability *qmp_query_sev_capabilities(Error 
->> **errp)
->> 
->>      return data;
->>  }
->> +
->> +void qmp_sev_inject_launch_secret(const char *packet_hdr,
->> +                                  const char *secret, uint64_t gpa,
->> +                                  Error **errp)
->> +{
->> +    if (sev_inject_launch_secret(packet_hdr, secret, gpa) != 0) {
->> +        error_setg(errp, "SEV inject secret failed");
->> +    }
->> +}
->> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
->> index e5ee13309c..fed4588185 100644
->> --- a/target/i386/sev-stub.c
->> +++ b/target/i386/sev-stub.c
->> @@ -48,3 +48,8 @@ SevCapability *sev_get_capabilities(void)
->>  {
->>      return NULL;
->>  }
->> +int sev_inject_launch_secret(const char *hdr, const char *secret,
->> +                             uint64_t gpa)
->> +{
->> +    return 1;
->> +}
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index d273174ad3..b35f1ddc0c 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -28,6 +28,8 @@
->>  #include "sysemu/runstate.h"
->>  #include "trace.h"
->>  #include "migration/blocker.h"
->> +#include "exec/address-spaces.h"
->> +#include "monitor/monitor.h"
->> 
->>  #define TYPE_SEV_GUEST "sev-guest"
->>  #define SEV_GUEST(obj)                                          \
->> @@ -769,6 +771,70 @@ sev_encrypt_data(void *handle, uint8_t *ptr, 
->> uint64_t len)
->>      return 0;
->>  }
->> 
->> +int sev_inject_launch_secret(const char *packet_hdr,
->> +                             const char *secret, uint64_t gpa)
->> +{
->> +    struct kvm_sev_launch_secret input;
->> +    guchar *data = NULL, *hdr = NULL;
->> +    int error, ret = 1;
->> +    void *hva;
->> +    gsize hdr_sz = 0, data_sz = 0;
->> +    Error *local_err = NULL;
->> +    MemoryRegion *mr = NULL;
->> +
->> +    /* secret can be inject only in this state */
->> +    if (!sev_check_state(SEV_STATE_LAUNCH_SECRET)) {
+On Donnerstag, 2. Juli 2020 17:35:00 CEST Greg Kurz wrote:
+> > > It isn't readdir only, most requests span over multiple v9fs_co_*()
+> > > calls...> 
+> > Right, I know! And that's actually my root motivation to finally bring
+> > this
+> > patch set forward, since I am very aware that this patch set is just a
+> > small brick in the overall procecss of fixing similarly affected code
+> > portions. So yes, that's my plan to fix them with upcoming patch sets,
+> > too.
+> > 
+> > Having said that, could we probably try to make future reviews a bit more
+> > efficient at certain aspects? For instance it would help a lot if the
+> > patch
+> > set was reviewed entirely, and not stopped at the very first issue spotted
+> > and then suspended to ++version, as this creates large latencies in the
+> > overall review process?
 > 
-> This gives a build error for me; sev_check_state is declared as :
-> 
-> static bool
-> sev_check_state(const SevGuestState *sev, SevState state)
-> 
-> so it's expecting the state.
-> 
+> Review of 9pfs is a best effort thing... I usually stop reviewing when I'm
+> fed up or when all the time I could reasonably invest is elapsed. Breaking
+> down the series in smaller patches is the usual improvement for that.
 
-Ah, my bad. I think I missed the change from sev_state to sev_guest.
-I will send a v2 through with all the other fixes in the near future,
-unless there is anything else.
+No need to defend, you do these things voluntarily. I am glad that you spend 
+time on this project at all. I would appreciate though if we could reduce the 
+overall time for a patch set a bit, and my suggestion trying to walk through 
+an entire set before re-posting a new version might indeed bring an 
+improvement without anybody having to invest more time, but rather less.
 
-Thanks,
-Tobin
+> > And likewise it would also help if review is prioritized on relevant
+> > behaviour aspects (concept, design) first before arguing about code style
+> > details like variable names or other details invisible to users.
+> 
+> I don't remember questioning the overall concept behind these changes
+> because it looks reasonable enough (even if I would appreciate to be
+> able to verify them with a working reproducer).
 
->> +        error_report("SEV: Not in correct state. (LSECRET) %x",
->> +                     sev_state->state);
+What exactly do you mean here with working reproducer?
+
+> Even if it is invisible to the users, coding style or how a series is
+> broken down in patches is important for developers.
+
+Dedication for detail beyond a certain fine graded level is luxury, and for 
+that reason it is designated for projects which clearly can afford it. On 
+(sub)projects with low activity and high latency (like this one) it easily 
+leads to frustration, which is obviously contra productive.
+
+I don't say don't care about code style, details et al., but caring a bit less 
+on reviews would not hurt, so to say. A bit of (invisible) tolerance avoids 
+friction and stagnancy.
+
+> > And finally: compromises. As man power on 9p is very limited, it would
+> > make
+> > sense to limit patch sets at a certain extent and agree to postpone
+> > certain
+> > non-critical issues to subsequent patches (or sets of), otherwise a patch
+> > set will grow and grow and it will take ages to get forward.
 > 
-> also it's showing as sev_state undeclared.
+> FWIW this patchset was more than 10 patches and now it is only 5 :)
+
+Hey, no misleading number crunching please. ;-) Three dropped patches were 
+never intended to be merged, they were pure benchmarks.
+
+> The good news is that you'll soon be able to merge things by yourself.
+> I'll help you when I can but I won't be the gating factor anymore.
 > 
->> +        return 1;
->> +    }
->> +
->> +    hdr = g_base64_decode(packet_hdr, &hdr_sz);
->> +    if (!hdr || hdr_sz != 52) {
+> Hurrah !
+
+Yep, I'll do my best to pursue your work, I appreciate what you did and that 
+you still volunteer to help!
+
+> > > > > 2) basically means moving some logic from the frontend to the
+> > > > > backend, ie. called from v9fs_co_run_in_worker(). This implies
+> > > > > that a very long request (ie. one that would span on many calls
+> > > > > to readdir()) cannot be interrupted by the client anymore, as
+> > > > > opposed to what we have now BTW.
+> > > 
+> > > ... most likely to allow clients to interrupt a long request with a
+> > > Tflush. Have you considered this aspect in your changes ?
+> > 
+> > In this particular patch set, no, as for readdir this should not be an
+> > issue in practice for anybody. After this patch set is applied, even on
+> > huge directories, the fs driver's duration for readdir would barely be
+> > measurable. In fact the server's latency would always be much higher,
+> > yet.
 > 
-> Here and ...
+> Reproducer ? Numbers ? ;)
+
+Well, you have already seen and run the benchmark in this series yourself. You 
+can easily hit several hundred ms server latency, which is very hard to top 
+with any fs driver reading a directory. Ok, maybe with a tape drive you could, 
+but that's pretty much it. :) With a 'normal' system the fs driver would 
+rather block for something between <1ms .. 8ms, i.e. fs driver completes 
+before it would be able to actually see a flush request.
+
+But to make it also clear: it would not bite with the new design either. If 
+someone really would see a necessity to abort readdir requests, that would be 
+possible without huge changes.
+
+> > > > > Then the whole seekdir/rewinddir/telldir/readdir sequence should
+> > > > > be called with a single v9fs_co_run_in_worker() invocation, in
+> > > > > which case the locking could just be something like:
+> > > > > 
+> > > > > int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState
+> > > > > *fidp,
+> > > > > 
+> > > > >                                       struct V9fsDirEnt **entries,
+> > > > >                                       int32_t maxsize, bool dostat)
+> > > > > 
+> > > > > {
+> > > > > 
+> > > > >     int err = 0;
+> > > > >     
+> > > > >     if (v9fs_request_cancelled(pdu)) {
+> > > > >     
+> > > > >         return -EINTR;
+> > > > >     
+> > > > >     }
+> > > > >     
+> > > > >     v9fs_readdir_lock(&fidp->fs.dir);
+> > > > >     
+> > > > >     v9fs_co_run_in_worker({
+> > > > >     
+> > > > >         err = do_readdir_many(pdu, fidp, entries, maxsize, dostat);
+> > > > >     
+> > > > >     });
+> > > > >     
+> > > > >     v9fs_readdir_unlock(&fidp->fs.dir);
+> > > > >     return err;
+> > > > > 
+> > > > > }
+> > > > 
+> > > > That's exactly what should be prevented. The lock must be on driver
+> > > > thread
+> > > > side, not on main thread side. The goal is to reduce the time slice of
+> > > > individual locks. If the lock is on main thread, the time slice of a
+> > > > lock
+> > > > (even on huge directories with thousands of entries) is multiple
+> > > > factors
+> > > > larger than if the lock is on driver thread side. So that's not just
+> > > > few
+> > > > percent or so, it is huge.
+> > > 
+> > > Sorry I don't get it...  In a contention-less situation, which is the
+> > > case we really care for, qemu_co_mutex_lock() has no overhead.
+> > 
+> > Yes, it only kicks in if there is concurrency.
 > 
->> +        error_report("SEV: Failed to decode sequence header");
->> +        return 1;
->> +    }
->> +
->> +    data = g_base64_decode(secret, &data_sz);
->> +    if (!data || data_sz <= 0 || data_sz > 0x3E80) {
+> And we don't care to preserve performance for silly clients, do we ?
+
+We don't necessarily need to preserve performance for them, that's right. But 
+it is already handled appropriately for them, so destroying it (i.e. slowing 
+them down) only makes sense if there is a good reason for that.
+
+> > > > > This would technically leave the locking in the main I/O thread,
+> > > > > but it isn't conceptually different from locking at the beginning
+> > > > > of do_readdir_lock() and unlocking before returning. My concern
+> > > > > is that I don't know how coroutine mutexes behave with multiple
+> > > > > worker threads...
+> > > > 
+> > > > Well, your Mutex -> CoMutex change was intended to fix a deadlock with
+> > > > the
+> > > > old readdir implementation. That deadlock could not happen with the
+> > > > new
+> > > > readdir implementation, which suggests that it probably makes sense to
+> > > > revert this change (i.e. CoMutex -> Mutex) for this new
+> > > > implementation.
+> > > 
+> > > No we can't because it is also used with 9p2000.u, that you said you
+> > > don't want to fix.
+> > 
+> > Yes and no, I did not say I don't want to fix readdir for 9p2000.u at all.
+> > What I said was I want to prioritize and concentrate on the most relevant
+> > issues first. 9p2000.L is the most commonly used protocol variant, so I
+> > would like to fix the most severe (e.g. performance) issues for 9p2000.L
+> > first before spending time on 9p2000.u which is AFAICS barely used in
+> > comparison, which I personally don't use at all, and which I am hence not
+> > testing in the same degree and cannot serve with the same quality as
+> > 9p2000.L right now.
+> > 
+> > Plus if there are really users caring for 9p2000.u, I can gladly assist
+> > them to address these issues for 9p2000.u as well, provided that they
+> > help at least with testing the required 9p2000.u changes.
 > 
-> here - please don't embed magic constants; they should be a #define
-> or const somewhere so we can tell what they are.
+> I would personally do the opposite... again ;)
 > 
->> +        error_report("SEV: Failed to decode data");
->> +        goto err;
->> +    }
->> +
->> +    hva = gpa2hva(&mr, gpa, data_sz, &local_err);
->> +    if (!hva) {
->> +        error_report("SEV: Failed to calculate guest address.");
->> +        goto err;
->> +    }
->> +
->> +    input.hdr_uaddr = (unsigned long)hdr;
->> +    input.hdr_len = hdr_sz;
->> +
->> +    input.trans_uaddr = (unsigned long)data;
->> +    input.trans_len = data_sz;
->> +
->> +    input.guest_uaddr = (unsigned long)hva;
->> +    input.guest_len = data_sz;
+> Like you say we essentially care for 9p2000.L and we only do limited
+> support for 9p2000.u. If we have a change that we really want for
+> 9p2000.L but it has an impact on 9p2000.u because of shared code,
+> it is fine to do the changes anyway, including changes to the 9p2000.u
+> specific code. Very basic testing of 9p2000.u (mount/ls or find/umount)
+> or maybe running pjd-fstest is enough IMHO. If we break someone's setup
+> and he complains, then we can ask him to test a fix before we merge it.
+
+Well, so you want to handle the relevant 9p2000.u readdir optimizations by 
+yourself, and you would send it as follow-up patch set (after this set is 
+through), including test cases?
+
+> > Back to the actual topic: so what do we do about the mutex then? CoMutex
+> > for 9p2000.u and Mutex for 9p2000.L? I know you find that ugly, but it
+> > would just be a transitional measure.
 > 
-> I'd probably use casts to uint64_t here for hdr, data, and hva
-> since that's what the structure you are assigning to has.
+> That would ruin my day...
 > 
->> +
->> +    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
->> +                                input.trans_uaddr, input.trans_len);
->> +
->> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_LAUNCH_SECRET,
->> +                    &input, &error);
->> +    if (ret) {
->> +        error_report("SEV: failed to inject secret ret=%d fw_error=%d 
->> '%s'",
->> +                     ret, error, fw_error_to_str(error));
->> +        goto err;
->> +    }
->> +
->> +    ret = 0;
->> +
->> +err:
->> +    g_free(data);
->> +    g_free(hdr);
->> +    return ret;
->> +}
->> +
->>  static void
->>  sev_register_types(void)
->>  {
->> diff --git a/target/i386/trace-events b/target/i386/trace-events
->> index 789c700d4a..9f299e94a2 100644
->> --- a/target/i386/trace-events
->> +++ b/target/i386/trace-events
->> @@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void 
->> *pdh) "policy 0x%x session
->>  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 
->> 0x%" PRIu64
->>  kvm_sev_launch_measurement(const char *value) "data %s"
->>  kvm_sev_launch_finish(void) ""
->> +kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, 
->> int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len 
->> %d"
->> --
->> 2.20.1 (Apple Git-117)
->> 
+> More seriously, the recent fix for a deadlock condition that was present
+> for years proves that nobody seems to be using silly clients with QEMU.
+> So I think we should just dump the lock and add a one-time warning in
+> the top level handlers when we detect a duplicate readdir request on
+> the same fid. This should be a very simple patch (I can take care of
+> it right away).
+
+Looks like we have a consensus! Then I wait for your patch removing the lock, 
+and for your feedback whether or not you see anything else in this patch set?
+
+> > Best regards,
+> > Christian Schoenebeck
+> 
+> Cheers,
+> 
 > --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Greg
+
+Best regards,
+Christian Schoenebeck
+
+
 
