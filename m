@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC6E7C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42735C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:15:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2A2720675
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:15:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2A2720675
+	by mail.kernel.org (Postfix) with ESMTPS id 1CCB720675
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:15:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CCB720675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrLXl-0001Bo-TD
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:15:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43532)
+	id 1jrLXn-0001EW-9k
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:15:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLW0-0006pU-Ds; Fri, 03 Jul 2020 09:14:04 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60374 helo=relay3.sw.ru)
+ id 1jrLW3-0006uW-Qo; Fri, 03 Jul 2020 09:14:07 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60366 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLVv-0007eV-QN; Fri, 03 Jul 2020 09:14:02 -0400
+ id 1jrLVw-0007eU-0t; Fri, 03 Jul 2020 09:14:07 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLVj-0004Vj-JD; Fri, 03 Jul 2020 16:13:47 +0300
+ id 1jrLVj-0004Vj-V0; Fri, 03 Jul 2020 16:13:48 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v8 01/10] qcow2: Fix capitalization of header extension
- constant.
-Date: Fri,  3 Jul 2020 16:13:41 +0300
-Message-Id: <1593782030-521984-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v8 08/10] qcow2.py: Introduce '-j' key to dump in JSON format
+Date: Fri,  3 Jul 2020 16:13:48 +0300
+Message-Id: <1593782030-521984-9-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -51,7 +50,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,43 +69,131 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the capitalization of the hexadecimal numbers consistent for the
-QCOW2 header extension constants in docs/interop/qcow2.txt.
+Add the command key to the qcow2.py arguments list to dump QCOW2
+metadata in JSON format. Here is the suggested way to do that. The
+implementation of the dump in JSON format is in the patch that follows.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2.c          | 2 +-
- docs/interop/qcow2.txt | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/qcow2.py        | 19 +++++++++++++++----
+ tests/qemu-iotests/qcow2_format.py | 16 ++++++++--------
+ 2 files changed, 23 insertions(+), 12 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0cd2e67..80dfe5f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -66,7 +66,7 @@ typedef struct {
- } QEMU_PACKED QCowExtension;
+diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
+index 0910e6a..7402279 100755
+--- a/tests/qemu-iotests/qcow2.py
++++ b/tests/qemu-iotests/qcow2.py
+@@ -26,16 +26,19 @@ from qcow2_format import (
+ )
  
- #define  QCOW2_EXT_MAGIC_END 0
--#define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
-+#define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xe2792aca
- #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
- #define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
- #define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index cb72346..f072e27 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -231,7 +231,7 @@ be stored. Each extension has a structure like the following:
  
-     Byte  0 -  3:   Header extension type:
-                         0x00000000 - End of the header extension area
--                        0xE2792ACA - Backing file format name string
-+                        0xe2792aca - Backing file format name string
-                         0x6803f857 - Feature name table
-                         0x23852875 - Bitmaps extension
-                         0x0537be77 - Full disk encryption header pointer
++dump_json = False
++
++
+ def cmd_dump_header(fd):
+     h = QcowHeader(fd)
+-    h.dump()
++    h.dump(dump_json)
+     print()
+-    h.dump_extensions()
++    h.dump_extensions(dump_json)
+ 
+ 
+ def cmd_dump_header_exts(fd):
+     h = QcowHeader(fd)
+-    h.dump_extensions()
++    h.dump_extensions(dump_json)
+ 
+ 
+ def cmd_set_header(fd, name, value):
+@@ -134,6 +137,11 @@ cmds = [
+ 
+ 
+ def main(filename, cmd, args):
++    global dump_json
++    dump_json = '-j' in sys.argv
++    if dump_json:
++        sys.argv.remove('-j')
++        args.remove('-j')
+     fd = open(filename, "r+b")
+     try:
+         for name, handler, num_args, desc in cmds:
+@@ -151,11 +159,14 @@ def main(filename, cmd, args):
+ 
+ 
+ def usage():
+-    print("Usage: %s <file> <cmd> [<arg>, ...]" % sys.argv[0])
++    print("Usage: %s <file> <cmd> [<arg>, ...] [<key>, ...]" % sys.argv[0])
+     print("")
+     print("Supported commands:")
+     for name, handler, num_args, desc in cmds:
+         print("    %-20s - %s" % (name, desc))
++    print("")
++    print("Supported keys:")
++    print("    %-20s - %s" % ('-j', 'Dump in JSON format'))
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index b512f84..dae6b6e 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -110,7 +110,7 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
+         self.__dict__ = dict((field[2], values[i])
+                              for i, field in enumerate(self.fields))
+ 
+-    def dump(self):
++    def dump(self, dump_json=None):
+         for f in self.fields:
+             value = self.__dict__[f[2]]
+             if isinstance(f[1], str):
+@@ -141,8 +141,8 @@ class Qcow2BitmapExt(Qcow2Struct):
+             [Qcow2BitmapDirEntry(fd, cluster_size=self.cluster_size)
+              for _ in range(self.nb_bitmaps)]
+ 
+-    def dump(self):
+-        super().dump()
++    def dump(self, dump_json=None):
++        super().dump(dump_json)
+         for entry in self.bitmap_directory:
+             print()
+             entry.dump()
+@@ -186,7 +186,7 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+         self.bitmap_table = Qcow2BitmapTable(raw_table=table,
+                                              cluster_size=self.cluster_size)
+ 
+-    def dump(self):
++    def dump(self, dump_json=None):
+         print(f'{"Bitmap name":<25} {self.name}')
+         super(Qcow2BitmapDirEntry, self).dump()
+         self.bitmap_table.dump()
+@@ -294,13 +294,13 @@ class QcowHeaderExtension(Qcow2Struct):
+         else:
+             self.obj = None
+ 
+-    def dump(self):
++    def dump(self, dump_json=None):
+         super().dump()
+ 
+         if self.obj is None:
+             print(f'{"data":<25} {self.data_str}')
+         else:
+-            self.obj.dump()
++            self.obj.dump(dump_json)
+ 
+     @classmethod
+     def create(cls, magic, data):
+@@ -399,8 +399,8 @@ class QcowHeader(Qcow2Struct):
+         buf = buf[0:header_bytes-1]
+         fd.write(buf)
+ 
+-    def dump_extensions(self):
++    def dump_extensions(self, dump_json=None):
+         for ex in self.extensions:
+             print('Header extension:')
+-            ex.dump()
++            ex.dump(dump_json)
+             print()
 -- 
 1.8.3.1
 
