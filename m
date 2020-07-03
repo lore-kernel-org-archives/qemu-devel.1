@@ -2,91 +2,87 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4577C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC7CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:15:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B02DF20760
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D25B207FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:15:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U7ruTLMq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B02DF20760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aMcqnOht"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D25B207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrNPK-00008i-U9
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:15:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46948)
+	id 1jrNPi-000113-Ho
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:15:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jrNNe-0006xR-MN
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:13:34 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40892
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jrNNd-0003MK-0D
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:13:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593789212;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=QVnfttb8D2X/I6mwkNp2uIGrH9l+nTr4MCxthHhdi4w=;
- b=U7ruTLMqd3iupfKkD6QCIA/i8taJTdOYnGU4J9P+UbWgB75ubAcPclRap2B8vDsukmf4Yr
- miuMwIN2prvJdcmPKSLEWY7MCCAnl3n3NQvKbLr0osc3BkPUKlCj6Y/UQCIcjzPO+1Ebyz
- d7WliTSp/47JDzDCgR8Bq6LyKbS1d5g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-FsZrbSiEM4OoAKn_M40Zvw-1; Fri, 03 Jul 2020 11:13:28 -0400
-X-MC-Unique: FsZrbSiEM4OoAKn_M40Zvw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 891A4107ACCA;
- Fri,  3 Jul 2020 15:13:27 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-87.ams2.redhat.com [10.36.112.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74BAE5BAEA;
- Fri,  3 Jul 2020 15:13:23 +0000 (UTC)
-Subject: Re: [PATCH v3 3/9] build: Check that mlockall() exists
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200703145614.16684-1-peter.maydell@linaro.org>
- <20200703145614.16684-4-peter.maydell@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <4a8e6dcd-2ce0-8530-4621-f9b0207c26c0@redhat.com>
-Date: Fri, 3 Jul 2020 17:13:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jrNOg-00081Z-Vv
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:14:39 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36738)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jrNOf-0003WF-3X
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:14:38 -0400
+Received: by mail-oi1-x244.google.com with SMTP id h17so26767262oie.3
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 08:14:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uQr1ovV/77RGBgM6mZ+pg4X+QZDp7O8J+Oh2NgPuKyw=;
+ b=aMcqnOhtcmwbhIlM9TGeW2qdCWe2wTJ7VuwHCug6cHMTnX4LVmxQsdPKx5feXUufx4
+ SZD7j1/yzONhDJYx11GfosEFM6HHi3Qxdk3Ft4+goo5F1M0k6ioL5AltXx9eirBSdIPw
+ DLvwggevnyf2Paz7pu6LTTR4kxfS8IrQRvLZfielVUkGeP19wqRfEzGJa2x9cmWWMyyo
+ PRVOmpveuvM9kN/8mrR8VepwnBNvgYgK8jHb6kNP3Tvi+K7iC0BerRM8mb8Hz2xlRBaY
+ Qb1y3rYegOJ/OgCobXgEKLbUm2YW3WJ7FEkH/AWbrtPXAV3H9yw4SrRP0lI2dVLrvkXD
+ guaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uQr1ovV/77RGBgM6mZ+pg4X+QZDp7O8J+Oh2NgPuKyw=;
+ b=IeV+HtgvubL6VhT8wo+Xs/s/2ibA4LKVc3F8OUbmTB2KD+k57jkddZV5Rmq6sVNqIp
+ wuBkMtmWRzb442tVDE7oJ9GCB+xEeqsXsjdxnDGBtyxNMdxMOsVpmUGGgv+VpZDFuAGm
+ rdqjalbr12AwByidFlwJpEZzogVfKA2akbcDTkde8bZCZXzcb6dUuh9BpnNhmQ/02tSS
+ aputeGscDXli36KmyK1WKjwVGGBLJlkFypl+gi66fwODQXY110ScacoFzynk6j1RbCq/
+ ScbiSyfGgHtntKYYitdwOdzxbrMbbw2czlQ8ChBy9p2TL62UbWPQp72kWK3dUwuogHYW
+ 7PbQ==
+X-Gm-Message-State: AOAM530+F82eEcIt1xgX1A59NdGmIzdLZOlZMRR14ug+EPbf/cEDxupj
+ NaDKCShv6JaQTof0CrCSdiZ7QmPTTK5a+gFr6yWEDVcyIoI=
+X-Google-Smtp-Source: ABdhPJyNC8MaZmBn9Hi1m+C5ncRD1wNz6PKIWGIpYdoxEVsQQuMzD3tio+G254/K/ei81lLVO/00CrtBdbDMkjXQyWU=
+X-Received: by 2002:aca:1706:: with SMTP id j6mr878613oii.146.1593789275595;
+ Fri, 03 Jul 2020 08:14:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200703145614.16684-4-peter.maydell@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20190201160653.13829-1-peter.maydell@linaro.org>
+ <20190201160653.13829-36-peter.maydell@linaro.org>
+ <CAFEAcA8ZgeGom6wVmCih9wY-s+kJ-yEsty_=S7+KQ_tkidN-Og@mail.gmail.com>
+ <20200701151124.GD2714117@strawberry.localdomain>
+In-Reply-To: <20200701151124.GD2714117@strawberry.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Jul 2020 16:14:24 +0100
+Message-ID: <CAFEAcA9yoqfjvNMdjGoZnQ2DXvJKhNoLC5A=7mq=WfuxFzDekw@mail.gmail.com>
+Subject: Re: [PULL 35/47] target/arm: Send interrupts on PMU counter overflow
+To: Aaron Lindsay <aaron@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,41 +95,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Carlier <devnexen@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/07/2020 16.56, Peter Maydell wrote:
-> From: David CARLIER <devnexen@gmail.com>
-> 
-> Instead of assuming that all POSIX platforms provide mlockall(),
-> test for it in configure. If the host doesn't provide this platform
-> then os_mlock() will fail -ENOSYS, as it does already on Windows.
-> 
-> This is necessary for Haiku, which does not have mlockall().
-> 
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> [PMM: Expanded commit message]
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  configure  | 15 +++++++++++++++
->  os-posix.c |  4 ++++
->  2 files changed, 19 insertions(+)
-[...]
-> diff --git a/os-posix.c b/os-posix.c
-> index 3cd52e1e700..e02b566940c 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -337,6 +337,7 @@ bool is_daemonized(void)
->  
->  int os_mlock(void)
->  {
-> +#if defined CONFIG_MLOCKALL
+On Wed, 1 Jul 2020 at 16:11, Aaron Lindsay <aaron@os.amperecomputing.com> wrote:
+> Ouch - I'm sorry this slipped through the cracks in my inbox for so
+> long.
+>
+> I assume you mean something like:
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index dc9c29f998..9b917f9425 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -2271,13 +2271,13 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+>        .access = PL1_RW, .accessfn = access_tpm,
+>        .type = ARM_CP_ALIAS | ARM_CP_IO,
+>        .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+> -      .writefn = pmintenclr_write, },
+> +      .writefn = pmintenclr_write, .raw_writefn = raw_write },
+>      { .name = "PMINTENCLR_EL1", .state = ARM_CP_STATE_AA64,
+>        .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 2,
+>        .access = PL1_RW, .accessfn = access_tpm,
+>        .type = ARM_CP_ALIAS | ARM_CP_IO,
+>        .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+> -      .writefn = pmintenclr_write },
+> +      .writefn = pmintenclr_write, .raw_writefn = raw_write },
+>      { .name = "CCSIDR", .state = ARM_CP_STATE_BOTH,
+>        .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 0,
+>        .access = PL1_R,
 
-Also missing the parentheses?
+For cases like this where you have a 'set' and a 'clr' register
+that really are accessing the same state under the hood, the
+way to do it is:
+ * the 'set' register provides the raw_readfn/raw_writefn
+   as raw_read/raw_write
+ * the 'clr' register adds ARM_CP_NO_RAW to its .type flags,
+   which means "don't do any raw accesses to this, it doesn't
+   have any underlying state that's not already synced or
+   migrated via some other mechanism".
 
- Thomas
+> One thing I'm trying to figure out (talking non-KVM here) is whether
+> skipping calling pmu_update_irq() can mean an interrupt would not be set
+> when it should have been. It looks like the ARMCPRegInfo's for
+> PMINTENSET already do `.raw_writefn = raw_write`, so I suppose at least
+> we would be consistent with this change. But I can never remember - is
+> it guaranteed that the raw functions are only ever called when the
+> interrupt state would already be taken care of separately (i.e. when
+> restoring a checkpoint)?
 
+Yes, the raw writes only happen for migration or for when
+we're syncing state from a KVM kernel, so the state of
+the device at the other end of the irq line should already
+be correct.
+
+thanks
+-- PMM
 
