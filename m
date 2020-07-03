@@ -2,63 +2,64 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A7BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:37:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C73C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C6652070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:37:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C6652070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE2682070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:38:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE2682070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrMoY-0002uI-OP
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 10:37:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37636)
+	id 1jrMpm-0004KT-8k
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 10:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <guoheyi@linux.alibaba.com>)
- id 1jrMns-00027H-Bu; Fri, 03 Jul 2020 10:36:36 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:9443)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jrMpD-0003qf-6N; Fri, 03 Jul 2020 10:37:59 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:53882)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <guoheyi@linux.alibaba.com>)
- id 1jrMnk-00020m-VD; Fri, 03 Jul 2020 10:36:32 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R821e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04427; MF=guoheyi@linux.alibaba.com;
- NM=1; PH=DS; RN=7; SR=0; TI=SMTPD_---0U1av7be_1593786962; 
-Received: from B-G4TALVDL-1650.local(mailfrom:guoheyi@linux.alibaba.com
- fp:SMTPD_---0U1av7be_1593786962) by smtp.aliyun-inc.com(127.0.0.1);
- Fri, 03 Jul 2020 22:36:02 +0800
-Subject: Re: [RFC] virt/acpi: set PSCI flag even when psci_conduit is disabled
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1593769409-13534-1-git-send-email-guoheyi@linux.alibaba.com>
- <CAFEAcA8RU6fS8PX7LMhn4U33nKoRvcO_mnyBFcmW3iOpA40sCQ@mail.gmail.com>
-From: Heyi Guo <guoheyi@linux.alibaba.com>
-Message-ID: <00016872-f1ca-5989-8ad6-28cf05ea0c57@linux.alibaba.com>
-Date: Fri, 3 Jul 2020 22:36:02 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jrMpA-00029d-JO; Fri, 03 Jul 2020 10:37:58 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 9F02FBF465;
+ Fri,  3 Jul 2020 14:37:52 +0000 (UTC)
+Date: Fri, 3 Jul 2020 16:37:49 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 11/18] hw/block/nvme: add remaining mandatory
+ controller parameters
+Message-ID: <20200703143749.dgk45bmvl6ir7oyg@apples.localdomain>
+References: <20200703063420.2241014-1-its@irrelevant.dk>
+ <20200703063420.2241014-12-its@irrelevant.dk>
+ <e2cbec3f-896e-fa17-2aac-2c82e0d6df60@redhat.com>
+ <20200703084626.xib465ie3vvladip@apples.localdomain>
+ <05eda6c8-b6fc-b034-a76d-dc563427ed35@redhat.com>
+ <20200703101003.iirx66jjnauvk7a3@apples.localdomain>
+ <5e623e78-29b0-50c7-28d2-78ae2dfb9ece@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8RU6fS8PX7LMhn4U33nKoRvcO_mnyBFcmW3iOpA40sCQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=47.88.44.36;
- envelope-from=guoheyi@linux.alibaba.com; helo=out4436.biz.mail.alibaba.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 10:36:16
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, ENV_AND_HDR_SPF_MATCH=-0.5,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+In-Reply-To: <5e623e78-29b0-50c7-28d2-78ae2dfb9ece@redhat.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 10:37:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,37 +72,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yitian.ly@alibaba-inc.com, "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Jul  3 13:02, Philippe Mathieu-Daudé wrote:
+> On 7/3/20 12:10 PM, Klaus Jensen wrote:
+> > On Jul  3 11:21, Philippe Mathieu-Daudé wrote:
+> >> On 7/3/20 10:46 AM, Klaus Jensen wrote:
+> >>> On Jul  3 10:31, Philippe Mathieu-Daudé wrote:
+> >>>> On 7/3/20 8:34 AM, Klaus Jensen wrote:
+> >>>>> From: Klaus Jensen <k.jensen@samsung.com>
+> >>>>>
+> >>>>> Add support for any remaining mandatory controller operating parameters
+> >>>>> (features).
+> >>>>>
+> >>>>> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> >>>>> Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> >>>>> ---
+> >>>>>  hw/block/nvme.c       | 39 +++++++++++++++++++++++++++++++++------
+> >>>>>  hw/block/nvme.h       | 18 ++++++++++++++++++
+> >>>>>  hw/block/trace-events |  2 ++
+> >>>>>  include/block/nvme.h  |  7 +++++++
+> >>>>>  4 files changed, 60 insertions(+), 6 deletions(-)
+> >>>>>
+> >>>>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> >>>>> index ba523f6768bf..affb9a967534 100644
+> >>>>> --- a/hw/block/nvme.c
+> >>>>> +++ b/hw/block/nvme.c
+> >>>>> @@ -1056,8 +1056,16 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >>>>>      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> >>>>>      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> >>>>>      uint32_t result;
+> >>>>> +    uint8_t fid = NVME_GETSETFEAT_FID(dw10);
+> >>>>> +    uint16_t iv;
+> >>>>>  
+> >>>>> -    switch (dw10) {
+> >>>>> +    trace_pci_nvme_getfeat(nvme_cid(req), fid, dw11);
+> >>>>> +
+> >>>>> +    if (!nvme_feature_support[fid]) {
+> >>>>> +        return NVME_INVALID_FIELD | NVME_DNR;
+> >>>>> +    }
+> >>>>> +
+> >>>>> +    switch (fid) {
+> >>>>>      case NVME_TEMPERATURE_THRESHOLD:
+> >>>>>          result = 0;
+> >>>>>  
+> >>>>> @@ -1088,14 +1096,27 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >>>>>                               ((n->params.max_ioqpairs - 1) << 16));
+> >>>>>          trace_pci_nvme_getfeat_numq(result);
+> >>>>>          break;
+> >>>>> +    case NVME_INTERRUPT_VECTOR_CONF:
+> >>>>> +        iv = dw11 & 0xffff;
+> >>>>> +        if (iv >= n->params.max_ioqpairs + 1) {
+> >>>>> +            return NVME_INVALID_FIELD | NVME_DNR;
+> >>>>> +        }
+> >>>>> +
+> >>>>> +        result = iv;
+> >>>>> +        if (iv == n->admin_cq.vector) {
+> >>>>> +            result |= NVME_INTVC_NOCOALESCING;
+> >>>>> +        }
+> >>>>> +
+> >>>>> +        result = cpu_to_le32(result);
+> >>>>> +        break;
+> >>>>>      case NVME_ASYNCHRONOUS_EVENT_CONF:
+> >>>>>          result = cpu_to_le32(n->features.async_config);
+> >>>>>          break;
+> >>>>>      case NVME_TIMESTAMP:
+> >>>>>          return nvme_get_feature_timestamp(n, cmd);
+> >>>>>      default:
+> >>>>> -        trace_pci_nvme_err_invalid_getfeat(dw10);
+> >>>>> -        return NVME_INVALID_FIELD | NVME_DNR;
+> >>>>> +        result = cpu_to_le32(nvme_feature_default[fid]);
+> >>>>
+> >>>> So here we expect uninitialized fid entries to return 0, right?
+> >>>>
+> >>>
+> >>> Yes, if defaults are not 0 (like NVME_ARBITRATION), it is explicitly set.
+> >>>
+> >>>>> +        break;
+> >>>>>      }
+> >>>>>  
+> >>>>>      req->cqe.result = result;
+> >>>>> @@ -1124,8 +1145,15 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >>>>>  {
+> >>>>>      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> >>>>>      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> >>>>> +    uint8_t fid = NVME_GETSETFEAT_FID(dw10);
+> >>>>>  
+> >>>>> -    switch (dw10) {
+> >>>>> +    trace_pci_nvme_setfeat(nvme_cid(req), fid, dw11);
+> >>>>> +
+> >>>>> +    if (!nvme_feature_support[fid]) {
+> >>>>> +        return NVME_INVALID_FIELD | NVME_DNR;
+> >>>>> +    }
+> >>>>> +
+> >>>>> +    switch (fid) {
+> >>>>>      case NVME_TEMPERATURE_THRESHOLD:
+> >>>>>          if (NVME_TEMP_TMPSEL(dw11) != NVME_TEMP_TMPSEL_COMPOSITE) {
+> >>>>>              break;
+> >>>>> @@ -1172,8 +1200,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >>>>>      case NVME_TIMESTAMP:
+> >>>>>          return nvme_set_feature_timestamp(n, cmd);
+> >>>>>      default:
+> >>>>> -        trace_pci_nvme_err_invalid_setfeat(dw10);
+> >>>>> -        return NVME_INVALID_FIELD | NVME_DNR;
+> >>>>> +        return NVME_FEAT_NOT_CHANGEABLE | NVME_DNR;
+> >>>>>      }
+> >>>>>      return NVME_SUCCESS;
+> >>>>>  }
+> >>>>> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> >>>>> index f8940435f9ef..8ad1e3c89cee 100644
+> >>>>> --- a/hw/block/nvme.h
+> >>>>> +++ b/hw/block/nvme.h
+> >>>>> @@ -87,6 +87,24 @@ typedef struct NvmeFeatureVal {
+> >>>>>      uint32_t    async_config;
+> >>>>>  } NvmeFeatureVal;
+> >>
+> >> What do you think about adding:
+> >>
+> >> --- a/include/block/nvme.h
+> >> +++ b/include/block/nvme.h
+> >> @@ -804,7 +804,8 @@ enum NvmeFeatureIds {
+> >>      NVME_WRITE_ATOMICITY            = 0xa,
+> >>      NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
+> >>      NVME_TIMESTAMP                  = 0xe,
+> >> -    NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
+> >> +    NVME_SOFTWARE_PROGRESS_MARKER   = 0x80,
+> >> +    NVME_FEATURE_ID_COUNT           = 0x100
+> >>  };
+> >>
+> > 
+> > I can definitely go with that. I added it as NVME_FID_MAX.
+> 
+> Good name.
+> 
+> > 
+> >>>>>  
+> >>>>> +static const uint32_t nvme_feature_default[0x100] = {
+> >>
+> >> Why uint32_t and not uint16_t?
+> >>
+> > 
+> > The feature values are by definition 32 bits wide, so even though the
+> > defaults here do not require it, I think uin32_t should be used.
+> 
+> Can you prepend a new patch making nvme_get_feature() return uin32_t
+> instead of uint16_t? That would be clearer.
+> 
 
-在 2020/7/3 下午6:37, Peter Maydell 写道:
-> On Fri, 3 Jul 2020 at 10:44, Heyi Guo <guoheyi@linux.alibaba.com> wrote:
->> vms->psci_conduit being disabled only means PSCI is not implemented by
->> qemu; it doesn't mean PSCI is not supported on this virtual machine.
->> Actually vms->psci_conduit is set to disabled when vms->secure and
->> firmware_loaded are both set, which means we will run ARM trusted
->> firmware, which will definitely provide PSCI.
->>
->> The issue can be reproduced when running qemu in TCG mode with secure
->> enabled, while using ARM trusted firmware + qemu virt UEFI as firmware
->> binaries, and we can see secondary cores will not be waken up.
-> If you're using a real EL3 guest firmware then it's the job of
-> the guest firmware to provide a DTB to the guest EL2/EL1 that says
-> "and I support PSCI" if it supports PSCI, surely? QEMU can't tell
-> whether the EL3 code does or doesn't do that...
+Ah. Now I see where the confusion comes from ;)
 
-Thanks, Peter. Does that mean the ACPI tables generated in qemu are only 
-templates and firmware should update them if necessary?
-
-Heyi
-
->
-> thanks
-> -- PMM
+nvme_get_feature() does not return the value of the feature. It returns
+a uint16_t with a value from the NvmeStatusCodes enum (which really
+should be a typedef used all over the place.
 
