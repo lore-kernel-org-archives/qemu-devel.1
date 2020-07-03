@@ -2,124 +2,83 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B88AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 859DBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB3C720826
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:28:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51EFB20826
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WDuq4s5O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB3C720826
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ehw0tnxa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51EFB20826
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHzj-0008Pc-0x
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:28:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32890)
+	id 1jrHzo-0000CT-7p
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrHgb-0000dA-2d; Fri, 03 Jul 2020 05:08:45 -0400
-Received: from mail-eopbgr140133.outbound.protection.outlook.com
- ([40.107.14.133]:62071 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrHgY-0005Bb-RQ; Fri, 03 Jul 2020 05:08:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j6oV9TfJmKS5dlum39DSXeTi8XhooOjPpgGe3PFBePmLKfHBWvqhHVa9pVBJQ/4MUN/75DjOONWrZ2zph+nJ9teWNbMnEUlfTS5418qeTiMqnMsFKREzA7HGK0COwzgsX+CW4eE4yI8c4HWDuLQFJCf6MJ/CPZHWtzXYRyzjrI67YnbVSFPsnFxeBJDVCvjcrk27ckVedcxzZlQ8yfvdGwCGX9N7uX2Nll8o/tgrc09c00VwQtnO6NrkjS+3PPe4It9LjqwVmFqpDFwEaufJBMQDk8i6dLSmB6yWoryeFmXY3jBpgV7wL4oa7pztG4+tkyunIcP/QYyKXm3U7gstQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gROxmM85WksCQt4OE9w7dTkzc0OSiFHd0QycJQzZFRs=;
- b=OFR2Yi8lKp+jyTnUv/eUEbImlvijpvbWu5AkyABfZ2eFMhjeEW+W7EXL9YhkotzAokHv4ucZmZFd7Ms5d5j9T7rTbVRtUTfrBoSGI7KbZcarsOsh9hv1dueLvr8j66hCi4yo4BdPGCZW1rLRhUIiACyH9zTXkUW+mddpwltmf08LnDj7lKnLwXUx0gYaE8zzFGY5Sx1MbGmxwhwckiNBCKNrehqePgIvrivYLOUntwMu1VOwGEapves3l69WHuP7uqsAtBg1y/fIf3a4LIx8RNg3br5M4duE2n26P393opr7q8V3o4Kcvq0BZwV9zG+q0wKBpC04O+lSvwcrc+rksg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gROxmM85WksCQt4OE9w7dTkzc0OSiFHd0QycJQzZFRs=;
- b=WDuq4s5OzUDV97F7aq9Iui0JJ4qG1vBG1dl0g37wmj0evN7RyfE2sdXr12OZcRa7+gbfHor/WPk/ws3AvRgFP6+a8b8wA3TJsRgVs+nnioeLJng7jjHcUbADKLpHfRkrVubWrIjU3aqlrKp38DujzlsOMakrRV86p+nHJ2p55Z8=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.28; Fri, 3 Jul
- 2020 09:08:34 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Fri, 3 Jul 2020
- 09:08:34 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v11 4/8] pflash: introduce ERRP_AUTO_PROPAGATE
-Date: Fri,  3 Jul 2020 12:08:12 +0300
-Message-Id: <20200703090816.3295-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200703090816.3295-1-vsementsov@virtuozzo.com>
-References: <20200703090816.3295-1-vsementsov@virtuozzo.com>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtN-0002iG-T8
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:21:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56942
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtM-0000x4-7t
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:21:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593768115;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=0v+efBXvG4neeNQh6xjq4PNeyTvbDjVJQF6XXTzwxZs=;
+ b=Ehw0tnxakYKNu8lLB2jWms22R8kTf+d9+hn/6Q8v5KRY3ynADi66WG/EgQAmf3K4mPW/1m
+ U7Vf2a+zw6JUcFmLGlF5cQnzJfzqLt4IkIjQb24ZElsFel3wG1tLN7WtD8RzrF+mls8v6Z
+ xb2qPna3vjJIiQLJlLQtoeRml19jauA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-442-mrjS3A-_OgqVP1iPEjw5LA-1; Fri, 03 Jul 2020 05:21:52 -0400
+X-MC-Unique: mrjS3A-_OgqVP1iPEjw5LA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DCCAA0BD9;
+ Fri,  3 Jul 2020 09:21:51 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-90.ams2.redhat.com [10.36.114.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7791F7AC63;
+ Fri,  3 Jul 2020 09:21:50 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 0/7] Block layer patches
+Date: Fri,  3 Jul 2020 11:21:36 +0200
+Message-Id: <20200703092143.165594-1-kwolf@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR10CA0022.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.15) by
- AM0PR10CA0022.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23 via Frontend
- Transport; Fri, 3 Jul 2020 09:08:33 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.15]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e2a67fb6-d655-48c9-c280-08d81f30a9a0
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54484363028505D9E6B03FDAC16A0@AM7PR08MB5448.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1060;
-X-Forefront-PRVS: 045315E1EE
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: si0oHt09K0nIEiUSrOzaOKJ0DrQjZPCOGUOm+ZX09F3UF+Clc3FcWQhv3yYcy/o/AR03LDXdcesFGpj40who9Dc9oyS+fgXsLtAAidLDRFXwb7t3keJrneVGbCvPJwAoUNoSISsb9rawKpIbSeLWS6uZJK7WkUY6E2+/MycgsQG+4MyV46r7fumYf7ykT4OEGHV4sgAqKLiFCcOfSlVx1iocQd5KIZevI/yxMi3hc4ZjnxToV8F88FxDG4BmClaKh4VJLpSAeUQWvxBDGMYdzaGJ2LKuK2EkUdUDQvrLa2l4MMbFSplxq6RTrZvgvzSR
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(366004)(376002)(136003)(396003)(346002)(66946007)(66476007)(66556008)(2906002)(86362001)(1076003)(8676002)(83380400001)(6512007)(5660300002)(8936002)(6666004)(186003)(36756003)(4326008)(6506007)(16526019)(6486002)(6916009)(26005)(478600001)(956004)(52116002)(316002)(54906003)(2616005);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Iof8IOAxVE8Yh2hSpJ0Y0Dp9FMViDODx6bkxCfw1yYO7aD+WTWpV59xe4bYGEKt3dqsQ1hfOk9/5qPsIKyb/W/36ci/328/eOZ3QZZ2o/m3PAzbF0Z4ZhQbE0lWnhmyNLVVvb/t//vOndl3cpQNdvp1vt5Nw7GA2cm9FUlKn1u3tVqMLDW3CKyEIFUtSPcNLxKRAcgA1DQ1VADog0PiyyFVV1uIhLihXvJEitfOuxaTzHzf99O4jYqQKIa/zKB3nEIigQm8zs7AkNv75HzA03f5Lod6BJvzTymYyHwOeKEhbV5VOx4nh8j7oF2GGcR+OVI92+ib9Mo140xFLR/+a+ZIKPbZXOInhUemdRBX8mIsWEZH/0gy19554SV8WPxy0Ein+zovh3m/13jrT9eZSZYWBu17ZrBOp3uwh3P2WoK0NQCYZ1dUGjcoBuGwhHaZ5Ya9WjZPuo5YuJML9lSQ748IoXTShtZMtRkJqXd+NhtE=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2a67fb6-d655-48c9-c280-08d81f30a9a0
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2020 09:08:33.8985 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EiUlv3aL0sB5Gt3vubAHGT/JlSDR+mLxSMakxbBfExk431pIikrxLitpWMSokFdHb3bvaCCs5if9Br6jO1GEO9fbdcMQH+K8mKJkk4Em/ao=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
-Received-SPF: pass client-ip=40.107.14.133;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 05:08:30
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,106 +91,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, groug@kaod.org,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &error_fatal
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+The following changes since commit 64f0ad8ad8e13257e7c912df470d46784b55c3fd:
 
-If we want to check error after errp-function call, we need to
-introduce local_err and then propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatal, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2020-07-02' into staging (2020-07-02 15:54:09 +0100)
 
-This commit is generated by command
+are available in the Git repository at:
 
-    sed -n '/^Parallel NOR Flash devices$/,/^$/{s/^F: //p}' \
-        MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/block/pflash_cfi01.c | 7 +++----
- hw/block/pflash_cfi02.c | 7 +++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
+for you to fetch changes up to 4f071a9460886667fde061c05b79dc786cc22e3c:
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index cddc3a5a0c..859cfeae14 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -696,12 +696,12 @@ static const MemoryRegionOps pflash_cfi01_ops = {
- 
- static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PFlashCFI01 *pfl = PFLASH_CFI01(dev);
-     uint64_t total_len;
-     int ret;
-     uint64_t blocks_per_device, sector_len_per_device, device_len;
-     int num_devices;
--    Error *local_err = NULL;
- 
-     if (pfl->sector_len == 0) {
-         error_setg(errp, "attribute \"sector-length\" not specified or zero.");
-@@ -735,9 +735,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-         &pfl->mem, OBJECT(dev),
-         &pflash_cfi01_ops,
-         pfl,
--        pfl->name, total_len, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+        pfl->name, total_len, errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index b40ce2335a..15035ee5ef 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -724,9 +724,9 @@ static const MemoryRegionOps pflash_cfi02_ops = {
- 
- static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PFlashCFI02 *pfl = PFLASH_CFI02(dev);
-     int ret;
--    Error *local_err = NULL;
- 
-     if (pfl->uniform_sector_len == 0 && pfl->sector_len[0] == 0) {
-         error_setg(errp, "attribute \"sector-length\" not specified or zero.");
-@@ -792,9 +792,8 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- 
-     memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
-                                   &pflash_cfi02_ops, pfl, pfl->name,
--                                  pfl->chip_len, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                  pfl->chip_len, errp);
-+    if (*errp) {
-         return;
-     }
- 
--- 
-2.21.0
+  iotests: Fix 051 output after qdev_init_nofail() removal (2020-07-03 10:06:29 +0200)
+
+----------------------------------------------------------------
+Block layer patches:
+
+- qemu-img convert: Don't pre-zero images (removes nowadays
+  counterproductive optimisation)
+- qemu-storage-daemon: Fix object-del, cleaner shutdown
+- vvfat: Check that the guest doesn't escape the given host directory
+  with read-write vvfat drives
+- vvfat: Fix crash by out-of-bounds array writes for read-write drives
+- iotests fixes
+
+----------------------------------------------------------------
+Kevin Wolf (3):
+      qemu-img convert: Don't pre-zero images
+      vvfat: Check that updated filenames are valid
+      vvfat: Fix array_remove_slice()
+
+Max Reitz (1):
+      iotests.py: Do not wait() before communicate()
+
+Philippe Mathieu-Daudé (1):
+      iotests: Fix 051 output after qdev_init_nofail() removal
+
+Stefan Hajnoczi (2):
+      qemu-storage-daemon: remember to add qemu_object_opts
+      qemu-storage-daemon: add missing cleanup calls
+
+ block/vvfat.c                 | 67 +++++++++++++++++++------------------------
+ qemu-img.c                    |  9 ------
+ qemu-storage-daemon.c         |  5 ++++
+ tests/qemu-iotests/iotests.py | 34 +++++++++++-----------
+ tests/qemu-iotests/051.pc.out |  4 +--
+ 5 files changed, 53 insertions(+), 66 deletions(-)
 
 
