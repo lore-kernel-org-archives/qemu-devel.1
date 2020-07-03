@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65333C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:13:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F60C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:14:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30177217BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:13:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3094F217BA
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:14:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="cnqiYyQc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30177217BA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="SzxnbM6A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3094F217BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOJu-000492-Cp
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:13:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59244)
+	id 1jrOKW-00053U-Ty
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:14:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5t-0003lE-Cn; Fri, 03 Jul 2020 11:59:17 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41855)
+ id 1jrO5s-0003hy-6x; Fri, 03 Jul 2020 11:59:16 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:41781)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5m-0007TP-T6; Fri, 03 Jul 2020 11:59:16 -0400
+ id 1jrO5l-0007SA-9K; Fri, 03 Jul 2020 11:59:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=LY/et2AdwdNh1S7gB98XcKaWu4e2Wpe6nEn2bXOs7rA=; 
- b=cnqiYyQc8kbgfG4FWnwS65mvbqQ183cqMi/XZ45JiiOUkiQLwkccnT/fAhgA+06Iti7taiWz0ZK0OiFE6B1VepGkDemqw3Rj0M5d/S1JUxUSQ+FTufErgof7fjFk8Czl5QBbLRyc3W03QZO2IcTMhtkVM3og7Z9jVlgVKoFEBRHs0AvQTtWYnoBUetdDa3M+sD4piYy7KWQKxQ98NEkkB7xuzKda9046tvJ63GUIbXuWgviF2Bg9fAA7jf/XpQLyD8kz+u6r7FUih5i2WRFShb7eUkzynhN4wCvrm/v7X5dCiJteywHzzy4qCEFUQ8dMifGv9+9L6MyU1gilEx0kkA==;
+ bh=oGG1Fgq5BJpPtfkJKz5xEU3qJSWeyhX0fR6sza+6YaA=; 
+ b=SzxnbM6AUqEhC+8h6fZUN7iXYOSdnoL4UNDICBNTtA9bC3BBnNh4WUefL4/ompFZSLHg6IHCat97lZF6PpSF82wTM18B7kSVmEjleg2BVMWunyZEhqHLnevn3S0pUZEGVg6nqelKBuwKRrDwFUn/tO8/9zfZqRj5rcxRO/BF/MgFi0JRnzctkLtLBK+aH5O727x8owdmYj1FDKW4te/+lf5LepJxxwqVw4Fz1avli4tNxlept48zSpky3gIxK/S9zAknSyG/t4P4o2mB4BiQWQeXdtozlMPlnsNq0Y4fAzQJ+CdCd/uGmY077FTp4RgQMtk8k2cKhs66rMa372/pdw==;
 Received: from [81.0.49.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jrO5P-0001Sn-KM; Fri, 03 Jul 2020 17:58:47 +0200
+ id 1jrO5L-0001Qf-PX; Fri, 03 Jul 2020 17:58:43 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jrO52-0007Qg-Hc; Fri, 03 Jul 2020 17:58:24 +0200
+ id 1jrO52-0007QF-8O; Fri, 03 Jul 2020 17:58:24 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 32/34] qcow2: Allow preallocation and backing files if
- extended_l2 is set
-Date: Fri,  3 Jul 2020 17:58:18 +0200
-Message-Id: <87cb87b541ceccc8a6df66da0001a29e20077115.1593791819.git.berto@igalia.com>
+Subject: [PATCH v10 23/34] qcow2: Add subcluster support to
+ discard_in_l2_slice()
+Date: Fri,  3 Jul 2020 17:58:09 +0200
+Message-Id: <3ec5e165ed2d27a5e866761088d44d511490b508.1593791819.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1593791819.git.berto@igalia.com>
 References: <cover.1593791819.git.berto@igalia.com>
@@ -85,54 +85,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Traditional qcow2 images don't allow preallocation if a backing file
-is set. This is because once a cluster is allocated there is no way to
-tell that its data should be read from the backing file.
+Two things need to be taken into account here:
 
-Extended L2 entries have individual allocation bits for each
-subcluster, and therefore it is perfectly possible to have an
-allocated cluster with all its subclusters unallocated.
+1) With full_discard == true the L2 entry must be cleared completely.
+   This also includes the L2 bitmap if the image has extended L2
+   entries.
+
+2) With full_discard == false we have to make the discarded cluster
+   read back as zeroes. With normal L2 entries this is done with the
+   QCOW_OFLAG_ZERO bit, whereas with extended L2 entries this is done
+   with the individual 'all zeroes' bits for each subcluster.
+
+   Note however that QCOW_OFLAG_ZERO is not supported in v2 qcow2
+   images so, if there is a backing file, discard cannot guarantee
+   that the image will read back as zeroes. If this is important for
+   the caller it should forbid it as qcow2_co_pdiscard() does (see
+   80f5c01183 for more details).
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c              | 7 ++++---
- tests/qemu-iotests/206.out | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ block/qcow2-cluster.c | 52 +++++++++++++++++++------------------------
+ 1 file changed, 23 insertions(+), 29 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 3dfb56ccca..06e5c53b70 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3451,10 +3451,11 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         qcow2_opts->preallocation = PREALLOC_MODE_OFF;
-     }
-     if (qcow2_opts->has_backing_file &&
--        qcow2_opts->preallocation != PREALLOC_MODE_OFF)
-+        qcow2_opts->preallocation != PREALLOC_MODE_OFF &&
-+        !qcow2_opts->extended_l2)
-     {
--        error_setg(errp, "Backing file and preallocation cannot be used at "
--                   "the same time");
-+        error_setg(errp, "Backing file and preallocation can only be used at "
-+                   "the same time if extended_l2 is on");
-         ret = -EINVAL;
-         goto out;
-     }
-diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
-index 363c5abe35..a100849fcb 100644
---- a/tests/qemu-iotests/206.out
-+++ b/tests/qemu-iotests/206.out
-@@ -203,7 +203,7 @@ Job failed: Different refcount widths than 16 bits require compatibility level 1
- === Invalid backing file options ===
- {"execute": "blockdev-create", "arguments": {"job-id": "job0", "options": {"backing-file": "/dev/null", "driver": "qcow2", "file": "node0", "preallocation": "full", "size": 67108864}}}
- {"return": {}}
--Job failed: Backing file and preallocation cannot be used at the same time
-+Job failed: Backing file and preallocation can only be used at the same time if extended_l2 is on
- {"execute": "job-dismiss", "arguments": {"id": "job0"}}
- {"return": {}}
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index cb07fd00a1..ea025dc531 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1848,11 +1848,17 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+     assert(nb_clusters <= INT_MAX);
  
+     for (i = 0; i < nb_clusters; i++) {
+-        uint64_t old_l2_entry;
+-
+-        old_l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
++        uint64_t old_l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
++        uint64_t old_l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
++        uint64_t new_l2_entry = old_l2_entry;
++        uint64_t new_l2_bitmap = old_l2_bitmap;
++        QCow2ClusterType cluster_type =
++            qcow2_get_cluster_type(bs, old_l2_entry);
+ 
+         /*
++         * If full_discard is true, the cluster should not read back as zeroes,
++         * but rather fall through to the backing file.
++         *
+          * If full_discard is false, make sure that a discarded area reads back
+          * as zeroes for v3 images (we cannot do it for v2 without actually
+          * writing a zero-filled buffer). We can skip the operation if the
+@@ -1861,40 +1867,28 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+          *
+          * TODO We might want to use bdrv_block_status(bs) here, but we're
+          * holding s->lock, so that doesn't work today.
+-         *
+-         * If full_discard is true, the sector should not read back as zeroes,
+-         * but rather fall through to the backing file.
+          */
+-        switch (qcow2_get_cluster_type(bs, old_l2_entry)) {
+-        case QCOW2_CLUSTER_UNALLOCATED:
+-            if (full_discard || !bs->backing) {
+-                continue;
++        if (full_discard) {
++            new_l2_entry = new_l2_bitmap = 0;
++        } else if (bs->backing || qcow2_cluster_is_allocated(cluster_type)) {
++            if (has_subclusters(s)) {
++                new_l2_entry = 0;
++                new_l2_bitmap = QCOW_L2_BITMAP_ALL_ZEROES;
++            } else {
++                new_l2_entry = s->qcow_version >= 3 ? QCOW_OFLAG_ZERO : 0;
+             }
+-            break;
++        }
+ 
+-        case QCOW2_CLUSTER_ZERO_PLAIN:
+-            if (!full_discard) {
+-                continue;
+-            }
+-            break;
+-
+-        case QCOW2_CLUSTER_ZERO_ALLOC:
+-        case QCOW2_CLUSTER_NORMAL:
+-        case QCOW2_CLUSTER_COMPRESSED:
+-            break;
+-
+-        default:
+-            abort();
++        if (old_l2_entry == new_l2_entry && old_l2_bitmap == new_l2_bitmap) {
++            continue;
+         }
+ 
+         /* First remove L2 entries */
+         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+-        if (!full_discard && s->qcow_version >= 3) {
+-            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
+-        } else {
+-            set_l2_entry(s, l2_slice, l2_index + i, 0);
++        set_l2_entry(s, l2_slice, l2_index + i, new_l2_entry);
++        if (has_subclusters(s)) {
++            set_l2_bitmap(s, l2_slice, l2_index + i, new_l2_bitmap);
+         }
+-
+         /* Then decrease the refcount */
+         qcow2_free_any_clusters(bs, old_l2_entry, 1, type);
+     }
 -- 
 2.20.1
 
