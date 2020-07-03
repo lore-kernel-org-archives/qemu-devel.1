@@ -4,42 +4,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D99C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7962C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D2F120760
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D2F120760
+	by mail.kernel.org (Postfix) with ESMTPS id 7C4A220936
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:21:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C4A220936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrLbs-00088f-JE
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:20:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43564)
+	id 1jrLd9-0002V3-PZ
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:21:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLW2-0006r1-Cc; Fri, 03 Jul 2020 09:14:06 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60340 helo=relay3.sw.ru)
+ id 1jrLW3-0006sS-46; Fri, 03 Jul 2020 09:14:07 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60348 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLVv-0007eQ-Uj; Fri, 03 Jul 2020 09:14:04 -0400
+ id 1jrLVv-0007eS-W5; Fri, 03 Jul 2020 09:14:06 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLVj-0004Vj-Os; Fri, 03 Jul 2020 16:13:47 +0300
+ id 1jrLVk-0004Vj-1I; Fri, 03 Jul 2020 16:13:48 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v8 04/10] qcow2_format.py: dump bitmap flags in human readable
- way.
-Date: Fri,  3 Jul 2020 16:13:44 +0300
-Message-Id: <1593782030-521984-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v8 09/10] qcow2_format.py: collect fields to dump in JSON
+ format
+Date: Fri,  3 Jul 2020 16:13:49 +0300
+Message-Id: <1593782030-521984-10-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -51,7 +51,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,41 +70,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce the class BitmapFlags that parses a bitmap flags mask.
+As __dict__ is being extended with class members we do not want to
+print, make a light copy of the initial __dict__ and extend the copy
+by adding lists we have to print in the JSON output.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ tests/qemu-iotests/qcow2_format.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index 1435e34..d8c058d 100644
+index dae6b6e..e8eb36f 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -40,6 +40,22 @@ class Flags64(Qcow2Field):
-         return str(bits)
+@@ -110,6 +110,8 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
+         self.__dict__ = dict((field[2], values[i])
+                              for i, field in enumerate(self.fields))
  
++        self.fields_dict = self.__dict__.copy()
++
+     def dump(self, dump_json=None):
+         for f in self.fields:
+             value = self.__dict__[f[2]]
+@@ -140,6 +142,7 @@ class Qcow2BitmapExt(Qcow2Struct):
+         self.bitmap_directory = \
+             [Qcow2BitmapDirEntry(fd, cluster_size=self.cluster_size)
+              for _ in range(self.nb_bitmaps)]
++        self.fields_dict.update(bitmap_directory=self.bitmap_directory)
  
-+class BitmapFlags(Qcow2Field):
-+
-+    flags = {
-+        0x1: 'in-use',
-+        0x2: 'auto'
-+    }
-+
-+    def __str__(self):
-+        bits = []
-+        for bit in range(64):
-+            flag = self.value & (1 << bit)
-+            if flag:
-+                bits.append(self.flags.get(flag, '{:#x}'.format(flag)))
-+        return f'{self.value:#x} ({bits})'
-+
-+
- class Enum(Qcow2Field):
+     def dump(self, dump_json=None):
+         super().dump(dump_json)
+@@ -185,6 +188,7 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+         table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
+         self.bitmap_table = Qcow2BitmapTable(raw_table=table,
+                                              cluster_size=self.cluster_size)
++        self.fields_dict.update(bitmap_table=self.bitmap_table)
  
-     def __str__(self):
+     def dump(self, dump_json=None):
+         print(f'{"Bitmap name":<25} {self.name}')
 -- 
 1.8.3.1
 
