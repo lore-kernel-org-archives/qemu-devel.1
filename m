@@ -2,88 +2,55 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1086EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D99C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B11C120675
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ATP21OfK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B11C120675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4D2F120760
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D2F120760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrLbk-0007u6-Pe
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:20:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43990)
+	id 1jrLbs-00088f-JE
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrLXN-0000ws-OM
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:15:30 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42650)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrLXK-00081K-4j
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:15:29 -0400
-Received: by mail-ot1-x341.google.com with SMTP id g37so2914905otb.9
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 06:15:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=+oq+jdstCX5HFxMxLTaR5mr4I2zXa6c3eHgBmoGVyzs=;
- b=ATP21OfKyI4/2FMe2VvgwZyZeH8z76j+dQbwxUHJkQCOEr5DtdIIf6sl1UcL+EMLk/
- fzBeUfeVsuNn0tUzwEd+nVsv002Oc2pQ3Ke9YLecLgyireLv6UYyutC041LI50v+tBAA
- 7EOEHXLzZrN8M4H635PxYC9kOjzQSqH1bblAZV8+Aeg+Lppcvt+dJVwHxnGlhmqtvnIx
- n9Gpvk3IEUz83iOniAWjgEECOkCST/gYVt5oku4K6ncW55gGKtmO6A2yK23uO7OHqD4v
- 0a4ychTU0Y5ppmxAbhHN97tuyInvKxSQWHNRcEe7zlFY4oqXozhnx8SWg20i1kc63fxG
- USew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=+oq+jdstCX5HFxMxLTaR5mr4I2zXa6c3eHgBmoGVyzs=;
- b=jmzKTbB9DNnQXOuusWbupcCuA6uRj4VGBpw7fDm1vbDF8q8v2LhsiWjCqsiZ3+L0SY
- kB2d7qZdsEz/d2hJsGfK4OtzvRqdGoOUgDzEQ86JAD1YP6UnrJ41L8QCwvNvRKsLDDOy
- +LHDpAtxZUr+MQpDLh96lTXQyuAReNcO65QbyDo50yP/Js2zNsdJDwyI4hy4/wlXXp6O
- JkD3DClPv9ePtLNLnHthQxZ+r4zMv3nC2zvGEI/LVCxEHBROhdxrrD3AA0vwjZagdIbK
- qJ/B24xDjrPu1+nwd7YRAWxGJ3Uv52E3QENkmN9qhNuUAtbIfqRmLDCEFuzwpmCbKmS9
- /drw==
-X-Gm-Message-State: AOAM533a1HxmAUwEm2cV/s/A8+P7QHHROS/iKEX46yLepwUdK09TBcxJ
- 4GSoPk9gJP4J4mlsZWufK9Tu4PT4lnl15mWu+qN1Uw==
-X-Google-Smtp-Source: ABdhPJw+KlNnjFqyUdPyAysO/Kkj7P7fcEksINrN4QVsppjBsbuetByRxWbs7zYcCsIK5pyScB7oUTt2s1n5tl6huhY=
-X-Received: by 2002:a9d:7303:: with SMTP id e3mr24435935otk.221.1593782125076; 
- Fri, 03 Jul 2020 06:15:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200630133912.9428-1-f4bug@amsat.org>
- <20200630133912.9428-9-f4bug@amsat.org>
-In-Reply-To: <20200630133912.9428-9-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Jul 2020 14:15:14 +0100
-Message-ID: <CAFEAcA9K5ikriXrrNGSz2MN54uwEcLx7TM7CGjFuLEei7gKdcg@mail.gmail.com>
-Subject: Re: [PATCH v7 08/17] hw/sd/sdcard: Call sd_addr_to_wpnum where it is
- used, consider zero size
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jrLW2-0006r1-Cc; Fri, 03 Jul 2020 09:14:06 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60340 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jrLVv-0007eQ-Uj; Fri, 03 Jul 2020 09:14:04 -0400
+Received: from [172.16.25.136] (helo=localhost.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jrLVj-0004Vj-Os; Fri, 03 Jul 2020 16:13:47 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v8 04/10] qcow2_format.py: dump bitmap flags in human readable
+ way.
+Date: Fri,  3 Jul 2020 16:13:44 +0300
+Message-Id: <1593782030-521984-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 09:13:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,50 +64,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 at 14:39, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
->
-> Avoid setting 'sect' variable just once (its name is confuse
-> anyway). Directly set 'sd->wpgrps_size'. Special case when
-> size is zero.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/sd/sd.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 078b0e81ee..e5adcc8055 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -556,8 +556,6 @@ static void sd_reset(DeviceState *dev)
->      }
->      size =3D sect << 9;
->
-> -    sect =3D sd_addr_to_wpnum(size) + 1;
-> -
->      sd->size =3D size;
->      sd->state =3D sd_idle_state;
->      sd->rca =3D 0x0000;
-> @@ -570,7 +568,11 @@ static void sd_reset(DeviceState *dev)
->
->      g_free(sd->wp_groups);
->      sd->wp_switch =3D sd->blk ? blk_is_read_only(sd->blk) : false;
-> -    sd->wpgrps_size =3D sect;
-> +    if (sd->size) {
-> +        sd->wpgrps_size =3D sd_addr_to_wpnum(sd, sd->size) + 1;
-> +    } else {
-> +        sd->wpgrps_size =3D 1;
-> +    }
+Introduce the class BitmapFlags that parses a bitmap flags mask.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/qcow2_format.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-thanks
--- PMM
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index 1435e34..d8c058d 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -40,6 +40,22 @@ class Flags64(Qcow2Field):
+         return str(bits)
+ 
+ 
++class BitmapFlags(Qcow2Field):
++
++    flags = {
++        0x1: 'in-use',
++        0x2: 'auto'
++    }
++
++    def __str__(self):
++        bits = []
++        for bit in range(64):
++            flag = self.value & (1 << bit)
++            if flag:
++                bits.append(self.flags.get(flag, '{:#x}'.format(flag)))
++        return f'{self.value:#x} ({bits})'
++
++
+ class Enum(Qcow2Field):
+ 
+     def __str__(self):
+-- 
+1.8.3.1
+
 
