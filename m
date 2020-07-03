@@ -2,81 +2,102 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE783C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E62C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E199208E4
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 860A720870
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:23:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THZfXH+/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E199208E4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcpyqPcT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 860A720870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrORZ-000228-TV
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:21:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60084)
+	id 1jrOTh-00061d-Hs
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:23:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jrO8q-00015h-Eo
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:02:21 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48150
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jrOGx-0008DO-4H
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:10:43 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22315
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jrO8n-0008IM-U6
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:02:19 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jrOGv-0002GZ-AI
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:10:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593792136;
+ s=mimecast20190719; t=1593792640;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QBCgCDInfFECHeq4DAuxkUBflOMbLuBSh4FmjCvUoKI=;
- b=THZfXH+/Iv1CFT5mib8msvPwGiE3a1i2U03SSDUOG/AiD3JMwg+0s36IsDlH1epTVrP5Ed
- WaKwJbPiGQitHLpRn/XBAQImomTrSOuERwlLSaJLcof+4w3ugeNZqa1aJMk0hjET+HI6zb
- FMNTUCz7IGIoQMldVAOoGBbZLpOjYXc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-NtVNTqzKOrS_wevjcJmepw-1; Fri, 03 Jul 2020 12:02:14 -0400
-X-MC-Unique: NtVNTqzKOrS_wevjcJmepw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CDEB186A206;
- Fri,  3 Jul 2020 16:02:12 +0000 (UTC)
-Received: from work-vm (ovpn-114-207.ams2.redhat.com [10.36.114.207])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADC389CA0;
- Fri,  3 Jul 2020 16:02:10 +0000 (UTC)
-Date: Fri, 3 Jul 2020 17:02:08 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: James Bottomley <jejb@linux.ibm.com>
-Subject: Re: [PATCH v2] SEV: QMP support for Inject-Launch-Secret
-Message-ID: <20200703160208.GG6641@work-vm>
-References: <20200702194213.23272-1-tobin@linux.vnet.ibm.com>
- <20200703110929.GB6641@work-vm>
- <1593791654.3972.26.camel@linux.ibm.com>
+ bh=iEErfAAUmSWz7XxBKfMjIbETjeIrgJHwvgsvYUQtikY=;
+ b=gcpyqPcTDKC53fDM5e0ssYMriPlcvtU9MDqGBWjKDanyrcVMgIR9lvE+QeCfQ03vkAuqFC
+ PDNaQBA3K+mIqxl71nYLfGihdsehhGm2hu4kUL/RgDLO0yK4aikER/70kehNh4et3M2Z/z
+ jUW/t2ghNLIKtl0zGpvWWVOJmcSYwyk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-s7FVdhplOguMxRezv524rA-1; Fri, 03 Jul 2020 12:10:39 -0400
+X-MC-Unique: s7FVdhplOguMxRezv524rA-1
+Received: by mail-wr1-f72.google.com with SMTP id j16so26768216wrw.3
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 09:10:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iEErfAAUmSWz7XxBKfMjIbETjeIrgJHwvgsvYUQtikY=;
+ b=Fg6THf7hRIl5JYrma2X1+voXsSeecrnk4AvtgBj7/xxHXvFIX33Cx/G4knSf8RPCfY
+ JLllyp8ex+5sLKU4/XtfL34L0OPKbfUiTlcE/JqsfLRFKab+acAn8qSTHBFOa7F0xJC5
+ vrm+V129bC5NUZtuL35wWZnEOVLtDbEa5obc35681AVvV4IZZpYcwQSeNpdl5kSTz8Nm
+ Ja+u6ZTmXZpo7dL06sGL3sPOd84MFQYabptAXliG0ro3Czy5R6S1u4pwUJnzTovh9PQT
+ Hbo5MRgG/PDUd8s28KbjJe/rcERx97sdLeFV5Afo2w0BnINUAUedGycUOZuihK9HAxbL
+ Ukag==
+X-Gm-Message-State: AOAM533FU8ozy45P3HDlR8u6WZOO5WIOBGGJ+8dCIge0lPOYHlpBK5w1
+ BjxXjD7Lurx8a/sy1VdQT+M6tqUScLCsvHIgNeTzzgSN9dUKCHtHrF1mLVoRT0b77sSxnts3yDI
+ bJwm4KZDUuYs1oc4=
+X-Received: by 2002:adf:afc3:: with SMTP id y3mr39681190wrd.277.1593792637814; 
+ Fri, 03 Jul 2020 09:10:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxAsHS28gtPjF7hu4kzjD3hdCBuvWM2/67JaTaA2T591inLvcv28B39mbGeRwVNu/VRE3ik6A==
+X-Received: by 2002:adf:afc3:: with SMTP id y3mr39681177wrd.277.1593792637637; 
+ Fri, 03 Jul 2020 09:10:37 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5cf9:fc14:deb7:51fc?
+ ([2001:b07:6468:f312:5cf9:fc14:deb7:51fc])
+ by smtp.gmail.com with ESMTPSA id h23sm10070wmb.3.2020.07.03.09.10.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 03 Jul 2020 09:10:37 -0700 (PDT)
+Subject: Re: [PATCH 2/2] target-i386: sev: fail query-sev-capabilities if QEMU
+ cannot use SEV
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200630154521.552874-1-pbonzini@redhat.com>
+ <20200630154521.552874-3-pbonzini@redhat.com> <20200703160841.GA6680@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d009abf4-6a78-bef2-5789-e51b7ec815e2@redhat.com>
+Date: Fri, 3 Jul 2020 18:10:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1593791654.3972.26.camel@linux.ibm.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200703160841.GA6680@work-vm>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,45 +118,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, tobin@ibm.com,
- qemu-devel@nongnu.org, Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>,
- pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* James Bottomley (jejb@linux.ibm.com) wrote:
-> On Fri, 2020-07-03 at 12:11 +0100, Dr. David Alan Gilbert wrote:
-> > * Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
-> [...]
-> > > +    input.trans_uaddr = (uint64_t)data;
-> > > +    input.trans_len = data_sz;
-> > > +
-> > > +    input.guest_uaddr = (uint64_t)hva;
-> > 
-> > Thanks for changing these; although it fails a 32bit build (which is
-> > probably mostly pointless for SEV, but it fails the build rather than
-> > building it out). The easy fix here seems to be:
-> >    (uint64_t)(uintptr_t)
-> 
-> That's a pointer width issue.  The recommended way to communicate to
-> the compiler that we really want to cast a 32 bit pointer to a 64 bit
-> value is actually to cast to unsigned long before casting to pointer,
-> so
-> 
-> (uint64_t)(unsigned long)hva
-> 
-> Many other things work, of course, but if you follow the recommendation
-> you (hopefully) don't trip future compiler warnings.
+On 03/07/20 18:08, Dr. David Alan Gilbert wrote:
+>> +        error_setg(errp, "KVM not enabled\n");
+>> +        return NULL;
+>> +    }
+>> +    if (kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, NULL) < 0) {
+>> +        error_setg(errp, "SEV is not enabled\n");
+> Can you make that 'SEV is not enabled in KVM' so it's obvious
+> that it's the KVM side and not the qemu side (like you've
+> done in the previous patch).
 
-OK, fair enough
-(Out of curiosity can you explain why unsigned long not uintptr_t?)
 
-Dave
+Sure.
 
-> James
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
 
 
