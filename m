@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA0B6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2566C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75B1E20748
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:21:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB0F4207E8
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:25:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPh/qorq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B1E20748
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m9M+fZsv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0F4207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrAOg-0004WL-PQ
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 21:21:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50768)
+	id 1jrASg-000603-0R
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 21:25:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jrAMW-00015n-DY; Thu, 02 Jul 2020 21:19:32 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:34228)
+ id 1jrAS1-0005Rp-QW; Thu, 02 Jul 2020 21:25:13 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:44862)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jrAMU-0005Mv-UY; Thu, 02 Jul 2020 21:19:32 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id l19so1832445ybl.1;
- Thu, 02 Jul 2020 18:19:30 -0700 (PDT)
+ id 1jrAS0-00067F-1U; Thu, 02 Jul 2020 21:25:13 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id p204so10884734ybc.11;
+ Thu, 02 Jul 2020 18:25:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GJYRLJU1nGbebkdEaZI1GrtzuGIGfHc8B6xnBzBoyeE=;
- b=CPh/qorq3t+omt0z6ifBqdnEy2sc8a7hBFoXoEvOLxf3i5u0YkDopB6TWZnxPmJIBZ
- wAATUQqc6ioNdaqIvU0fiATD8vdXANgfYh799pK+9a9u8bUy9h1yjoOnXXnXgg35F3Wr
- 4rgwPK2raCzcf0CAerMwvZxlnYd3JoI9B8TzEqdCP8qMnNd6ndoD+U9iOWhV5/dVZMcw
- kwJIMWo1XT2kxU3EtE+unCCucuKQ2OjItnNM76tiOZPBIgm8kE6q+pcutiO5MgKoZCzy
- ortVt8y2MrbiRsDj23Bj1V5piKrz5A7NDQpWyIaec2L6Tw53j/PHT0UFWmgSGiLI5G23
- mjfA==
+ :cc; bh=IgVCY6njpbs+8brTd4/i59ExrVWYmfVlgdFpyCSHicQ=;
+ b=m9M+fZsvJPOIt/cpWrvS1n+MREQ3nUR+r//BWfSTq1uhOhhMCjSKicFBKnGcPSF8JF
+ yQwCWUbniJuB9JCp2oqcik5VrcazRoVJAZoBrVD/HFEeXQiU1GDtwn7P3jbbwfyOCh0z
+ PWIIKFCXKQBT9Ly4WozN7JAD9UeDk3XLcSrQxbkFFJiNczPqbKDExKBP0joRknQe9pkd
+ qxUDak9MX8NgZaUISRcrxnQhfOyvSnfNJl4h0Qi3gfdsLUm5oLimf02JExkmXYUmklzR
+ qY/fZn96ruBYDBDO8wARfVlATU7fQ/TezWmHx8kp5I0qKR4qnjIMohQzGaltQyn86HDU
+ sJYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=GJYRLJU1nGbebkdEaZI1GrtzuGIGfHc8B6xnBzBoyeE=;
- b=Xni0kd+T8yv6sj6hA34fuVAnDcs89oScc036TIC50sbf8VnyDw0/htyMfPqQ3lEksb
- UU4saS316QGoXKF0c4+5x3g6t45fd7w0BI05WRVWDI1QO7Rm+gywwzNDOY7ycS7bGm+A
- 930sZSbETkEarlNwVu9epY2zwqNHvVecuHcOxkmHz9XuMhAGMOeqmINmpOT+ItJpTsgR
- 6JBGhzGJA2VjEdGm1M2OrDK1hf39l14Kxl2MrET7gvtKZREBiRVEQnFtU3+FQVEQJhmN
- ZF2w4GGHGpgxR3HTe7qHM3CT1tFDcrAYQKn8chwyNng/CMO/SOy/ozh2L8xdRXYinhdG
- L4nw==
-X-Gm-Message-State: AOAM533NPS6Fmck8hB7y3tvVekN237lLE0txRPYa+yEZhsgt9SWDiwmx
- FHNFUe6h6YB0MAhx6gkpLfzFaecnpAuzzaXBclk=
-X-Google-Smtp-Source: ABdhPJwPk+8MN2r+y8rlxM47hHb1B0YViRYGUUEwABz65QU9F5CJX3R49M+3JMiXMPWbmAK4txaC/EzjkwlBy4lE/Zg=
-X-Received: by 2002:a25:800c:: with SMTP id m12mr56637950ybk.239.1593739169906; 
- Thu, 02 Jul 2020 18:19:29 -0700 (PDT)
+ bh=IgVCY6njpbs+8brTd4/i59ExrVWYmfVlgdFpyCSHicQ=;
+ b=QMDpAdKUCj/tbza0NbhXdEYC8pJrJJA1GMyNaykXpYKmsPfxbnTCTXB3nlO747JwT+
+ 7p8bEYyjZyKc50tA7BgwaUOWeYNtl9x7F8ruEHHo4BOQm7J8zmnyUCMgbC5OPu8JQEQ5
+ eNHQMmqR6qMDzMonmoJlv1fEoua8yn/1fflbwkxOUUE0UO7cZiD/OOcKC4Wm7VHQnHS1
+ kgQ4Mzgnbj8fJmPyfHjkqG9cOv5A6LHPIgS73tO2R6JYAYgslcrikt241cqy0irckIdn
+ bESnujSZrq6gXsFt0r8KzkRXOFrVF/KIKdkAQDydm6EnxT0LoYg9EPKKI293CTMYlMzw
+ L3Xw==
+X-Gm-Message-State: AOAM532nDoxSqaKGPXhay76ODogNKUVj1NK5i0JpFJZJDANw4ik4Bcj/
+ 1WU97mR+77MhuGrQWQZu8XltrIObZSsIpghqQPk=
+X-Google-Smtp-Source: ABdhPJycpbc2If/GpgyWIbZPhpD4Wyl1HksviNoBPJcD71WCgJqvFL5VKN0mdZ130uRhLDG4gaozMvgXHq3p2TxhkSo=
+X-Received: by 2002:a25:afca:: with SMTP id d10mr51009157ybj.517.1593739510148; 
+ Thu, 02 Jul 2020 18:25:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200701183949.398134-1-atish.patra@wdc.com>
- <20200701183949.398134-5-atish.patra@wdc.com>
-In-Reply-To: <20200701183949.398134-5-atish.patra@wdc.com>
+References: <cover.1593547870.git.alistair.francis@wdc.com>
+ <ea4f280e6f77e734c8e555e3c98d10085ce9f5b6.1593547870.git.alistair.francis@wdc.com>
+In-Reply-To: <ea4f280e6f77e734c8e555e3c98d10085ce9f5b6.1593547870.git.alistair.francis@wdc.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 3 Jul 2020 09:19:18 +0800
-Message-ID: <CAEUhbmXea4nf9pq-6bumtK-rE8b0B7EF-agptnX5T_Hpm5EfgA@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] RISC-V: Support 64 bit start address
-To: Atish Patra <atish.patra@wdc.com>
+Date: Fri, 3 Jul 2020 09:24:59 +0800
+Message-ID: <CAEUhbmVsQX+es-xw5Omj+-dsU1Km2kKNAZa_NJ6PipE4ZAEucA@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] target/riscv: Regen floating point rounding mode
+ in dynamic mode
+To: Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -92,31 +93,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>,
- Alistair Francis <Alistair.Francis@wdc.com>
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 2, 2020 at 2:39 AM Atish Patra <atish.patra@wdc.com> wrote:
+On Wed, Jul 1, 2020 at 4:23 AM Alistair Francis
+<alistair.francis@wdc.com> wrote:
 >
-> Even though the start address in ROM code is declared as a 64 bit address
-> for RV64, it can't be used as upper bits are set to zero in ROM code.
+> When a guest specificies the the rounding mode should be dynamic 0b111
+> then we want to re-caclulate the rounding mode on each instruction. The
+> gen_helper_set_rounding_mode() function will correctly check the
+> rounding mode and handle a dynamic rounding, we just need to make sure
+> it's always called if dynamic rounding is selected.
 >
-> Update the ROM code correctly to reflect the 64bit value.
->
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> Fixes: 1885350 ("RISCV dynamic rounding mode is not behaving correctly")
+
+I can't find this commit id.
+
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/riscv/boot.c     | 6 +++++-
->  hw/riscv/sifive_u.c | 6 +++++-
->  2 files changed, 10 insertions(+), 2 deletions(-)
+>  target/riscv/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
-Tested-by: Bin Meng <bin.meng@windriver.com>
+Regards,
+Bin
 
