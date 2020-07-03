@@ -2,73 +2,134 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F98C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53093C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A84562084C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:33:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A84562084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0D2C7206A1
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:33:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jGQm9dy0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D2C7206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrI4P-00027a-R8
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:33:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38674)
+	id 1jrI4d-0002gg-90
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:33:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jrI2Y-0007A0-KM
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:31:26 -0400
-Resent-Date: Fri, 03 Jul 2020 05:31:26 -0400
-Resent-Message-Id: <E1jrI2Y-0007A0-KM@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21389)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jrHqR-00059P-27
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:18:55 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41374
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jrI2U-0002og-CK
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:31:26 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593768673; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=nU1b47RWIr6E6OfNpYydgnrJbRi2nP/pZgL5sZVryzQ5ATE2TKG0fF6oThznzoLVDZVvXsnsDaq47G+K7wPvr6M60zybnaBbhjJb4rqqoql605+ptYoknWuobDUQkMONTLV4awSG3zW+oZfXz/uBXq8K/CiqEa1hAOt260JSJgI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593768673;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=FwezRKZzvsx2Lj4iNF9Df/k5KUZHYmfanKrnANya6yk=; 
- b=isyNz5ZvS6rWZASSpESPXvyE9zzeTQ1NoocU7Lr/HQR4EgL2H1bwR/qgb4nZdcRjHd+Xt+CvKwBBjJM1UyPF2yEDt69nu67kZWwm64NgX23YxIqbBmhOmv+RJkXCXuhZ9EG0ZqyAnTSup8VktrkRnKOb3YALc0MHtqbRK0/bMBU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593768670792961.3588295007256;
- Fri, 3 Jul 2020 02:31:10 -0700 (PDT)
-Message-ID: <159376866972.11379.9245521031151558627@d1fd068a5071>
-Subject: Re: [PULL 00/41] virtio,acpi: features, fixes, cleanups.
-In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jrHqN-0000Fl-Tc
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:18:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593767930;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Lh8CMVtk48iFtCSbon+RDBTOxYWllYUQ43Wb9Owi9LE=;
+ b=jGQm9dy0l/h+0iiCeoEvVIyDgT53m5kMJyK4igjstrxTq7mlcy5kSTS/8BbSSh6jydCOKI
+ wCdMYubylmj3wKN5SorNM3PH/QUzg7S4JJSw1tVidkVNx+zdMu/LU9jt/HHu3/T2ek7fWT
+ i/9jIH3TwvhW8QaYFlJnCRy7oRn6JYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-ON1tPJnOMZG6fOIW5SqYTQ-1; Fri, 03 Jul 2020 05:18:48 -0400
+X-MC-Unique: ON1tPJnOMZG6fOIW5SqYTQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72ABF800C60;
+ Fri,  3 Jul 2020 09:18:47 +0000 (UTC)
+Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0903E7BD40;
+ Fri,  3 Jul 2020 09:18:42 +0000 (UTC)
+Subject: Re: [PULL 13/41] virtio-mem: Paravirtualized memory hot(un)plug
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+References: <20200703090252.368694-1-mst@redhat.com>
+ <20200703090252.368694-14-mst@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <3691367f-9b31-dfa2-f180-823b1f080c09@redhat.com>
+Date: Fri, 3 Jul 2020 11:18:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mst@redhat.com
-Date: Fri, 3 Jul 2020 02:31:10 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 05:31:20
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200703090252.368694-14-mst@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,164 +142,350 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwMzA5MDI1Mi4zNjg2
-OTQtMS1tc3RAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvNDFdIHZpcnRpbyxhY3BpOiBmZWF0dXJlcywgZml4
-ZXMsIGNsZWFudXBzLgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA3MDMwOTAyNTIuMzY4
-Njk0LTEtbXN0QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
-Z10gICAgICAgICBwYXRjaGV3LzIwMjAwNzAzMDkwMjUyLjM2ODY5NC0xLW1zdEByZWRoYXQuY29t
-IC0+IHBhdGNoZXcvMjAyMDA3MDMwOTAyNTIuMzY4Njk0LTEtbXN0QHJlZGhhdC5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMzI2ZjRjIHZob3N0LXZkcGE6IGludHJvZHVjZSB2
-aG9zdC12ZHBhIG5ldCBjbGllbnQKNWI3OTUwNiB2aG9zdC12ZHBhOiBpbnRyb2R1Y2Ugdmhvc3Qt
-dmRwYSBiYWNrZW5kCjM0ZTNkMzIgdmhvc3RfbmV0OiBpbnRyb2R1Y2Ugc2V0X2NvbmZpZyAmIGdl
-dF9jb25maWcKNDVlMTc1NSB2aG9zdDogaW1wbGVtZW50IHZob3N0X2ZvcmNlX2lvbW11IG1ldGhv
-ZAo1MjFkZGE1IHZob3N0OiBpbnRyb2R1Y2UgbmV3IFZob3N0T3BzIHZob3N0X2ZvcmNlX2lvbW11
-CmNkZTNmNGQgdmhvc3Q6IGltcGxlbWVudCB2aG9zdF92cV9nZXRfYWRkciBtZXRob2QKOWNhNzc3
-NyB2aG9zdDogaW50cm9kdWNlIG5ldyBWaG9zdE9wcyB2aG9zdF92cV9nZXRfYWRkcgo0NjM2NWVm
-IHZob3N0OiBpbXBsZW1lbnQgdmhvc3RfZGV2X3N0YXJ0IG1ldGhvZAoyNThlZjQwIHZob3N0OiBp
-bnRyb2R1Y2UgbmV3IFZob3N0T3BzIHZob3N0X2Rldl9zdGFydAo1OTVmZWU4IHZob3N0OiBjaGVj
-ayB0aGUgZXhpc3RlbmNlIG9mIHZob3N0X3NldF9pb3RsYl9jYWxsYmFjawo2ZDMxNjExIHZpcnRp
-by1wY2k6IGltcGxlbWVudCBxdWV1ZV9lbmFibGVkIG1ldGhvZAo5ZDdjYzdlIHZpcnRpby1idXM6
-IGludHJvZHVjZSBxdWV1ZV9lbmFibGVkIG1ldGhvZAo2M2UxODUyIHZob3N0X25ldDogdXNlIHRo
-ZSBmdW5jdGlvbiBxZW11X2dldF9wZWVyCmMxNGE2M2IwIG5ldDogaW50cm9kdWNlIHFlbXVfZ2V0
-X3BlZXIKYWUwMjU5OCBNQUlOVEFJTkVSUzogYWRkIFZULWQgZW50cnkKZTNkYTI2ZCBkb2NzOiB2
-aG9zdC11c2VyOiBhZGQgVmlydGlvIHN0YXR1cyBwcm90b2NvbCBmZWF0dXJlCjExZTY5YmUgdGVz
-dHMvYWNwaTogcmVtb3ZlIHN0YWxlIGFsbG93ZWQgdGFibGVzCjU0OTVkZDIgbnVtYTogQXV0by1l
-bmFibGUgTlVNQSB3aGVuIGFueSBtZW1vcnkgZGV2aWNlcyBhcmUgcG9zc2libGUKMDNiYmYxYyB2
-aXJ0aW8tbWVtOiBFeGNsdWRlIHVucGx1Z2dlZCBtZW1vcnkgZHVyaW5nIG1pZ3JhdGlvbgpkMDZj
-ODM1IHZpcnRpby1tZW06IEFkZCB0cmFjZSBldmVudHMKOGUyN2FlZiB2aXJ0aW8tbWVtOiBNaWdy
-YXRpb24gc2FuaXR5IGNoZWNrcwpjOTZlYTFhIHZpcnRpby1wY2k6IFNlbmQgcWFwaSBldmVudHMg
-d2hlbiB0aGUgdmlydGlvLW1lbSBzaXplIGNoYW5nZXMKYjM2YjM3ZCB2aXJ0aW8tbWVtOiBBbGxv
-dyBub3RpZmllcnMgZm9yIHNpemUgY2hhbmdlcwpkYTA4ZjUxIHBjOiBTdXBwb3J0IGZvciB2aXJ0
-aW8tbWVtLXBjaQoxMThmZjk2IG51bWE6IEhhbmRsZSB2aXJ0aW8tbWVtIGluIE5VTUEgc3RhdHMK
-MWJiZGY2ZCBobXA6IEhhbmRsZSB2aXJ0aW8tbWVtIHdoZW4gcHJpbnRpbmcgbWVtb3J5IGRldmlj
-ZSBpbmZvCjhlNDZiNjEgTUFJTlRBSU5FUlM6IEFkZCBteXNlbGYgYXMgdmlydGlvLW1lbSBtYWlu
-dGFpbmVyCjJiNzRkNjMgdmlydGlvLXBjaTogUHJveHkgZm9yIHZpcnRpby1tZW0KOTYxZWRjMiB2
-aXJ0aW8tbWVtOiBQYXJhdmlydHVhbGl6ZWQgbWVtb3J5IGhvdCh1bilwbHVnCjRmMTVhMjkgbWln
-cmF0aW9uL2NvbG86IFVzZSByYW1fYmxvY2tfZGlzY2FyZF9kaXNhYmxlKCkKYmVkZDE1ZCBtaWdy
-YXRpb24vcmRtYTogVXNlIHJhbV9ibG9ja19kaXNjYXJkX2Rpc2FibGUoKQoxNzBiMjFmIHRhcmdl
-dC9pMzg2OiBzZXY6IFVzZSByYW1fYmxvY2tfZGlzY2FyZF9kaXNhYmxlKCkKMDRiMTI5NyB2aXJ0
-aW8tYmFsbG9vbjogUmlwIG91dCBxZW11X2JhbGxvb25faW5oaWJpdCgpCjAxNjE5NWEgczM5MHgv
-cHY6IENvbnZlcnQgdG8gcmFtX2Jsb2NrX2Rpc2NhcmRfZGlzYWJsZSgpCjExNzcxMmQgYWNjZWwv
-a3ZtOiBDb252ZXJ0IHRvIHJhbV9ibG9ja19kaXNjYXJkX2Rpc2FibGUoKQo3YTdmZjMzIHZmaW86
-IENvbnZlcnQgdG8gcmFtX2Jsb2NrX2Rpc2NhcmRfZGlzYWJsZSgpCmU0MWJlZGQgZXhlYzogSW50
-cm9kdWNlIHJhbV9ibG9ja19kaXNjYXJkXyhkaXNhYmxlfHJlcXVpcmUpKCkKN2JmMmY4YiBwYzog
-U3VwcG9ydCBjb2xkcGx1Z2dpbmcgb2YgdmlydGlvLXBtZW0tcGNpIGRldmljZXMgb24gYWxsIGJ1
-c2VzCmFiZmYxNjQgdmlydGlvLWJhbGxvb246IGFsd2F5cyBpbmRpY2F0ZSBTX0RPTkUgd2hlbiBt
-aWdyYXRpb24gZmFpbHMKY2JiNWEyYyBSZXZlcnQgInRlc3RzL21pZ3JhdGlvbjogUmVkdWNlIGF1
-dG9jb252ZXJnZSBpbml0aWFsIGJhbmR3aWR0aCIKMmY5ZDZjNSB0ZXN0czogZGlzYXNzZW1ibGUt
-YW1sLnNoOiBnZW5lcmF0ZSBBTUwgaW4gcmVhZGFibGUgZm9ybWF0Cgo9PT0gT1VUUFVUIEJFR0lO
-ID09PQoxLzQxIENoZWNraW5nIGNvbW1pdCAyZjlkNmM1YzhkNGYgKHRlc3RzOiBkaXNhc3NlbWJs
-ZS1hbWwuc2g6IGdlbmVyYXRlIEFNTCBpbiByZWFkYWJsZSBmb3JtYXQpCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzE2OiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMzMDogRklMRTogdGVzdHMvZGF0YS9hY3BpL2Rpc2Fzc2VtbGUtYW1sLnNoOjEwOgor
-ICAgICAgICBlY2hvICJVc2FnZTogLi90ZXN0cy9kYXRhL2FjcGkvZGlzYXNzZW1sZS1hbWwuc2gg
-Wy1vIDxvdXRwdXQtZGlyZWN0b3J5Pl0iCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzgxOiBGSUxFOiB0ZXN0cy9kYXRhL2FjcGkvcmVidWlsZC1leHBlY3RlZC1hbWwuc2g6Mzk6Citl
-Y2hvICJZb3UgY2FuIHVzZSAke1NSQ19QQVRIfS90ZXN0cy9kYXRhL2FjcGkvZGlzYXNzZW1sZS1h
-bWwuc2ggdG8gZGlzYXNzZW1ibGUgdGhlbSB0byBBU0wuIgoKdG90YWw6IDEgZXJyb3JzLCAyIHdh
-cm5pbmdzLCA1OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzQxIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgoyLzQxIENoZWNraW5nIGNvbW1pdCBjYmI1YTJjMTk4MzUgKFJldmVydCAidGVzdHMv
-bWlncmF0aW9uOiBSZWR1Y2UgYXV0b2NvbnZlcmdlIGluaXRpYWwgYmFuZHdpZHRoIikKMy80MSBD
-aGVja2luZyBjb21taXQgYWJmZjE2NDdmYTM2ICh2aXJ0aW8tYmFsbG9vbjogYWx3YXlzIGluZGlj
-YXRlIFNfRE9ORSB3aGVuIG1pZ3JhdGlvbiBmYWlscykKNC80MSBDaGVja2luZyBjb21taXQgN2Jm
-MmY4YmMyZGJlIChwYzogU3VwcG9ydCBjb2xkcGx1Z2dpbmcgb2YgdmlydGlvLXBtZW0tcGNpIGRl
-dmljZXMgb24gYWxsIGJ1c2VzKQo1LzQxIENoZWNraW5nIGNvbW1pdCBlNDFiZWRkNzg3NGIgKGV4
-ZWM6IEludHJvZHVjZSByYW1fYmxvY2tfZGlzY2FyZF8oZGlzYWJsZXxyZXF1aXJlKSgpKQo2LzQx
-IENoZWNraW5nIGNvbW1pdCA3YTdmZjMzMTdjZWMgKHZmaW86IENvbnZlcnQgdG8gcmFtX2Jsb2Nr
-X2Rpc2NhcmRfZGlzYWJsZSgpKQo3LzQxIENoZWNraW5nIGNvbW1pdCAxMTc3MTJkM2Y2MTEgKGFj
-Y2VsL2t2bTogQ29udmVydCB0byByYW1fYmxvY2tfZGlzY2FyZF9kaXNhYmxlKCkpCjgvNDEgQ2hl
-Y2tpbmcgY29tbWl0IDAxNjE5NWFiOTA0NSAoczM5MHgvcHY6IENvbnZlcnQgdG8gcmFtX2Jsb2Nr
-X2Rpc2NhcmRfZGlzYWJsZSgpKQo5LzQxIENoZWNraW5nIGNvbW1pdCAwNGIxMjk3OGIwYzggKHZp
-cnRpby1iYWxsb29uOiBSaXAgb3V0IHFlbXVfYmFsbG9vbl9pbmhpYml0KCkpCjEwLzQxIENoZWNr
-aW5nIGNvbW1pdCAxNzBiMjFmMjI4NDggKHRhcmdldC9pMzg2OiBzZXY6IFVzZSByYW1fYmxvY2tf
-ZGlzY2FyZF9kaXNhYmxlKCkpCjExLzQxIENoZWNraW5nIGNvbW1pdCBiZWRkMTVkMzcwMjggKG1p
-Z3JhdGlvbi9yZG1hOiBVc2UgcmFtX2Jsb2NrX2Rpc2NhcmRfZGlzYWJsZSgpKQoxMi80MSBDaGVj
-a2luZyBjb21taXQgNGYxNWEyOTMwY2Q0IChtaWdyYXRpb24vY29sbzogVXNlIHJhbV9ibG9ja19k
-aXNjYXJkX2Rpc2FibGUoKSkKMTMvNDEgQ2hlY2tpbmcgY29tbWl0IDk2MWVkYzI1ZDA2ZCAodmly
-dGlvLW1lbTogUGFyYXZpcnR1YWxpemVkIG1lbW9yeSBob3QodW4pcGx1ZykKV0FSTklORzogYWRk
-ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
-aW5nPwojMTUwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBz
-cGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMyMDc6IEZJTEU6IGh3L3ZpcnRpby92
-aXJ0aW8tbWVtLmM6NTM6CisjaWYgZGVmaW5lZChfX3g4Nl82NF9fKQoKdG90YWw6IDAgZXJyb3Jz
-LCAyIHdhcm5pbmdzLCA4NzkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTMvNDEgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KMTQvNDEgQ2hlY2tpbmcgY29tbWl0IDJiNzRkNjMwZWUyMyAodmlydGlv
-LXBjaTogUHJveHkgZm9yIHZpcnRpby1tZW0pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
-dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM0OiAKbmV3IGZp
-bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTc2IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDE0LzQxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzQxIENoZWNr
-aW5nIGNvbW1pdCA4ZTQ2YjYxZWZlNzUgKE1BSU5UQUlORVJTOiBBZGQgbXlzZWxmIGFzIHZpcnRp
-by1tZW0gbWFpbnRhaW5lcikKMTYvNDEgQ2hlY2tpbmcgY29tbWl0IDFiYmRmNmQ4YjZlNyAoaG1w
-OiBIYW5kbGUgdmlydGlvLW1lbSB3aGVuIHByaW50aW5nIG1lbW9yeSBkZXZpY2UgaW5mbykKMTcv
-NDEgQ2hlY2tpbmcgY29tbWl0IDExOGZmOTZiYzFjOSAobnVtYTogSGFuZGxlIHZpcnRpby1tZW0g
-aW4gTlVNQSBzdGF0cykKMTgvNDEgQ2hlY2tpbmcgY29tbWl0IGRhMDhmNTEyNjZkNyAocGM6IFN1
-cHBvcnQgZm9yIHZpcnRpby1tZW0tcGNpKQoxOS80MSBDaGVja2luZyBjb21taXQgYjM2YjM3ZDdh
-MDdjICh2aXJ0aW8tbWVtOiBBbGxvdyBub3RpZmllcnMgZm9yIHNpemUgY2hhbmdlcykKMjAvNDEg
-Q2hlY2tpbmcgY29tbWl0IGM5NmVhMWE0ZWNlNSAodmlydGlvLXBjaTogU2VuZCBxYXBpIGV2ZW50
-cyB3aGVuIHRoZSB2aXJ0aW8tbWVtIHNpemUgY2hhbmdlcykKMjEvNDEgQ2hlY2tpbmcgY29tbWl0
-IDhlMjdhZWY5NTc0OSAodmlydGlvLW1lbTogTWlncmF0aW9uIHNhbml0eSBjaGVja3MpCjIyLzQx
-IENoZWNraW5nIGNvbW1pdCBkMDZjODM1YjRhNWEgKHZpcnRpby1tZW06IEFkZCB0cmFjZSBldmVu
-dHMpCjIzLzQxIENoZWNraW5nIGNvbW1pdCAwM2JiZjFjMDQyOGUgKHZpcnRpby1tZW06IEV4Y2x1
-ZGUgdW5wbHVnZ2VkIG1lbW9yeSBkdXJpbmcgbWlncmF0aW9uKQoyNC80MSBDaGVja2luZyBjb21t
-aXQgNTQ5NWRkMjRjNTlmIChudW1hOiBBdXRvLWVuYWJsZSBOVU1BIHdoZW4gYW55IG1lbW9yeSBk
-ZXZpY2VzIGFyZSBwb3NzaWJsZSkKMjUvNDEgQ2hlY2tpbmcgY29tbWl0IDExZTY5YmVmZTgzMyAo
-dGVzdHMvYWNwaTogcmVtb3ZlIHN0YWxlIGFsbG93ZWQgdGFibGVzKQoyNi80MSBDaGVja2luZyBj
-b21taXQgZTNkYTI2ZDU0YmY5IChkb2NzOiB2aG9zdC11c2VyOiBhZGQgVmlydGlvIHN0YXR1cyBw
-cm90b2NvbCBmZWF0dXJlKQoyNy80MSBDaGVja2luZyBjb21taXQgYWUwMjU5OGNkNzVmIChNQUlO
-VEFJTkVSUzogYWRkIFZULWQgZW50cnkpCjI4LzQxIENoZWNraW5nIGNvbW1pdCBjMTRhNjNiMDBk
-NjQgKG5ldDogaW50cm9kdWNlIHFlbXVfZ2V0X3BlZXIpCjI5LzQxIENoZWNraW5nIGNvbW1pdCA2
-M2UxODUyNjRmMWMgKHZob3N0X25ldDogdXNlIHRoZSBmdW5jdGlvbiBxZW11X2dldF9wZWVyKQoz
-MC80MSBDaGVja2luZyBjb21taXQgOWQ3Y2M3ZWFiYjlhICh2aXJ0aW8tYnVzOiBpbnRyb2R1Y2Ug
-cXVldWVfZW5hYmxlZCBtZXRob2QpCjMxLzQxIENoZWNraW5nIGNvbW1pdCA2ZDMxNjExZmNiZGUg
-KHZpcnRpby1wY2k6IGltcGxlbWVudCBxdWV1ZV9lbmFibGVkIG1ldGhvZCkKMzIvNDEgQ2hlY2tp
-bmcgY29tbWl0IDU5NWZlZThhYzEwYyAodmhvc3Q6IGNoZWNrIHRoZSBleGlzdGVuY2Ugb2Ygdmhv
-c3Rfc2V0X2lvdGxiX2NhbGxiYWNrKQozMy80MSBDaGVja2luZyBjb21taXQgMjU4ZWY0MGNmNzYw
-ICh2aG9zdDogaW50cm9kdWNlIG5ldyBWaG9zdE9wcyB2aG9zdF9kZXZfc3RhcnQpCjM0LzQxIENo
-ZWNraW5nIGNvbW1pdCA0NjM2NWVmNzc0ZjYgKHZob3N0OiBpbXBsZW1lbnQgdmhvc3RfZGV2X3N0
-YXJ0IG1ldGhvZCkKMzUvNDEgQ2hlY2tpbmcgY29tbWl0IDljYTc3Nzc4NThiYyAodmhvc3Q6IGlu
-dHJvZHVjZSBuZXcgVmhvc3RPcHMgdmhvc3RfdnFfZ2V0X2FkZHIpCjM2LzQxIENoZWNraW5nIGNv
-bW1pdCBjZGUzZjRkMzBhNTcgKHZob3N0OiBpbXBsZW1lbnQgdmhvc3RfdnFfZ2V0X2FkZHIgbWV0
-aG9kKQozNy80MSBDaGVja2luZyBjb21taXQgNTIxZGRhNWQ1NDJiICh2aG9zdDogaW50cm9kdWNl
-IG5ldyBWaG9zdE9wcyB2aG9zdF9mb3JjZV9pb21tdSkKMzgvNDEgQ2hlY2tpbmcgY29tbWl0IDQ1
-ZTE3NTUzMzk0YyAodmhvc3Q6IGltcGxlbWVudCB2aG9zdF9mb3JjZV9pb21tdSBtZXRob2QpCjM5
-LzQxIENoZWNraW5nIGNvbW1pdCAzNGUzZDMyM2FmYTQgKHZob3N0X25ldDogaW50cm9kdWNlIHNl
-dF9jb25maWcgJiBnZXRfY29uZmlnKQo0MC80MSBDaGVja2luZyBjb21taXQgNWI3OTUwNjZlMTAx
-ICh2aG9zdC12ZHBhOiBpbnRyb2R1Y2Ugdmhvc3QtdmRwYSBiYWNrZW5kKQpXQVJOSU5HOiBhZGRl
-ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
-bmc/CiMxMTQ6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
-bmdzLCA3NTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNDAvNDEgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KNDEvNDEgQ2hlY2tpbmcgY29tbWl0IGQzMjZmNGNhOTg1ZiAodmhvc3QtdmRwYTogaW50
-cm9kdWNlIHZob3N0LXZkcGEgbmV0IGNsaWVudCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjI6IApuZXcg
-ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMjEgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggNDEvNDEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3MDMwOTAyNTIu
-MzY4Njk0LTEtbXN0QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On 03.07.20 11:04, Michael S. Tsirkin wrote:
+> From: David Hildenbrand <david@redhat.com>
+> 
+> This is the very basic/initial version of virtio-mem. An introduction to
+> virtio-mem can be found in the Linux kernel driver [1]. While it can be
+> used in the current state for hotplug of a smaller amount of memory, it
+> will heavily benefit from resizeable memory regions in the future.
+> 
+> Each virtio-mem device manages a memory region (provided via a memory
+> backend). After requested by the hypervisor ("requested-size"), the
+> guest can try to plug/unplug blocks of memory within that region, in order
+> to reach the requested size. Initially, and after a reboot, all memory is
+> unplugged (except in special cases - reboot during postcopy).
+> 
+> The guest may only try to plug/unplug blocks of memory within the usable
+> region size. The usable region size is a little bigger than the
+> requested size, to give the device driver some flexibility. The usable
+> region size will only grow, except on reboots or when all memory is
+> requested to get unplugged. The guest can never plug more memory than
+> requested. Unplugged memory will get zapped/discarded, similar to in a
+> balloon device.
+> 
+> The block size is variable, however, it is always chosen in a way such that
+> THP splits are avoided (e.g., 2MB). The state of each block
+> (plugged/unplugged) is tracked in a bitmap.
+> 
+> As virtio-mem devices (e.g., virtio-mem-pci) will be memory devices, we now
+> expose "VirtioMEMDeviceInfo" via "query-memory-devices".
+> 
+> --------------------------------------------------------------------------
+> 
+> There are two important follow-up items that are in the works:
+> 1. Resizeable memory regions: Use resizeable allocations/RAM blocks to
+>    grow/shrink along with the usable region size. This avoids creating
+>    initially very big VMAs, RAM blocks, and KVM slots.
+> 2. Protection of unplugged memory: Make sure the gust cannot actually
+>    make use of unplugged memory.
+> 
+> Other follow-up items that are in the works:
+> 1. Exclude unplugged memory during migration (via precopy notifier).
+> 2. Handle remapping of memory.
+> 3. Support for other architectures.
+> 
+> --------------------------------------------------------------------------
+> 
+> Example usage (virtio-mem-pci is introduced in follow-up patches):
+> 
+> Start QEMU with two virtio-mem devices (one per NUMA node):
+>  $ qemu-system-x86_64 -m 4G,maxmem=20G \
+>   -smp sockets=2,cores=2 \
+>   -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
+>   [...]
+>   -object memory-backend-ram,id=mem0,size=8G \
+>   -device virtio-mem-pci,id=vm0,memdev=mem0,node=0,requested-size=0M \
+>   -object memory-backend-ram,id=mem1,size=8G \
+>   -device virtio-mem-pci,id=vm1,memdev=mem1,node=1,requested-size=1G
+> 
+> Query the configuration:
+>  (qemu) info memory-devices
+>  Memory device [virtio-mem]: "vm0"
+>    memaddr: 0x140000000
+>    node: 0
+>    requested-size: 0
+>    size: 0
+>    max-size: 8589934592
+>    block-size: 2097152
+>    memdev: /objects/mem0
+>  Memory device [virtio-mem]: "vm1"
+>    memaddr: 0x340000000
+>    node: 1
+>    requested-size: 1073741824
+>    size: 1073741824
+>    max-size: 8589934592
+>    block-size: 2097152
+>    memdev: /objects/mem1
+> 
+> Add some memory to node 0:
+>  (qemu) qom-set vm0 requested-size 500M
+> 
+> Remove some memory from node 1:
+>  (qemu) qom-set vm1 requested-size 200M
+> 
+> Query the configuration again:
+>  (qemu) info memory-devices
+>  Memory device [virtio-mem]: "vm0"
+>    memaddr: 0x140000000
+>    node: 0
+>    requested-size: 524288000
+>    size: 524288000
+>    max-size: 8589934592
+>    block-size: 2097152
+>    memdev: /objects/mem0
+>  Memory device [virtio-mem]: "vm1"
+>    memaddr: 0x340000000
+>    node: 1
+>    requested-size: 209715200
+>    size: 209715200
+>    max-size: 8589934592
+>    block-size: 2097152
+>    memdev: /objects/mem1
+> 
+> [1] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Message-Id: <20200626072248.78761-11-david@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  qapi/misc.json                 |  39 +-
+>  include/hw/virtio/virtio-mem.h |  78 ++++
+>  hw/virtio/virtio-mem.c         | 724 +++++++++++++++++++++++++++++++++
+>  hw/virtio/Kconfig              |  11 +
+>  hw/virtio/Makefile.objs        |   1 +
+>  5 files changed, 852 insertions(+), 1 deletion(-)
+>  create mode 100644 include/hw/virtio/virtio-mem.h
+>  create mode 100644 hw/virtio/virtio-mem.c
+> 
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index a5a0beb902..65ca3edf32 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1356,19 +1356,56 @@
+>            }
+>  }
+>  
+> +##
+> +# @VirtioMEMDeviceInfo:
+> +#
+> +# VirtioMEMDevice state information
+> +#
+> +# @id: device's ID
+> +#
+> +# @memaddr: physical address in memory, where device is mapped
+> +#
+> +# @requested-size: the user requested size of the device
+> +#
+> +# @size: the (current) size of memory that the device provides
+> +#
+> +# @max-size: the maximum size of memory that the device can provide
+> +#
+> +# @block-size: the block size of memory that the device provides
+> +#
+> +# @node: NUMA node number where device is assigned to
+> +#
+> +# @memdev: memory backend linked with the region
+> +#
+> +# Since: 5.1
+> +##
+> +{ 'struct': 'VirtioMEMDeviceInfo',
+> +  'data': { '*id': 'str',
+> +            'memaddr': 'size',
+> +            'requested-size': 'size',
+> +            'size': 'size',
+> +            'max-size': 'size',
+> +            'block-size': 'size',
+> +            'node': 'int',
+> +            'memdev': 'str'
+> +          }
+> +}
+> +
+>  ##
+>  # @MemoryDeviceInfo:
+>  #
+>  # Union containing information about a memory device
+>  #
+>  # nvdimm is included since 2.12. virtio-pmem is included since 4.1.
+> +# virtio-mem is included since 5.1.
+>  #
+>  # Since: 2.1
+>  ##
+>  { 'union': 'MemoryDeviceInfo',
+>    'data': { 'dimm': 'PCDIMMDeviceInfo',
+>              'nvdimm': 'PCDIMMDeviceInfo',
+> -            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+> +            'virtio-pmem': 'VirtioPMEMDeviceInfo',
+> +            'virtio-mem': 'VirtioMEMDeviceInfo'
+>            }
+>  }
+>  
+> diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
+> new file mode 100644
+> index 0000000000..6981096f7c
+> --- /dev/null
+> +++ b/include/hw/virtio/virtio-mem.h
+> @@ -0,0 +1,78 @@
+> +/*
+> + * Virtio MEM device
+> + *
+> + * Copyright (C) 2020 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef HW_VIRTIO_MEM_H
+> +#define HW_VIRTIO_MEM_H
+> +
+> +#include "standard-headers/linux/virtio_mem.h"
+> +#include "hw/virtio/virtio.h"
+> +#include "qapi/qapi-types-misc.h"
+> +#include "sysemu/hostmem.h"
+> +
+> +#define TYPE_VIRTIO_MEM "virtio-mem"
+> +
+> +#define VIRTIO_MEM(obj) \
+> +        OBJECT_CHECK(VirtIOMEM, (obj), TYPE_VIRTIO_MEM)
+> +#define VIRTIO_MEM_CLASS(oc) \
+> +        OBJECT_CLASS_CHECK(VirtIOMEMClass, (oc), TYPE_VIRTIO_MEM)
+> +#define VIRTIO_MEM_GET_CLASS(obj) \
+> +        OBJECT_GET_CLASS(VirtIOMEMClass, (obj), TYPE_VIRTIO_MEM)
+> +
+> +#define VIRTIO_MEM_MEMDEV_PROP "memdev"
+> +#define VIRTIO_MEM_NODE_PROP "node"
+> +#define VIRTIO_MEM_SIZE_PROP "size"
+> +#define VIRTIO_MEM_REQUESTED_SIZE_PROP "requested-size"
+> +#define VIRTIO_MEM_BLOCK_SIZE_PROP "block-size"
+> +#define VIRTIO_MEM_ADDR_PROP "memaddr"
+> +
+> +typedef struct VirtIOMEM {
+> +    VirtIODevice parent_obj;
+> +
+> +    /* guest -> host request queue */
+> +    VirtQueue *vq;
+> +
+> +    /* bitmap used to track unplugged memory */
+> +    int32_t bitmap_size;
+> +    unsigned long *bitmap;
+> +
+> +    /* assigned memory backend and memory region */
+> +    HostMemoryBackend *memdev;
+> +
+> +    /* NUMA node */
+> +    uint32_t node;
+> +
+> +    /* assigned address of the region in guest physical memory */
+> +    uint64_t addr;
+> +
+> +    /* usable region size (<= region_size) */
+> +    uint64_t usable_region_size;
+> +
+> +    /* actual size (how much the guest plugged) */
+> +    uint64_t size;
+> +
+> +    /* requested size */
+> +    uint64_t requested_size;
+> +
+> +    /* block size and alignment */
+> +    uint64_t block_size;
+> +} VirtIOMEM;
+> +
+> +typedef struct VirtIOMEMClass {
+> +    /* private */
+> +    VirtIODevice parent;
+> +
+> +    /* public */
+> +    void (*fill_device_info)(const VirtIOMEM *vmen, VirtioMEMDeviceInfo *vi);
+> +    MemoryRegion *(*get_memory_region)(VirtIOMEM *vmem, Error **errp);
+> +} VirtIOMEMClass;
+> +
+> +#endif
+> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+> new file mode 100644
+> index 0000000000..d8a0c974d3
+> --- /dev/null
+> +++ b/hw/virtio/virtio-mem.c
+> @@ -0,0 +1,724 @@
+> +/*
+> + * Virtio MEM device
+> + *
+> + * Copyright (C) 2020 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "qemu/iov.h"
+> +#include "qemu/cutils.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/units.h"
+> +#include "sysemu/numa.h"
+> +#include "sysemu/sysemu.h"
+> +#include "sysemu/reset.h"
+> +#include "hw/virtio/virtio.h"
+> +#include "hw/virtio/virtio-bus.h"
+> +#include "hw/virtio/virtio-access.h"
+> +#include "hw/virtio/virtio-mem.h"
+> +#include "qapi/error.h"
+> +#include "qapi/visitor.h"
+> +#include "exec/ram_addr.h"
+> +#include "migration/misc.h"
+> +#include "hw/boards.h"
+> +#include "hw/qdev-properties.h"
+> +#include "config-devices.h"
+> +
+> +/*
+> + * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
+> + * memory (e.g., 2MB on x86_64).
+> + */
+> +#define VIRTIO_MEM_MIN_BLOCK_SIZE QEMU_VMALLOC_ALIGN
+> +/*
+> + * Size the usable region bigger than the requested size if possible. Esp.
+> + * Linux guests will only add (aligned) memory blocks in case they fully
+> + * fit into the usable region, but plug+online only a subset of the pages.
+> + * The memory block size corresponds mostly to the section size.
+> + *
+> + * This allows e.g., to add 20MB with a section size of 128MB on x86_64, and
+> + * a section size of 1GB on arm64 (as long as the start address is properly
+> + * aligned, similar to ordinary DIMMs).
+> + *
+> + * We can change this at any time and maybe even make it configurable if
+> + * necessary (as the section size can change). But it's more likely that the
+> + * section size will rather get smaller and not bigger over time.
+> + */
+> +#if defined(__x86_64__)
+> +#define VIRTIO_MEM_USABLE_EXTENT (2 * (128 * MiB))
+
+I just did a cross-compile on s390x and noticed that this should be
+guarded by defined(TARGET_X86_64) (it's target dependent).
+
+Sorry for the noise.
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
