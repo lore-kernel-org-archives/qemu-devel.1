@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F13DBC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D87EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:33:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC4AF208C7
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:32:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59542208C7
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:33:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HPIvE6MT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC4AF208C7
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hTRRcDqR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59542208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrNfj-0003gE-11
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:32:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51108)
+	id 1jrNgr-0005Dr-MD
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:33:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jrNbl-00075w-Js
+ id 1jrNbl-000768-Nr
  for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:28:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59688
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58093
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jrNbi-0006f8-UG
+ id 1jrNbg-0006eC-AV
  for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:28:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593790085;
+ s=mimecast20190719; t=1593790082;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n1C5a7JztNWosbsqPUhwZhKiIAVmAdulGlfADd5r4eg=;
- b=HPIvE6MTOfHChGE5tMrzYCK/4F2Ti4/yn/lOfrZsZXGGjc/GRglapWSQgOO39oQJ7tRWq5
- vsI3BCannlpcRTqXDaslm6/SCm/GRAJ4LVH5lSV4eMFPrca6KkR6S2XDxWqsiA0SA3f+/j
- YPmTCka8REmlfwLu8qkDB+3iB3RTZV4=
+ bh=TgBnNY+2WV0e8/kWUtIYyrE1baZDFHlj+IejXzvllD8=;
+ b=hTRRcDqRvigdy4xjIfg+9/iiVOQiWLbtvfu0zDkzC9Ag7zzMvHwXyW9JGldGQsUrmtIYJW
+ 4phqq4VaPe0/e7Y3hDImOo9Uqo95wCuGv7DVXyFFBOU18gsglQzh9i6E4l4BklPfaA/Tta
+ U/vadCUA9TjBawbsoXA40/zhnicnSus=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-qF00r_0TPKiWm5NAi0_UDA-1; Fri, 03 Jul 2020 11:27:59 -0400
-X-MC-Unique: qF00r_0TPKiWm5NAi0_UDA-1
+ us-mta-367-4XdK1vOXN52AiGmc0iux8A-1; Fri, 03 Jul 2020 11:28:00 -0400
+X-MC-Unique: 4XdK1vOXN52AiGmc0iux8A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89C0F1054F8B;
- Fri,  3 Jul 2020 15:27:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAE7B800C60;
+ Fri,  3 Jul 2020 15:27:59 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-207.ams2.redhat.com
  [10.36.114.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8D3782DE72;
- Fri,  3 Jul 2020 15:27:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF3F42DE72;
+ Fri,  3 Jul 2020 15:27:58 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, quintela@redhat.com, zhukeqian1@huawei.com,
  stefanha@redhat.com
-Subject: [PULL 4/5] migration: postcopy take proper error return
-Date: Fri,  3 Jul 2020 16:27:47 +0100
-Message-Id: <20200703152748.277255-5-dgilbert@redhat.com>
+Subject: [PULL 5/5] migration: Count new_dirty instead of real_dirty
+Date: Fri,  3 Jul 2020 16:27:48 +0100
+Message-Id: <20200703152748.277255-6-dgilbert@redhat.com>
 In-Reply-To: <20200703152748.277255-1-dgilbert@redhat.com>
 References: <20200703152748.277255-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -75,9 +75,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -102,34 +102,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Keqian Zhu <zhukeqian1@huawei.com>
 
-This function returns a boolean success and we're returning -1;
-lets just use the 'out' error path.
+real_dirty_pages becomes equal to total ram size after dirty log sync
+in ram_init_bitmaps, the reason is that the bitmap of ramblock is
+initialized to be all set, so old path counts them as "real dirty" at
+beginning.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Fixes: 58b7c17e226 ("Disable mlock around incoming postcopy")
-Buglink: https://bugs.launchpad.net/qemu/+bug/1885720
-Message-Id: <20200701093557.130096-1-dgilbert@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+This causes wrong dirty rate and false positive throttling.
+
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Message-Id: <20200622032037.31112-1-zhukeqian1@huawei.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/postcopy-ram.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/exec/ram_addr.h | 5 +----
+ migration/ram.c         | 8 +++++---
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index a36402722b..bef2a3afed 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -389,7 +389,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
-      */
-     if (munlockall()) {
-         error_report("%s: munlockall: %s", __func__,  strerror(errno));
--        return -1;
-+        goto out;
-     }
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 7b5c24e928..3ef729a23c 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -442,8 +442,7 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
+ static inline
+ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                                                ram_addr_t start,
+-                                               ram_addr_t length,
+-                                               uint64_t *real_dirty_pages)
++                                               ram_addr_t length)
+ {
+     ram_addr_t addr;
+     unsigned long word = BIT_WORD((start + rb->offset) >> TARGET_PAGE_BITS);
+@@ -469,7 +468,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+             if (src[idx][offset]) {
+                 unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+                 unsigned long new_dirty;
+-                *real_dirty_pages += ctpopl(bits);
+                 new_dirty = ~dest[k];
+                 dest[k] |= bits;
+                 new_dirty &= bits;
+@@ -502,7 +500,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                         start + addr + offset,
+                         TARGET_PAGE_SIZE,
+                         DIRTY_MEMORY_MIGRATION)) {
+-                *real_dirty_pages += 1;
+                 long k = (start + addr) >> TARGET_PAGE_BITS;
+                 if (!test_and_set_bit(k, dest)) {
+                     num_dirty++;
+diff --git a/migration/ram.c b/migration/ram.c
+index 069b6e30bc..5554a7d2d8 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -859,9 +859,11 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
+ /* Called with RCU critical section */
+ static void ramblock_sync_dirty_bitmap(RAMState *rs, RAMBlock *rb)
+ {
+-    rs->migration_dirty_pages +=
+-        cpu_physical_memory_sync_dirty_bitmap(rb, 0, rb->used_length,
+-                                              &rs->num_dirty_pages_period);
++    uint64_t new_dirty_pages =
++        cpu_physical_memory_sync_dirty_bitmap(rb, 0, rb->used_length);
++
++    rs->migration_dirty_pages += new_dirty_pages;
++    rs->num_dirty_pages_period += new_dirty_pages;
+ }
  
-     /*
+ /**
 -- 
 2.26.2
 
