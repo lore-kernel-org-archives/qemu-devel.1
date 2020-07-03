@@ -2,97 +2,97 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B72EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4123FC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:39:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38350207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BBF4207FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:39:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lTuQnDrH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38350207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r3VV2i59"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BBF4207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOi5-0007jj-GJ
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:38:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37656)
+	id 1jrOio-0000e3-9Y
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:39:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vincent.mc.li@gmail.com>)
- id 1jrOSt-00050j-Dq
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:23:03 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37017)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jrOef-0000vZ-3t; Fri, 03 Jul 2020 12:35:13 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37975)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <vincent.mc.li@gmail.com>)
- id 1jrOSr-0005ei-Hz
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:23:03 -0400
-Received: by mail-pl1-x644.google.com with SMTP id p1so3548591pls.4
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 09:23:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jrOed-00009x-8t; Fri, 03 Jul 2020 12:35:12 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z13so33366187wrw.5;
+ Fri, 03 Jul 2020 09:35:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:date:to:cc:subject:in-reply-to:message-id:references
- :user-agent:mime-version;
- bh=Nw2HaGEG/PrRXeswlYbS7n308ZWghxL3g2iZGsLx+eU=;
- b=lTuQnDrHXCXbySaFCrBGKvRsQ0qMiNmn4boE4wKlZPO3vOT7/Gt4hW+/8aK1+xYbL/
- UPVSTr+J337j9LgxWrxEul13DsGF4K8OXVSOSx60xlJGwTeNr3bqPQLYi7BDPAewRqnf
- 2n7mKg5F7VLt4NHinPAImPuEeO4kE5yRGfi9Cn1sBP+WtLj3Dwu7owCxJg8IMNeNojfQ
- SFYAsgZ2nBBitk90ycGEuEhXSuGqClSrBSzgmvD8aUtMDUE5uw95jF0Zq+Ts2yLP3bH/
- oHOPR0HnTeZ3GjeUKbsMy8GRXqUhlbxa3qnI0DYpjhEV2OGQqA4qtJQZOXGyrnYxPpHp
- FUCQ==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=J9fEYD4ab0vzqkQT1cWscq34B3z+iFCmm3a29FrbHVU=;
+ b=r3VV2i598oUWCnEvGs2rfvD3+26DNM4PzKiY+zyAolMgbMgQwZ5LdfP5eXnLz7rVmj
+ gwwaak4kLeDxsUGMHlPRQ3uZvWHaX6uSjtlzjLdcTrcpDLYegO1QRD29GEhtpZ+EeUHP
+ 7Z5lMs5/50amTkByuO60O48DuVNe8Zt/n7qSCyypHMIzqm+wrSOGcsmkzIjXHGW8UF18
+ YAiZnf7n+5ICfLExI380eYK5hJ/etbPRd0bVwxuptAA/A9xtMMxpgtRvWdjJOt8RpMux
+ cIKUuc9QlZiXROita2ZfO0tptotdeovKbF+u8PsL3ye10rTMAz8PVzclh6P0OzFrvMB5
+ d8cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:in-reply-to:message-id
- :references:user-agent:mime-version;
- bh=Nw2HaGEG/PrRXeswlYbS7n308ZWghxL3g2iZGsLx+eU=;
- b=cWyrznNqBSLo8Riltlmg0PpFtUVlXK98KBJuXkvfM3W3QfErPBwbwwfheRykEigDgm
- CW/qrCHCiDqlZVVDH1G5R5J/mEHlSsKNA81jc09HTXmzbF8GhFVscNL21gx98YPFzI1n
- D8QboJGGvzfSOStWRQCRc+pOFyY4ZbYxM+ZFZqLroT+VnFyrRBHpQaRgNS2JvmBPS+id
- lPvZ32bPbDnJeByCuY52w33FV3NRoSPCY2vcockyYqZrQtXBoYZMVklGiKmZUWTXwTZA
- EhQwALQ6xLOe9EPwKo9RuFmg7czGsXnFIJ9CbtNtoZBSjyyTZ9msoRT0bhK7A/648Cjs
- /zUg==
-X-Gm-Message-State: AOAM532Bzv8U7wUq4LJt2Oi+W0GncFJkdyFiOk1n0UbmDPXOXEd8KpSA
- 2/9aHQuQqpbpnDt6mGKyEKk=
-X-Google-Smtp-Source: ABdhPJzstVOjxf08xeFUZrYN3H+7KsJ6roAYFTbIVlAWYK1J5W4FXlYIQVlyTJCy8EwV+clXLx2h7A==
-X-Received: by 2002:a17:902:8491:: with SMTP id
- c17mr23742426plo.262.1593793379335; 
- Fri, 03 Jul 2020 09:22:59 -0700 (PDT)
-Received: from sin-l-00030390.olympus.f5net.com
- (c-71-231-121-172.hsd1.wa.comcast.net. [71.231.121.172])
- by smtp.gmail.com with ESMTPSA id a68sm11587433pje.35.2020.07.03.09.22.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 09:22:58 -0700 (PDT)
-From: Vincent Li <vincent.mc.li@gmail.com>
-X-Google-Original-From: Vincent Li <vli@gmail.com>
-Date: Fri, 3 Jul 2020 09:22:57 -0700 (PDT)
-X-X-Sender: vli@sea-ml-00029224.olympus.f5net.com
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: Question about virtio-net: implement RX RSS processing
-In-Reply-To: <6657ac45-383a-4654-d5d4-be76a8fcfdfa@redhat.com>
-Message-ID: <alpine.OSX.2.21.2007030921400.35758@sea-ml-00029224.olympus.f5net.com>
-References: <alpine.OSX.2.21.2007020914350.260@sea-ml-00029224.olympus.f5net.com>
- <6657ac45-383a-4654-d5d4-be76a8fcfdfa@redhat.com>
-User-Agent: Alpine 2.21 (OSX 202 2017-01-01)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=J9fEYD4ab0vzqkQT1cWscq34B3z+iFCmm3a29FrbHVU=;
+ b=bariaGZp47lXDEKLL1gTDuOeXSc+sQED/E9rb09THxK/sB8hR8x7YsrC+gXxCxx0Ok
+ QzBriY4Dcori+dYwx2cqU3eZ9ZEw0oey3OYrkcgKUco8jWjvIut4wngLEYDN9zHLLd+d
+ 6k8/5KVSOMvQCAAwlRY3GmialiwwR366U0/eKfvN/njovSTTdOkqOlEsE69MW3KIAxs5
+ Z1Ywwfo3nyIgCSaovgB4FU+AVWEg7MjsaznFRlD3EQGgfFa+NdirbTJm6nidiATG3DGo
+ JdiNL8qi7WxFH/hAYCt76yB1quWWqF4bYk7SAJ3IshkOVxFe9ZaW2cerPOcy/iNU29tN
+ eoHw==
+X-Gm-Message-State: AOAM5333HxhNmqSYxczvsHrNTB6yOK+mulyPHIRmMzW2evocPip6/6DC
+ SEXMhKvAoK1cSNHkKc79MqViwZGiayU=
+X-Google-Smtp-Source: ABdhPJxRYEXx+5ZBWW1xzThzHttU3WKvlIdTFbAE0S5bt5fsHdRtJjfMqyMr16cBN9kyiG7eqYSIJg==
+X-Received: by 2002:a5d:4f0b:: with SMTP id c11mr3964539wru.344.1593794109399; 
+ Fri, 03 Jul 2020 09:35:09 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id u84sm13716676wmg.7.2020.07.03.09.35.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 03 Jul 2020 09:35:08 -0700 (PDT)
+Subject: Re: [PATCH v3 12/12] docs/system: Add Nuvoton machine documentation
+To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org,
+ clg@kaod.org, joel@jms.id.au
+References: <20200626235519.591734-1-hskinnemoen@google.com>
+ <20200626235519.591734-13-hskinnemoen@google.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <56028150-9efd-dc34-5244-2c6fa1f6b8e2@amsat.org>
+Date: Fri, 3 Jul 2020 18:35:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-1976117165-1593793378=:35758"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=vincent.mc.li@gmail.com; helo=mail-pl1-x644.google.com
+In-Reply-To: <20200626235519.591734-13-hskinnemoen@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- MALFORMED_FREEMAIL=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 10
+X-Spam_score: 1.0
+X-Spam_bar: +
+X-Spam_report: (1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, PDS_OTHER_BAD_TLD=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,175 +105,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vincent Li <vincent.mc.li@gmail.com>,
- Yuri Benditovich <yuri.benditovich@daynix.com>, qemu-devel@nongnu.org
+Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 6/27/20 1:55 AM, Havard Skinnemoen wrote:
+> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> ---
+[...]
+> +Boot options
+> +------------
+> +
+> +The Nuvoton machines can boot from an OpenBMC firmware image, or directly into
+> +a kernel using the ``-kernel`` option. OpenBMC images for `quanta-gsj` and
+> +possibly others can be downloaded from the OpenPOWER jenkins :
+> +
+> +   https://openpower.xyz/
 
---0-1976117165-1593793378=:35758
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+I can only see the build log, not the u-boot/kernel binaries.
+Can you point me to an example please?
 
+> +
+> +Booting a full firmware image requires a Boot ROM specified via the ``-bios``
+> +option to QEMU. The firmware image should be attached as an MTD drive. Example :
+> +
+> +.. code-block:: bash
+> +
+> +  $ qemu-system-arm -machine quanta-gsj -nographic \
+> +      -bios npcm7xx_bootrom.bin \
+> +      -drive file=image-bmc,if=mtd,bus=0,unit=0,format=raw
+> diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+> index 1bd477a293..38a9daa9b9 100644
+> --- a/docs/system/target-arm.rst
+> +++ b/docs/system/target-arm.rst
+> @@ -84,6 +84,7 @@ undocumented; you can get a complete list by running
+>     arm/aspeed
+>     arm/musicpal
+>     arm/nseries
+> +   arm/nuvoton
+>     arm/orangepi
+>     arm/palm
+>     arm/xscale
+> 
 
-Thank you for the answers and I will study the vhost-net patches set you 
-mentioned
-
-On Fri, 3 Jul 2020, Jason Wang wrote:
-
-> 
-> On 2020/7/3 上午1:07, Vincent Li wrote:
-> > Hi,
-> > 
-> > I noticed the [PULL V2 02/33] virtio-net: implement RX RSS processing
-> > https://marc.info/?l=qemu-devel&m=159248675403246&w=2 and cloned
-> > https://github.com/jasowang/qemu.git tags/net-pull-request for testing the
-> > RX RSS feature, but I am not clear how to test this feature and see if it
-> > meets my needs.
-> 
-> 
-> Yuri may know more but I think the only driver that supports RSS is Windows
-> driver currently.
-> 
-> 
-> > 
-> > I am running F-Stack Nginx applications
-> > https://github.com/F-Stack/f-stack/tree/dev/app/nginx-1.16.1 in KVM guest,
-> > F-Stack is FreeBSD TCP/IP stack ported to support DPDK, and F-Stack set
-> > RSS mode as code below
-> > https://github.com/F-Stack/f-stack/blob/dev/lib/ff_dpdk_if.c#L605
-> > 
-> >       /* Set RSS mode */
-> >       uint64_t default_rss_hf = ETH_RSS_PROTO_MASK;
-> >       port_conf.rxmode.mq_mode = ETH_MQ_RX_RSS;
-> >       port_conf.rx_adv_conf.rss_conf.rss_hf = default_rss_hf;
-> >       if (dev_info.hash_key_size == 52) {
-> >           port_conf.rx_adv_conf.rss_conf.rss_key = default_rsskey_52bytes;
-> >           port_conf.rx_adv_conf.rss_conf.rss_key_len = 52;
-> >           use_rsskey_52bytes = 1;
-> >       } else {
-> >           port_conf.rx_adv_conf.rss_conf.rss_key = default_rsskey_40bytes;
-> >           port_conf.rx_adv_conf.rss_conf.rss_key_len = 40;
-> >       }
-> >       port_conf.rx_adv_conf.rss_conf.rss_hf &=
-> > dev_info.flow_type_rss_offloads;
-> >       if (port_conf.rx_adv_conf.rss_conf.rss_hf != ETH_RSS_PROTO_MASK) {
-> >           printf("Port %u modified RSS hash function based on hardware
-> > support,"
-> >           "requested:%#"PRIx64" configured:%#"PRIx64"\n",
-> >           port_id, default_rss_hf, port_conf.rx_adv_conf.rss_conf.rss_hf);
-> >       }
-> > 
-> > But  DPDK virtio PMD does not support RSS as below commit shows:
-> > 
-> > commit 13b3137f3b7c8f866947a9b34e06a8aec0d084f7
-> > Author: Dilshod Urazov
-> > Date:   Wed Oct 9 13:32:07 2019 +0100
-> > 
-> >      net/virtio: reject unsupported Rx multi-queue modes
-> >           This driver supports none of DCB, RSS or VMDQ modes, therefore
-> > must
-> >      check and return error if configured incorrectly.
-> >           Virtio can distribute Rx packets across multi-queue, but there is
-> >      no controls (algorithm, redirection table, hash function) except
-> >      number of Rx queues and ETH_MQ_RX_NONE is the best fit meaning
-> >      no method is enforced on how to route packets to MQs.
-> >           Fixes: c1f86306a026 ("virtio: add new driver")
-> >      Cc: stable@dpdk.org
-> >           Signed-off-by: Dilshod Urazov
-> >      Signed-off-by: Andrew Rybchenko
-> >      Reviewed-by: Maxime Coquelin
-> > 
-> > diff --git a/drivers/net/virtio/virtio_ethdev.c
-> >             b/drivers/net/virtio/virtio_ethdev.c
-> > index 0a2ed2e50..76bd40a3e 100644
-> > --- a/drivers/net/virtio/virtio_ethdev.c
-> > +++ b/drivers/net/virtio/virtio_ethdev.c
-> > @@ -2066,6 +2066,13 @@ virtio_dev_configure(struct rte_eth_dev *dev)
-> >          PMD_INIT_LOG(DEBUG, "configure");
-> >          req_features = VIRTIO_PMD_DEFAULT_GUEST_FEATURES;
-> >   +       if (rxmode->mq_mode != ETH_MQ_RX_NONE) {
-> > +               PMD_DRV_LOG(ERR,
-> > +                       "Unsupported Rx multi queue mode %d",
-> > +                       rxmode->mq_mode);
-> > +               return -EINVAL;
-> > +       }
-> > +
-> >          if (dev->data->dev_conf.intr_conf.rxq) {
-> >                  ret = virtio_init_device(dev, hw->req_guest_features);
-> >                  if (ret < 0)
-> > 
-> > 
-> > 
-> > So the problem is I can't run F-Stack Applications in KVM/Qemu guest with
-> > multi queue/vCPU/RSS  support, this problem seems apply to DPDK TCP
-> > applications require multi queue/RSS support in KVM/Qemu guest, for
-> > example mTCP https://github.com/mtcp-stack/mtcp I tested has similar
-> > problem.
-> > 
-> > I am not clear on the picture of how everything work together for  this
-> > virtio-net RSS feature.
-> > 
-> > I have read following blogs
-> > 
-> > https://www.redhat.com/en/blog/introduction-virtio-networking-and-vhost-net
-> > https://www.redhat.com/en/blog/how-vhost-user-came-being-virtio-networking-and-dpdk
-> > 
-> > Someone told me that in order for DPDK frond end virtio PMD in guest support
-> > RSS, the backend
-> > also needs to support RSS, including vhost-net and vhost-user, it should
-> > have nothing to do with this Qemu virtio-net RSS, is that correct?  if
-> > correct, I have following questions:
-> > 
-> > 1, What is the use case for this Qemu virtio-net RSS?
-> 
-> 
-> It's just RSS as what other device can provide for steering or balancing.
-> 
-> 
-> > 2, How to test the use case?
-> 
-> 
-> Need use windows guest.
-> 
-> 
-> > 3, Are there any plan to improve vhost-net/vhost-user, DPDK virtio PMD to
-> > support RSS?
-> 
-> 
-> For vhost-net, Sameeh posted a eBPF based solution RFC[1], we need some one to
-> carry on the work. It doesn't request any extension to vhost-net thanks to the
-> steering eBPF support in tuntap.
-> 
-> For vhost-user, we need probably extend vhost-user protocols first.
-> 
-> You're welcome to contribute patches.
-> 
-> [1] https://patchwork.kernel.org/cover/10581921/
-> 
-> Thanks
-> 
-> 
-> > 
-> > For 3,  I think this is important for KVM/Qemu/OVS-DPDK/Vhost-net
-> > environment for DPDK TCP/UDP applications.
-> > 
-> > Note I have no problem running F-Stack or mTCP applications in VMware ESXi
-> > guest environment with multi queue/vCPU/RSS requirement since DPDK vmxnet3
-> > PMD support RSS and I assume VMware ESXi backend support RSS, so it looks
-> > VMware has
-> > advantage over this.
-> > 
-> > Thank you for your patience to read this email
-> > 
-> > Regards,
-> > 
-> > Vincent
-> > 
-> 
-> 
---0-1976117165-1593793378=:35758--
 
