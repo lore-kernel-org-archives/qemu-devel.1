@@ -2,106 +2,130 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 432AAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E51C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:14:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CF6E20870
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3802120836
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:14:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmE1Smjs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CF6E20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OXV3cesa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3802120836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHlo-0002PX-87
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60094)
+	id 1jrHmc-0004Zq-EH
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:14:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcl-0000JD-Pw
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:47 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60459
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcf-0004Ua-9E
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593767080;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=c5tdu84EsYu030A7xZkXJlQoGtXOTX2WueiDbJOGS4I=;
- b=SmE1SmjsnXvnPl57zYZ9nLcQ4wz92yua/XOnRmrIw9ldHgi5+HPXgholBBeHVCwP8X51lF
- 1W2F+QghFiuaKsQjvgMIY0Kwlya/GbQW3gpXyWxB7g3g/M6oANllUOMBp0LYAbmMlywEN7
- Y8N2xaYw4GiPwgXcErzhk8BvFa//eBo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-n_kCMByxNQOWK_FmE4bvlg-1; Fri, 03 Jul 2020 05:04:38 -0400
-X-MC-Unique: n_kCMByxNQOWK_FmE4bvlg-1
-Received: by mail-wr1-f69.google.com with SMTP id 89so7685723wrr.15
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:04:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=c5tdu84EsYu030A7xZkXJlQoGtXOTX2WueiDbJOGS4I=;
- b=UiHPRMfHYyNi10XrjcTTDoW3pfbfJOArm7s06kS3lkmiyXcaYsN0MVM8le21WiAss8
- NzTtkN2YfVhsZ/FYm9mUE/BjUTdSLYcZrg0y2yuqekTuP/fcF2njzqb7k3AKWkcwovfn
- UGk2BUC3k953OgPasCPkJ4d97iRLO/yiqa85x9NFhuDJZy1uMV49ajYeclStPG5BV3oY
- nLmTk3G4cQgUshcG9ZRY6UNg86mvf6+VDpyKU3S1WtHhXWLqL1WZzmKX9x295VxgwwoR
- embESfO/3C1DNVdSH57unVDHoDVEzsdpgf4Sm99Quny4MnHEPoTRfPH4YfJYAqTvVcfO
- KlZw==
-X-Gm-Message-State: AOAM532lY4mCcHaZVgY+s73O028nNRtQ0CSez4X08d+p3TToc6KhG3ws
- DX9AIBrqxDNob5pj4vHCDEam1RInDiYG0x+FZ23BEksVsiJTDSn79cKiXySKPMHpLtRihbZy73T
- 9Zxk5BCYTgC2KLw4=
-X-Received: by 2002:a1c:b182:: with SMTP id
- a124mr33866091wmf.114.1593767077142; 
- Fri, 03 Jul 2020 02:04:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzVOY4TvhikLMVstjU3wXl+ftQ+Rs9F/kNmVJrga8v+b2EPC/UoLYQ6F5T/cQ+W7boy9mqzgg==
-X-Received: by 2002:a1c:b182:: with SMTP id
- a124mr33866071wmf.114.1593767076894; 
- Fri, 03 Jul 2020 02:04:36 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- f12sm13711084wrw.53.2020.07.03.02.04.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 02:04:36 -0700 (PDT)
-Date: Fri, 3 Jul 2020 05:04:34 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 24/41] numa: Auto-enable NUMA when any memory devices are
- possible
-Message-ID: <20200703090252.368694-25-mst@redhat.com>
-References: <20200703090252.368694-1-mst@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jrHfW-0006RT-Nt
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:07:38 -0400
+Received: from mail-eopbgr10127.outbound.protection.outlook.com
+ ([40.107.1.127]:3861 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jrHfT-00051B-97
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:07:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GQdxl0VIXqdp/KwZZJNltmHs8RwkCvntv89qz9Qr1Ch6zJ+24kT54cEgPWDjZHSCHnOmzkXgsZr7ULDAUs90l0a0k/LzoZEFJ5JvayOBzDLT2GYYKp9RgJAYqmJeW3iVPv8/qZlsvwy3NPX2ZA+yd3srr3fU7psjEBmiwF4XJczwHeT175K2c/4VDXzpvGM4Ala9NdREVliKYHiGJ0jHay1p79gf4IqlEnEAmin/5p2QiBaTmP5ly9LGJ1l5FdvfIdVbtzF3DqXB6iEtl8fSzoKDvGK8YtVtXFeyAaG7HWzY3ptVHpsABx6nCrzNfjrUDCewPvQ8adBdt9/IRbRXMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Klt1CeyhRjNZnkIESAe9QrKs+8nA+yTs0ukPYZ/VXvs=;
+ b=PZ2QV6UkLuSxDzYi1R1Do90klp75IDd8n2LNPL2zrX38R3/URMGo1PB7ug1qktp8hp74tWCvIJ7RKkEgsqnB6trEObKSdI7dHLly2bvsNmiOB91Wx+hZwx77BQzBvMK6jrDCnmd09KLoirePLoGawVQEk90/oUGSWZ1SwWJKsyDtu8o6PzRj3RuTytoik/eQXeF/688E66eAeIYPdHOOy6Y9oOiP10qkyt4Z9hv+oISNQ+fVa6+8a2N5dorvB1AnZhKux5YellBvFlmfnL4HSg2x1moZWx2kRZF6aMPuaubfUGkt0LFZ3W1eBzZV/Bar45zrNPdhklirWnarzquB+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Klt1CeyhRjNZnkIESAe9QrKs+8nA+yTs0ukPYZ/VXvs=;
+ b=OXV3cesaMGqhUvcZUXcggQ6/GEuf8W9d2P4vmqpIRwHpXb51Q+JAaX/EMX98vKTjdTEKKCbHbtlkHZP8TaOxSSnZgXW4LMW+BqUOcrhWSBvhpuG+ODrdYjouM1thGGpi4H1ZFQiC8Q5K2TyL5svcZwY3nuEUMMphs6o3X1/WLlE=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.28; Fri, 3 Jul
+ 2020 09:07:32 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Fri, 3 Jul 2020
+ 09:07:32 +0000
+Subject: Re: Questionable aspects of QEMU Error's design
+To: Markus Armbruster <armbru@redhat.com>
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <87blo7heag.fsf@dusky.pond.sub.org> <87blndey9c.fsf@dusky.pond.sub.org>
+ <3b9d53fd-bdd0-c15b-292c-c4952fa24dfd@virtuozzo.com>
+ <923ceeeb-1fc8-489e-a32d-4cebfa6eadae@virtuozzo.com>
+ <87y2ptstxm.fsf@dusky.pond.sub.org> <87d05dqc97.fsf@dusky.pond.sub.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <177ccdc5-9fcb-f9f7-3eb2-7241bf76fdff@virtuozzo.com>
+Date: Fri, 3 Jul 2020 12:07:30 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <87d05dqc97.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM4PR0501CA0043.eurprd05.prod.outlook.com
+ (2603:10a6:200:68::11) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.15) by
+ AM4PR0501CA0043.eurprd05.prod.outlook.com (2603:10a6:200:68::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23 via Frontend
+ Transport; Fri, 3 Jul 2020 09:07:31 +0000
+X-Originating-IP: [185.215.60.15]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6990c207-01a2-4bc6-19e9-08d81f3084bd
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54489FA05D578F41DCD63A37C16A0@AM7PR08MB5448.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-Forefront-PRVS: 045315E1EE
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mPHFMa4akWzUA+kdv43DHl/gDYmXVi+VewA0iOyZG2BlpfwBSlNd/U9zi2z/1byRk06Rhod3wjIOPH7MYAFp3Mrq+l+p4A2BskOyjrVQbR5YgikDI3NRkcZE63wlmeOSYqCGrY1MtzKMhFWKJKrtpaOs7wuW8PVU3zvRPm6OmlVeRQZDSMBwsoLSPUjqg/6zExei80QjotFV6Rg77G/OkdlTrgzbwI8MWiq6jHI/jxRNgvictWJEBt870AL1DV5s8IMwHOzE9+ghH0SOXA6B/RT+LS2iW8i84srRRrEkGQyAW4VyS7c8G73pGcxOOdS5gbN+BzMPTKq1nx0yIEg0oFHLGHipM0JWORTmSPs4WDtbbVChWzFyBdTaTQRmZkh7
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39840400004)(366004)(376002)(136003)(396003)(346002)(66946007)(66476007)(66556008)(2906002)(86362001)(31696002)(8676002)(83380400001)(5660300002)(8936002)(186003)(36756003)(31686004)(4326008)(16526019)(6486002)(6916009)(26005)(16576012)(478600001)(956004)(52116002)(316002)(54906003)(2616005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: w/D06fJ7H7dT1mMIoUOeIlxVnYwUnbDjG2+hi/xEMGYE1a43kdwrE1tVMTGj/RqnEm9eWzVmyeVuy7q6NuX3e628h92FDYJb49KVy56MtH3iRk7Rw2oQUaPxGtchUMNaxJ8w7B+nA042SeGjYClvq51URcOmxqPMVty6IWav3fhcMKMbRMN9UZyxIkGwK0hdVTtW+mRbwpyhMTDLWp5Z9DfIdKE4t6O/Q6HToEj0fsz6vMxwY/6EeFzZWxMYMQw929w1zI2wcgi0fcOf42lmB7YGaFrv5/uDNkCMptZbh3ecADuKswTWCnKNTfqi2LBXZIKUasAnoG4cTYEf4F3W/n8ULfMIb3L3ErcF+i79kwsYpiHpdSXZN4JEDILI3HaPfj5N+J7B0uJ/s8m5xM9crYCa3TcOmXt0084Fmj7Fi6VjnuWf2YtY3CXNdpZRzFijwK9xZCjgL3QnEEoaRG7Hix8OIpMbTIib3Vg+SAu3UtI=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6990c207-01a2-4bc6-19e9-08d81f3084bd
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2020 09:07:32.0922 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: grgyy7oXBz+UKYcFdUJ7RLJ8hA+BryR8jsSduCm2A/uUarwzbsuKoiFZD8VtEXvNbgktHZaH6shr1zOCHDg5tPTmcyKphm1fKCGnXdpZwsg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
+Received-SPF: pass client-ip=40.107.1.127;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 05:07:33
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,164 +139,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- David Hildenbrand <david@redhat.com>,
- "qemu-arm @ nongnu . org" <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alex Shi <alex.shi@linux.alibaba.com>, Richard Henderson <rth@twiddle.net>
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+03.07.2020 10:38, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
+> 
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>
+>>> 28.04.2020 08:20, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 27.04.2020 18:36, Markus Armbruster wrote:
+>>>>> FYI, I'm working on converting QemuOpts, QAPI visitors and QOM.  I keep
+>>>>> running into bugs.  So far:
+> [...]
+>>>>> I got another one coming for QOM and qdev before I can post the
+>>>>> conversion.
+>>>>>
+>>>>> Vladimir, since the conversion will mess with error_propagate(), I'd
+>>>>> like to get it in before your auto-propagation work.
+>>>>>
+>>>>
+>>>> OK, just let me know when to regenerate the series, it's not hard.
+>>>>
+>>>
+>>> Hi! Is all that merged? Should I resend now?
+>>
+>> I ran into many bugs and fell into a few rabbit holes.  I'm busy
+>> finishing and flushing the patches.
+> 
+> All merged except for the final series "[PATCH v2 00/44] Less clumsy
+> error checking".  v2 has a lot of change within the series, but in
+> aggregate it's really close to v1.  This makes be optimistic it can
+> serve as a base for your auto-propagation work.  To get it into 5.1, we
+> need a respin, a re-review, and a pull request.  Time is awfully short.
+> Sorry for taking so long!  If you want to try, I can give it priority on
+> my side.
+> 
 
-Let's auto-enable it also when maxmem is specified but no slots are
-defined. This will result in us properly creating ACPI srat tables,
-indicating the maximum possible PFN to the guest OS. Based on this, e.g.,
-Linux will enable the swiotlb properly.
+Of course let's try)
 
-This avoids having to manually force the switolb on (swiotlb=force) in
-Linux in case we're booting only using DMA memory (e.g., 2GB on x86-64),
-and virtio-mem adds memory later on that really needs the swiotlb to be
-used for DMA.
 
-Let's take care of backwards compatibility if somebody has a setup that
-specifies "maxram" without "slots".
-
-Reported-by: Alex Shi <alex.shi@linux.alibaba.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Sergio Lopez <slp@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-arm@nongnu.org <qemu-arm@nongnu.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200626072248.78761-22-david@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/hw/boards.h |  1 +
- hw/arm/virt.c       |  2 ++
- hw/core/numa.c      | 11 ++++++-----
- hw/i386/microvm.c   |  1 +
- hw/i386/pc.c        |  1 +
- hw/i386/pc_piix.c   |  1 +
- hw/i386/pc_q35.c    |  1 +
- 7 files changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 18815d9be2..426ce5f625 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -207,6 +207,7 @@ struct MachineClass {
-     const char **valid_cpu_types;
-     strList *allowed_dynamic_sysbus_devices;
-     bool auto_enable_numa_with_memhp;
-+    bool auto_enable_numa_with_memdev;
-     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
-     bool ignore_boot_device_suffixes;
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index cd0834ce7f..f97be80a86 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2373,6 +2373,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     hc->unplug = virt_machine_device_unplug_cb;
-     mc->nvdimm_supported = true;
-     mc->auto_enable_numa_with_memhp = true;
-+    mc->auto_enable_numa_with_memdev = true;
-     mc->default_ram_id = "mach-virt.ram";
- 
-     object_class_property_add(oc, "acpi", "OnOffAuto",
-@@ -2485,6 +2486,7 @@ static void virt_machine_5_0_options(MachineClass *mc)
-     virt_machine_5_1_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     mc->numa_mem_supported = true;
-+    mc->auto_enable_numa_with_memdev = false;
- }
- DEFINE_VIRT_MACHINE(5, 0)
- 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index e9aec69afd..6a20ce7cf1 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -688,8 +688,9 @@ void numa_complete_configuration(MachineState *ms)
-     NodeInfo *numa_info = ms->numa_state->nodes;
- 
-     /*
--     * If memory hotplug is enabled (slots > 0) but without '-numa'
--     * options explicitly on CLI, guestes will break.
-+     * If memory hotplug is enabled (slot > 0) or memory devices are enabled
-+     * (ms->maxram_size > ram_size) but without '-numa' options explicitly on
-+     * CLI, guests will break.
-      *
-      *   Windows: won't enable memory hotplug without SRAT table at all
-      *
-@@ -704,9 +705,9 @@ void numa_complete_configuration(MachineState *ms)
-      * assume there is just one node with whole RAM.
-      */
-     if (ms->numa_state->num_nodes == 0 &&
--        ((ms->ram_slots > 0 &&
--        mc->auto_enable_numa_with_memhp) ||
--        mc->auto_enable_numa)) {
-+        ((ms->ram_slots && mc->auto_enable_numa_with_memhp) ||
-+         (ms->maxram_size > ms->ram_size && mc->auto_enable_numa_with_memdev) ||
-+         mc->auto_enable_numa)) {
-             NumaNodeOptions node = { };
-             parse_numa_node(ms, &node, &error_abort);
-             numa_info[0].node_mem = ram_size;
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index 5e931975a0..81d0888930 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -464,6 +464,7 @@ static void microvm_class_init(ObjectClass *oc, void *data)
-     mc->max_cpus = 288;
-     mc->has_hotpluggable_cpus = false;
-     mc->auto_enable_numa_with_memhp = false;
-+    mc->auto_enable_numa_with_memdev = false;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-     mc->nvdimm_supported = false;
-     mc->default_ram_id = "microvm.ram";
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 576f2502f9..61acc9e530 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1975,6 +1975,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
-     mc->auto_enable_numa_with_memhp = true;
-+    mc->auto_enable_numa_with_memdev = true;
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
-     mc->hot_add_cpu = pc_hot_add_cpu;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 1d832b2878..fae487f57d 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -444,6 +444,7 @@ static void pc_i440fx_5_0_machine_options(MachineClass *m)
-     m->numa_mem_supported = true;
-     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
-+    m->auto_enable_numa_with_memdev = false;
- }
- 
- DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 047ea8db28..acd6d405f0 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -372,6 +372,7 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
-     m->numa_mem_supported = true;
-     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
-+    m->auto_enable_numa_with_memhp = false;
- }
- 
- DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
 -- 
-MST
-
+Best regards,
+Vladimir
 
