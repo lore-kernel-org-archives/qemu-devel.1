@@ -2,94 +2,61 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA49C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 737E1C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:47:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 684A220826
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:38:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GawXPQpf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684A220826
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4770B206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:47:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4770B206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHDW-00046I-O0
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 04:38:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54008)
+	id 1jrHLl-0006i0-GP
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 04:47:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrHCr-0003E2-R1
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:38:01 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39178
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrHCo-00076b-Pt
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:38:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593765477;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RsGI1XE4tmsFurs1pv9cfaNLQbcA4+IY+c0l6yIZwJQ=;
- b=GawXPQpfvsh2j8zCRHO/QTZmLbJvPzpjBbKjrqXn0UFO6t0VUCnVAq8sHFfLpIuA/udOG6
- FCQOKJ/PLnnjCjJlol8Gn76RyshtpZqLx4j38mf/VawHjxaaEaUl/RM0GibeYPFLTwfmZz
- QUb6j2wTEpopkBFi9Mkz1YYc5QFt2Vo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-n2qEXaN4NlKk5KZqLb4XEA-1; Fri, 03 Jul 2020 04:37:53 -0400
-X-MC-Unique: n2qEXaN4NlKk5KZqLb4XEA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6C4E1940920;
- Fri,  3 Jul 2020 08:37:52 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E3D9C1001268;
- Fri,  3 Jul 2020 08:37:48 +0000 (UTC)
-Date: Fri, 3 Jul 2020 09:37:45 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 6/6] migration: support picking vmstate disk in QMP
- snapshot commands
-Message-ID: <20200703083745.GB2213227@redhat.com>
-References: <20200702175754.2211821-1-berrange@redhat.com>
- <20200702175754.2211821-7-berrange@redhat.com>
- <a4aacccc-3761-591c-637d-1e0110a6c337@redhat.com>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jrHL9-0006E8-8b; Fri, 03 Jul 2020 04:46:35 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:53404)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jrHL6-0000Nb-DD; Fri, 03 Jul 2020 04:46:34 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 06B8DBF465;
+ Fri,  3 Jul 2020 08:46:29 +0000 (UTC)
+Date: Fri, 3 Jul 2020 10:46:26 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 11/18] hw/block/nvme: add remaining mandatory
+ controller parameters
+Message-ID: <20200703084626.xib465ie3vvladip@apples.localdomain>
+References: <20200703063420.2241014-1-its@irrelevant.dk>
+ <20200703063420.2241014-12-its@irrelevant.dk>
+ <e2cbec3f-896e-fa17-2aac-2c82e0d6df60@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a4aacccc-3761-591c-637d-1e0110a6c337@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e2cbec3f-896e-fa17-2aac-2c82e0d6df60@redhat.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:42:13
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,141 +69,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 02, 2020 at 01:19:43PM -0500, Eric Blake wrote:
-> On 7/2/20 12:57 PM, Daniel P. Berrangé wrote:
-> > This wires up support for a new "vmstate" parameter to the QMP commands
-> > for snapshots (savevm, loadvm). This parameter accepts block driver
-> > state node name.
+On Jul  3 10:31, Philippe Mathieu-Daudé wrote:
+> On 7/3/20 8:34 AM, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
 > > 
-> > One use case for this would be a VM using OVMF firmware where the
-> > variables store is the first snapshottable disk image. The vmstate
-> > snapshot usually wants to be stored in the primary root disk of the
-> > VM, not the firmeware varstore. Thus there needs to be a mechanism
-> 
-> firmware
-> 
-> > to override the default choice of disk.
+> > Add support for any remaining mandatory controller operating parameters
+> > (features).
 > > 
-> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 > > ---
+> >  hw/block/nvme.c       | 39 +++++++++++++++++++++++++++++++++------
+> >  hw/block/nvme.h       | 18 ++++++++++++++++++
+> >  hw/block/trace-events |  2 ++
+> >  include/block/nvme.h  |  7 +++++++
+> >  4 files changed, 60 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index ba523f6768bf..affb9a967534 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -1056,8 +1056,16 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> >      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> >      uint32_t result;
+> > +    uint8_t fid = NVME_GETSETFEAT_FID(dw10);
+> > +    uint16_t iv;
+> >  
+> > -    switch (dw10) {
+> > +    trace_pci_nvme_getfeat(nvme_cid(req), fid, dw11);
+> > +
+> > +    if (!nvme_feature_support[fid]) {
+> > +        return NVME_INVALID_FIELD | NVME_DNR;
+> > +    }
+> > +
+> > +    switch (fid) {
+> >      case NVME_TEMPERATURE_THRESHOLD:
+> >          result = 0;
+> >  
+> > @@ -1088,14 +1096,27 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >                               ((n->params.max_ioqpairs - 1) << 16));
+> >          trace_pci_nvme_getfeat_numq(result);
+> >          break;
+> > +    case NVME_INTERRUPT_VECTOR_CONF:
+> > +        iv = dw11 & 0xffff;
+> > +        if (iv >= n->params.max_ioqpairs + 1) {
+> > +            return NVME_INVALID_FIELD | NVME_DNR;
+> > +        }
+> > +
+> > +        result = iv;
+> > +        if (iv == n->admin_cq.vector) {
+> > +            result |= NVME_INTVC_NOCOALESCING;
+> > +        }
+> > +
+> > +        result = cpu_to_le32(result);
+> > +        break;
+> >      case NVME_ASYNCHRONOUS_EVENT_CONF:
+> >          result = cpu_to_le32(n->features.async_config);
+> >          break;
+> >      case NVME_TIMESTAMP:
+> >          return nvme_get_feature_timestamp(n, cmd);
+> >      default:
+> > -        trace_pci_nvme_err_invalid_getfeat(dw10);
+> > -        return NVME_INVALID_FIELD | NVME_DNR;
+> > +        result = cpu_to_le32(nvme_feature_default[fid]);
 > 
-> > +++ b/qapi/migration.json
-> > @@ -1630,6 +1630,7 @@
-> >   # @tag: name of the snapshot to create. If it already
-> >   # exists it will be replaced.
-> >   # @exclude: list of block device node names to exclude
-> > +# @vmstate: block device node name to save vmstate to
-> >   #
-> >   # Note that execution of the VM will be paused during the time
-> >   # it takes to save the snapshot
-> > @@ -1641,6 +1642,7 @@
-> >   # -> { "execute": "savevm",
-> >   #      "data": {
-> >   #         "tag": "my-snap",
-> > +#         "vmstate": "disk0",
-> >   #         "exclude": ["pflash0-vars"]
-> >   #      }
-> >   #    }
-> > @@ -1650,6 +1652,7 @@
-> >   ##
-> >   { 'command': 'savevm',
-> >     'data': { 'tag': 'str',
-> > +            '*vmstate': 'str',
-> >               '*exclude': ['str'] } }
+> So here we expect uninitialized fid entries to return 0, right?
 > 
-> During save, the list of block devices is obvious: everything that is not
-> excluded.  But,
+
+Yes, if defaults are not 0 (like NVME_ARBITRATION), it is explicitly set.
+
+> > +        break;
+> >      }
+> >  
+> >      req->cqe.result = result;
+> > @@ -1124,8 +1145,15 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >  {
+> >      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> >      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> > +    uint8_t fid = NVME_GETSETFEAT_FID(dw10);
+> >  
+> > -    switch (dw10) {
+> > +    trace_pci_nvme_setfeat(nvme_cid(req), fid, dw11);
+> > +
+> > +    if (!nvme_feature_support[fid]) {
+> > +        return NVME_INVALID_FIELD | NVME_DNR;
+> > +    }
+> > +
+> > +    switch (fid) {
+> >      case NVME_TEMPERATURE_THRESHOLD:
+> >          if (NVME_TEMP_TMPSEL(dw11) != NVME_TEMP_TMPSEL_COMPOSITE) {
+> >              break;
+> > @@ -1172,8 +1200,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >      case NVME_TIMESTAMP:
+> >          return nvme_set_feature_timestamp(n, cmd);
+> >      default:
+> > -        trace_pci_nvme_err_invalid_setfeat(dw10);
+> > -        return NVME_INVALID_FIELD | NVME_DNR;
+> > +        return NVME_FEAT_NOT_CHANGEABLE | NVME_DNR;
+> >      }
+> >      return NVME_SUCCESS;
+> >  }
+> > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> > index f8940435f9ef..8ad1e3c89cee 100644
+> > --- a/hw/block/nvme.h
+> > +++ b/hw/block/nvme.h
+> > @@ -87,6 +87,24 @@ typedef struct NvmeFeatureVal {
+> >      uint32_t    async_config;
+> >  } NvmeFeatureVal;
+> >  
+> > +static const uint32_t nvme_feature_default[0x100] = {
+> > +    [NVME_ARBITRATION]           = NVME_ARB_AB_NOLIMIT,
+> > +};
+> > +
+> > +static const bool nvme_feature_support[0x100] = {
+> > +    [NVME_ARBITRATION]              = true,
+> > +    [NVME_POWER_MANAGEMENT]         = true,
+> > +    [NVME_TEMPERATURE_THRESHOLD]    = true,
+> > +    [NVME_ERROR_RECOVERY]           = true,
+> > +    [NVME_VOLATILE_WRITE_CACHE]     = true,
+> > +    [NVME_NUMBER_OF_QUEUES]         = true,
+> > +    [NVME_INTERRUPT_COALESCING]     = true,
+> > +    [NVME_INTERRUPT_VECTOR_CONF]    = true,
+> > +    [NVME_WRITE_ATOMICITY]          = true,
+> > +    [NVME_ASYNCHRONOUS_EVENT_CONF]  = true,
+> > +    [NVME_TIMESTAMP]                = true,
+> > +};
 > 
-> >   ##
-> > @@ -1659,6 +1662,7 @@
-> >   #
-> >   # @tag: name of the snapshot to load.
-> >   # @exclude: list of block device node names to exclude
-> > +# @vmstate: block device node name to load vmstate from
-> >   #
-> >   # Returns: nothing
-> >   #
-> > @@ -1667,6 +1671,7 @@
-> >   # -> { "execute": "loadvm",
-> >   #      "data": {
-> >   #         "tag": "my-snap",
-> > +#         "vmstate": "disk0",
-> >   #         "exclude": ["pflash0-vars"]
-> >   #      }
-> >   #    }
-> > @@ -1676,6 +1681,7 @@
-> >   ##
-> >   { 'command': 'loadvm',
-> >     'data': { 'tag': 'str',
-> > +            '*vmstate': 'str',
-> >               '*exclude': ['str'] } }
+> Nack. No variable assignation in header please.
+> Move that to the source file.
 > 
-> ...now that we support exclusion during saving, or even without exclusion
-> but when the user has performed hotplug/unplug operations in the meantime
-> from when the snapshot was created, isn't load better off listing all
-> devices which SHOULD be restored, rather than excluding devices that should
-> NOT be restored?  (After all, libvirt knows which disks existed at the time
-> of the snapshot, which may be different than the set of disks that exist now
-> even though we are throwing out the state now to go back to the state at the
-> time of the snapshot)
 
-If the user has hotplugged / unplugged any devices, then I expect the
-snapshot load to fail, because the vmstate will be referencing devices
-that don't exist, or will be missing devices. Same way migration will
-fail unless target QEMU has exact same device setup that was first
-serialized into the vmstate
+Understood :)
 
-In theory I guess you could have kept device ABI the same, but switched
-out disk backends, but I question the sanity of doing that while you have
-saved snapshots, unless you're preserving those snapshots in the new
-images in which case it will just work.
-
-> Then there's the question of symmetry: if load needs an explicit list of
-> blocks to load from (rather than the set of blocks that are currently
-> associated with the machine), should save also take its list by positive
-> inclusion rather than negative exclusion?
-
-I choose exclusion because the normal case is that you want to snapshot
-everything. You sometimes have a small number of exceptions, most notably
-the OVMF varstore. IOW if you're currently relying on default behaviour
-of snapshotting everything, it is much easier to just exclude one image
-and than to switch to explicitly including everything. Essentially I can
-just pass a static string associated with the varstore to be excluded,
-instead of having to dynamically build up a list of everything.
-
-I wouldn't mind supporting inclusion *and* exclusion, so users have the
-choice of which approach to take.
-
-> And why does delvm not need to specify which block is the vmstate? delvm is
-> in the same boat as loadvm - the set of blocks involved at the time of the
-> snapshot creation may be different than the set of blocks currently
-> associated with the guest at the time you run load/delvm.
-
-There's no code in delvm that needs to take any special action wrt
-vmstate. It simply deletes snapshots from all the disks present.
-
+> > +
+> >  typedef struct NvmeCtrl {
+> >      PCIDevice    parent_obj;
+> >      MemoryRegion iomem;
+> > diff --git a/hw/block/trace-events b/hw/block/trace-events
+> > index 091af16ca7d7..42e62f4649f8 100644
+> > --- a/hw/block/trace-events
+> > +++ b/hw/block/trace-events
+> > @@ -46,6 +46,8 @@ pci_nvme_identify_ctrl(void) "identify controller"
+> >  pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
+> >  pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
+> >  pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+> > +pci_nvme_getfeat(uint16_t cid, uint8_t fid, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" cdw11 0x%"PRIx32""
+> > +pci_nvme_setfeat(uint16_t cid, uint8_t fid, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" cdw11 0x%"PRIx32""
+> >  pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
+> >  pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
+> >  pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
+> > diff --git a/include/block/nvme.h b/include/block/nvme.h
+> > index 0dce15af6bcf..406648d4cf94 100644
+> > --- a/include/block/nvme.h
+> > +++ b/include/block/nvme.h
+> > @@ -662,6 +662,7 @@ enum NvmeStatusCodes {
+> >      NVME_FW_REQ_RESET           = 0x010b,
+> >      NVME_INVALID_QUEUE_DEL      = 0x010c,
+> >      NVME_FID_NOT_SAVEABLE       = 0x010d,
+> > +    NVME_FEAT_NOT_CHANGEABLE    = 0x010e,
+> >      NVME_FID_NOT_NSID_SPEC      = 0x010f,
+> >      NVME_FW_REQ_SUSYSTEM_RESET  = 0x0110,
+> >      NVME_CONFLICTING_ATTRS      = 0x0180,
+> > @@ -866,6 +867,7 @@ enum NvmeIdCtrlLpa {
+> >  #define NVME_CTRL_SGLS_ADDR_OFFSET         (0x1 << 20)
+> >  
+> >  #define NVME_ARB_AB(arb)    (arb & 0x7)
+> > +#define NVME_ARB_AB_NOLIMIT 0x7
+> >  #define NVME_ARB_LPW(arb)   ((arb >> 8) & 0xff)
+> >  #define NVME_ARB_MPW(arb)   ((arb >> 16) & 0xff)
+> >  #define NVME_ARB_HPW(arb)   ((arb >> 24) & 0xff)
+> > @@ -873,6 +875,8 @@ enum NvmeIdCtrlLpa {
+> >  #define NVME_INTC_THR(intc)     (intc & 0xff)
+> >  #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
+> >  
+> > +#define NVME_INTVC_NOCOALESCING (0x1 << 16)
+> > +
+> >  #define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
+> >  #define NVME_TEMP_THSEL_OVER   0x0
+> >  #define NVME_TEMP_THSEL_UNDER  0x1
+> > @@ -902,6 +906,9 @@ enum NvmeFeatureIds {
+> >      NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
+> >  };
+> >  
+> > +#define NVME_GETSETFEAT_FID_MASK 0xff
+> > +#define NVME_GETSETFEAT_FID(dw10) (dw10 & NVME_GETSETFEAT_FID_MASK)
+> > +
+> >  typedef struct NvmeRangeType {
+> >      uint8_t     type;
+> >      uint8_t     attributes;
+> > 
 > 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
 
