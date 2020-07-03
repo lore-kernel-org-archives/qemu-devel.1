@@ -2,85 +2,91 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE993C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE32C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AFF0206E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:35:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dT6oHVtR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFF0206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4B1C2073E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:36:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4B1C2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrI6I-0006V5-Pu
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:35:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35968)
+	id 1jrI7t-0001Zn-U7
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:36:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtV-0002p3-Cl
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51815
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtT-0000yD-WC
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593768120;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AtvVYwlc1+ydxWQZdKR7ou+wPvfLfU9yuoxoUybNOEo=;
- b=dT6oHVtRx9wWNZleCPqjSGawhuUTrbSJpHmlRBr9VMOTMhmlnxUESZlTgwMkGdhcjZPs7O
- NUic3wh8s0nOjJ52zmSQFfw6cp7BVj8/L1UTqcyLnj2A8uY3Esp+9R5vTzgYhEq6GqiEhX
- dxUnfqewLI5OmnwdUUtdXhyqNBd8AjI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-gGWpX8jtOZWUQrEghJhGmQ-1; Fri, 03 Jul 2020 05:21:56 -0400
-X-MC-Unique: gGWpX8jtOZWUQrEghJhGmQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29540107ACF3;
- Fri,  3 Jul 2020 09:21:55 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-90.ams2.redhat.com [10.36.114.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 350AD7AC63;
- Fri,  3 Jul 2020 09:21:54 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 3/7] qemu-storage-daemon: add missing cleanup calls
-Date: Fri,  3 Jul 2020 11:21:39 +0200
-Message-Id: <20200703092143.165594-4-kwolf@redhat.com>
-In-Reply-To: <20200703092143.165594-1-kwolf@redhat.com>
-References: <20200703092143.165594-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jrI7C-0000GX-GS
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:36:14 -0400
+Received: from mga04.intel.com ([192.55.52.120]:60536)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jrI79-0004m9-4I
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:36:13 -0400
+IronPort-SDR: RFpDIWwfa7jHvHGdV7CbXzTPO1jHHTd1eD1+I3veXcScR+2oHx9dyL1sP8Rn+i+mbne80pKc4h
+ S3Q6CfDwFCjQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="144644711"
+X-IronPort-AV: E=Sophos;i="5.75,307,1589266800"; d="scan'208";a="144644711"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Jul 2020 02:27:51 -0700
+IronPort-SDR: xE9yh13K0bKsngCqM06AuzhWmuYmV2zPOSuKm7i5lxM5b3jHqyMqB2ZKcmgfQCGDq3M5PZ824k
+ p++JgOKXmanA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,307,1589266800"; d="scan'208";a="278386416"
+Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
+ by orsmga003.jf.intel.com with ESMTP; 03 Jul 2020 02:27:51 -0700
+Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 3 Jul 2020 02:27:50 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 3 Jul 2020 17:27:48 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Fri, 3 Jul 2020 17:27:48 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: RE: [PATCH V2 0/2] net/colo-compare.c: Expose "max_queue_size" to
+ users and clean up
+Thread-Topic: [PATCH V2 0/2] net/colo-compare.c: Expose "max_queue_size" to
+ users and clean up
+Thread-Index: AQHWScdKlRnAwnxk2E6+4tCs8rrEA6j1pKeA
+Date: Fri, 3 Jul 2020 09:27:48 +0000
+Message-ID: <15d75b295b7b482db3ef2428aee87a6d@intel.com>
+References: <20200624012042.29355-1-chen.zhang@intel.com>
+In-Reply-To: <20200624012042.29355-1-chen.zhang@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Received-SPF: pass client-ip=192.55.52.120; envelope-from=chen.zhang@intel.com;
+ helo=mga04.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 05:27:51
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,40 +100,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: qemu-dev <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+Hi Jason,
 
-Several components used by qemu-storage-daemon have cleanup functions
-that aren't called. Keep the "valgrind --leak-check=full" as clean as
-possible by invoking the necessary cleanup functions.
+Maybe missed this updated series?
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200619101132.2401756-3-stefanha@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qemu-storage-daemon.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Thanks
+Zhang Chen
 
-diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-index a01cbd6371..7e9b0e0d3f 100644
---- a/qemu-storage-daemon.c
-+++ b/qemu-storage-daemon.c
-@@ -335,5 +335,9 @@ int main(int argc, char *argv[])
-         main_loop_wait(false);
-     }
- 
-+    monitor_cleanup();
-+    qemu_chr_cleanup();
-+    user_creatable_cleanup();
-+
-     return EXIT_SUCCESS;
- }
--- 
-2.25.4
+> -----Original Message-----
+> From: Zhang, Chen <chen.zhang@intel.com>
+> Sent: Wednesday, June 24, 2020 9:21 AM
+> To: Jason Wang <jasowang@redhat.com>
+> Cc: Zhang Chen <zhangckid@gmail.com>; qemu-dev <qemu-
+> devel@nongnu.org>; Zhang, Chen <chen.zhang@intel.com>
+> Subject: [PATCH V2 0/2] net/colo-compare.c: Expose "max_queue_size" to
+> users and clean up
+>=20
+> From: Zhang Chen <chen.zhang@intel.com>
+>=20
+> This series make a way to config COLO "max_queue_size" parameters
+> according to user's scenarios and environments and do some clean up for
+> descriptions.
+>=20
+> V2:
+>  - Rebase on upstream code.
+>=20
+> Zhang Chen (2):
+>   net/colo-compare.c: Expose compare "max_queue_size" to users
+>   qemu-options.hx: Clean up and fix typo for colo-compare
+>=20
+>  net/colo-compare.c | 43
+> ++++++++++++++++++++++++++++++++++++++++++-
+>  qemu-options.hx    | 33 +++++++++++++++++----------------
+>  2 files changed, 59 insertions(+), 17 deletions(-)
+>=20
+> --
+> 2.17.1
 
 
