@@ -7,38 +7,39 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01813C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2450C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:18:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C507220675
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:17:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C507220675
+	by mail.kernel.org (Postfix) with ESMTPS id 5906020675
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:18:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5906020675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrLZc-0004Qc-Pa
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:17:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43598)
+	id 1jrLaa-0005ha-CU
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:18:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLW4-0006xK-Qy; Fri, 03 Jul 2020 09:14:08 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60342 helo=relay3.sw.ru)
+ id 1jrLW0-0006q5-OC; Fri, 03 Jul 2020 09:14:04 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60346 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLVw-0007eN-0f; Fri, 03 Jul 2020 09:14:08 -0400
+ id 1jrLVv-0007eR-Qn; Fri, 03 Jul 2020 09:14:04 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLVj-0004Vj-Sd; Fri, 03 Jul 2020 16:13:47 +0300
+ id 1jrLVj-0004Vj-KP; Fri, 03 Jul 2020 16:13:47 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v8 06/10] qcow2_format.py: pass cluster size to substructures
-Date: Fri,  3 Jul 2020 16:13:46 +0300
-Message-Id: <1593782030-521984-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v8 02/10] qcow2_format.py: make printable data an extension
+ class member
+Date: Fri,  3 Jul 2020 16:13:42 +0300
+Message-Id: <1593782030-521984-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -50,7 +51,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,82 +70,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The cluster size of an image is the QcowHeader class member and may be
-obtained by dependent extension structures such as Qcow2BitmapExt for
-further bitmap table details print.
+Let us differ binary data type from string one for the extension data
+variable and keep the string as the QcowHeaderExtension class member.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/qcow2_format.py | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index 7c0dc9a..cfd9646 100644
+index cc432e7..2f3681b 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -130,14 +130,16 @@ class Qcow2BitmapExt(Qcow2Struct):
-         ('u64', '{:#x}', 'bitmap_directory_offset')
-     )
+@@ -165,6 +165,13 @@ class QcowHeaderExtension(Qcow2Struct):
+             self.data = fd.read(padded)
+             assert self.data is not None
  
--    def __init__(self, fd):
-+    def __init__(self, fd, cluster_size):
-         super().__init__(fd=fd)
-+        self.cluster_size = cluster_size
-         self.read_bitmap_directory(fd)
- 
-     def read_bitmap_directory(self, fd):
-         fd.seek(self.bitmap_directory_offset)
-         self.bitmap_directory = \
--            [Qcow2BitmapDirEntry(fd) for _ in range(self.nb_bitmaps)]
-+            [Qcow2BitmapDirEntry(fd, cluster_size=self.cluster_size)
-+             for _ in range(self.nb_bitmaps)]
- 
-     def dump(self):
-         super().dump()
-@@ -158,8 +160,9 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
-         ('u32', '{}', 'extra_data_size')
-     )
- 
--    def __init__(self, fd):
-+    def __init__(self, fd, cluster_size):
-         super().__init__(fd=fd)
-+        self.cluster_size = cluster_size
-         # Seek relative to the current position in the file
-         fd.seek(self.extra_data_size, 1)
-         bitmap_name = fd.read(self.name_size)
-@@ -199,11 +202,13 @@ class QcowHeaderExtension(Qcow2Struct):
-         # then padding to next multiply of 8
-     )
- 
--    def __init__(self, magic=None, length=None, data=None, fd=None):
-+    def __init__(self, magic=None, length=None, data=None, fd=None,
-+                 cluster_size=None):
-         """
-         Support both loading from fd and creation from user data.
-         For fd-based creation current position in a file will be used to read
-         the data.
-+        The cluster_size value may be obtained by dependent structures.
- 
-         This should be somehow refactored and functionality should be moved to
-         superclass (to allow creation of any qcow2 struct), but then, fields
-@@ -242,7 +247,7 @@ class QcowHeaderExtension(Qcow2Struct):
-             # Step back to reread data
-             padded = (self.length + 7) & ~7
-             fd.seek(-padded, 1)
--            self.obj = Qcow2BitmapExt(fd=fd)
-+            self.obj = Qcow2BitmapExt(fd=fd, cluster_size=cluster_size)
-             fd.seek(position)
++        data_str = self.data[:self.length]
++        if all(c in string.printable.encode('ascii') for c in data_str):
++            data_str = f"'{ data_str.decode('ascii') }'"
++        else:
++            data_str = '<binary>'
++        self.data_str = data_str
++
+         if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
+             self.obj = Qcow2BitmapExt(data=self.data)
          else:
-             self.obj = None
-@@ -318,7 +323,7 @@ class QcowHeader(Qcow2Struct):
-             end = self.cluster_size
+@@ -174,12 +181,7 @@ class QcowHeaderExtension(Qcow2Struct):
+         super().dump()
  
-         while fd.tell() < end:
--            ext = QcowHeaderExtension(fd=fd)
-+            ext = QcowHeaderExtension(fd=fd, cluster_size=self.cluster_size)
-             if ext.magic == 0:
-                 break
-             else:
+         if self.obj is None:
+-            data = self.data[:self.length]
+-            if all(c in string.printable.encode('ascii') for c in data):
+-                data = f"'{ data.decode('ascii') }'"
+-            else:
+-                data = '<binary>'
+-            print(f'{"data":<25} {data}')
++            print(f'{"data":<25} {self.data_str}')
+         else:
+             self.obj.dump()
+ 
 -- 
 1.8.3.1
 
