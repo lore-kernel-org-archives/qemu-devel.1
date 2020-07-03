@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B93C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EBBBC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:10:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF9A6217BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:09:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0816D217BA
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:10:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Ejj+wLEL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF9A6217BA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="XReo+abT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0816D217BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOGA-0006Pe-W4
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:09:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59198)
+	id 1jrOGz-0007en-8B
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:10:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5q-0003dA-Nt; Fri, 03 Jul 2020 11:59:14 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41791)
+ id 1jrO5m-0003QE-Bo; Fri, 03 Jul 2020 11:59:10 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:41753)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5l-0007SL-9j; Fri, 03 Jul 2020 11:59:14 -0400
+ id 1jrO5k-0007S0-Bj; Fri, 03 Jul 2020 11:59:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=XKJZ8yyqhlVSk84jmRYI3Yd+Y6Hi+Lfy6XSaI9F5REg=; 
- b=Ejj+wLELDOEWRBuYnNGPwORF9XACAT4J+E4ARbbGYMg8pW8evGDFzUj2U371rbA2JDp5pCxAGEoDjURwQqb9OOfpl3AoniJ3lD25g5kxUS92s8AonFUyowQKlQc2h1xvtvlDRJfVfYge/tSn0D2ErSEJnoKE1jYc/iM+zBFeiYuyI0vou4gVNAPzEkZ7qV144JDF1bHijsff/kYJ/0H2WlDiK75AON1kZqw+A/G76od6Xf2RjcxT+bfGrNhE3tkFuwfuJQTXyouImy9F2Y8DKAWG7m25+HErV8+TakN7ORzCKgla5Y3gjumJL1dn4e5d3d3cytUNUP3I7rRencUSpw==;
+ bh=fFliMiIZg8gQ9uYP+jhwHbbYWydz6rMSlmOIpLu6pk0=; 
+ b=XReo+abTqSdx4mMBNZcVTmkZRUxGv6nIef5MxwZRxbTHgJromDE5j+LVVrwSOwBSPPJ/a9lahMLg/F4UwsfPOEj38E/RXu15UaKWT056DMFnY9+UiH5hs9IOPbG9WqdBrMLycARUj476sY5dtXquqHtCReFoz6fPvTYwVIuOzj6chRym6UGAozlJa1SvbH7sLTJVGLYWCXUKrBSVhlN3so1ndXZBWttPYmtFdhTrrEPqMF3oosPWXr1G7NHlYpeM0+2XrvqOMYhRFUA5dCJusG18CV1/V5YkZtop7LvYl98JxTbaT6/v07UBDi/9xcZxzUumQT3Pk4CIDGrW78KQVQ==;
 Received: from [81.0.49.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jrO5L-0001Rk-Vj; Fri, 03 Jul 2020 17:58:44 +0200
+ id 1jrO5L-0001Qg-JV; Fri, 03 Jul 2020 17:58:43 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jrO52-0007Qj-IW; Fri, 03 Jul 2020 17:58:24 +0200
+ id 1jrO52-0007QH-9O; Fri, 03 Jul 2020 17:58:24 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 33/34] qcow2: Assert that expand_zero_clusters_in_l1()
- does not support subclusters
-Date: Fri,  3 Jul 2020 17:58:19 +0200
-Message-Id: <85378aabb27575eb1dc853213c0bd7176ed4bd1a.1593791819.git.berto@igalia.com>
+Subject: [PATCH v10 24/34] qcow2: Add subcluster support to
+ check_refcounts_l2()
+Date: Fri,  3 Jul 2020 17:58:10 +0200
+Message-Id: <54394425a624bd2180f3b01bf4a9526f8ad6ed6e.1593791819.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1593791819.git.berto@igalia.com>
 References: <cover.1593791819.git.berto@igalia.com>
@@ -85,87 +85,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function is only used by qcow2_expand_zero_clusters() to
-downgrade a qcow2 image to a previous version. This would require
-transforming all extended L2 entries into normal L2 entries but this
-is not a simple task and there are no plans to implement this at the
-moment.
+The offset field of an uncompressed cluster's L2 entry must be aligned
+to the cluster size, otherwise it is invalid. If the cluster has no
+data then it means that the offset points to a preallocation, so we
+can clear the offset field without affecting the guest-visible data.
+This is what 'qemu-img check' does when run in repair mode.
+
+On traditional qcow2 images this can only happen when QCOW_OFLAG_ZERO
+is set, and repairing such entries turns the clusters from ZERO_ALLOC
+into ZERO_PLAIN.
+
+Extended L2 entries have no ZERO_ALLOC clusters and no QCOW_OFLAG_ZERO
+but the idea is the same: if none of the subclusters are allocated
+then we can clear the offset field and leave the bitmap untouched.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c      | 8 +++++++-
- tests/qemu-iotests/061     | 6 ++++++
- tests/qemu-iotests/061.out | 5 +++++
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ block/qcow2-refcount.c     | 16 +++++++++++-----
+ tests/qemu-iotests/060.out |  2 +-
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index bbf373ad21..81c49ba934 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -2159,6 +2159,9 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-     int ret;
-     int i, j;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 770c5dbc83..aae52607eb 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1669,12 +1669,18 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
  
-+    /* qcow2_downgrade() is not allowed in images with subclusters */
-+    assert(!has_subclusters(s));
+             /* Correct offsets are cluster aligned */
+             if (offset_into_cluster(s, offset)) {
++                bool contains_data;
+                 res->corruptions++;
+ 
+-                if (qcow2_get_cluster_type(bs, l2_entry) ==
+-                    QCOW2_CLUSTER_ZERO_ALLOC)
+-                {
+-                    fprintf(stderr, "%s offset=%" PRIx64 ": Preallocated zero "
++                if (has_subclusters(s)) {
++                    uint64_t l2_bitmap = get_l2_bitmap(s, l2_table, i);
++                    contains_data = (l2_bitmap & QCOW_L2_BITMAP_ALL_ALLOC);
++                } else {
++                    contains_data = !(l2_entry & QCOW_OFLAG_ZERO);
++                }
 +
-     slice_size2 = s->l2_slice_size * l2_entry_size(s);
-     n_slices = s->cluster_size / slice_size2;
++                if (!contains_data) {
++                    fprintf(stderr, "%s offset=%" PRIx64 ": Preallocated "
+                             "cluster is not properly aligned; L2 entry "
+                             "corrupted.\n",
+                             fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR",
+@@ -1686,7 +1692,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+                         int ign = active ? QCOW2_OL_ACTIVE_L2 :
+                                            QCOW2_OL_INACTIVE_L2;
  
-@@ -2227,7 +2230,8 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                 if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN) {
-                     if (!bs->backing) {
-                         /* not backed; therefore we can simply deallocate the
--                         * cluster */
-+                         * cluster. No need to call set_l2_bitmap(), this
-+                         * function doesn't support images with subclusters. */
-                         set_l2_entry(s, l2_slice, j, 0);
-                         l2_dirty = true;
-                         continue;
-@@ -2298,6 +2302,8 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                 } else {
-                     set_l2_entry(s, l2_slice, j, offset);
-                 }
-+                /* No need to call set_l2_bitmap() after set_l2_entry() because
-+                 * this function doesn't support images with subclusters. */
-                 l2_dirty = true;
-             }
+-                        l2_entry = QCOW_OFLAG_ZERO;
++                        l2_entry = has_subclusters(s) ? 0 : QCOW_OFLAG_ZERO;
+                         set_l2_entry(s, l2_table, i, l2_entry);
+                         ret = qcow2_pre_write_overlap_check(bs, ign,
+                                 l2e_offset, l2_entry_size(s), false);
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index be5f8707a3..fa3d68f0df 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -320,7 +320,7 @@ discard 65536/65536 bytes at offset 0
+ qcow2: Marking image as corrupt: Preallocated zero cluster offset 0x2a00 unaligned (guest offset: 0); further corruption events will be suppressed
+ write failed: Input/output error
+ --- Repairing ---
+-Repairing offset=2a00: Preallocated zero cluster is not properly aligned; L2 entry corrupted.
++Repairing offset=2a00: Preallocated cluster is not properly aligned; L2 entry corrupted.
+ The following inconsistencies were found and repaired:
  
-diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index 10eb243164..23add2dfe3 100755
---- a/tests/qemu-iotests/061
-+++ b/tests/qemu-iotests/061
-@@ -303,6 +303,12 @@ $QEMU_IMG amend -o "compat=0.10" "$TEST_IMG"
- _img_info --format-specific
- _check_test_img
- 
-+echo
-+echo "=== Testing version downgrade with extended L2 entries ==="
-+echo
-+_make_test_img -o "compat=1.1,extended_l2=on" 64M
-+$QEMU_IMG amend -o "compat=0.10" "$TEST_IMG"
-+
- echo
- echo "=== Try changing the external data file ==="
- echo
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index f618259d47..a139d4f1fe 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -528,6 +528,11 @@ Format specific information:
-     extended l2: false
- No errors were found on the image.
- 
-+=== Testing version downgrade with extended L2 entries ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+qemu-img: Cannot downgrade an image with incompatible features 0x10 set
-+
- === Try changing the external data file ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+     0 leaked clusters
 -- 
 2.20.1
 
