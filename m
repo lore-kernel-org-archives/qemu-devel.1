@@ -7,79 +7,77 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CD0C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA46C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B72BC207DA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:04:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE002207FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:06:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/FpPoxH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B72BC207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bfe/Njzg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE002207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHcp-0008Nx-V0
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:04:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59566)
+	id 1jrHeF-0003F0-4s
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:06:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbm-0006aD-Rn
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:46 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47567
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbo-0006dT-Gq
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47010
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbl-0004N1-2J
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:46 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbm-0004ND-Jr
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593767023;
+ s=mimecast20190719; t=1593767025;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=3SejujQmFP8i9uGegxOHZH22A3MzEqNQC/7kkGUHxhs=;
- b=X/FpPoxHXxDTjPYC3C8sD3wW8SFrHj6OlEpN3ybbYwjOJoVh1d8NhHBtFgd3aeOkF6KCyc
- IZhKaWmKqCo69pjx63Wt1usPAnWRxx2LPfKyuxPobKwtHZPuH1EnJRxsMzPYj5bsSqcCvH
- zjCxaO5d+4GfYFIQbLRzhKkMQ6kytD8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-64dmjPcOOfOi4XMFXrTgVw-1; Fri, 03 Jul 2020 05:03:42 -0400
-X-MC-Unique: 64dmjPcOOfOi4XMFXrTgVw-1
-Received: by mail-wm1-f72.google.com with SMTP id v11so15781891wmb.1
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:03:41 -0700 (PDT)
+ bh=zAm2WZsz8jFA4V7I3jZT5e4XH4Wdo1IJW/sufln0SFE=;
+ b=Bfe/Njzg9k2XPtkrfhyxRp/zdDChCt+pxI4PPxj5fiajsUUJG180kdTghiGFSP9pT0TSlt
+ Zf/11IbixrRi9znTb9tt9te2wxkEEqRAKirIouZRa0OzosY/1C+lSYHU2wf8yHNhyE661Y
+ 8Xkc+1dYepUUSjCzE5r2gWxNpBqcZC0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-250-fWeBs5jfMnWlc70NENxPag-1; Fri, 03 Jul 2020 05:03:44 -0400
+X-MC-Unique: fWeBs5jfMnWlc70NENxPag-1
+Received: by mail-wm1-f70.google.com with SMTP id g187so34473955wme.0
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:03:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=3SejujQmFP8i9uGegxOHZH22A3MzEqNQC/7kkGUHxhs=;
- b=tIMrBlh/CpZfin2JNrcmZQPxkmpi5suwv5bi+UaaSXWk4ut6E7SvliWO6M4MBx+f1B
- Y4YOcyzpTr1JQZL9tSy5FrqYRKjrlwBAUm04vj93PEuPgS3D7w/5A5c6/SakWTYv+BqZ
- sckrjQ+c8M6EbbPNc/e8XYlaWGFRsRWgsHAKUJ0EFvttnorisOfwFyBvu/DrLjuoVqnt
- 8t1wweOozA3aQtCqFaN8DrcAhlV7HRPRSpVWB5WPOOJ4xHw8KrAlsOlzU637aW1ExuI8
- MStFKeBUkDrpfn3W3lHTRvq3FbwLKeitGGGfnas9OpT3qYcbSKy74dBwMoWg5bvl1+/L
- iB2Q==
-X-Gm-Message-State: AOAM530twIcRyh06s2q/E64vNbRHc9Q036o/DnBCB1Y9S+eF3sZgBkoK
- MnP0eYKoeCm+J+j6rDG9iI+3NzoXE233E8Qk2U/nxq01yqqDmqV2XA0yvXF81R6SnM43Iusl0CT
- CsRynw7r/zUlPg1w=
-X-Received: by 2002:a1c:bcd4:: with SMTP id
- m203mr35307708wmf.124.1593767019911; 
- Fri, 03 Jul 2020 02:03:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx54lyMEhYehJC9RdYF6g0URy/LZ1hAqBXGniXvFqkXRx8GH3aV/DPBPqhphpWlQA8ellUFbA==
-X-Received: by 2002:a1c:bcd4:: with SMTP id
- m203mr35307685wmf.124.1593767019691; 
- Fri, 03 Jul 2020 02:03:39 -0700 (PDT)
+ bh=zAm2WZsz8jFA4V7I3jZT5e4XH4Wdo1IJW/sufln0SFE=;
+ b=iTZzCG9InuDNZ09Q/yeCyt2usd6QVVUQGrSR/AP1AiyvFWVi+CxyEMaRcLXR4rbqu5
+ zzQUpqv+NRXp4oQL5nQnSBbydGq1SPIRq/N/6OgWtsLPtP5h0Zm10lualiblWQTx7+t5
+ O4Zd4+jWHHLY0vOp7WywETAfUw1FLfiArZtof3j+8/AZjHidZi4/AI8bCht+AI6aMrbV
+ HO5Q+vcqdZa8gqI1FzT4TUV8rtfZLtm+ESYMw7OG8iMlzurl9Qkm0+hiWNYIxh7mzhWT
+ 6Hx+cCz9ezPrlKBHVsgjsJAXVWIgakNY7lZo+lzs+GltRPGzb+VfTeOdEUY7i0Gi4mZZ
+ Kvgw==
+X-Gm-Message-State: AOAM53267JbBPy87kgBpG8BFs0bxXGtzyq3rOuBJwF0KCSCPC2hmvFO1
+ h6LvLs0waVFrifHT9VTE7Qehzy0CPRtccvC6SzS9NRESPzpCDxmpJb04l25Kjcac5DJR4p1cyyp
+ 083Qm99Fn/QttdDE=
+X-Received: by 2002:a1c:b103:: with SMTP id a3mr35426326wmf.186.1593767022776; 
+ Fri, 03 Jul 2020 02:03:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyAwOkXJuUflto4b9dJWf5KWO22GkGrEzGFgLtLk73NjZ1tIdVgpxkN0p7zfjsDkR4HJo7w9Q==
+X-Received: by 2002:a1c:b103:: with SMTP id a3mr35426314wmf.186.1593767022605; 
+ Fri, 03 Jul 2020 02:03:42 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- h84sm13809795wme.22.2020.07.03.02.03.38
+ q1sm13319920wro.82.2020.07.03.02.03.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 02:03:39 -0700 (PDT)
-Date: Fri, 3 Jul 2020 05:03:37 -0400
+ Fri, 03 Jul 2020 02:03:42 -0700 (PDT)
+Date: Fri, 3 Jul 2020 05:03:40 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/41] virtio-balloon: always indicate S_DONE when migration
- fails
-Message-ID: <20200703090252.368694-4-mst@redhat.com>
+Subject: [PULL 04/41] pc: Support coldplugging of virtio-pmem-pci devices on
+ all buses
+Message-ID: <20200703090252.368694-5-mst@redhat.com>
 References: <20200703090252.368694-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
@@ -91,9 +89,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -115,95 +113,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alexander Duyck <alexander.h.duyck@linux.intel.com>,
- Wei Wang <wei.w.wang@intel.com>, Alexander Duyck <alexander.duyck@gmail.com>,
- David Hildenbrand <david@redhat.com>
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Vivek Goyal <vgoyal@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: David Hildenbrand <david@redhat.com>
 
-If something goes wrong during precopy, before stopping the VM, we will
-never send a S_DONE indication to the VM, resulting in the hinted pages
-not getting released to be used by the guest OS (e.g., Linux).
+E.g., with "pc-q35-4.2", trying to coldplug a virtio-pmem-pci devices
+results in
+    "virtio-pmem-pci not supported on this bus"
 
-Easy to reproduce:
-1. Start migration (e.g., HMP "migrate -d 'exec:gzip -c > STATEFILE.gz'")
-2. Cancel migration (e.g., HMP "migrate_cancel")
-3. Oberve in the guest (e.g., cat /proc/meminfo) that there is basically
-   no free memory left.
+Reasons is, that the bus does not support hotplug and, therefore, does
+not have a hotplug handler. Let's allow coldplugging virtio-pmem devices
+on such buses. The hotplug order is only relevant for virtio-pmem-pci
+when the guest is already alive and the device is visible before
+memory_device_plug() wired up the memory device bits.
 
-While at it, add similar locking to virtio_balloon_free_page_done() as
-done in virtio_balloon_free_page_stop. Locking is still weird, but that
-has to be sorted out separately.
+Hotplug attempts will still fail with:
+    "Error: Bus 'pcie.0' does not support hotplugging"
 
-There is nothing to do in the PRECOPY_NOTIFY_COMPLETE case. Add some
-comments regarding S_DONE handling.
+Hotunplug attempts will still fail with:
+    "Error: Bus 'pcie.0' does not support hotplugging"
 
-Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
-Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Cc: Wei Wang <wei.w.wang@intel.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>
+Reported-by: Vivek Goyal <vgoyal@redhat.com>
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200629080615.26022-1-david@redhat.com>
+Message-Id: <20200626072248.78761-2-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ hw/i386/pc.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 10507b2a43..8a84718490 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -628,8 +628,13 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(s);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4af9679d03..58b1425c17 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1643,13 +1643,13 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+     HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+     Error *local_err = NULL;
  
--    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
--    virtio_notify_config(vdev);
-+    if (s->free_page_report_status != FREE_PAGE_REPORT_S_DONE) {
-+        /* See virtio_balloon_free_page_stop() */
-+        qemu_mutex_lock(&s->free_page_lock);
-+        s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
-+        qemu_mutex_unlock(&s->free_page_lock);
-+        virtio_notify_config(vdev);
-+    }
+-    if (!hotplug_dev2) {
++    if (!hotplug_dev2 && dev->hotplugged) {
+         /*
+          * Without a bus hotplug handler, we cannot control the plug/unplug
+-         * order. This should never be the case on x86, however better add
+-         * a safety net.
++         * order. We should never reach this point when hotplugging on x86,
++         * however, better add a safety net.
+          */
+-        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
++        error_setg(errp, "virtio-pmem-pci hotplug not supported on this bus.");
+         return;
+     }
+     /*
+@@ -1658,7 +1658,7 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+      */
+     memory_device_pre_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev), NULL,
+                            &local_err);
+-    if (!local_err) {
++    if (!local_err && hotplug_dev2) {
+         hotplug_handler_pre_plug(hotplug_dev2, dev, &local_err);
+     }
+     error_propagate(errp, local_err);
+@@ -1676,9 +1676,11 @@ static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
+      * device bits.
+      */
+     memory_device_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+-    hotplug_handler_plug(hotplug_dev2, dev, &local_err);
+-    if (local_err) {
+-        memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
++    if (hotplug_dev2) {
++        hotplug_handler_plug(hotplug_dev2, dev, &local_err);
++        if (local_err) {
++            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
++        }
+     }
+     error_propagate(errp, local_err);
  }
- 
- static int
-@@ -653,17 +658,26 @@ virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
-     case PRECOPY_NOTIFY_SETUP:
-         precopy_enable_free_page_optimization();
-         break;
--    case PRECOPY_NOTIFY_COMPLETE:
--    case PRECOPY_NOTIFY_CLEANUP:
-     case PRECOPY_NOTIFY_BEFORE_BITMAP_SYNC:
-         virtio_balloon_free_page_stop(dev);
-         break;
-     case PRECOPY_NOTIFY_AFTER_BITMAP_SYNC:
-         if (vdev->vm_running) {
-             virtio_balloon_free_page_start(dev);
--        } else {
--            virtio_balloon_free_page_done(dev);
-+            break;
-         }
-+        /*
-+         * Set S_DONE before migrating the vmstate, so the guest will reuse
-+         * all hinted pages once running on the destination. Fall through.
-+         */
-+    case PRECOPY_NOTIFY_CLEANUP:
-+        /*
-+         * Especially, if something goes wrong during precopy or if migration
-+         * is canceled, we have to properly communicate S_DONE to the VM.
-+         */
-+        virtio_balloon_free_page_done(dev);
-+        break;
-+    case PRECOPY_NOTIFY_COMPLETE:
-         break;
-     default:
-         virtio_error(vdev, "%s: %d reason unknown", __func__, pnd->reason);
 -- 
 MST
 
