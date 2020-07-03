@@ -2,74 +2,97 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07620C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1128BC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8DA020885
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:45:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8DA020885
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D0D2C20884
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:57:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LpjOlT0U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D2C20884
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrSYt-0002MO-3k
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:45:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42938)
+	id 1jrSkW-0008PH-3N
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:57:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jrSY7-0001qk-Dv
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 16:44:43 -0400
-Resent-Date: Fri, 03 Jul 2020 16:44:43 -0400
-Resent-Message-Id: <E1jrSY7-0001qk-Dv@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21397)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jrSY1-0007fi-SM
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 16:44:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593809061; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=FhqG+5jDJZb0/AbTmv3P+5Ez4oWk+nBBKhF+riWjGDr8Sr3Oqm3jsvKI501pQ91KY8CxTWPpWJasgYS2YUcZRs+43tbeUwVacv79xcDRXuxB/PQAMXwUBNkfwkYl/BMsl8Pf7eFmXwiKpzVKAFguLW6jSuOIoSqdlSH7VQmxHMQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593809061;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=HCNqo29KGwtG6iGx2UaFTNPUw3kx1D+KUvTfQQL72wI=; 
- b=J0ffmEoXotLZMTp3jqZT9T2butraMA18PIvgUjtUrgxgWW8NvTUFJt2DikAuF5b/UQGGV3LNJUKt3aySDYAcW+BIEVEjfYKQ1hzJBvmLqWjHk2nIcLgqhI+3kUIhO8tEjq+DtAXYnuqZe/qDOwujgJyTZb73/fUVm2icB6MgQa4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593809060032343.06260603044745;
- Fri, 3 Jul 2020 13:44:20 -0700 (PDT)
-Message-ID: <159380905868.16530.11130859212111999060@d1fd068a5071>
-Subject: Re: [PATCH 0/3] Add ability to choose MDIO phy number to i.MX
- processors
-In-Reply-To: <cover.1593806826.git.jcd@tribudubois.net>
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jrSjZ-0007o0-QU
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 16:56:33 -0400
+Received: from mail-vk1-xa44.google.com ([2607:f8b0:4864:20::a44]:36456)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jrSjY-0002Gl-Aj
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 16:56:33 -0400
+Received: by mail-vk1-xa44.google.com with SMTP id s192so7360924vkh.3
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 13:56:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=URtNUD6GSTAQ7SAD3xbfDjQDrrOchuNcrcx+xI4NSVE=;
+ b=LpjOlT0UFhP+SidGvZSXO+FB7vrfIlT9OCWkrGyCza0bwCdS1lSrEhpanXfpdxHuyb
+ E7sbXs3Xaif6cp7Ri/ywqjfzxqLFYmsc6fm5joK6Ub9eUR2oExeIJU3M/syRMS+XT0uI
+ 4DBt3w48SykIUP4RcFYNfYvmcABVqzMwTTn3V4Up48Gqdmr6n21gEDegdIGM4IAxQXbi
+ tyN3eAsz4H5gFfm3wkw0vyKbxLs2tmpdOfFTtomVE+MwwV3ygOOF3B5VMna02o7orsjQ
+ kMFXQLvraOJS2Gr3o01wAMPaS4c9uTAolXQYoYn/Av3zMAwBoY1+a0tqaQvyWD49NMkc
+ WRfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=URtNUD6GSTAQ7SAD3xbfDjQDrrOchuNcrcx+xI4NSVE=;
+ b=Ix7pQeQPV6qBnC9s1eDz7nqFICdmja1jLGhT0k/9U2L/r5dY4bwqSlM5vRWDMdY6iX
+ RsnDuHr0n3T7bdEb7T+ik1hdz60UL23cRHxrbIGbUK9npbJpa/+9OON3j7FQEVPXVsiz
+ AdT5fRIDrlleARtrFocvpeCfNAcRfxVkrwi7Zd3iWqhpC54oIikkpx/FLnQyYojVmgDe
+ 4Q2V3VPODdIX5GiXdWpTngfoPW/qdgTwyR1fI+qhZe0p7BLX3qQZRJc5BVPp9lvxwpNW
+ IXYtY7JAjhkz+SfZa2AoS27dDLVmonV8QL9GeC/o7dcOvPLWVXaVSGcglAs2vt9xC7Sl
+ sdFA==
+X-Gm-Message-State: AOAM533ShgUDABY1GGImAPe+Y1CaIdnYbYpa3wg3GbguCnY6Ksb2EuZ2
+ TxWW3xVwc2oPyK5/ot3A3llSvvYKtwJ4WW195IYcew==
+X-Google-Smtp-Source: ABdhPJwm33N5yPnBIXG5z1amad3dreXS7niLMQG2asMrmf3TDID+AhfweT7T57ZYyqXh9bg9Y/90YdD4hK2o6YNvF64=
+X-Received: by 2002:a05:6122:130b:: with SMTP id
+ e11mr29630373vkp.20.1593809790964; 
+ Fri, 03 Jul 2020 13:56:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: jcd@tribudubois.net
-Date: Fri, 3 Jul 2020 13:44:20 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 16:44:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200626235519.591734-1-hskinnemoen@google.com>
+ <20200626235519.591734-6-hskinnemoen@google.com>
+ <001d2d27-dfe2-b03b-9996-ca69ba81a542@amsat.org>
+In-Reply-To: <001d2d27-dfe2-b03b-9996-ca69ba81a542@amsat.org>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Fri, 3 Jul 2020 13:56:19 -0700
+Message-ID: <CAFQmdRZ4o9hs57kGU6WWHuBw4X+F55WyEsrhqiDTnSb3iftxTA@mail.gmail.com>
+Subject: Re: [PATCH v3 05/12] hw/arm: Add NPCM730 and NPCM750 SoC models
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
+ Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::a44;
+ envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,47 +105,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, jcd@tribudubois.net, peter.chubb@nicta.com.au,
- qemu-devel@nongnu.org, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTkzODA2ODI2Lmdp
-dC5qY2RAdHJpYnVkdWJvaXMubmV0LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCnFlbXUtc3lzdGVtLWFhcmNoNjQ6
-IFByb3BlcnR5ICcucGh5LW51bScgbm90IGZvdW5kCkJyb2tlbiBwaXBlCi90bXAvcWVtdS10ZXN0
-L3NyYy90ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjE3NToga2lsbF9xZW11KCkgZGV0ZWN0ZWQgUUVN
-VSBkZWF0aCBmcm9tIHNpZ25hbCA2IChBYm9ydGVkKSAoY29yZSBkdW1wZWQpCkVSUk9SIC0gdG9v
-IGZldyB0ZXN0cyBydW4gKGV4cGVjdGVkIDY2LCBnb3QgMCkKbWFrZTogKioqIFtjaGVjay1xdGVz
-dC1hYXJjaDY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMu
-Li4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDE1NApDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJu
-ZWwgbW9kdWxlOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5Ci0tLQogICAgcmFpc2UgQ2FsbGVk
-UHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6
-IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29t
-LnFlbXUuaW5zdGFuY2UudXVpZD00YTIzMzVjM2RlZGM0NDAwYmFlN2IzMjc5NThkZmE1YScsICct
-dScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJt
-JywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAn
-LWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9
-MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRj
-aGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAn
-L3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTllNThrZnpuL3NyYy9kb2NrZXItc3JjLjIwMjAt
-MDctMDMtMTYuMjkuMjAuMjgxNjk6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycs
-ICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4
-aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlk
-PTRhMjMzNWMzZGVkYzQ0MDBiYWU3YjMyNzk1OGRmYTVhCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1
-bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10
-ZXN0ZXItdG1wLTllNThrZnpuL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tA
-Y2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxNG01OC42NjZzCnVzZXIgICAgMG05LjE2OXMKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVy
-LjE1OTM4MDY4MjYuZ2l0LmpjZEB0cmlidWR1Ym9pcy5uZXQvdGVzdGluZy5kb2NrZXItcXVpY2tA
-Y2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Fri, Jul 3, 2020 at 6:32 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>
+> On 6/27/20 1:55 AM, Havard Skinnemoen wrote:
+> > +/*
+> > + * This covers the whole MMIO space. We'll use this to catch any MMIO =
+accesses
+> > + * that aren't handled by any device.
+> > + */
+> > +#define NPCM7XX_MMIO_BA         (0x80000000)
+> > +#define NPCM7XX_MMIO_SZ         (0x7FFD0000)
+>
+> Could be 0x80000000 since UNIMP_DEVICE is created with low
+> priority.
+
+Good point, I'll do that.
+
+> > +    /* I/O space -- unimplemented unless overridden below. */
+> > +    create_unimplemented_device("npcm7xx.io", NPCM7XX_MMIO_BA, NPCM7XX=
+_MMIO_SZ);
+>
+> Note by doing that you won't get transaction failures when accessing
+> unassigned regions. This not incorrect, but a bit overkill (this covers
+> almost 2GiB...).
+
+A lot of that 2GiB space is used by six 128 MiB flash memory
+apertures. But there are some holes that probably should generate
+transaction failures instead of a default response.
+
+Would it be OK if I send a patch to tighten up the unimplemented space
+once a few more of the peripherals have been implemented?
+
+Havard
 
