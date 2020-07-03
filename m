@@ -5,73 +5,72 @@ X-Spam-Level:
 X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D45FBC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC2BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:20:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4DC920737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8453020737
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 01:20:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qiPZMUMO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4DC920737
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxhJuctL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8453020737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrANJ-00024c-RB
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 21:20:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50742)
+	id 1jrANN-0002Fp-QR
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 21:20:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jrAMR-0000xN-0R; Thu, 02 Jul 2020 21:19:27 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:38111)
+ id 1jrAMT-0000zp-Mv; Thu, 02 Jul 2020 21:19:29 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:32774)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jrAMP-0005MP-FF; Thu, 02 Jul 2020 21:19:26 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id e197so10659575yba.5;
- Thu, 02 Jul 2020 18:19:24 -0700 (PDT)
+ id 1jrAMS-0005MZ-47; Thu, 02 Jul 2020 21:19:29 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id o4so14712894ybp.0;
+ Thu, 02 Jul 2020 18:19:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YGahHP3tyu+0BNL78d1oYyAyhbkJC746FTnL0fkPy7A=;
- b=qiPZMUMO0EPe8+RJHmDiuneh8JfDk3m0eFse94euLCwEX3hqff8cKmqLKI3fon/uVt
- WLf0U4N4Z1ZkrcwU6149ROsUAh/ZcQU0MXSz3zK+J/kGLEHxNLFaxjftw13B3Fveeru6
- xkCvoQTyarvz0poen2uZk3Q0fyHgpf/b5xHvQyJM8eyfC41KWjaTXV6ysX0eCIvRhPRh
- OqzEae8bViEkZClnb5bY0N8X3/NvxlXGY7x5guMaWJGgW3z0PAlSVCFfExzi19SdsQbR
- QIbU3K9c+zJjtfQKyYR8uCVii4VjjKA75OpHQind0SRD9hbZUU7EGTepKPySfGJfgtdy
- 1JHw==
+ :cc; bh=W96E0lKCag1Y0M/Pnhw3YHiDTbeq3/x61CkSWRMK3fc=;
+ b=lxhJuctLowhRrVeRUWRu1zBG2xx9OCpN/Uet5PRrEue9Yst+lv3mWw+tkLOrAQjyxO
+ d3vXaJGGW6MhgcVwjgijen+C8uIcRAR2sn6zZ4mzw3F6frVk7FcJzPhAZKGakehsUtCP
+ rdzk2zVNwZseY5ZyNG8T/niK0OFp/TOFQpPs2YTW/xHH97OXT4bIYwHMSlfrN7cGoGlO
+ vcXnbZJmhqAlJAZmLG3w6AjBw/Lb+XCI37K0Pw4BDNRQwyqh7S8GGo3AcprQeUusdkk7
+ SnZ/86O4rkO/i8/amL+1t8TY6DPGYQ/deWFnOk+lUOGUC5YJE+jzhdmhigOfvrXDstvz
+ 6ZgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=YGahHP3tyu+0BNL78d1oYyAyhbkJC746FTnL0fkPy7A=;
- b=gpB9FVLVElFAuggLS1HXBvR5YOP09+32DkfGUPVZkWMH5oBTcbv8mHcuPBk1DZ4QkR
- DxeDgY7xRAYFcpPWC6xHBItcpGKyCHxlwOWBGHdXSHaQ18LYiYJZTUBZYiBczyQ5L2X4
- vBCMw7DOR9TIgJLPhYAGkEby2pJrN/YBqxNrA60e4nEKJIvIqdeTn4IFSp/O5YetTVXy
- HdB2oIROf+M16WvG3gca6mjNnVu74xgyEIsiRNYj2cv767C1Fw8sNV5u3KD+FUYfnW5x
- TKzxSHYu1PPwEEUUV4z2EyKzPMVG4xSzUjhhUi7RoxcS6R6wylbV0AyrcI7BomFKbpE+
- ei/g==
-X-Gm-Message-State: AOAM533Bcr6ML9hLKdzOFMrAqbnAmfRN+RpPvnGVPa0MNdfweyXniEUI
- N55JLMGkpTTx3wCaslhI0tPgzrHgo4mTMlDYU+Q=
-X-Google-Smtp-Source: ABdhPJzP26e/++syjzTiKuWSwUfZOMZA2zTlzlfVOVLDbt5j0U1izzRe5W/hPvYhAJfdJPu0ZifCXD5iEBWyZPXDLU0=
-X-Received: by 2002:a25:38c5:: with SMTP id
- f188mr55693721yba.332.1593739163789; 
- Thu, 02 Jul 2020 18:19:23 -0700 (PDT)
+ bh=W96E0lKCag1Y0M/Pnhw3YHiDTbeq3/x61CkSWRMK3fc=;
+ b=TtVTTT/OvJ34zQ0XLTVwSfpRP8Zvx/WC+TgA+JXz6+4pU+lUS7qrEjqZNnyMRslwUq
+ 62p31qpgZ5zOpJNH2webYNFT7znYqOQTd278MRrpzCObWnPTPSkVsaJ1FssXIkPgtUb9
+ 2N1w6YwqbQkve4wTlRUVFB6PBJMzYEzJYoOv8/Gd7sAtEPAA1bcJYOrMIkhgFFAKSrCb
+ xG/IeRGqKTu3H4pr+O2KXIAhs2zd4e3aBHmKCD0I+hL81VODsrdeOZROzrs2OzwECxcy
+ MThbtZBXFyHfcCQz1AW6Ee/2JpWuVWSPAUNxqdQORCi9d0Mt5mEUw5UUAfjqb88fcJT7
+ 3h9w==
+X-Gm-Message-State: AOAM531i2ZIqBiNENZz7+oK1Yg2feDqP3Me+NgC/BTDKEHS5uLEP7AKu
+ e/9gQFdwgzZ0YIGt2qBwVxgwegfJwwAN4goK64Y=
+X-Google-Smtp-Source: ABdhPJwcWmtms5y/bvECvWO5XcgmbQqN9/LANeTuvA7K10ukCmDUcMYGWzOMoHS+rdnh67XJi8gJWyM9WrBdkrWbKmQ=
+X-Received: by 2002:a25:afca:: with SMTP id d10mr50985211ybj.517.1593739166826; 
+ Thu, 02 Jul 2020 18:19:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200701183949.398134-1-atish.patra@wdc.com>
- <20200701183949.398134-3-atish.patra@wdc.com>
-In-Reply-To: <20200701183949.398134-3-atish.patra@wdc.com>
+ <20200701183949.398134-4-atish.patra@wdc.com>
+In-Reply-To: <20200701183949.398134-4-atish.patra@wdc.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 3 Jul 2020 09:19:12 +0800
-Message-ID: <CAEUhbmX9O2UO-Vc1jn=VOY6fz0Drdnh-F+m6h9CZVSJLUFTxwg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/4] RISC-V: Copy the fdt in dram instead of ROM
+Date: Fri, 3 Jul 2020 09:19:15 +0800
+Message-ID: <CAEUhbmWcRCTVg-9kkFzPZ5_ZF63h841QzPYP=xRm=Y2s1=sJDQ@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] riscv: Add opensbi firmware dynamic support
 To: Atish Patra <atish.patra@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,21 +105,30 @@ Sender: "Qemu-devel"
 
 On Thu, Jul 2, 2020 at 2:39 AM Atish Patra <atish.patra@wdc.com> wrote:
 >
-> Currently, the fdt is copied to the ROM after the reset vector. The firmware
-> has to copy it to DRAM. Instead of this, directly copy the device tree to a
-> pre-computed dram address. The device tree load address should be as far as
-> possible from kernel and initrd images. That's why it is kept at the end of
-> the DRAM or 4GB whichever is lesser.
+> OpenSBI is the default firmware in Qemu and has various firmware loading
+> options. Currently, qemu loader uses fw_jump which has a compile time
+> pre-defined address where fdt & kernel image must reside. This puts a
+> constraint on image size of the Linux kernel depending on the fdt location
+> and available memory. However, fw_dynamic allows the loader to specify
+> the next stage location (i.e. Linux kernel/U-Boot) in memory and other
+> configurable boot options available in OpenSBI.
+>
+> Add support for OpenSBI dynamic firmware loading support. This doesn't
+> break existing setup and fw_jump will continue to work as it is. Any
+> other firmware will continue to work without any issues as long as it
+> doesn't expect anything specific from loader in "a2" register.
 >
 > Signed-off-by: Atish Patra <atish.patra@wdc.com>
 > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/riscv/boot.c         | 53 +++++++++++++++++++++++++++++------------
->  hw/riscv/sifive_u.c     | 28 ++++++++++------------
->  hw/riscv/spike.c        |  7 +++++-
->  hw/riscv/virt.c         |  7 +++++-
->  include/hw/riscv/boot.h |  4 +++-
->  5 files changed, 66 insertions(+), 33 deletions(-)
+>  hw/riscv/boot.c                 | 42 +++++++++++++++++++++---
+>  hw/riscv/sifive_u.c             | 20 +++++++++---
+>  hw/riscv/spike.c                | 13 ++++++--
+>  hw/riscv/virt.c                 | 12 +++++--
+>  include/hw/riscv/boot.h         |  5 ++-
+>  include/hw/riscv/boot_opensbi.h | 58 +++++++++++++++++++++++++++++++++
+>  6 files changed, 134 insertions(+), 16 deletions(-)
+>  create mode 100644 include/hw/riscv/boot_opensbi.h
 >
 
 Reviewed-by: Bin Meng <bin.meng@windriver.com>
