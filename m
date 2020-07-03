@@ -2,85 +2,89 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A26FC433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FE6C433E0
 	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 17:10:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF055204EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 17:10:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9338204EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 17:10:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NTyIN0ns"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF055204EA
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XxmYAKhb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9338204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrPCc-0005jV-3G
+	id 1jrPCc-0005jx-S1
 	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 13:10:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50520)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrOxe-0005sj-BG
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:54:50 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45169)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jrOy8-00071a-Pn
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:55:20 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38317)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrOxY-0005oj-GB
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:54:49 -0400
-Received: by mail-wr1-x441.google.com with SMTP id s10so33384355wrw.12
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 09:54:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jrOy6-00066B-HV
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:55:20 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f18so34757335wml.3
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 09:55:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=VKvp3GygN6NnSayidALafcM4t4tV8T/cgZll1mJohvM=;
- b=NTyIN0ns1+eSMr4oOtscO/0nnHqmiA0KUWOeizBulFcWpsQt5nYQqVzqo9Uew0KkTR
- 5zdNGPKcvfod5SVYumuQ+mXtJTkIw7u6wqMw+yDbFhQq9aBpQsEpWeXb+2hj5aVJO2Di
- iikeml2zfcSflRtTZMs87NOSmDLwfzddKok0lFsLp3xKmdCM8NygtJvLbjXSeD6kHtc7
- PP+1OvnER8vn0EX2eEmf6DhF2fr72mtrR2T8stgTT7w0yf+MnQrP5Oaip1YNuvL19ugE
- D3OR3PXrFeswP60q5wCLXAAj98FbyXqprDaWN5cW69/8enBCHEVLBmIAD7Nc33ojGKjm
- 16gA==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=W8fHU1Q34qhbmf1bF38BEOB2Y1nvfjEx0sr5BNzD76M=;
+ b=XxmYAKhbxIgJYjX1hA9bqWQH/mtmNcY+TEdNzFWxYNE/MA2rqFN7VH0Ki3ZlY4MTv/
+ gp3+CWFdOCCp1O5UqzcUspAeJhRo5S3W4H2YOLCDQ3iHJTMs0HgYx5PQh/HMtouJrTas
+ g5zt+5xvUV4GUuOr4HRUD1ykAlW/gR6G6EBuLLuMd0OebWcnAqQ3o8G792soTq9OsnC1
+ /Nik6Yscroj0Db+8M5u9fbox2HJr0vtbDP7/OadTtswDmy11BOto8OmzvdD6vea7+qO9
+ 5VokRavpoectvDygxf7OVv+cyGQ2OLCZI+FXbY/kXrwKx8k/k7i1wVntqm8vRklaRMet
+ KJ3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=VKvp3GygN6NnSayidALafcM4t4tV8T/cgZll1mJohvM=;
- b=tyUrsYfLxDyWt8p4uTnA8PbzSKb2jMgJeg4m4cnDZDYeEsLxgjweX1Omvs+0faOqkp
- exPGIQevzdo9f3nRhaq2hE27/wirD1RzbPYGywaCXoq0owXLmQjFOTz1+F8lLVAsrsWc
- +CBgwFUrXe8iefF+jwVx4SuEmClsG5SDccDFYy3ZTU4lyoRBlLduTLtDEtCM2e+WjqY8
- 9qq6Cy70wGnjpFz9UJ7dOMeX5fCeUPe6lDt7W40vFSC+n3L1iM5xi1avsWTRW+adxY47
- dpsAoE5qkEnFEtPy2lx2qUP1uyPXXIpiNdeaVdoVBGt2u3xe/8pbIA032oHuoRToHj2f
- eQMQ==
-X-Gm-Message-State: AOAM531/EQeRoiaVg4ud760/yXRNnTJRr3KAfZcBOyCVOFP27iLVJsAl
- v99Gvv6qDCH4c0eGRfmQ79ARjBXH6Zqc3A==
-X-Google-Smtp-Source: ABdhPJzUJEN/pj5+7JN7/vRmMYXVVZ+ANSmGGqiZMogjQcw3xu/jIc8wiYX60ym1nIF2Y/gc7LeYuQ==
-X-Received: by 2002:a5d:68c7:: with SMTP id p7mr39704358wrw.16.1593795282877; 
- Fri, 03 Jul 2020 09:54:42 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm5574224wrx.69.2020.07.03.09.54.41
- for <qemu-devel@nongnu.org>
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=W8fHU1Q34qhbmf1bF38BEOB2Y1nvfjEx0sr5BNzD76M=;
+ b=q309mFTnzNg3VDF5j/imDb/kY8k2x+Uiq4BW0g0PUNbfW4J3oygEFc9sSoc+pnWdDB
+ XOHq4c291t3UqGbYENNPhDPcK6qkQk75PwySaQXTyGHuh3MPRiFq+dkng6XFJUz5mB+W
+ NEK/Uag/1DRcubvyshoH1WR44kH9flg+koQoaw0X6VvjjRV7aZYkBUbp0tu+1x5hvKPo
+ FAzWiTwHOB/QOr4bIxOU16CBjDCQ/rm1e+f67/yJRLroMLMrnmEVIfHXWS+EZ+uqMBns
+ 8wHrE/+WG2m3SlW0LCkUwAuFFDvK3xqZc6lk/jL6yU+uKaLi4onCl6AluF/8J55AYqZ7
+ fGYQ==
+X-Gm-Message-State: AOAM533hvR1YxcqNZqZEvNIIkQCsXVmlUIPrmpujCJ6/4FZvHPWi73Pr
+ E2uU6hIu5q7e+lw8TfMhlFxwQA==
+X-Google-Smtp-Source: ABdhPJypzM37xfqdB86VJ8IH9EgWr6Z291isKpPh02LVudAHll5kOJUfAxPTcVwJXuKu8OcV8E1Dng==
+X-Received: by 2002:a1c:cc03:: with SMTP id h3mr37172590wmb.87.1593795316962; 
+ Fri, 03 Jul 2020 09:55:16 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id e17sm14104281wrr.88.2020.07.03.09.55.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 09:54:42 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 31/34] hw/arm/pxa2xx_pic: Use LOG_GUEST_ERROR for bad guest
- register accesses
-Date: Fri,  3 Jul 2020 17:54:02 +0100
-Message-Id: <20200703165405.17672-32-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200703165405.17672-1-peter.maydell@linaro.org>
-References: <20200703165405.17672-1-peter.maydell@linaro.org>
+ Fri, 03 Jul 2020 09:55:15 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 4943A1FF7E;
+ Fri,  3 Jul 2020 17:55:15 +0100 (BST)
+References: <20200701161153.30988-1-alex.bennee@linaro.org>
+ <20200701161153.30988-2-alex.bennee@linaro.org>
+ <CAFEAcA810JVTTfwkf9ezR=0dkwRLxERBUSgroUV3OTy4ZGu5Dg@mail.gmail.com>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 1/3] docs/booting.rst: start documenting the boot
+ process
+In-reply-to: <CAFEAcA810JVTTfwkf9ezR=0dkwRLxERBUSgroUV3OTy4ZGu5Dg@mail.gmail.com>
+Date: Fri, 03 Jul 2020 17:55:15 +0100
+Message-ID: <874kqopmh8.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,73 +106,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of using printf() for logging guest accesses to invalid
-register offsets in the pxa2xx PIC device, use the usual
-qemu_log_mask(LOG_GUEST_ERROR,...).
 
-This was the only user of the REG_FMT macro in pxa.h, so we can
-remove that.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200628142429.17111-16-peter.maydell@linaro.org
----
- include/hw/arm/pxa.h | 1 -
- hw/arm/pxa2xx_pic.c  | 9 +++++++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+> On Wed, 1 Jul 2020 at 17:16, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>>
+>> While working on some test cases I realised there was quite a lot of
+>> assumed knowledge about how things boot up. I thought it would be
+>> worth gathering this together in a user facing document where we could
+>> pour in the details and background to the boot process. As it's quite
+>> wordy I thought it should be a separate document to the manual (which
+>> can obviously reference this).
+>>
+>> The document follows the socratic method and leaves the reader to ask
+>> themselves some questions in an effort to elucidate them about any
+>> problems they may be having.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Message-Id: <20190308211557.22589-1-alex.bennee@linaro.org>
+>>
+>
+> I have some typo/grammar nits below, but more significantly:
+> I don't really see why this is a bit of QEMU's documentation
+> rather than, say, a blog post.
 
-diff --git a/include/hw/arm/pxa.h b/include/hw/arm/pxa.h
-index f6dfb5c0cf0..8843e5f9107 100644
---- a/include/hw/arm/pxa.h
-+++ b/include/hw/arm/pxa.h
-@@ -184,7 +184,6 @@ struct PXA2xxI2SState {
- };
- 
- # define PA_FMT			"0x%08lx"
--# define REG_FMT		"0x" TARGET_FMT_plx
- 
- PXA2xxState *pxa270_init(MemoryRegion *address_space, unsigned int sdram_size,
-                          const char *revision);
-diff --git a/hw/arm/pxa2xx_pic.c b/hw/arm/pxa2xx_pic.c
-index 105c5e63f2f..ceee6aa48db 100644
---- a/hw/arm/pxa2xx_pic.c
-+++ b/hw/arm/pxa2xx_pic.c
-@@ -11,6 +11,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-+#include "qemu/log.h"
- #include "cpu.h"
- #include "hw/arm/pxa.h"
- #include "hw/sysbus.h"
-@@ -166,7 +167,9 @@ static uint64_t pxa2xx_pic_mem_read(void *opaque, hwaddr offset,
-     case ICHP:	/* Highest Priority register */
-         return pxa2xx_pic_highest(s);
-     default:
--        printf("%s: Bad register offset " REG_FMT "\n", __func__, offset);
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "pxa2xx_pic_mem_read: bad register offset 0x%" HWADDR_PRIx
-+                      "\n", offset);
-         return 0;
-     }
- }
-@@ -199,7 +202,9 @@ static void pxa2xx_pic_mem_write(void *opaque, hwaddr offset,
-         s->priority[32 + ((offset - IPR32) >> 2)] = value & 0x8000003f;
-         break;
-     default:
--        printf("%s: Bad register offset " REG_FMT "\n", __func__, offset);
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "pxa2xx_pic_mem_write: bad register offset 0x%"
-+                      HWADDR_PRIx "\n", offset);
-         return;
-     }
-     pxa2xx_pic_update(opaque);
--- 
-2.20.1
+The aim was to make it an initial overview so when people ask about why
+they can't boot their systems they have considered the questions at the
+end. It does seem to be a repeating topic on the IRC channel.
 
+> It doesn't really say much
+> about QEMU in particular. It's also rather vague about
+> what guest architecture it's talking about, and they can
+> differ significantly both in the real world and in how QEMU
+> handles them.
+
+Perhaps what we really need is a shorter punchier section offering
+guidance in the manual itself? It just seemed quite a big topic which is
+why I ended up with a fairly long explanation without even getting to
+specifics.
+
+I could certainly see the document being expanded in the future with
+more concrete examples for various architectures and scenarios.
+
+> Also, why put it in interop?
+
+interop being where QEMU interfaces with other things such as kernels
+and firmwares? It seems too user focused for devel and too long for the
+manual itself.
+
+--=20
+Alex Benn=C3=A9e
 
