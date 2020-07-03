@@ -7,61 +7,61 @@ X-Spam-Status: No, score=0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D44C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4407EC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 17:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 410A020760
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF44420708
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 17:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="HWYGCjjU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410A020760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="S9TB7tVy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF44420708
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrLgT-000786-JB
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:24:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45802)
+	id 1jrPNJ-0006rS-6W
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 13:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jrLfX-0005rM-Ni
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:23:55 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:43266)
+ id 1jrPEV-0001BH-Sf
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 13:12:15 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:44903)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jrLfU-0001Pc-O4
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:23:55 -0400
+ id 1jrPEP-00023p-NN
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 13:12:15 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1593782633; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1593796332; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=eKwGl4Y/pRszNK+H8FGA5sLSzGucAKQk1PBcSU/VNbA=;
- b=HWYGCjjU0vu5ZzeMWENHBJSUaXlGHQeK7eXiMKVB6ktjac7XNt1WSNgytalHSn/yp7LnmG71
- TQaesqhrHNySMfL7aoqeU/MYWHgnOzDYiAU+dtgrV3h25m/pc0TIoMiq/oY6Sa6VISoWIInt
- uzw9cPAX4fq6jXuPJRzxNUJw+Z8=
+ Sender; bh=p1FpqA2MRSck15SlFMAW/HjJtU+UI3Aqjs+JXnjTj/A=;
+ b=S9TB7tVyusZtCSVpTOOJOM7CPVl8ag0iug1d8NbVMxxioch9R6WomzPSFw2igD/HYd6dpHVL
+ xGK6q1mIPbS5znUVa+5uMfy8mqxVf5vUFZlHpqunCa4Sdt7904hcaXTIkI6FpkDI1u6PivVf
+ UDZw6DIJYHvxgioLh1RDbB/qdQE=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (66.90.74.34.bc.googleusercontent.com
- [34.74.90.66]) by smtp-out-n09.prod.us-east-1.postgun.com with SMTP id
- 5eff3161356bcc26ab515f83 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Fri, 03 Jul 2020 13:23:45 GMT
-Date: Fri, 03 Jul 2020 13:23:44 +0000
-Message-ID: <5eff3160ed8bb_3d7c3fcc510fafe86794b@sidekiq-catchall-01-sv-gprd.mail>
-Subject: QEMU | Pipeline #162858807 has failed for master | 6651620b
+Received: from mg.gitlab.com (67.90.74.34.bc.googleusercontent.com
+ [34.74.90.67]) by smtp-out-n08.prod.us-east-1.postgun.com with SMTP id
+ 5eff66dc0206ad41d16f1469 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Fri, 03 Jul 2020 17:11:56 GMT
+Date: Fri, 03 Jul 2020 17:11:56 +0000
+Message-ID: <5eff66dc866f1_48c73fa9eb29fcdc176056@sidekiq-catchall-03-sv-gprd.mail>
+Subject: QEMU | Pipeline #162936835 has failed for master | 4abf70a6
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5eff3160e15f6_3d7c3fcc510fafe867861";
+ boundary="--==_mimepart_5eff66dc7f22e_48c73fa9eb29fcdc1759a8";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 162858807
+X-GitLab-Pipeline-Id: 162936835
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -99,7 +99,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5eff3160e15f6_3d7c3fcc510fafe867861
+----==_mimepart_5eff66dc7f22e_48c73fa9eb29fcdc1759a8
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,231 +111,53 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: 6651620b ( https://gitlab.com/qemu-project/qemu/-/commit/6651620b=
-92bc08cde07cb500e9a43dba7bd9b2b7 )
-Commit Message: Merge remote-tracking branch 'remotes/kraxel/ta...
+Commit: 4abf70a6 ( https://gitlab.com/qemu-project/qemu/-/commit/4abf70a6=
+61a5df3886ac9d7c19c3617fa92b922a )
+Commit Message: Merge remote-tracking branch 'remotes/maxreitz/...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #162858807 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
-2858807 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
-had 2 failed builds.
+Pipeline #162936835 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
+2936835 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+had 1 failed build.
 
-Job #623043447 ( https://gitlab.com/qemu-project/qemu/-/jobs/623043447/ra=
-w )
-
-Stage: test
-Name: build-tcg-disabled
-Trace: 208      ...        [12:59:42]             ...              =
-
-208      =1B[32mpass      =1B[0m [12:59:42] [12:59:42]   0s              =
- =
-
-209      ...        [12:59:42]             ...              =
-
-209      =1B[32mpass      =1B[0m [12:59:42] [12:59:42]   0s              =
- =
-
-215      ...        [12:59:42]             ...              =
-
-215      =1B[32mpass      =1B[0m [12:59:42] [13:01:01]  79s              =
- =
-
-216      ...        [13:01:01]             ...              =
-
-216      =1B[32mpass      =1B[0m [13:01:01] [13:01:05]   4s              =
- =
-
-218      ...        [13:01:05]             ...              =
-
-218      =1B[32mpass      =1B[0m [13:01:05] [13:01:07]   2s              =
- =
-
-222      ...        [13:01:07]             ...              =
-
-222      =1B[32mpass      =1B[0m [13:01:07] [13:01:07]   0s              =
- =
-
-227      ...        [13:01:07]             ...              =
-
-227      =1B[32mpass      =1B[0m [13:01:07] [13:01:08]   1s              =
- =
-
-234      ...        [13:01:08]             ...              =
-
-234      =1B[32mpass      =1B[0m [13:01:08] [13:01:08]   0s              =
- =
-
-246      ...        [13:01:08]             ...              =
-
-246      =1B[32mpass      =1B[0m [13:01:08] [13:01:09]   1s              =
- =
-
-247      ...        [13:01:09]             ...              =
-
-247      =1B[32mpass      =1B[0m [13:01:09] [13:01:10]   1s              =
- =
-
-248      ...        [13:01:10]             ...              =
-
-248      =1B[32mpass      =1B[0m [13:01:10] [13:01:10]   0s              =
- =
-
-250      ...        [13:01:10]             ...              =
-
-250      =1B[32mpass      =1B[0m [13:01:10] [13:01:11]   1s              =
- =
-
-254      ...        [13:01:11]             ...              =
-
-254      =1B[32mpass      =1B[0m [13:01:11] [13:01:11]   0s              =
- =
-
-255      ...        [13:01:11]             ...              =
-
-255      =1B[32mpass      =1B[0m [13:01:11] [13:01:13]   2s              =
- =
-
-257      ...        [13:01:13]             ...              =
-
-257      =1B[32mpass      =1B[0m [13:01:13] [13:01:23]  10s              =
- =
-
-258      ...        [13:01:23]             ...              =
-
-258      =1B[32mpass      =1B[0m [13:01:23] [13:01:24]   1s              =
- =
-
-260      ...        [13:01:24]             ...              =
-
-260      =1B[32mpass      =1B[0m [13:01:24] [13:01:25]   1s              =
- =
-
-261      ...        [13:01:25]             ...              =
-
-261      =1B[32mpass      =1B[0m [13:01:25] [13:01:50]  25s              =
- =
-
-262      ...        [13:01:50]             ...              =
-
-262      =1B[32mpass      =1B[0m [13:01:50] [13:01:50]   0s              =
- =
-
-263      ...        [13:01:50]             ...              =
-
-263      =1B[32mpass      =1B[0m [13:01:50] [13:01:53]   3s              =
- =
-
-264      ...        [13:01:53]             ...              =
-
-264      =1B[32mpass      =1B[0m [13:01:53] [13:01:57]   4s              =
- =
-
-270      ...        [13:01:57]             ...              =
-
-270      =1B[32mpass      =1B[0m [13:01:57] [13:01:58]   1s              =
- =
-
-272      ...        [13:01:58]             ...              =
-
-272      =1B[32mpass      =1B[0m [13:01:58] [13:01:59]   1s              =
- =
-
-273      ...        [13:01:59]             ...              =
-
-273      =1B[32mpass      =1B[0m [13:01:59] [13:01:59]   0s              =
- =
-
-277      ...        [13:01:59]             ...              =
-
-277      =1B[32mpass      =1B[0m [13:01:59] [13:02:01]   2s              =
- =
-
-279      ...        [13:02:01]             ...              =
-
-279      =1B[32mpass      =1B[0m [13:02:01] [13:02:01]   0s              =
- =
-
-Failures: 051
-Failed 1 of 57 iotests
-section_end:1593781334:step_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #623043445 ( https://gitlab.com/qemu-project/qemu/-/jobs/623043445/ra=
+Job #623392108 ( https://gitlab.com/qemu-project/qemu/-/jobs/623392108/ra=
 w )
 
 Stage: test
 Name: build-disabled
-Trace: =1B[0KRunning with gitlab-runner 13.1.0 (6214287e)
-=1B[0;m=1B[0K  on docker-auto-scale 0277ea0f
-=1B[0;msection_start:1593779910:prepare_executor
-=1B[0K=1B[0K=1B[36;1mPreparing the "docker+machine" executor=1B[0;m
-=1B[0;m=1B[0KUsing Docker executor with image fedora:latest ...
-=1B[0;m=1B[0KPulling docker image fedora:latest ...
-=1B[0;m=1B[0KUsing docker image sha256:adfbfa4a115a799771d3060d0aa213584c=
-91e549187da4fb0036240294ca4a8f for fedora:latest ...
-=1B[0;msection_end:1593779927:prepare_executor
-=1B[0Ksection_start:1593779927:prepare_script
-=1B[0K=1B[0K=1B[36;1mPreparing environment=1B[0;m
-=1B[0;mRunning on runner-0277ea0f-project-11167699-concurrent-0 via runne=
-r-0277ea0f-srm-1593779865-df1fb9e9...
-section_end:1593779931:prepare_script
-=1B[0Ksection_start:1593779931:get_sources
-=1B[0K=1B[0K=1B[36;1mGetting source from Git repository=1B[0;m
-=1B[0;m=1B[32;1m$ eval "$CI_PRE_CLONE_SCRIPT"=1B[0;m
-=1B[32;1mFetching changes...=1B[0;m
-Initialized empty Git repository in /builds/qemu-project/qemu/.git/
-=1B[32;1mCreated fresh repository.=1B[0;m
-=1B[32;1mChecking out 6651620b as master...=1B[0;m
-
-=1B[32;1mSkipping Git submodules setup=1B[0;m
-section_end:1593779990:get_sources
-=1B[0Ksection_start:1593779990:step_script
-=1B[0K=1B[0K=1B[36;1mExecuting "step_script" stage of the job script=1B[0=
-;m
-=1B[0;m=1B[32;1m$ dnf update -y=1B[0;m
-Fedora Modular 31 - x86_64                      4.5 MB/s | 5.2 MB     00:=
-01    =
-
-Fedora Modular 31 - x86_64 - Updates            8.2 MB/s | 4.1 MB     00:=
-00    =
-
-Fedora 31 - x86_64 - Updates                    1.4 kB/s | 8.1 kB     00:=
-05    =
-
-Errors during downloading metadata for repository 'updates':
-  - Downloading successful, but checksum doesn't match. Calculated: 0f5fc=
-40ff497fe3cc6d2bf47de3d348674864633bd0663bbfc94ee405f737e697306dd1a94c716=
-50d1578ce595bcf5b55e1122f4dc7246830cb52ef50e8f26cf(sha512) 0f5fc40ff497fe=
-3cc6d2bf47de3d348674864633bd0663bbfc94ee405f737e697306dd1a94c71650d1578ce=
-595bcf5b55e1122f4dc7246830cb52ef50e8f26cf(sha512) 0f5fc40ff497fe3cc6d2bf4=
-7de3d348674864633bd0663bbfc94ee405f737e697306dd1a94c71650d1578ce595bcf5b5=
-5e1122f4dc7246830cb52ef50e8f26cf(sha512)  Expected: c4d63059c930cf5f6574c=
-119d7a25d543802581cfb6f175101aa0731f453e73b098b944ef737c7e4d48dde6a3a5607=
-49bccc50eb51e4add0e9b67ccd1a4e638d(sha512) 3b1c65ee5ed1e1ab3be4c0170926d2=
-415f68ddbd158272ecf51f3da4ad48c935d00a38a891f229bbd452e90e26a21432034e6a7=
-2bf8f32bdb162c70955183367(sha512) 149dd4bef3cbe549550616451c11589547eea9f=
-2305c72c5b74331dcf7bb86a2b5d6039301e9ff1553731e6daaf11d688b2d62252aa8b076=
-ca3b6cab1fb56fcf(sha512) =
-
-  - Downloading successful, but checksum doesn't match. Calculated: c46e0=
-cbda8e48c658978e1b426d7753b64112430b24e3e59f51020313ff7e64ec3929eeaec32ba=
-7d34998798ca47f84f943b49f92eb4ba10effb5bec81724efb(sha512) c46e0cbda8e48c=
-658978e1b426d7753b64112430b24e3e59f51020313ff7e64ec3929eeaec32ba7d3499879=
-8ca47f84f943b49f92eb4ba10effb5bec81724efb(sha512) c46e0cbda8e48c658978e1b=
-426d7753b64112430b24e3e59f51020313ff7e64ec3929eeaec32ba7d34998798ca47f84f=
-943b49f92eb4ba10effb5bec81724efb(sha512)  Expected: c4d63059c930cf5f6574c=
-119d7a25d543802581cfb6f175101aa0731f453e73b098b944ef737c7e4d48dde6a3a5607=
-49bccc50eb51e4add0e9b67ccd1a4e638d(sha512) 3b1c65ee5ed1e1ab3be4c0170926d2=
-415f68ddbd158272ecf51f3da4ad48c935d00a38a891f229bbd452e90e26a21432034e6a7=
-2bf8f32bdb162c70955183367(sha512) 149dd4bef3cbe549550616451c11589547eea9f=
-2305c72c5b74331dcf7bb86a2b5d6039301e9ff1553731e6daaf11d688b2d62252aa8b076=
-ca3b6cab1fb56fcf(sha512) =
-
-Error: Failed to download metadata for repo 'updates': Cannot download re=
-pomd.xml: Cannot download repodata/repomd.xml: All mirrors were tried
-section_end:1593780000:step_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+Trace: Could not access KVM kernel module: No such file or directory
+qemu-system-i386: -accel kvm: failed to initialize kvm: No such file or d=
+irectory
+qemu-system-i386: falling back to tcg
+Could not access KVM kernel module: No such file or directory
+qemu-system-i386: -accel kvm: failed to initialize kvm: No such file or d=
+irectory
+qemu-system-i386: falling back to tcg
+  TEST    check-qtest-i386: tests/qtest/device-introspect-test
+  TEST    check-qtest-i386: tests/qtest/machine-none-test
+  TEST    check-qtest-i386: tests/qtest/qmp-test
+  TEST    check-qtest-i386: tests/qtest/qmp-cmd-test
+  TEST    check-qtest-i386: tests/qtest/qom-test
+  TEST    check-qtest-i386: tests/qtest/test-hmp
+  TEST    check-qtest-i386: tests/qtest/qos-test
+  TEST    check-qtest-mips64: tests/qtest/endianness-test
+  TEST    check-qtest-mips64: tests/qtest/display-vga-test
+  TEST    check-qtest-mips64: tests/qtest/cdrom-test
+  TEST    check-qtest-mips64: tests/qtest/device-introspect-test
+  TEST    check-qtest-mips64: tests/qtest/machine-none-test
+  TEST    check-qtest-mips64: tests/qtest/qmp-test
+  TEST    check-qtest-mips64: tests/qtest/qmp-cmd-test
+  TEST    check-qtest-mips64: tests/qtest/qom-test
+  TEST    check-qtest-mips64: tests/qtest/test-hmp
+  TEST    check-qtest-mips64: tests/qtest/qos-test
+  TEST    check-qtest-ppc64: tests/qtest/machine-none-test
+  TEST    check-qtest-ppc64: tests/qtest/qmp-test
+  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test
+  TEST    check-qtest-ppc64: tests/qtest/qom-test
+  TEST    check-qtest-ppc64: tests/qtest/test-hmp
+section_end:1593796315:step_script
+=1B[0K=1B[31;1mERROR: Job failed: execution took longer than 1h0m0s secon=
+ds
 =1B[0;m
 
 
@@ -346,7 +168,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5eff3160e15f6_3d7c3fcc510fafe867861
+----==_mimepart_5eff66dc7f22e_48c73fa9eb29fcdc1759a8
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -361,7 +183,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #162858807 has failed for master | 6651620b</title=
+<title>QEMU | Pipeline #162936835 has failed for master | 4abf70a6</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -529,17 +351,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/6651620b92bc08cd=
-e07cb500e9a43dba7bd9b2b7" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/4abf70a661a5df38=
+86ac9d7c19c3617fa92b922a" style=3D"color: #3777b0; text-decoration: none;=
 ">
-6651620b
+4abf70a6
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/kraxel/ta...
+Merge remote-tracking branch 'remotes/maxreitz/...
 </div>
 </td>
 </tr>
@@ -596,9 +418,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/162858807" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/162936835" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#162858807
+#162936835
 </a>
 triggered by
 </td>
@@ -627,9 +449,9 @@ Alex Benn&#233;e
 sans-serif; color: #333333; font-size: 14px; font-weight: 400; line-heigh=
 t: 1.4; padding: 0 8px 16px;" align=3D"center">
 had
-2
+1
 failed
-builds.
+build.
 </td>
 </tr>
 <tr class=3D"table-warning">
@@ -675,155 +497,7 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/623043447" style=3D=
-"color: #3777b0; text-decoration: none;">
-build-tcg-disabled
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>208      =
-...        [12:59:42]             ...              =
-
-208      </span><span class=3D"term-fg-green">pass      </span><span> [12=
-:59:42] [12:59:42]   0s               <br />209      ...        [12:59:42=
-]             ...              =
-
-209      </span><span class=3D"term-fg-green">pass      </span><span> [12=
-:59:42] [12:59:42]   0s               <br />215      ...        [12:59:42=
-]             ...              =
-
-215      </span><span class=3D"term-fg-green">pass      </span><span> [12=
-:59:42] [13:01:01]  79s               <br />216      ...        [13:01:01=
-]             ...              =
-
-216      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:01] [13:01:05]   4s               <br />218      ...        [13:01:05=
-]             ...              =
-
-218      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:05] [13:01:07]   2s               <br />222      ...        [13:01:07=
-]             ...              =
-
-222      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:07] [13:01:07]   0s               <br />227      ...        [13:01:07=
-]             ...              =
-
-227      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:07] [13:01:08]   1s               <br />234      ...        [13:01:08=
-]             ...              =
-
-234      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:08] [13:01:08]   0s               <br />246      ...        [13:01:08=
-]             ...              =
-
-246      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:08] [13:01:09]   1s               <br />247      ...        [13:01:09=
-]             ...              =
-
-247      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:09] [13:01:10]   1s               <br />248      ...        [13:01:10=
-]             ...              =
-
-248      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:10] [13:01:10]   0s               <br />250      ...        [13:01:10=
-]             ...              =
-
-250      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:10] [13:01:11]   1s               <br />254      ...        [13:01:11=
-]             ...              =
-
-254      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:11] [13:01:11]   0s               <br />255      ...        [13:01:11=
-]             ...              =
-
-255      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:11] [13:01:13]   2s               <br />257      ...        [13:01:13=
-]             ...              =
-
-257      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:13] [13:01:23]  10s               <br />258      ...        [13:01:23=
-]             ...              =
-
-258      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:23] [13:01:24]   1s               <br />260      ...        [13:01:24=
-]             ...              =
-
-260      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:24] [13:01:25]   1s               <br />261      ...        [13:01:25=
-]             ...              =
-
-261      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:25] [13:01:50]  25s               <br />262      ...        [13:01:50=
-]             ...              =
-
-262      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:50] [13:01:50]   0s               <br />263      ...        [13:01:50=
-]             ...              =
-
-263      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:50] [13:01:53]   3s               <br />264      ...        [13:01:53=
-]             ...              =
-
-264      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:53] [13:01:57]   4s               <br />270      ...        [13:01:57=
-]             ...              =
-
-270      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:57] [13:01:58]   1s               <br />272      ...        [13:01:58=
-]             ...              =
-
-272      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:58] [13:01:59]   1s               <br />273      ...        [13:01:59=
-]             ...              =
-
-273      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:59] [13:01:59]   0s               <br />277      ...        [13:01:59=
-]             ...              =
-
-277      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:01:59] [13:02:01]   2s               <br />279      ...        [13:02:01=
-]             ...              =
-
-279      </span><span class=3D"term-fg-green">pass      </span><span> [13=
-:02:01] [13:02:01]   0s               <br />Failures: 051<br />Failed 1 o=
-f 57 iotests<br /></span><span class=3D"term-fg-l-red term-bold">ERROR: J=
-ob failed: exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-test
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/623043445" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/623392108" style=3D=
 "color: #3777b0; text-decoration: none;">
 build-disabled
 </a>
@@ -836,84 +510,32 @@ sans-serif; padding: 0 0 16px;">
 <pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>Running w=
-ith gitlab-runner 13.1.0 (6214287e)<br /></span><span>  on docker-auto-sc=
-ale 0277ea0f<br /></span><div class=3D"section-start" data-timestamp=3D"1=
-593779910" data-section=3D"prepare-executor" role=3D"button"></div><span =
-class=3D"term-fg-l-cyan term-bold section section-header js-s-prepare-exe=
-cutor">Preparing the "docker+machine" executor</span><span class=3D"secti=
-on section-header js-s-prepare-executor"><br /></span><span class=3D"sect=
-ion line js-s-prepare-executor">Using Docker executor with image fedora:l=
-atest ...<br /></span><span class=3D"section line js-s-prepare-executor">=
-Pulling docker image fedora:latest ...<br /></span><span class=3D"section=
- line js-s-prepare-executor">Using docker image sha256:adfbfa4a115a799771=
-d3060d0aa213584c91e549187da4fb0036240294ca4a8f for fedora:latest ...<br /=
-></span><div class=3D"section-end" data-section=3D"prepare-executor"></di=
-v><div class=3D"section-start" data-timestamp=3D"1593779927" data-section=
-=3D"prepare-script" role=3D"button"></div><span class=3D"term-fg-l-cyan t=
-erm-bold section section-header js-s-prepare-script">Preparing environmen=
-t</span><span class=3D"section section-header js-s-prepare-script"><br />=
-</span><span class=3D"section line js-s-prepare-script">Running on runner=
--0277ea0f-project-11167699-concurrent-0 via runner-0277ea0f-srm-159377986=
-5-df1fb9e9...<br /></span><div class=3D"section-end" data-section=3D"prep=
-are-script"></div><div class=3D"section-start" data-timestamp=3D"15937799=
-31" data-section=3D"get-sources" role=3D"button"></div><span class=3D"ter=
-m-fg-l-cyan term-bold section section-header js-s-get-sources">Getting so=
-urce from Git repository</span><span class=3D"section section-header js-s=
--get-sources"><br /></span><span class=3D"term-fg-l-green term-bold secti=
-on line js-s-get-sources">$ eval "$CI_PRE_CLONE_SCRIPT"</span><span class=
-=3D"section line js-s-get-sources"><br /></span><span class=3D"term-fg-l-=
-green term-bold section line js-s-get-sources">Fetching changes...</span>=
-<span class=3D"section line js-s-get-sources"><br />Initialized empty Git=
- repository in /builds/qemu-project/qemu/.git/<br /></span><span class=3D=
-"term-fg-l-green term-bold section line js-s-get-sources">Created fresh r=
-epository.</span><span class=3D"section line js-s-get-sources"><br /></sp=
-an><span class=3D"term-fg-l-green term-bold section line js-s-get-sources=
-">Checking out 6651620b as master...</span><span class=3D"section line js=
--s-get-sources"><br /><br /></span><span class=3D"term-fg-l-green term-bo=
-ld section line js-s-get-sources">Skipping Git submodules setup</span><sp=
-an class=3D"section line js-s-get-sources"><br /></span><div class=3D"sec=
-tion-end" data-section=3D"get-sources"></div><div class=3D"section-start"=
- data-timestamp=3D"1593779990" data-section=3D"step-script" role=3D"butto=
-n"></div><span class=3D"term-fg-l-cyan term-bold section section-header j=
-s-s-step-script">Executing "step_script" stage of the job script</span><s=
-pan class=3D"section section-header js-s-step-script"><br /></span><span =
-class=3D"term-fg-l-green term-bold section line js-s-step-script">$ dnf u=
-pdate -y</span><span class=3D"section line js-s-step-script"><br />Fedora=
- Modular 31 - x86_64                      4.5 MB/s | 5.2 MB     00:01    =
-<br />Fedora Modular 31 - x86_64 - Updates            8.2 MB/s | 4.1 MB  =
-   00:00    <br />Fedora 31 - x86_64 - Updates                    1.4 kB/=
-s | 8.1 kB     00:05    <br />Errors during downloading metadata for repo=
-sitory 'updates':<br />  - Downloading successful, but checksum doesn't m=
-atch. Calculated: 0f5fc40ff497fe3cc6d2bf47de3d348674864633bd0663bbfc94ee4=
-05f737e697306dd1a94c71650d1578ce595bcf5b55e1122f4dc7246830cb52ef50e8f26cf=
-(sha512) 0f5fc40ff497fe3cc6d2bf47de3d348674864633bd0663bbfc94ee405f737e69=
-7306dd1a94c71650d1578ce595bcf5b55e1122f4dc7246830cb52ef50e8f26cf(sha512) =
-0f5fc40ff497fe3cc6d2bf47de3d348674864633bd0663bbfc94ee405f737e697306dd1a9=
-4c71650d1578ce595bcf5b55e1122f4dc7246830cb52ef50e8f26cf(sha512)  Expected=
-: c4d63059c930cf5f6574c119d7a25d543802581cfb6f175101aa0731f453e73b098b944=
-ef737c7e4d48dde6a3a560749bccc50eb51e4add0e9b67ccd1a4e638d(sha512) 3b1c65e=
-e5ed1e1ab3be4c0170926d2415f68ddbd158272ecf51f3da4ad48c935d00a38a891f229bb=
-d452e90e26a21432034e6a72bf8f32bdb162c70955183367(sha512) 149dd4bef3cbe549=
-550616451c11589547eea9f2305c72c5b74331dcf7bb86a2b5d6039301e9ff1553731e6da=
-af11d688b2d62252aa8b076ca3b6cab1fb56fcf(sha512) <br />  - Downloading suc=
-cessful, but checksum doesn't match. Calculated: c46e0cbda8e48c658978e1b4=
-26d7753b64112430b24e3e59f51020313ff7e64ec3929eeaec32ba7d34998798ca47f84f9=
-43b49f92eb4ba10effb5bec81724efb(sha512) c46e0cbda8e48c658978e1b426d7753b6=
-4112430b24e3e59f51020313ff7e64ec3929eeaec32ba7d34998798ca47f84f943b49f92e=
-b4ba10effb5bec81724efb(sha512) c46e0cbda8e48c658978e1b426d7753b64112430b2=
-4e3e59f51020313ff7e64ec3929eeaec32ba7d34998798ca47f84f943b49f92eb4ba10eff=
-b5bec81724efb(sha512)  Expected: c4d63059c930cf5f6574c119d7a25d543802581c=
-fb6f175101aa0731f453e73b098b944ef737c7e4d48dde6a3a560749bccc50eb51e4add0e=
-9b67ccd1a4e638d(sha512) 3b1c65ee5ed1e1ab3be4c0170926d2415f68ddbd158272ecf=
-51f3da4ad48c935d00a38a891f229bbd452e90e26a21432034e6a72bf8f32bdb162c70955=
-183367(sha512) 149dd4bef3cbe549550616451c11589547eea9f2305c72c5b74331dcf7=
-bb86a2b5d6039301e9ff1553731e6daaf11d688b2d62252aa8b076ca3b6cab1fb56fcf(sh=
-a512) <br />Error: Failed to download metadata for repo 'updates': Cannot=
- download repomd.xml: Cannot download repodata/repomd.xml: All mirrors we=
-re tried<br /></span><div class=3D"section-end" data-section=3D"step-scri=
-pt"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit=
- code 1<br /></span></pre>
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>Could not=
+ access KVM kernel module: No such file or directory<br />qemu-system-i38=
+6: -accel kvm: failed to initialize kvm: No such file or directory<br />q=
+emu-system-i386: falling back to tcg<br />Could not access KVM kernel mod=
+ule: No such file or directory<br />qemu-system-i386: -accel kvm: failed =
+to initialize kvm: No such file or directory<br />qemu-system-i386: falli=
+ng back to tcg<br />  TEST    check-qtest-i386: tests/qtest/device-intros=
+pect-test<br />  TEST    check-qtest-i386: tests/qtest/machine-none-test<=
+br />  TEST    check-qtest-i386: tests/qtest/qmp-test<br />  TEST    chec=
+k-qtest-i386: tests/qtest/qmp-cmd-test<br />  TEST    check-qtest-i386: t=
+ests/qtest/qom-test<br />  TEST    check-qtest-i386: tests/qtest/test-hmp=
+<br />  TEST    check-qtest-i386: tests/qtest/qos-test<br />  TEST    che=
+ck-qtest-mips64: tests/qtest/endianness-test<br />  TEST    check-qtest-m=
+ips64: tests/qtest/display-vga-test<br />  TEST    check-qtest-mips64: te=
+sts/qtest/cdrom-test<br />  TEST    check-qtest-mips64: tests/qtest/devic=
+e-introspect-test<br />  TEST    check-qtest-mips64: tests/qtest/machine-=
+none-test<br />  TEST    check-qtest-mips64: tests/qtest/qmp-test<br />  =
+TEST    check-qtest-mips64: tests/qtest/qmp-cmd-test<br />  TEST    check=
+-qtest-mips64: tests/qtest/qom-test<br />  TEST    check-qtest-mips64: te=
+sts/qtest/test-hmp<br />  TEST    check-qtest-mips64: tests/qtest/qos-tes=
+t<br />  TEST    check-qtest-ppc64: tests/qtest/machine-none-test<br />  =
+TEST    check-qtest-ppc64: tests/qtest/qmp-test<br />  TEST    check-qtes=
+t-ppc64: tests/qtest/qmp-cmd-test<br />  TEST    check-qtest-ppc64: tests=
+/qtest/qom-test<br />  TEST    check-qtest-ppc64: tests/qtest/test-hmp<br=
+ /></span><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exec=
+ution took longer than 1h0m0s seconds<br /></span></pre>
 </td>
 </tr>
 </tbody>
@@ -961,5 +583,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5eff3160e15f6_3d7c3fcc510fafe867861--
+----==_mimepart_5eff66dc7f22e_48c73fa9eb29fcdc1759a8--
 
