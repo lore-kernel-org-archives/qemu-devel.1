@@ -2,103 +2,124 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55807C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1723FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F69920723
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C501F20723
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:26:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dC0fr232"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F69920723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="I/zt7nZI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C501F20723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHwm-0000h8-8R
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:25:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60420)
+	id 1jrHxT-0002VT-V7
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:26:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHdP-0001sJ-QE
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:05:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51539
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHdM-0004dk-PK
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:05:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593767124;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=4lWrpFH2CiygCO5uciNVA5FaqB2VaYbCK0AZiDA9UeM=;
- b=dC0fr232nKPleewPy//UtgLzYptzlUYVRp9cu7AEWc9JatR+IDxCME0Owwr3rlNs/75vmA
- 8IlGYuN21IJFFAbtLlm3o8QVGt5GN0+xTW0qf6h6ynAb+NmV5AAsBaIqvxRYRFO0CEDCy3
- u2jlFE6ZlurMhANz/EzSPtyW1ZdHpkw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-3my4vMv-OB2a-WOkJSudRA-1; Fri, 03 Jul 2020 05:05:22 -0400
-X-MC-Unique: 3my4vMv-OB2a-WOkJSudRA-1
-Received: by mail-wr1-f72.google.com with SMTP id j5so31095377wro.6
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:05:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=4lWrpFH2CiygCO5uciNVA5FaqB2VaYbCK0AZiDA9UeM=;
- b=W6u/neug59BYNNGzvVfMlKtvpmGJiS4dTxZ19oy6tYr/sUTONFLHfJV0B2agkwK6Uy
- XG0aGYh9TxFCkKB/zeBqIznkxkPtQqD+bazQgqWNNDkuEuIXeX9ukiRDUv19Q2D44Bwe
- b+HWehcGmAKDvzWw2uDYQZA+VDaTKyamBAUPdkSSm/zY1ScxajnL1daqpU00LJ2/drDE
- Wk6SyFL/zxI+VTUhMUw+xe5mwZrpmAEWv1DF6f47ZA6+IFb447BRwLMwFAWxI0RpoEWZ
- sVm92X1cj0rg/w97zhqh/zyEbhlhTDRztiZEXUE9XPBAFV/JleGQJPyfrsNTwiwGaenV
- BEDQ==
-X-Gm-Message-State: AOAM532Au8phhxi+cwCgvg9ZbDcYEBgYOOQQ37pNB7qT//Q+bGbv2lko
- Ze4F6x+sxhu3YcfM8OPzqPQijEW9fHEa4f5jpPEhXaRrfEfb8Wg9VVQHdwHOt6srOdv/RdDldzF
- FkRKwe0h4pgGtnWM=
-X-Received: by 2002:adf:fa81:: with SMTP id h1mr37517276wrr.288.1593767120688; 
- Fri, 03 Jul 2020 02:05:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyndo4k2CJKMNmigFNFENSZMbKA+5k3QpYp17PU0YGF22QZO0UIugjtWebpjI7nFBhdxRwCXQ==
-X-Received: by 2002:adf:fa81:: with SMTP id h1mr37517234wrr.288.1593767120301; 
- Fri, 03 Jul 2020 02:05:20 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
- by smtp.gmail.com with ESMTPSA id
- g145sm4297039wmg.23.2020.07.03.02.05.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 02:05:19 -0700 (PDT)
-Date: Fri, 3 Jul 2020 05:05:17 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jrHgV-0000NJ-17; Fri, 03 Jul 2020 05:08:39 -0400
+Received: from mail-eopbgr140133.outbound.protection.outlook.com
+ ([40.107.14.133]:62071 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jrHgR-0005Bb-Ri; Fri, 03 Jul 2020 05:08:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PG75k+Ti7TRubwqEaO8gSY94vwbW7S+bDjZ537tvQvfdICuTL7ozIvER5SmyIsp6xbkn/Zppr4SG1sy/2wjtZkwUAFbhyvxHwf3oENnkXUyTVrum7TSu47AR9dSteFqqTU+9a0hF0fso0mwOpkNlP2ZTZ/T46TapmK+OZ0g7fpLwq9V6s7ndgUVR59H+3FsaXUuKWtQ842tX3/VFpPfWarLDaA2/jPHieCPogQRCVDH5q5LQye2YX0dEWYDLVZroB/ftRcLOO6DI3dC6ARE9WcxJTzf47fHSLzU2s9ugUC7VpcvcFNPJ3AgxNXEDSoxc7TpnjPetLY+ufEJnBZ/IAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xfHSVlIo44tg6W+pIWSY0xjOo9Pxh+Mei6mpQ0bwGBI=;
+ b=hfPRJtx8r8PeEjR/UnHIt4VrpuTkD5v+YQ6J1bYNuxkJhRj/nWuCwzMDf56F/n2Fm/qenz2eren1svMqpug8wPdn3uPcZpwCdeqvn3aQc5VKtM3QYurZ5hTDb6G8rcvd38DKWSvwjaxsZI2Rk0c1a8GgPxzIhNZP3F4snAkFRjTD6qBlUXlwuBpJeR/UtgW9O69eMZPlYmSOVrc6mgT2c9g8goshsxtXZHcagwTMQJU/TdwEWwdFiyBKLT60mt5j5Lkzme4XQ+js+OfgFd5xnRluRGYfShD9QjeDXDyAPuGiOvbgOTq7lTOzOWelOjbf4+2BtALDTwcfCoIlOFvMUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xfHSVlIo44tg6W+pIWSY0xjOo9Pxh+Mei6mpQ0bwGBI=;
+ b=I/zt7nZIKaKbYh5fzHlsIrXpH/QWCYg8H75OfNqP/KwfjJw3Yp7BvjYAcH1vW0rGfY+u2q+xroNqJqFHjqMy4rek6QZY9OU3JMWlET8kKTX+hS9zeeWt41pcqCCsOJs8thnk/251sTIEGCqMHd9O/c7BUMcSUYFeGKWdRFLqF9k=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.28; Fri, 3 Jul
+ 2020 09:08:31 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Fri, 3 Jul 2020
+ 09:08:31 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 41/41] vhost-vdpa: introduce vhost-vdpa net client
-Message-ID: <20200703090252.368694-42-mst@redhat.com>
-References: <20200703090252.368694-1-mst@redhat.com>
+Subject: [PATCH v11 1/8] error: auto propagated local_err
+Date: Fri,  3 Jul 2020 12:08:09 +0300
+Message-Id: <20200703090816.3295-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200703090816.3295-1-vsementsov@virtuozzo.com>
+References: <20200703090816.3295-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR10CA0022.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:17c::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (185.215.60.15) by
+ AM0PR10CA0022.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23 via Frontend
+ Transport; Fri, 3 Jul 2020 09:08:29 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.15]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 223dc08a-cc50-47bf-3d53-08d81f30a7d8
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB544893CD56056C56E2F94BF3C16A0@AM7PR08MB5448.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 045315E1EE
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1jbAEV1m1poFTYrkwpLSbN/kErl6G+bZeWohFVMoDtJNGWXm+Fmt8INoJVrgbeNzuGwWqhP1f+VL+NLOqdG/MIwyr5n1gRElbKtMMHFc0QnGXNl7RhfVKv1J30ODZzSa057Rm4CDUh9uFSbfCODxQBTDr14ILdf2J3AylZFy/74YjGHUf0+ydR5UKH3b0qh5yke4Ay76gA1vPxH5PcobrkFu6A+iSpuiLP5xeJtrRnG17eBOkFYEvR+HTPLrVCPOLjEZ1xR/tQqf+UeEGuxNeapz/cOGYbzfNzF1+nGrT445yXAjEEEGHRgIyeuc8XUDywLbKr8unsXxoxHWstIaKA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39840400004)(366004)(376002)(136003)(396003)(346002)(66946007)(66476007)(66556008)(2906002)(86362001)(1076003)(30864003)(8676002)(83380400001)(6512007)(5660300002)(8936002)(6666004)(186003)(36756003)(4326008)(6506007)(16526019)(6486002)(6916009)(7416002)(26005)(478600001)(956004)(52116002)(316002)(54906003)(2616005);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: fBGiTrHrwuLh8rYAW6i0mZhe63DX/yN3XNiwlSHSCF1LLcQ9lxm8ZfeULw1gDejcYxvN4+hpD4TasCQh15+YOlOGqwdwXOpcp5qt07a/Gm6oR+RG57SY2Q52UhLyjpqT2hUDAB+ozFKHdIcG3SMpGhMFcosYuGJEyrrDeGYXNQQF0dBmreU4yY2b7eGhMgRVXNaOynDARbsEEF/NzzvpUce86vYIU4QFTuW5Bo6AHCfs0q3+wc3ubGq0TWdOCE7nhl0aN+x/rqIKbNhxeMZkONHPQ/YYQFzEiL3e+inVjizx5t+L4R4d5ojypXmb18kbhTfXhLdtM+HKpa5YYD0IUtEooxSUOznzm8vHEJfEnnPOiZtOsakFNnVEvyHQNpckpVQYPxGSrFZw/JMf5OjaL+UUpK1+0ItBgj93br0QGGLMgoLA32D0UJC8KO78mxdVtvbvSTQKtGGr7NDt3ht4drWSmWtD6klUgrn9YBbzjpA=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 223dc08a-cc50-47bf-3d53-08d81f30a7d8
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2020 09:08:30.9515 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kGsMQcAU8WJFwLq3H2143YQ8NIIaOwmWlgKU86XBdnn75rmxrPIoYGyZlzhEwQLh71Bgd6E4FSlDKvBqIciCuD45B5qLaix0G8cAbFTyygY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
+Received-SPF: pass client-ip=40.107.14.133;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 05:08:30
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,394 +132,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cindy Lu <lulu@redhat.com>,
- Tiwei Bie <tiwei.bie@intel.com>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Lingshan Zhu <lingshan.zhu@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, armbru@redhat.com,
+ groug@kaod.org, Stefano Stabellini <sstabellini@kernel.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cindy Lu <lulu@redhat.com>
+Introduce a new ERRP_AUTO_PROPAGATE macro, to be used at start of
+functions with an errp OUT parameter.
 
-This patch set introduces a new net client type: vhost-vdpa.
-vhost-vdpa net client will set up a vDPA device which is specified
-by a "vhostdev" parameter.
+It has three goals:
 
-Signed-off-by: Lingshan Zhu <lingshan.zhu@intel.com>
-Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-Signed-off-by: Cindy Lu <lulu@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Message-Id: <20200701145538.22333-15-lulu@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
+1. Fix issue with error_fatal and error_prepend/error_append_hint: user
+can't see this additional information, because exit() happens in
+error_setg earlier than information is added. [Reported by Greg Kurz]
+
+2. Fix issue with error_abort and error_propagate: when we wrap
+error_abort by local_err+error_propagate, the resulting coredump will
+refer to error_propagate and not to the place where error happened.
+(the macro itself doesn't fix the issue, but it allows us to [3.] drop
+the local_err+error_propagate pattern, which will definitely fix the
+issue) [Reported by Kevin Wolf]
+
+3. Drop local_err+error_propagate pattern, which is used to workaround
+void functions with errp parameter, when caller wants to know resulting
+status. (Note: actually these functions could be merely updated to
+return int error code).
+
+To achieve these goals, later patches will add invocations
+of this macro at the start of functions with either use
+error_prepend/error_append_hint (solving 1) or which use
+local_err+error_propagate to check errors, switching those
+functions to use *errp instead (solving 2 and 3).
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/net.json            |  28 ++++-
- include/net/vhost-vdpa.h |  22 ++++
- net/clients.h            |   2 +
- net/net.c                |   3 +
- net/vhost-vdpa.c         | 228 +++++++++++++++++++++++++++++++++++++++
- net/Makefile.objs        |   2 +-
- 6 files changed, 282 insertions(+), 3 deletions(-)
- create mode 100644 include/net/vhost-vdpa.h
- create mode 100644 net/vhost-vdpa.c
 
-diff --git a/qapi/net.json b/qapi/net.json
-index 9244c9af56..558d520a2f 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -428,16 +428,39 @@
-     '*vhostforce':    'bool',
-     '*queues':        'int' } }
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
+Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul@xen.org>
+Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
+Cc: xen-devel@lists.xenproject.org
+
+ include/qapi/error.h | 205 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 172 insertions(+), 33 deletions(-)
+
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 5ceb3ace06..b54aedbfd7 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -39,7 +39,7 @@
+  *   • pointer-valued functions return non-null / null pointer, and
+  *   • integer-valued functions return non-negative / negative.
+  *
+- * How to:
++ * = Deal with Error object =
+  *
+  * Create an error:
+  *     error_setg(errp, "situation normal, all fouled up");
+@@ -73,28 +73,91 @@
+  * reporting it (primarily useful in testsuites):
+  *     error_free_or_abort(&err);
+  *
+- * Pass an existing error to the caller:
+- *     error_propagate(errp, err);
+- * where Error **errp is a parameter, by convention the last one.
++ * = Deal with Error ** function parameter =
+  *
+- * Pass an existing error to the caller with the message modified:
+- *     error_propagate_prepend(errp, err);
++ * A function may use the error system to return errors. In this case, the
++ * function defines an Error **errp parameter, by convention the last one (with
++ * exceptions for functions using ... or va_list).
+  *
+- * Avoid
+- *     error_propagate(errp, err);
+- *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+- * because this fails to prepend when @errp is &error_fatal.
++ * The caller may then pass in the following errp values:
++ *
++ * 1. &error_abort
++ *    Any error will result in abort().
++ * 2. &error_fatal
++ *    Any error will result in exit() with a non-zero status.
++ * 3. NULL
++ *    No error reporting through errp parameter.
++ * 4. The address of a NULL-initialized Error *err
++ *    Any error will populate errp with an error object.
+  *
+- * Create a new error and pass it to the caller:
++ * The following rules then implement the correct semantics desired by the
++ * caller.
++ *
++ * Create a new error to pass to the caller:
+  *     error_setg(errp, "situation normal, all fouled up");
+  *
+- * Call a function and receive an error from it:
++ * Calling another errp-based function:
++ *     f(..., errp);
++ *
++ * == Checking success of subcall ==
++ *
++ * If a function returns a value indicating an error in addition to setting
++ * errp (which is recommended), then you don't need any additional code, just
++ * do:
++ *
++ *     int ret = f(..., errp);
++ *     if (ret < 0) {
++ *         ... handle error ...
++ *         return ret;
++ *     }
++ *
++ * If a function returns nothing (not recommended for new code), the only way
++ * to check success is by consulting errp; doing this safely requires the use
++ * of the ERRP_AUTO_PROPAGATE macro, like this:
++ *
++ *     int our_func(..., Error **errp) {
++ *         ERRP_AUTO_PROPAGATE();
++ *         ...
++ *         subcall(..., errp);
++ *         if (*errp) {
++ *             ...
++ *             return -EINVAL;
++ *         }
++ *         ...
++ *     }
++ *
++ * ERRP_AUTO_PROPAGATE takes care of wrapping the original errp as needed, so
++ * that the rest of the function can directly use errp (including
++ * dereferencing), where any errors will then be propagated on to the original
++ * errp when leaving the function.
++ *
++ * In some cases, we need to check result of subcall, but do not want to
++ * propagate the Error object to our caller. In such cases we don't need
++ * ERRP_AUTO_PROPAGATE, but just a local Error object:
++ *
++ * Receive an error and not pass it:
+  *     Error *err = NULL;
+- *     foo(arg, &err);
++ *     subcall(arg, &err);
+  *     if (err) {
+  *         handle the error...
++ *         error_free(err);
+  *     }
+  *
++ * Note that older code that did not use ERRP_AUTO_PROPAGATE would instead need
++ * a local Error * variable and the use of error_propagate() to properly handle
++ * all possible caller values of errp. Now this is DEPRECATED* (see below).
++ *
++ * Note that any function that wants to modify an error object, such as by
++ * calling error_append_hint or error_prepend, must use ERRP_AUTO_PROPAGATE, in
++ * order for a caller's use of &error_fatal to see the additional information.
++ *
++ * In rare cases, we need to pass existing Error object to the caller by hand:
++ *     error_propagate(errp, err);
++ *
++ * Pass an existing error to the caller with the message modified:
++ *     error_propagate_prepend(errp, err);
++ *
++ *
+  * Call a function ignoring errors:
+  *     foo(arg, NULL);
+  *
+@@ -104,26 +167,6 @@
+  * Call a function treating errors as fatal:
+  *     foo(arg, &error_fatal);
+  *
+- * Receive an error and pass it on to the caller:
+- *     Error *err = NULL;
+- *     foo(arg, &err);
+- *     if (err) {
+- *         handle the error...
+- *         error_propagate(errp, err);
+- *     }
+- * where Error **errp is a parameter, by convention the last one.
+- *
+- * Do *not* "optimize" this to
+- *     foo(arg, errp);
+- *     if (*errp) { // WRONG!
+- *         handle the error...
+- *     }
+- * because errp may be NULL!
+- *
+- * But when all you do with the error is pass it on, please use
+- *     foo(arg, errp);
+- * for readability.
+- *
+  * Receive and accumulate multiple errors (first one wins):
+  *     Error *err = NULL, *local_err = NULL;
+  *     foo(arg, &err);
+@@ -151,6 +194,61 @@
+  *         error_setg(&err, ...); // WRONG!
+  *     }
+  * because this may pass a non-null err to error_setg().
++ *
++ * DEPRECATED*
++ *
++ * The following pattern of receiving, checking, and then forwarding an error
++ * to the caller by hand is now deprecated:
++ *
++ *     Error *err = NULL;
++ *     foo(arg, &err);
++ *     if (err) {
++ *         handle the error...
++ *         error_propagate(errp, err);
++ *     }
++ *
++ * Instead, use ERRP_AUTO_PROPAGATE macro.
++ *
++ * The old pattern is deprecated because of two things:
++ *
++ * 1. Issue with error_abort and error_propagate: when we wrap error_abort by
++ * local_err+error_propagate, the resulting coredump will refer to
++ * error_propagate and not to the place where error happened.
++ *
++ * 2. A lot of extra code of the same pattern
++ *
++ * How to update old code to use ERRP_AUTO_PROPAGATE?
++ *
++ * All you need is to add ERRP_AUTO_PROPAGATE() invocation at function start,
++ * than you may safely dereference errp to check errors and do not need any
++ * additional local Error variables or calls to error_propagate().
++ *
++ * Example:
++ *
++ * old code
++ *
++ *     void fn(..., Error **errp) {
++ *         Error *err = NULL;
++ *         foo(arg, &err);
++ *         if (err) {
++ *             handle the error...
++ *             error_propagate(errp, err);
++ *             return;
++ *         }
++ *         ...
++ *     }
++ *
++ * updated code
++ *
++ *     void fn(..., Error **errp) {
++ *         ERRP_AUTO_PROPAGATE();
++ *         foo(arg, errp);
++ *         if (*errp) {
++ *             handle the error...
++ *             return;
++ *         }
++ *         ...
++ *     }
+  */
  
-+##
-+# @NetdevVhostVDPAOptions:
-+#
-+# Vhost-vdpa network backend
-+#
-+# vDPA device is a device that uses a datapath which complies with the virtio
-+# specifications with a vendor specific control path.
-+#
-+# @vhostdev: path of vhost-vdpa device
-+#            (default:'/dev/vhost-vdpa-0')
-+#
-+# @queues: number of queues to be created for multiqueue vhost-vdpa
-+#          (default: 1)
-+#
-+# Since: 5.1
-+##
-+{ 'struct': 'NetdevVhostVDPAOptions',
-+  'data': {
-+    '*vhostdev':     'str',
-+    '*queues':       'int' } }
+ #ifndef ERROR_H
+@@ -359,6 +457,47 @@ void error_set_internal(Error **errp,
+                         ErrorClass err_class, const char *fmt, ...)
+     GCC_FMT_ATTR(6, 7);
+ 
++typedef struct ErrorPropagator {
++    Error *local_err;
++    Error **errp;
++} ErrorPropagator;
 +
- ##
- # @NetClientDriver:
- #
- # Available netdev drivers.
- #
- # Since: 2.7
-+#
-+# @vhost-vdpa since 5.1
- ##
- { 'enum': 'NetClientDriver',
-   'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
--            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
-+            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vdpa' ] }
- 
- ##
- # @Netdev:
-@@ -465,7 +488,8 @@
-     'bridge':   'NetdevBridgeOptions',
-     'hubport':  'NetdevHubPortOptions',
-     'netmap':   'NetdevNetmapOptions',
--    'vhost-user': 'NetdevVhostUserOptions' } }
-+    'vhost-user': 'NetdevVhostUserOptions',
-+    'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
- 
- ##
- # @NetFilterDirection:
-diff --git a/include/net/vhost-vdpa.h b/include/net/vhost-vdpa.h
-new file mode 100644
-index 0000000000..45e34b7cfc
---- /dev/null
-+++ b/include/net/vhost-vdpa.h
-@@ -0,0 +1,22 @@
++static inline void error_propagator_cleanup(ErrorPropagator *prop)
++{
++    error_propagate(prop->errp, prop->local_err);
++}
++
++G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
++
 +/*
-+ * vhost-vdpa.h
++ * ERRP_AUTO_PROPAGATE
 + *
-+ * Copyright(c) 2017-2018 Intel Corporation.
-+ * Copyright(c) 2020 Red Hat, Inc.
++ * This macro exists to assist with proper error handling in a function which
++ * uses an Error **errp parameter.  It must be used as the first line of a
++ * function which modifies an error (with error_prepend, error_append_hint, or
++ * similar) or which wants to dereference *errp.  It is still safe (but
++ * useless) to use in other functions.
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * If errp is NULL or points to error_fatal, it is rewritten to point to a
++ * local Error object, which will be automatically propagated to the original
++ * errp on function exit (see error_propagator_cleanup).
 + *
++ * After invocation of this macro it is always safe to dereference errp
++ * (as it's not NULL anymore) and to add information by error_prepend or
++ * error_append_hint (as, if it was error_fatal, we swapped it with a
++ * local_error to be propagated on cleanup).
++ *
++ * Note: we don't wrap the error_abort case, as we want resulting coredump
++ * to point to the place where the error happened, not to error_propagate.
 + */
++#define ERRP_AUTO_PROPAGATE() \
++    g_auto(ErrorPropagator) _auto_errp_prop = {.errp = errp}; \
++    do { \
++        if (!errp || errp == &error_fatal) { \
++            errp = &_auto_errp_prop.local_err; \
++        } \
++    } while (0)
 +
-+#ifndef VHOST_VDPA_H
-+#define VHOST_VDPA_H
-+
-+#define TYPE_VHOST_VDPA "vhost-vdpa"
-+
-+struct vhost_net *vhost_vdpa_get_vhost_net(NetClientState *nc);
-+uint64_t vhost_vdpa_get_acked_features(NetClientState *nc);
-+
-+extern const int vdpa_feature_bits[];
-+
-+#endif /* VHOST_VDPA_H */
-diff --git a/net/clients.h b/net/clients.h
-index a6ef267e19..92f9b59aed 100644
---- a/net/clients.h
-+++ b/net/clients.h
-@@ -61,4 +61,6 @@ int net_init_netmap(const Netdev *netdev, const char *name,
- int net_init_vhost_user(const Netdev *netdev, const char *name,
-                         NetClientState *peer, Error **errp);
- 
-+int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp);
- #endif /* QEMU_NET_CLIENTS_H */
-diff --git a/net/net.c b/net/net.c
-index 9099a327dd..94dc546fb2 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -966,6 +966,9 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
- #ifdef CONFIG_VHOST_NET_USER
-         [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
- #endif
-+#ifdef CONFIG_VHOST_NET_VDPA
-+        [NET_CLIENT_DRIVER_VHOST_VDPA] = net_init_vhost_vdpa,
-+#endif
- #ifdef CONFIG_L2TPV3
-         [NET_CLIENT_DRIVER_L2TPV3]    = net_init_l2tpv3,
- #endif
-diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-new file mode 100644
-index 0000000000..bc0e0d2d35
---- /dev/null
-+++ b/net/vhost-vdpa.c
-@@ -0,0 +1,228 @@
-+/*
-+ * vhost-vdpa.c
-+ *
-+ * Copyright(c) 2017-2018 Intel Corporation.
-+ * Copyright(c) 2020 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "clients.h"
-+#include "net/vhost_net.h"
-+#include "net/vhost-vdpa.h"
-+#include "hw/virtio/vhost-vdpa.h"
-+#include "qemu/config-file.h"
-+#include "qemu/error-report.h"
-+#include "qemu/option.h"
-+#include "qapi/error.h"
-+#include <sys/ioctl.h>
-+#include <err.h>
-+#include "standard-headers/linux/virtio_net.h"
-+#include "monitor/monitor.h"
-+#include "hw/virtio/vhost.h"
-+
-+/* Todo:need to add the multiqueue support here */
-+typedef struct VhostVDPAState {
-+    NetClientState nc;
-+    struct vhost_vdpa vhost_vdpa;
-+    VHostNetState *vhost_net;
-+    uint64_t acked_features;
-+    bool started;
-+} VhostVDPAState;
-+
-+const int vdpa_feature_bits[] = {
-+    VIRTIO_F_NOTIFY_ON_EMPTY,
-+    VIRTIO_RING_F_INDIRECT_DESC,
-+    VIRTIO_RING_F_EVENT_IDX,
-+    VIRTIO_F_ANY_LAYOUT,
-+    VIRTIO_F_VERSION_1,
-+    VIRTIO_NET_F_CSUM,
-+    VIRTIO_NET_F_GUEST_CSUM,
-+    VIRTIO_NET_F_GSO,
-+    VIRTIO_NET_F_GUEST_TSO4,
-+    VIRTIO_NET_F_GUEST_TSO6,
-+    VIRTIO_NET_F_GUEST_ECN,
-+    VIRTIO_NET_F_GUEST_UFO,
-+    VIRTIO_NET_F_HOST_TSO4,
-+    VIRTIO_NET_F_HOST_TSO6,
-+    VIRTIO_NET_F_HOST_ECN,
-+    VIRTIO_NET_F_HOST_UFO,
-+    VIRTIO_NET_F_MRG_RXBUF,
-+    VIRTIO_NET_F_MTU,
-+    VIRTIO_F_IOMMU_PLATFORM,
-+    VIRTIO_F_RING_PACKED,
-+    VIRTIO_NET_F_GUEST_ANNOUNCE,
-+    VHOST_INVALID_FEATURE_BIT
-+};
-+
-+VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
-+{
-+    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-+    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+    return s->vhost_net;
-+}
-+
-+uint64_t vhost_vdpa_get_acked_features(NetClientState *nc)
-+{
-+    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-+    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+    s->acked_features = vhost_net_get_acked_features(s->vhost_net);
-+
-+    return s->acked_features;
-+}
-+
-+static int vhost_vdpa_net_check_device_id(struct vhost_net *net)
-+{
-+    uint32_t device_id;
-+    int ret;
-+    struct vhost_dev *hdev;
-+
-+    hdev = (struct vhost_dev *)&net->dev;
-+    ret = hdev->vhost_ops->vhost_get_device_id(hdev, &device_id);
-+    if (device_id != VIRTIO_ID_NET) {
-+        return -ENOTSUP;
-+    }
-+    return ret;
-+}
-+
-+static void vhost_vdpa_del(NetClientState *ncs)
-+{
-+    VhostVDPAState *s;
-+    assert(ncs->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+    s = DO_UPCAST(VhostVDPAState, nc, ncs);
-+    if (s->vhost_net) {
-+        vhost_net_cleanup(s->vhost_net);
-+    }
-+}
-+
-+static int vhost_vdpa_add(NetClientState *ncs, void *be)
-+{
-+    VhostNetOptions options;
-+    struct vhost_net *net = NULL;
-+    VhostVDPAState *s;
-+    int ret;
-+
-+    options.backend_type = VHOST_BACKEND_TYPE_VDPA;
-+    assert(ncs->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+    s = DO_UPCAST(VhostVDPAState, nc, ncs);
-+    options.net_backend = ncs;
-+    options.opaque      = be;
-+    options.busyloop_timeout = 0;
-+
-+    net = vhost_net_init(&options);
-+    if (!net) {
-+        error_report("failed to init vhost_net for queue");
-+        goto err;
-+    }
-+    if (s->vhost_net) {
-+        vhost_net_cleanup(s->vhost_net);
-+        g_free(s->vhost_net);
-+    }
-+    s->vhost_net = net;
-+    ret = vhost_vdpa_net_check_device_id(net);
-+    if (ret) {
-+        goto err;
-+    }
-+    return 0;
-+err:
-+    if (net) {
-+        vhost_net_cleanup(net);
-+    }
-+    vhost_vdpa_del(ncs);
-+    return -1;
-+}
-+
-+static void vhost_vdpa_cleanup(NetClientState *nc)
-+{
-+    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-+
-+    if (s->vhost_net) {
-+        vhost_net_cleanup(s->vhost_net);
-+        g_free(s->vhost_net);
-+        s->vhost_net = NULL;
-+    }
-+}
-+
-+static bool vhost_vdpa_has_vnet_hdr(NetClientState *nc)
-+{
-+    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+
-+    return true;
-+}
-+
-+static bool vhost_vdpa_has_ufo(NetClientState *nc)
-+{
-+    assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+    VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-+    uint64_t features = 0;
-+    features |= (1ULL << VIRTIO_NET_F_HOST_UFO);
-+    features = vhost_net_get_features(s->vhost_net, features);
-+    return !!(features & (1ULL << VIRTIO_NET_F_HOST_UFO));
-+
-+}
-+
-+static NetClientInfo net_vhost_vdpa_info = {
-+        .type = NET_CLIENT_DRIVER_VHOST_VDPA,
-+        .size = sizeof(VhostVDPAState),
-+        .cleanup = vhost_vdpa_cleanup,
-+        .has_vnet_hdr = vhost_vdpa_has_vnet_hdr,
-+        .has_ufo = vhost_vdpa_has_ufo,
-+};
-+
-+static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
-+                               const char *name, const char *vhostdev)
-+{
-+    NetClientState *nc = NULL;
-+    VhostVDPAState *s;
-+    int vdpa_device_fd = -1;
-+    int ret = 0;
-+    assert(name);
-+    nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
-+    snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
-+    nc->queue_index = 0;
-+    s = DO_UPCAST(VhostVDPAState, nc, nc);
-+    vdpa_device_fd = qemu_open(vhostdev, O_RDWR);
-+    if (vdpa_device_fd == -1) {
-+        return -errno;
-+    }
-+    s->vhost_vdpa.device_fd = vdpa_device_fd;
-+    ret = vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
-+    assert(s->vhost_net);
-+    return ret;
-+}
-+
-+static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    const char *name = opaque;
-+    const char *driver, *netdev;
-+
-+    driver = qemu_opt_get(opts, "driver");
-+    netdev = qemu_opt_get(opts, "netdev");
-+    if (!driver || !netdev) {
-+        return 0;
-+    }
-+    if (strcmp(netdev, name) == 0 &&
-+        !g_str_has_prefix(driver, "virtio-net-")) {
-+        error_setg(errp, "vhost-vdpa requires frontend driver virtio-net-*");
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp)
-+{
-+    const NetdevVhostVDPAOptions *opts;
-+
-+    assert(netdev->type == NET_CLIENT_DRIVER_VHOST_VDPA);
-+    opts = &netdev->u.vhost_vdpa;
-+    /* verify net frontend */
-+    if (qemu_opts_foreach(qemu_find_opts("device"), net_vhost_check_net,
-+                          (char *)name, errp)) {
-+        return -1;
-+    }
-+    return net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name, opts->vhostdev);
-+}
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index c5d076d19c..5ab45545db 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -26,7 +26,7 @@ tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
- tap-obj-y ?= tap-stub.o
- common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
- common-obj-$(CONFIG_WIN32) += tap-win32.o
--
-+common-obj-$(CONFIG_VHOST_NET_VDPA) += vhost-vdpa.o
- vde.o-libs = $(VDE_LIBS)
- 
- common-obj-$(CONFIG_CAN_BUS) += can/
+ /*
+  * Special error destination to abort on error.
+  * See error_setg() and error_propagate() for details.
 -- 
-MST
+2.21.0
 
 
