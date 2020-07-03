@@ -2,76 +2,108 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D4FC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1251AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F65920720
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:12:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3D6F20720
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:14:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxVVgkm1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F65920720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q4Q8OfuW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3D6F20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrIge-0005bp-A2
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 06:12:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56666)
+	id 1jrIi2-0008Fc-Uo
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 06:14:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jrIbR-0003m8-9T
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:07:29 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42001
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrIgn-0006Ju-0D
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:13:01 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43082
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jrIbN-0005cw-6L
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:07:28 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrIgl-00074u-9a
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:13:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593770843;
+ s=mimecast20190719; t=1593771178;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+h8DgdJ/QNhxgIogOI7OC8K+gM1arOnEuxQ/Zp39QDo=;
- b=dxVVgkm1rxmCwjiOyNadDSiS77DGV3nUpcqMx9C+6/w8mtJqtCeFgoaNazECLokWxr6zPw
- 8CiPfIh57EIiou+msKyGodfS/KqmVCnXFYH4o0EKLNtNkesJuHZ9+awaBg5i9aTZIUAxlr
- OeYwKKkWv5cbPaErPi0XE3qoFqnmHmI=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=tjNyeWXOLKa2vKrRnnXP1fSwELFaD4aeU9xls3++Rm0=;
+ b=Q4Q8OfuWmr/3iCbTI6fC3gQOzPf1DkvaDl+MtJKSbs5u/3pPN3WM8MGnw9l36GSJNLL5LT
+ fCv4GyiHw+xH/DwkQlZ1yBpbUdUQJqQbtn+w0r3GWzWmoT0Ngrn2DsBqHOoVUM/U3caMvW
+ FNrCZmnocwqhsHSlhh9Unk9ZSxh0izI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-Ap_CO2XRNP6E7h_U_u9o8Q-1; Fri, 03 Jul 2020 06:07:19 -0400
-X-MC-Unique: Ap_CO2XRNP6E7h_U_u9o8Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-361-l9bYoLucMZ2AEDsnPTRd6Q-1; Fri, 03 Jul 2020 06:12:56 -0400
+X-MC-Unique: l9bYoLucMZ2AEDsnPTRd6Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 170A3186A200;
- Fri,  3 Jul 2020 10:07:18 +0000 (UTC)
-Received: from localhost (ovpn-113-54.ams2.redhat.com [10.36.113.54])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E5C8173FE9;
- Fri,  3 Jul 2020 10:07:14 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 07/14] pc-bios: s390x: Move panic() into header and add
- infinite loop
-Date: Fri,  3 Jul 2020 12:06:43 +0200
-Message-Id: <20200703100650.621212-8-cohuck@redhat.com>
-In-Reply-To: <20200703100650.621212-1-cohuck@redhat.com>
-References: <20200703100650.621212-1-cohuck@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D06B1BFE1;
+ Fri,  3 Jul 2020 10:12:54 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-131.ams2.redhat.com
+ [10.36.113.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C3F217D75;
+ Fri,  3 Jul 2020 10:12:52 +0000 (UTC)
+Subject: Re: [PATCH v2 01/25] iotests: Fix 051 output after qdev_init_nofail()
+ removal
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200624140446.15380-1-alex.bennee@linaro.org>
+ <20200624140446.15380-2-alex.bennee@linaro.org>
+ <20200703080728.GC5285@linux.fritz.box>
+ <b91984af-ca2f-1cb2-905a-ba26212df208@redhat.com> <87d05cq5lu.fsf@linaro.org>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9d82d78c-4436-170b-a497-44f45a016b39@redhat.com>
+Date: Fri, 3 Jul 2020 12:12:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <87d05cq5lu.fsf@linaro.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -94,119 +126,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, fam@euphon.net,
+ Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, f4bug@amsat.org,
+ John Snow <jsnow@redhat.com>, cota@braap.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Janosch Frank <frankja@linux.ibm.com>
+On 03.07.20 12:02, Alex Bennée wrote:
+> 
+> Max Reitz <mreitz@redhat.com> writes:
+> 
+>> On 03.07.20 10:07, Kevin Wolf wrote:
+>>> Am 24.06.2020 um 16:04 hat Alex Bennée geschrieben:
+>>>> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>>
+>>>> Commit 96927c744 replaced qdev_init_nofail() call by
+>>>> isa_realize_and_unref() which has a different error
+>>>> message. Update the test output accordingly.
+>>>>
+>>>> Gitlab CI error after merging b77b5b3dc7:
+>>>> https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4375
+>>>>
+>>>> Reported-by: Thomas Huth <thuth@redhat.com>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>> Message-Id: <20200616154949.6586-1-philmd@redhat.com>
+>>>
+>>> Thanks, applied (this individual patch) to the block branch.
+>>
+>> Hm, I’ve already included it in my pull request from last week:
+>>
+>> https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg01159.html
+>>
+>> Unfortunately, the request got no response so far.
+> 
+> I think Peter's been on holiday this week so I guess there will be a
+> pile of PRs to process next week.
 
-panic() was defined for the ccw and net bios, i.e. twice, so it's
-cleaner to rather put it into the header.
-
-Also let's add an infinite loop into the assembly of disabled_wait() so
-the caller doesn't need to take care of it.
-
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200624075226.92728-9-frankja@linux.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/main.c     | 7 -------
- pc-bios/s390-ccw/netmain.c  | 8 --------
- pc-bios/s390-ccw/s390-ccw.h | 9 +++++++--
- pc-bios/s390-ccw/start.S    | 5 +++--
- 4 files changed, 10 insertions(+), 19 deletions(-)
-
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 8b912454c940..146a50760bc7 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -46,13 +46,6 @@ void write_iplb_location(void)
-     lowcore->ptr_iplb = ptr2u32(&iplb);
- }
- 
--void panic(const char *string)
--{
--    sclp_print(string);
--    disabled_wait();
--    while (1) { }
--}
--
- unsigned int get_loadparm_index(void)
- {
-     return atoui(loadparm_str);
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index f1ee63577ad7..056e93a818fd 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -439,14 +439,6 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
-     return rc;
- }
- 
--void panic(const char *string)
--{
--    sclp_print(string);
--    for (;;) {
--        disabled_wait();
--    }
--}
--
- void write_subsystem_identification(void)
- {
-     SubChannelId *schid = (SubChannelId *) 184;
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index c5820e43aed1..36b884ccedf2 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -50,12 +50,11 @@ typedef unsigned long long __u64;
- #include "iplb.h"
- 
- /* start.s */
--void disabled_wait(void);
-+void disabled_wait(void) __attribute__ ((__noreturn__));
- void consume_sclp_int(void);
- void consume_io_int(void);
- 
- /* main.c */
--void panic(const char *string);
- void write_subsystem_identification(void);
- void write_iplb_location(void);
- extern char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
-@@ -91,6 +90,12 @@ bool menu_is_enabled_enum(void);
- 
- #define MAX_BOOT_ENTRIES  31
- 
-+static inline void panic(const char *string)
-+{
-+    sclp_print(string);
-+    disabled_wait();
-+}
-+
- static inline void fill_hex(char *out, unsigned char val)
- {
-     const char hex[] = "0123456789abcdef";
-diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
-index aa8fceb19da2..ce519300a1f3 100644
---- a/pc-bios/s390-ccw/start.S
-+++ b/pc-bios/s390-ccw/start.S
-@@ -47,8 +47,9 @@ memsetxc:
-  */
- 	.globl disabled_wait
- disabled_wait:
--        larl %r1,disabled_wait_psw
--        lpswe   0(%r1)
-+	larl	%r1,disabled_wait_psw
-+	lpswe	0(%r1)
-+1:	j	1b
- 
- 
- /*
--- 
-2.25.4
+It looked to me like he responded to some pull requests this week, so,
+well...  I don’t know.
 
 
