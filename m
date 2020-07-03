@@ -2,83 +2,82 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26305C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9B4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:59:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E939B2073E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:52:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC56A20724
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:59:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGG4HmeK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E939B2073E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4DedgHu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC56A20724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrQny-0006zU-8C
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 14:52:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47952)
+	id 1jrQtr-0001it-75
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 14:59:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrQl6-0002oS-Ok; Fri, 03 Jul 2020 14:50:01 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45253)
+ id 1jrQt4-0000Wz-Oc
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 14:58:14 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:39599)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrQl5-0007dC-4r; Fri, 03 Jul 2020 14:50:00 -0400
-Received: by mail-wr1-x441.google.com with SMTP id s10so33695708wrw.12;
- Fri, 03 Jul 2020 11:49:57 -0700 (PDT)
+ id 1jrQt3-0001To-8v
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 14:58:14 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id w3so22615993wmi.4
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 11:58:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=y9ApWH9gz4M4qZvGxoP6zo+vP+3Z0/10bVmtSoKgmDA=;
- b=WGG4HmeKWLz+kxxqc8rPXhCqT+QP+vqOXsU5ZHY/LfEs9GDrQGYtqRObnqqIy5D+Ds
- 3BG5FVWk3TTLApEXgACm0rFLTDfJ8d+jjRCFmGjEcShsMriWW8b+aYMWn8rlhgwwNwsJ
- wfSmJ0WTVGjYiQZoylYvUQF+jRloEQQw1iFl9PLe9TESvpNTDtlJCvOURdruz5sXX+jd
- zw+l0OfkTT1/4bNuPuP1YAEAd3SlBoawtbBukiQDSyaYGOI0jxL4KgxLVZuH6kVGlXkG
- p56mtIGkJxObAymfysJexA6eg2xFrd3bGkrF6UAK2qxDkO6a54cNgXj2FI6NsoGWaOb4
- fkjg==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=B93WOFgqX36UhvJ4vEyF01rHmdjp3ebCmiX6P/HuZtQ=;
+ b=l4DedgHut2kH7jrsVW9S9mLBchlDn/wAcKJr3XEtvsHdVnK5cN/6mZ6HJdpBrb/J3R
+ vDVc/5bBnNcUM1q8SAlRUDexoD+SLiL8n9ucCjgaZFup51yZcjad4Eq0RU0PSek3qyru
+ CciV0RvgQ/WUQtwahZOMmUAwcptEkGp/oreaTXvXTIkrIeX0+3kWFyOz5M2fevGzwPxp
+ 7heSt95z1Z2NQ4Mt3oy7wvkNMvL7DqvqXL6MGBPPvGq4K/5oMTGvvli6yb6vwcEBNWVd
+ G5M7e0V7NbmUkuU6WN1s8sidCLat+au/MIzYY1SzeseI04e4MiNDJXBRaKb2DYruBlUf
+ 7gRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=y9ApWH9gz4M4qZvGxoP6zo+vP+3Z0/10bVmtSoKgmDA=;
- b=HHbBgGxqdYCmkCV0gNAyuwCb/valDS2ZvJHAHilV3Gfdtkw9OoMZ3BT+QU6yecgzPq
- w4loAIRBmqsOE3vhhcwbRsQ9VYGYUzwaOkXk/OT5wu5bWxC6wWj9HcJDvBriILKCfqfb
- pCc78I6ttfB6f3B/Fj5eS7XLECgbsA0CTFEqmwJaEP9vwAbi0pEWjlWPtzZ8oCtrA0bS
- kGqGs4H9w10DTn5O+rcCSrhjMTU90iVq5mYC2wWXPdEwz52JePXx6rurwm3ok9ZUSW8e
- QRKCb28+bSJob30NsPjUUQwaCsUsfrOL8UBLbxvBunknHs6VCdqFSVHh/AbW42Xery/a
- NBGg==
-X-Gm-Message-State: AOAM531eBHxrS5CYR02/2IXhdSsLETCfEQk2JUfL523bcTEjrhG0UIYo
- KX+cS39eCcZURoIHGPl4wd19fu3mwj0=
-X-Google-Smtp-Source: ABdhPJzmjsXnWHN2++nWfTCBU5nNVneetlT9YQ4EefGjogysbLJLzzBYrEtz6UC01KQOi42GQIc7YA==
-X-Received: by 2002:adf:edd0:: with SMTP id v16mr37371559wro.214.1593802196812; 
- Fri, 03 Jul 2020 11:49:56 -0700 (PDT)
+ :mime-version:content-transfer-encoding;
+ bh=B93WOFgqX36UhvJ4vEyF01rHmdjp3ebCmiX6P/HuZtQ=;
+ b=N0r1Wtx0Z3XdE1wxhc+Yn0eCNUawP5xOJj9bSXoL127mZ/FUsGhI11Vs5l1tmzyghG
+ NslUUgVmPoz4qd29uurzACHIOQ+qEZeG2kOVNJqWQDB639x9bBWUe4AOXN3LFyX21FWG
+ AOjKOMjunmptDmfRSRiLmSENRcwAsP8IrYHpn0FqyEsYqFBG5s+5KXI46Eqyszv/rZGZ
+ BBAhLZrLCkObjUwU2GWBA+tFOjlxeQvhhYtQMdSiTBwRT5Z5o17t79zbfJSz9G2kRpo3
+ coBLaQpVeqBTx6QGCiCrWtFLEGXOf+h2Uk2KCXbRULHJ+mxvzXvZqcTVUUWsM6fxlmHZ
+ TLsw==
+X-Gm-Message-State: AOAM531f7VcDGvm6Uu9qAzLJoUOZLDSLvxxNz0hZ8Cb24KyLKqvN7VNv
+ z2r4bphMR8xKN3e2fcbnu9YGAi5MGbM=
+X-Google-Smtp-Source: ABdhPJyL9Z1um6dnmOjPcgSzOcO5t9ik07NsCiKVmASUjU16cEQXDN7/CeSDXOurUSbS1hOR/FYcxw==
+X-Received: by 2002:a7b:c055:: with SMTP id u21mr36133526wmc.23.1593802691545; 
+ Fri, 03 Jul 2020 11:58:11 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id x11sm13778369wmc.26.2020.07.03.11.49.55
+ by smtp.gmail.com with ESMTPSA id t16sm16060929wru.9.2020.07.03.11.58.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 11:49:56 -0700 (PDT)
+ Fri, 03 Jul 2020 11:58:11 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] hw/ppc: Use TYPE_SYSBUS_OHCI instead of hardcoded string
-Date: Fri,  3 Jul 2020 20:49:52 +0200
-Message-Id: <20200703184952.4918-3-f4bug@amsat.org>
+Subject: [PATCH 0/2] hw/char/serial: Migrate I/O serial device
+Date: Fri,  3 Jul 2020 20:58:07 +0200
+Message-Id: <20200703185809.5896-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200703184952.4918-1-f4bug@amsat.org>
-References: <20200703184952.4918-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -100,67 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Beniamino Galvani <b.galvani@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By using the TYPE_* definitions for devices, we can:
-- quickly find where devices are used with 'git-grep'
-- easily rename a non-user-creatable device (one-line change).
+We migrate the memory mapped device, but not the I/O one.
+No particular reason, so let it be migratable.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/display/sm501.c | 3 ++-
- hw/ppc/sam460ex.c  | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Philippe Mathieu-Daudé (2):
+  hw/char/serial: Separate and document static properties
+  hw/char/serial: Allow migration of the I/O serial device
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 9cccc68c35..c122a4eca5 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -36,6 +36,7 @@
- #include "hw/qdev-properties.h"
- #include "hw/i2c/i2c.h"
- #include "hw/display/i2c-ddc.h"
-+#include "hw/usb/hcd-ohci.h"
- #include "qemu/range.h"
- #include "ui/pixel_ops.h"
- #include "qemu/bswap.h"
-@@ -1961,7 +1962,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-     sysbus_init_mmio(sbd, &s->state.mmio_region);
- 
-     /* bridge to usb host emulation module */
--    usb_dev = qdev_new("sysbus-ohci");
-+    usb_dev = qdev_new(TYPE_SYSBUS_OHCI);
-     qdev_prop_set_uint32(usb_dev, "num-ports", 2);
-     qdev_prop_set_uint64(usb_dev, "dma-offset", s->base);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(usb_dev), &error_fatal);
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index 1a106a68de..593436937a 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -35,6 +35,7 @@
- #include "hw/char/serial.h"
- #include "hw/i2c/ppc4xx_i2c.h"
- #include "hw/i2c/smbus_eeprom.h"
-+#include "hw/usb/hcd-ohci.h"
- #include "hw/usb/hcd-ehci.h"
- #include "hw/ppc/fdt.h"
- #include "hw/qdev-properties.h"
-@@ -370,7 +371,7 @@ static void sam460ex_init(MachineState *machine)
- 
-     /* USB */
-     sysbus_create_simple(TYPE_PPC4xx_EHCI, 0x4bffd0400, uic[2][29]);
--    dev = qdev_new("sysbus-ohci");
-+    dev = qdev_new(TYPE_SYSBUS_OHCI);
-     qdev_prop_set_string(dev, "masterbus", "usb-bus.0");
-     qdev_prop_set_uint32(dev, "num-ports", 6);
-     sbdev = SYS_BUS_DEVICE(dev);
+ include/hw/char/serial.h |  7 +++++--
+ hw/char/serial.c         | 12 +++++++++++-
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
 -- 
 2.21.3
 
