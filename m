@@ -2,56 +2,101 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E71C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D05C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D364E20760
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:32:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D364E20760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	by mail.kernel.org (Postfix) with ESMTPS id ABBB320760
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:33:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JwLr6vNe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABBB320760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOcK-0004mK-2C
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:32:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35156)
+	id 1jrOdL-0006Mr-T6
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:33:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jrOI0-0001Pf-27; Fri, 03 Jul 2020 12:11:51 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48379 helo=relay3.sw.ru)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jrOHq-0002cv-U4; Fri, 03 Jul 2020 12:11:46 -0400
-Received: from [192.168.15.23] (helo=iris.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.93)
- (envelope-from <den@openvz.org>)
- id 1jrOHf-0005Rg-RD; Fri, 03 Jul 2020 19:11:27 +0300
-From: "Denis V. Lunev" <den@openvz.org>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 5/7] block, migration: add bdrv_finalize_vmstate helper
-Date: Fri,  3 Jul 2020 19:11:28 +0300
-Message-Id: <20200703161130.23772-6-den@openvz.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200703161130.23772-1-den@openvz.org>
-References: <20200703161130.23772-1-den@openvz.org>
-Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
- helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 12:11:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrOL9-0006BR-Mm
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:15:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58474
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrOL7-0003WR-LP
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:15:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593792900;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=faVuA6XsjUgnJyBwKxSDHRX8cyqJtIw/ArhZE775aWQ=;
+ b=JwLr6vNe0jhBn54EJAwgZ34I7Artq9TbElyX1628TZJZ7VSa9f44MXBdWPZX7sFf3B1n5u
+ PSOWEJq79Ru23U6lNK3lHHmWiebsji32XYyIedP394+9nQXwhtGlSPO3aCeYemuHbU0fbh
+ MWkHNBg8V4Cp35yBIs+k1I3mCJswQMQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299-jqg1rYizOwSwVcYv2gP3_A-1; Fri, 03 Jul 2020 12:14:56 -0400
+X-MC-Unique: jqg1rYizOwSwVcYv2gP3_A-1
+Received: by mail-wm1-f72.google.com with SMTP id 65so15818810wmd.8
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 09:14:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=faVuA6XsjUgnJyBwKxSDHRX8cyqJtIw/ArhZE775aWQ=;
+ b=Viu005UmRWLmpoRgdEnFreZNCygcedGWSsDX/AZPL8+smXZ9kQlsHv5QnpV8e8PvL9
+ 10nOTf3clKPUUA3PmiKbK8PlmwmtE5Tb0MpKy1TJW8tCG8ppgiBpOkXQIvWJA6js0L6p
+ jnCH6JOBcqb6tD9Kw39tqsha+RMRQfGm+c6z5K1Te3r4BXbFzD5iUSN7cbVo1RCUCK8n
+ 6b+4YrE9KxrZqi+dGZRoqN8iKshd+/CzNxmFZh8Oc90Lp1vywsVwZNm8AwP90QcC3h5n
+ lZgALzTC+Ap/KlisyoRhwz8nQQvYRoYPKajqFEs9h+Lvd4C7zvZom/kMEhepyINhGqfm
+ imvg==
+X-Gm-Message-State: AOAM530JT8pd1yC9R+B10ZDkf6r+unVQb4DR/eBQfRZnbMtfqtnaKOYm
+ R+phr+1FPE460G33nbS9NExU94jAMG8liOPt8mr3wxFBbu5y/g9FlYboW5lEZp/0PR9/cuSKdYv
+ zpd7YQhAPtCHTurg=
+X-Received: by 2002:a5d:5151:: with SMTP id u17mr6886865wrt.154.1593792895539; 
+ Fri, 03 Jul 2020 09:14:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzhuPyC4UVKvR4E+wI2bduxfvSn3/zDBZUvrCJhxl+LE019hAKKbfVm6HkC2wGH76RRCbRBDA==
+X-Received: by 2002:a5d:5151:: with SMTP id u17mr6886854wrt.154.1593792895381; 
+ Fri, 03 Jul 2020 09:14:55 -0700 (PDT)
+Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id e4sm14178974wrt.97.2020.07.03.09.14.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Jul 2020 09:14:54 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH] MAINTAINERS: Cover the firmware JSON schema
+Date: Fri,  3 Jul 2020 18:14:53 +0200
+Message-Id: <20200703161453.8406-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -64,130 +109,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now bdrv_fclose() is just calling bdrv_flush().
+Add an entry to cover firmware.json (see commit 3a0adfc9bf:
+schema that describes the different uses and properties of
+virtual machine firmware).
+Cc the libvirt maintainers if it ever changes.
 
-The problem is that migration code is working inefficiently from block
-layer terms and are frequently called for very small pieces of
-unaligned data. Block layer is capable to work this way, but this is very
-slow.
-
-This patch is a preparation for the introduction of the intermediate
-buffer at block driver state. It would be beneficial to separate
-conventional bdrv_flush() from closing QEMU file from migration code.
-
-The patch also forces bdrv_finalize_vmstate() operation inside
-synchronous blk_save_vmstate() operation. This helper is used from
-qemu-io only.
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Fam Zheng <fam@euphon.net>
-CC: Juan Quintela <quintela@redhat.com>
-CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- block/block-backend.c |  6 +++++-
- block/io.c            | 15 +++++++++++++++
- include/block/block.h |  5 +++++
- migration/savevm.c    |  4 ++++
- 4 files changed, 29 insertions(+), 1 deletion(-)
+Based on a comment from Laszlo:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg604925.html
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 1c6e53bbde..5bb11c8e01 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2177,16 +2177,20 @@ int blk_truncate(BlockBackend *blk, int64_t offset, bool exact,
- int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
-                      int64_t pos, int size)
- {
--    int ret;
-+    int ret, ret2;
+I don't think Laszlo should be the sole maintainer, not sure
+who else should be listed. Gerd and Kashyap? :)
+Can we add it 'maintained' without specific maintainer?
+---
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dec252f38b..57c90201df 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2601,6 +2601,12 @@ F: include/hw/i2c/smbus_master.h
+ F: include/hw/i2c/smbus_slave.h
+ F: include/hw/i2c/smbus_eeprom.h
  
-     if (!blk_is_available(blk)) {
-         return -ENOMEDIUM;
-     }
- 
-     ret = bdrv_save_vmstate(blk_bs(blk), buf, pos, size);
-+    ret2 = bdrv_finalize_vmstate(blk_bs(blk));
-     if (ret < 0) {
-         return ret;
-     }
-+    if (ret2 < 0) {
-+        return ret2;
-+    }
- 
-     if (!blk->enable_write_cache) {
-         ret = bdrv_flush(blk_bs(blk));
-diff --git a/block/io.c b/block/io.c
-index df8f2a98d4..1f69268361 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2724,6 +2724,21 @@ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
-     return bdrv_rw_vmstate(bs, qiov, pos, true);
- }
- 
-+static int coroutine_fn bdrv_co_finalize_vmstate(BlockDriverState *bs)
-+{
-+    return 0;
-+}
++Firmware schema specifications
++M: Laszlo Ersek <lersek@redhat.com>
++R: libvir-list@redhat.com
++S: Maintained
++F: docs/interop/firmware.json
 +
-+static int coroutine_fn bdrv_finalize_vmstate_co_entry(void *opaque)
-+{
-+    return bdrv_co_finalize_vmstate(opaque);
-+}
-+
-+int bdrv_finalize_vmstate(BlockDriverState *bs)
-+{
-+    return bdrv_run_co(bs, bdrv_finalize_vmstate_co_entry, bs);
-+}
-+
- /**************************************************************/
- /* async I/Os */
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index e8fc814996..0119b68505 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -572,6 +572,11 @@ int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
- 
- int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
-                       int64_t pos, int size);
-+/*
-+ * bdrv_finalize_vmstate() is mandatory to commit vmstate changes if
-+ * bdrv_save_vmstate() was ever called.
-+ */
-+int bdrv_finalize_vmstate(BlockDriverState *bs);
- 
- void bdrv_img_create(const char *filename, const char *fmt,
-                      const char *base_filename, const char *base_fmt,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index da3dead4e9..798a4cb402 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -150,6 +150,10 @@ static ssize_t block_get_buffer(void *opaque, uint8_t *buf, int64_t pos,
- 
- static int bdrv_fclose(void *opaque, Error **errp)
- {
-+    int err = bdrv_finalize_vmstate(opaque);
-+    if (err < 0) {
-+        return err;
-+    }
-     return bdrv_flush(opaque);
- }
- 
+ EDK2 Firmware
+ M: Laszlo Ersek <lersek@redhat.com>
+ M: Philippe Mathieu-Daudé <philmd@redhat.com>
 -- 
-2.17.1
+2.21.3
 
 
