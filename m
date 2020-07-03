@@ -2,84 +2,87 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B02FEC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:31:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D57C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:39:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F09120890
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:31:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE0C1206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:39:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+Q1gb/c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F09120890
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yy95M8rE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE0C1206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrGAJ-0005dz-Or
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 03:31:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38056)
+	id 1jrGHt-0007dI-5b
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 03:39:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jrG9g-0005Bn-JL
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:30:40 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48295
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrGHL-0007ES-Jy
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:38:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57052
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jrG9e-0007s8-A2
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:30:40 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrGHK-0001bY-1W
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:38:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593761437;
+ s=mimecast20190719; t=1593761912;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BO+UoMCKelL16/Y2pSLyoI6zj6H6iuUXbalWUnmtq6Y=;
- b=R+Q1gb/c8XmKgudLkDQKGIWszvDRSLnwDQH3lSLdeD8YKqDxvX/UdH1ghbw8/sHhQG4NLe
- 1go+NcWk0vEmusYxBNW5RbGjy9kEjr7erH/e4vpX+gHD99N5acS+MoaR6GSwECwpATZYd9
- NbvNGQaI8zS5JPDFvHcK4X68IRlz4+8=
+ bh=h3egHuNW7B59Xnb28NjzBJ+kMsciqf3h2+2qLpKMk2Y=;
+ b=Yy95M8rEjzCGji+rgHoqg6xEjmzAFqorJ3GEQjVgwKKBkTrDhf4mcf8XQ/YyJrwc/J9hP/
+ 5+QsCaMquynfkhBLE7z0SKIMXwW+De0AGenNkbf5N6Skd57Q5bdvw/IEiZlQ8RdStt6JEN
+ h7g5h4wy/Ih9WKX1+ZO0shBYnUCI4AY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-9G0KWRe_Nou5cXOTKSbIOg-1; Fri, 03 Jul 2020 03:30:33 -0400
-X-MC-Unique: 9G0KWRe_Nou5cXOTKSbIOg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-250-sqi4E35fO3S6_km1ifvQ5Q-1; Fri, 03 Jul 2020 03:38:31 -0400
+X-MC-Unique: sqi4E35fO3S6_km1ifvQ5Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56554107ACF9;
- Fri,  3 Jul 2020 07:30:31 +0000 (UTC)
-Received: from [10.72.13.231] (ovpn-13-231.pek2.redhat.com [10.72.13.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A17CA10013D9;
- Fri,  3 Jul 2020 07:30:04 +0000 (UTC)
-Subject: Re: [PATCH v4 00/14]vDPA support in qemu
-To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
- eblake@redhat.com, cohuck@redhat.com
-References: <20200701145538.22333-1-lulu@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <2f068402-2b8f-c3e5-0f91-c2e18a802b04@redhat.com>
-Date: Fri, 3 Jul 2020 15:30:03 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5301110CE781;
+ Fri,  3 Jul 2020 07:38:30 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B8AA7923E;
+ Fri,  3 Jul 2020 07:38:30 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 89E511138648; Fri,  3 Jul 2020 09:38:28 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: Questionable aspects of QEMU Error's design
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <87blo7heag.fsf@dusky.pond.sub.org>
+ <87blndey9c.fsf@dusky.pond.sub.org>
+ <3b9d53fd-bdd0-c15b-292c-c4952fa24dfd@virtuozzo.com>
+ <923ceeeb-1fc8-489e-a32d-4cebfa6eadae@virtuozzo.com>
+ <87y2ptstxm.fsf@dusky.pond.sub.org>
+Date: Fri, 03 Jul 2020 09:38:28 +0200
+In-Reply-To: <87y2ptstxm.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Fri, 15 May 2020 06:28:37 +0200")
+Message-ID: <87d05dqc97.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200701145538.22333-1-lulu@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,111 +103,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
- saugatm@xilinx.com, hanand@xilinx.com, hch@infradead.org, eperezma@redhat.com,
- jgg@mellanox.com, shahafs@mellanox.com, kevin.tian@intel.com,
- parav@mellanox.com, vmireyno@marvell.com, cunming.liang@intel.com,
- gdawar@xilinx.com, jiri@mellanox.com, xiao.w.wang@intel.com,
- stefanha@redhat.com, zhihong.wang@intel.com, aadam@redhat.com,
- rdunlap@infradead.org, maxime.coquelin@redhat.com, lingshan.zhu@intel.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Markus Armbruster <armbru@redhat.com> writes:
 
-On 2020/7/1 下午10:55, Cindy Lu wrote:
-> vDPA device is a device that uses a datapath which complies with the
-> virtio specifications with vendor specific control path. vDPA devices
-> can be both physically located on the hardware or emulated by software.
-> This PATCH introduce the vDPA support in qemu
-> TODO
-> 1) vIOMMU support
-> 2) live migration support
-> 3) docs for vhost-vdpa
-> 4) config interrupt support
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 >
-> Change from v1
-> separate the patch of vhost_vq_get_addr
-> separate the patch of vhost_dev_start
-> introduce the docmation for vhost-vdpa.rst
-> other comments form last version
-> github address
-> https://github.com/lulu-github-name/qemutmp.git PATCHV2
+>> 28.04.2020 08:20, Vladimir Sementsov-Ogievskiy wrote:
+>>> 27.04.2020 18:36, Markus Armbruster wrote:
+>>>> FYI, I'm working on converting QemuOpts, QAPI visitors and QOM.=C2=A0 =
+I keep
+>>>> running into bugs.=C2=A0 So far:
+[...]
+>>>> I got another one coming for QOM and qdev before I can post the
+>>>> conversion.
+>>>>
+>>>> Vladimir, since the conversion will mess with error_propagate(), I'd
+>>>> like to get it in before your auto-propagation work.
+>>>>
+>>>
+>>> OK, just let me know when to regenerate the series, it's not hard.
+>>>
+>>
+>> Hi! Is all that merged? Should I resend now?
 >
-> Change from v3
-> fix the complie problem
-> separate the patch of vhost_force_iommu
-> other comments form last version
-> github address
-> https://github.com/lulu-github-name/qemutmp.git PATCHV3
->
-> Change from v3
-> fix the centos7 test problem
-> other comments form last version
-> github address
-> https://github.com/lulu-github-name/qemutmp.git PATCHV4
+> I ran into many bugs and fell into a few rabbit holes.  I'm busy
+> finishing and flushing the patches.
 
-
-Thanks a lot for patches.
-
-I think we may have a more generic handling of forcing IOMMU_PLATFORM. 
-But it can be done on top.
-
-So
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
->
-> Cindy Lu (11):
->    net: introduce qemu_get_peer
->    vhost_net: use the function qemu_get_peer
->    vhost: introduce new VhostOps vhost_dev_start
->    vhost: implement vhost_dev_start method
->    vhost: introduce new VhostOps vhost_vq_get_addr
->    vhost: implement vhost_vq_get_addr method
->    vhost: introduce new VhostOps vhost_force_iommu
->    vhost: implement vhost_force_iommu method
->    vhost_net: introduce set_config & get_config
->    vhost-vdpa: introduce vhost-vdpa backend
->    vhost-vdpa: introduce vhost-vdpa net client
->
-> Jason Wang (3):
->    virtio-bus: introduce queue_enabled method
->    virtio-pci: implement queue_enabled method
->    vhost: check the existence of vhost_set_iotlb_callback
->
->   configure                         |  21 ++
->   docs/interop/index.rst            |   1 +
->   docs/interop/vhost-vdpa.rst       |  17 ++
->   hw/net/vhost_net-stub.c           |  11 +
->   hw/net/vhost_net.c                |  45 ++-
->   hw/net/virtio-net.c               |  19 ++
->   hw/virtio/Makefile.objs           |   1 +
->   hw/virtio/vhost-backend.c         |   6 +
->   hw/virtio/vhost-vdpa.c            | 475 ++++++++++++++++++++++++++++++
->   hw/virtio/vhost.c                 |  52 +++-
->   hw/virtio/virtio-pci.c            |  13 +
->   hw/virtio/virtio.c                |   6 +
->   include/hw/virtio/vhost-backend.h |  19 +-
->   include/hw/virtio/vhost-vdpa.h    |  26 ++
->   include/hw/virtio/vhost.h         |   7 +
->   include/hw/virtio/virtio-bus.h    |   4 +
->   include/net/net.h                 |   1 +
->   include/net/vhost-vdpa.h          |  22 ++
->   include/net/vhost_net.h           |   5 +
->   net/Makefile.objs                 |   2 +-
->   net/clients.h                     |   2 +
->   net/net.c                         |  10 +
->   net/vhost-vdpa.c                  | 228 ++++++++++++++
->   qapi/net.json                     |  28 +-
->   qemu-options.hx                   |  12 +
->   25 files changed, 1004 insertions(+), 29 deletions(-)
->   create mode 100644 docs/interop/vhost-vdpa.rst
->   create mode 100644 hw/virtio/vhost-vdpa.c
->   create mode 100644 include/hw/virtio/vhost-vdpa.h
->   create mode 100644 include/net/vhost-vdpa.h
->   create mode 100644 net/vhost-vdpa.c
->
+All merged except for the final series "[PATCH v2 00/44] Less clumsy
+error checking".  v2 has a lot of change within the series, but in
+aggregate it's really close to v1.  This makes be optimistic it can
+serve as a base for your auto-propagation work.  To get it into 5.1, we
+need a respin, a re-review, and a pull request.  Time is awfully short.
+Sorry for taking so long!  If you want to try, I can give it priority on
+my side.
 
 
