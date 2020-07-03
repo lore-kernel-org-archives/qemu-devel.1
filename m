@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED623C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2866C433E1
 	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C752320870
+	by mail.kernel.org (Postfix) with ESMTPS id AD44120772
 	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:16:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C752320870
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD44120772
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrS6t-000541-2t
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:16:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34812)
+	id 1jrS6s-00052g-Up
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
- id 1jrS5z-0003lv-Vq
+ id 1jrS5z-0003lX-0L
  for qemu-devel@nongnu.org; Fri, 03 Jul 2020 16:15:39 -0400
-Received: from relay8-d.mail.gandi.net ([217.70.183.201]:50135)
+Received: from relay8-d.mail.gandi.net ([217.70.183.201]:34415)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
- id 1jrS5v-00010X-N9
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 16:15:39 -0400
+ id 1jrS5x-00010e-9O
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 16:15:38 -0400
 X-Originating-IP: 82.252.130.88
 Received: from localhost.localdomain (lns-bzn-59-82-252-130-88.adsl.proxad.net
  [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
- by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id D0A6A1BF206;
- Fri,  3 Jul 2020 20:15:32 +0000 (UTC)
+ by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id C3B901BF20B;
+ Fri,  3 Jul 2020 20:15:34 +0000 (UTC)
 From: Jean-Christophe Dubois <jcd@tribudubois.net>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org, peter.chubb@nicta.com.au,
  f4bug@amsat.org
-Subject: [PATCH 2/3] Add the ability to change the FEC PHY MDIO device number
- on i.MX6 processor
-Date: Fri,  3 Jul 2020 22:15:16 +0200
-Message-Id: <05a64e83eb1c0c865ac077b22c599425c024c02c.1593806826.git.jcd@tribudubois.net>
+Subject: [PATCH 3/3] Add the ability to change the FEC PHY MDIO devices
+ numbers on i.MX7 processor
+Date: Fri,  3 Jul 2020 22:15:17 +0200
+Message-Id: <c850187322be9930e47c8b234c385a7d0da245cb.1593806826.git.jcd@tribudubois.net>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1593806826.git.jcd@tribudubois.net>
 References: <cover.1593806826.git.jcd@tribudubois.net>
@@ -78,51 +78,53 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
 ---
- hw/arm/fsl-imx6.c         | 7 +++++++
- include/hw/arm/fsl-imx6.h | 1 +
- 2 files changed, 8 insertions(+)
+ hw/arm/fsl-imx7.c         | 9 +++++++++
+ include/hw/arm/fsl-imx7.h | 1 +
+ 2 files changed, 10 insertions(+)
 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 4ae3c3efc28..0721f333497 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -402,6 +402,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-                                             spi_table[i].irq));
-     }
+diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
+index b49d895a412..5dbf0e500aa 100644
+--- a/hw/arm/fsl-imx7.c
++++ b/hw/arm/fsl-imx7.c
+@@ -364,6 +364,8 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+             FSL_IMX7_ENET2_ADDR,
+         };
  
-+    object_property_set_uint(OBJECT(&s->eth), s->phy_num, "phy-num", &err);
-     qdev_set_nic_properties(DEVICE(&s->eth), &nd_table[0]);
-     sysbus_realize(SYS_BUS_DEVICE(&s->eth), &err);
-     if (err) {
-@@ -476,10 +477,16 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-                                 &s->ocram_alias);
++        object_property_set_uint(OBJECT(&s->eth[i]), s->phy_num[i],
++                                 "phy-num", &error_abort);
+         object_property_set_uint(OBJECT(&s->eth[i]), FSL_IMX7_ETH_NUM_TX_RINGS,
+                                  "tx-ring-num", &error_abort);
+         qdev_set_nic_properties(DEVICE(&s->eth[i]), &nd_table[i]);
+@@ -551,10 +553,17 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+                                 FSL_IMX7_PCIE_PHY_SIZE);
  }
  
-+static Property fsl_imx6_properties[] = {
-+    DEFINE_PROP_UINT32("fec-phy-num", FslIMX6State, phy_num, 0),
++static Property fsl_imx7_properties[] = {
++    DEFINE_PROP_UINT32("fec1-phy-num", FslIMX7State, phy_num[0], 0),
++    DEFINE_PROP_UINT32("fec2-phy-num", FslIMX7State, phy_num[1], 1),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
- static void fsl_imx6_class_init(ObjectClass *oc, void *data)
+ static void fsl_imx7_class_init(ObjectClass *oc, void *data)
  {
      DeviceClass *dc = DEVICE_CLASS(oc);
  
-+    device_class_set_props(dc, fsl_imx6_properties);
-     dc->realize = fsl_imx6_realize;
-     dc->desc = "i.MX6 SOC";
-     /* Reason: Uses serial_hd() in the realize() function */
-diff --git a/include/hw/arm/fsl-imx6.h b/include/hw/arm/fsl-imx6.h
-index 1ebd7513246..162fe99375d 100644
---- a/include/hw/arm/fsl-imx6.h
-+++ b/include/hw/arm/fsl-imx6.h
-@@ -73,6 +73,7 @@ typedef struct FslIMX6State {
-     MemoryRegion   caam;
-     MemoryRegion   ocram;
-     MemoryRegion   ocram_alias;
-+    uint32_t       phy_num;
- } FslIMX6State;
++    device_class_set_props(dc, fsl_imx7_properties);
+     dc->realize = fsl_imx7_realize;
  
+     /* Reason: Uses serial_hds and nd_table in realize() directly */
+diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
+index da977f9ffb4..ad889237077 100644
+--- a/include/hw/arm/fsl-imx7.h
++++ b/include/hw/arm/fsl-imx7.h
+@@ -81,6 +81,7 @@ typedef struct FslIMX7State {
+     IMX7GPRState       gpr;
+     ChipideaState      usb[FSL_IMX7_NUM_USBS];
+     DesignwarePCIEHost pcie;
++    uint32_t           phy_num[FSL_IMX7_NUM_ETHS];
+ } FslIMX7State;
  
+ enum FslIMX7MemoryMap {
 -- 
 2.25.1
 
