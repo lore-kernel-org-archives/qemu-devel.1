@@ -2,81 +2,93 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDADC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC00C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:50:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEAF2207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:28:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 643A8206B6
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:50:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdJ4a0uH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEAF2207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZIhc1dk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 643A8206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrJrq-0003Kq-5R
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 07:28:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47216)
+	id 1jrKCv-0001UY-LQ
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 07:50:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrJrI-0002vY-9y
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:27:56 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57150
+ (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
+ id 1jrKCC-00013f-1Y
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:49:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58961
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrJrF-0007qa-Us
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:27:55 -0400
+ (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
+ id 1jrKC9-0004se-R6
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:49:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593775671;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=puHAKZZb3Doh5SG1vI+fY92nWGWqHQ23G2JApvyki94=;
- b=HdJ4a0uHMpLsKiGXjuTmB5VMpMK0Y9dtsPN2BqqfM8/x9cA8Gocpt5nUPsEeg8MU5g/a9U
- /BNlxfaF1EndM8UT3wxceBHRA8ssOUkBr8V3sHORe/sVdFkFHSt2zygKYPpAkgq3m2PWGA
- 7VvRCYx3GuoUyV3u4wXFvjhyaRNY5Fg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-deYTFpIlOROocfHJ21EY8g-1; Fri, 03 Jul 2020 07:27:42 -0400
-X-MC-Unique: deYTFpIlOROocfHJ21EY8g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4B13EC1A0;
- Fri,  3 Jul 2020 11:27:41 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C65C87AC71;
- Fri,  3 Jul 2020 11:27:33 +0000 (UTC)
-Date: Fri, 3 Jul 2020 12:27:30 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH v2 0/3] trace: Add a trace backend for the recorder library
-Message-ID: <20200703112730.GD2213227@redhat.com>
-References: <20200626162706.3304357-1-dinechin@redhat.com>
- <20200630125916.GG91444@stefanha-x1.localdomain>
- <lysge8c2b5.fsf@redhat.com>
+ s=mimecast20190719; t=1593776968;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=0cotN0VkpLeRM9l5/avyjvhdml1532rlSJT8aDU2t5w=;
+ b=cZIhc1dkrZnP5r0aFr6pXB4Ow85DGZvzwPI3J0jOzWIrUL/TisqYTL3zoNKqXgAdY0kqZu
+ bqk4RVQi2Mg+dcwLC4wpTMYwN8lfSE29YSwzBGl2n2z/xc2+imk9TS6CpA1Xye3sCoiexy
+ 6Whn8bHBVl9ylEQQhreEYudRFWBxIMA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-WbJj_JAMPbaQFF3eT4wY3A-1; Fri, 03 Jul 2020 07:48:17 -0400
+X-MC-Unique: WbJj_JAMPbaQFF3eT4wY3A-1
+Received: by mail-wr1-f71.google.com with SMTP id a18so31348200wrm.14
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 04:48:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=0cotN0VkpLeRM9l5/avyjvhdml1532rlSJT8aDU2t5w=;
+ b=WJzE8I6QFfbPD5mVx0JER4ARBWghqVLy17MZsPriTr06W9UtC4yeQAjZ9L4GPz63wl
+ osVjbEv51QheVxG03fSepv1zmVFQJKNCR4C8mOiYHGO4w3aK1cCGJ5NV2s1PTAioVQel
+ dtOPX/WPglgt8EBeBNTz/+2hie2hkbYnadiwooV/RDr/BUbXIWgEIc0gfFsWINtihXKb
+ DVUYztCw3Pcy4wG6jsvKfi8ttzi82L6OIgx9aasJ8WBsq/CkRzwm/13PCLIUhk4c2oZW
+ cVWBR3VDXdxZQoB8exfhDC87S5+4X9DtF5Htp8all8yCdVclMtWgoNZTB5ZdMyN0rsqS
+ O20Q==
+X-Gm-Message-State: AOAM533tkVpqlckyOU/RaKDo9EGkF1/TR82uMVrm/4w+huHeGuXKr2ty
+ nwVSCmHKZ156UjEXhEnghm91Cn6dmSynvmYaFHkkrPggYV20UtbO+/008e8bVOcfh2VR8NcXrfT
+ IfdPcs4VGeNWloX4=
+X-Received: by 2002:a5d:63ce:: with SMTP id c14mr38847033wrw.254.1593776895815; 
+ Fri, 03 Jul 2020 04:48:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxouBZ96Lekv7rFvMlcSvxWVAA3/3WbEuw9Gp4kX3Frs+zROIWAIOURA9CPTKATaNeJW/JWTQ==
+X-Received: by 2002:a5d:63ce:: with SMTP id c14mr38847017wrw.254.1593776895532; 
+ Fri, 03 Jul 2020 04:48:15 -0700 (PDT)
+Received: from localhost (trasno.trasno.org. [83.165.45.250])
+ by smtp.gmail.com with ESMTPSA id v11sm50237532wmb.3.2020.07.03.04.48.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Jul 2020 04:48:14 -0700 (PDT)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio-net: fix removal of failover device
+Date: Fri,  3 Jul 2020 13:48:13 +0200
+Message-Id: <20200703114813.5911-1-quintela@redhat.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-In-Reply-To: <lysge8c2b5.fsf@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=quintela@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=quintela@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -84,7 +96,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,56 +109,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 03, 2020 at 12:37:02PM +0200, Christophe de Dinechin wrote:
-> 
-> On 2020-06-30 at 14:59 CEST, Stefan Hajnoczi wrote...
-> > On Fri, Jun 26, 2020 at 06:27:03PM +0200, Christophe de Dinechin wrote:
-> >> The recorder library implements low-cost always-on tracing, with three
-> >> usage models:
-> >>
-> >> 1. Flight recorder: Dump information on recent events in case of crash
-> >> 2. Tracing: Individual traces can be enabled using environment variables
-> >> 3. Real-time graphing / control, using the recorder_scope application
-> >>
-> >> This short series introduces a new "recorder" back-end which connects
-> >> to the recorder. Traces using the recorder are intentionally "always on".
-> >> An example is given of how the recorder can also be used separately
-> >> from generated traces. This can be useful if you want to enable
-> >> multiple related traces for a particular topic.
-> >>
-> >> This series requires a small makefile fix submitted earlier, included
-> >> here for convenience.
-> >>
-> >> Christophe de Dinechin (3):
-> >>   Makefile: Compute libraries for libqemuutil.a and libvhost-user.a
-> >>   trace: Add support for recorder back-end
-> >>   trace: Example of "centralized" recorder tracing
-> >
-> > Please add a build to .travis.yml that enables recorder. That way we'll
-> > catch build failures.
-> 
-> There is no recorder package in Xenial.
+If you have a networking device and its virtio failover device, and
+you remove them in this order:
+- virtio device
+- the real device
 
-Our .gitlab-ci.yml is going to start using the containers built from
-tests/docker/dockerfiles. So if you add the package to the dockerfiles
-that support it we can get coverage that way. I presume it'll need the
-.gitlab-ci.yml modified to add the extra configure arg too.
+You get qemu crash.
+See bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1820120
 
+Bug exist on qemu 4.2 and 5.0.
+But in 5.0 don't shows because commit
+77b06bba62034a87cc61a9c8de1309ae3e527d97
 
-Regards,
-Daniel
+somehow papers over it.
+
+CC: Jason Wang <jasowang@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ hw/net/virtio-net.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 9bb5578e5d..8d84713df3 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -3398,6 +3398,7 @@ static void virtio_net_device_unrealize(DeviceState *dev)
+     g_free(n->vlans);
+ 
+     if (n->failover) {
++        device_listener_unregister(&n->primary_listener);
+         g_free(n->primary_device_id);
+         g_free(n->standby_id);
+         qobject_unref(n->primary_device_dict);
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.25.4
 
 
