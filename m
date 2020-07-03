@@ -2,88 +2,135 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6E1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C451AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:01:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8692207DA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:49:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85D4F20CC7
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:01:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="einKbsbT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8692207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1gC6DGb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85D4F20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrJFc-0003dl-2k
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 06:49:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38118)
+	id 1jrJRI-0007jV-KZ
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 07:01:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrJEa-00032l-FE
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:47:56 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45692)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrJEY-0006UE-MX
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:47:56 -0400
-Received: by mail-oi1-x244.google.com with SMTP id j11so23498347oiw.12
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 03:47:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Xe0t1B1OTczk7tDAkJTP5/N3zoJrfuGIFqb847H4X+Y=;
- b=einKbsbT8KKzbVSlx7017XWNRnaCm5FElH3gJ5+fW15sO4xCczHaga6bXTlR/D1QvN
- YuamYH1jhNa/PdeAV2UPIThlJp3O121IeeHoikebTJgsB9NtLP5e0U9DY6QbSu9sryTm
- wnnxWpeOp1RKbfg+LRZ+u2LAPBeBhiJCRtpxCLmbar++NfumO1isCmfq1HRCNPhemMPL
- FUzikKE4MkT0MlasrPhyC5eGkheZwFZ2wRn83O8OpTURYHTrwL6JaeNhjdE/rgUA3vYW
- CtpiLPvKPnP87M5y3Lq5YZ5rj9RJNB9iqb7LdXPlCa4Fyc26pDuZ2cONcFqPg3CuqGvj
- MNfA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrJQH-0006Sm-QC
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:00:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42665
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrJQF-0000nA-5q
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:00:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593773997;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=DhI+iINLmG9wbC98d4e3LOFv6CystaXx4ipnTUnpRHM=;
+ b=b1gC6DGbLarpQB5V85OGvdxjPl2aQblEAc9hWWAXHTANDJmUjhtQiuButSEc1sjimj9u7e
+ ZPfhiyHyQ8xV1J5j+UBS0yCGxjc4kTJ4oZHav6gwBfMDANPVwVQbm6FJZb9nsrbHFSSgEH
+ SJuiSgMLsCeERJVkBXLh33nd66n97qA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-KHtJwnEbNvasOUsBRjlhSA-1; Fri, 03 Jul 2020 06:59:56 -0400
+X-MC-Unique: KHtJwnEbNvasOUsBRjlhSA-1
+Received: by mail-wr1-f69.google.com with SMTP id b8so17187124wro.19
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 03:59:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Xe0t1B1OTczk7tDAkJTP5/N3zoJrfuGIFqb847H4X+Y=;
- b=QbbM0pnKy1Qy/ujozVj41B0nH5f6O//Y8tOEQus6K7M5WNYYcHMV+BvF3hm7qrE5o1
- R2K401dQc/01BQA0lZmWLZchSI0mPmHiePnW28k283ZsI6Gd2kn0C6nL9PRigNv4f3zp
- 9s+1o2N0R0oQLdTANmUOFQFSg2p3jfYQclBEuXunCyJEeagimKM8WbrJSHn1gWArP7is
- MZRPHer1C60Bnr2C4XgokWhynQEsfjyX4u7xr33ZsJ/sFL7qn9zL/fxdIN4x8hQnze71
- gY35GMTeLycC/43jU/gEXashiZkaRyBXiN7zT9rRVoJ3v1OpWLk2QzZfI/qRSOYIkNEP
- yFdA==
-X-Gm-Message-State: AOAM532YfMo+oI9KGFf5mp4D0Lb7ybm1UaRYD2tRj/O13QvBsRTHxyYx
- fRA0rPenUTsKmj/wyhwTJh9ElyjLMIBJpStCEpGDEQ==
-X-Google-Smtp-Source: ABdhPJztVPqVMDKLqAlRJ4DR0G8Ng41oXlof6kZ2urUWaX9ZT4PrvtY7e9gEJ3xW1tIX1V663NSVWu5AbhtqQYrZZuQ=
-X-Received: by 2002:aca:1706:: with SMTP id j6mr42826oii.146.1593773273414;
- Fri, 03 Jul 2020 03:47:53 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=DhI+iINLmG9wbC98d4e3LOFv6CystaXx4ipnTUnpRHM=;
+ b=ECp+Fgwd904cQJuVvEiJmbbSlOPQjCb5yKF1k6BvPRmOi6KKSKuejxfNfU+kTYQVz5
+ MJTtUVhAOMlW7kztzta5MnbekXYwYfLAmZ2SD5COxuqTE84EGqHsZEkkuAhfuqGVXuCS
+ loNqgo6MYZKw/d9360wKQH56vG6RkY9qPLsm5JqnVc2d1X2bDI394tOLhP3Ecx+oERlm
+ qOdxh8CGTgTXDXX3FeHiq/Vbjg58yL1zNNlYBK1/BzSFKLfMIoibUo5DkYSv10FdcqDf
+ 1dj9w+tnJob4R6IXYQ9dKqw3IvYzBHbjC/TZcaccpbjpalxCmFSMyJpLt0zlz1n0JjSd
+ BdKQ==
+X-Gm-Message-State: AOAM533Q3RvE1z5cg6sg+mJStZ/PgB/+e96CvKmiTEihRY/8YXAKgeIL
+ A9lFFkS3vj/RV2U+z4AYTJi8uY1byBrRfT8l4jXWQakC7jkD2q5m77VFy7OVqwYDPeQ8mDWhNd/
+ mZxMuRQqLZE2LhQM=
+X-Received: by 2002:adf:c44d:: with SMTP id a13mr37130970wrg.205.1593773995158; 
+ Fri, 03 Jul 2020 03:59:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2ESSz1aF2vm64sV3V5cvm2OAnNyY0UDCpDmAxrn05yfJR4wF8e9eiKYLZuSXKaoJf6A9JqQ==
+X-Received: by 2002:adf:c44d:: with SMTP id a13mr37130946wrg.205.1593773994899; 
+ Fri, 03 Jul 2020 03:59:54 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id g16sm15007199wrh.91.2020.07.03.03.59.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 03 Jul 2020 03:59:54 -0700 (PDT)
+Subject: Re: [PATCH v2 15/18] hw/block/nvme: reject invalid nsid values in
+ active namespace id list
+To: Klaus Jensen <its@irrelevant.dk>
+References: <20200703063420.2241014-1-its@irrelevant.dk>
+ <20200703063420.2241014-16-its@irrelevant.dk>
+ <6a038075-13fd-2f60-23a2-ddc7081cff32@redhat.com>
+ <20200703083701.sj4xlgyzp6xte4xi@apples.localdomain>
+ <3d45ddb7-867e-3c40-c78b-cf5bc095e2e0@redhat.com>
+ <20200703092213.27qhr5ow4kksunrw@apples.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <ba990b8f-35fb-8d8c-e835-88c09ca1e42e@redhat.com>
+Date: Fri, 3 Jul 2020 12:59:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200624081349.121791-1-mreitz@redhat.com>
- <fd4e80a9-c7b1-08d0-0ae6-cf74946d6c5b@redhat.com>
-In-Reply-To: <fd4e80a9-c7b1-08d0-0ae6-cf74946d6c5b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Jul 2020 11:47:42 +0100
-Message-ID: <CAFEAcA_d81NP1iu8kNSypou-rd7aVPznix6VOEoDTog=LX7aLg@mail.gmail.com>
-Subject: Re: [PULL v2 0/2] Block patches
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200703092213.27qhr5ow4kksunrw@apples.localdomain>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,47 +143,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 3 Jul 2020 at 10:52, Max Reitz <mreitz@redhat.com> wrote:
->
-> On 24.06.20 10:13, Max Reitz wrote:
-> > The following changes since commit d88d5a3806d78dcfca648c62dae9d88d3e80=
-3bd2:
-> >
-> >   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/renesas-hw-2=
-0200622' into staging (2020-06-23 13:55:52 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/XanClic/qemu.git tags/pull-block-2020-06-24
-> >
-> > for you to fetch changes up to 24b861c0386a17ea31eb824310c21118fb7be883=
-:
-> >
-> >   iotests: don't test qcow2.py inside 291 (2020-06-24 10:00:04 +0200)
-> >
-> > ----------------------------------------------------------------
-> > Block patches:
-> > - Two iotest fixes
-> >
-> > ----------------------------------------------------------------
-> > This is v2, where I dropped Maxim=E2=80=99s LUKS keyslot amendment seri=
-es and my
-> > iotest patches, because both caused iotest failures on some test
-> > machines.
->
-> Ping?
->
-> Or should I just send another pull request that includes Maxim=E2=80=99s
-> original series to supersede this one altogether?
+On 7/3/20 11:22 AM, Klaus Jensen wrote:
+> On Jul  3 11:14, Philippe Mathieu-Daudé wrote:
+>> On 7/3/20 10:37 AM, Klaus Jensen wrote:
+>>> On Jul  3 10:20, Philippe Mathieu-Daudé wrote:
+>>>> On 7/3/20 8:34 AM, Klaus Jensen wrote:
+>>>>> From: Klaus Jensen <k.jensen@samsung.com>
+>>>>>
+>>>>> Reject the nsid broadcast value (0xffffffff) and 0xfffffffe in the
+>>>>> Active Namespace ID list.
+>>>>
+>>>> Can we have a definition instead of this 0xfffffffe magic value please?
+>>>>
+>>>
+>>> Hmm, not really actually. It's not a magic value, its just because the
+>>> logic in Active Namespace ID list would require that it should report
+>>> any namespaces with ids *higher* than the one specified, so since
+>>> 0xffffffff (NVME_NSID_BROADCAST) is invalid, NVME_NSID_BROADCAST - 1
+>>> needs to be as well.
+>>
+>> OK.
+>>
+>>>
+>>> What do you say I change it to `min_nsid >= NVME_NSID_BROADCAST - 1`?
+>>> The original condition just reads well if you are sitting with the spec
+>>> on the side.
+>>
+>> IMO this is clearer:
+>>
+>>   if (min_nsid + 1 >= NVME_NSID_BROADCAST) {
+>>       return NVME_INVALID_NSID | NVME_DNR;
+>>   }
+>>
+> 
+> But since min_nsid is uint32_t that would not be wise ;)
 
-Sorry, your resend just fell out of my to-process queue for some
-reason; I can put it back in the list to process.
+Hmm indeed.
 
--- PMM
+> 
+> I'll go with the - 1 and add a comment!
+
+Good, thanks.
+
+> 
+>> Whichever form you prefer you can amend to the respin patch:
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
+>>>
+>>>>>
+>>>>> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+>>>>> ---
+>>>>>  hw/block/nvme.c | 4 ++++
+>>>>>  1 file changed, 4 insertions(+)
+>>>>>
+>>>>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+>>>>> index 65c2fa3ac1f4..0dac7a41ddae 100644
+>>>>> --- a/hw/block/nvme.c
+>>>>> +++ b/hw/block/nvme.c
+>>>>> @@ -956,6 +956,10 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+>>>>>  
+>>>>>      trace_pci_nvme_identify_nslist(min_nsid);
+>>>>>  
+>>>>> +    if (min_nsid == 0xfffffffe || min_nsid == NVME_NSID_BROADCAST) {
+>>>>> +        return NVME_INVALID_NSID | NVME_DNR;
+>>>>> +    }
+>>>>> +
+>>>>>      list = g_malloc0(data_len);
+>>>>>      for (i = 0; i < n->num_namespaces; i++) {
+>>>>>          if (i < min_nsid) {
+>>>>>
+>>>>
+>>>
+>>
+> 
+
 
