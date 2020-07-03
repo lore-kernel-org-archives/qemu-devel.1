@@ -2,126 +2,97 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1C7C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6015C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4BF82073E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:27:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 819B82073E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:27:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Cwvea67U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4BF82073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="NpmniK53"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819B82073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOWw-0002dD-V1
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:27:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33582)
+	id 1jrOWy-0001Tw-Ix
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:27:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34766)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrOCc-0007n1-Na; Fri, 03 Jul 2020 12:06:15 -0400
-Received: from mail-db8eur05on2126.outbound.protection.outlook.com
- ([40.107.20.126]:58457 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jrOH8-0000B7-9W
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:10:54 -0400
+Received: from mout.web.de ([217.72.192.78]:36341)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrOCY-0001Gh-AT; Fri, 03 Jul 2020 12:06:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JJ+lbVG08L5D8SNPPZSxmXukK6sJPWiQcu8HbQSz4s7t1X+0f4Udeb6PMaVTtd+b0REzHSSvjcEuGR72lTqOqeyJUr5cHFYxhKqHdOGSxIo+Avgw+YnP1nkNOoGNd1o65OrcJVy+KaYfwQWubN9oxRTUqmYcinhMpDxHf5xoAAQUrJCWaBC9oNAccrWbUXhlA28rBGWOzifanhPpFOlCWplJWSpBwbyIH4ivXSOSLUjVhoNwm6Fr6wenVOHJt1PJ3EpipQhwqEh0DZOuUjB70ZjIb3ZLBxsMCA8gZNHEHX9arpzBmSG2tM3bBKFHo9j2GtgxdPwKiVgMmtsrFF5k7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IxTz9TBA7HJgj2AgpgwKqtaSPcnkztL2Z657MBkdBVE=;
- b=DaAUtxP3HCZdmi7Rb+8nQqVmoyaPRyA1s9mnjOlJaSq/gITjSbpIIpn8hxL1iCZgogZydU/HknrqatzXOQZQwBOrvXuuShbTVtvhlVLOLQa9nlizRWl9w0VxCqSNe8klOe+EEubsWo8b8lJbr6iptalwcQoGOTogXtfrctCyBAXG+EYarYPjHvQVQ6ggUOyHWoR1O4Rt0bCW+rmR3Pg9PsiGRCvoHJtrNNCD9kyN/9wUjqUc+S26bqg4Drz7BR1WE1ZNx+qIfj8CAprC9OntNCaRovWsmVwCebVHvj/9nFkSrh6jDgSELOoRgc1xiGCxa1MbOrY4+yRsb/uGYrKYzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IxTz9TBA7HJgj2AgpgwKqtaSPcnkztL2Z657MBkdBVE=;
- b=Cwvea67Ub5h7HMsKui+cOmI0q/Pl2C8KFiOBGo8PZFCxl+lUAnAwNPTLWqI4aFPnQzXSlaYU5yeaybfflwjN0Of0gA7Z3GQ1eJaSqHD+CclCeJfZs/lX2mrFnrI4RCDh84AyQzehBQGAxnGwo6zDerZ8bpAgMLKK345EbJrlFYw=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3623.eurprd08.prod.outlook.com (2603:10a6:20b:48::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.28; Fri, 3 Jul
- 2020 16:06:06 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Fri, 3 Jul 2020
- 16:06:06 +0000
-Subject: Re: [PATCH v2 25/44] qom: Use return values to check for error where
- that's simpler
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200702155000.3455325-1-armbru@redhat.com>
- <20200702155000.3455325-26-armbru@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <3468bdbe-2e7d-3a51-4c2e-5f188ca092fd@virtuozzo.com>
-Date: Fri, 3 Jul 2020 19:06:04 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200702155000.3455325-26-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0902CA0002.eurprd09.prod.outlook.com
- (2603:10a6:200:9b::12) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jrOH6-0002J8-0v
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:10:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1593792641;
+ bh=xpHbtpP+GgyD7bEG1RQEqMQhn4aPPVOKSm0SMKZFXpE=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=NpmniK53qaArYmstgupc8mnR0h2iTRB1J9oaDe1lhpPoQz5hqCbXhchzr9v5IdDHQ
+ 6B7qkYzIPNkYY84VDD47E7NW5YfTjKYVa0TyzxCMZIYuozz5DiYpB88IOH3nyPWsR4
+ tQQeAJ590Jc66E8U0UamSVQNX491psOCqBYKei2E=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.230]) by smtp.web.de (mrweb103
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MMEvB-1jjOay25s5-0083om; Fri, 03
+ Jul 2020 18:10:41 +0200
+Date: Fri, 3 Jul 2020 18:10:31 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL V2 29/33] net/colo-compare.c: Correct ordering in
+ complete and finalize
+Message-ID: <20200703181031.4ed6fcde@luklap>
+In-Reply-To: <CAFEAcA-1K_zVHPFz31W9Tx7CmAXo=4-qQNJxrZnYT0Heg5_1NA@mail.gmail.com>
+References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
+ <1592486508-6135-30-git-send-email-jasowang@redhat.com>
+ <CAFEAcA-1K_zVHPFz31W9Tx7CmAXo=4-qQNJxrZnYT0Heg5_1NA@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.15) by
- AM4PR0902CA0002.eurprd09.prod.outlook.com (2603:10a6:200:9b::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20 via Frontend
- Transport; Fri, 3 Jul 2020 16:06:05 +0000
-X-Originating-IP: [185.215.60.15]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 37284fc9-f69d-4c87-cbec-08d81f6afdfd
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3623:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3623F2160F0CB3DF878C8E29C16A0@AM6PR08MB3623.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:499;
-X-Forefront-PRVS: 045315E1EE
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: huU69RTQNEPIP3fhY2GmTZQcNrXLuYxCkwedJJH0wiNdp07LQYP1+zAEuKrzOraDRYct92T1ko2NEyXyNSgUWB3tERqCepXIkxTKYt3F7+smRKhf2kX8qdl2Pfz8Cwf/3kSSbR7dR0tQw59Fj1PSDtfjliUIQwyKiXAl8Hj8xU1eWF/FUr/Fhpp4L+P4/RCxzaS3I6mPAvy7YYY3azTgKCZIKC+a3UyRoUTnTO7PwW0JdRGIU26eJZaD7L9CJ5JoeHnOJJJ3cmZcVehEyF0oRVDesxfrpvM7SJ3NvCvlTJD+OO/F/C8jEeZTc2QIcmkObwvdBb6Y7w1gr9oBJWS3ylbSdJdbdg+x8l3ihPyhMy16YQoNe8iSFD1bW0rMwQjE
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(39840400004)(396003)(136003)(366004)(346002)(5660300002)(8936002)(4326008)(2616005)(956004)(316002)(52116002)(31686004)(8676002)(16576012)(16526019)(186003)(26005)(6486002)(478600001)(86362001)(31696002)(83380400001)(66946007)(66556008)(66476007)(2906002)(36756003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Air7BP2B/Gx9p9aeZx0d/yO9eeIrMJSW2vyy6cMV0mOvtFIM6wh5dlFOqbSjfZKfQZ8gE5YJwVM1sXy8en6l70G8E3B+e54XFxNMFlYm+cAQA0iIsA4qAcSm+KWX8DTOO7gp5nvVgNCJvS06JxWe0dm422Pa6hTym88+7f/ULhBuAvAMSfYHqf0Vah3WO0QsgcGSOpIqXn25WY4CQf451vK7Fz+Ab3wNG3cZJI5DkPnRQ07RotWGeRmoIZu+M2nGySG+Q6d1OgbeIbuucGkFVFzpAH110nGkvJOH9EbsUCdmOJZu7rwiF47nl/JG1rGfiuCs8MMHPjX54RIIDOMkKGrWVN7ZzbyNCfLWx8okWAg3TT++GHJiN3jtnNjMpyQDeVPElTNikOVvj7RWInNVL4hf9G33jv0fg8SHhubMnwfSp4ub79EyaHM1spS9dIvwFN+jEJYSYsKgnqP214+sx9bi6FTI4kCUxKFDm7OIowc=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37284fc9-f69d-4c87-cbec-08d81f6afdfd
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2020 16:06:06.3756 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: I1fhiKb4NJl4b2I0IZsJgQH1IffUYw+qCr9Xiogu7N3nCDztx/1Ke9kCC6gaveM4ZlgahDJBLKhGscYKl9/MrFU2TyBlm8O3X2R3rtC4DK4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3623
-Received-SPF: pass client-ip=40.107.20.126;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 12:06:08
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+Content-Type: multipart/signed; boundary="Sig_/pVkttQkYty3D3Cm/INVSv_E";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:KvjfzB2AL6XnST9EZaMFxQGM9zmw8a42JkXskVtGu9G6d2/W2AB
+ tAaWjGPdXY/loyFcLAO7aq0F5ztu2a2C1ULoQKi5vjL4Oac4qv4uHJ23vsixI7iOYYBXpFM
+ V8pRHClGwPdZZK1wZ11JehW/vv7JHjTL2TGpEMVC7eJnjqFdEOwEALO/qr08N4KOgoKUjI5
+ 3huO9SZKB+fqlzo9beQDg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1Gr5VZ46A9c=:atC74PT4o4Ao5Bk+T9bFcy
+ +WPc1D3SpXmPvooHnf9ZKVSEO+svE9NKrAVnyhL8CvDxqJDtDUv7SCRR2N9nAQSFF/exJA0NY
+ TCxdQWq9OL8lxPyw7QsjV/JbJPRuOxxwSMEU6vP5kmv1/8itn9hnq3YT8SB+hR1n9TqXHpFHG
+ T0s2yMWCoLcn8lWVz4Snn90cJLdIQpt61hRy1kLotGSqDCAH197LryYToA3uCP+F22Szukm1s
+ BEvT4RtfLGwMM5SC2kJx8zsWEM5eJdp2bJyVmukF+Q8P2Tld7OfsMCkft2vRGrRaThlaxUspf
+ 79HTikyyE8S7hzj609VxFRx5PmhN3MIW1h9Pj0DG3+pDwMDFdnhxhK1nsZEQqlgzlDvhN7xdJ
+ sKmwtHA9DmGqheCNI5fj96I4n/CeCYnkC6oR4rPLDjPaOeCo/cMB+uUX1UDIQtUETCqTfZmmg
+ CxbqVd4ecurRsfOrSEknIvhzikkcTmxTUZg3s0bvRy1DV9OMzcWxmdOTfnYTqK86tGpfvzYo9
+ THNajy1Cwkp2UP84+z3hpCrz9nfztIlwwbC/O2k17+YmpfCCXJGfSkdKlFRVfg2kQerFYFLFq
+ IkRO+UyBeX9aNkJmT3n8Gq3zaG7EMXJU+/ULS+AxI4VsdECeVFCtC7jJItSlSSo4HrowFm7SO
+ RVWzq7rK9pnrGRUbGqNZ/2qDfisZRtsFZq0mGq30+tRcD5g4TaUYGMUU0xWBtAhkzf/wAF4Zi
+ A+NiSqBa6mVf0a1eToXFMam7AkseZrMang/+MOFiqtxrAca4H1UKlQ3Qcojd03MUhZyaLUFJV
+ 27tgwnD+nih9lAh3+oLTJa+oqkeygFFGHvsPuXu2uf5Kyr6YoU2Dm37uOytn6/gfM3ZXur7FI
+ RJeYaRWZpAGOicelmTQ2eMhMTgiTyYKDq7S1Z+H3iGwCGam0je8lb5XKLejc6AebPlQD86hQZ
+ Ptzs2hw92S1cKcnJL5y4b/ovkFUA4LYeB9HETsNBWDvVBaSuW+eOiQzF/W/vtT8XieYEN3feH
+ kCAIoUPfaz6T5E+CmPmWglv683Dv5LC5KKMDjAGX9lEGiEPY0RxgTmoImPhRXI5r4Zwyw/N+n
+ FwK+QDX61ZgnIhQ5vrJN+2PxTp1xTrTgXCvqR1jPWxwQuTzWeQD9vZijDshk0tIyj3dYZ//gl
+ QpH+DFVJcp0/NB0eKjm/bMaVdoYBzUiHECIb1UZdBQsnfLxZDBoizDlcMs1pYH4ZJQWusKe64
+ 6A/0/J+hakqtxUAe5
+Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 12:10:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,83 +105,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, pbonzini@redhat.com
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-02.07.2020 18:49, Markus Armbruster wrote:
-> When using the Error object to check for error, we need to receive it
-> into a local variable, then propagate() it to @errp.
-> 
-> Using the return value permits allows receiving it straight to @errp.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->   qom/object.c | 16 +++++++++-------
->   1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/qom/object.c b/qom/object.c
-> index 0808da2767..56d858b6a5 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -549,8 +549,7 @@ void object_initialize_child_with_propsv(Object *parentobj,
->       object_initialize(childobj, size, type);
->       obj = OBJECT(childobj);
->   
-> -    object_set_propv(obj, &local_err, vargs);
-> -    if (local_err) {
-> +    if (object_set_propv(obj, errp, vargs) < 0) {
->           goto out;
->       }
->   
-> @@ -743,7 +742,7 @@ Object *object_new_with_propv(const char *typename,
->       }
->       obj = object_new_with_type(klass->type);
->   
-> -    if (object_set_propv(obj, &local_err, vargs) < 0) {
-> +    if (object_set_propv(obj, errp, vargs) < 0) {
->           goto error;
->       }
->   
-> @@ -1767,14 +1766,17 @@ static void object_set_link_property(Object *obj, Visitor *v,
->       char *path = NULL;
->   
->       visit_type_str(v, name, &path, &local_err);
+--Sig_/pVkttQkYty3D3Cm/INVSv_E
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-why not use return value of visit_type_str ?
+On Thu, 25 Jun 2020 10:30:24 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->   
-> -    if (!local_err && strcmp(path, "") != 0) {
-> -        new_target = object_resolve_link(obj, name, path, &local_err);
-> +    if (strcmp(path, "") != 0) {
-> +        new_target = object_resolve_link(obj, name, path, errp);
->       }
+> On Thu, 18 Jun 2020 at 14:23, Jason Wang <jasowang@redhat.com> wrote:
+> >
+> > From: Lukas Straub <lukasstraub2@web.de>
+> >
+> > In colo_compare_complete, insert CompareState into net_compares
+> > only after everything has been initialized.
+> > In colo_compare_finalize, remove CompareState from net_compares
+> > before anything is deinitialized. =20
+>=20
+> Hi; this code-motion seems to have prompted Coverity to
+> discover a possible deref-of-NULL-pointer (cID 1429969):
+>=20
+>=20
+> > @@ -1409,6 +1397,19 @@ static void colo_compare_finalize(Object *obj)
+> >      }
+> >      qemu_mutex_unlock(&colo_compare_mutex);
+> >
+> > +    qemu_chr_fe_deinit(&s->chr_pri_in, false);
+> > +    qemu_chr_fe_deinit(&s->chr_sec_in, false);
+> > +    qemu_chr_fe_deinit(&s->chr_out, false);
+> > +    if (s->notify_dev) {
+> > +        qemu_chr_fe_deinit(&s->chr_notify_dev, false);
+> > +    }
+> > +
+> > +    if (s->iothread) { =20
+>=20
+> Here we check s->iothread, which implies that it could be NULL...
+>=20
+> > +        colo_compare_timer_del(s);
+> > +    }
+> > +
+> > +    qemu_bh_delete(s->event_bh);
+> > +
+> >      AioContext *ctx =3D iothread_get_aio_context(s->iothread); =20
+>=20
+> ...but here we pass it to iothread_get_aio_context(), which
+> unconditionally dereferences it, so will crash if it is NULL.
+>=20
+> Either we need to avoid calling this if s->iothread is NULL,
+> or if it can't ever be NULL then the earlier NULL check was
+> pointless and can be removed.
 
-Hmmm. You actually change the logic when visit_type_str succeeded but path equal to "":
+I'll look into it.
 
-prepatch, we continue processing with new_target == NULL, after the patch we just do nothing and report success (errp == NULL).
+Regards,
+Lukas Straub
 
-I don't know whether pre-patch or after-patch behavior is correct, but if it is a logic change, let's note it in the commit message, if path equal to "" actually impossible, let's assert it. Or just keep old logic as is, by moving return (together with duplicated g_free(path) of course) into "if (strcmp(path, "") != 0) {".
-
->   
->       g_free(path);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> +    if (!new_target) {
->           return;
->       }
->   
-> 
+>=20
+> >      aio_context_acquire(ctx);
+> >      AIO_WAIT_WHILE(ctx, !s->out_sendco.done);
+> > --
+> > 2.5.0 =20
+>=20
+> thanks
+> -- PMM
 
 
--- 
-Best regards,
-Vladimir
+--Sig_/pVkttQkYty3D3Cm/INVSv_E
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7/WHcACgkQNasLKJxd
+sliSXQ//Q+0X+xL0DQH8CrTyNMnRR6z6TxtnQ2gZoCN83L0ENmH6j656yLoxPHef
+9vI1qDCVBLb4A6UpYhsizmL9xIO/7kfCSkjqvNYc9qWt7P8wHg45OOmLQJOYMvaB
+I0aDDEGcKf0SRgWbHFlVI0X6iAj5uE4h+B4gcwYoOcj9ruqSRafzeWn2xJJwV0Oe
+AvI861I6yPkC7CuJhg7+kfekuW4WsZFB2vJzDU4SU8I0IBR+0VVRZOEYuUdWOdwP
+ZKtR/F+qbGtaXms9tiDjY9mDuDnE3219Mw0sGPoh/EoyybcU9lakVzwCoVrtIkWm
+Ct4yfawcxoeLqU+zL8geunrd07swCfKpbUyNrVhi3Ucuk8gvYnmHVBEQh/NDtIA2
+9+ajRWPo18+hId35UbSmFNmepT7etjUOAocD5heHQ4boL7IcBNkiyLREmlbYk1EA
+J2G1lzmwJMRFRMQcB7YbEKDAHl03ve9coFrdSJn24K7R6jsC5RynlJ+uPLVzjaNQ
+y1+9SuQIFaGz6PMyijm1/eIZa5Q2Dh/IY3G2/GZnvKHcL4cFEwthFQgVmh7UsItF
+ELwccDdAFKltx+a+7/uZftDi/bhnb656S39Bc+0maUCPyReEG+32r3NSX4r0wJeb
+iplBoKIYlUBDs8KJIDV8vhNQ54HAgV1D7jqA8skgbIYFwJxZWeE=
+=boCE
+-----END PGP SIGNATURE-----
+
+--Sig_/pVkttQkYty3D3Cm/INVSv_E--
 
