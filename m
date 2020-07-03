@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 564A7C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B189EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:05:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 235502084C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B6672084C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:05:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Z1wJQhvb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 235502084C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="CwiNDGzb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6672084C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOBP-0004w4-D7
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:04:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58898)
+	id 1jrOBY-0005GK-Mp
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:05:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59070)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5Q-0002Zk-TK; Fri, 03 Jul 2020 11:58:48 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41476)
+ id 1jrO5l-0003P7-U6; Fri, 03 Jul 2020 11:59:09 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:41632)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5K-0007Q1-Cv; Fri, 03 Jul 2020 11:58:48 -0400
+ id 1jrO5j-0007RY-5u; Fri, 03 Jul 2020 11:59:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=FDdJ3NUfcSN6UfYGz2xPvNrqQCi8ZzpI2orXDpb0voQ=; 
- b=Z1wJQhvbU5oJmNI+F0e1a00x9VOztJlH1TfkYH2lzUfYgg/gDPOUyWEdEtM3fIfoC+zQWLejmt3AG7xJW7wolqH7uvS+5BBEEJTzOZOTLp2o1dhJi0RXqolhYx6uxT2qIRXBTSz51XG8fIzm9YpfaMwnD8MONChUR4RLZryic8HP+EA/nknHhZk+o1zwWRSIJEMEQ2Xbpzh3C5CroxEV54w7rpT01gjHpmjdHUjSLLnioSzNcGB+kMXOK/ul33EnXZD+H1DAdXWxxd4PitfLp9ntB2Dmsg4VusYYHBGaF1uK9BMQZU7kNX9PgW0h3mdddbNIWjzyrd7M3SKDUUsWnA==;
+ bh=oVvkoh0mTNbIRBSFnxeF+tzn2aLLzOycbGEes3iCPWw=; 
+ b=CwiNDGzbZXHp9D8Mklv/UIb5PWGQByuXoPf+n+KxbQg78O9owebCow1NcFSHtrwSSb8hyiz8jv1EhS5Js4aEM9LOhoNjqLI9+YfRcOrXzIoLjfOZ2HtMR6gFsgkGqwQWxTLK6jXBty1vr5DREi/D9H6z4iFAuW8PC5GeSETRYm+QoRKc7nWFEOUFJL2KwmoSxF/gHN1rHP26OwArKbE7og1wdu/gmteWSauclfpmQNwbAtlyuc/iDiYU9HfgqLfUtH76b/t94ArZJeSvn/Kpn3dzSkBc6yvrJtNzoeBbsGM5UIKSP3QsHdzloQPw/wJeFDXcNiau7g1AyRfsK5zMLw==;
 Received: from [81.0.49.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jrO5G-0001QG-Gg; Fri, 03 Jul 2020 17:58:38 +0200
+ id 1jrO5K-0001QU-Vo; Fri, 03 Jul 2020 17:58:43 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jrO51-0007PR-NZ; Fri, 03 Jul 2020 17:58:23 +0200
+ id 1jrO51-0007Pn-VN; Fri, 03 Jul 2020 17:58:23 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 07/34] qcow2: Document the Extended L2 Entries feature
-Date: Fri,  3 Jul 2020 17:57:53 +0200
-Message-Id: <41f8d8092dffd560cbeb59bf6565645b763c1b98.1593791819.git.berto@igalia.com>
+Subject: [PATCH v10 14/34] qcow2: Add QCow2SubclusterType and
+ qcow2_get_subcluster_type()
+Date: Fri,  3 Jul 2020 17:58:00 +0200
+Message-Id: <9cbc64ad6a09c560f9ad2ea3089ae35ad9bad0a1.1593791819.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1593791819.git.berto@igalia.com>
 References: <cover.1593791819.git.berto@igalia.com>
@@ -84,168 +85,220 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Subcluster allocation in qcow2 is implemented by extending the
-existing L2 table entries and adding additional information to
-indicate the allocation status of each subcluster.
+This patch adds QCow2SubclusterType, which is the subcluster-level
+version of QCow2ClusterType. All QCOW2_SUBCLUSTER_* values have the
+the same meaning as their QCOW2_CLUSTER_* equivalents (when they
+exist). See below for details and caveats.
 
-This patch documents the changes to the qcow2 format and how they
-affect the calculation of the L2 cache size.
+In images without extended L2 entries clusters are treated as having
+exactly one subcluster so it is possible to replace one data type with
+the other while keeping the exact same semantics.
+
+With extended L2 entries there are new possible values, and every
+subcluster in the same cluster can obviously have a different
+QCow2SubclusterType so functions need to be adapted to work on the
+subcluster level.
+
+There are several things that have to be taken into account:
+
+  a) QCOW2_SUBCLUSTER_COMPRESSED means that the whole cluster is
+     compressed. We do not support compression at the subcluster
+     level.
+
+  b) There are two different values for unallocated subclusters:
+     QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN which means that the whole
+     cluster is unallocated, and QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC
+     which means that the cluster is allocated but the subcluster is
+     not. The latter can only happen in images with extended L2
+     entries.
+
+  c) QCOW2_SUBCLUSTER_INVALID is used to detect the cases where an L2
+     entry has a value that violates the specification. The caller is
+     responsible for handling these situations.
+
+     To prevent compatibility problems with images that have invalid
+     values but are currently being read by QEMU without causing side
+     effects, QCOW2_SUBCLUSTER_INVALID is only returned for images
+     with extended L2 entries.
+
+qcow2_cluster_to_subcluster_type() is added as a separate function
+from qcow2_get_subcluster_type(), but this is only temporary and both
+will be merged in a subsequent patch.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- docs/interop/qcow2.txt | 68 ++++++++++++++++++++++++++++++++++++++++--
- docs/qcow2-cache.txt   | 19 +++++++++++-
- 2 files changed, 83 insertions(+), 4 deletions(-)
+ block/qcow2.h | 126 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 125 insertions(+), 1 deletion(-)
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index cb723463f2..64e9345fb4 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -42,6 +42,9 @@ The first cluster of a qcow2 image contains the file header:
-                     as the maximum cluster size and won't be able to open images
-                     with larger cluster sizes.
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 82b86f6cec..3aec6f452a 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -80,6 +80,21 @@
  
-+                    Note: if the image has Extended L2 Entries then cluster_bits
-+                    must be at least 14 (i.e. 16384 byte clusters).
-+
-          24 - 31:   size
-                     Virtual disk size in bytes.
+ #define QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER 32
  
-@@ -117,7 +120,12 @@ the next fields through header_length.
-                                 clusters. The compression_type field must be
-                                 present and not zero.
++/* The subcluster X [0..31] is allocated */
++#define QCOW_OFLAG_SUB_ALLOC(X)   (1ULL << (X))
++/* The subcluster X [0..31] reads as zeroes */
++#define QCOW_OFLAG_SUB_ZERO(X)    (QCOW_OFLAG_SUB_ALLOC(X) << 32)
++/* Subclusters [X, Y) (0 <= X <= Y <= 32) are allocated */
++#define QCOW_OFLAG_SUB_ALLOC_RANGE(X, Y) \
++    (QCOW_OFLAG_SUB_ALLOC(Y) - QCOW_OFLAG_SUB_ALLOC(X))
++/* Subclusters [X, Y) (0 <= X <= Y <= 32) read as zeroes */
++#define QCOW_OFLAG_SUB_ZERO_RANGE(X, Y) \
++    (QCOW_OFLAG_SUB_ALLOC_RANGE(X, Y) << 32)
++/* L2 entry bitmap with all allocation bits set */
++#define QCOW_L2_BITMAP_ALL_ALLOC  (QCOW_OFLAG_SUB_ALLOC_RANGE(0, 32))
++/* L2 entry bitmap with all "read as zeroes" bits set */
++#define QCOW_L2_BITMAP_ALL_ZEROES (QCOW_OFLAG_SUB_ZERO_RANGE(0, 32))
++
+ /* Size of normal and extended L2 entries */
+ #define L2E_SIZE_NORMAL   (sizeof(uint64_t))
+ #define L2E_SIZE_EXTENDED (sizeof(uint64_t) * 2)
+@@ -462,6 +477,33 @@ typedef struct QCowL2Meta
+     QLIST_ENTRY(QCowL2Meta) next_in_flight;
+ } QCowL2Meta;
  
--                    Bits 4-63:  Reserved (set to 0)
-+                    Bit 4:      Extended L2 Entries.  If this bit is set then
-+                                L2 table entries use an extended format that
-+                                allows subcluster-based allocation. See the
-+                                Extended L2 Entries section for more details.
++/*
++ * In images with standard L2 entries all clusters are treated as if
++ * they had one subcluster so QCow2ClusterType and QCow2SubclusterType
++ * can be mapped to each other and have the exact same meaning
++ * (QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC cannot happen in these images).
++ *
++ * In images with extended L2 entries QCow2ClusterType refers to the
++ * complete cluster and QCow2SubclusterType to each of the individual
++ * subclusters, so there are several possible combinations:
++ *
++ *     |--------------+---------------------------|
++ *     | Cluster type | Possible subcluster types |
++ *     |--------------+---------------------------|
++ *     | UNALLOCATED  |         UNALLOCATED_PLAIN |
++ *     |              |                ZERO_PLAIN |
++ *     |--------------+---------------------------|
++ *     | NORMAL       |         UNALLOCATED_ALLOC |
++ *     |              |                ZERO_ALLOC |
++ *     |              |                    NORMAL |
++ *     |--------------+---------------------------|
++ *     | COMPRESSED   |                COMPRESSED |
++ *     |--------------+---------------------------|
++ *
++ * QCOW2_SUBCLUSTER_INVALID means that the L2 entry is incorrect and
++ * the image should be marked corrupt.
++ */
 +
-+                    Bits 5-63:  Reserved (set to 0)
+ typedef enum QCow2ClusterType {
+     QCOW2_CLUSTER_UNALLOCATED,
+     QCOW2_CLUSTER_ZERO_PLAIN,
+@@ -470,6 +512,16 @@ typedef enum QCow2ClusterType {
+     QCOW2_CLUSTER_COMPRESSED,
+ } QCow2ClusterType;
  
-          80 -  87:  compatible_features
-                     Bitmask of compatible features. An implementation can
-@@ -498,7 +506,7 @@ cannot be relaxed without an incompatible layout change).
- Given an offset into the virtual disk, the offset into the image file can be
- obtained as follows:
++typedef enum QCow2SubclusterType {
++    QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN,
++    QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC,
++    QCOW2_SUBCLUSTER_ZERO_PLAIN,
++    QCOW2_SUBCLUSTER_ZERO_ALLOC,
++    QCOW2_SUBCLUSTER_NORMAL,
++    QCOW2_SUBCLUSTER_COMPRESSED,
++    QCOW2_SUBCLUSTER_INVALID,
++} QCow2SubclusterType;
++
+ typedef enum QCow2MetadataOverlap {
+     QCOW2_OL_MAIN_HEADER_BITNR      = 0,
+     QCOW2_OL_ACTIVE_L1_BITNR        = 1,
+@@ -634,9 +686,11 @@ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+ static inline QCow2ClusterType qcow2_get_cluster_type(BlockDriverState *bs,
+                                                       uint64_t l2_entry)
+ {
++    BDRVQcow2State *s = bs->opaque;
++
+     if (l2_entry & QCOW_OFLAG_COMPRESSED) {
+         return QCOW2_CLUSTER_COMPRESSED;
+-    } else if (l2_entry & QCOW_OFLAG_ZERO) {
++    } else if ((l2_entry & QCOW_OFLAG_ZERO) && !has_subclusters(s)) {
+         if (l2_entry & L2E_OFFSET_MASK) {
+             return QCOW2_CLUSTER_ZERO_ALLOC;
+         }
+@@ -656,6 +710,76 @@ static inline QCow2ClusterType qcow2_get_cluster_type(BlockDriverState *bs,
+     }
+ }
  
--    l2_entries = (cluster_size / sizeof(uint64_t))
-+    l2_entries = (cluster_size / sizeof(uint64_t))        [*]
- 
-     l2_index = (offset / cluster_size) % l2_entries
-     l1_index = (offset / cluster_size) / l2_entries
-@@ -508,6 +516,8 @@ obtained as follows:
- 
-     return cluster_offset + (offset % cluster_size)
- 
-+    [*] this changes if Extended L2 Entries are enabled, see next section
++/*
++ * For an image without extended L2 entries, return the
++ * QCow2SubclusterType equivalent of a given QCow2ClusterType.
++ */
++static inline
++QCow2SubclusterType qcow2_cluster_to_subcluster_type(QCow2ClusterType type)
++{
++    switch (type) {
++    case QCOW2_CLUSTER_COMPRESSED:
++        return QCOW2_SUBCLUSTER_COMPRESSED;
++    case QCOW2_CLUSTER_ZERO_PLAIN:
++        return QCOW2_SUBCLUSTER_ZERO_PLAIN;
++    case QCOW2_CLUSTER_ZERO_ALLOC:
++        return QCOW2_SUBCLUSTER_ZERO_ALLOC;
++    case QCOW2_CLUSTER_NORMAL:
++        return QCOW2_SUBCLUSTER_NORMAL;
++    case QCOW2_CLUSTER_UNALLOCATED:
++        return QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN;
++    default:
++        g_assert_not_reached();
++    }
++}
 +
- L1 table entry:
- 
-     Bit  0 -  8:    Reserved (set to 0)
-@@ -548,7 +558,8 @@ Standard Cluster Descriptor:
-                     nor is data read from the backing file if the cluster is
-                     unallocated.
- 
--                    With version 2, this is always 0.
-+                    With version 2 or with extended L2 entries (see the next
-+                    section), this is always 0.
- 
-          1 -  8:    Reserved (set to 0)
- 
-@@ -585,6 +596,57 @@ file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
- no backing file or the backing file is smaller than the image, they shall read
- zeros for all parts that are not covered by the backing file.
- 
-+== Extended L2 Entries ==
++/*
++ * In an image without subsclusters @l2_bitmap is ignored and
++ * @sc_index must be 0.
++ * Return QCOW2_SUBCLUSTER_INVALID if an invalid l2 entry is detected
++ * (this checks the whole entry and bitmap, not only the bits related
++ * to subcluster @sc_index).
++ */
++static inline
++QCow2SubclusterType qcow2_get_subcluster_type(BlockDriverState *bs,
++                                              uint64_t l2_entry,
++                                              uint64_t l2_bitmap,
++                                              unsigned sc_index)
++{
++    BDRVQcow2State *s = bs->opaque;
++    QCow2ClusterType type = qcow2_get_cluster_type(bs, l2_entry);
++    assert(sc_index < s->subclusters_per_cluster);
 +
-+An image uses Extended L2 Entries if bit 4 is set on the incompatible_features
-+field of the header.
++    if (has_subclusters(s)) {
++        switch (type) {
++        case QCOW2_CLUSTER_COMPRESSED:
++            return QCOW2_SUBCLUSTER_COMPRESSED;
++        case QCOW2_CLUSTER_NORMAL:
++            if ((l2_bitmap >> 32) & l2_bitmap) {
++                return QCOW2_SUBCLUSTER_INVALID;
++            } else if (l2_bitmap & QCOW_OFLAG_SUB_ZERO(sc_index)) {
++                return QCOW2_SUBCLUSTER_ZERO_ALLOC;
++            } else if (l2_bitmap & QCOW_OFLAG_SUB_ALLOC(sc_index)) {
++                return QCOW2_SUBCLUSTER_NORMAL;
++            } else {
++                return QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC;
++            }
++        case QCOW2_CLUSTER_UNALLOCATED:
++            if (l2_bitmap & QCOW_L2_BITMAP_ALL_ALLOC) {
++                return QCOW2_SUBCLUSTER_INVALID;
++            } else if (l2_bitmap & QCOW_OFLAG_SUB_ZERO(sc_index)) {
++                return QCOW2_SUBCLUSTER_ZERO_PLAIN;
++            } else {
++                return QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN;
++            }
++        default:
++            g_assert_not_reached();
++        }
++    } else {
++        return qcow2_cluster_to_subcluster_type(type);
++    }
++}
 +
-+In these images standard data clusters are divided into 32 subclusters of the
-+same size. They are contiguous and start from the beginning of the cluster.
-+Subclusters can be allocated independently and the L2 entry contains information
-+indicating the status of each one of them. Compressed data clusters don't have
-+subclusters so they are treated the same as in images without this feature.
-+
-+The size of an extended L2 entry is 128 bits so the number of entries per table
-+is calculated using this formula:
-+
-+    l2_entries = (cluster_size / (2 * sizeof(uint64_t)))
-+
-+The first 64 bits have the same format as the standard L2 table entry described
-+in the previous section, with the exception of bit 0 of the standard cluster
-+descriptor.
-+
-+The last 64 bits contain a subcluster allocation bitmap with this format:
-+
-+Subcluster Allocation Bitmap (for standard clusters):
-+
-+    Bit  0 - 31:    Allocation status (one bit per subcluster)
-+
-+                    1: the subcluster is allocated. In this case the
-+                       host cluster offset field must contain a valid
-+                       offset.
-+                    0: the subcluster is not allocated. In this case
-+                       read requests shall go to the backing file or
-+                       return zeros if there is no backing file data.
-+
-+                    Bits are assigned starting from the least significant
-+                    one (i.e. bit x is used for subcluster x).
-+
-+        32 - 63     Subcluster reads as zeros (one bit per subcluster)
-+
-+                    1: the subcluster reads as zeros. In this case the
-+                       allocation status bit must be unset. The host
-+                       cluster offset field may or may not be set.
-+                    0: no effect.
-+
-+                    Bits are assigned starting from the least significant
-+                    one (i.e. bit x is used for subcluster x - 32).
-+
-+Subcluster Allocation Bitmap (for compressed clusters):
-+
-+    Bit  0 - 63:    Reserved (set to 0)
-+                    Compressed clusters don't have subclusters,
-+                    so this field is not used.
- 
- == Snapshots ==
- 
-diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-index d57f409861..5f763aa6bb 100644
---- a/docs/qcow2-cache.txt
-+++ b/docs/qcow2-cache.txt
-@@ -1,6 +1,6 @@
- qcow2 L2/refcount cache configuration
- =====================================
--Copyright (C) 2015, 2018 Igalia, S.L.
-+Copyright (C) 2015, 2018-2020 Igalia, S.L.
- Author: Alberto Garcia <berto@igalia.com>
- 
- This work is licensed under the terms of the GNU GPL, version 2 or
-@@ -222,3 +222,20 @@ support this functionality, and is 0 (disabled) on other platforms.
- This functionality currently relies on the MADV_DONTNEED argument for
- madvise() to actually free the memory. This is a Linux-specific feature,
- so cache-clean-interval is not supported on other systems.
-+
-+
-+Extended L2 Entries
-+-------------------
-+All numbers shown in this document are valid for qcow2 images with normal
-+64-bit L2 entries.
-+
-+Images with extended L2 entries need twice as much L2 metadata, so the L2
-+cache size must be twice as large for the same disk space.
-+
-+   disk_size = l2_cache_size * cluster_size / 16
-+
-+i.e.
-+
-+   l2_cache_size = disk_size * 16 / cluster_size
-+
-+Refcount blocks are not affected by this.
+ /* Check whether refcounts are eager or lazy */
+ static inline bool qcow2_need_accurate_refcounts(BDRVQcow2State *s)
+ {
 -- 
 2.20.1
 
