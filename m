@@ -7,82 +7,80 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C451AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C11C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:01:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85D4F20CC7
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:01:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C6B020936
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:01:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1gC6DGb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85D4F20CC7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGM9Pl9P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C6B020936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrJRI-0007jV-KZ
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 07:01:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40178)
+	id 1jrJRh-0008Mh-9U
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 07:01:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrJQH-0006Sm-QC
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:00:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42665
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrJQq-00079W-Em
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:00:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22341
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrJQF-0000nA-5q
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:00:01 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrJQn-0000xl-Lg
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:00:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593773997;
+ s=mimecast20190719; t=1593774032;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=DhI+iINLmG9wbC98d4e3LOFv6CystaXx4ipnTUnpRHM=;
- b=b1gC6DGbLarpQB5V85OGvdxjPl2aQblEAc9hWWAXHTANDJmUjhtQiuButSEc1sjimj9u7e
- ZPfhiyHyQ8xV1J5j+UBS0yCGxjc4kTJ4oZHav6gwBfMDANPVwVQbm6FJZb9nsrbHFSSgEH
- SJuiSgMLsCeERJVkBXLh33nd66n97qA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-KHtJwnEbNvasOUsBRjlhSA-1; Fri, 03 Jul 2020 06:59:56 -0400
-X-MC-Unique: KHtJwnEbNvasOUsBRjlhSA-1
-Received: by mail-wr1-f69.google.com with SMTP id b8so17187124wro.19
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 03:59:55 -0700 (PDT)
+ bh=rTNIzhaoBchyTkWYudp0oPId1KCU/mxL83twpGFjZWo=;
+ b=WGM9Pl9P+hCwMXs4OGECBLVgDlco/GNqqn57+IzFpr5B1uy79VTYULReMmUoZtHLoOcK9K
+ F+mvTk+REhS0JqN8hRJbmtsZY46xZ4r153gGJQeEDBgsyPLPAODm4dXO57PIXrKSVO2T4V
+ ftZm9wJiT1deJHOd+Su5JoYyAoYOdAE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-WESM4ae6MU2XoWty6UhMiA-1; Fri, 03 Jul 2020 07:00:30 -0400
+X-MC-Unique: WESM4ae6MU2XoWty6UhMiA-1
+Received: by mail-wm1-f72.google.com with SMTP id v6so32438561wmg.1
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 04:00:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=DhI+iINLmG9wbC98d4e3LOFv6CystaXx4ipnTUnpRHM=;
- b=ECp+Fgwd904cQJuVvEiJmbbSlOPQjCb5yKF1k6BvPRmOi6KKSKuejxfNfU+kTYQVz5
- MJTtUVhAOMlW7kztzta5MnbekXYwYfLAmZ2SD5COxuqTE84EGqHsZEkkuAhfuqGVXuCS
- loNqgo6MYZKw/d9360wKQH56vG6RkY9qPLsm5JqnVc2d1X2bDI394tOLhP3Ecx+oERlm
- qOdxh8CGTgTXDXX3FeHiq/Vbjg58yL1zNNlYBK1/BzSFKLfMIoibUo5DkYSv10FdcqDf
- 1dj9w+tnJob4R6IXYQ9dKqw3IvYzBHbjC/TZcaccpbjpalxCmFSMyJpLt0zlz1n0JjSd
- BdKQ==
-X-Gm-Message-State: AOAM533Q3RvE1z5cg6sg+mJStZ/PgB/+e96CvKmiTEihRY/8YXAKgeIL
- A9lFFkS3vj/RV2U+z4AYTJi8uY1byBrRfT8l4jXWQakC7jkD2q5m77VFy7OVqwYDPeQ8mDWhNd/
- mZxMuRQqLZE2LhQM=
-X-Received: by 2002:adf:c44d:: with SMTP id a13mr37130970wrg.205.1593773995158; 
- Fri, 03 Jul 2020 03:59:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz2ESSz1aF2vm64sV3V5cvm2OAnNyY0UDCpDmAxrn05yfJR4wF8e9eiKYLZuSXKaoJf6A9JqQ==
-X-Received: by 2002:adf:c44d:: with SMTP id a13mr37130946wrg.205.1593773994899; 
- Fri, 03 Jul 2020 03:59:54 -0700 (PDT)
+ bh=rTNIzhaoBchyTkWYudp0oPId1KCU/mxL83twpGFjZWo=;
+ b=dM0QfcZVO1NqktlgbEpPhd5ysxB5nwk9CFDI9d10b9+3/XxF1GzCJUTZq9kJ90l/N8
+ 8+MEgN6NV9V3SCVEc0as5NUo14dDzsG0pr5LXold9ExM3CZ3C0GNgOfehAG77jNmL6H0
+ 12tFxudan+vJOui9ltLPl/8nOV+J6AFHmV/F6qCH/0FXpnQJN+gixxy5SqFeuX3tImwB
+ tJTObRAssidaxGnDY77QyXmb4Ld5+uE2CmDzM+7ARKETeMHfhcHbIsSRWDdx2ouL8hAZ
+ INCC71gMDxU0Q7CjRxnMfUu7BwxhOGmDKoV2xCi9I8iZwF39WxZwKplsSZ9jXf+ixIUZ
+ 5bRA==
+X-Gm-Message-State: AOAM532HhpfkGy9fMvLuJLzVFU4D8YOokr3YpdDUAQUceYLb64tElEaE
+ GQPQid0tIIxSGpYZQ5D3bCHcI110aMT+aeD3jMknTyKntaN5SiSLSnapspGEBJOnHnADeZ6XCj0
+ S+mS2MIyTwEyJCmQ=
+X-Received: by 2002:a5d:4051:: with SMTP id w17mr34622560wrp.183.1593774029691; 
+ Fri, 03 Jul 2020 04:00:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxF0NSrs1DUrniIBJxYZrIfIg6m2vVw9RyEACThPoKCbsOfEoSj4vt1cLw4H+bRV4lkIDEvgQ==
+X-Received: by 2002:a5d:4051:: with SMTP id w17mr34622544wrp.183.1593774029461; 
+ Fri, 03 Jul 2020 04:00:29 -0700 (PDT)
 Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id g16sm15007199wrh.91.2020.07.03.03.59.53
+ by smtp.gmail.com with ESMTPSA id g14sm9831280wrw.83.2020.07.03.04.00.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jul 2020 03:59:54 -0700 (PDT)
-Subject: Re: [PATCH v2 15/18] hw/block/nvme: reject invalid nsid values in
- active namespace id list
+ Fri, 03 Jul 2020 04:00:28 -0700 (PDT)
+Subject: Re: [PATCH v2 14/18] hw/block/nvme: support identify namespace
+ descriptor list
 To: Klaus Jensen <its@irrelevant.dk>
 References: <20200703063420.2241014-1-its@irrelevant.dk>
- <20200703063420.2241014-16-its@irrelevant.dk>
- <6a038075-13fd-2f60-23a2-ddc7081cff32@redhat.com>
- <20200703083701.sj4xlgyzp6xte4xi@apples.localdomain>
- <3d45ddb7-867e-3c40-c78b-cf5bc095e2e0@redhat.com>
- <20200703092213.27qhr5ow4kksunrw@apples.localdomain>
+ <20200703063420.2241014-15-its@irrelevant.dk>
+ <1a1e7fdf-6e87-aa6b-f687-cc6d98297efe@redhat.com>
+ <20200703100002.aufq55fja2gktfl6@apples.localdomain>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -107,12 +105,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <ba990b8f-35fb-8d8c-e835-88c09ca1e42e@redhat.com>
-Date: Fri, 3 Jul 2020 12:59:52 +0200
+Message-ID: <b5b4fcaa-293b-4b87-338d-240da908ce4e@redhat.com>
+Date: Fri, 3 Jul 2020 13:00:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200703092213.27qhr5ow4kksunrw@apples.localdomain>
+In-Reply-To: <20200703100002.aufq55fja2gktfl6@apples.localdomain>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -120,9 +118,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -152,78 +150,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/20 11:22 AM, Klaus Jensen wrote:
-> On Jul  3 11:14, Philippe Mathieu-Daudé wrote:
->> On 7/3/20 10:37 AM, Klaus Jensen wrote:
->>> On Jul  3 10:20, Philippe Mathieu-Daudé wrote:
->>>> On 7/3/20 8:34 AM, Klaus Jensen wrote:
->>>>> From: Klaus Jensen <k.jensen@samsung.com>
->>>>>
->>>>> Reject the nsid broadcast value (0xffffffff) and 0xfffffffe in the
->>>>> Active Namespace ID list.
->>>>
->>>> Can we have a definition instead of this 0xfffffffe magic value please?
->>>>
+On 7/3/20 12:00 PM, Klaus Jensen wrote:
+> On Jul  3 10:27, Philippe Mathieu-Daudé wrote:
+>> On 7/3/20 8:34 AM, Klaus Jensen wrote:
+>>> From: Klaus Jensen <k.jensen@samsung.com>
 >>>
->>> Hmm, not really actually. It's not a magic value, its just because the
->>> logic in Active Namespace ID list would require that it should report
->>> any namespaces with ids *higher* than the one specified, so since
->>> 0xffffffff (NVME_NSID_BROADCAST) is invalid, NVME_NSID_BROADCAST - 1
->>> needs to be as well.
->>
->> OK.
->>
+>>> Since we are not providing the NGUID or EUI64 fields, we must support
+>>> the Namespace UUID. We do not have any way of storing a persistent
+>>> unique identifier, so conjure up a UUID that is just the namespace id.
 >>>
->>> What do you say I change it to `min_nsid >= NVME_NSID_BROADCAST - 1`?
->>> The original condition just reads well if you are sitting with the spec
->>> on the side.
+>>> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+>>> Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+>>> ---
+>>>  hw/block/nvme.c       | 41 +++++++++++++++++++++++++++++++++++++++++
+>>>  hw/block/trace-events |  1 +
+>>>  2 files changed, 42 insertions(+)
+>>>
+>>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+>>> index 8230e0e3826b..65c2fa3ac1f4 100644
+>>> --- a/hw/block/nvme.c
+>>> +++ b/hw/block/nvme.c
+>>> @@ -971,6 +971,45 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+>>>      return ret;
+>>>  }
+>>>  
+>>> +static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeIdentify *c)
+>>> +{
+>>> +    uint32_t nsid = le32_to_cpu(c->nsid);
+>>> +    uint64_t prp1 = le64_to_cpu(c->prp1);
+>>> +    uint64_t prp2 = le64_to_cpu(c->prp2);
+>>> +
+>>> +    uint8_t list[NVME_IDENTIFY_DATA_SIZE];
+>>> +
+>>> +    struct data {
+>>> +        struct {
+>>> +            NvmeIdNsDescr hdr;
+>>> +            uint8_t v[16];
 >>
->> IMO this is clearer:
->>
->>   if (min_nsid + 1 >= NVME_NSID_BROADCAST) {
->>       return NVME_INVALID_NSID | NVME_DNR;
->>   }
+>> You might consider to use QemuUUID from "qemu/uuid.h". The benefits
+>> are you can use qemu_uuid_parse() qemu_uuid_unparse*() for tracing,
+>> and DEFINE_PROP_UUID() in case you want to set a particular UUID
+>> from command line, it case it is important to the guest.
 >>
 > 
-> But since min_nsid is uint32_t that would not be wise ;)
-
-Hmm indeed.
-
+> Yes, definitely. Niklas also does this in his patch for namespace types
+> support. And I think that it's very important that it can be made
+> persistent, which would require a device property.
 > 
-> I'll go with the - 1 and add a comment!
+> Thus, if it is OK with the rest of you, I would like to defer this to
+> when we merge the multiple namespaces patch and add "uuid" as a nvme-ns
+> device property there. Then, we do not have to add the uuid property on
+> the nvme device now and then have to keep it around when the namespace
+> related properties moves to the nvme-ns device.
 
-Good, thanks.
-
-> 
->> Whichever form you prefer you can amend to the respin patch:
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
->>>
->>>>>
->>>>> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
->>>>> ---
->>>>>  hw/block/nvme.c | 4 ++++
->>>>>  1 file changed, 4 insertions(+)
->>>>>
->>>>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
->>>>> index 65c2fa3ac1f4..0dac7a41ddae 100644
->>>>> --- a/hw/block/nvme.c
->>>>> +++ b/hw/block/nvme.c
->>>>> @@ -956,6 +956,10 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
->>>>>  
->>>>>      trace_pci_nvme_identify_nslist(min_nsid);
->>>>>  
->>>>> +    if (min_nsid == 0xfffffffe || min_nsid == NVME_NSID_BROADCAST) {
->>>>> +        return NVME_INVALID_NSID | NVME_DNR;
->>>>> +    }
->>>>> +
->>>>>      list = g_malloc0(data_len);
->>>>>      for (i = 0; i < n->num_namespaces; i++) {
->>>>>          if (i < min_nsid) {
->>>>>
->>>>
->>>
->>
-> 
+No objection, it was a simple suggestion to consider for later ;)
 
 
