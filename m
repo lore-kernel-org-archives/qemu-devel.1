@@ -2,80 +2,81 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D1DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B98C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:22:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32AC820737
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:20:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 016D12088E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:22:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6O5K1Ig"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32AC820737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmN1pd7v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016D12088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrKg7-0000NE-52
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 08:20:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59084)
+	id 1jrKiJ-0002Sw-B7
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 08:22:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jrKfX-0008PH-Q9
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 08:19:51 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23048
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrKgw-0001bG-4G
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 08:21:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60759
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jrKfV-0003qS-RB
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 08:19:51 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrKgt-0004Zu-Am
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 08:21:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593778788;
+ s=mimecast20190719; t=1593778874;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=U5b6yS5gh4OwLUqwEhMioKcO+mNLZfjEYPNXtA5NIwo=;
- b=O6O5K1IgTQEVbId4c8JVJGspbY96w2cXPcNdofqtyesayZqMrquOam9UUpMq6Ed1j45hAE
- cbQcH5nN+tO+YervRctiA/BXPA/ty8C/9cVZyDugFUZin3uzZCrsecrfkwuGja1rY4xmDt
- hTnE7xkWSXHTUcQ1/J4obFFH8TNzWqw=
+ bh=OFZaiDUGq9XKA6+Nv/EAsHQzDgTIil5M4zIbcIwkIqc=;
+ b=gmN1pd7vWW6GzT7vRxV26a7Bikolv477Xz/Kwg/GI8KBWn0oT+qbd/vazVnQlugXwkkGxI
+ SbOWhFpcL2c/Q9wGv4Rg2D3N/3btQO/yBS2/jUEUW1F+tUIuH3ucKjqmPg2iQiF/LCS+85
+ puCEQ0ZKaz72A5sTwtp+XSb+Iasnqjo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-KB6k9V0QMsa4Vq_DmNCnlg-1; Fri, 03 Jul 2020 08:19:43 -0400
-X-MC-Unique: KB6k9V0QMsa4Vq_DmNCnlg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-98-qFUObpYdN-iJbTl3QoP64A-1; Fri, 03 Jul 2020 08:21:10 -0400
+X-MC-Unique: qFUObpYdN-iJbTl3QoP64A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E03CF100CCC3
- for <qemu-devel@nongnu.org>; Fri,  3 Jul 2020 12:19:42 +0000 (UTC)
-Received: from work-vm (ovpn-114-207.ams2.redhat.com [10.36.114.207])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 19B837BD4D;
- Fri,  3 Jul 2020 12:19:41 +0000 (UTC)
-Date: Fri, 3 Jul 2020 13:19:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, quintela@redhat.com, thuth@redhat.com
-Subject: Re: [PATCH] migration: postcopy take proper error return
-Message-ID: <20200703121939.GB36813@work-vm>
-References: <20200701093557.130096-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6447818FE861;
+ Fri,  3 Jul 2020 12:21:09 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 367C9B3A79;
+ Fri,  3 Jul 2020 12:21:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B7B1D1138648; Fri,  3 Jul 2020 14:21:07 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: Questionable aspects of QEMU Error's design
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <87blo7heag.fsf@dusky.pond.sub.org>
+Date: Fri, 03 Jul 2020 14:21:07 +0200
+In-Reply-To: <87blo7heag.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Sat, 04 Apr 2020 09:59:35 +0200")
+Message-ID: <874kqooklo.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200701093557.130096-1-dgilbert@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,44 +97,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> This function returns a boolean success and we're returning -1;
-> lets just use the 'out' error path.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Fixes: 58b7c17e226 ("Disable mlock around incoming postcopy")
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1885720
+Markus Armbruster <armbru@redhat.com> writes:
 
-queued
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> QEMU's Error was patterned after GLib's GError.  Differences include:
+> [...]
+>> * Return value conventions
+>>
+>>   Common: non-void functions return a distinct error value on failure
+>>   when such a value can be defined.  Patterns:
+>>
+>>   - Functions returning non-null pointers on success return null pointer
+>>     on failure.
+>>
+>>   - Functions returning non-negative integers on success return a
+>>     negative error code on failure.
+>>
+>>   Different: GLib discourages void functions, because these lead to
+>>   awkward error checking code.  We have tons of them, and tons of
+>>   awkward error checking code:
+>>
+>>     Error *err = NULL;
+>>     frobnicate(arg, &err);
+>>     if (err) {
+>>         ... recover ...
+>>         error_propagate(errp, err);
+>>     }
+>>
+>>   instead of
+>>
+>>     if (!frobnicate(arg, errp))
+>>         ... recover ...
+>>     }
+>>
+>>   Can also lead to pointless creation of Error objects.
+>>
+>>   I consider this a design mistake.  Can we still fix it?  We have more
+>>   than 2000 void functions taking an Error ** parameter...
+>>
+>>   Transforming code that receives and checks for errors with Coccinelle
+>>   shouldn't be hard.  Transforming code that returns errors seems more
+>>   difficult.  We need to transform explicit and implicit return to
+>>   either return true or return false, depending on what we did to the
+>>   @errp parameter on the way to the return.  Hmm.
+> [...]
+>
+> To figure out what functions with an Error ** parameter return, I used
+> Coccinelle to find such function definitions and print the return types.
+> Summary of results:
+>
+>    2155 void
+>     873 signed integer
+>     494 pointer
+>     153 bool
+>      33 unsigned integer
+>       6 enum
+>    ---------------------
+>    3714 total
 
-> ---
->  migration/postcopy-ram.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index a36402722b..bef2a3afed 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -389,7 +389,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
->       */
->      if (munlockall()) {
->          error_report("%s: munlockall: %s", __func__,  strerror(errno));
-> -        return -1;
-> +        goto out;
->      }
->  
->      /*
-> -- 
-> 2.26.2
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+With my "[PATCH v2 00/44] Less clumsy error checking" applied, I now count
+
+     1946 void
+      879 signed integer
+      484 pointer
+      301 bool
+       33 unsigned integer
+        3 GuestFsfreezeStatus
+        1 gnutls_x509_crt_t
+        1 QCryptoCipherAlgorithm
+        1 COLOMessage
+        1 BlockdevDetectZeroesOptions
+     ---------------------
+     3650 total
+
+About 7% complete for function definitions.
+
+> I then used Coccinelle to find checked calls of void functions (passing
+> &error_fatal or &error_abort is not considered "checking" here).  These
+> calls become simpler if we make the functions return a useful value.  I
+> found a bit under 600 direct calls, and some 50 indirect calls.
+
+Different method this time: I count any direct function call that takes
+&err other than &error_abort, &error_fatal, and whose value, if any, is
+not used.
+
+Current master: 1050
+
+With my "[PATCH v2 00/44] Less clumsy error checking" applied: 649
+
+About 38% complete for function calls.
+
+> Most frequent direct calls:
+>
+>     127 object_property_set_bool
+>      27 qemu_opts_absorb_qdict
+>      16 visit_type_str
+>      14 visit_type_int
+>      10 visit_type_uint32
+
+Top scorers master:
+
+    151 sysbus_realize()
+     34 qemu_opts_absorb_qdict()
+     29 visit_type_int()
+     24 visit_type_str()
+     23 cpu_exec_realizefn()
+     19 visit_type_size()
+     16 qdev_realize()
+     14 visit_type_bool()
+     12 visit_type_uint32()
+     11 visit_type_int32()
+     11 object_property_set_bool()
+     10 object_property_set_uint()
+     10 object_property_set_int()
+    +420 functions with fewer than 10 calls
+
+Top scorers with my patches applied:
+
+     23 cpu_exec_realizefn()
+     15 visit_type_int()
+     10 visit_type_size()
+    +387 functions with fewer than 10 calls
+
+Looks like this is going to be a long slog.
+
+With functions into buckets by same name prefix up to the first '_':
+
+     63 visit
+     57 qmp
+     33 bdrv
+     29 cpu
+     26 xen
+     25 memory
+   +113 buckets with fewer than 25 calls
+
+[...]
+>
+> Please understand these are rough numbers from quick & dirty scripts.
+
+Still are.
 
 
