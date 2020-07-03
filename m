@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 044D7C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 028CDC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:28:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3B4720782
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:27:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD89520782
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:28:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dk96nhEs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3B4720782
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCS1tXol"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD89520782
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrSHv-000076-0g
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:27:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35440)
+	id 1jrSI9-0000qc-0r
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:28:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9t-0000FW-9K; Fri, 03 Jul 2020 16:19:41 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51691)
+ id 1jrS9q-00008I-JZ; Fri, 03 Jul 2020 16:19:38 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51691)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9r-0001Ye-P1; Fri, 03 Jul 2020 16:19:40 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 22so33117352wmg.1;
- Fri, 03 Jul 2020 13:19:39 -0700 (PDT)
+ id 1jrS9p-0001X5-2G; Fri, 03 Jul 2020 16:19:38 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 22so33117264wmg.1;
+ Fri, 03 Jul 2020 13:19:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UXJvzBp5XXWV6ZmNLki/P3wnGb416mLql6yjwQiSGLo=;
- b=dk96nhEsndhNP4xeuzSzx4n20E7xj1RWaS7XVjFRRTT6rSCabTEvtrC97OcWbc0bDG
- AshQzlE6ysirgPlO51z/UM4EDuT+D/gX7H/bk3H6HF0+kPSK8L9itcSB1ZPPWcTsq4m3
- jjCtrviGIPzoGStubB44BZAq7MdLn6VExBjuNwcDlTEXpTGgedklSYjwIAA8NmgcDkRx
- HnzhWaDz3GRecXJlcIe/4uG9n6Suxd19pAGszUM9CQz3zIK0YxuK3bwjwky6UbblGS6C
- OsV0cB2ky6OAAi8UPN49+z1ODjzSLTZTiZ7Mjr2WrHBivOFreYGrhxrLfg8YWomWmG9V
- LDwg==
+ bh=T5nJI2LUTbVg1rYYlvNxvcvN3Wxzp57Pf4RjUCFDYTw=;
+ b=hCS1tXol16rSXoExw49au2z42P2i8sMa9LCJuDoYnvB9NPrR09uWTPhNhrWZEi7B+C
+ AeDSbaNQbIHOMjtUtsjVSwSa0nxOsnXh3HP7ufPkyN0D3sNWSXCSDtte5yfC5elh0MOc
+ Pj5Gl8t+Dv9VNIXc8e/e36hjJXHYJXuy/T3h0DN59nvSV4WAm6NWECP1ZJqI1utLkj7I
+ zNiiCVRPxFeGWIOwHbBWU4rXG8bpR8L2kATfJkQC2p/dfuHKEY7BpFWq/oash/kByRV+
+ RHgO6o7LtZenaqJeFmQvlYVE7IPzo5DyBNwXsGm/JMA+4MXxhr+VvhI0IiPgWFgM8Eca
+ Daow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=UXJvzBp5XXWV6ZmNLki/P3wnGb416mLql6yjwQiSGLo=;
- b=H/o5TJmK0n2Yvuryde9GZ68wUkGxr+mbx9eMHsS9aP6/WULdMgwzShm1iFHeufvS9W
- UK9MJ/tFP2ryu3OtMNHwEyuXULU9Sp4JGFfNH9rG0XtbZ3oIZ0SQHyzDvQXgyBDD+CUY
- 2G5v2tSH2ZaG3MFh1qKGLUhs4oY1/aFkmgT/Y0otl5RyTySYZj6e0BbhsGkctK4r1y2o
- I3FsF0z9P5BKoC/lcEnhgDXRbr6UOB3Ad3DjoO4cvru1yDBqbO5lGECPWLEWdO3hHX+f
- fOo3TpRUdJ9ljpCxGsErN0GmkqDmIxbFX8LRvvQpUsPhm5DevUCWhQJ+/EvZI8mnscaB
- B5TA==
-X-Gm-Message-State: AOAM532NXWoHa4EFI8x5ZL9Ke1lU8i/tbOfrNGj0O+qEDCs4mUDjDlVW
- LffpI3FLhwmLRnRTYP8Jk4QTq3Ub1Mw=
-X-Google-Smtp-Source: ABdhPJwvtbSsSw6vNyrRlwFYBAZyIhPE0cKxDdNOvXndT0qPeQxN2rSEPxKTbng+N702slL+Bssozw==
-X-Received: by 2002:a05:600c:21ca:: with SMTP id
- x10mr37960285wmj.63.1593807578015; 
- Fri, 03 Jul 2020 13:19:38 -0700 (PDT)
+ bh=T5nJI2LUTbVg1rYYlvNxvcvN3Wxzp57Pf4RjUCFDYTw=;
+ b=S7HHGdCxCfHA+JIKq9McWyrqJOV4aCQna1IUA4/D0/KqMhKSKV04fIg0QlxbI6FawQ
+ TzbjrlEoxFxcatH+SAqFfReHu8lihqxSgYzY2pB9WiYi96qvBB00ppe8vyKxfwhdANhV
+ XHP+H6JIvsbipxjXE3eUnXVoqv7Sfjkfq9+j+8d1WGxcDszc7B8PA9MbQUvQTzfvSr1E
+ 9MUCcoHuS8DjiRdKkFfWXJjP/X4jOgcTkY8Yiw5oUirOcx2R5vDmRW9zYivzmpv0DqYn
+ lscJScVEqxJ9RZU6inzXkSd3U/JSzclJq4jJre4iGlp3o67GjJR3gbApO9poRq8ka4B0
+ 7dAg==
+X-Gm-Message-State: AOAM5304a/C3aHJlmzyBucZ1jpXq6yKMmB4XgttZ95JKbGPTzmTHk8+E
+ 9ggw0QuZYjie3GoEy0bLnZUTdL8lnSc=
+X-Google-Smtp-Source: ABdhPJwF+hq/F5xIJJxUT8e7AaEYuwarGmJX3PbacUMavL4+YGeD/CMRTJSEUe0cPdJ5oT0ne+VU9w==
+X-Received: by 2002:a1c:f007:: with SMTP id a7mr38215884wmb.103.1593807575224; 
+ Fri, 03 Jul 2020 13:19:35 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.36
+ by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 13:19:37 -0700 (PDT)
+ Fri, 03 Jul 2020 13:19:34 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 17/18] hw/sparc64/sun4u: Mark devices with no migratable fields
-Date: Fri,  3 Jul 2020 22:19:10 +0200
-Message-Id: <20200703201911.26573-18-f4bug@amsat.org>
+Subject: [PATCH 15/18] hw/misc/unimp: Mark the device with no migratable fields
+Date: Fri,  3 Jul 2020 22:19:08 +0200
+Message-Id: <20200703201911.26573-16-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200703201911.26573-1-f4bug@amsat.org>
 References: <20200703201911.26573-1-f4bug@amsat.org>
@@ -79,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -119,54 +118,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These devices don't have fields to migrate. Be explicit
+This device doesn't have fields to migrate. Be explicit
 by using vmstate_qdev_no_state_to_migrate.
-
-Add a more descriptive comment to keep a clear separation
-between static property vs runtime changeable.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sparc64/sun4u.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/misc/unimp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 9c8655cffc..2653893625 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -82,12 +82,15 @@ struct hwdef {
- typedef struct EbusState {
-     /*< private >*/
-     PCIDevice parent_obj;
-+    /*< public >*/
+diff --git a/hw/misc/unimp.c b/hw/misc/unimp.c
+index bc4084d344..8a0db25a77 100644
+--- a/hw/misc/unimp.c
++++ b/hw/misc/unimp.c
+@@ -79,6 +79,7 @@ static void unimp_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
-     ISABus *isa_bus;
-     qemu_irq isa_bus_irqs[ISA_NUM_IRQS];
--    uint64_t console_serial_base;
-     MemoryRegion bar0;
-     MemoryRegion bar1;
-+
-+    /* Properties */
-+    uint64_t console_serial_base;
- } EbusState;
- 
- #define TYPE_EBUS "ebus"
-@@ -384,6 +387,7 @@ static void ebus_class_init(ObjectClass *klass, void *data)
-     k->device_id = PCI_DEVICE_ID_SUN_EBUS;
-     k->revision = 0x01;
-     k->class_id = PCI_CLASS_BRIDGE_OTHER;
+     dc->realize = unimp_realize;
 +    dc->vmsd = vmstate_qdev_no_state_to_migrate;
-     device_class_set_props(dc, ebus_properties);
+     device_class_set_props(dc, unimp_properties);
  }
  
-@@ -476,6 +480,7 @@ static void prom_class_init(ObjectClass *klass, void *data)
- 
-     device_class_set_props(dc, prom_properties);
-     dc->realize = prom_realize;
-+    dc->vmsd = vmstate_qdev_no_state_to_migrate;
- }
- 
- static const TypeInfo prom_info = {
 -- 
 2.21.3
 
