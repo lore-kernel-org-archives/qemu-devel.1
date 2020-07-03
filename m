@@ -2,43 +2,46 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D023C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2134DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:36:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D62FC20772
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:36:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D62FC20772
+	by mail.kernel.org (Postfix) with ESMTPS id EBEAF20772
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:36:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBEAF20772
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrFJ2-0008GN-2i
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:36:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54448)
+	id 1jrFJE-00005R-69
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:36:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFHn-0006QE-IO; Fri, 03 Jul 2020 02:34:59 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:52970)
+ id 1jrFHp-0006Rm-7h; Fri, 03 Jul 2020 02:35:01 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:52988)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFHl-00034E-Ge; Fri, 03 Jul 2020 02:34:59 -0400
+ id 1jrFHl-00034T-TE; Fri, 03 Jul 2020 02:35:00 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 7A47BBF628;
- Fri,  3 Jul 2020 06:34:54 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id DD85DBF803;
+ Fri,  3 Jul 2020 06:34:55 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 00/18] hw/block/nvme: bump to v1.3
-Date: Fri,  3 Jul 2020 08:34:02 +0200
-Message-Id: <20200703063420.2241014-1-its@irrelevant.dk>
+Subject: [PATCH v2 02/18] hw/block/nvme: additional tracing
+Date: Fri,  3 Jul 2020 08:34:04 +0200
+Message-Id: <20200703063420.2241014-3-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200703063420.2241014-1-its@irrelevant.dk>
+References: <20200703063420.2241014-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
@@ -62,7 +65,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
  Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
  Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
  Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
@@ -74,54 +77,162 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-This adds mandatory features of NVM Express v1.3 to the emulated NVMe
-device.
+Add various additional tracing and streamline nvme_identify_ns and
+nvme_identify_nslist (they do not need to repeat the command, it is
+already in the trace name).
 
-v2:
-  * hw/block/nvme: bump spec data structures to v1.3
-    - Shorten some constants. (Dmitry)
-  * hw/block/nvme: add temperature threshold feature
-    - Remove unused temp_thresh member. (Dmitry)
-  * hw/block/nvme: add support for the get log page command
-    - Change the temperature field in the NvmeSmartLog struct to be an
-      uint16_t and handle wierd alignment by adding QEMU_PACKED to the
-      struct. (Dmitry)
-  * hw/block/nvme: add remaining mandatory controller parameters
-    - Fix spelling. (Dmitry)
-  * hw/block/nvme: support the get/set features select and save fields
-    - Fix bad logic causing temperature thresholds to always report
-      defaults. (Dmitry)
-  * hw/block/nvme: reject invalid nsid values in active namespace id list
-    - Added patch; reject the 0xfffffffe and 0xffffffff nsid values.
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+---
+ hw/block/nvme.c       | 19 +++++++++++++++++++
+ hw/block/nvme.h       | 14 ++++++++++++++
+ hw/block/trace-events | 13 +++++++++++--
+ 3 files changed, 44 insertions(+), 2 deletions(-)
 
-
-Klaus Jensen (18):
-  hw/block/nvme: bump spec data structures to v1.3
-  hw/block/nvme: additional tracing
-  hw/block/nvme: add support for the abort command
-  hw/block/nvme: add temperature threshold feature
-  hw/block/nvme: mark fw slot 1 as read-only
-  hw/block/nvme: add support for the get log page command
-  hw/block/nvme: add support for the asynchronous event request command
-  hw/block/nvme: move NvmeFeatureVal into hw/block/nvme.h
-  hw/block/nvme: flush write cache when disabled
-  hw/block/nvme: fix missing endian conversion
-  hw/block/nvme: add remaining mandatory controller parameters
-  hw/block/nvme: support the get/set features select and save fields
-  hw/block/nvme: make sure ncqr and nsqr is valid
-  hw/block/nvme: support identify namespace descriptor list
-  hw/block/nvme: reject invalid nsid values in active namespace id list
-  hw/block/nvme: enforce valid queue creation sequence
-  hw/block/nvme: provide the mandatory subnqn field
-  hw/block/nvme: bump supported version to v1.3
-
- block/nvme.c          |  18 +-
- hw/block/nvme.c       | 611 ++++++++++++++++++++++++++++++++++++++++--
- hw/block/nvme.h       |  62 ++++-
- hw/block/trace-events |  27 +-
- include/block/nvme.h  | 222 ++++++++++++---
- 5 files changed, 874 insertions(+), 66 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 71b388aa0e20..f5d9148f0936 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -331,6 +331,8 @@ static void nvme_post_cqes(void *opaque)
+ static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
+ {
+     assert(cq->cqid == req->sq->cqid);
++    trace_pci_nvme_enqueue_req_completion(nvme_cid(req), cq->cqid,
++                                          req->status);
+     QTAILQ_REMOVE(&req->sq->out_req_list, req, entry);
+     QTAILQ_INSERT_TAIL(&cq->req_list, req, entry);
+     timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+@@ -343,6 +345,8 @@ static void nvme_rw_cb(void *opaque, int ret)
+     NvmeCtrl *n = sq->ctrl;
+     NvmeCQueue *cq = n->cq[sq->cqid];
+ 
++    trace_pci_nvme_rw_cb(nvme_cid(req));
++
+     if (!ret) {
+         block_acct_done(blk_get_stats(n->conf.blk), &req->acct);
+         req->status = NVME_SUCCESS;
+@@ -378,6 +382,8 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     uint64_t offset = slba << data_shift;
+     uint32_t count = nlb << data_shift;
+ 
++    trace_pci_nvme_write_zeroes(nvme_cid(req), slba, nlb);
++
+     if (unlikely(slba + nlb > ns->id_ns.nsze)) {
+         trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+         return NVME_LBA_RANGE | NVME_DNR;
+@@ -445,6 +451,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+     NvmeNamespace *ns;
+     uint32_t nsid = le32_to_cpu(cmd->nsid);
+ 
++    trace_pci_nvme_io_cmd(nvme_cid(req), nsid, nvme_sqid(req), cmd->opcode);
++
+     if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+         trace_pci_nvme_err_invalid_ns(nsid, n->num_namespaces);
+         return NVME_INVALID_NSID | NVME_DNR;
+@@ -876,6 +884,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+ 
+ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+ {
++    trace_pci_nvme_admin_cmd(nvme_cid(req), nvme_sqid(req), cmd->opcode);
++
+     switch (cmd->opcode) {
+     case NVME_ADM_CMD_DELETE_SQ:
+         return nvme_del_sq(n, cmd);
+@@ -1204,6 +1214,8 @@ static uint64_t nvme_mmio_read(void *opaque, hwaddr addr, unsigned size)
+     uint8_t *ptr = (uint8_t *)&n->bar;
+     uint64_t val = 0;
+ 
++    trace_pci_nvme_mmio_read(addr);
++
+     if (unlikely(addr & (sizeof(uint32_t) - 1))) {
+         NVME_GUEST_ERR(pci_nvme_ub_mmiord_misaligned32,
+                        "MMIO read not 32-bit aligned,"
+@@ -1273,6 +1285,8 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+             return;
+         }
+ 
++        trace_pci_nvme_mmio_doorbell_cq(cq->cqid, new_head);
++
+         start_sqs = nvme_cq_full(cq) ? 1 : 0;
+         cq->head = new_head;
+         if (start_sqs) {
+@@ -1311,6 +1325,8 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+             return;
+         }
+ 
++        trace_pci_nvme_mmio_doorbell_sq(sq->sqid, new_tail);
++
+         sq->tail = new_tail;
+         timer_mod(sq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+     }
+@@ -1320,6 +1336,9 @@ static void nvme_mmio_write(void *opaque, hwaddr addr, uint64_t data,
+     unsigned size)
+ {
+     NvmeCtrl *n = (NvmeCtrl *)opaque;
++
++    trace_pci_nvme_mmio_write(addr, data);
++
+     if (addr < sizeof(n->bar)) {
+         nvme_write_bar(n, addr, data, size);
+     } else if (addr >= 0x1000) {
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 1d30c0bca283..1bf5c80ed843 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -115,4 +115,18 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+     return n->ns_size >> nvme_ns_lbads(ns);
+ }
+ 
++static inline uint16_t nvme_cid(NvmeRequest *req)
++{
++    if (req) {
++        return le16_to_cpu(req->cqe.cid);
++    }
++
++    return 0xffff;
++}
++
++static inline uint16_t nvme_sqid(NvmeRequest *req)
++{
++    return le16_to_cpu(req->sq->sqid);
++}
++
+ #endif /* HW_NVME_H */
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 958fcc5508d1..c40c0d2e4b28 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -33,19 +33,28 @@ pci_nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
+ pci_nvme_irq_pin(void) "pulsing IRQ pin"
+ pci_nvme_irq_masked(void) "IRQ is masked"
+ pci_nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64""
++pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
++pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8""
+ pci_nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
++pci_nvme_rw_cb(uint16_t cid) "cid %"PRIu16""
++pci_nvme_write_zeroes(uint16_t cid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" slba %"PRIu64" nlb %"PRIu32""
+ pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
+ pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
+ pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
+ pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
+ pci_nvme_identify_ctrl(void) "identify controller"
+-pci_nvme_identify_ns(uint16_t ns) "identify namespace, nsid=%"PRIu16""
+-pci_nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=%"PRIu16""
++pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
++pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
+ pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
+ pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
+ pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
+ pci_nvme_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
+ pci_nvme_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
++pci_nvme_enqueue_req_completion(uint16_t cid, uint16_t cqid, uint16_t status) "cid %"PRIu16" cqid %"PRIu16" status 0x%"PRIx16""
++pci_nvme_mmio_read(uint64_t addr) "addr 0x%"PRIx64""
++pci_nvme_mmio_write(uint64_t addr, uint64_t data) "addr 0x%"PRIx64" data 0x%"PRIx64""
++pci_nvme_mmio_doorbell_cq(uint16_t cqid, uint16_t new_head) "cqid %"PRIu16" new_head %"PRIu16""
++pci_nvme_mmio_doorbell_sq(uint16_t sqid, uint16_t new_tail) "cqid %"PRIu16" new_tail %"PRIu16""
+ pci_nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+ pci_nvme_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+ pci_nvme_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
 -- 
 2.27.0
 
