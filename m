@@ -2,65 +2,65 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79558C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE993C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:35:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FD54206A1
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:35:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AFF0206E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:35:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LEwRluyY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD54206A1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dT6oHVtR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFF0206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrI64-00062j-HM
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:35:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36038)
+	id 1jrI6I-0006V5-Pu
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:35:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtY-0002rs-5l
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43593
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtV-0002p3-Cl
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51815
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtU-0000ye-2k
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:07 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtT-0000yD-WC
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593768123;
+ s=mimecast20190719; t=1593768120;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tFtSJJBUvX6PJuZeC0cgXFvmmdXZ2AJHL25InONN2Wk=;
- b=LEwRluyYYzdvLbJr+n8b8X9dc7UK/Hm+55DyDuPDeq7GFxL/V9XIt/20qHnHQXEgFCBCu4
- hh92dxOy7un+OZCxhDhVZvyqKxzud6MtyK/C4trvOoketdxZnepzITXrb3FZuulnjmTB6y
- +Xw1YX+LBsg7cJIWz/8tcL5Lfn+iuX8=
+ bh=AtvVYwlc1+ydxWQZdKR7ou+wPvfLfU9yuoxoUybNOEo=;
+ b=dT6oHVtRx9wWNZleCPqjSGawhuUTrbSJpHmlRBr9VMOTMhmlnxUESZlTgwMkGdhcjZPs7O
+ NUic3wh8s0nOjJ52zmSQFfw6cp7BVj8/L1UTqcyLnj2A8uY3Esp+9R5vTzgYhEq6GqiEhX
+ dxUnfqewLI5OmnwdUUtdXhyqNBd8AjI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-nkVBivhaO_ubOJkzxfvWiw-1; Fri, 03 Jul 2020 05:22:01 -0400
-X-MC-Unique: nkVBivhaO_ubOJkzxfvWiw-1
+ us-mta-389-gGWpX8jtOZWUQrEghJhGmQ-1; Fri, 03 Jul 2020 05:21:56 -0400
+X-MC-Unique: gGWpX8jtOZWUQrEghJhGmQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F0F0800FEA;
- Fri,  3 Jul 2020 09:22:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29540107ACF3;
+ Fri,  3 Jul 2020 09:21:55 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-90.ams2.redhat.com [10.36.114.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2CE227AC63;
- Fri,  3 Jul 2020 09:21:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 350AD7AC63;
+ Fri,  3 Jul 2020 09:21:54 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 7/7] iotests: Fix 051 output after qdev_init_nofail() removal
-Date: Fri,  3 Jul 2020 11:21:43 +0200
-Message-Id: <20200703092143.165594-8-kwolf@redhat.com>
+Subject: [PULL 3/7] qemu-storage-daemon: add missing cleanup calls
+Date: Fri,  3 Jul 2020 11:21:39 +0200
+Message-Id: <20200703092143.165594-4-kwolf@redhat.com>
 In-Reply-To: <20200703092143.165594-1-kwolf@redhat.com>
 References: <20200703092143.165594-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -69,11 +69,11 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -99,49 +99,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Commit 96927c744 replaced qdev_init_nofail() call by
-isa_realize_and_unref() which has a different error
-message. Update the test output accordingly.
+Several components used by qemu-storage-daemon have cleanup functions
+that aren't called. Keep the "valgrind --leak-check=full" as clean as
+possible by invoking the necessary cleanup functions.
 
-Gitlab CI error after merging b77b5b3dc7:
-https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4375
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200616154949.6586-1-philmd@redhat.com>
-Message-Id: <20200624140446.15380-2-alex.bennee@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200619101132.2401756-3-stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/051.pc.out | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ qemu-storage-daemon.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 0ea80d35f0..da8ad87187 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -142,7 +142,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
+diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+index a01cbd6371..7e9b0e0d3f 100644
+--- a/qemu-storage-daemon.c
++++ b/qemu-storage-daemon.c
+@@ -335,5 +335,9 @@ int main(int argc, char *argv[])
+         main_loop_wait(false);
+     }
  
- Testing: -drive if=ide
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: Initialization of device ide-hd failed: Device needs media, but drive is empty
-+(qemu) QEMU_PROG: Device needs media, but drive is empty
- 
- Testing: -drive if=virtio
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -214,7 +214,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: Initialization of device ide-hd failed: Block node is read-only
-+(qemu) QEMU_PROG: Block node is read-only
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
++    monitor_cleanup();
++    qemu_chr_cleanup();
++    user_creatable_cleanup();
++
+     return EXIT_SUCCESS;
+ }
 -- 
 2.25.4
 
