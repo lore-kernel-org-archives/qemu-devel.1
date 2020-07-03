@@ -4,82 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E434C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B92C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3878620899
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:26:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CFFE21531
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:27:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UkFrkPAd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3878620899
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6To8t4A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CFFE21531
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrNa8-000577-Hx
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49224)
+	id 1jrNb3-00062X-9X
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:27:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrNVU-0000Px-Og
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:21:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26990
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrNWI-0001Ra-GU
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:22:30 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53144
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrNVS-0004u5-UN
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:21:40 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrNWG-0004zf-OO
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:22:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593789698;
+ s=mimecast20190719; t=1593789747;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=TXGOyAfRTueLFIWhliljfrW+qNfpuAQPHew1HnIPaNk=;
- b=UkFrkPAdmde3RtTa37he7Rh8LXDy2ia845Yd693iSjRLunPOvZcGJV3Qoj6HF9ThKYlbuC
- fOe0CeiCJND7TUy7i1JVOA+xDqUI6lACphuWlzh73r9Tm3/LnhH9o8sMJWyXeLHyl4Ok9p
- kOkpY++tcsAX+Bnk2K0T9g7oPN2Tc54=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-HRFaJNNzO2Ghx9R26PX7Ow-1; Fri, 03 Jul 2020 11:21:36 -0400
-X-MC-Unique: HRFaJNNzO2Ghx9R26PX7Ow-1
-Received: by mail-wr1-f70.google.com with SMTP id s16so18821977wrv.1
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 08:21:36 -0700 (PDT)
+ bh=K1O8DynqaACZRdDGnKgd4vtpztkAb2AZOI72AmyIAXY=;
+ b=T6To8t4ABvIatBMOrz8jcA3/DdwOLuXSIB3FbPxWFpbStt3xAYFm8J4TdCNKpqVm5Zp2oS
+ LRMRVqnKFiY5tx7qT17yZIqmSOf1FcVyV/RUJop5DjJvWDj5if4n0zAvUVN46tb4m3QHbI
+ wsEoNfH+6lsRdoyTgCWw28BxIZxan2I=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-Fuc1eHSDNV-iqpXjBN_IOw-1; Fri, 03 Jul 2020 11:22:26 -0400
+X-MC-Unique: Fuc1eHSDNV-iqpXjBN_IOw-1
+Received: by mail-wr1-f72.google.com with SMTP id i10so31880031wrn.21
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 08:22:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=TXGOyAfRTueLFIWhliljfrW+qNfpuAQPHew1HnIPaNk=;
- b=o73cVucJJoZK+dChqPf8hiT21dvTpfsUymnikb0Gn9oe7OL1FzQpySQ0JjleHG7cfI
- kiyNtdQI3HvBd6uI2A26MGdV+jKpMT11IZxq/L7knzlLEB1Wyo1SyBeMrOxOpBgHv1It
- m3RyKGGP+slx8KTm/S7KZNg0boLpy1FmmsYQvHW3VcKSu5Z8RbpE3FeKgGQbwTSCUwgY
- O1gsnc/7pePBrG5pNt0+r82ko0X7pFBCzugZKmYh6RIHnU4u2JTXxTJCktjhGCsYKvxv
- X3NDT9NppXEhQlryUcUE0ra76vp9lNMdSMFvsfigfZbYu3nJbrMu7ogNE7G14Kjcj3fj
- BdAQ==
-X-Gm-Message-State: AOAM530O4/qjfvdHd1jODShL4XLwivNARhV8HkfzMWcWxGycchu4mD11
- xQgUCg2rja9D8YlIwUe6163J9Xed6yBGCOjkFnpsbh5zPJWVIJzd7ey3ZiPl7BfRuYV2jPazzGe
- bqF7mFGxEb4PK0SE=
-X-Received: by 2002:a1c:1dc7:: with SMTP id d190mr36204811wmd.36.1593789695600; 
- Fri, 03 Jul 2020 08:21:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxFdDJ3SlmdZXCYJZQ98o2MkMtKS8AShRntjj2Lc1HWtgAZFM1sq2gkyQyYaLFVu7ecUfNKZg==
-X-Received: by 2002:a1c:1dc7:: with SMTP id d190mr36204795wmd.36.1593789695352; 
- Fri, 03 Jul 2020 08:21:35 -0700 (PDT)
+ bh=K1O8DynqaACZRdDGnKgd4vtpztkAb2AZOI72AmyIAXY=;
+ b=CDl2OHEpQiAevdvY7vJ1CW0BbJlbK01pWyr1Oal7lRLMLUSk62zS9YLFdooOduJZTN
+ F30BNDWycQbbq5QA5esAnkUp+CVkN0UKR/1SqCKboA2XKlP4n0E8Ux6tOhnoioXw9UYM
+ v4zko2GGTZt538podES40ZzcTrz5hbft6H5MWO0dFTCnN7y+y5U0bEzKyKdeORchGhbx
+ CowxP5V2MraYCUxTuAsrErdXkCqpIiCH2Hmpcn4V0+T1nSbnbZkEio5xx8XULkshW4+Z
+ jLqnKn607L6BLF+u7xvznec+0gAMoJJ6+l9KMvy2CihlulIkdR+hpWdij9oulrVz1isz
+ f+ug==
+X-Gm-Message-State: AOAM532mlbGekpHheGEiObhIiujh+lPefcoHdYDRnweY9B9XVgBWBAKJ
+ g5fqrSrn4ZrattphpFu4XzfCktu454ve6GBajvGBVHy0eOk5f54T4tI6HwJC8Ai0kcDP6aqUjM3
+ 8r8lCX4x/32bws7w=
+X-Received: by 2002:adf:ee0b:: with SMTP id y11mr14476664wrn.360.1593789745368; 
+ Fri, 03 Jul 2020 08:22:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwHz2YijGY2rgQK2WSYxgY2xMj45l3gHBIcgIo96Wo1j0yDj70BooWGki1fG6BF3FOjSD4sbg==
+X-Received: by 2002:adf:ee0b:: with SMTP id y11mr14476642wrn.360.1593789745100; 
+ Fri, 03 Jul 2020 08:22:25 -0700 (PDT)
 Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id t16sm15509973wru.9.2020.07.03.08.21.34
+ by smtp.gmail.com with ESMTPSA id w128sm14805833wmb.19.2020.07.03.08.22.24
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jul 2020 08:21:34 -0700 (PDT)
-Subject: Re: [PATCH v3 4/9] osdep.h: Always include <sys/signal.h> if it exists
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
- qemu-devel@nongnu.org
+ Fri, 03 Jul 2020 08:22:24 -0700 (PDT)
+Subject: Re: [PATCH v3 6/9] bswap.h: Include <endian.h> on Haiku for bswap
+ operations
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200703145614.16684-1-peter.maydell@linaro.org>
- <20200703145614.16684-5-peter.maydell@linaro.org>
- <2b801122-1ee2-d62d-a5dc-30f7c770b54d@redhat.com>
+ <20200703145614.16684-7-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <2f546897-94d8-253b-f3e0-b4d228efd74c@redhat.com>
-Date: Fri, 3 Jul 2020 17:21:33 +0200
+Message-ID: <052f08f6-8028-b634-097a-66c1fa62a9a0@redhat.com>
+Date: Fri, 3 Jul 2020 17:22:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <2b801122-1ee2-d62d-a5dc-30f7c770b54d@redhat.com>
+In-Reply-To: <20200703145614.16684-7-peter.maydell@linaro.org>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -117,9 +116,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -145,62 +144,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/20 5:15 PM, Thomas Huth wrote:
-> On 03/07/2020 16.56, Peter Maydell wrote:
->> From: David CARLIER <devnexen@gmail.com>
->>
->> Regularize our handling of <sys/signal.h>: currently we include it in
->> osdep.h, but only for OpenBSD, and we include it without an ifdef
->> guard in a couple of C files.  This causes problems for Haiku, which
->> doesn't have that header.
->>
->> Instead, check in configure whether sys/signal.h exists, and if it
->> does then always include it from osdep.h.
->>
->> Signed-off-by: David Carlier <devnexen@gmail.com>
->> [PMM: Expanded commit message]
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  configure                   | 8 ++++++++
->>  include/qemu/osdep.h        | 2 +-
->>  hw/xen/xen-legacy-backend.c | 1 -
->>  util/oslib-posix.c          | 1 -
->>  4 files changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/configure b/configure
->> index ddc53d873ef..d131f760d8f 100755
->> --- a/configure
->> +++ b/configure
->> @@ -3212,6 +3212,11 @@ if ! check_include "ifaddrs.h" ; then
->>    have_ifaddrs_h=no
->>  fi
->>  
->> +have_sys_signal_h=no
->> +if check_include "sys/signal.h" ; then
->> +  have_sys_signal_h=yes
->> +fi
->> +
->>  ##########################################
->>  # VTE probe
->>  
->> @@ -7398,6 +7403,9 @@ fi
->>  if test "$have_broken_size_max" = "yes" ; then
->>      echo "HAVE_BROKEN_SIZE_MAX=y" >> $config_host_mak
->>  fi
->> +if test "$have_sys_signal_h" = "yes" ; then
->> +    echo "CONFIG_SYS_SIGNAL=y" >> $config_host_mak
->> +fi
+On 7/3/20 4:56 PM, Peter Maydell wrote:
+> From: David CARLIER <devnexen@gmail.com>
 > 
-> I'd maybe rather name it HAVE_SYS_SIGNAL_H, but I guess that's just a
-> matter of taste.
+> Haiku puts the bswap* functions in <endian.h>; pull in that
+> include file on that platform.
+> 
+> Signed-off-by: David Carlier <devnexen@gmail.com>
+> [PMM: Expanded commit message]
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/qemu/bswap.h | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+> index 2a9f3fe783e..1d3e4c24e41 100644
+> --- a/include/qemu/bswap.h
+> +++ b/include/qemu/bswap.h
+> @@ -8,6 +8,8 @@
+>  # include <machine/bswap.h>
+>  #elif defined(__FreeBSD__)
+>  # include <sys/endian.h>
+> +#elif defined(__HAIKU__)
+> +# include <endian.h>
+>  #elif defined(CONFIG_BYTESWAP_H)
+>  # include <byteswap.h>
+>  
+> 
 
-Agreed, if possible.
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> 
 
 
