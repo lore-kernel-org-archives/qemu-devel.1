@@ -2,82 +2,83 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC53C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE5BC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:55:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 882F02186A
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9DE32186A
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:55:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OXs3OmNl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 882F02186A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QqMnKaq2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9DE32186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOy0-0006B9-NN
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:55:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49844)
+	id 1jrOy2-0006Aq-5X
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:55:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrOx1-0004Re-KP
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:54:11 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:36513)
+ id 1jrOx2-0004Rk-57
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:54:12 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:46057)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrOwz-0005di-GW
+ id 1jrOx0-0005dm-Ca
  for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:54:11 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id 17so34697821wmo.1
+Received: by mail-wr1-x432.google.com with SMTP id s10so33382521wrw.12
  for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 09:54:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=ZW0SIqdeT0i01plHkzXlYZ7aOUhmN4FeDWx37zPpsMw=;
- b=OXs3OmNlxxMoOSD7B5DxDu/2f553IwGn4jA8T9gyPDnQPWi161xXFKKXUKwBDxnzjb
- ctgII9sJIKRkRE02NpqPSZzN0BMPk9BX3g8ElWtpA2K3iJfxYqOVBb4dyaJ0wInDK0Su
- Ybxv7aHKZHbhaVGKHpxvLrv52Zxvd7vYoXZSdNgc2vtPHzMPj3PwfVDVeFjYKRUu29X3
- WK+yZ1q5hANI2+7VuGLv+ScouM3GkS5pzxOGpNWfYdLAOn0pudSOnNJ/iHN4OuegFEOU
- w7LMVSnPuidIaSVbXss3NTzw1oeqmrUsbLNHn+ZggUmmoTHVe/Xopch332oPXuKt60m4
- C5aw==
+ bh=I7r9/QjL8RuKBxpXMjuZlnSwNbq823MwcTI3Yaf9uyQ=;
+ b=QqMnKaq2Lr9LgyPgpIG3mRvCf2u2bWUfVV8lhIgkYVYjD8y+nsM/lZzrdcp7ijiAvh
+ im/ExmavNO6GM10W5yzPttOQHQkE81eD3xSoH+Y4lds0HSlx9sqaS8i4eE3FD8YKYZs3
+ tR2kWzDvODxosMFVZ1qZQB7QXjFX2lw9ZAZvwf5B7nOojT6gMQaKUlJv6Giwx+45TZ15
+ djsSZcuY7wv0IYUfTKOeOlTX2LAWR55QcsLLM2ZRmITz8XgE5FrS66q1wU052/IlOf/7
+ JmXjUuLnklCOrC2IhN3JGxktLqQtAApOcOAjajyNTRnmUunrF2T+zMGFSuAOcdLChBAU
+ 7nJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ZW0SIqdeT0i01plHkzXlYZ7aOUhmN4FeDWx37zPpsMw=;
- b=jEhPMEs4D/4Oifa5POU5YHaml7Z9N0P25FyYyyCXPXQ3l6XnRL+TbNW54iZGGtH/NQ
- ymQMgsq009CDeTlnT3CoL8j8EINe52Mm4KvloVD0bdkekAznyrzFji4vkzCnKj4A8g35
- 6p8XgGYuPF1l9TrPaVoiJ/snkEACKfPGLNX3sLLEopwdexIUJhqLvn6Oh1E5sRe+tNMZ
- uML4gQd2Q1IwhgShL6XJtoMPSfTDvAaD17tQXmQLAEeZI1K8aOBitAm4pOrZrFcMq3I4
- cNZjSoY4X+jF67QBTpxqQIM1mWeUPWilb2Lx0VxDf3t6eZQ/uqEWnoPC4zVQE1opesz5
- Rjiw==
-X-Gm-Message-State: AOAM531z3m83VBF2OCjE1ZRgXFbUGmsth9KhV3s0XMrEUcjMXuk6TDNN
- 26TK31dkIIwMEIqs2ITWOCUkogHgRL00hg==
-X-Google-Smtp-Source: ABdhPJzOABMOVcacSgK36hobLMK7YS4FwxJoKOmqEmSX7KBMeR4z8JOAykkkumTFQ95HVZhXLBPI7A==
-X-Received: by 2002:a1c:4c16:: with SMTP id z22mr37282672wmf.103.1593795247175; 
- Fri, 03 Jul 2020 09:54:07 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=I7r9/QjL8RuKBxpXMjuZlnSwNbq823MwcTI3Yaf9uyQ=;
+ b=eSVFdjNrRntoiNIuzwOKwLjGmXXIboz8DjERkhxLWCRJecgJIbtKATxlVg79ejcsdY
+ YPNtJ1it11J35NNlaWHSv4Z198PLHTjiyWkZbM74i0xdHOyvKAhhALTyfK724RG36pNw
+ vZHg7ooZTUvPL5j64zhg9/ijzA4Uhooomhq3JWV3DXwsVheMPv5JyQOvsUn4JfmSyerZ
+ qCby22CFu5UNGbbIAMdCuuWClnWlUBtu9vHk4wIu/6QSM6cB4sBr8HWTbSvyPpiZltKh
+ 2yByHKIuojHk7EqzcdTfhKdhK5sydW6lDFmLXL6eW/D6LEfCH1TA8xaTsnQZEti2WKP2
+ jVOw==
+X-Gm-Message-State: AOAM531v9oUAhLRep+hGsIQWeHeHrxUYjxo2v4qwcfEYL0IIh/NGjca/
+ Kda0i1MJ1REAbm9rCwloXE4Rkb6sMkalzQ==
+X-Google-Smtp-Source: ABdhPJzceQIGujK+Bymfs+Rd0kjP+elfIua6Aard7si9DwwOFxn6c1Qmn9KRZ8PGRw8dAq80WFMsDA==
+X-Received: by 2002:adf:a3d0:: with SMTP id m16mr1823354wrb.232.1593795248424; 
+ Fri, 03 Jul 2020 09:54:08 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm5574224wrx.69.2020.07.03.09.54.06
+ by smtp.gmail.com with ESMTPSA id j15sm5574224wrx.69.2020.07.03.09.54.07
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 09:54:06 -0700 (PDT)
+ Fri, 03 Jul 2020 09:54:07 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/34] target-arm queue
-Date: Fri,  3 Jul 2020 17:53:31 +0100
-Message-Id: <20200703165405.17672-1-peter.maydell@linaro.org>
+Subject: [PULL 01/34] Add a phy-num property to the i.MX FEC emulator
+Date: Fri,  3 Jul 2020 17:53:32 +0100
+Message-Id: <20200703165405.17672-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200703165405.17672-1-peter.maydell@linaro.org>
+References: <20200703165405.17672-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,126 +104,123 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I might squeeze in another pullreq before softfreeze, but the
-queue was already big enough that I wanted to send this lot out now.
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
 
--- PMM
+We need a solution to use an Ethernet PHY that is not the first device
+on the MDIO bus (device 0 on MDIO bus).
 
-The following changes since commit 4abf70a661a5df3886ac9d7c19c3617fa92b922a:
+As an example with the i.MX6UL the NXP SOC has 2 Ethernet devices but
+only one MDIO bus on which the 2 related PHY are connected but at unique
+addresses.
 
-  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-06-24' into staging (2020-07-03 15:34:45 +0100)
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+Message-id: a1a5c0e139d1c763194b8020573dcb6025daeefa.1593296112.git.jcd@tribudubois.net
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/net/imx_fec.h |  1 +
+ hw/net/imx_fec.c         | 24 +++++++++++++++++-------
+ hw/net/trace-events      |  4 ++--
+ 3 files changed, 20 insertions(+), 9 deletions(-)
 
-are available in the Git repository at:
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index 7b3faa40194..9f03034b893 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -268,6 +268,7 @@ typedef struct IMXFECState {
+     uint32_t phy_advertise;
+     uint32_t phy_int;
+     uint32_t phy_int_mask;
++    uint32_t phy_num;
+ 
+     bool is_fec;
+ 
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index eefedc252de..2c148040414 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -280,12 +280,16 @@ static void imx_phy_reset(IMXFECState *s)
+ static uint32_t imx_phy_read(IMXFECState *s, int reg)
+ {
+     uint32_t val;
++    uint32_t phy = reg / 32;
+ 
+-    if (reg > 31) {
+-        /* we only advertise one phy */
++    if (phy != s->phy_num) {
++        qemu_log_mask(LOG_GUEST_ERROR, "[%s.phy]%s: Bad phy num %u\n",
++                      TYPE_IMX_FEC, __func__, phy);
+         return 0;
+     }
+ 
++    reg %= 32;
++
+     switch (reg) {
+     case 0:     /* Basic Control */
+         val = s->phy_control;
+@@ -331,20 +335,25 @@ static uint32_t imx_phy_read(IMXFECState *s, int reg)
+         break;
+     }
+ 
+-    trace_imx_phy_read(val, reg);
++    trace_imx_phy_read(val, phy, reg);
+ 
+     return val;
+ }
+ 
+ static void imx_phy_write(IMXFECState *s, int reg, uint32_t val)
+ {
+-    trace_imx_phy_write(val, reg);
++    uint32_t phy = reg / 32;
+ 
+-    if (reg > 31) {
+-        /* we only advertise one phy */
++    if (phy != s->phy_num) {
++        qemu_log_mask(LOG_GUEST_ERROR, "[%s.phy]%s: Bad phy num %u\n",
++                      TYPE_IMX_FEC, __func__, phy);
+         return;
+     }
+ 
++    reg %= 32;
++
++    trace_imx_phy_write(val, phy, reg);
++
+     switch (reg) {
+     case 0:     /* Basic Control */
+         if (val & 0x8000) {
+@@ -926,7 +935,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+                                                        extract32(value,
+                                                                  18, 10)));
+         } else {
+-            /* This a write operation */
++            /* This is a write operation */
+             imx_phy_write(s, extract32(value, 18, 10), extract32(value, 0, 16));
+         }
+         /* raise the interrupt as the PHY operation is done */
+@@ -1315,6 +1324,7 @@ static void imx_eth_realize(DeviceState *dev, Error **errp)
+ static Property imx_eth_properties[] = {
+     DEFINE_NIC_PROPERTIES(IMXFECState, conf),
+     DEFINE_PROP_UINT32("tx-ring-num", IMXFECState, tx_ring_num, 1),
++    DEFINE_PROP_UINT32("phy-num", IMXFECState, phy_num, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index e6875c4c0f6..5db45456d92 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -413,8 +413,8 @@ i82596_set_multicast(uint16_t count) "Added %d multicast entries"
+ i82596_channel_attention(void *s) "%p: Received CHANNEL ATTENTION"
+ 
+ # imx_fec.c
+-imx_phy_read(uint32_t val, int reg) "0x%04"PRIx32" <= reg[%d]"
+-imx_phy_write(uint32_t val, int reg) "0x%04"PRIx32" => reg[%d]"
++imx_phy_read(uint32_t val, int phy, int reg) "0x%04"PRIx32" <= phy[%d].reg[%d]"
++imx_phy_write(uint32_t val, int phy, int reg) "0x%04"PRIx32" => phy[%d].reg[%d]"
+ imx_phy_update_link(const char *s) "%s"
+ imx_phy_reset(void) ""
+ imx_fec_read_bd(uint64_t addr, int flags, int len, int data) "tx_bd 0x%"PRIx64" flags 0x%04x len %d data 0x%08x"
+-- 
+2.20.1
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200703
-
-for you to fetch changes up to 0f10bf84a9d489259a5b11c6aa1b05c1175b76ea:
-
-  Deprecate TileGX port (2020-07-03 16:59:46 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * i.MX6UL EVK board: put PHYs in the correct places
- * hw/arm/virt: Let the virtio-iommu bypass MSIs
- * target/arm: kvm: Handle DABT with no valid ISS
- * hw/arm/virt-acpi-build: Only expose flash on older machine types
- * target/arm: Fix temp double-free in sve ldr/str
- * hw/display/bcm2835_fb.c: Initialize all fields of struct
- * hw/arm/spitz: Code cleanup to fix Coverity-detected memory leak
- * Deprecate TileGX port
-
-----------------------------------------------------------------
-Andrew Jones (4):
-      tests/acpi: remove stale allowed tables
-      tests/acpi: virt: allow DSDT acpi table changes
-      hw/arm/virt-acpi-build: Only expose flash on older machine types
-      tests/acpi: virt: update golden masters for DSDT
-
-Beata Michalska (2):
-      target/arm: kvm: Handle DABT with no valid ISS
-      target/arm: kvm: Handle misconfigured dabt injection
-
-Eric Auger (5):
-      qdev: Introduce DEFINE_PROP_RESERVED_REGION
-      virtio-iommu: Implement RESV_MEM probe request
-      virtio-iommu: Handle reserved regions in the translation process
-      virtio-iommu-pci: Add array of Interval properties
-      hw/arm/virt: Let the virtio-iommu bypass MSIs
-
-Jean-Christophe Dubois (3):
-      Add a phy-num property to the i.MX FEC emulator
-      Add the ability to select a different PHY for each i.MX6UL FEC interface
-      Select MDIO device 2 and 1 as PHY devices for i.MX6UL EVK board.
-
-Peter Maydell (19):
-      hw/display/bcm2835_fb.c: Initialize all fields of struct
-      hw/arm/spitz: Detabify
-      hw/arm/spitz: Create SpitzMachineClass abstract base class
-      hw/arm/spitz: Keep pointers to MPU and SSI devices in SpitzMachineState
-      hw/arm/spitz: Keep pointers to scp0, scp1 in SpitzMachineState
-      hw/arm/spitz: Implement inbound GPIO lines for bit5 and power signals
-      hw/misc/max111x: provide QOM properties for setting initial values
-      hw/misc/max111x: Don't use vmstate_register()
-      ssi: Add ssi_realize_and_unref()
-      hw/arm/spitz: Use max111x properties to set initial values
-      hw/misc/max111x: Use GPIO lines rather than max111x_set_input()
-      hw/misc/max111x: Create header file for documentation, TYPE_ macros
-      hw/arm/spitz: Encapsulate misc GPIO handling in a device
-      hw/gpio/zaurus.c: Use LOG_GUEST_ERROR for bad guest register accesses
-      hw/arm/spitz: Use LOG_GUEST_ERROR for bad guest register accesses
-      hw/arm/pxa2xx_pic: Use LOG_GUEST_ERROR for bad guest register accesses
-      hw/arm/spitz: Provide usual QOM macros for corgi-ssp and spitz-lcdtg
-      Replace uses of FROM_SSI_SLAVE() macro with QOM casts
-      Deprecate TileGX port
-
-Richard Henderson (1):
-      target/arm: Fix temp double-free in sve ldr/str
-
- docs/system/deprecated.rst                  |  11 +
- include/exec/memory.h                       |   6 +
- include/hw/arm/fsl-imx6ul.h                 |   2 +
- include/hw/arm/pxa.h                        |   1 -
- include/hw/arm/sharpsl.h                    |   3 -
- include/hw/arm/virt.h                       |   8 +
- include/hw/misc/max111x.h                   |  56 +++
- include/hw/net/imx_fec.h                    |   1 +
- include/hw/qdev-properties.h                |   3 +
- include/hw/ssi/ssi.h                        |  31 +-
- include/hw/virtio/virtio-iommu.h            |   2 +
- include/qemu/typedefs.h                     |   1 +
- target/arm/cpu.h                            |   2 +
- target/arm/kvm_arm.h                        |  10 +
- target/arm/translate-a64.h                  |   1 +
- tests/qtest/bios-tables-test-allowed-diff.h |  18 -
- hw/arm/fsl-imx6ul.c                         |  10 +
- hw/arm/mcimx6ul-evk.c                       |   2 +
- hw/arm/pxa2xx_pic.c                         |   9 +-
- hw/arm/spitz.c                              | 507 ++++++++++++++++------------
- hw/arm/virt-acpi-build.c                    |   5 +-
- hw/arm/virt.c                               |  33 ++
- hw/arm/z2.c                                 |  11 +-
- hw/core/qdev-properties.c                   |  89 +++++
- hw/display/ads7846.c                        |   9 +-
- hw/display/bcm2835_fb.c                     |   4 +
- hw/display/ssd0323.c                        |  10 +-
- hw/gpio/zaurus.c                            |  12 +-
- hw/misc/max111x.c                           |  86 +++--
- hw/net/imx_fec.c                            |  24 +-
- hw/sd/ssi-sd.c                              |   4 +-
- hw/ssi/ssi.c                                |   7 +-
- hw/virtio/virtio-iommu-pci.c                |  11 +
- hw/virtio/virtio-iommu.c                    | 114 ++++++-
- target/arm/kvm.c                            |  80 +++++
- target/arm/kvm32.c                          |  34 ++
- target/arm/kvm64.c                          |  49 +++
- target/arm/translate-a64.c                  |   6 +
- target/arm/translate-sve.c                  |   8 +-
- MAINTAINERS                                 |   1 +
- hw/net/trace-events                         |   4 +-
- hw/virtio/trace-events                      |   1 +
- tests/data/acpi/virt/DSDT                   | Bin 5307 -> 5205 bytes
- tests/data/acpi/virt/DSDT.memhp             | Bin 6668 -> 6566 bytes
- tests/data/acpi/virt/DSDT.numamem           | Bin 5307 -> 5205 bytes
- 45 files changed, 974 insertions(+), 312 deletions(-)
- create mode 100644 include/hw/misc/max111x.h
 
