@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0ADC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3427BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C0EE2070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:06:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF63E2070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:06:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="iRoBcnyl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C0EE2070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DBYn+9l1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF63E2070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOCx-00086M-S2
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:06:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58972)
+	id 1jrOD9-000056-6Y
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:06:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5k-0003Km-6H; Fri, 03 Jul 2020 11:59:08 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41613)
+ id 1jrO5R-0002aY-5V; Fri, 03 Jul 2020 11:58:49 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:41475)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5h-0007RQ-VR; Fri, 03 Jul 2020 11:59:07 -0400
+ id 1jrO5K-0007Q3-AR; Fri, 03 Jul 2020 11:58:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=I35ViQaFk2/nBgwl0sVywGlAy6Mjqm2ObaFUT95jhoQ=; 
- b=iRoBcnylN34WlBvphF4NXyK0PD7t/G5aX9iTZatWzXDtbfzgYbZwLjbVS4a3gN/YD/4Z3FDP4aJjz44VmU2nFqxqxgNDfm1QCYExi77aLJ0gyYYd46IhCgylLrV1KvqGcVIgmH0VDcmYLfskclyBcdrVlENwJOLF/i8kSZK9EsjMQEbQUvtKDzR/NhO2JZAQ61/S4jxoSO+BpqgMymj0Zcp971+StbSeV8ijsiJVVAjWP5npsCifW6mNU+ryG3EL1MtezksNEq8xwyzghsqoa5Wu+Xb8q0SpwpFc7PtfUgDGc1ZvkG/099XzNx4KNvHtk4ElrsEWMSvCpZmEWFbi1w==;
+ bh=3/+4+w072NPN2HtyhGIdw7rKwWLkDQ11O7JlmSXpOjI=; 
+ b=DBYn+9l1sBbM18TO4TfkCUp0amXX690bt7kJIuDjGXcsOMBc7MCoGFCXzE7G3zrHcUFWOccaeW+tpq2PSTc5mE6EHFZvH3W2AJnwewuU6Wpwl6y+Oa0QddIshfD2wGm3c4U7rdgB4BQik1EyPaUCMljgUWForuvxoPhHhLBgnO6H9fSlBLppU346Buw9gn9l7wLolmizHpilOIwoRrwCddxu4aX1gW/dunyu7trtKYHxqptoc4VbzVXJEw40b0GXFFc6LiLmcKEK66FqcW6CWhJhRGiO07JY9lQgiwa2s8HWcy2ISsDCRqJMcJY0oJT7NMkA9mz7cp3dMlAUmcUAqw==;
 Received: from [81.0.49.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jrO5K-0001QS-UP; Fri, 03 Jul 2020 17:58:43 +0200
+ id 1jrO5G-0001QD-Fu; Fri, 03 Jul 2020 17:58:38 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jrO51-0007Pi-TX; Fri, 03 Jul 2020 17:58:23 +0200
+ id 1jrO51-0007PN-Kq; Fri, 03 Jul 2020 17:58:23 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 12/34] qcow2: Add l2_entry_size()
-Date: Fri,  3 Jul 2020 17:57:58 +0200
-Message-Id: <6a78cdf9456b9518d667f4abe6dd9a68f391ad71.1593791819.git.berto@igalia.com>
+Subject: [PATCH v10 05/34] qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters in
+ handle_copied()
+Date: Fri,  3 Jul 2020 17:57:51 +0200
+Message-Id: <fcb9fc375127f5bff7594dca66ec6088c0e74654.1593791819.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1593791819.git.berto@igalia.com>
 References: <cover.1593791819.git.berto@igalia.com>
@@ -84,207 +85,470 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qcow2 images with subclusters have 128-bit L2 entries. The first 64
-bits contain the same information as traditional images and the last
-64 bits form a bitmap with the status of each individual subcluster.
+When writing to a qcow2 file there are two functions that take a
+virtual offset and return a host offset, possibly allocating new
+clusters if necessary:
 
-Because of that we cannot assume that L2 entries are sizeof(uint64_t)
-anymore. This function returns the proper value for the image.
+   - handle_copied() looks for normal data clusters that are already
+     allocated and have a reference count of 1. In those clusters we
+     can simply write the data and there is no need to perform any
+     copy-on-write.
+
+   - handle_alloc() looks for clusters that do need copy-on-write,
+     either because they haven't been allocated yet, because their
+     reference count is != 1 or because they are ZERO_ALLOC clusters.
+
+The ZERO_ALLOC case is a bit special because those are clusters that
+are already allocated and they could perfectly be dealt with in
+handle_copied() (as long as copy-on-write is performed when required).
+
+In fact, there is extra code specifically for them in handle_alloc()
+that tries to reuse the existing allocation if possible and frees them
+otherwise.
+
+This patch changes the handling of ZERO_ALLOC clusters so the
+semantics of these two functions are now like this:
+
+   - handle_copied() looks for clusters that are already allocated and
+     which we can overwrite (NORMAL and ZERO_ALLOC clusters with a
+     reference count of 1).
+
+   - handle_alloc() looks for clusters for which we need a new
+     allocation (all other cases).
+
+One important difference after this change is that clusters found
+in handle_copied() may now require copy-on-write, but this will be
+necessary anyway once we add support for subclusters.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.h          |  9 +++++++++
- block/qcow2-cluster.c  | 12 ++++++------
- block/qcow2-refcount.c | 14 ++++++++------
- block/qcow2.c          |  8 ++++----
- 4 files changed, 27 insertions(+), 16 deletions(-)
+ block/qcow2-cluster.c | 256 +++++++++++++++++++++++-------------------
+ 1 file changed, 141 insertions(+), 115 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 4fe31adfd3..46b351229a 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -80,6 +80,10 @@
- 
- #define QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER 32
- 
-+/* Size of normal and extended L2 entries */
-+#define L2E_SIZE_NORMAL   (sizeof(uint64_t))
-+#define L2E_SIZE_EXTENDED (sizeof(uint64_t) * 2)
-+
- #define MIN_CLUSTER_BITS 9
- #define MAX_CLUSTER_BITS 21
- 
-@@ -521,6 +525,11 @@ static inline bool has_subclusters(BDRVQcow2State *s)
-     return false;
- }
- 
-+static inline size_t l2_entry_size(BDRVQcow2State *s)
-+{
-+    return has_subclusters(s) ? L2E_SIZE_EXTENDED : L2E_SIZE_NORMAL;
-+}
-+
- static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
-                                     int idx)
- {
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index b501642c56..9ba60f3fde 100644
+index 543f515c81..723a122977 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -208,7 +208,7 @@ static int l2_load(BlockDriverState *bs, uint64_t offset,
-                    uint64_t l2_offset, uint64_t **l2_slice)
+@@ -1040,13 +1040,18 @@ void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m)
+ 
+ /*
+  * For a given write request, create a new QCowL2Meta structure, add
+- * it to @m and the BDRVQcow2State.cluster_allocs list.
++ * it to @m and the BDRVQcow2State.cluster_allocs list. If the write
++ * request does not need copy-on-write or changes to the L2 metadata
++ * then this function does nothing.
+  *
+  * @host_cluster_offset points to the beginning of the first cluster.
+  *
+  * @guest_offset and @bytes indicate the offset and length of the
+  * request.
+  *
++ * @l2_slice contains the L2 entries of all clusters involved in this
++ * write request.
++ *
+  * If @keep_old is true it means that the clusters were already
+  * allocated and will be overwritten. If false then the clusters are
+  * new and we have to decrease the reference count of the old ones.
+@@ -1054,15 +1059,53 @@ void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m)
+ static void calculate_l2_meta(BlockDriverState *bs,
+                               uint64_t host_cluster_offset,
+                               uint64_t guest_offset, unsigned bytes,
+-                              QCowL2Meta **m, bool keep_old)
++                              uint64_t *l2_slice, QCowL2Meta **m, bool keep_old)
  {
      BDRVQcow2State *s = bs->opaque;
--    int start_of_slice = sizeof(uint64_t) *
-+    int start_of_slice = l2_entry_size(s) *
-         (offset_to_l2_index(s, offset) - offset_to_l2_slice_index(s, offset));
+-    unsigned cow_start_from = 0;
++    int l2_index = offset_to_l2_slice_index(s, guest_offset);
++    uint64_t l2_entry;
++    unsigned cow_start_from, cow_end_to;
+     unsigned cow_start_to = offset_into_cluster(s, guest_offset);
+     unsigned cow_end_from = cow_start_to + bytes;
+-    unsigned cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
+     unsigned nb_clusters = size_to_clusters(s, cow_end_from);
+     QCowL2Meta *old_m = *m;
++    QCow2ClusterType type;
++
++    assert(nb_clusters <= s->l2_slice_size - l2_index);
++
++    /* Return if there's no COW (all clusters are normal and we keep them) */
++    if (keep_old) {
++        int i;
++        for (i = 0; i < nb_clusters; i++) {
++            l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
++            if (qcow2_get_cluster_type(bs, l2_entry) != QCOW2_CLUSTER_NORMAL) {
++                break;
++            }
++        }
++        if (i == nb_clusters) {
++            return;
++        }
++    }
++
++    /* Get the L2 entry of the first cluster */
++    l2_entry = be64_to_cpu(l2_slice[l2_index]);
++    type = qcow2_get_cluster_type(bs, l2_entry);
++
++    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
++        cow_start_from = cow_start_to;
++    } else {
++        cow_start_from = 0;
++    }
++
++    /* Get the L2 entry of the last cluster */
++    l2_entry = be64_to_cpu(l2_slice[l2_index + nb_clusters - 1]);
++    type = qcow2_get_cluster_type(bs, l2_entry);
++
++    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
++        cow_end_to = cow_end_from;
++    } else {
++        cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
++    }
  
-     return qcow2_cache_get(bs, s->l2_table_cache, l2_offset + start_of_slice,
-@@ -281,7 +281,7 @@ static int l2_allocate(BlockDriverState *bs, int l1_index)
+     *m = g_malloc0(sizeof(**m));
+     **m = (QCowL2Meta) {
+@@ -1088,18 +1131,22 @@ static void calculate_l2_meta(BlockDriverState *bs,
+     QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
+ }
  
-     /* allocate a new l2 entry */
+-/* Returns true if writing to a cluster requires COW */
+-static bool cluster_needs_cow(BlockDriverState *bs, uint64_t l2_entry)
++/*
++ * Returns true if writing to the cluster pointed to by @l2_entry
++ * requires a new allocation (that is, if the cluster is unallocated
++ * or has refcount > 1 and therefore cannot be written in-place).
++ */
++static bool cluster_needs_new_alloc(BlockDriverState *bs, uint64_t l2_entry)
+ {
+     switch (qcow2_get_cluster_type(bs, l2_entry)) {
+     case QCOW2_CLUSTER_NORMAL:
++    case QCOW2_CLUSTER_ZERO_ALLOC:
+         if (l2_entry & QCOW_OFLAG_COPIED) {
+             return false;
+         }
+     case QCOW2_CLUSTER_UNALLOCATED:
+     case QCOW2_CLUSTER_COMPRESSED:
+     case QCOW2_CLUSTER_ZERO_PLAIN:
+-    case QCOW2_CLUSTER_ZERO_ALLOC:
+         return true;
+     default:
+         abort();
+@@ -1107,20 +1154,38 @@ static bool cluster_needs_cow(BlockDriverState *bs, uint64_t l2_entry)
+ }
  
--    l2_offset = qcow2_alloc_clusters(bs, s->l2_size * sizeof(uint64_t));
-+    l2_offset = qcow2_alloc_clusters(bs, s->l2_size * l2_entry_size(s));
-     if (l2_offset < 0) {
-         ret = l2_offset;
-         goto fail;
-@@ -305,7 +305,7 @@ static int l2_allocate(BlockDriverState *bs, int l1_index)
+ /*
+- * Returns the number of contiguous clusters that can be used for an allocating
+- * write, but require COW to be performed (this includes yet unallocated space,
+- * which must copy from the backing file)
++ * Returns the number of contiguous clusters that can be written to
++ * using one single write request, starting from @l2_index.
++ * At most @nb_clusters are checked.
++ *
++ * If @new_alloc is true this counts clusters that are either
++ * unallocated, or allocated but with refcount > 1 (so they need to be
++ * newly allocated and COWed).
++ *
++ * If @new_alloc is false this counts clusters that are already
++ * allocated and can be overwritten in-place (this includes clusters
++ * of type QCOW2_CLUSTER_ZERO_ALLOC).
+  */
+-static int count_cow_clusters(BlockDriverState *bs, int nb_clusters,
+-    uint64_t *l2_slice, int l2_index)
++static int count_single_write_clusters(BlockDriverState *bs, int nb_clusters,
++                                       uint64_t *l2_slice, int l2_index,
++                                       bool new_alloc)
+ {
++    BDRVQcow2State *s = bs->opaque;
++    uint64_t l2_entry = be64_to_cpu(l2_slice[l2_index]);
++    uint64_t expected_offset = l2_entry & L2E_OFFSET_MASK;
+     int i;
  
-     /* allocate a new entry in the l2 cache */
- 
--    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
-+    slice_size2 = s->l2_slice_size * l2_entry_size(s);
-     n_slices = s->cluster_size / slice_size2;
- 
-     trace_qcow2_l2_allocate_get_empty(bs, l1_index);
-@@ -369,7 +369,7 @@ fail:
+     for (i = 0; i < nb_clusters; i++) {
+-        uint64_t l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
+-        if (!cluster_needs_cow(bs, l2_entry)) {
++        l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
++        if (cluster_needs_new_alloc(bs, l2_entry) != new_alloc) {
+             break;
+         }
++        if (!new_alloc) {
++            if (expected_offset != (l2_entry & L2E_OFFSET_MASK)) {
++                break;
++            }
++            expected_offset += s->cluster_size;
++        }
      }
-     s->l1_table[l1_index] = old_l2_offset;
-     if (l2_offset > 0) {
--        qcow2_free_clusters(bs, l2_offset, s->l2_size * sizeof(uint64_t),
-+        qcow2_free_clusters(bs, l2_offset, s->l2_size * l2_entry_size(s),
-                             QCOW2_DISCARD_ALWAYS);
+ 
+     assert(i <= nb_clusters);
+@@ -1191,10 +1256,10 @@ static int handle_dependencies(BlockDriverState *bs, uint64_t guest_offset,
+ }
+ 
+ /*
+- * Checks how many already allocated clusters that don't require a copy on
+- * write there are at the given guest_offset (up to *bytes). If *host_offset is
+- * not INV_OFFSET, only physically contiguous clusters beginning at this host
+- * offset are counted.
++ * Checks how many already allocated clusters that don't require a new
++ * allocation there are at the given guest_offset (up to *bytes).
++ * If *host_offset is not INV_OFFSET, only physically contiguous clusters
++ * beginning at this host offset are counted.
+  *
+  * Note that guest_offset may not be cluster aligned. In this case, the
+  * returned *host_offset points to exact byte referenced by guest_offset and
+@@ -1203,12 +1268,12 @@ static int handle_dependencies(BlockDriverState *bs, uint64_t guest_offset,
+  * Returns:
+  *   0:     if no allocated clusters are available at the given offset.
+  *          *bytes is normally unchanged. It is set to 0 if the cluster
+- *          is allocated and doesn't need COW, but doesn't have the right
+- *          physical offset.
++ *          is allocated and can be overwritten in-place but doesn't have
++ *          the right physical offset.
+  *
+- *   1:     if allocated clusters that don't require a COW are available at
+- *          the requested offset. *bytes may have decreased and describes
+- *          the length of the area that can be written to.
++ *   1:     if allocated clusters that can be overwritten in place are
++ *          available at the requested offset. *bytes may have decreased
++ *          and describes the length of the area that can be written to.
+  *
+  *  -errno: in error cases
+  */
+@@ -1217,7 +1282,7 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
+ {
+     BDRVQcow2State *s = bs->opaque;
+     int l2_index;
+-    uint64_t cluster_offset;
++    uint64_t l2_entry, cluster_offset;
+     uint64_t *l2_slice;
+     uint64_t nb_clusters;
+     unsigned int keep_clusters;
+@@ -1238,7 +1303,8 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
+ 
+     l2_index = offset_to_l2_slice_index(s, guest_offset);
+     nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
+-    assert(nb_clusters <= INT_MAX);
++    /* Limit total byte count to BDRV_REQUEST_MAX_BYTES */
++    nb_clusters = MIN(nb_clusters, BDRV_REQUEST_MAX_BYTES >> s->cluster_bits);
+ 
+     /* Find L2 entry for the first involved cluster */
+     ret = get_cluster_table(bs, guest_offset, &l2_slice, &l2_index);
+@@ -1246,41 +1312,39 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
+         return ret;
+     }
+ 
+-    cluster_offset = be64_to_cpu(l2_slice[l2_index]);
++    l2_entry = be64_to_cpu(l2_slice[l2_index]);
++    cluster_offset = l2_entry & L2E_OFFSET_MASK;
++
++    if (!cluster_needs_new_alloc(bs, l2_entry)) {
++        if (offset_into_cluster(s, cluster_offset)) {
++            qcow2_signal_corruption(bs, true, -1, -1, "%s cluster offset "
++                                    "%#" PRIx64 " unaligned (guest offset: %#"
++                                    PRIx64 ")", l2_entry & QCOW_OFLAG_ZERO ?
++                                    "Preallocated zero" : "Data",
++                                    cluster_offset, guest_offset);
++            ret = -EIO;
++            goto out;
++        }
+ 
+-    /* Check how many clusters are already allocated and don't need COW */
+-    if (qcow2_get_cluster_type(bs, cluster_offset) == QCOW2_CLUSTER_NORMAL
+-        && (cluster_offset & QCOW_OFLAG_COPIED))
+-    {
+         /* If a specific host_offset is required, check it */
+-        bool offset_matches =
+-            (cluster_offset & L2E_OFFSET_MASK) == *host_offset;
+-
+-        if (offset_into_cluster(s, cluster_offset & L2E_OFFSET_MASK)) {
+-            qcow2_signal_corruption(bs, true, -1, -1, "Data cluster offset "
+-                                    "%#llx unaligned (guest offset: %#" PRIx64
+-                                    ")", cluster_offset & L2E_OFFSET_MASK,
+-                                    guest_offset);
+-            ret = -EIO;
+-            goto out;
+-        }
+-
+-        if (*host_offset != INV_OFFSET && !offset_matches) {
++        if (*host_offset != INV_OFFSET && cluster_offset != *host_offset) {
+             *bytes = 0;
+             ret = 0;
+             goto out;
+         }
+ 
+         /* We keep all QCOW_OFLAG_COPIED clusters */
+-        keep_clusters =
+-            count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
+-                                      &l2_slice[l2_index],
+-                                      QCOW_OFLAG_COPIED | QCOW_OFLAG_ZERO);
++        keep_clusters = count_single_write_clusters(bs, nb_clusters, l2_slice,
++                                                    l2_index, false);
+         assert(keep_clusters <= nb_clusters);
+ 
+         *bytes = MIN(*bytes,
+                  keep_clusters * s->cluster_size
+                  - offset_into_cluster(s, guest_offset));
++        assert(*bytes != 0);
++
++        calculate_l2_meta(bs, cluster_offset, guest_offset,
++                          *bytes, l2_slice, m, true);
+ 
+         ret = 1;
+     } else {
+@@ -1294,8 +1358,7 @@ out:
+     /* Only return a host offset if we actually made progress. Otherwise we
+      * would make requirements for handle_alloc() that it can't fulfill */
+     if (ret > 0) {
+-        *host_offset = (cluster_offset & L2E_OFFSET_MASK)
+-                     + offset_into_cluster(s, guest_offset);
++        *host_offset = cluster_offset + offset_into_cluster(s, guest_offset);
+     }
+ 
+     return ret;
+@@ -1356,9 +1419,10 @@ static int do_alloc_cluster_offset(BlockDriverState *bs, uint64_t guest_offset,
+ }
+ 
+ /*
+- * Allocates new clusters for an area that either is yet unallocated or needs a
+- * copy on write. If *host_offset is not INV_OFFSET, clusters are only
+- * allocated if the new allocation can match the specified host offset.
++ * Allocates new clusters for an area that is either still unallocated or
++ * cannot be overwritten in-place. If *host_offset is not INV_OFFSET,
++ * clusters are only allocated if the new allocation can match the specified
++ * host offset.
+  *
+  * Note that guest_offset may not be cluster aligned. In this case, the
+  * returned *host_offset points to exact byte referenced by guest_offset and
+@@ -1381,12 +1445,10 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+     BDRVQcow2State *s = bs->opaque;
+     int l2_index;
+     uint64_t *l2_slice;
+-    uint64_t entry;
+     uint64_t nb_clusters;
+     int ret;
+-    bool keep_old_clusters = false;
+ 
+-    uint64_t alloc_cluster_offset = INV_OFFSET;
++    uint64_t alloc_cluster_offset;
+ 
+     trace_qcow2_handle_alloc(qemu_coroutine_self(), guest_offset, *host_offset,
+                              *bytes);
+@@ -1401,10 +1463,8 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+ 
+     l2_index = offset_to_l2_slice_index(s, guest_offset);
+     nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
+-    assert(nb_clusters <= INT_MAX);
+-
+-    /* Limit total allocation byte count to INT_MAX */
+-    nb_clusters = MIN(nb_clusters, INT_MAX >> s->cluster_bits);
++    /* Limit total allocation byte count to BDRV_REQUEST_MAX_BYTES */
++    nb_clusters = MIN(nb_clusters, BDRV_REQUEST_MAX_BYTES >> s->cluster_bits);
+ 
+     /* Find L2 entry for the first involved cluster */
+     ret = get_cluster_table(bs, guest_offset, &l2_slice, &l2_index);
+@@ -1412,67 +1472,32 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+         return ret;
+     }
+ 
+-    entry = be64_to_cpu(l2_slice[l2_index]);
+-    nb_clusters = count_cow_clusters(bs, nb_clusters, l2_slice, l2_index);
++    nb_clusters = count_single_write_clusters(bs, nb_clusters,
++                                              l2_slice, l2_index, true);
+ 
+     /* This function is only called when there were no non-COW clusters, so if
+      * we can't find any unallocated or COW clusters either, something is
+      * wrong with our code. */
+     assert(nb_clusters > 0);
+ 
+-    if (qcow2_get_cluster_type(bs, entry) == QCOW2_CLUSTER_ZERO_ALLOC &&
+-        (entry & QCOW_OFLAG_COPIED) &&
+-        (*host_offset == INV_OFFSET ||
+-         start_of_cluster(s, *host_offset) == (entry & L2E_OFFSET_MASK)))
+-    {
+-        int preallocated_nb_clusters;
+-
+-        if (offset_into_cluster(s, entry & L2E_OFFSET_MASK)) {
+-            qcow2_signal_corruption(bs, true, -1, -1, "Preallocated zero "
+-                                    "cluster offset %#llx unaligned (guest "
+-                                    "offset: %#" PRIx64 ")",
+-                                    entry & L2E_OFFSET_MASK, guest_offset);
+-            ret = -EIO;
+-            goto fail;
+-        }
+-
+-        /* Try to reuse preallocated zero clusters; contiguous normal clusters
+-         * would be fine, too, but count_cow_clusters() above has limited
+-         * nb_clusters already to a range of COW clusters */
+-        preallocated_nb_clusters =
+-            count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
+-                                      &l2_slice[l2_index], QCOW_OFLAG_COPIED);
+-        assert(preallocated_nb_clusters > 0);
+-
+-        nb_clusters = preallocated_nb_clusters;
+-        alloc_cluster_offset = entry & L2E_OFFSET_MASK;
+-
+-        /* We want to reuse these clusters, so qcow2_alloc_cluster_link_l2()
+-         * should not free them. */
+-        keep_old_clusters = true;
++    /* Allocate at a given offset in the image file */
++    alloc_cluster_offset = *host_offset == INV_OFFSET ? INV_OFFSET :
++        start_of_cluster(s, *host_offset);
++    ret = do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster_offset,
++                                  &nb_clusters);
++    if (ret < 0) {
++        goto out;
+     }
+ 
+-    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+-
+-    if (alloc_cluster_offset == INV_OFFSET) {
+-        /* Allocate, if necessary at a given offset in the image file */
+-        alloc_cluster_offset = *host_offset == INV_OFFSET ? INV_OFFSET :
+-                               start_of_cluster(s, *host_offset);
+-        ret = do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster_offset,
+-                                      &nb_clusters);
+-        if (ret < 0) {
+-            goto fail;
+-        }
+-
+-        /* Can't extend contiguous allocation */
+-        if (nb_clusters == 0) {
+-            *bytes = 0;
+-            return 0;
+-        }
+-
+-        assert(alloc_cluster_offset != INV_OFFSET);
++    /* Can't extend contiguous allocation */
++    if (nb_clusters == 0) {
++        *bytes = 0;
++        ret = 0;
++        goto out;
+     }
+ 
++    assert(alloc_cluster_offset != INV_OFFSET);
++
+     /*
+      * Save info needed for meta data update.
+      *
+@@ -1495,13 +1520,14 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+     *bytes = MIN(*bytes, nb_bytes - offset_into_cluster(s, guest_offset));
+     assert(*bytes != 0);
+ 
+-    calculate_l2_meta(bs, alloc_cluster_offset, guest_offset, *bytes,
+-                      m, keep_old_clusters);
++    calculate_l2_meta(bs, alloc_cluster_offset, guest_offset, *bytes, l2_slice,
++                      m, false);
+ 
+-    return 1;
++    ret = 1;
+ 
+-fail:
+-    if (*m && (*m)->nb_clusters > 0) {
++out:
++    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
++    if (ret < 0 && *m && (*m)->nb_clusters > 0) {
+         QLIST_REMOVE(*m, next_in_flight);
      }
      return ret;
-@@ -717,7 +717,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
- 
-         /* Then decrease the refcount of the old table */
-         if (l2_offset) {
--            qcow2_free_clusters(bs, l2_offset, s->l2_size * sizeof(uint64_t),
-+            qcow2_free_clusters(bs, l2_offset, s->l2_size * l2_entry_size(s),
-                                 QCOW2_DISCARD_OTHER);
-         }
- 
-@@ -1914,7 +1914,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-     int ret;
-     int i, j;
- 
--    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
-+    slice_size2 = s->l2_slice_size * l2_entry_size(s);
-     n_slices = s->cluster_size / slice_size2;
- 
-     if (!is_active_l1) {
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 04546838e8..770c5dbc83 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1254,7 +1254,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-     l2_slice = NULL;
-     l1_table = NULL;
-     l1_size2 = l1_size * sizeof(uint64_t);
--    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
-+    slice_size2 = s->l2_slice_size * l2_entry_size(s);
-     n_slices = s->cluster_size / slice_size2;
- 
-     s->cache_discards = true;
-@@ -1605,7 +1605,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-     int i, l2_size, nb_csectors, ret;
- 
-     /* Read L2 table from disk */
--    l2_size = s->l2_size * sizeof(uint64_t);
-+    l2_size = s->l2_size * l2_entry_size(s);
-     l2_table = g_malloc(l2_size);
- 
-     ret = bdrv_pread(bs->file, l2_offset, l2_table, l2_size);
-@@ -1680,15 +1680,16 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                             fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR",
-                             offset);
-                     if (fix & BDRV_FIX_ERRORS) {
-+                        int idx = i * (l2_entry_size(s) / sizeof(uint64_t));
-                         uint64_t l2e_offset =
--                            l2_offset + (uint64_t)i * sizeof(uint64_t);
-+                            l2_offset + (uint64_t)i * l2_entry_size(s);
-                         int ign = active ? QCOW2_OL_ACTIVE_L2 :
-                                            QCOW2_OL_INACTIVE_L2;
- 
-                         l2_entry = QCOW_OFLAG_ZERO;
-                         set_l2_entry(s, l2_table, i, l2_entry);
-                         ret = qcow2_pre_write_overlap_check(bs, ign,
--                                l2e_offset, sizeof(uint64_t), false);
-+                                l2e_offset, l2_entry_size(s), false);
-                         if (ret < 0) {
-                             fprintf(stderr, "ERROR: Overlap check failed\n");
-                             res->check_errors++;
-@@ -1698,7 +1699,8 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                         }
- 
-                         ret = bdrv_pwrite_sync(bs->file, l2e_offset,
--                                               &l2_table[i], sizeof(uint64_t));
-+                                               &l2_table[idx],
-+                                               l2_entry_size(s));
-                         if (ret < 0) {
-                             fprintf(stderr, "ERROR: Failed to overwrite L2 "
-                                     "table entry: %s\n", strerror(-ret));
-@@ -1905,7 +1907,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
-         }
- 
-         ret = bdrv_pread(bs->file, l2_offset, l2_table,
--                         s->l2_size * sizeof(uint64_t));
-+                         s->l2_size * l2_entry_size(s));
-         if (ret < 0) {
-             fprintf(stderr, "ERROR: Could not read L2 table: %s\n",
-                     strerror(-ret));
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 5c175a314c..7df55a88a8 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -870,7 +870,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-     uint64_t max_l2_entries = DIV_ROUND_UP(virtual_disk_size, s->cluster_size);
-     /* An L2 table is always one cluster in size so the max cache size
-      * should be a multiple of the cluster size. */
--    uint64_t max_l2_cache = ROUND_UP(max_l2_entries * sizeof(uint64_t),
-+    uint64_t max_l2_cache = ROUND_UP(max_l2_entries * l2_entry_size(s),
-                                      s->cluster_size);
- 
-     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
-@@ -1031,7 +1031,7 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
-         }
-     }
- 
--    r->l2_slice_size = l2_cache_entry_size / sizeof(uint64_t);
-+    r->l2_slice_size = l2_cache_entry_size / l2_entry_size(s);
-     r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size,
-                                            l2_cache_entry_size);
-     r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size,
-@@ -1478,7 +1478,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         bs->encrypted = true;
-     }
- 
--    s->l2_bits = s->cluster_bits - 3; /* L2 is always one cluster */
-+    s->l2_bits = s->cluster_bits - ctz32(l2_entry_size(s));
-     s->l2_size = 1 << s->l2_bits;
-     /* 2^(s->refcount_order - 3) is the refcount width in bytes */
-     s->refcount_block_bits = s->cluster_bits - (s->refcount_order - 3);
-@@ -4245,7 +4245,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-          *  preallocation. All that matters is that we will not have to allocate
-          *  new refcount structures for them.) */
-         nb_new_l2_tables = DIV_ROUND_UP(nb_new_data_clusters,
--                                        s->cluster_size / sizeof(uint64_t));
-+                                        s->cluster_size / l2_entry_size(s));
-         /* The cluster range may not be aligned to L2 boundaries, so add one L2
-          * table for a potential head/tail */
-         nb_new_l2_tables++;
 -- 
 2.20.1
 
