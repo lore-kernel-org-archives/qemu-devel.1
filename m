@@ -2,130 +2,59 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A677FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D3DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:15:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70C2D206A1
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:09:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGKToi5K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C2D206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EDB3D206A1
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:15:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDB3D206A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrGlW-0002an-Ob
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 04:09:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47518)
+	id 1jrGqt-0005cq-9T
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 04:15:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrGks-0001bU-Th
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:09:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21283
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrGkq-00006g-OM
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:09:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593763743;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=iEa5ZtEDkDYGW+/+k1TSFjcId/lGhTCxhOtyeJs5zao=;
- b=iGKToi5K8FRwspzg4264a5H3J5yJOchq/mpYZxKbaiV+BtTmuxMXoRJ0VshKNV3zf0yzbk
- Vqa5XAFFrlxHgh5SaV1YQd+xf2zYk5ShO7BV/8YBkl1+bSNT8VMW+P7toiC38Wi/qkMBoo
- ZLx3S3S8dIwpEDYDFD08xciLy9et84U=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-t0_5xBDJOPiX1QAi5BPsOQ-1; Fri, 03 Jul 2020 04:09:00 -0400
-X-MC-Unique: t0_5xBDJOPiX1QAi5BPsOQ-1
-Received: by mail-wr1-f72.google.com with SMTP id w4so29068936wrm.5
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 01:09:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=iEa5ZtEDkDYGW+/+k1TSFjcId/lGhTCxhOtyeJs5zao=;
- b=Rprcig3CD6jL8ii2g6HgVFGpm03mmkmDL7NEb3YHX9aR4JdieN9zycpVnV1BVHJWTG
- WtIJzog76FcQ1pUvvz+T5QlzEkBRZn2PkjPYgSKEdnUgmeJPu9uBou/iswOMvoE+m7i3
- aTkUPuWG1oQEAqFutX2PLmeh7dnCJuH9U34ucvRgGIWkDQxJLGSdKm54YOjyCG2FHv3Q
- BaomeOTHTjYuvJBvAUlwmvMy/bXnwE/zva7lrjRM2FDrlmOmQByThpfGHVQkSRdzlvZz
- yboud/sdkE3OS9kVHFOG96znckpSzu6sTg5V1+ypxFj+DiFAYNlEeIZ7qcSF38P4gVXW
- SnDA==
-X-Gm-Message-State: AOAM532j7A2kvRDxnogspNqqppznnTmcU2+TsUMO9FGEH7nKIobkXdrE
- 5r7S4TXfFgZ26XbxxZgJtagLVJeU4my6XqsfMaRR8HzXynhgYvC6iQFwpNYCsbFRq6CYWKvT9xD
- zsDgXthO7Y04BwUM=
-X-Received: by 2002:a5d:6803:: with SMTP id w3mr35038190wru.200.1593763739371; 
- Fri, 03 Jul 2020 01:08:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx1QCxxZAgyXgl1OTP518f3p6LlZACOqmjgNy8DvfUdOtiRjikdN4NNBbFlO9ZeKNQx9xrKdQ==
-X-Received: by 2002:a5d:6803:: with SMTP id w3mr35038158wru.200.1593763739063; 
- Fri, 03 Jul 2020 01:08:59 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u65sm12558516wmg.5.2020.07.03.01.08.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jul 2020 01:08:58 -0700 (PDT)
-Subject: Re: [PATCH v2 04/18] hw/block/nvme: add temperature threshold feature
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jrGqG-00056e-PR; Fri, 03 Jul 2020 04:14:40 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:53320)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jrGqE-0001qG-8a; Fri, 03 Jul 2020 04:14:40 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 20CDBBF465;
+ Fri,  3 Jul 2020 08:14:35 +0000 (UTC)
+Date: Fri, 3 Jul 2020 10:14:31 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 02/18] hw/block/nvme: additional tracing
+Message-ID: <20200703081431.kss35x4zr5g7pwuq@apples.localdomain>
 References: <20200703063420.2241014-1-its@irrelevant.dk>
- <20200703063420.2241014-5-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <91dbea26-9503-fd4c-f0f6-45c8bf9c17e5@redhat.com>
-Date: Fri, 3 Jul 2020 10:08:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ <20200703063420.2241014-3-its@irrelevant.dk>
+ <f474e1b3-2510-2b93-908e-31310f19b1a5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200703063420.2241014-5-its@irrelevant.dk>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f474e1b3-2510-2b93-908e-31310f19b1a5@redhat.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:42:13
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,155 +67,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
  Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/20 8:34 AM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+On Jul  3 10:03, Philippe Mathieu-Daudé wrote:
+> On 7/3/20 8:34 AM, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> > 
+> > Add various additional tracing and streamline nvme_identify_ns and
+> > nvme_identify_nslist (they do not need to repeat the command, it is
+> > already in the trace name).
+> > 
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> > ---
+> >  hw/block/nvme.c       | 19 +++++++++++++++++++
+> >  hw/block/nvme.h       | 14 ++++++++++++++
+> >  hw/block/trace-events | 13 +++++++++++--
+> >  3 files changed, 44 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index 71b388aa0e20..f5d9148f0936 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -331,6 +331,8 @@ static void nvme_post_cqes(void *opaque)
+> >  static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
+> >  {
+> >      assert(cq->cqid == req->sq->cqid);
+> > +    trace_pci_nvme_enqueue_req_completion(nvme_cid(req), cq->cqid,
+> > +                                          req->status);
+> >      QTAILQ_REMOVE(&req->sq->out_req_list, req, entry);
+> >      QTAILQ_INSERT_TAIL(&cq->req_list, req, entry);
+> >      timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+> > @@ -343,6 +345,8 @@ static void nvme_rw_cb(void *opaque, int ret)
+> >      NvmeCtrl *n = sq->ctrl;
+> >      NvmeCQueue *cq = n->cq[sq->cqid];
+> >  
+> > +    trace_pci_nvme_rw_cb(nvme_cid(req));
+> > +
+> >      if (!ret) {
+> >          block_acct_done(blk_get_stats(n->conf.blk), &req->acct);
+> >          req->status = NVME_SUCCESS;
+> > @@ -378,6 +382,8 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+> >      uint64_t offset = slba << data_shift;
+> >      uint32_t count = nlb << data_shift;
+> >  
+> > +    trace_pci_nvme_write_zeroes(nvme_cid(req), slba, nlb);
+> > +
+> >      if (unlikely(slba + nlb > ns->id_ns.nsze)) {
+> >          trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+> >          return NVME_LBA_RANGE | NVME_DNR;
+> > @@ -445,6 +451,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >      NvmeNamespace *ns;
+> >      uint32_t nsid = le32_to_cpu(cmd->nsid);
+> >  
+> > +    trace_pci_nvme_io_cmd(nvme_cid(req), nsid, nvme_sqid(req), cmd->opcode);
+> > +
+> >      if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> >          trace_pci_nvme_err_invalid_ns(nsid, n->num_namespaces);
+> >          return NVME_INVALID_NSID | NVME_DNR;
+> > @@ -876,6 +884,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >  
+> >  static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >  {
+> > +    trace_pci_nvme_admin_cmd(nvme_cid(req), nvme_sqid(req), cmd->opcode);
+> > +
+> >      switch (cmd->opcode) {
+> >      case NVME_ADM_CMD_DELETE_SQ:
+> >          return nvme_del_sq(n, cmd);
+> > @@ -1204,6 +1214,8 @@ static uint64_t nvme_mmio_read(void *opaque, hwaddr addr, unsigned size)
+> >      uint8_t *ptr = (uint8_t *)&n->bar;
+> >      uint64_t val = 0;
+> >  
+> > +    trace_pci_nvme_mmio_read(addr);
+> > +
+> >      if (unlikely(addr & (sizeof(uint32_t) - 1))) {
+> >          NVME_GUEST_ERR(pci_nvme_ub_mmiord_misaligned32,
+> >                         "MMIO read not 32-bit aligned,"
+> > @@ -1273,6 +1285,8 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+> >              return;
+> >          }
+> >  
+> > +        trace_pci_nvme_mmio_doorbell_cq(cq->cqid, new_head);
+> > +
+> >          start_sqs = nvme_cq_full(cq) ? 1 : 0;
+> >          cq->head = new_head;
+> >          if (start_sqs) {
+> > @@ -1311,6 +1325,8 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+> >              return;
+> >          }
+> >  
+> > +        trace_pci_nvme_mmio_doorbell_sq(sq->sqid, new_tail);
+> > +
+> >          sq->tail = new_tail;
+> >          timer_mod(sq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+> >      }
+> > @@ -1320,6 +1336,9 @@ static void nvme_mmio_write(void *opaque, hwaddr addr, uint64_t data,
+> >      unsigned size)
+> >  {
+> >      NvmeCtrl *n = (NvmeCtrl *)opaque;
+> > +
+> > +    trace_pci_nvme_mmio_write(addr, data);
+> > +
+> >      if (addr < sizeof(n->bar)) {
+> >          nvme_write_bar(n, addr, data, size);
+> >      } else if (addr >= 0x1000) {
+> > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> > index 1d30c0bca283..1bf5c80ed843 100644
+> > --- a/hw/block/nvme.h
+> > +++ b/hw/block/nvme.h
+> > @@ -115,4 +115,18 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+> >      return n->ns_size >> nvme_ns_lbads(ns);
+> >  }
+> >  
+> > +static inline uint16_t nvme_cid(NvmeRequest *req)
+> > +{
+> > +    if (req) {
+> > +        return le16_to_cpu(req->cqe.cid);
+> > +    }
+> > +
+> > +    return 0xffff;
 > 
-> It might seem weird to implement this feature for an emulated device,
-> but it is mandatory to support and the feature is useful for testing
-> asynchronous event request support, which will be added in a later
-> patch.
-
-It might be interesting to plug that to the "temperature sensor
-interface" I suggested here (I'll rework on it during 5.2):
-https://www.mail-archive.com/qemu-block@nongnu.org/msg65192.html
-
-> 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Acked-by: Keith Busch <kbusch@kernel.org>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  hw/block/nvme.c      | 48 ++++++++++++++++++++++++++++++++++++++++++++
->  hw/block/nvme.h      |  1 +
->  include/block/nvme.h |  5 ++++-
->  3 files changed, 53 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index b7037a7d3504..5ca50646369e 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -59,6 +59,9 @@
->  #define NVME_DB_SIZE  4
->  #define NVME_CMB_BIR 2
->  #define NVME_PMR_BIR 2
-> +#define NVME_TEMPERATURE 0x143
-> +#define NVME_TEMPERATURE_WARNING 0x157
-> +#define NVME_TEMPERATURE_CRITICAL 0x175
->  
->  #define NVME_GUEST_ERR(trace, fmt, ...) \
->      do { \
-> @@ -827,9 +830,31 @@ static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
->  static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  {
->      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
->      uint32_t result;
->  
->      switch (dw10) {
-> +    case NVME_TEMPERATURE_THRESHOLD:
-> +        result = 0;
-> +
-> +        /*
-> +         * The controller only implements the Composite Temperature sensor, so
-> +         * return 0 for all other sensors.
-> +         */
-> +        if (NVME_TEMP_TMPSEL(dw11) != NVME_TEMP_TMPSEL_COMPOSITE) {
-> +            break;
-> +        }
-> +
-> +        switch (NVME_TEMP_THSEL(dw11)) {
-> +        case NVME_TEMP_THSEL_OVER:
-> +            result = cpu_to_le16(n->features.temp_thresh_hi);
-> +            break;
-> +        case NVME_TEMP_THSEL_UNDER:
-> +            result = cpu_to_le16(n->features.temp_thresh_low);
-> +            break;
-> +        }
-> +
-> +        break;
->      case NVME_VOLATILE_WRITE_CACHE:
->          result = blk_enable_write_cache(n->conf.blk);
->          trace_pci_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
-> @@ -874,6 +899,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
->  
->      switch (dw10) {
-> +    case NVME_TEMPERATURE_THRESHOLD:
-> +        if (NVME_TEMP_TMPSEL(dw11) != NVME_TEMP_TMPSEL_COMPOSITE) {
-> +            break;
-> +        }
-> +
-> +        switch (NVME_TEMP_THSEL(dw11)) {
-> +        case NVME_TEMP_THSEL_OVER:
-> +            n->features.temp_thresh_hi = NVME_TEMP_TMPTH(dw11);
-> +            break;
-> +        case NVME_TEMP_THSEL_UNDER:
-> +            n->features.temp_thresh_low = NVME_TEMP_TMPTH(dw11);
-> +            break;
-> +        default:
-> +            return NVME_INVALID_FIELD | NVME_DNR;
-> +        }
-> +
-> +        break;
->      case NVME_VOLATILE_WRITE_CACHE:
->          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
->          break;
-> @@ -1454,6 +1496,7 @@ static void nvme_init_state(NvmeCtrl *n)
->      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
->      n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
->      n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
-> +    n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
->  }
->  
->  static void nvme_init_blk(NvmeCtrl *n, Error **errp)
-> @@ -1611,6 +1654,11 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
->      id->acl = 3;
->      id->frmw = 7 << 1;
->      id->lpa = 1 << 0;
-> +
-> +    /* recommended default value (~70 C) */
-> +    id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
-> +    id->cctemp = cpu_to_le16(NVME_TEMPERATURE_CRITICAL);
-> +
->      id->sqes = (0x6 << 4) | 0x6;
->      id->cqes = (0x4 << 4) | 0x4;
->      id->nn = cpu_to_le32(n->num_namespaces);
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 1bf5c80ed843..3acde10e1d2a 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -107,6 +107,7 @@ typedef struct NvmeCtrl {
->      NvmeSQueue      admin_sq;
->      NvmeCQueue      admin_cq;
->      NvmeIdCtrl      id_ctrl;
-> +    NvmeFeatureVal  features;
->  } NvmeCtrl;
->  
->  /* calculate the number of LBAs that the namespace can accomodate */
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index 2a80d2a7ed89..d2c457695b38 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -860,7 +860,10 @@ enum NvmeIdCtrlOncs {
->  typedef struct NvmeFeatureVal {
->      uint32_t    arbitration;
->      uint32_t    power_mgmt;
-> -    uint32_t    temp_thresh;
-> +    struct {
-> +        uint16_t temp_thresh_hi;
-> +        uint16_t temp_thresh_low;
-> +    };
->      uint32_t    err_rec;
->      uint32_t    volatile_wc;
->      uint32_t    num_queues;
+> In this case I find the inverted logic easier. Matter
+> of taste :)
 > 
 
+Your taste is definitely better than mine. I'll queue it up for a style
+fix ;)
+
+> > +}
+> > +
+> > +static inline uint16_t nvme_sqid(NvmeRequest *req)
+> > +{
+> > +    return le16_to_cpu(req->sq->sqid);
+> > +}
+> 
+> Later I'd prefer we move these out of the header, and remove
+> the inline attribute.
+> I.e. nvme_ns_nlbas() is only used once.
+> 
+> OK for now.
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+
+I agree, I'll also queue that up and include it if the series calls for
+a v3.
+
+> > +
+> >  #endif /* HW_NVME_H */
+> > diff --git a/hw/block/trace-events b/hw/block/trace-events
+> > index 958fcc5508d1..c40c0d2e4b28 100644
+> > --- a/hw/block/trace-events
+> > +++ b/hw/block/trace-events
+> > @@ -33,19 +33,28 @@ pci_nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
+> >  pci_nvme_irq_pin(void) "pulsing IRQ pin"
+> >  pci_nvme_irq_masked(void) "IRQ is masked"
+> >  pci_nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64""
+> > +pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
+> > +pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8""
+> >  pci_nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
+> > +pci_nvme_rw_cb(uint16_t cid) "cid %"PRIu16""
+> > +pci_nvme_write_zeroes(uint16_t cid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" slba %"PRIu64" nlb %"PRIu32""
+> >  pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
+> >  pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
+> >  pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
+> >  pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
+> >  pci_nvme_identify_ctrl(void) "identify controller"
+> > -pci_nvme_identify_ns(uint16_t ns) "identify namespace, nsid=%"PRIu16""
+> > -pci_nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=%"PRIu16""
+> > +pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
+> > +pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
+> >  pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
+> >  pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
+> >  pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
+> >  pci_nvme_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
+> >  pci_nvme_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
+> > +pci_nvme_enqueue_req_completion(uint16_t cid, uint16_t cqid, uint16_t status) "cid %"PRIu16" cqid %"PRIu16" status 0x%"PRIx16""
+> > +pci_nvme_mmio_read(uint64_t addr) "addr 0x%"PRIx64""
+> > +pci_nvme_mmio_write(uint64_t addr, uint64_t data) "addr 0x%"PRIx64" data 0x%"PRIx64""
+> > +pci_nvme_mmio_doorbell_cq(uint16_t cqid, uint16_t new_head) "cqid %"PRIu16" new_head %"PRIu16""
+> > +pci_nvme_mmio_doorbell_sq(uint16_t sqid, uint16_t new_tail) "cqid %"PRIu16" new_tail %"PRIu16""
+> >  pci_nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+> >  pci_nvme_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+> >  pci_nvme_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
+> > 
+> 
 
