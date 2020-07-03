@@ -2,73 +2,97 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF0DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B229AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08ED620760
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:34:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75BFF20737
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:35:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="icqvb5JC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08ED620760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=cl.cam.ac.uk
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+Ze1Ytx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75BFF20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOeN-0007gk-5I
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:34:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36188)
+	id 1jrOeV-00005s-Jl
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:35:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
- id 1jrOM1-0007WT-8n; Fri, 03 Jul 2020 12:15:57 -0400
-Received: from ppsw-32.csi.cam.ac.uk ([131.111.8.132]:60496)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
- id 1jrOLu-0003ph-UO; Fri, 03 Jul 2020 12:15:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
- s=20180806.ppsw;
- h=Sender:Content-Transfer-Encoding:MIME-Version:Message-Id:
- Date:Subject:Cc:To:From:Reply-To:Content-Type:Content-ID:Content-Description:
- Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
- In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=nyUs57KD+/rwm24QCMUWSjfEn7hQD64IT/vc42otKB0=; b=icqvb5JCSpE+tTHqPm34NenHOC
- d1GdrtDFU3ovsUxWP1PiFogrqIz1kvvsef5qnxSz8Dn5I117B7x0cVQhowyOQwzNfFvylxPzR1H4h
- 2qxGTF6aXGIMxy2UgByfH1WJlfVbU0K0Q6u9gl4gi/UBkbm/ydUGMkrJa3dhR9vLFPWw=;
-X-Cam-AntiVirus: no malware found
-X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
-Received: from host86-181-137-242.range86-181.btcentralplus.com
- ([86.181.137.242]:53505 helo=Alexs-MBP-10.home)
- by ppsw-32.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.156]:587)
- with esmtpsa (LOGIN:alr48) (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- id 1jrOLo-000TRi-2l (Exim 4.92.3)
- (return-path <alr48@hermes.cam.ac.uk>); Fri, 03 Jul 2020 17:15:44 +0100
-From: Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH] Fix MIPS add.s after 1ace099f2acb952eaaef0ba7725879949a7e4406
-Date: Fri,  3 Jul 2020 17:15:15 +0100
-Message-Id: <20200703161515.25966-1-Alexander.Richardson@cl.cam.ac.uk>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jrON9-000155-9L
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:17:07 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55792
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jrON7-0004IH-7u
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:17:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593793024;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aCxD3V2bUwJ7rSi7NJxu+jhTfXjS0kevOSYm2+EMEhc=;
+ b=h+Ze1YtxGcAYkNzK2gzF6tWpZ6vmsDJkw//qMgg+GV8XZcmqS6tpHMdQjrUkdH3YQ6dYHB
+ gtkmZRk641AHTdTDXIqxN/aCNpdM9PowDSG5cOAyv+PYB5msuPpBgfS9I9k8iP8faemM0r
+ 2owQP3uKCCH6b03JnqRx4w4qwrxS8nU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-171-EXUK670FN3SNMSu8DMhvTg-1; Fri, 03 Jul 2020 12:17:02 -0400
+X-MC-Unique: EXUK670FN3SNMSu8DMhvTg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A09EC18FE868;
+ Fri,  3 Jul 2020 16:17:01 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A60A62DE74;
+ Fri,  3 Jul 2020 16:16:57 +0000 (UTC)
+Date: Fri, 3 Jul 2020 17:16:54 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 2/6] migration: introduce savevm, loadvm, delvm QMP
+ commands
+Message-ID: <20200703161654.GN2213227@redhat.com>
+References: <20200702175754.2211821-1-berrange@redhat.com>
+ <20200702175754.2211821-3-berrange@redhat.com>
+ <fcff0e8b-fd60-2897-0553-49ab24a9b7fa@redhat.com>
+ <20200702182452.GP1888119@redhat.com>
+ <20200703154933.GE6641@work-vm>
+ <20200703160235.GM2213227@redhat.com>
+ <20200703161012.GH6641@work-vm>
 MIME-Version: 1.0
+In-Reply-To: <20200703161012.GH6641@work-vm>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=131.111.8.132;
- envelope-from=alr48@hermes.cam.ac.uk; helo=ppsw-32.csi.cam.ac.uk
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 12:15:45
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,38 +105,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After merging latest QEMU upstream into our CHERI fork, I noticed that
-some of the FPU tests in our MIPS baremetal testsuite
-(https://github.com/CTSRD-CHERI/cheritest) started failing. It turns out
-this commit accidentally changed add.s into a subtract.
+On Fri, Jul 03, 2020 at 05:10:12PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrangé (berrange@redhat.com) wrote:
+> > On Fri, Jul 03, 2020 at 04:49:33PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Daniel P. Berrangé (berrange@redhat.com) wrote:
+> > > > On Thu, Jul 02, 2020 at 01:12:52PM -0500, Eric Blake wrote:
+> > > > > On 7/2/20 12:57 PM, Daniel P. Berrangé wrote:
+> > > > > > savevm, loadvm and delvm are some of the few commands that have never
+> > > > > > been converted to use QMP. The primary reason for this lack of
+> > > > > > conversion is that they block execution of the thread for as long as
+> > > > > > they run.
+> > > > > > 
+> > > > > > Despite this downside, however, libvirt and applications using libvirt
+> > > > > > has used these commands for as long as QMP has existed, via the
+> > > > > > "human-monitor-command" passthrough command. IOW, while it is clearly
+> > > > > > desirable to be able to fix the blocking problem, this is not an
+> > > > > > immediate obstacle to real world usage.
+> > > > > > 
+> > > > > > Meanwhile there is a need for other features which involve adding new
+> > > > > > parameters to the commands. This is possible with HMP passthrough, but
+> > > > > > it provides no reliable way for apps to introspect features, so using
+> > > > > > QAPI modelling is highly desirable.
+> > > > > > 
+> > > > > > This patch thus introduces trival savevm, loadvm, delvm commands
+> > > > > 
+> > > > > trivial
+> > > > > 
+> > > > > > to QMP that are functionally identical to the HMP counterpart, including
+> > > > > > the blocking problem.
+> > > > > 
+> > > > > Should we name them 'x-savevm', 'x-loadvm', 'x-delvm' to give ourselves room
+> > > > > to change them when we DO solve the blocking issue?  Or will the solution of
+> > > > > the blocking issue introduce new QMP commands, at which point we can add QMP
+> > > > > deprecation markers on these commands to eventually retire them?
+> > > > 
+> > > > I was in two minds about this, so I'm open to arguments either way.
+> > > > 
+> > > > The primary goal is for libvirt to consume the APIs as soon as possible,
+> > > > and generally libvirt doesn't want todo this is they are declared experimental
+> > > > via a "x-" prefix. So that pushes me away from "x-".
+> > > > 
+> > > > If we don't have an "x-" prefix and want to make changes, we can add extra
+> > > > parameters to trigger new behaviour in backwards compatible manner. Or we can
+> > > > simply deprecate these commands, deleting them 2 releases later, while adding
+> > > > completely new commands.
+> > > > 
+> > > > If we think the prposed design will definitely need incompatible changes in
+> > > > a very short time frame though, that would push towards "x-".
+> > > > 
+> > > > So IMHO the right answer largely depends on whether there is a credible
+> > > > strategy to implement the ideal non-blocking solution in a reasonable amount
+> > > > of time. I can't justify spending much time on this myself, but I'm willing
+> > > > to consider & try proposals for solving the blocking problem if they're not
+> > > > too complex / invasive.
+> > > 
+> > > Remind me, what was the problem with just making a block: migration
+> > > channel, and then we can migrate to it?
+> > 
+> > migration only does vmstate, not disks. The current blockdev commands
+> > are all related to external snapshots, nothing for internal snapshots
+> > AFAIK. So we still need commands to load/save internal snapshots of
+> > the disk data in the qcow2 files.
+> > 
+> > So we could look at loadvm/savevm conceptually as a syntax sugar above
+> > a migration transport that targets disk images, and blockdev QMP command
+> > that can do internal snapshots. Neither of these exist though and feel
+> > like a significantly larger amount of work than using existing functionality
+> > that is currently working.
+> 
+> I think that's what we should aim for; adding this wrapper isn't gaining
+> that much without moving a bit towards that; so I would stick with the
+> x- for now.
 
-Signed-off-by: Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
----
- target/mips/fpu_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The question is how much work that approach will be and whether anyone can
+realistically commit to doing that ? It looks like a much larger piece of
+work in both QEMU and libvirt side to do that. I don't want to see us stuck
+with a x-savevm for years because no one has resource to work on the perfect
+solution. If we did get a perfect solution at a point in future, we can
+still deprecate and then remove any "savevm" command we add to QMP.
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index 7a3a61cab3..56beda49d8 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -1221,7 +1221,7 @@ uint32_t helper_float_add_s(CPUMIPSState *env,
- {
-     uint32_t wt2;
- 
--    wt2 = float32_sub(fst0, fst1, &env->active_fpu.fp_status);
-+    wt2 = float32_add(fst0, fst1, &env->active_fpu.fp_status);
-     update_fcr31(env, GETPC());
-     return wt2;
- }
+Regards,
+Daniel
 -- 
-2.27.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
