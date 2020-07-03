@@ -2,81 +2,81 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1B6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF67CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB78F2084C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:15:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CAE820836
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWcEKsxb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB78F2084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KixL9Ry/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAE820836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHmh-0004vL-15
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:15:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60166)
+	id 1jrHml-00054t-Pc
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:15:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcw-0000m5-Fs
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50545
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcb-0008MO-Iv
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26760
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcu-0004Wx-Kp
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:58 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcZ-0004Ty-Iv
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593767096;
+ s=mimecast20190719; t=1593767074;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=p8xQzlc8evAUo7O9syva6ExL2iB8bosWtyuBg9IIFRI=;
- b=EWcEKsxb2S5khNGrF/OBuPDb2bzVAGEXSl4B/u834uQfQd2yYntHfRI65DdIVUhEA64StP
- RAbq7e9aB5qizf6mN1rYuReCV/QbRvS/72Ud53HkcSyfUZoBAh2McgS/EoIEr+liYLCLSE
- sST+Oq1z1y5HTxbNm8+rhBXPgunTOSg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-wN8ZjjPBMoGbIpX3MTpRlQ-1; Fri, 03 Jul 2020 05:04:54 -0400
-X-MC-Unique: wN8ZjjPBMoGbIpX3MTpRlQ-1
-Received: by mail-wr1-f69.google.com with SMTP id j16so25790043wrw.3
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:04:54 -0700 (PDT)
+ bh=zKfOMeb80edcLFenYqj0ugS/WcCDRNzf8rPuIVf+r7A=;
+ b=KixL9Ry/e3Z1Roi07rrLqiPHid40S5HEUBRSoSPmz04eDnvjOAH4eL6mmJc/lvIc64w+t7
+ OpGJStunmXlGABCZgLLfJqtErYkYHFAwJ794k37lFgQYrjCrs+eyWhA0SOhjWN1xYV/0Bt
+ GDYhQBs3FNfocr/MIvxYoK6nd7t8LR0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-5ttbS1-mNoy-3ByITTVypA-1; Fri, 03 Jul 2020 05:04:33 -0400
+X-MC-Unique: 5ttbS1-mNoy-3ByITTVypA-1
+Received: by mail-wr1-f72.google.com with SMTP id b8so17078036wro.19
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:04:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=p8xQzlc8evAUo7O9syva6ExL2iB8bosWtyuBg9IIFRI=;
- b=F6B0K5kO281PiWgUm1mZxp9ZKsZgWFX1ighujQ8SnXxoSYd/LXvhR+ePz9K8TQVKkq
- U+buTn3q2hh2VeCiZhzmDDG2Sa6f/cJxi91RU39YVZWevXOUsXFdD60NfWJry+8qKP4V
- 4bKujohgHTBjGPHzyvPatB7Gz0ET99XYqBgZBBLbLZr8JHPZRHdDiOt1OlrT9DXz79md
- BKqbkgglldegurOx+gJ+4y9pjxj6h6W6A6Dlqj+xuaYuLejCyAdNirwq/WCLe0QoRqMP
- oNiUSdICk2Tzz4f9gLuieSrKFWyq3t6c9TjoYBMc9XvSQ06ttSG1c2GzTJLwnk6k/L+b
- f1bQ==
-X-Gm-Message-State: AOAM530+FfBuVsXdhQbp1Qj1t/ZRQbYdWEVct18nqm8+/Mb0EsLfblDU
- 4l5ShhVGB5ErQa+jX66Yv8Z/f5P3PslvKR/a6UeRGXb900t3ZWQD0KelXJ/BGW1FFVGrfe3+smQ
- v9GlcQ2jfOF3WkEk=
-X-Received: by 2002:a1c:1fc2:: with SMTP id f185mr35665323wmf.0.1593767092510; 
- Fri, 03 Jul 2020 02:04:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/+NCQY/8s+fYN/U36NCE9Z30ec1RCDY0E24HVBQ280WACb+OaFy9RKxUR/WSYxJ3VgSHywg==
-X-Received: by 2002:a1c:1fc2:: with SMTP id f185mr35665308wmf.0.1593767092343; 
- Fri, 03 Jul 2020 02:04:52 -0700 (PDT)
+ bh=zKfOMeb80edcLFenYqj0ugS/WcCDRNzf8rPuIVf+r7A=;
+ b=Rydwiw/06l0IaJKOOuTK0YbWIVD1j6Lt9158fL011J+HRe7pma1L7oslviDko41mRP
+ uBUhPPnfEDXuGiB3DzSOObizUm26GCwnEmZZKKOb9wqEVIq6Cg7Mu5YD1KcomzGeeEWQ
+ 7sraGLjQtlQ9P88pbX4UkQMIMOabHATA8CLdRJWYdRgJfo6iUn0tJbZK3X7WUbSa3YEl
+ lEDbr6JEWpoKlvrZSTreEHcO4Vo2Gmbl5PQVH9xPDsu57q4AY9qF844d2ZS5Hdv4X/fn
+ DED0EEbqTWE+a3UUXYfBGZ0d8MSge3afNnF9o40yyW4ZLGxITOnxqsmFbmJCpBFndt4M
+ KVBg==
+X-Gm-Message-State: AOAM531Nk2ZhpIiRrrYvasfvN5iDYAN3Jhy0LUwkrSL7Vfty4AMUSIyV
+ Z2yJ5poCH5YMRmSXrFSHig6aP7uPHcEWVFr8CQYwFyMg4PxPFFisqMTPCXE5LFByKvCDwSWtvvw
+ 8xR+8l4bWeo6xCf0=
+X-Received: by 2002:a1c:2842:: with SMTP id o63mr20443804wmo.169.1593767071569; 
+ Fri, 03 Jul 2020 02:04:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzloWGEE4QTiyiBS6m7hTJJ+iumHhz4F90o9MEyRgcBgspemvVJD3D4UJrzq1galFpln8iL7Q==
+X-Received: by 2002:a1c:2842:: with SMTP id o63mr20443789wmo.169.1593767071392; 
+ Fri, 03 Jul 2020 02:04:31 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- 65sm14121679wre.6.2020.07.03.02.04.51
+ w17sm14404130wra.42.2020.07.03.02.04.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 02:04:51 -0700 (PDT)
-Date: Fri, 3 Jul 2020 05:04:50 -0400
+ Fri, 03 Jul 2020 02:04:30 -0700 (PDT)
+Date: Fri, 3 Jul 2020 05:04:29 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 30/41] virtio-bus: introduce queue_enabled method
-Message-ID: <20200703090252.368694-31-mst@redhat.com>
+Subject: [PULL 22/41] virtio-mem: Add trace events
+Message-ID: <20200703090252.368694-23-mst@redhat.com>
 References: <20200703090252.368694-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
@@ -88,9 +88,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -111,61 +111,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Cindy Lu <lulu@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jason Wang <jasowang@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-This patch introduces queue_enabled() method which allows the
-transport to implement its own way to report whether or not a queue is
-enabled.
+Let's add some trace events that might come in handy later.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Cindy Lu <lulu@redhat.com>
-Message-Id: <20200701145538.22333-4-lulu@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200626072248.78761-20-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- include/hw/virtio/virtio-bus.h | 4 ++++
- hw/virtio/virtio.c             | 6 ++++++
- 2 files changed, 10 insertions(+)
+ hw/virtio/virtio-mem.c | 10 +++++++++-
+ hw/virtio/trace-events | 10 ++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bus.h
-index 38c9399cd4..0f6f215925 100644
---- a/include/hw/virtio/virtio-bus.h
-+++ b/include/hw/virtio/virtio-bus.h
-@@ -83,6 +83,10 @@ typedef struct VirtioBusClass {
-      */
-     int (*ioeventfd_assign)(DeviceState *d, EventNotifier *notifier,
-                             int n, bool assign);
-+    /*
-+     * Whether queue number n is enabled.
-+     */
-+    bool (*queue_enabled)(DeviceState *d, int n);
-     /*
-      * Does the transport have variable vring alignment?
-      * (ie can it ever call virtio_queue_set_align()?)
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index cc9c9dc162..5bd2a2f621 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -3286,6 +3286,12 @@ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index 6ed5409669..fdd4dbb42c 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -30,6 +30,7 @@
+ #include "hw/boards.h"
+ #include "hw/qdev-properties.h"
+ #include "config-devices.h"
++#include "trace.h"
  
- bool virtio_queue_enabled(VirtIODevice *vdev, int n)
- {
-+    BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-+    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-+
-+    if (k->queue_enabled) {
-+        return k->queue_enabled(qbus->parent, n);
-+    }
-     return virtio_queue_get_desc_addr(vdev, n) != 0;
+ /*
+  * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
+@@ -100,6 +101,7 @@ static void virtio_mem_send_response(VirtIOMEM *vmem, VirtQueueElement *elem,
+     VirtIODevice *vdev = VIRTIO_DEVICE(vmem);
+     VirtQueue *vq = vmem->vq;
+ 
++    trace_virtio_mem_send_response(le16_to_cpu(resp->type));
+     iov_from_buf(elem->in_sg, elem->in_num, 0, resp, sizeof(*resp));
+ 
+     virtqueue_push(vq, elem, sizeof(*resp));
+@@ -195,6 +197,7 @@ static void virtio_mem_plug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     const uint16_t nb_blocks = le16_to_cpu(req->u.plug.nb_blocks);
+     uint16_t type;
+ 
++    trace_virtio_mem_plug_request(gpa, nb_blocks);
+     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, true);
+     virtio_mem_send_response_simple(vmem, elem, type);
+ }
+@@ -206,6 +209,7 @@ static void virtio_mem_unplug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     const uint16_t nb_blocks = le16_to_cpu(req->u.unplug.nb_blocks);
+     uint16_t type;
+ 
++    trace_virtio_mem_unplug_request(gpa, nb_blocks);
+     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, false);
+     virtio_mem_send_response_simple(vmem, elem, type);
+ }
+@@ -225,6 +229,7 @@ static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
+         return;
+     }
+ 
++    trace_virtio_mem_resized_usable_region(vmem->usable_region_size, newsize);
+     vmem->usable_region_size = newsize;
  }
  
+@@ -247,7 +252,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+         vmem->size = 0;
+         notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
+     }
+-
++    trace_virtio_mem_unplugged_all();
+     virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
+     return 0;
+ }
+@@ -255,6 +260,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+ static void virtio_mem_unplug_all_request(VirtIOMEM *vmem,
+                                           VirtQueueElement *elem)
+ {
++    trace_virtio_mem_unplug_all_request();
+     if (virtio_mem_unplug_all(vmem)) {
+         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_BUSY);
+     } else {
+@@ -272,6 +278,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+         .type = cpu_to_le16(VIRTIO_MEM_RESP_ACK),
+     };
+ 
++    trace_virtio_mem_state_request(gpa, nb_blocks);
+     if (!virtio_mem_valid_range(vmem, gpa, size)) {
+         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ERROR);
+         return;
+@@ -284,6 +291,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     } else {
+         resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_MIXED);
+     }
++    trace_virtio_mem_state_response(le16_to_cpu(resp.u.state.state));
+     virtio_mem_send_response(vmem, elem, &resp);
+ }
+ 
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 6427a0047d..292fc15e29 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -74,3 +74,13 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+ virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+ virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
++
++# virtio-mem.c
++virtio_mem_send_response(uint16_t type) "type=%" PRIu16
++virtio_mem_plug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_unplug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_unplugged_all(void) ""
++virtio_mem_unplug_all_request(void) ""
++virtio_mem_resized_usable_region(uint64_t old_size, uint64_t new_size) "old_size=0x%" PRIx64 "new_size=0x%" PRIx64
++virtio_mem_state_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_state_response(uint16_t state) "state=%" PRIu16
 -- 
 MST
 
