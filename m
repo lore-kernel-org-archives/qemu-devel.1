@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C39C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF7BC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:17:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E79620836
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:17:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0659C20836
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:17:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VuOitSzR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E79620836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PktqJYCF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0659C20836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHp5-0001Kt-F6
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:17:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60154)
+	id 1jrHpJ-0001wZ-98
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:17:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcu-0000gg-8y
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25376
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcr-0000YX-8w
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37318
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcs-0004Wf-9E
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:55 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHcp-0004WM-GX
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:04:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593767093;
+ s=mimecast20190719; t=1593767090;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=qOJsVqrCvYFr1+pi9ZUb1wgSPCHp9bN1XR/9RybzirU=;
- b=VuOitSzRaHIb4QJNXcS72/ISJjX5Hr4MZByCuFWI0Vs9qvG0Rq2I+mnMvjzr0hBAGxF6i+
- AWXncfrGua/FcZUsPIJ3IGRnJ1MSIEzQR6dABWgmEZSLkH14rmSpCtLDoLfqLFpjmfIA5l
- JIOs9W+x/vyOKKdXEkGafqaZT6Dy3dk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-0F0PfGihPfOKVHV1GBOmmA-1; Fri, 03 Jul 2020 05:04:52 -0400
-X-MC-Unique: 0F0PfGihPfOKVHV1GBOmmA-1
-Received: by mail-wm1-f72.google.com with SMTP id h6so34436054wmb.7
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:04:51 -0700 (PDT)
+ bh=J87y6/ALZV5j2hxcU6iv08lRd5sVzb2p1LKaAZ1dyww=;
+ b=PktqJYCFDRVdf16AcozFUD05+JoA3j5QkHjEqV8UakyoNCX1KaDzWU+f+mRKy4xUOip80Y
+ EUbCLLjIgMMcJ5xHJIAcBCSnTEfX+9dpaDQcUBn6XtLuRiEuEpCEJKRB8fiKFUVgA6gykZ
+ 9MVWoLg8gPuicUf4RZ5S8oUg4jk/BCM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-Yh3HwYPuN9ezq8KJMRgMlg-1; Fri, 03 Jul 2020 05:04:49 -0400
+X-MC-Unique: Yh3HwYPuN9ezq8KJMRgMlg-1
+Received: by mail-wr1-f70.google.com with SMTP id 89so7685945wrr.15
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:04:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=qOJsVqrCvYFr1+pi9ZUb1wgSPCHp9bN1XR/9RybzirU=;
- b=t6wMhs8dl3VHruOIyh2vYsdaNXmYt2p5KDlqlRHZMnkuJ9Kbpj7+MEfCR1MvtFQKtd
- 1+U3v8o3WwzY0feISFF/SO6ONSP0b6oPxFV0cwXr7vG4yhL/kvdYv2C6lGTMju5+Yj4i
- PeqwN/pGxpqOv0UG2QscdQua4nTvTNARAgscsHxXpqyX86VavQaOjxkjEdTT64u8lmGX
- 4sZSynuikmClgaEsthJDisvOahdbqRTCLQhPraxsGPMWf9fX1Or4uPn6WpqzjInWfpVw
- n7bgt2Vk+tJBgrOsNqZxBTr721X0r1ev9Bo9wdbbVCZ9SEpTuSQsVpnak1YJ5LOz6rkC
- cn9Q==
-X-Gm-Message-State: AOAM533KNLspFN7EWF5QRrrJXrjqW4OmzfbcUEwxp4ebBuRFAFYE3vGI
- TXnKsHxPeE+OdRsHq491M5l3kEGjax/r+a0fhKXUfuewFxtYEPwTxxZMEEaVAtXoPTc9SB6vLqZ
- RI0rKI30k/ROB/QA=
-X-Received: by 2002:adf:f889:: with SMTP id u9mr39235924wrp.149.1593767090098; 
- Fri, 03 Jul 2020 02:04:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzySN1/QREO4c5w90k2hJ1JxA3lvy9YL/6xY6hlGJyqClhZmdp042tt2BsRx5fcoQ9gOZZIHQ==
-X-Received: by 2002:adf:f889:: with SMTP id u9mr39235906wrp.149.1593767089927; 
- Fri, 03 Jul 2020 02:04:49 -0700 (PDT)
+ bh=J87y6/ALZV5j2hxcU6iv08lRd5sVzb2p1LKaAZ1dyww=;
+ b=rmO7/UF4yxVyAENMHlKpVfitutcWNSCsmNcFWyZD4J2A7KW7qiSSHhYA7rwm1IJZ8g
+ VwUBKub83cR3d8mdu6bQK4zeE9GLJMltI4uQMTlDIW8SiCJpnIlcj66ApyiCe6t30Sfw
+ 7PQ/cb0nPInYpE3o5WOeOaZLZofotamn1E2+hVpFYZ+Dw4Q4s6LLV/tGFtkIG7eisuBh
+ OibZQeP4fkStbsmQbGod9pI0XYX6PSd+z+80itX0eKZnsInHfUabNWeKwBLdh60+Tk81
+ b6LQso3V3/4Xs+zGdPBC2TqmtLlniBPmDj/9cW27rr5ihfBWltu+/rqcomZNN9Ekp781
+ wl2A==
+X-Gm-Message-State: AOAM533WAjrVPn/qtWqSOTK4vFUsOdgAfXuQJLbta4n6VlwZ3QOUvAmP
+ 1k4Zw0tBtsr1mg8xAYksXYeTYdabIUY6TMc5Vl0cqalHpvW2OS/A1X3rPNkGIYX0Y3iYLjWIfWW
+ ON0o/ciNnlEpmmr8=
+X-Received: by 2002:adf:ef89:: with SMTP id d9mr38010490wro.124.1593767087724; 
+ Fri, 03 Jul 2020 02:04:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzSYSfj3xYoukHI0nOCXK7dVWXT/4kzB734/IOwzyT6AJ8eKiFl1wqTUJigyr1s6tJp2eFNgg==
+X-Received: by 2002:adf:ef89:: with SMTP id d9mr38010467wro.124.1593767087490; 
+ Fri, 03 Jul 2020 02:04:47 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- d81sm40383962wmc.0.2020.07.03.02.04.48
+ r12sm13030188wrc.22.2020.07.03.02.04.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 02:04:49 -0700 (PDT)
-Date: Fri, 3 Jul 2020 05:04:47 -0400
+ Fri, 03 Jul 2020 02:04:46 -0700 (PDT)
+Date: Fri, 3 Jul 2020 05:04:45 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/41] vhost_net: use the function qemu_get_peer
-Message-ID: <20200703090252.368694-30-mst@redhat.com>
+Subject: [PULL 28/41] net: introduce qemu_get_peer
+Message-ID: <20200703090252.368694-29-mst@redhat.com>
 References: <20200703090252.368694-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
@@ -88,9 +88,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -111,8 +111,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
  Cindy Lu <lulu@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -120,74 +119,49 @@ Sender: "Qemu-devel"
 
 From: Cindy Lu <lulu@redhat.com>
 
-user the qemu_get_peer to replace the old process
+This is a small function that can get the peer
+from given NetClientState and queue_index
 
 Signed-off-by: Cindy Lu <lulu@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20200701145538.22333-3-lulu@redhat.com>
+Message-Id: <20200701145538.22333-2-lulu@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/vhost_net.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ include/net/net.h | 1 +
+ net/net.c         | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index 6b82803fa7..4096d64aaf 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -306,7 +306,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
-     VirtioBusState *vbus = VIRTIO_BUS(qbus);
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
-+    struct vhost_net *net;
-     int r, e, i;
-+    NetClientState *peer;
+diff --git a/include/net/net.h b/include/net/net.h
+index 39085d9444..e7ef42d62b 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -176,6 +176,7 @@ void hmp_info_network(Monitor *mon, const QDict *qdict);
+ void net_socket_rs_init(SocketReadState *rs,
+                         SocketReadStateFinalize *finalize,
+                         bool vnet_hdr);
++NetClientState *qemu_get_peer(NetClientState *nc, int queue_index);
  
-     if (!k->set_guest_notifiers) {
-         error_report("binding does not support guest notifiers");
-@@ -314,9 +316,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     }
+ /* NIC info */
  
-     for (i = 0; i < total_queues; i++) {
--        struct vhost_net *net;
+diff --git a/net/net.c b/net/net.c
+index d1130296e1..9099a327dd 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -325,6 +325,13 @@ void *qemu_get_nic_opaque(NetClientState *nc)
+     return nic->opaque;
+ }
  
--        net = get_vhost_net(ncs[i].peer);
-+        peer = qemu_get_peer(ncs, i);
-+        net = get_vhost_net(peer);
-         vhost_net_set_vq_index(net, i * 2);
- 
-         /* Suppress the masking guest notifiers on vhost user
-@@ -335,15 +337,16 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
-     }
- 
-     for (i = 0; i < total_queues; i++) {
--        r = vhost_net_start_one(get_vhost_net(ncs[i].peer), dev);
-+        peer = qemu_get_peer(ncs, i);
-+        r = vhost_net_start_one(get_vhost_net(peer), dev);
- 
-         if (r < 0) {
-             goto err_start;
-         }
- 
--        if (ncs[i].peer->vring_enable) {
-+        if (peer->vring_enable) {
-             /* restore vring enable state */
--            r = vhost_set_vring_enable(ncs[i].peer, ncs[i].peer->vring_enable);
-+            r = vhost_set_vring_enable(peer, peer->vring_enable);
- 
-             if (r < 0) {
-                 goto err_start;
-@@ -355,7 +358,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
- 
- err_start:
-     while (--i >= 0) {
--        vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
-+        peer = qemu_get_peer(ncs , i);
-+        vhost_net_stop_one(get_vhost_net(peer), dev);
-     }
-     e = k->set_guest_notifiers(qbus->parent, total_queues * 2, false);
-     if (e < 0) {
++NetClientState *qemu_get_peer(NetClientState *nc, int queue_index)
++{
++    assert(nc != NULL);
++    NetClientState *ncs = nc + queue_index;
++    return ncs->peer;
++}
++
+ static void qemu_cleanup_net_client(NetClientState *nc)
+ {
+     QTAILQ_REMOVE(&net_clients, nc, next);
 -- 
 MST
 
