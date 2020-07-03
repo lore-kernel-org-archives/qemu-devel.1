@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3339C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E76CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:42:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77503208C7
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:42:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77503208C7
+	by mail.kernel.org (Postfix) with ESMTPS id 04F3B208C7
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:42:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F3B208C7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrFOu-0001K5-Oc
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:42:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54730)
+	id 1jrFPU-00024M-AG
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:42:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFIE-00076s-G3; Fri, 03 Jul 2020 02:35:26 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:53094)
+ id 1jrFHt-0006aA-3r; Fri, 03 Jul 2020 02:35:05 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:53068)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFIB-00037N-G9; Fri, 03 Jul 2020 02:35:26 -0400
+ id 1jrFHq-00036O-JB; Fri, 03 Jul 2020 02:35:04 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 9D3E2BF80E;
- Fri,  3 Jul 2020 06:35:01 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 3B3C8BF848;
+ Fri,  3 Jul 2020 06:35:00 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 13/18] hw/block/nvme: make sure ncqr and nsqr is valid
-Date: Fri,  3 Jul 2020 08:34:15 +0200
-Message-Id: <20200703063420.2241014-14-its@irrelevant.dk>
+Subject: [PATCH v2 10/18] hw/block/nvme: fix missing endian conversion
+Date: Fri,  3 Jul 2020 08:34:12 +0200
+Message-Id: <20200703063420.2241014-11-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200703063420.2241014-1-its@irrelevant.dk>
 References: <20200703063420.2241014-1-its@irrelevant.dk>
@@ -77,36 +77,27 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-0xffff is not an allowed value for NCQR and NSQR in Set Features on
-Number of Queues.
+Fix a missing cpu_to conversion.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/nvme.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/block/nvme.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 9cff0f45dd7e..8230e0e3826b 100644
+index f3a5b857bc92..ba523f6768bf 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1256,6 +1256,14 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+@@ -1080,7 +1080,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+ 
+         break;
+     case NVME_VOLATILE_WRITE_CACHE:
+-        result = blk_enable_write_cache(n->conf.blk);
++        result = cpu_to_le32(blk_enable_write_cache(n->conf.blk));
+         trace_pci_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
          break;
      case NVME_NUMBER_OF_QUEUES:
-+        /*
-+         * NVMe v1.3, Section 5.21.1.7: 0xffff is not an allowed value for NCQR
-+         * and NSQR.
-+         */
-+        if ((dw11 & 0xffff) == 0xffff || ((dw11 >> 16) & 0xffff) == 0xffff) {
-+            return NVME_INVALID_FIELD | NVME_DNR;
-+        }
-+
-         trace_pci_nvme_setfeat_numq((dw11 & 0xFFFF) + 1,
-                                     ((dw11 >> 16) & 0xFFFF) + 1,
-                                     n->params.max_ioqpairs,
 -- 
 2.27.0
 
