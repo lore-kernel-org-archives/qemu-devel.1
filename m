@@ -2,122 +2,86 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E90C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1FCC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30BEB20826
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:24:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD2A220723
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:24:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LunQVUgn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30BEB20826
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbNsrPgZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD2A220723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHvf-0007G3-Do
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:24:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32802)
+	id 1jrHvl-0007V9-1f
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrHgR-0000Cr-B4; Fri, 03 Jul 2020 05:08:35 -0400
-Received: from mail-eopbgr140133.outbound.protection.outlook.com
- ([40.107.14.133]:62071 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrHgO-0005Bb-U8; Fri, 03 Jul 2020 05:08:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C4AY0Ep0XMLvWjRbcvX1CzIra9cp56MtaTbTkGCacPsBPUtsXqWHjhEng5DOHajT2JfvusRniNfXriwwZa+Evf+TBAOIbYbM4QzlBugVXPx1UZF3jx/VT57NgbZ9h/jnwLp2DfAUyfxHoLeDEKdokVM8XeiLkypOEMQ0t4LekteDQNPNXqW2Nwwm8VGfGrSBfPC6JGk/q3yIVzb3PeMZtZO9ZNqBq/+w820d80QUvJu78IibQqLI2nPGc83IMiYNgwLzlQHV8MVG5EldE6gCjpbYgeSTFC7/XaP1qwRzWIUEoRorpNmvEq6N61GNFViHrbQ56w1uoXRaO9Zn4gjuNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q16QWkpMwIuNHc3KdZv/XpoCCAtL9O/q/HdoKTKbv4Q=;
- b=jgGwE0S2HBzoHY8CDSUWHqrNfdYpaYUXC+KQNWpbnKeTbn7F+G9YN+mPxqnksPbxVtejGpREGlQ/f7mdL4TEewFeDPgQZ9WwqJFSqunp/nYGSxmfw5a9PjLw5c2VFN9CJUIy1YR5MiP6h1Ypj2rLqN+E5XFYC80uCsy0IVonw8uOV3Rhc3gOH5NtxgH0BA5+GbDhdyHQvdL+P1Vx7eunhtvwAsKJAQaRPn2yCGzkNeoVaK2d5NeQOhQ7wi1OlQsq8Ju862TEmSSmtssSaIIiS6JqAAIZ7pq9GCuYJmIApR7JdRPMpzHhOrHQfQ2YF5srgPqLvIKuwgAtHagU3PTfsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q16QWkpMwIuNHc3KdZv/XpoCCAtL9O/q/HdoKTKbv4Q=;
- b=LunQVUgnTaclkBF4I6nnQE+IFmN4OaxCnrkfTE3FeMAItn8A9u9KlmU/ye510QzOmG3UiyyGdumNGnZLmZ6ttTDA0uj70i4ZA9qYsOoz8m1ESgtLRMB8rUD5cdAx/BvHaqpVuNETkq1lnx5TAUOlZ85mD4+OsjdyjhC064G5zus=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.28; Fri, 3 Jul
- 2020 09:08:29 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Fri, 3 Jul 2020
- 09:08:29 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v11 0/8] error: auto propagated local_err part I
-Date: Fri,  3 Jul 2020 12:08:08 +0300
-Message-Id: <20200703090816.3295-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR10CA0022.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtV-0002pH-TF
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38910
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jrHtU-0000yJ-0i
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:22:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593768120;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TVF5KUpHWkY3Qg0PDkkb2MQ94k7vQg1CYbztYqZ3E/s=;
+ b=bbNsrPgZry0pKwnEnauxzeu0bOgh2iqDFtH8VXq4mA5rKEskTDQ/FQXq3yMoq7sVbQwfeJ
+ m4bHGwTrNKfWrrVZesoYIfa7XwEYGV+otiERZju4pkOTmQpibMJwcgajK8HUgP/VMJgirW
+ /9po8Z4j9Trfk2sfp3MPwRg3UwM5VrE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-SiLobQuyMleMxuVHlRWzmQ-1; Fri, 03 Jul 2020 05:21:58 -0400
+X-MC-Unique: SiLobQuyMleMxuVHlRWzmQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FA5F107ACCA;
+ Fri,  3 Jul 2020 09:21:57 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-90.ams2.redhat.com [10.36.114.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD86A7AC63;
+ Fri,  3 Jul 2020 09:21:56 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 5/7] vvfat: Fix array_remove_slice()
+Date: Fri,  3 Jul 2020 11:21:41 +0200
+Message-Id: <20200703092143.165594-6-kwolf@redhat.com>
+In-Reply-To: <20200703092143.165594-1-kwolf@redhat.com>
+References: <20200703092143.165594-1-kwolf@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.15) by
- AM0PR10CA0022.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23 via Frontend
- Transport; Fri, 3 Jul 2020 09:08:28 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.15]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1bd17e35-e055-464a-5372-08d81f30a715
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5448B4D9C641AAAE72A3A7E7C16A0@AM7PR08MB5448.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:549;
-X-Forefront-PRVS: 045315E1EE
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: L04HZ2pvo4FC4jRzJH8NlD47x6lKD5S+585bh7ZI9JBj3eB4TIc0PMyV8Q8msmfKLyK7roNEiqOfxB+gnhogaDtjnXGrJ+pubtnDggQzg53VjevKWAWdjb6PoRlnxYuLicjLP9DJqaRHeEzuo+L/K2Mxoxvo/MWeJD1YiarU4e1DHgIKMpGruGudnUHzpAdoUv4R5wLu08cdATQEBIHcD1ox+D0T4i2UEepDWif3GGJTBH3JzSGkthYoOZXVkhJg8KkQsB2T/v5d/3nBhSMhHff13aYoiq+2u/nDUcHZ72Pylx0mlTVUn5kJpkzrPehqk1hBQEm8NuEG01lHb8vH3rfi0G3eM9s1Hk1p79VTTX0GeCLUyLBfL2MoT16V6Ipc8gsgx+UwwLZcyPHkBuYkzw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(366004)(376002)(136003)(396003)(346002)(66946007)(66476007)(66556008)(966005)(2906002)(86362001)(1076003)(8676002)(83380400001)(6512007)(5660300002)(8936002)(6666004)(186003)(36756003)(4326008)(6506007)(16526019)(6486002)(6916009)(7416002)(26005)(478600001)(956004)(52116002)(316002)(54906003)(2616005);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: VB1dOkt/mh/DTF47kWkSm6T8zoiTIA0e7iYdoDje8lqTMTtTx33rQE1gttsV68xNybs3cKHdNWAJ4BTiEQsqW9nhOUfuY6OS8LOIKqJDeZxT6l+4NeCw7s1E8IUdCScAsCYBZghDbiw/jiTKnN6WhshK6Ohk1v3JmuLMVtSIz1DLOwrgZSnIETkkQY0SwnxZHDQAILD7IJ/epaPeWGG//Cj3ut6oX4RZnl4ECJADPm8DFK2wO8fyksb0RZiy6CgbOJV3Yuq9ZcljN895dCtn56h67nGKRbXapRZJYqqK7p2qwMPCGtjvFbqzPF6WkAiphxVswlhIN96t2GM00a+52jC+gSO9aXZU1nCXJxmne96rhnz9rDjkr65wF83kM8sVpiFrv1q4h2RiPj6AOSAi8TisjwQJPiU8aVMV+Km/WCPWbZ5u+0JHadyvMVd2zEB1inbewhjxWES8hxQ7hE+rKD+SmMU10qKuap8kzDd65yu5LBbUYPgWls+KhDfVVnWR
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1bd17e35-e055-464a-5372-08d81f30a715
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2020 09:08:29.6213 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tBVLwEgyFYNMa7oBcYgz6QK7YVU2CMRv33TIjpQ6dRQIAHbDNFc0aSI5YV1cFtWHwosuu19fqWa0Dv2DJmnGPKORWKMg/FqtU2LeCqcj7is=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
-Received-SPF: pass client-ip=40.107.14.133;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 05:08:30
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,121 +94,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, armbru@redhat.com,
- Max Reitz <mreitz@redhat.com>, groug@kaod.org,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: <20200702155000.3455325-1-armbru@redhat.com>
+array_remove_slice() calls array_roll() with array->next - 1 as the
+destination index. This is only correct for count == 1, otherwise we're
+writing past the end of the array. array->next - count would be correct.
 
-v11: (based-on "[PATCH v2 00/44] Less clumsy error checking")
-01: minor rebase of documentation, keep r-bs
-02: - minor comment tweaks [Markus]
-    - use explicit file name in MAINTAINERS instead of pattern
-    - add Markus's r-b
-03,07,08: rabase changes, drop r-bs
+However, this is the only place ever calling array_roll(), so this
+rather complicated operation isn't even necessary.
 
+Fix the problem and simplify the code by replacing it with a single
+memmove() call. array_roll() can now be removed.
 
-v11 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v11
-v10 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v10
+Reported-by: Nathan Huckleberry <nhuck15@gmail.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20200623175534.38286-3-kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/vvfat.c | 42 +++++-------------------------------------
+ 1 file changed, 5 insertions(+), 37 deletions(-)
 
-In these series, there is no commit-per-subsystem script, each generated
-commit is generated in separate.
-
-Still, generating commands are very similar, and looks like
-
-    sed -n '/^<Subsystem name>$/,/^$/{s/^F: //p}' MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Note, that in each generated commit, generation command is the only
-text, indented by 8 spaces in 'git log -1' output, so, to regenerate all
-commits (for example, after rebase, or change in coccinelle script), you
-may use the following command:
-
-git rebase -x "sh -c \"git show --pretty= --name-only | xargs git checkout HEAD^ -- ; git reset; git log -1 | grep '^        ' | sh\"" HEAD~6
-
-Which will start automated interactive rebase for generated patches,
-which will stop if generated patch changed
-(you may do git commit --amend to apply updated generated changes).
-
-Note:
-  git show --pretty= --name-only   - lists files, changed in HEAD
-  git log -1 | grep '^        ' | sh   - rerun generation command of HEAD
-
-
-Check for compilation of changed .c files
-git rebase -x "sh -c \"git show --pretty= --name-only | sed -n 's/\.c$/.o/p' | xargs make -j9\"" HEAD~6
-
-Vladimir Sementsov-Ogievskiy (8):
-  error: auto propagated local_err
-  scripts: Coccinelle script to use ERRP_AUTO_PROPAGATE()
-  SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
-  pflash: introduce ERRP_AUTO_PROPAGATE
-  fw_cfg: introduce ERRP_AUTO_PROPAGATE
-  virtio-9p: introduce ERRP_AUTO_PROPAGATE
-  nbd: introduce ERRP_AUTO_PROPAGATE
-  xen: introduce ERRP_AUTO_PROPAGATE
-
- scripts/coccinelle/auto-propagated-errp.cocci | 337 ++++++++++++++++++
- include/block/nbd.h                           |   1 +
- include/qapi/error.h                          | 208 +++++++++--
- block/nbd.c                                   |   7 +-
- hw/9pfs/9p-local.c                            |  12 +-
- hw/9pfs/9p.c                                  |   1 +
- hw/block/dataplane/xen-block.c                |  17 +-
- hw/block/pflash_cfi01.c                       |   7 +-
- hw/block/pflash_cfi02.c                       |   7 +-
- hw/block/xen-block.c                          | 102 +++---
- hw/nvram/fw_cfg.c                             |  14 +-
- hw/pci-host/xen_igd_pt.c                      |   7 +-
- hw/sd/sdhci-pci.c                             |   7 +-
- hw/sd/sdhci.c                                 |  21 +-
- hw/sd/ssi-sd.c                                |  10 +-
- hw/xen/xen-backend.c                          |   7 +-
- hw/xen/xen-bus.c                              |  92 ++---
- hw/xen/xen-host-pci-device.c                  |  27 +-
- hw/xen/xen_pt.c                               |  25 +-
- hw/xen/xen_pt_config_init.c                   |  17 +-
- nbd/client.c                                  |   5 +
- nbd/server.c                                  |   5 +
- MAINTAINERS                                   |   1 +
- 23 files changed, 690 insertions(+), 247 deletions(-)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
-
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Cc: xen-devel@lists.xenproject.org
-
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 62230542e5..2eb8cbb19f 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -140,48 +140,16 @@ static inline void* array_insert(array_t* array,unsigned int index,unsigned int
+     return array->pointer+index*array->item_size;
+ }
+ 
+-/* this performs a "roll", so that the element which was at index_from becomes
+- * index_to, but the order of all other elements is preserved. */
+-static inline int array_roll(array_t* array,int index_to,int index_from,int count)
+-{
+-    char* buf;
+-    char* from;
+-    char* to;
+-    int is;
+-
+-    if(!array ||
+-            index_to<0 || index_to>=array->next ||
+-            index_from<0 || index_from>=array->next)
+-        return -1;
+-
+-    if(index_to==index_from)
+-        return 0;
+-
+-    is=array->item_size;
+-    from=array->pointer+index_from*is;
+-    to=array->pointer+index_to*is;
+-    buf=g_malloc(is*count);
+-    memcpy(buf,from,is*count);
+-
+-    if(index_to<index_from)
+-        memmove(to+is*count,to,from-to);
+-    else
+-        memmove(from,from+is*count,to-from);
+-
+-    memcpy(to,buf,is*count);
+-
+-    g_free(buf);
+-
+-    return 0;
+-}
+-
+ static inline int array_remove_slice(array_t* array,int index, int count)
+ {
+     assert(index >=0);
+     assert(count > 0);
+     assert(index + count <= array->next);
+-    if(array_roll(array,array->next-1,index,count))
+-        return -1;
++
++    memmove(array->pointer + index * array->item_size,
++            array->pointer + (index + count) * array->item_size,
++            (array->next - index - count) * array->item_size);
++
+     array->next -= count;
+     return 0;
+ }
 -- 
-2.21.0
+2.25.4
 
 
