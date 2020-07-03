@@ -2,126 +2,73 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D49C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD551C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:13:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0C48206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F45B206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 18:13:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HJ+qNabP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C48206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="XyddKv/E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F45B206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrQ8B-0001nf-1v
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 14:09:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39700)
+	id 1jrQC8-0004Ub-On
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 14:13:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrQ73-00011H-19; Fri, 03 Jul 2020 14:08:37 -0400
-Received: from mail-eopbgr10094.outbound.protection.outlook.com
- ([40.107.1.94]:15525 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jrQB5-0003uR-R2
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 14:12:50 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:53123)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jrQ71-0005vk-3f; Fri, 03 Jul 2020 14:08:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dl8esQEklFqcveEiJ4LLuKFGabk19sKZB6J6fQcXuMVpqN+3usOjQA5sdOpnaXO4tpP5Ev5Z2/jGHaNzSjhiGG4ZAlDQabEF9xzqlKGG+rqVld0fDl9MxO8QztSS1tjdn5Re1aQCqjTpwGu9dbWHjI0tn2/VAFx7Xzf/9tfSDzpIT4mc++HOFTy8RXu3ttEzJLirOhiZn22vSLreG00rdSJ3B5npvprMm1stvAYiOS/Q3JPd8qNdKR3kPeKsUYPDclxJY/s14LCmhTZjSXiAI0SfIh20+8MQ2AbtqhcqlQR2YEUSsHCnHxJHNcJD42SYwKVJWaSxPVOoRVMEKMusFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3BRxcqyhfN4BFMHbaxxA1LSgeTBDZ/YsKJVHB40GJXI=;
- b=VZNOZZtzbUhooQ598RfewxBc3H5PqiI5U9yk5oSA/ZsAC6jK/8/dPmPIPwbDRBfe1uG/9pA7UTezCN+qMAO5LJF3BoMAB0xQrvLcHrTKLvekVO0GzO8/ZYn2sYztsWlsw5d+YaN7fikv7KgISXK/qnPB2TWZPpagAh9pYe2f2CYeQlXmX2h4ZKLgdAYZFscTTCvFZV3v5lzhsRl1pRImkU0bEEHP1yqGx9w1lJThH0Fi+/R8PUPLqkESew4aYT5B7rXdKl6WrFniKHyNvrmGLmOjb7JmHoR4VittiZ5xtkCj68rfmyIk8dtAwsiJ8JkTmY8aF36yVIYlvdWbyGmuYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3BRxcqyhfN4BFMHbaxxA1LSgeTBDZ/YsKJVHB40GJXI=;
- b=HJ+qNabPTRutBgp1riy7ld+14naPKs+NjyqzlAO9U1ECHGV7HrvQpjOKpuAuwoMpqT2E5CANZ/e/gnP65Btl3z4V+NLBy36KZ4K5hu5YNbnGZMj8fwwqWoAirC9L3tFaDMe6Cd2TEnJKkTmE0rxhVFK1Lvjrk9JcZMGPfK4d/hk=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
- by VI1PR08MB2685.eurprd08.prod.outlook.com (2603:10a6:802:1d::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.28; Fri, 3 Jul
- 2020 18:08:31 +0000
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::2c53:d56b:77ba:8aac]) by VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::2c53:d56b:77ba:8aac%7]) with mapi id 15.20.3131.036; Fri, 3 Jul 2020
- 18:08:30 +0000
-Subject: Re: [PATCH v3 00/10] drop unallocated_blocks_are_zero
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200528094405.145708-1-vsementsov@virtuozzo.com>
- <68480ac0-8186-4dd1-86c9-2789f85f3e3a@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <15511ebf-656f-1d56-3ba7-284daccc81a2@virtuozzo.com>
-Date: Fri, 3 Jul 2020 21:08:27 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <68480ac0-8186-4dd1-86c9-2789f85f3e3a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0501CA0056.eurprd05.prod.outlook.com
- (2603:10a6:200:68::24) To VI1PR08MB5503.eurprd08.prod.outlook.com
- (2603:10a6:803:137::19)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jrQB3-0007OB-Aj
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 14:12:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=ohZDw3bJkitu6+J48VAUrgc8f3zLT8Z79n3TuL+exog=; b=XyddKv/EklVrfH3PKGgFmL4g0c
+ E4JCX9kfPtAgsiD7tgMdAOabsAkELGEMlY4TWNX/e8XNHLBqOeKceZm4RSr8UkxTQrBCpFKZBy7Lu
+ q+RhXM2uU7MnnX6DtOOqn4ykhrOhqQfUM7xCGs+scVZLpGY0E+DdsSamv8XiW22smVgVZj1TEHpdR
+ xyQykqC9AYfnWeWiUwGZG7yj9he1ndJxPudf1R+mvTwg4OT8AV0Yx28GvutJW/dCItqn7n0wSJyy6
+ VCFWwowJTVq/LSnblGxeumU0En4XzDKrCyMUxSi10VEv+p2qkiWn+hf3oh0+hzBvDRSebhH8KsMPh
+ I+j7rUSPEDNlILL4gWx53AB1Dj3AlTe6tIOKtSVw0+fLmKTvtPau5e6MDYwYNulBzMqEijkQWsCOG
+ JOyzK2QAK8C37Md/xlrnUvVx66+kajiy0BxI44DTktC5b6UAPZSU9VSxBiDJZv21+/GgqKHVZcQHT
+ PQ4iVIN+5lA5u2DzbtkC+LyX6eUHX7el3WNn2ndi+rp3tKUpiz2nXmRkWeupRK9kjOHw/zis9lpa0
+ vbiYGZ3DeTpB9u1Ibu8550W1WzJLwlhkon+Ggeh3Qyw/WhFOoEuxtYc03+fIwscOK4uzaQ1uuMBjS
+ 8/grKf7Rf6MVJa+IAuPNeSQvHB/75d2WRNWrHaQe8=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
+Date: Fri, 03 Jul 2020 20:12:40 +0200
+Message-ID: <3725173.XoidOMcW12@silver>
+In-Reply-To: <20200703175315.61461738@bahia.lan>
+References: <cover.1587309014.git.qemu_oss@crudebyte.com>
+ <5261112.usFQB0EGfy@silver> <20200703175315.61461738@bahia.lan>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.15) by
- AM4PR0501CA0056.eurprd05.prod.outlook.com (2603:10a6:200:68::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20 via Frontend
- Transport; Fri, 3 Jul 2020 18:08:28 +0000
-X-Originating-IP: [185.215.60.15]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c5038e3e-6f19-46ee-0c61-08d81f7c1741
-X-MS-TrafficTypeDiagnostic: VI1PR08MB2685:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR08MB26855A873D5C1B8065ADA572C16A0@VI1PR08MB2685.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-Forefront-PRVS: 045315E1EE
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7DMJH/4x1Q0JWj6gxYuZ6Bl5UuTS5tpJ1wYTLYHBOMTKrgLTZ8Bc321iUQlNbeVMUZ5vxvppu2mjk9BhyA0YAlRDkcIXBp8397EXbd81Hz96dqlBugzkWY+5p+jNwmgvZD82KV8DRpN34M3+QXskJE/TpEr/ZSBepvGB/4hicxuy6uWey12aCzxO1R5slITOjSvz60J0Ou4U5fECR49427n3ts0AdQCy0koVyFRgGyXQgm38PFKKUfjle78MxDYDdFZSayy2kY0VeuEqzT/S+SfW5tePUntj0L4SpWVwb7BTIiuO/iVwZqDlLbUoa3XHt/xnfSlue85sp2mBO8ga51aRO7y48fVIxBxIsyxGCL7ULAUlDv0wkWQufm0W+HrnI02V1MjI4BiQmGWAA+ad8ZBiTLBqm5KnnbSthvR7+ZXPmCrwcbiuI6XaJk+oEeerYQv2ZhlolN7qyV4H2/DtYQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(366004)(39850400004)(346002)(136003)(376002)(31686004)(36756003)(52116002)(316002)(31696002)(83380400001)(7416002)(26005)(4326008)(8936002)(16526019)(86362001)(2616005)(956004)(2906002)(5660300002)(186003)(478600001)(66556008)(66476007)(66946007)(16576012)(6486002)(4744005)(8676002)(966005)(53546011)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: EvnAiKI6y5GbmSKmOmbSUpC9MhVgRkq3lNy6NUF94KSs96H88NcbFUJNseUlgLrQq8lMWnMzGfIjXveFmG+mGKnb3f2WkdeqB6NLItQ0JI8jBvhH68AfxDgoG2WYZg0ZXuaBL0hMujkPdnhNiRznBJUna2rSfA5JVFwgiIM8xTsj4R7lE8+ziI/LW9yOfC1fWoQj1KlxNJ9f2hDudaU6xchfIZV58imbxLcBqeSQFKYziKMOX6wYqRiHxNg+/G0TGACmwoYhIsbOut1dtgFQgWE2tIdcpH1f1GggEpFmkTYmvn4nEZGOPNEIeasPOEkSe9RexRHYauqAW4GyNUGxrYslVvN0AfWBXNQRinxGV6Lm+dPOKG/aYDZAA8o/QVisocLtwuy28u09D9zpRqXh8T/MLOja1uHpxBuyx0jpsiWRAf2lGpxjjVwQLxqWma6XCfQ8AkUFmiNdViqcp69f47qln+rFzQXoCPx3VkHMo5e13fA9BkH7xRWgY+HlVXZf
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5038e3e-6f19-46ee-0c61-08d81f7c1741
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2020 18:08:30.2436 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4T6i0cri2/shRTzZmtVzoY/7MHmC8/HuijaHx/E10lLbg6ee5nP/8sSUClhHKaf7mG2eFVt0ZJPaTJTIhiIN77XUzVWZarzduXlO+rYfBZE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB2685
-Received-SPF: pass client-ip=40.107.1.94;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 14:08:32
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=5.189.157.229;
+ envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 14:12:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,35 +81,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, stefanha@redhat.com, codyprime@gmail.com,
- sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org, ronniesahlberg@gmail.com,
- pbonzini@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-03.07.2020 17:06, Max Reitz wrote:
-> On 28.05.20 11:43, Vladimir Sementsov-Ogievskiy wrote:
->> This is first step to block-status refactoring, and solves most simple
->> problem mentioned in my investigation of block-status described in
->> the thread "backing chain & block status & filters":
->>    https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg04706.html
->>
->> The whole series is reviewed, let's proceed with it please!
->>
->> v3: rebase on master
->> 02: grammar fix in commit msg, add Eric's r-b
->> 03,04,09: add Eric's r-b
->> 10: add my r-b
+On Freitag, 3. Juli 2020 17:53:15 CEST Greg Kurz wrote:
+> > > I don't remember questioning the overall concept behind these changes
+> > > because it looks reasonable enough (even if I would appreciate to be
+> > > able to verify them with a working reproducer).
+> > 
+> > What exactly do you mean here with working reproducer?
 > 
-> Thanks, applied to my block branch:
-> 
-> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-> 
+> Some test program to be run in a real guest that gets improved performance
+> with this patch set for example.
 
-Thanks!
+Mhm, for now the benchmark patches already provided should be proof enough 
+that this optimization will bring significant improvements in the end.
 
--- 
+Like mentioned on a side note; to actually feel the difference with a real 
+Linux client, a kernel patch is also required for the guest. But I definitely 
+don't start dealing with LKML before the ground is laid on QEMU side (i.e. 
+this patch set is merged on master).
+
+> > I don't say don't care about code style, details et al., but caring a bit
+> > less on reviews would not hurt, so to say. A bit of (invisible) tolerance
+> > avoids friction and stagnancy.
+> 
+> No, this friction and stagnancy is essentially the result of not sharing
+> the same agenda and different tastes also.
+
+That summary is a bit too simple, and you know that. But okay, let's leave it 
+that way.
+
+> > rather block for something between <1ms .. 8ms, i.e. fs driver completes
+> > before it would be able to actually see a flush request.
+> > 
+> > But to make it also clear: it would not bite with the new design either.
+> > If
+> > someone really would see a necessity to abort readdir requests, that would
+> > be possible without huge changes.
+> 
+> Tflush requests are handled in the top-half exclusively by design, ie.
+> they rely on the worker thread handling the targeted request to yield
+> control back to the main I/O thread. Since this doesn't happen anymore
+> with your patches, I'm not sure how you be able to abort a _many readdir_
+> request once it's been fired into a worker thread.
+> 
+> A possible solution could be to break down a Treaddir into multiple
+> _many readdirs_ jobs, and have a knob or some logic to control the
+> latency ratio.
+
+Too complicated, there is no need to break it down into subtasks or something. 
+It can be handled with a simple abort condition in readdir_many()'s loop. But 
+that's not an issue for now to discuss the details.
+
+> > > > > > > Then the whole seekdir/rewinddir/telldir/readdir sequence should
+> > > > > > > be called with a single v9fs_co_run_in_worker() invocation, in
+> > > > > > > which case the locking could just be something like:
+> > > > > > > 
+> > > > > > > int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState
+> > > > > > > *fidp,
+> > > > > > > 
+> > > > > > >                                       struct V9fsDirEnt
+> > > > > > >                                       **entries,
+> > > > > > >                                       int32_t maxsize, bool
+> > > > > > >                                       dostat)
+> > > > > > > 
+> > > > > > > {
+> > > > > > > 
+> > > > > > >     int err = 0;
+> > > > > > >     
+> > > > > > >     if (v9fs_request_cancelled(pdu)) {
+> > > > > > >     
+> > > > > > >         return -EINTR;
+> > > > > > >     
+> > > > > > >     }
+> > > > > > >     
+> > > > > > >     v9fs_readdir_lock(&fidp->fs.dir);
+> > > > > > >     
+> > > > > > >     v9fs_co_run_in_worker({
+> > > > > > >     
+> > > > > > >         err = do_readdir_many(pdu, fidp, entries, maxsize,
+> > > > > > >         dostat);
+> > > > > > >     
+> > > > > > >     });
+> > > > > > >     
+> > > > > > >     v9fs_readdir_unlock(&fidp->fs.dir);
+> > > > > > >     return err;
+> > > > > > > 
+> > > > > > > }
+> > > > > > 
+> > > > > > That's exactly what should be prevented. The lock must be on
+> > > > > > driver
+> > > > > > thread
+> > > > > > side, not on main thread side. The goal is to reduce the time
+> > > > > > slice of
+> > > > > > individual locks. If the lock is on main thread, the time slice of
+> > > > > > a
+> > > > > > lock
+> > > > > > (even on huge directories with thousands of entries) is multiple
+> > > > > > factors
+> > > > > > larger than if the lock is on driver thread side. So that's not
+> > > > > > just
+> > > > > > few
+> > > > > > percent or so, it is huge.
+> > > > > 
+> > > > > Sorry I don't get it...  In a contention-less situation, which is
+> > > > > the
+> > > > > case we really care for, qemu_co_mutex_lock() has no overhead.
+> > > > 
+> > > > Yes, it only kicks in if there is concurrency.
+> > > 
+> > > And we don't care to preserve performance for silly clients, do we ?
+> > 
+> > We don't necessarily need to preserve performance for them, that's right.
+> > But it is already handled appropriately for them, so destroying it (i.e.
+> > slowing them down) only makes sense if there is a good reason for that.
+> 
+> Ending up with a mix of two different kind of mutexes for 9p2000.L and .u is
+> a good enough reason for me.
+
+Correct behaviour always has precedence before code aesthetics, but we already 
+agreed to remove the lock entirely anyway, so let's move on.
+
+> > > > > > > This would technically leave the locking in the main I/O thread,
+> > > > > > > but it isn't conceptually different from locking at the
+> > > > > > > beginning
+> > > > > > > of do_readdir_lock() and unlocking before returning. My concern
+> > > > > > > is that I don't know how coroutine mutexes behave with multiple
+> > > > > > > worker threads...
+> > > > > > 
+> > > > > > Well, your Mutex -> CoMutex change was intended to fix a deadlock
+> > > > > > with
+> > > > > > the
+> > > > > > old readdir implementation. That deadlock could not happen with
+> > > > > > the
+> > > > > > new
+> > > > > > readdir implementation, which suggests that it probably makes
+> > > > > > sense to
+> > > > > > revert this change (i.e. CoMutex -> Mutex) for this new
+> > > > > > implementation.
+> > > > > 
+> > > > > No we can't because it is also used with 9p2000.u, that you said you
+> > > > > don't want to fix.
+> > > > 
+> > > > Yes and no, I did not say I don't want to fix readdir for 9p2000.u at
+> > > > all.
+> > > > What I said was I want to prioritize and concentrate on the most
+> > > > relevant
+> > > > issues first. 9p2000.L is the most commonly used protocol variant, so
+> > > > I
+> > > > would like to fix the most severe (e.g. performance) issues for
+> > > > 9p2000.L
+> > > > first before spending time on 9p2000.u which is AFAICS barely used in
+> > > > comparison, which I personally don't use at all, and which I am hence
+> > > > not
+> > > > testing in the same degree and cannot serve with the same quality as
+> > > > 9p2000.L right now.
+> > > > 
+> > > > Plus if there are really users caring for 9p2000.u, I can gladly
+> > > > assist
+> > > > them to address these issues for 9p2000.u as well, provided that they
+> > > > help at least with testing the required 9p2000.u changes.
+> > > 
+> > > I would personally do the opposite... again ;)
+> > > 
+> > > Like you say we essentially care for 9p2000.L and we only do limited
+> > > support for 9p2000.u. If we have a change that we really want for
+> > > 9p2000.L but it has an impact on 9p2000.u because of shared code,
+> > > it is fine to do the changes anyway, including changes to the 9p2000.u
+> > > specific code. Very basic testing of 9p2000.u (mount/ls or find/umount)
+> > > or maybe running pjd-fstest is enough IMHO. If we break someone's setup
+> > > and he complains, then we can ask him to test a fix before we merge it.
+> > 
+> > Well, so you want to handle the relevant 9p2000.u readdir optimizations by
+> > yourself, and you would send it as follow-up patch set (after this set is
+> > through), including test cases?
+> 
+> Ah it wasn't my point. I was just saying that any valuable change for
+> 9p2000.L prevails and if you have to change some common code (eg.
+> locking) that could impact the 9p2000.u experience, you can do it
+> anyway, even if you only do smoke testing with 9p2000.u.
+
+Ah I see, so you would. But you don't. ;-)
+
+And yes, I could. But I won't either, for the following reasons:
+
+1. I would have to write readdir test cases for 9p2000.u as well, because the 
+   9p2000.L tests are incompatible. -> My time
+
+2. I have to change the 9p2000.u server code -> My time
+
+3. This patch grows substantially, by both lines and amount of patches -> My
+   time and probably +10 versions more of this patch series.
+
+4. I would have to do at least some basic testing of 9p2000.u behaviour
+   -> My time
+
+All these things would bring me +x months farther away from reaching my actual 
+goal: making 9p useable by Linux clients. So no, I don't waste time on 
+9p2000.u optimizations before I see somebody actually caring for 9p2000.u 
+efficiency.
+
 Best regards,
-Vladimir
+Christian Schoenebeck
+
+
 
