@@ -2,55 +2,88 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC618C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1086EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE89920675
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:19:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE89920675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id B11C120675
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:20:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ATP21OfK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B11C120675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrLay-0006aD-1T
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:19:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43652)
+	id 1jrLbk-0007u6-Pe
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:20:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLWG-0007N2-3F; Fri, 03 Jul 2020 09:14:20 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60358 helo=relay3.sw.ru)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLWC-0007eW-Uw; Fri, 03 Jul 2020 09:14:19 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.93)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jrLVk-0004Vj-2Y; Fri, 03 Jul 2020 16:13:48 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v8 10/10] qcow2_format.py: support dumping metadata in JSON
- format
-Date: Fri,  3 Jul 2020 16:13:50 +0300
-Message-Id: <1593782030-521984-11-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 09:13:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jrLXN-0000ws-OM
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:15:30 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42650)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jrLXK-00081K-4j
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:15:29 -0400
+Received: by mail-ot1-x341.google.com with SMTP id g37so2914905otb.9
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 06:15:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=+oq+jdstCX5HFxMxLTaR5mr4I2zXa6c3eHgBmoGVyzs=;
+ b=ATP21OfKyI4/2FMe2VvgwZyZeH8z76j+dQbwxUHJkQCOEr5DtdIIf6sl1UcL+EMLk/
+ fzBeUfeVsuNn0tUzwEd+nVsv002Oc2pQ3Ke9YLecLgyireLv6UYyutC041LI50v+tBAA
+ 7EOEHXLzZrN8M4H635PxYC9kOjzQSqH1bblAZV8+Aeg+Lppcvt+dJVwHxnGlhmqtvnIx
+ n9Gpvk3IEUz83iOniAWjgEECOkCST/gYVt5oku4K6ncW55gGKtmO6A2yK23uO7OHqD4v
+ 0a4ychTU0Y5ppmxAbhHN97tuyInvKxSQWHNRcEe7zlFY4oqXozhnx8SWg20i1kc63fxG
+ USew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+oq+jdstCX5HFxMxLTaR5mr4I2zXa6c3eHgBmoGVyzs=;
+ b=jmzKTbB9DNnQXOuusWbupcCuA6uRj4VGBpw7fDm1vbDF8q8v2LhsiWjCqsiZ3+L0SY
+ kB2d7qZdsEz/d2hJsGfK4OtzvRqdGoOUgDzEQ86JAD1YP6UnrJ41L8QCwvNvRKsLDDOy
+ +LHDpAtxZUr+MQpDLh96lTXQyuAReNcO65QbyDo50yP/Js2zNsdJDwyI4hy4/wlXXp6O
+ JkD3DClPv9ePtLNLnHthQxZ+r4zMv3nC2zvGEI/LVCxEHBROhdxrrD3AA0vwjZagdIbK
+ qJ/B24xDjrPu1+nwd7YRAWxGJ3Uv52E3QENkmN9qhNuUAtbIfqRmLDCEFuzwpmCbKmS9
+ /drw==
+X-Gm-Message-State: AOAM533a1HxmAUwEm2cV/s/A8+P7QHHROS/iKEX46yLepwUdK09TBcxJ
+ 4GSoPk9gJP4J4mlsZWufK9Tu4PT4lnl15mWu+qN1Uw==
+X-Google-Smtp-Source: ABdhPJw+KlNnjFqyUdPyAysO/Kkj7P7fcEksINrN4QVsppjBsbuetByRxWbs7zYcCsIK5pyScB7oUTt2s1n5tl6huhY=
+X-Received: by 2002:a9d:7303:: with SMTP id e3mr24435935otk.221.1593782125076; 
+ Fri, 03 Jul 2020 06:15:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200630133912.9428-1-f4bug@amsat.org>
+ <20200630133912.9428-9-f4bug@amsat.org>
+In-Reply-To: <20200630133912.9428-9-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Jul 2020 14:15:14 +0100
+Message-ID: <CAFEAcA9K5ikriXrrNGSz2MN54uwEcLx7TM7CGjFuLEei7gKdcg@mail.gmail.com>
+Subject: Re: [PATCH v7 08/17] hw/sd/sdcard: Call sd_addr_to_wpnum where it is
+ used, consider zero size
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -64,183 +97,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implementation of dumping QCOW2 image metadata.
-The sample output:
-{
-    "Header_extensions": [
-        {
-            "name": "Feature table",
-            "magic": 1745090647,
-            "length": 192,
-            "data_str": "<binary>"
-        },
-        {
-            "name": "Bitmaps",
-            "magic": 595929205,
-            "length": 24,
-            "data": {
-                "nb_bitmaps": 2,
-                "reserved32": 0,
-                "bitmap_directory_size": 64,
-                "bitmap_directory_offset": 1048576,
-                "bitmap_directory": [
-                    {
-                        "name": "bitmap-1",
-                        "bitmap_table_offset": 589824,
-                        "bitmap_table_size": 1,
-                        "flags": 2,
-                        "type": 1,
-                        "granularity_bits": 15,
-                        "name_size": 8,
-                        "extra_data_size": 0,
-                        "bitmap_table": {
-                            "entries": [
-                                {
-                                    "type": "serialized",
-                                    "offset": 655360
-                                },
-                                ...
+On Tue, 30 Jun 2020 at 14:39, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> Avoid setting 'sect' variable just once (its name is confuse
+> anyway). Directly set 'sd->wpgrps_size'. Special case when
+> size is zero.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sd.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 078b0e81ee..e5adcc8055 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -556,8 +556,6 @@ static void sd_reset(DeviceState *dev)
+>      }
+>      size =3D sect << 9;
+>
+> -    sect =3D sd_addr_to_wpnum(size) + 1;
+> -
+>      sd->size =3D size;
+>      sd->state =3D sd_idle_state;
+>      sd->rca =3D 0x0000;
+> @@ -570,7 +568,11 @@ static void sd_reset(DeviceState *dev)
+>
+>      g_free(sd->wp_groups);
+>      sd->wp_switch =3D sd->blk ? blk_is_read_only(sd->blk) : false;
+> -    sd->wpgrps_size =3D sect;
+> +    if (sd->size) {
+> +        sd->wpgrps_size =3D sd_addr_to_wpnum(sd, sd->size) + 1;
+> +    } else {
+> +        sd->wpgrps_size =3D 1;
+> +    }
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/qcow2_format.py | 59 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index e8eb36f..70be4a1 100644
---- a/tests/qemu-iotests/qcow2_format.py
-+++ b/tests/qemu-iotests/qcow2_format.py
-@@ -19,6 +19,15 @@
- 
- import struct
- import string
-+import json
-+
-+
-+class ComplexEncoder(json.JSONEncoder):
-+    def default(self, obj):
-+        if hasattr(obj, 'get_fields_dict'):
-+            return obj.get_fields_dict()
-+        else:
-+            return json.JSONEncoder.default(self, obj)
- 
- 
- class Qcow2Field:
-@@ -113,6 +122,11 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
-         self.fields_dict = self.__dict__.copy()
- 
-     def dump(self, dump_json=None):
-+        if dump_json:
-+            print(json.dumps(self.get_fields_dict(), indent=4,
-+                             cls=ComplexEncoder))
-+            return
-+
-         for f in self.fields:
-             value = self.__dict__[f[2]]
-             if isinstance(f[1], str):
-@@ -150,6 +164,9 @@ class Qcow2BitmapExt(Qcow2Struct):
-             print()
-             entry.dump()
- 
-+    def get_fields_dict(self):
-+        return self.fields_dict
-+
- 
- class Qcow2BitmapDirEntry(Qcow2Struct):
- 
-@@ -195,6 +212,11 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
-         super(Qcow2BitmapDirEntry, self).dump()
-         self.bitmap_table.dump()
- 
-+    def get_fields_dict(self):
-+        bmp_name = dict(name=self.name)
-+        bme_dict = {**bmp_name, **self.fields_dict}
-+        return bme_dict
-+
- 
- class Qcow2BitmapTableEntry:
- 
-@@ -210,6 +232,9 @@ class Qcow2BitmapTableEntry:
-         else:
-             self.type = 'all-zeroes'
- 
-+    def get_fields_dict(self):
-+        return dict(type=self.type, offset=self.offset)
-+
- 
- class Qcow2BitmapTable:
- 
-@@ -226,6 +251,18 @@ class Qcow2BitmapTable:
-         for i, entry in bitmap_table:
-             print(f'{i:<14} {entry.type:<15} {entry.offset:<24} {size}')
- 
-+    def get_fields_dict(self):
-+        return dict(entries=self.entries)
-+
-+
-+class Qcow2HeaderExtensionsDoc:
-+
-+    def __init__(self, extensions):
-+        self.extensions = extensions
-+
-+    def get_fields_dict(self):
-+        return dict(Header_extensions=self.extensions)
-+
- 
- QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
- 
-@@ -241,6 +278,9 @@ class QcowHeaderExtension(Qcow2Struct):
-             0x44415441: 'Data file'
-         }
- 
-+        def get_fields_dict(self):
-+            return self.mapping.get(self.value, "<unknown>")
-+
-     fields = (
-         ('u32', Magic, 'magic'),
-         ('u32', '{}', 'length')
-@@ -306,6 +346,16 @@ class QcowHeaderExtension(Qcow2Struct):
-         else:
-             self.obj.dump(dump_json)
- 
-+    def get_fields_dict(self):
-+        ext_name = dict(name=self.Magic(self.magic))
-+        he_dict = {**ext_name, **self.fields_dict}
-+        if self.obj is not None:
-+            he_dict.update(data=self.obj)
-+        else:
-+            he_dict.update(data_str=self.data_str)
-+
-+        return he_dict
-+
-     @classmethod
-     def create(cls, magic, data):
-         return QcowHeaderExtension(magic, len(data), data)
-@@ -404,7 +454,16 @@ class QcowHeader(Qcow2Struct):
-         fd.write(buf)
- 
-     def dump_extensions(self, dump_json=None):
-+        if dump_json:
-+            ext_doc = Qcow2HeaderExtensionsDoc(self.extensions)
-+            print(json.dumps(ext_doc.get_fields_dict(), indent=4,
-+                             cls=ComplexEncoder))
-+            return
-+
-         for ex in self.extensions:
-             print('Header extension:')
-             ex.dump(dump_json)
-             print()
-+
-+    def get_fields_dict(self):
-+        return self.fields_dict
--- 
-1.8.3.1
-
+thanks
+-- PMM
 
