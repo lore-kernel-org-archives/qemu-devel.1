@@ -2,95 +2,68 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9EC4C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7131C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A437B20870
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6DB220870
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ST7f7R3o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A437B20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="kVdXEn8f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DB220870
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOQv-0000uQ-Sc
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:21:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60244)
+	id 1jrOQz-00012H-Rk
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:21:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrO9I-0001mX-NS
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:02:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60950
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrO9G-00006U-KX
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:02:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593792165;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rH2Dhr5IyF5hTu+C+FJwJzn/bdxmflkuVQlkAH0T6Pg=;
- b=ST7f7R3oalSTAmZYpvuHzUtTIEJ5CF9+gF3TEIyTrnOkeDVFvInu0z+aYvVCKE2ycJd6fs
- jO4xrLtH3qhBiHJ3WtkQNSIz/S62izPB/b9sehSFceee589N15tVUCDTpDNzKcfrqLe8lE
- 2a2oeeot7u8o4OjBZ5Onf1hfW2+RC8Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-SgZx_tJGMqW3penv9PSwxA-1; Fri, 03 Jul 2020 12:02:43 -0400
-X-MC-Unique: SgZx_tJGMqW3penv9PSwxA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90E8FEC1AA;
- Fri,  3 Jul 2020 16:02:42 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D4F1B7BD45;
- Fri,  3 Jul 2020 16:02:38 +0000 (UTC)
-Date: Fri, 3 Jul 2020 17:02:35 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 2/6] migration: introduce savevm, loadvm, delvm QMP
- commands
-Message-ID: <20200703160235.GM2213227@redhat.com>
-References: <20200702175754.2211821-1-berrange@redhat.com>
- <20200702175754.2211821-3-berrange@redhat.com>
- <fcff0e8b-fd60-2897-0553-49ab24a9b7fa@redhat.com>
- <20200702182452.GP1888119@redhat.com>
- <20200703154933.GE6641@work-vm>
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jrO5s-0003jD-JF; Fri, 03 Jul 2020 11:59:16 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:41784)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jrO5l-0007SC-8M; Fri, 03 Jul 2020 11:59:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+ bh=XvmUrGR71Xt8ZgPWAcZ6giCPlQgftC5eKXhHfCBQicY=; 
+ b=kVdXEn8fBteDMmZD7YFEX4aHGPhWEFXBZAmsCkRLb3RXBUIrWvDKinlcoMJaVSCsPUF6CzA+A/iNTpEHN1pHvgR3UL+y78zVCMtbl3pcn+f/cK0/OMTaQPcDechHIipMlLgUkKzTjMKsTRoA3YA4VxsNCM6293bp7xKCx3E6UHYyE8pdnshEJ5kh0gCLn71Qtq7oyMYavIDDeo6wKXjJysu1eYxrXHcL++20VQkhUk1dK4dzgNXGNi2HSqADt53E67iYLU7kijpW4Q8yZ9mYULcyGdPtMdYcMg4/LyBGGemHV3wiqJ5V91RRgK4i7U0gJ8MGophODaHDo+PsvmMyNA==;
+Received: from [81.0.49.0] (helo=perseus.local)
+ by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1jrO5L-0001Ri-UE; Fri, 03 Jul 2020 17:58:44 +0200
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1jrO52-0007QZ-FK; Fri, 03 Jul 2020 17:58:24 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 30/34] qcow2: Add prealloc field to QCowL2Meta
+Date: Fri,  3 Jul 2020 17:58:16 +0200
+Message-Id: <8d155ed48a10ed97851189e8502ea8a6773fac98.1593791819.git.berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.1593791819.git.berto@igalia.com>
+References: <cover.1593791819.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200703154933.GE6641@work-vm>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 11:21:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,87 +76,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Derek Su <dereksu@qnap.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 03, 2020 at 04:49:33PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrangé (berrange@redhat.com) wrote:
-> > On Thu, Jul 02, 2020 at 01:12:52PM -0500, Eric Blake wrote:
-> > > On 7/2/20 12:57 PM, Daniel P. Berrangé wrote:
-> > > > savevm, loadvm and delvm are some of the few commands that have never
-> > > > been converted to use QMP. The primary reason for this lack of
-> > > > conversion is that they block execution of the thread for as long as
-> > > > they run.
-> > > > 
-> > > > Despite this downside, however, libvirt and applications using libvirt
-> > > > has used these commands for as long as QMP has existed, via the
-> > > > "human-monitor-command" passthrough command. IOW, while it is clearly
-> > > > desirable to be able to fix the blocking problem, this is not an
-> > > > immediate obstacle to real world usage.
-> > > > 
-> > > > Meanwhile there is a need for other features which involve adding new
-> > > > parameters to the commands. This is possible with HMP passthrough, but
-> > > > it provides no reliable way for apps to introspect features, so using
-> > > > QAPI modelling is highly desirable.
-> > > > 
-> > > > This patch thus introduces trival savevm, loadvm, delvm commands
-> > > 
-> > > trivial
-> > > 
-> > > > to QMP that are functionally identical to the HMP counterpart, including
-> > > > the blocking problem.
-> > > 
-> > > Should we name them 'x-savevm', 'x-loadvm', 'x-delvm' to give ourselves room
-> > > to change them when we DO solve the blocking issue?  Or will the solution of
-> > > the blocking issue introduce new QMP commands, at which point we can add QMP
-> > > deprecation markers on these commands to eventually retire them?
-> > 
-> > I was in two minds about this, so I'm open to arguments either way.
-> > 
-> > The primary goal is for libvirt to consume the APIs as soon as possible,
-> > and generally libvirt doesn't want todo this is they are declared experimental
-> > via a "x-" prefix. So that pushes me away from "x-".
-> > 
-> > If we don't have an "x-" prefix and want to make changes, we can add extra
-> > parameters to trigger new behaviour in backwards compatible manner. Or we can
-> > simply deprecate these commands, deleting them 2 releases later, while adding
-> > completely new commands.
-> > 
-> > If we think the prposed design will definitely need incompatible changes in
-> > a very short time frame though, that would push towards "x-".
-> > 
-> > So IMHO the right answer largely depends on whether there is a credible
-> > strategy to implement the ideal non-blocking solution in a reasonable amount
-> > of time. I can't justify spending much time on this myself, but I'm willing
-> > to consider & try proposals for solving the blocking problem if they're not
-> > too complex / invasive.
-> 
-> Remind me, what was the problem with just making a block: migration
-> channel, and then we can migrate to it?
+This field allows us to indicate that the L2 metadata update does not
+come from a write request with actual data but from a preallocation
+request.
 
-migration only does vmstate, not disks. The current blockdev commands
-are all related to external snapshots, nothing for internal snapshots
-AFAIK. So we still need commands to load/save internal snapshots of
-the disk data in the qcow2 files.
+For traditional images this does not make any difference, but for
+images with extended L2 entries this means that the clusters are
+allocated normally in the L2 table but individual subclusters are
+marked as unallocated.
 
-So we could look at loadvm/savevm conceptually as a syntax sugar above
-a migration transport that targets disk images, and blockdev QMP command
-that can do internal snapshots. Neither of these exist though and feel
-like a significantly larger amount of work than using existing functionality
-that is currently working.
+This will allow preallocating images that have a backing file.
 
-Regards,
-Daniel
+There is one special case: when we resize an existing image we can
+also request that the new clusters are preallocated. If the image
+already had a backing file then we have to hide any possible stale
+data and zero out the new clusters (see commit 955c7d6687 for more
+details).
+
+In this case the subclusters cannot be left as unallocated so the L2
+bitmap must be updated.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.h         | 8 ++++++++
+ block/qcow2-cluster.c | 2 +-
+ block/qcow2.c         | 6 ++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 4ef4ae4ab0..f3499e53bf 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -463,6 +463,14 @@ typedef struct QCowL2Meta
+      */
+     bool skip_cow;
+ 
++    /**
++     * Indicates that this is not a normal write request but a preallocation.
++     * If the image has extended L2 entries this means that no new individual
++     * subclusters will be marked as allocated in the L2 bitmap (but any
++     * existing contents of that bitmap will be kept).
++     */
++    bool prealloc;
++
+     /**
+      * The I/O vector with the data from the actual guest write request.
+      * If non-NULL, this is meant to be merged together with the data
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index e023bc4b01..bbf373ad21 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1067,7 +1067,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+         set_l2_entry(s, l2_slice, l2_index + i, offset | QCOW_OFLAG_COPIED);
+ 
+         /* Update bitmap with the subclusters that were just written */
+-        if (has_subclusters(s)) {
++        if (has_subclusters(s) && !m->prealloc) {
+             uint64_t l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
+             unsigned written_from = m->cow_start.offset;
+             unsigned written_to = m->cow_end.offset + m->cow_end.nb_bytes ?:
+diff --git a/block/qcow2.c b/block/qcow2.c
+index f443a68935..04572f39e1 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2086,6 +2086,7 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
+         QCowL2Meta *next;
+ 
+         if (link_l2) {
++            assert(!l2meta->prealloc);
+             ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+             if (ret) {
+                 goto out;
+@@ -3131,6 +3132,7 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
+ 
+         while (meta) {
+             QCowL2Meta *next = meta->next;
++            meta->prealloc = true;
+ 
+             ret = qcow2_alloc_cluster_link_l2(bs, meta);
+             if (ret < 0) {
+@@ -4224,6 +4226,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+         int64_t clusters_allocated;
+         int64_t old_file_size, last_cluster, new_file_size;
+         uint64_t nb_new_data_clusters, nb_new_l2_tables;
++        bool subclusters_need_allocation = false;
+ 
+         /* With a data file, preallocation means just allocating the metadata
+          * and forwarding the truncate request to the data file */
+@@ -4305,6 +4308,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+                                    BDRV_REQ_ZERO_WRITE, NULL);
+             if (ret >= 0) {
+                 flags &= ~BDRV_REQ_ZERO_WRITE;
++                /* Ensure that we read zeroes and not backing file data */
++                subclusters_need_allocation = true;
+             }
+         } else {
+             ret = -1;
+@@ -4343,6 +4348,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+                     .offset       = nb_clusters << s->cluster_bits,
+                     .nb_bytes     = 0,
+                 },
++                .prealloc     = !subclusters_need_allocation,
+             };
+             qemu_co_queue_init(&allocation.dependent_requests);
+ 
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.20.1
 
 
