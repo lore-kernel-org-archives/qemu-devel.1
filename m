@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BB2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39012C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7737B206BE
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:47:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 057232064B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 07:47:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CVN+EQzj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7737B206BE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpvVS2ju"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057232064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrGPU-0005XH-Mh
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 03:47:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41778)
+	id 1jrGQL-0006T1-Ap
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 03:47:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrGOc-0004xs-1T
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:46:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59107
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrGPX-0005iu-M4
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:47:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37723
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrGOa-0003cO-CF
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:46:05 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrGPW-0003sG-4L
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 03:47:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593762363;
+ s=mimecast20190719; t=1593762421;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=oh4ix7yF7kHSw6yR2JWHivmV9mK35kvyGsl9jYMIyd4=;
- b=CVN+EQzjBoUEBVAtxgPSOM8Z2t925KJCAHqRpFu3WrsKKF6IzLUbZvR4jmE0VNjAm0QKft
- bPkGbGpo20nclO+MUVTHK6kL3le8O6sJq2EJs9dqaZQYI1BSAZ7yMuQpFa9/jXk1Uo3U0P
- tfV6m/Y+KmmeMpp08w4BFgbeCY6vBlM=
+ bh=ym2q5bhX/TzYJ3dtu8gVaynSIQOovfyIkkNLV8z4wmY=;
+ b=OpvVS2ju0CLscWFLiYWbBe/Vnr6mgD15amZVR+q84ZaO/lyCV3C8sSWVG+yXW2dHVyKQiw
+ SiVDAMyVvt3MdTQRnWng+SY/jAnyni9jeUpevH2BwcmsfLNupoLnObPeos4CzEEPv9DxyY
+ uqp5CyvvxTJZnjrQ5aH0XA7MowKbLzI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-FUyawSvvOxycOzaNjXHKkg-1; Fri, 03 Jul 2020 03:46:01 -0400
-X-MC-Unique: FUyawSvvOxycOzaNjXHKkg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-17-Y6YKwT3hNp2VAm-zlWwuGg-1; Fri, 03 Jul 2020 03:46:57 -0400
+X-MC-Unique: Y6YKwT3hNp2VAm-zlWwuGg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F02E8107ACCA;
- Fri,  3 Jul 2020 07:45:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DAC71052509;
+ Fri,  3 Jul 2020 07:46:56 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-131.ams2.redhat.com
  [10.36.113.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 77D0F73FF7;
- Fri,  3 Jul 2020 07:45:58 +0000 (UTC)
-Subject: Re: [PATCH v9 32/34] qcow2: Allow preallocation and backing files if
- extended_l2 is set
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DEDB7BD40;
+ Fri,  3 Jul 2020 07:46:54 +0000 (UTC)
+Subject: Re: [PATCH v9 33/34] qcow2: Assert that expand_zero_clusters_in_l1()
+ does not support subclusters
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1593342067.git.berto@igalia.com>
- <7bc65fa80f741d90be50ab25ede29b8e27aad677.1593342067.git.berto@igalia.com>
+ <171529b6cfb1f6e109c7b27096e35e8aad628b87.1593342067.git.berto@igalia.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,23 +86,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f0b2cf7d-be6c-b79b-6011-3f29d4518dbf@redhat.com>
-Date: Fri, 3 Jul 2020 09:45:56 +0200
+Message-ID: <f36517b8-a0d1-3ebc-6477-3b1fb837936f@redhat.com>
+Date: Fri, 3 Jul 2020 09:46:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <7bc65fa80f741d90be50ab25ede29b8e27aad677.1593342067.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <171529b6cfb1f6e109c7b27096e35e8aad628b87.1593342067.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="7sFLjr4NcRLXSEaXLPOgLRVu5v3bz5Rxp"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ boundary="maB9TnJmEOphdCoKbSTDEjHhUM62e9NvA"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -130,52 +130,51 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7sFLjr4NcRLXSEaXLPOgLRVu5v3bz5Rxp
-Content-Type: multipart/mixed; boundary="lu8KbKsEc7CaxKQilxzwwgys6UcbEyRs4"
+--maB9TnJmEOphdCoKbSTDEjHhUM62e9NvA
+Content-Type: multipart/mixed; boundary="E6Tdl6n3Gw6lDwD6lro6m4hz57GLxybhl"
 
---lu8KbKsEc7CaxKQilxzwwgys6UcbEyRs4
+--E6Tdl6n3Gw6lDwD6lro6m4hz57GLxybhl
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 28.06.20 13:02, Alberto Garcia wrote:
-> Traditional qcow2 images don't allow preallocation if a backing file
-> is set. This is because once a cluster is allocated there is no way to
-> tell that its data should be read from the backing file.
->=20
-> Extended L2 entries have individual allocation bits for each
-> subcluster, and therefore it is perfectly possible to have an
-> allocated cluster with all its subclusters unallocated.
+> This function is only used by qcow2_expand_zero_clusters() to
+> downgrade a qcow2 image to a previous version. This would require
+> transforming all extended L2 entries into normal L2 entries but this
+> is not a simple task and there are no plans to implement this at the
+> moment.
 >=20
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  block/qcow2.c              | 7 ++++---
->  tests/qemu-iotests/206.out | 2 +-
->  2 files changed, 5 insertions(+), 4 deletions(-)
+>  block/qcow2-cluster.c      | 8 +++++++-
+>  tests/qemu-iotests/061     | 6 ++++++
+>  tests/qemu-iotests/061.out | 5 +++++
+>  3 files changed, 18 insertions(+), 1 deletion(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---lu8KbKsEc7CaxKQilxzwwgys6UcbEyRs4--
+--E6Tdl6n3Gw6lDwD6lro6m4hz57GLxybhl--
 
---7sFLjr4NcRLXSEaXLPOgLRVu5v3bz5Rxp
+--maB9TnJmEOphdCoKbSTDEjHhUM62e9NvA
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7+4jUACgkQ9AfbAGHV
-z0BZRwf/dazMwoaQN8VASwrtEHfjq276yhcrhTRu0iNzL3ClGOC1b1S5G9x1dV1z
-DQi2/anSj9pKTIN1EKK25r2Ev2fHqpkD7L9eyfaE+XlaSZZ+hUhoQLtjlEG80TtX
-/4nnshFymUn0lMf8QwQHWk8qzG6BnxMS6RXCgoyxV7yMMdvXTj8dX+fOLS7XSiBn
-eXhiKUlnPQcKUM84CfWMc92WRt3yKdlAGEcAHUZWBWJXeN/8kIqiA4tJoRwHPZHd
-pLbI9fy752JwPwSJS+DadGEl3Z+gMRJOS71bAUI5uwd44tghTj7qhiSGKNfdpedU
-UPBCYXnSPXMlk5k5AuGpMo3vVYW/ig==
-=iGvl
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7+4mwACgkQ9AfbAGHV
+z0CDawgAp5DGA/Hz9EBLiJRjoVSF1V4IKnFLfk7/mXsQRSk6c1/RqEq78KAy0Rix
+sQwnxsuT/u8Y5oO47UYdyIYNBd+3tg38ZtYWmVf4o6+QZOBzHMgo+87RZk2r4bJm
+XHJdVgM3UaRCSAd84lvpQrTijme9pBx9gnktmgbLhd0DM3+TiLI3TPDGk70rNwdx
+iB7HKyUGHQqfcgna0gdQTSasdEVnAYgsKw2T920xcWkycXAjjL1HWTnLMA5/jfEY
+CGQwwT++xLe8HTa2DmnyzStPwx3d6nD2AB16nBcdUO4xNNoc0ZizTTfi6dCEaZif
+vEB7nreHqxH3GU+KTve/Nc9+t9+fUA==
+=ED+y
 -----END PGP SIGNATURE-----
 
---7sFLjr4NcRLXSEaXLPOgLRVu5v3bz5Rxp--
+--maB9TnJmEOphdCoKbSTDEjHhUM62e9NvA--
 
 
