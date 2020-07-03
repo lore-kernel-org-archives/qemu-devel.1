@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE24C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B59C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:37:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6575920772
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:36:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6575920772
+	by mail.kernel.org (Postfix) with ESMTPS id 8E03020772
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:37:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E03020772
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrFJG-0000A7-JP
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:36:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54524)
+	id 1jrFKg-0003Ys-Pf
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:37:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFHq-0006TP-9Y; Fri, 03 Jul 2020 02:35:02 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:52996)
+ id 1jrFHq-0006Ty-Iz; Fri, 03 Jul 2020 02:35:02 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:53036)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFHn-00034h-An; Fri, 03 Jul 2020 02:35:01 -0400
+ id 1jrFHo-00035K-LZ; Fri, 03 Jul 2020 02:35:02 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 76989BF808;
- Fri,  3 Jul 2020 06:34:56 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id E00CBBF818;
+ Fri,  3 Jul 2020 06:34:57 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 03/18] hw/block/nvme: add support for the abort command
-Date: Fri,  3 Jul 2020 08:34:05 +0200
-Message-Id: <20200703063420.2241014-4-its@irrelevant.dk>
+Subject: [PATCH v2 05/18] hw/block/nvme: mark fw slot 1 as read-only
+Date: Fri,  3 Jul 2020 08:34:07 +0200
+Message-Id: <20200703063420.2241014-6-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200703063420.2241014-1-its@irrelevant.dk>
 References: <20200703063420.2241014-1-its@irrelevant.dk>
@@ -77,73 +77,51 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Required for compliance with NVMe revision 1.3d. See NVM Express 1.3d,
-Section 5.1 ("Abort command").
+Mark firmware slot 1 as read-only and only support that slot.
 
-The Abort command is a best effort command; for now, the device always
-fails to abort the given command.
-
-Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/nvme.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ hw/block/nvme.c      | 3 ++-
+ include/block/nvme.h | 4 ++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index f5d9148f0936..b7037a7d3504 100644
+index 5ca50646369e..f8e91a6965ed 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -761,6 +761,18 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
-     }
- }
+@@ -62,6 +62,7 @@
+ #define NVME_TEMPERATURE 0x143
+ #define NVME_TEMPERATURE_WARNING 0x157
+ #define NVME_TEMPERATURE_CRITICAL 0x175
++#define NVME_NUM_FW_SLOTS 1
  
-+static uint16_t nvme_abort(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-+{
-+    uint16_t sqid = le32_to_cpu(cmd->cdw10) & 0xffff;
-+
-+    req->cqe.result = 1;
-+    if (nvme_check_sqid(n, sqid)) {
-+        return NVME_INVALID_FIELD | NVME_DNR;
-+    }
-+
-+    return NVME_SUCCESS;
-+}
-+
- static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
- {
-     trace_pci_nvme_setfeat_timestamp(ts);
-@@ -897,6 +909,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-         return nvme_create_cq(n, cmd);
-     case NVME_ADM_CMD_IDENTIFY:
-         return nvme_identify(n, cmd);
-+    case NVME_ADM_CMD_ABORT:
-+        return nvme_abort(n, cmd, req);
-     case NVME_ADM_CMD_SET_FEATURES:
-         return nvme_set_feature(n, cmd, req);
-     case NVME_ADM_CMD_GET_FEATURES:
-@@ -1582,6 +1596,19 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     id->ieee[1] = 0x02;
-     id->ieee[2] = 0xb3;
-     id->oacs = cpu_to_le16(0);
-+
-+    /*
-+     * Because the controller always completes the Abort command immediately,
-+     * there can never be more than one concurrently executing Abort command,
-+     * so this value is never used for anything. Note that there can easily be
-+     * many Abort commands in the queues, but they are not considered
-+     * "executing" until processed by nvme_abort.
-+     *
-+     * The specification recommends a value of 3 for Abort Command Limit (four
-+     * concurrently outstanding Abort commands), so lets use that though it is
-+     * inconsequential.
-+     */
-+    id->acl = 3;
-     id->frmw = 7 << 1;
+ #define NVME_GUEST_ERR(trace, fmt, ...) \
+     do { \
+@@ -1652,7 +1653,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+      * inconsequential.
+      */
+     id->acl = 3;
+-    id->frmw = 7 << 1;
++    id->frmw = (NVME_NUM_FW_SLOTS << 1) | NVME_FRMW_SLOT1_RO;
      id->lpa = 1 << 0;
-     id->sqes = (0x6 << 4) | 0x6;
+ 
+     /* recommended default value (~70 C) */
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index d2c457695b38..d639e8bbee92 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -842,6 +842,10 @@ enum NvmeIdCtrlOncs {
+     NVME_ONCS_TIMESTAMP     = 1 << 6,
+ };
+ 
++enum NvmeIdCtrlFrmw {
++    NVME_FRMW_SLOT1_RO = 1 << 0,
++};
++
+ #define NVME_CTRL_SQES_MIN(sqes) ((sqes) & 0xf)
+ #define NVME_CTRL_SQES_MAX(sqes) (((sqes) >> 4) & 0xf)
+ #define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
 -- 
 2.27.0
 
