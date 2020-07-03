@@ -2,53 +2,57 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77292C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 664BBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:02:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 428D12070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F9002070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:02:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="KZJpjxZz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 428D12070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="izhlXkFQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F9002070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrO8V-0008Pu-C0
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:01:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58858)
+	id 1jrO8j-0000Pm-DI
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:02:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5O-0002Uq-UC; Fri, 03 Jul 2020 11:58:46 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41482)
+ id 1jrO5P-0002Wd-FX; Fri, 03 Jul 2020 11:58:47 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:41480)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5K-0007Q2-Fq; Fri, 03 Jul 2020 11:58:46 -0400
+ id 1jrO5K-0007Q5-Dc; Fri, 03 Jul 2020 11:58:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
- bh=FL4O71SBPFn/Ttghc64bRQJPVG0eW3B9YJVS7tu1zhc=; 
- b=KZJpjxZzaO3GFWXGjtDvaEkQshNHn6QZfOy596ZS21+pOnsxnARqK0IuPvKEWUuwTEriKVVKW0R24Yr5wX5f7Wh7X7Kag24kuzAXX9EJgl6vMQe4B8lDjK8UrLTO6sDqiOEq0vt3GqSb2c0Xns7Il75YoX1z7keybBUATrGvs9gf7AFdJflqUN3InYuURliZf8zRpV1mvCZPW8fJwO68VH4XieE44x8CzcLtSeiDqKZ1pjuGJk3cjswsfRXFoWY8K0iTXimRPZPQ0PHS1N6AbDsffDXkXLkwHj6zZMJwL/McenxDG6oCuBzR+42jVY3ywd8tNfWbb/q3cn1izqN/VA==;
+ h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+ bh=zbMhjtGKVeY7EryanAE+iwZTdNLcuFqDn9UZxBryOf4=; 
+ b=izhlXkFQeGs5BFYQqjElMH/1xOMd91cnPyzEAnH42EDA+7CmSEzKb9WWJZiALaTwp4OKkYu6VFBBkFTjPNX8q1RmUbwLdP8x3nyWv/SsidN2edc7ZFwSI0y5Xx7ny5W3yXT4AObucccPnFJBLo1/yiF7uzKqka9lkOoOk6ujcGkDCG2STucmddj4SKmAEAHPxzeesqOFLeR9JVkEn863ad0oTTOoCLbYjAsvN61jhpeR7Y6jJOZxeaF1k4qtTEVuCrNFenAKr5JdQn889N6c/U7hUV1CH0kUeo0fAKcVGuDd1nBIM7lGpDAsDIyIfsG4nR9xMjiMUYzcAar1gU92jQ==;
 Received: from [81.0.49.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jrO5G-0001QA-FA; Fri, 03 Jul 2020 17:58:38 +0200
+ id 1jrO5G-0001QK-Go; Fri, 03 Jul 2020 17:58:38 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jrO51-0007PD-G4; Fri, 03 Jul 2020 17:58:23 +0200
+ id 1jrO51-0007Pa-QC; Fri, 03 Jul 2020 17:58:23 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 00/34] Add subcluster allocation to qcow2
-Date: Fri,  3 Jul 2020 17:57:46 +0200
-Message-Id: <cover.1593791819.git.berto@igalia.com>
+Subject: [PATCH v10 09/34] qcow2: Add subcluster-related fields to
+ BDRVQcow2State
+Date: Fri,  3 Jul 2020 17:57:55 +0200
+Message-Id: <e5eef49e3e24ca9854d231e5e85c4b461df7e712.1593791819.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.1593791819.git.berto@igalia.com>
+References: <cover.1593791819.git.berto@igalia.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
@@ -81,164 +85,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: <20200610094600.4029-1-berto@igalia.com>
+This patch adds the following new fields to BDRVQcow2State:
 
-Hi,
+- subclusters_per_cluster: Number of subclusters in a cluster
+- subcluster_size: The size of each subcluster, in bytes
+- subcluster_bits: No. of bits so 1 << subcluster_bits = subcluster_size
 
-here's the new version of the patches to add subcluster allocation
-support to qcow2.
+Images without subclusters are treated as if they had exactly one
+subcluster per cluster (i.e. subcluster_size = cluster_size).
 
-Please refer to the cover letter of the first version for a full
-description of the patches:
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2.h | 5 +++++
+ block/qcow2.c | 5 +++++
+ 2 files changed, 10 insertions(+)
 
-   https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
-
-There are no major changes compared to v9, just fixes for the problems
-discovered by Max (see below for details).
-
-If you want to test this series make sure to apply this patch first:
-
-   https://lists.gnu.org/archive/html/qemu-block/2020-06/msg00504.html
-
-Berto
-
-v10:
-- Patch 02: Set host_offset to 0 also when the L2 table is empty [Max]
-- Patch 21: Fix assertion (l2_size -> l2_slice_size) and compiler
-            warnings [Max]
-- Patch 28: Let qcow2_co_truncate() make subcluster-aligned calls to
-            qcow2_cluster_zeroize() [Max]
-            Assert that offset is aligned in zero_in_l2_slice() [Max]
-- Patch 31: Use -ENOTSUP instead of -EINVAL [Max]
-- Patch 34: Remove length modifiers from printf [Max]
-            Forbid running the test with refcount_bits=1 [Max]
-
-v9: https://lists.gnu.org/archive/html/qemu-block/2020-06/msg01526.html
-v8: https://lists.gnu.org/archive/html/qemu-block/2020-06/msg00546.html
-v7: https://lists.gnu.org/archive/html/qemu-block/2020-05/msg01683.html
-v6: https://lists.gnu.org/archive/html/qemu-block/2020-05/msg01583.html
-v5: https://lists.gnu.org/archive/html/qemu-block/2020-05/msg00251.html
-v4: https://lists.gnu.org/archive/html/qemu-block/2020-03/msg00966.html
-v3: https://lists.gnu.org/archive/html/qemu-block/2019-12/msg00587.html
-v2: https://lists.gnu.org/archive/html/qemu-block/2019-10/msg01642.html
-v1: https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
-
-Output of git backport-diff against v9:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/34:[----] [--] 'qcow2: Make Qcow2AioTask store the full host offset'
-002/34:[0003] [FC] 'qcow2: Convert qcow2_get_cluster_offset() into qcow2_get_host_offset()'
-003/34:[----] [--] 'qcow2: Add calculate_l2_meta()'
-004/34:[----] [--] 'qcow2: Split cluster_needs_cow() out of count_cow_clusters()'
-005/34:[----] [--] 'qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters in handle_copied()'
-006/34:[----] [-C] 'qcow2: Add get_l2_entry() and set_l2_entry()'
-007/34:[----] [--] 'qcow2: Document the Extended L2 Entries feature'
-008/34:[----] [--] 'qcow2: Add dummy has_subclusters() function'
-009/34:[----] [--] 'qcow2: Add subcluster-related fields to BDRVQcow2State'
-010/34:[----] [--] 'qcow2: Add offset_to_sc_index()'
-011/34:[----] [--] 'qcow2: Add offset_into_subcluster() and size_to_subclusters()'
-012/34:[----] [--] 'qcow2: Add l2_entry_size()'
-013/34:[----] [--] 'qcow2: Update get/set_l2_entry() and add get/set_l2_bitmap()'
-014/34:[----] [--] 'qcow2: Add QCow2SubclusterType and qcow2_get_subcluster_type()'
-015/34:[----] [--] 'qcow2: Add qcow2_get_subcluster_range_type()'
-016/34:[----] [--] 'qcow2: Add qcow2_cluster_is_allocated()'
-017/34:[----] [--] 'qcow2: Add cluster type parameter to qcow2_get_host_offset()'
-018/34:[----] [--] 'qcow2: Replace QCOW2_CLUSTER_* with QCOW2_SUBCLUSTER_*'
-019/34:[----] [--] 'qcow2: Handle QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC'
-020/34:[----] [--] 'qcow2: Add subcluster support to calculate_l2_meta()'
-021/34:[0006] [FC] 'qcow2: Add subcluster support to qcow2_get_host_offset()'
-022/34:[----] [--] 'qcow2: Add subcluster support to zero_in_l2_slice()'
-023/34:[----] [--] 'qcow2: Add subcluster support to discard_in_l2_slice()'
-024/34:[----] [--] 'qcow2: Add subcluster support to check_refcounts_l2()'
-025/34:[----] [--] 'qcow2: Update L2 bitmap in qcow2_alloc_cluster_link_l2()'
-026/34:[----] [--] 'qcow2: Clear the L2 bitmap when allocating a compressed cluster'
-027/34:[----] [--] 'qcow2: Add subcluster support to handle_alloc_space()'
-028/34:[0007] [FC] 'qcow2: Add subcluster support to qcow2_co_pwrite_zeroes()'
-029/34:[----] [--] 'qcow2: Add subcluster support to qcow2_measure()'
-030/34:[----] [--] 'qcow2: Add prealloc field to QCowL2Meta'
-031/34:[0002] [FC] 'qcow2: Add the 'extended_l2' option and the QCOW2_INCOMPAT_EXTL2 bit'
-032/34:[----] [--] 'qcow2: Allow preallocation and backing files if extended_l2 is set'
-033/34:[----] [--] 'qcow2: Assert that expand_zero_clusters_in_l1() does not support subclusters'
-034/34:[0008] [FC] 'iotests: Add tests for qcow2 images with extended L2 entries'
-
-Alberto Garcia (34):
-  qcow2: Make Qcow2AioTask store the full host offset
-  qcow2: Convert qcow2_get_cluster_offset() into qcow2_get_host_offset()
-  qcow2: Add calculate_l2_meta()
-  qcow2: Split cluster_needs_cow() out of count_cow_clusters()
-  qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters in handle_copied()
-  qcow2: Add get_l2_entry() and set_l2_entry()
-  qcow2: Document the Extended L2 Entries feature
-  qcow2: Add dummy has_subclusters() function
-  qcow2: Add subcluster-related fields to BDRVQcow2State
-  qcow2: Add offset_to_sc_index()
-  qcow2: Add offset_into_subcluster() and size_to_subclusters()
-  qcow2: Add l2_entry_size()
-  qcow2: Update get/set_l2_entry() and add get/set_l2_bitmap()
-  qcow2: Add QCow2SubclusterType and qcow2_get_subcluster_type()
-  qcow2: Add qcow2_get_subcluster_range_type()
-  qcow2: Add qcow2_cluster_is_allocated()
-  qcow2: Add cluster type parameter to qcow2_get_host_offset()
-  qcow2: Replace QCOW2_CLUSTER_* with QCOW2_SUBCLUSTER_*
-  qcow2: Handle QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC
-  qcow2: Add subcluster support to calculate_l2_meta()
-  qcow2: Add subcluster support to qcow2_get_host_offset()
-  qcow2: Add subcluster support to zero_in_l2_slice()
-  qcow2: Add subcluster support to discard_in_l2_slice()
-  qcow2: Add subcluster support to check_refcounts_l2()
-  qcow2: Update L2 bitmap in qcow2_alloc_cluster_link_l2()
-  qcow2: Clear the L2 bitmap when allocating a compressed cluster
-  qcow2: Add subcluster support to handle_alloc_space()
-  qcow2: Add subcluster support to qcow2_co_pwrite_zeroes()
-  qcow2: Add subcluster support to qcow2_measure()
-  qcow2: Add prealloc field to QCowL2Meta
-  qcow2: Add the 'extended_l2' option and the QCOW2_INCOMPAT_EXTL2 bit
-  qcow2: Allow preallocation and backing files if extended_l2 is set
-  qcow2: Assert that expand_zero_clusters_in_l1() does not support
-    subclusters
-  iotests: Add tests for qcow2 images with extended L2 entries
-
- docs/interop/qcow2.txt           |  68 ++-
- docs/qcow2-cache.txt             |  19 +-
- qapi/block-core.json             |   7 +
- block/qcow2.h                    | 211 ++++++-
- include/block/block_int.h        |   1 +
- block/qcow2-cluster.c            | 912 +++++++++++++++++++++----------
- block/qcow2-refcount.c           |  47 +-
- block/qcow2.c                    | 310 +++++++----
- block/trace-events               |   2 +-
- tests/qemu-iotests/031.out       |   8 +-
- tests/qemu-iotests/036.out       |   4 +-
- tests/qemu-iotests/049.out       | 102 ++--
- tests/qemu-iotests/060.out       |   3 +-
- tests/qemu-iotests/061           |   6 +
- tests/qemu-iotests/061.out       |  25 +-
- tests/qemu-iotests/065           |  12 +-
- tests/qemu-iotests/082.out       |  48 +-
- tests/qemu-iotests/085.out       |  38 +-
- tests/qemu-iotests/144.out       |   4 +-
- tests/qemu-iotests/182.out       |   2 +-
- tests/qemu-iotests/185.out       |   8 +-
- tests/qemu-iotests/198.out       |   2 +
- tests/qemu-iotests/206.out       |   6 +-
- tests/qemu-iotests/242.out       |   5 +
- tests/qemu-iotests/255.out       |   8 +-
- tests/qemu-iotests/271           | 901 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/271.out       | 724 ++++++++++++++++++++++++
- tests/qemu-iotests/274.out       |  49 +-
- tests/qemu-iotests/280.out       |   2 +-
- tests/qemu-iotests/291.out       |   6 +-
- tests/qemu-iotests/common.filter |   1 +
- tests/qemu-iotests/group         |   1 +
- 32 files changed, 2967 insertions(+), 575 deletions(-)
- create mode 100755 tests/qemu-iotests/271
- create mode 100644 tests/qemu-iotests/271.out
-
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 2064dd3d85..eee4c8de9c 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -78,6 +78,8 @@
+ /* The cluster reads as all zeros */
+ #define QCOW_OFLAG_ZERO (1ULL << 0)
+ 
++#define QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER 32
++
+ #define MIN_CLUSTER_BITS 9
+ #define MAX_CLUSTER_BITS 21
+ 
+@@ -295,6 +297,9 @@ typedef struct BDRVQcow2State {
+     int cluster_bits;
+     int cluster_size;
+     int l2_slice_size;
++    int subcluster_bits;
++    int subcluster_size;
++    int subclusters_per_cluster;
+     int l2_bits;
+     int l2_size;
+     int l1_size;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index afb00ada42..5c175a314c 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1433,6 +1433,11 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+         }
+     }
+ 
++    s->subclusters_per_cluster =
++        has_subclusters(s) ? QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER : 1;
++    s->subcluster_size = s->cluster_size / s->subclusters_per_cluster;
++    s->subcluster_bits = ctz32(s->subcluster_size);
++
+     /* Check support for various header values */
+     if (header.refcount_order > 6) {
+         error_setg(errp, "Reference count entry width too large; may not "
 -- 
 2.20.1
 
