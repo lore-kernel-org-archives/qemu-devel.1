@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E71B1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4201AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B75D3206A1
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C0722070C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 08:21:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJrftzmK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B75D3206A1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NFG9AFVH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C0722070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrGuY-00005T-UF
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 04:19:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49518)
+	id 1jrGwc-0001w0-A0
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 04:21:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrGtq-0007cH-BU
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:18:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43620
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrGw3-0001MQ-15
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:20:39 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54032
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrGtn-0002SS-9v
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:18:22 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrGw1-0003LA-IX
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 04:20:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593764298;
+ s=mimecast20190719; t=1593764436;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=SuoPmEmUnEi6/tjSF6oOrW03tRAWrZgFzay2VrkzAJs=;
- b=ZJrftzmKfDZtV+jFq3rtKddOb8W3K26lKwlD2ycHLy49A/dveyBqO2rDJqtQn+ZgYf3y9F
- /vHtLKRTOm1LV/WOitineAc47pdWEf8phpZXS/y2KQ1Pa2BZMY9165g5KTjDO2fjD5seFF
- wQPjEuwm56FaWokumWvX8QU1CjW5w/w=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-JOqHGzdpMNWfVfr5sa8UYw-1; Fri, 03 Jul 2020 04:18:16 -0400
-X-MC-Unique: JOqHGzdpMNWfVfr5sa8UYw-1
-Received: by mail-wr1-f72.google.com with SMTP id y16so30948068wrr.20
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 01:18:16 -0700 (PDT)
+ bh=Vz2eU+RvowEKLnwzfla0N/b+laKD2SzlguG4+dRzxdM=;
+ b=NFG9AFVH6Hh/K9Q2Ik2PIOs1JMPAn2C9plFqhcm2dQiWFCcqiErdHN+tou+nVmFqqQwyxy
+ 6w9/d/Jjd9+s9+HeWzerTtECKFjicuAC3dTBsT/Kk3vw0RhgYD+XKXoYeha07RQ0bLi3xM
+ oZYUfajE4Bj9eC1VEJotf/1DXRqTaag=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-_bOW1-RRPeulb4oivkJsvg-1; Fri, 03 Jul 2020 04:20:32 -0400
+X-MC-Unique: _bOW1-RRPeulb4oivkJsvg-1
+Received: by mail-wm1-f69.google.com with SMTP id h25so20538862wmb.0
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 01:20:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=SuoPmEmUnEi6/tjSF6oOrW03tRAWrZgFzay2VrkzAJs=;
- b=oxyn1sFqEx0keUt6fdGuzlFi7Hp95HNhvE6iny6LKiF/tNAnhZRtBVDCpJHJTztiAJ
- rYMFlqq6ugrg7Kyvy1YqJ+TOX/H9bWsJQm8r1uWZ2ntFnFNbTBfc7ODoQURHZrQ4MRmL
- IlixUbt23iNOkf0v7TE5JmggHkZDuL3R76QeRNh2DB8TLU8Is6z4PgLY7BJVJKNBKmIX
- AcpX78RI1EJwB3hc9/C9gBpEcvzhx5/5oFTzIIpaFT5L160QiHO3rkNvOkf2GUUQ5QpZ
- mfIJNDumWrO10tw7gGKjZoAiSAnUtYI0sqSpe4PesHip1S8NVNw8EH0YzVV6Ou1D7QrY
- 5jTg==
-X-Gm-Message-State: AOAM5311aJjYwqNXPpdGGTmY+9dlhsO2KQVHkw+2+XSXoOcU9t2ZapfB
- i4bcX1Xe/75hUlDLdPbOFh+dn8GVgBsoETmnxE42ZRuptumoqLLa3AlOfuz6XfiH52QoXTJ6dJ7
- 6Q0SDKAHvWFdtiy4=
-X-Received: by 2002:adf:8444:: with SMTP id 62mr33949379wrf.278.1593764295767; 
- Fri, 03 Jul 2020 01:18:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxiQO6JnIXWAs+WHfpuW4NE9xQwG0guLX7dS/G5Q1JNkqg42P1kqvm6TbDmGl7XmC1+hUp0pw==
-X-Received: by 2002:adf:8444:: with SMTP id 62mr33949360wrf.278.1593764295540; 
- Fri, 03 Jul 2020 01:18:15 -0700 (PDT)
+ bh=Vz2eU+RvowEKLnwzfla0N/b+laKD2SzlguG4+dRzxdM=;
+ b=nIVeU8k7CFx2tnf5GG77vY7W39J/XPK/LnwomcptfRoHnyyEn0u34G7NowUSDb2M2T
+ 3IRaR5jSUkZ9uiB/yVvVW41bby5VeEBo9v0Z2RqZ3MXDMuyLUw9Z/TBA+kGpMYApMpqV
+ YfTEefT8aU7XWWXf3ZM1GqOBXpnoYC6MvBH6wL0xj3LJDK5lzy1XC7TZTYDhfuzNhUND
+ +cPCcFTDJjj7nzHGvo3fhCoySNr61XUv0owLyqiOv95ecmoxSimxtPMTExO7+jjr0Tac
+ rhV2f07R8BIE7ax03YZhoLkeVGuxvuv44v1V5hRciBksb+kPTgPkRzVLsSAaX/x4pzrl
+ AAzQ==
+X-Gm-Message-State: AOAM533UnpBUF69qGPwgE31YmjUpWDLuNoMskeqnJ1B5bwWtYooeAlFY
+ h3psp2kNSpHb6F2JL3S6B67Y6HwTK2g8je2BSt0Whq+0k07pA74las3S2ZWyaVZ/Og3M6zOEJCM
+ XtQgKvOx9w9MFky4=
+X-Received: by 2002:a5d:69cf:: with SMTP id s15mr24433841wrw.10.1593764431852; 
+ Fri, 03 Jul 2020 01:20:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwcD8kCJIEllq93UojSSJeev6oBlojbqbxC0qzE5+vjG1MgkmJxy+UvrlxlufvmOAsU19kK0g==
+X-Received: by 2002:a5d:69cf:: with SMTP id s15mr24433823wrw.10.1593764431664; 
+ Fri, 03 Jul 2020 01:20:31 -0700 (PDT)
 Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id h84sm13699425wme.22.2020.07.03.01.18.14
+ by smtp.gmail.com with ESMTPSA id u10sm12621199wml.29.2020.07.03.01.20.30
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jul 2020 01:18:15 -0700 (PDT)
-Subject: Re: [PATCH v2 17/18] hw/block/nvme: provide the mandatory subnqn field
+ Fri, 03 Jul 2020 01:20:31 -0700 (PDT)
+Subject: Re: [PATCH v2 15/18] hw/block/nvme: reject invalid nsid values in
+ active namespace id list
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
 References: <20200703063420.2241014-1-its@irrelevant.dk>
- <20200703063420.2241014-18-its@irrelevant.dk>
+ <20200703063420.2241014-16-its@irrelevant.dk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <73b19cd0-f52c-d61c-79b0-14f4d985aea6@redhat.com>
-Date: Fri, 3 Jul 2020 10:18:13 +0200
+Message-ID: <6a038075-13fd-2f60-23a2-ddc7081cff32@redhat.com>
+Date: Fri, 3 Jul 2020 10:20:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200703063420.2241014-18-its@irrelevant.dk>
+In-Reply-To: <20200703063420.2241014-16-its@irrelevant.dk>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -150,37 +151,32 @@ Sender: "Qemu-devel"
 On 7/3/20 8:34 AM, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> The SUBNQN field is mandatory in NVM Express 1.3.
+> Reject the nsid broadcast value (0xffffffff) and 0xfffffffe in the
+> Active Namespace ID list.
+
+Can we have a definition instead of this 0xfffffffe magic value please?
+
 > 
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 > ---
->  hw/block/nvme.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  hw/block/nvme.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 8138baa6fbd8..5bbb6aa0efc3 100644
+> index 65c2fa3ac1f4..0dac7a41ddae 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -2134,6 +2134,9 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
->      id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP |
->                             NVME_ONCS_FEATURES);
+> @@ -956,6 +956,10 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
 >  
-> +    pstrcpy((char *) id->subnqn, sizeof(id->subnqn), "nqn.2019-08.org.qemu:");
-> +    pstrcat((char *) id->subnqn, sizeof(id->subnqn), n->params.serial);
-
-What about using strpadcpy()?
-
-  char *subnqn = g_strdup_printf("nqn.2019-08.org.qemu:%s",
-                                 n->params.serial);
-  strpadcpy((char *)id->subnqn, sizeof(id->subnqn), subnqn, '\0');
-  g_free(subnqn);
-
+>      trace_pci_nvme_identify_nslist(min_nsid);
+>  
+> +    if (min_nsid == 0xfffffffe || min_nsid == NVME_NSID_BROADCAST) {
+> +        return NVME_INVALID_NSID | NVME_DNR;
+> +    }
 > +
->      id->psd[0].mp = cpu_to_le16(0x9c4);
->      id->psd[0].enlat = cpu_to_le32(0x10);
->      id->psd[0].exlat = cpu_to_le32(0x4);
+>      list = g_malloc0(data_len);
+>      for (i = 0; i < n->num_namespaces; i++) {
+>          if (i < min_nsid) {
 > 
 
 
