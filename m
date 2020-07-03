@@ -2,68 +2,89 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7131C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE783C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6DB220870
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E199208E4
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:21:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="kVdXEn8f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DB220870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THZfXH+/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E199208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOQz-00012H-Rk
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:21:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59226)
+	id 1jrORZ-000228-TV
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:21:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5s-0003jD-JF; Fri, 03 Jul 2020 11:59:16 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41784)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5l-0007SC-8M; Fri, 03 Jul 2020 11:59:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=XvmUrGR71Xt8ZgPWAcZ6giCPlQgftC5eKXhHfCBQicY=; 
- b=kVdXEn8fBteDMmZD7YFEX4aHGPhWEFXBZAmsCkRLb3RXBUIrWvDKinlcoMJaVSCsPUF6CzA+A/iNTpEHN1pHvgR3UL+y78zVCMtbl3pcn+f/cK0/OMTaQPcDechHIipMlLgUkKzTjMKsTRoA3YA4VxsNCM6293bp7xKCx3E6UHYyE8pdnshEJ5kh0gCLn71Qtq7oyMYavIDDeo6wKXjJysu1eYxrXHcL++20VQkhUk1dK4dzgNXGNi2HSqADt53E67iYLU7kijpW4Q8yZ9mYULcyGdPtMdYcMg4/LyBGGemHV3wiqJ5V91RRgK4i7U0gJ8MGophODaHDo+PsvmMyNA==;
-Received: from [81.0.49.0] (helo=perseus.local)
- by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jrO5L-0001Ri-UE; Fri, 03 Jul 2020 17:58:44 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1jrO52-0007QZ-FK; Fri, 03 Jul 2020 17:58:24 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v10 30/34] qcow2: Add prealloc field to QCowL2Meta
-Date: Fri,  3 Jul 2020 17:58:16 +0200
-Message-Id: <8d155ed48a10ed97851189e8502ea8a6773fac98.1593791819.git.berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1593791819.git.berto@igalia.com>
-References: <cover.1593791819.git.berto@igalia.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jrO8q-00015h-Eo
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:02:21 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48150
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jrO8n-0008IM-U6
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:02:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593792136;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=QBCgCDInfFECHeq4DAuxkUBflOMbLuBSh4FmjCvUoKI=;
+ b=THZfXH+/Iv1CFT5mib8msvPwGiE3a1i2U03SSDUOG/AiD3JMwg+0s36IsDlH1epTVrP5Ed
+ WaKwJbPiGQitHLpRn/XBAQImomTrSOuERwlLSaJLcof+4w3ugeNZqa1aJMk0hjET+HI6zb
+ FMNTUCz7IGIoQMldVAOoGBbZLpOjYXc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-72-NtVNTqzKOrS_wevjcJmepw-1; Fri, 03 Jul 2020 12:02:14 -0400
+X-MC-Unique: NtVNTqzKOrS_wevjcJmepw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CDEB186A206;
+ Fri,  3 Jul 2020 16:02:12 +0000 (UTC)
+Received: from work-vm (ovpn-114-207.ams2.redhat.com [10.36.114.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ADC389CA0;
+ Fri,  3 Jul 2020 16:02:10 +0000 (UTC)
+Date: Fri, 3 Jul 2020 17:02:08 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: James Bottomley <jejb@linux.ibm.com>
+Subject: Re: [PATCH v2] SEV: QMP support for Inject-Launch-Secret
+Message-ID: <20200703160208.GG6641@work-vm>
+References: <20200702194213.23272-1-tobin@linux.vnet.ibm.com>
+ <20200703110929.GB6641@work-vm>
+ <1593791654.3972.26.camel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 11:21:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <1593791654.3972.26.camel@linux.ibm.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,121 +97,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- Derek Su <dereksu@qnap.com>, Max Reitz <mreitz@redhat.com>
+Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, tobin@ibm.com,
+ qemu-devel@nongnu.org, Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This field allows us to indicate that the L2 metadata update does not
-come from a write request with actual data but from a preallocation
-request.
+* James Bottomley (jejb@linux.ibm.com) wrote:
+> On Fri, 2020-07-03 at 12:11 +0100, Dr. David Alan Gilbert wrote:
+> > * Tobin Feldman-Fitzthum (tobin@linux.vnet.ibm.com) wrote:
+> [...]
+> > > +    input.trans_uaddr = (uint64_t)data;
+> > > +    input.trans_len = data_sz;
+> > > +
+> > > +    input.guest_uaddr = (uint64_t)hva;
+> > 
+> > Thanks for changing these; although it fails a 32bit build (which is
+> > probably mostly pointless for SEV, but it fails the build rather than
+> > building it out). The easy fix here seems to be:
+> >    (uint64_t)(uintptr_t)
+> 
+> That's a pointer width issue.  The recommended way to communicate to
+> the compiler that we really want to cast a 32 bit pointer to a 64 bit
+> value is actually to cast to unsigned long before casting to pointer,
+> so
+> 
+> (uint64_t)(unsigned long)hva
+> 
+> Many other things work, of course, but if you follow the recommendation
+> you (hopefully) don't trip future compiler warnings.
 
-For traditional images this does not make any difference, but for
-images with extended L2 entries this means that the clusters are
-allocated normally in the L2 table but individual subclusters are
-marked as unallocated.
+OK, fair enough
+(Out of curiosity can you explain why unsigned long not uintptr_t?)
 
-This will allow preallocating images that have a backing file.
+Dave
 
-There is one special case: when we resize an existing image we can
-also request that the new clusters are preallocated. If the image
-already had a backing file then we have to hide any possible stale
-data and zero out the new clusters (see commit 955c7d6687 for more
-details).
-
-In this case the subclusters cannot be left as unallocated so the L2
-bitmap must be updated.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2.h         | 8 ++++++++
- block/qcow2-cluster.c | 2 +-
- block/qcow2.c         | 6 ++++++
- 3 files changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 4ef4ae4ab0..f3499e53bf 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -463,6 +463,14 @@ typedef struct QCowL2Meta
-      */
-     bool skip_cow;
- 
-+    /**
-+     * Indicates that this is not a normal write request but a preallocation.
-+     * If the image has extended L2 entries this means that no new individual
-+     * subclusters will be marked as allocated in the L2 bitmap (but any
-+     * existing contents of that bitmap will be kept).
-+     */
-+    bool prealloc;
-+
-     /**
-      * The I/O vector with the data from the actual guest write request.
-      * If non-NULL, this is meant to be merged together with the data
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index e023bc4b01..bbf373ad21 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1067,7 +1067,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-         set_l2_entry(s, l2_slice, l2_index + i, offset | QCOW_OFLAG_COPIED);
- 
-         /* Update bitmap with the subclusters that were just written */
--        if (has_subclusters(s)) {
-+        if (has_subclusters(s) && !m->prealloc) {
-             uint64_t l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
-             unsigned written_from = m->cow_start.offset;
-             unsigned written_to = m->cow_end.offset + m->cow_end.nb_bytes ?:
-diff --git a/block/qcow2.c b/block/qcow2.c
-index f443a68935..04572f39e1 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2086,6 +2086,7 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
-         QCowL2Meta *next;
- 
-         if (link_l2) {
-+            assert(!l2meta->prealloc);
-             ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-             if (ret) {
-                 goto out;
-@@ -3131,6 +3132,7 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
- 
-         while (meta) {
-             QCowL2Meta *next = meta->next;
-+            meta->prealloc = true;
- 
-             ret = qcow2_alloc_cluster_link_l2(bs, meta);
-             if (ret < 0) {
-@@ -4224,6 +4226,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-         int64_t clusters_allocated;
-         int64_t old_file_size, last_cluster, new_file_size;
-         uint64_t nb_new_data_clusters, nb_new_l2_tables;
-+        bool subclusters_need_allocation = false;
- 
-         /* With a data file, preallocation means just allocating the metadata
-          * and forwarding the truncate request to the data file */
-@@ -4305,6 +4308,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-                                    BDRV_REQ_ZERO_WRITE, NULL);
-             if (ret >= 0) {
-                 flags &= ~BDRV_REQ_ZERO_WRITE;
-+                /* Ensure that we read zeroes and not backing file data */
-+                subclusters_need_allocation = true;
-             }
-         } else {
-             ret = -1;
-@@ -4343,6 +4348,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-                     .offset       = nb_clusters << s->cluster_bits,
-                     .nb_bytes     = 0,
-                 },
-+                .prealloc     = !subclusters_need_allocation,
-             };
-             qemu_co_queue_init(&allocation.dependent_requests);
- 
--- 
-2.20.1
+> James
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
