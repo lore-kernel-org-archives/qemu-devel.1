@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1184C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED637C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:25:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BB9520782
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCC0920782
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:25:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPcc4yGf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BB9520782
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMsdntsC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCC0920782
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrSFi-0003sq-SB
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:25:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35334)
+	id 1jrSFn-0003ui-1W
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:25:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9k-0008MI-Qb; Fri, 03 Jul 2020 16:19:32 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:34173)
+ id 1jrS9g-0008Au-IW; Fri, 03 Jul 2020 16:19:28 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:55106)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9j-0001WH-AY; Fri, 03 Jul 2020 16:19:32 -0400
-Received: by mail-wr1-x429.google.com with SMTP id f7so30933043wrw.1;
- Fri, 03 Jul 2020 13:19:30 -0700 (PDT)
+ id 1jrS9f-0001Vd-4I; Fri, 03 Jul 2020 16:19:28 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id o8so33101691wmh.4;
+ Fri, 03 Jul 2020 13:19:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=yrLkH70WzIihdGm/NjbQjxTYMS+wbXewYaB/SgI3i5c=;
- b=DPcc4yGf1Z4stLcHhv7nxz6yIz2mqLYJJI42zmHJ2G0V+4Ygz0GVTBCkSgVPR8lWdo
- VV9BleOFs3RAgCU6TZy3GGBlgLsXtzJIB5g0tlQzZH9TOUj7bqDhab9+7QIue77z8BSL
- rcOEYulRh1uobMV2haKUFolWMT/Bf//oXSPdcz/BmybzkWtZyYwqE9JuzN9z8ejg7l5c
- nubGvp+tN6FTkqJSM1Cdth6Hr5nF5zuvq5DY0WkoGwCkykDjl8LWYJ3+X+Epee7LYhio
- fhZm/ZqMqRDCIrBzeIz7/bW1mJFnFslwngBJNEFrpa9F03aSdMR9NvKv9FsoVx/9Njy6
- ejog==
+ bh=my+2I7oEcIoGWnbLn8sq/+Zy6t716yBT3j4+w3PES+4=;
+ b=jMsdntsCkNXisGBb8CWMLEwcMT5w5vt3Sf5OaNZ9pzAtgCTTUxi5pfTcmNNtU+aeYs
+ wEr4QCmswYd+71G3yezbvj1mMfMVZtHHeGtkyC7UuxeJ+LKj/cLVHMXAN+003sXUtWBh
+ dimsIGOni4BsEQsiwyDzR8GGjEo8g261ygPJxPmfelMqA2wJiLXJ+F+IYolgMxNeL0s8
+ h2savXhtsNvan343BBx6k+lcOig6zXVV+7g4WTtLu/ukI0NgwbTRzYkod3gpbONdd15q
+ CvKcbi3VOuRytEWpLnBhrTu+RR5WFS8hZDz2nwrs8bce3NicYV7C7OHlhYuxEPjQVe+u
+ 1bQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=yrLkH70WzIihdGm/NjbQjxTYMS+wbXewYaB/SgI3i5c=;
- b=hyBg2HkICHiK+ttpEfBHUG46Ko/JvvGs3s3rNtp/9wxAmy0pS8TWcQStZm5RfeByh2
- 2xFNl/0EjfWhYygIUDitdbd0J3r7XdvxkTVlY8cuOse/31F12hqoe4O5pimXrkztq7O7
- Un+5rXDyTBj8jHeoQV7oI1lGgtQINXPXHVGSip+RDs+1x/J1M2hInc3KfNq8aF2Dn4If
- G5X5jqmc0G9eyfaCAb3T/Ef3pguiSZaPvdq3lRAVzZcNBdOOqJUyQUXokmnknubD+56k
- avrJ2mEYTLG9deAjwXGySdpcxmk5jrAlkTH1o/oMHc5DtlXOEsXaEbCe+GXhTU73IEhb
- /ZQQ==
-X-Gm-Message-State: AOAM533sJcBFh4UshAzXy9Sh9WB2ZgS276wkTs1Iik2W6vPLfxkJVejE
- YO0R9gJwgjS9ItPs4EUDB7Z6eICjbxI=
-X-Google-Smtp-Source: ABdhPJzPQkKAsw+WVIpI3SO5UKRRm5SfW2rhLL5gG2nSORaBH81Vnn3Ir3F2i9l85m7w1ZuGNxXdpA==
-X-Received: by 2002:a5d:6846:: with SMTP id o6mr38567514wrw.370.1593807569583; 
- Fri, 03 Jul 2020 13:19:29 -0700 (PDT)
+ bh=my+2I7oEcIoGWnbLn8sq/+Zy6t716yBT3j4+w3PES+4=;
+ b=Rjg0Zo1APAbGgM9xgSTeSD0x8LuPXVqY0osVlRozTJn1FceAb3w5RFowJpmzQmSBMl
+ rySILM2A/3emOI2cSlGtAy5CsrmMD7eHu8OURZiCn/nIZPn1WsPgxPgvjkCwDVsd6bwp
+ eYNLUoNLlsg3vYu3RIMpFxUBSalRoOtn1akUaMJOJYLGgTV8+CDEE7pefo2COrkNFV5F
+ kVcyQD/68j6sUqrBK0SBli2+Rek3kSyHfYrbfbq7ylZtf4VMjWZzLuzd9+M5ylYRvGMe
+ RF3O5VKfAbP+GVHDYsLZsocL2ENsqSppGraqax6I5JuZLB4o+9jS3BHETN1mudAQdOzm
+ 1MbQ==
+X-Gm-Message-State: AOAM5309oHwLAMQAdJ9CsufvzuvsiJV1TTLjToDb51sM0YI0Axf9JAKT
+ 2aff12JttUQkxBnEh+6nRsqIw4Xrfp8=
+X-Google-Smtp-Source: ABdhPJxmeyPqHpEMctz7hcbDpSQ57jL1oBVn5E+qjNvJuB1N1xdseIfddj8uVI/c3QjqZcUu8RekZA==
+X-Received: by 2002:a1c:7209:: with SMTP id n9mr10149730wmc.150.1593807565301; 
+ Fri, 03 Jul 2020 13:19:25 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.28
+ by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 13:19:29 -0700 (PDT)
+ Fri, 03 Jul 2020 13:19:24 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 11/18] hw/usb/hcd-ohci: Mark the device with no migratable
+Subject: [PATCH 08/18] hw/core/split-irq: Mark the device with no migratable
  fields
-Date: Fri,  3 Jul 2020 22:19:04 +0200
-Message-Id: <20200703201911.26573-12-f4bug@amsat.org>
+Date: Fri,  3 Jul 2020 22:19:01 +0200
+Message-Id: <20200703201911.26573-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200703201911.26573-1-f4bug@amsat.org>
 References: <20200703201911.26573-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x429.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -122,40 +122,23 @@ Sender: "Qemu-devel"
 This device doesn't have fields to migrate. Be explicit
 by using vmstate_qdev_no_state_to_migrate.
 
-Add a more descriptive comment to keep a clear separation
-between static property vs runtime changeable.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/usb/hcd-ohci.h | 2 ++
- hw/usb/hcd-ohci.c | 1 +
- 2 files changed, 3 insertions(+)
+ hw/core/split-irq.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/usb/hcd-ohci.h b/hw/usb/hcd-ohci.h
-index 5c8819aedf..3bcbad1269 100644
---- a/hw/usb/hcd-ohci.h
-+++ b/hw/usb/hcd-ohci.h
-@@ -100,6 +100,8 @@ typedef struct {
-     /*< public >*/
- 
-     OHCIState ohci;
-+
-+    /* Properties */
-     char *masterbus;
-     uint32_t num_ports;
-     uint32_t firstport;
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index 1e6e85e86a..6c76f65734 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -1983,6 +1983,7 @@ static void ohci_sysbus_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->realize = ohci_realize_pxa;
+diff --git a/hw/core/split-irq.c b/hw/core/split-irq.c
+index 3b90af2e8f..a7072f922c 100644
+--- a/hw/core/split-irq.c
++++ b/hw/core/split-irq.c
+@@ -71,6 +71,7 @@ static void split_irq_class_init(ObjectClass *klass, void *data)
+     /* No state to reset or migrate */
+     device_class_set_props(dc, split_irq_properties);
+     dc->realize = split_irq_realize;
 +    dc->vmsd = vmstate_qdev_no_state_to_migrate;
-     set_bit(DEVICE_CATEGORY_USB, dc->categories);
-     dc->desc = "OHCI USB Controller";
-     device_class_set_props(dc, ohci_sysbus_properties);
+ 
+     /* Reason: Needs to be wired up to work */
+     dc->user_creatable = false;
 -- 
 2.21.3
 
