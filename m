@@ -4,82 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0353C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CD0C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFADA207DA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B72BC207DA
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFlcqx/3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFADA207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/FpPoxH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B72BC207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrHcn-0008H2-V0
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59552)
+	id 1jrHcp-0008Nx-V0
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:04:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbl-0006Wi-4s
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45908
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbm-0006aD-Rn
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:46 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47567
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbj-0004Mx-E8
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:44 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrHbl-0004N1-2J
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:03:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593767022;
+ s=mimecast20190719; t=1593767023;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AZqj3bTam91VJKMgXj5mJaby8iNVg3MqxY1e+jpggf8=;
- b=aFlcqx/3vcke3nbIlpYeh3UhfvXWTySBbPxF5FD0CXoEFmo3+b1zQI4+EIF7DXmKhUDmS8
- aNQFVs3UQ4OJRLnsZwdWuPk1+KWFyp8Wbqv/oqn69yg11VTtQCQzsmQMvJPqCcT6TKdPZR
- v4FrTtbceVj7AprCG/qlvS7abhnlJ/I=
+ bh=3SejujQmFP8i9uGegxOHZH22A3MzEqNQC/7kkGUHxhs=;
+ b=X/FpPoxHXxDTjPYC3C8sD3wW8SFrHj6OlEpN3ybbYwjOJoVh1d8NhHBtFgd3aeOkF6KCyc
+ IZhKaWmKqCo69pjx63Wt1usPAnWRxx2LPfKyuxPobKwtHZPuH1EnJRxsMzPYj5bsSqcCvH
+ zjCxaO5d+4GfYFIQbLRzhKkMQ6kytD8=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-V_WzGbf8NfeAIg1YKSX-WQ-1; Fri, 03 Jul 2020 05:03:38 -0400
-X-MC-Unique: V_WzGbf8NfeAIg1YKSX-WQ-1
-Received: by mail-wm1-f72.google.com with SMTP id g6so28645033wmk.4
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:03:38 -0700 (PDT)
+ us-mta-196-64dmjPcOOfOi4XMFXrTgVw-1; Fri, 03 Jul 2020 05:03:42 -0400
+X-MC-Unique: 64dmjPcOOfOi4XMFXrTgVw-1
+Received: by mail-wm1-f72.google.com with SMTP id v11so15781891wmb.1
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 02:03:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=AZqj3bTam91VJKMgXj5mJaby8iNVg3MqxY1e+jpggf8=;
- b=GYXrGfvHYRrJ8O+ITIt7UEajzRZu7LnuT/gnHROiMbQe3zUWpHxhfQ0HYjX1/E6JSf
- nJlWKvjRmBCIeTUacD/DLLkmYdQ6jINPZ2MjuwWfyKV7GM+QtSvbU4Vm1FeR/XzVmoIv
- Fpl82GXOLEMGo/6Yc6tAGbtSAz+TKNbKSauTwKWFEiBSaj0IcZ2di1KWf0WPC3iCMdo9
- 2TRESfuRbwooKH2xzA6joptQEWe5hrXTbXGJPhF+MnfOTAlSkltpo0YnWonVAmay2A10
- ScAsjZs3uDzb4P0VxrF09b7IOXU5iYRIEfT+V0kwJobh/6GykRLsfHEB/nfX9RlQfNrN
- ZH2w==
-X-Gm-Message-State: AOAM532csp1GwMEXrzoLoOn5E0ethGfol0UPjyQmn1dw6N7iIsZ+eXDj
- iOeY+Zgd3m5Ug4Kfjr9CFVTHwm+t5pON2W34yS34FXA0zXgKltGG8SSMvxc14UtYv7mA6vwB64/
- i/oKWj08d4amMjhg=
-X-Received: by 2002:adf:e944:: with SMTP id m4mr36398271wrn.252.1593767017154; 
- Fri, 03 Jul 2020 02:03:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJznoot4RKu6ewktM7kVzYViOQ+YF9Kf/tp8FAaPlHR1r42c6UpGWD9YwduYyhKcX5Jl3NuvhQ==
-X-Received: by 2002:adf:e944:: with SMTP id m4mr36398265wrn.252.1593767016996; 
- Fri, 03 Jul 2020 02:03:36 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=3SejujQmFP8i9uGegxOHZH22A3MzEqNQC/7kkGUHxhs=;
+ b=tIMrBlh/CpZfin2JNrcmZQPxkmpi5suwv5bi+UaaSXWk4ut6E7SvliWO6M4MBx+f1B
+ Y4YOcyzpTr1JQZL9tSy5FrqYRKjrlwBAUm04vj93PEuPgS3D7w/5A5c6/SakWTYv+BqZ
+ sckrjQ+c8M6EbbPNc/e8XYlaWGFRsRWgsHAKUJ0EFvttnorisOfwFyBvu/DrLjuoVqnt
+ 8t1wweOozA3aQtCqFaN8DrcAhlV7HRPRSpVWB5WPOOJ4xHw8KrAlsOlzU637aW1ExuI8
+ MStFKeBUkDrpfn3W3lHTRvq3FbwLKeitGGGfnas9OpT3qYcbSKy74dBwMoWg5bvl1+/L
+ iB2Q==
+X-Gm-Message-State: AOAM530twIcRyh06s2q/E64vNbRHc9Q036o/DnBCB1Y9S+eF3sZgBkoK
+ MnP0eYKoeCm+J+j6rDG9iI+3NzoXE233E8Qk2U/nxq01yqqDmqV2XA0yvXF81R6SnM43Iusl0CT
+ CsRynw7r/zUlPg1w=
+X-Received: by 2002:a1c:bcd4:: with SMTP id
+ m203mr35307708wmf.124.1593767019911; 
+ Fri, 03 Jul 2020 02:03:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx54lyMEhYehJC9RdYF6g0URy/LZ1hAqBXGniXvFqkXRx8GH3aV/DPBPqhphpWlQA8ellUFbA==
+X-Received: by 2002:a1c:bcd4:: with SMTP id
+ m203mr35307685wmf.124.1593767019691; 
+ Fri, 03 Jul 2020 02:03:39 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- u65sm12684816wmg.5.2020.07.03.02.03.35
+ h84sm13809795wme.22.2020.07.03.02.03.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 02:03:36 -0700 (PDT)
-Date: Fri, 3 Jul 2020 05:03:34 -0400
+ Fri, 03 Jul 2020 02:03:39 -0700 (PDT)
+Date: Fri, 3 Jul 2020 05:03:37 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/41] Revert "tests/migration: Reduce autoconverge initial
- bandwidth"
-Message-ID: <20200703090252.368694-3-mst@redhat.com>
+Subject: [PULL 03/41] virtio-balloon: always indicate S_DONE when migration
+ fails
+Message-ID: <20200703090252.368694-4-mst@redhat.com>
 References: <20200703090252.368694-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
@@ -89,12 +89,11 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -115,44 +114,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ Wei Wang <wei.w.wang@intel.com>, Alexander Duyck <alexander.duyck@gmail.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 6d1da867e65f ("tests/migration: Reduce autoconverge initial bandwidth")
-since that change makes unit tests much slower for all developers, while it's not
-a robust way to fix migration tests. Migration tests need to find
-a more robust way to discover a reasonable bandwidth without slowing
-things down for everyone.
+From: David Hildenbrand <david@redhat.com>
 
-Fixes: 6d1da867e65f ("tests/migration: Reduce autoconverge initial bandwidth")
+If something goes wrong during precopy, before stopping the VM, we will
+never send a S_DONE indication to the VM, resulting in the hinted pages
+not getting released to be used by the guest OS (e.g., Linux).
+
+Easy to reproduce:
+1. Start migration (e.g., HMP "migrate -d 'exec:gzip -c > STATEFILE.gz'")
+2. Cancel migration (e.g., HMP "migrate_cancel")
+3. Oberve in the guest (e.g., cat /proc/meminfo) that there is basically
+   no free memory left.
+
+While at it, add similar locking to virtio_balloon_free_page_done() as
+done in virtio_balloon_free_page_stop. Locking is still weird, but that
+has to be sorted out separately.
+
+There is nothing to do in the PRECOPY_NOTIFY_COMPLETE case. Add some
+comments regarding S_DONE handling.
+
+Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Cc: Wei Wang <wei.w.wang@intel.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200629080615.26022-1-david@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Acked-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qtest/migration-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/virtio/virtio-balloon.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-index dc3490c9fa..21ea5ba1d2 100644
---- a/tests/qtest/migration-test.c
-+++ b/tests/qtest/migration-test.c
-@@ -1211,7 +1211,7 @@ static void test_migrate_auto_converge(void)
-      * without throttling.
-      */
-     migrate_set_parameter_int(from, "downtime-limit", 1);
--    migrate_set_parameter_int(from, "max-bandwidth", 1000000); /* ~1Mb/s */
-+    migrate_set_parameter_int(from, "max-bandwidth", 100000000); /* ~100Mb/s */
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 10507b2a43..8a84718490 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -628,8 +628,13 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(s);
  
-     /* To check remaining size after precopy */
-     migrate_set_capability(from, "pause-before-switchover", true);
+-    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
+-    virtio_notify_config(vdev);
++    if (s->free_page_report_status != FREE_PAGE_REPORT_S_DONE) {
++        /* See virtio_balloon_free_page_stop() */
++        qemu_mutex_lock(&s->free_page_lock);
++        s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
++        qemu_mutex_unlock(&s->free_page_lock);
++        virtio_notify_config(vdev);
++    }
+ }
+ 
+ static int
+@@ -653,17 +658,26 @@ virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
+     case PRECOPY_NOTIFY_SETUP:
+         precopy_enable_free_page_optimization();
+         break;
+-    case PRECOPY_NOTIFY_COMPLETE:
+-    case PRECOPY_NOTIFY_CLEANUP:
+     case PRECOPY_NOTIFY_BEFORE_BITMAP_SYNC:
+         virtio_balloon_free_page_stop(dev);
+         break;
+     case PRECOPY_NOTIFY_AFTER_BITMAP_SYNC:
+         if (vdev->vm_running) {
+             virtio_balloon_free_page_start(dev);
+-        } else {
+-            virtio_balloon_free_page_done(dev);
++            break;
+         }
++        /*
++         * Set S_DONE before migrating the vmstate, so the guest will reuse
++         * all hinted pages once running on the destination. Fall through.
++         */
++    case PRECOPY_NOTIFY_CLEANUP:
++        /*
++         * Especially, if something goes wrong during precopy or if migration
++         * is canceled, we have to properly communicate S_DONE to the VM.
++         */
++        virtio_balloon_free_page_done(dev);
++        break;
++    case PRECOPY_NOTIFY_COMPLETE:
+         break;
+     default:
+         virtio_error(vdev, "%s: %d reason unknown", __func__, pnd->reason);
 -- 
 MST
 
