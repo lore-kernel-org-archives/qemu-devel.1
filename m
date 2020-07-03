@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 819C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D318C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:59:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CB1D20899
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5750D2088E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:59:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MCh4Ug0J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CB1D20899
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tabBWabv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5750D2088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrN9Z-00070Q-Fi
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 10:59:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42614)
+	id 1jrN9y-0007lt-IT
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 10:59:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrN71-0003ib-Kw
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:23 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35036)
+ id 1jrN72-0003lJ-MU
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:24 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:32962)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrN6z-0006jL-R4
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:23 -0400
-Received: by mail-wm1-x343.google.com with SMTP id l2so32874530wmf.0
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 07:56:21 -0700 (PDT)
+ id 1jrN70-0006ju-ST
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:24 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a6so22515539wmm.0
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 07:56:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xdwJ7T2gYvtwSqRJeSeL30u3SzAKMgTYxu/rW3+6M/8=;
- b=MCh4Ug0JmCPpVEY2DbybO3y27usxhdBrluHJPNBGMh5M/x1P3dHWT6tTEvz8aX7381
- EkxVZsP1qsMNT4qM+/v5hzefmlpiTy/o68XLNqpj1jDIR/QeBV8QjbPH/d4ZIUIGkiZI
- NTek2pEvPEv90oB8YW/62DJJmTJ5GpO0C3WY4QUqB5r4Crgt+n3cpQ+DtpoOvfRWFIL5
- bf2l7vRQezIG16v3cTnEocJCGSgZeh18hO7lXDGuAUJDGaiBEf2YOXsaiv+DcXr8Y8MV
- yfHGOiC7HyQuw9bNxbIo9Lw4FfyG8mdk4FteU/Feml8hGzbthZJfAg4KEslcI1zAhItn
- UTAQ==
+ bh=srUPSKtqaAn1mMUbd1++IlCCTBASkwRrKLk2aoUltZI=;
+ b=tabBWabvR9rAPGPW+8opjMD8UrSGSzpi+Icu6HW7o6a3r822/UF7H1LuCGGfIp7AD3
+ 1YVwcIamsQUtEjTGlvD6S5kf2XQxBK35wYprcmT+AgmkTKNhE25VojZKRpXEQsMRHDeg
+ 3dnJUvp2VVYsM/Lw14za3qgxaRy/9vCTwHsFqbAT3wLYKeV84PBfeRSf4cKhd/NxoYNa
+ 1FIkGMRTLu38dm2r4IpM9X8PyVrIB+JTEIem4w9pn9RLrS72uautys1xpnseVk5pz7eu
+ 5oqbb+BPkqBDbmf/dtm6yV4JAYZ2bDAWUPhCFu8IO4JPYLSP0F0t79t/4OxeWTDKyOOF
+ F6Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xdwJ7T2gYvtwSqRJeSeL30u3SzAKMgTYxu/rW3+6M/8=;
- b=X9JJpTHyJVGStWOq0CwIwfqB6VnY57LYvCtO2w+3SclFXQnTgVhcL2QeHVPv+2Te0C
- mkDfMX2P+/wzUVXoG9I9NqOZSmy31wDmVtyusO4kLnh25UlCHdK+3MFd+pYm48v00Qoq
- 0NASZMukcCJkAlD6USSmkA3k9E8mrX3gqugQuhwk+P7yltge8bvbfJ4pJjj56o/VrTlT
- Gi9zPmtjRxtSjQAPT4T0F2ODAlP74EauZMo5knIsGqpakOnyFG+IfJ163S9kE82BSW4W
- 5R3QVLEPJ0VO5jLskgLl/gepf5ryIJTKrxRD4wbCF+OhdL/OBEO6gBmvTmggD40oy1zt
- kh3A==
-X-Gm-Message-State: AOAM530DyQr5t9Ex5ce+QZFFLGFiXYUqa44TfW3kYTwL7cNUKweZcfFz
- ec0UKeq2/oGI9rI60CVtoKSjymD0myTKug==
-X-Google-Smtp-Source: ABdhPJyAqaT/mkiD7SpYhyktS+Mo+xjvEKf28v++P/kmqNHYw1PzNPLLX2C1J+AOz3ykrIPvbGLXUg==
-X-Received: by 2002:a1c:2349:: with SMTP id j70mr36294944wmj.22.1593788180161; 
- Fri, 03 Jul 2020 07:56:20 -0700 (PDT)
+ bh=srUPSKtqaAn1mMUbd1++IlCCTBASkwRrKLk2aoUltZI=;
+ b=hSBeCx78AWBsqONVtqrL3msc77G+D/nV1nTvzz3BOHXARaC9G8mXC7Hp7aps+R7U+n
+ kizk8R9AU+dke5FBXRYyW99O3QLCsfzW49upErgF1p8fjsShYOJA4Xqhr66HXx8r+7/B
+ J4vuKqgrWAs9fOTYgoM8XKbcHe6DjPQyB6rosbIgoTtqWDXgTHbdzKlK2hjXPW482fPA
+ 39wctAWQn5Bk7g9RffyViIniN3O9Mllne/UkihWpIb69BuXylKi9IGmgpyd9kY4kwnT3
+ F0ELNcvlD6+yBL91zVA7MvL8nCHVmr6YO5jRH2hdUpi7TF+NlF3LUHXUngpU04JlBR4m
+ SLUw==
+X-Gm-Message-State: AOAM532358tm61SRGs4Qv0Sl9iwIl4WWKsOTuFODQ4rjWqupTHVq2J6U
+ 1RFwfyxG3Y3ROwNER1vG2ITOmy9CINR/Gg==
+X-Google-Smtp-Source: ABdhPJwGNwumLD3T1Qz741QSvoO4gMrZzOj/5VqiGPnwTYrShI/KeIjbAiHMN4onzicsx2+PpM/Eng==
+X-Received: by 2002:a1c:4846:: with SMTP id v67mr39261676wma.175.1593788181311; 
+ Fri, 03 Jul 2020 07:56:21 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s10sm14078347wme.31.2020.07.03.07.56.19
+ by smtp.gmail.com with ESMTPSA id s10sm14078347wme.31.2020.07.03.07.56.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 07:56:19 -0700 (PDT)
+ Fri, 03 Jul 2020 07:56:20 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/9] build: Check that mlockall() exists
-Date: Fri,  3 Jul 2020 15:56:08 +0100
-Message-Id: <20200703145614.16684-4-peter.maydell@linaro.org>
+Subject: [PATCH v3 4/9] osdep.h: Always include <sys/signal.h> if it exists
+Date: Fri,  3 Jul 2020 15:56:09 +0100
+Message-Id: <20200703145614.16684-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200703145614.16684-1-peter.maydell@linaro.org>
 References: <20200703145614.16684-1-peter.maydell@linaro.org>
@@ -106,74 +106,88 @@ Sender: "Qemu-devel"
 
 From: David CARLIER <devnexen@gmail.com>
 
-Instead of assuming that all POSIX platforms provide mlockall(),
-test for it in configure. If the host doesn't provide this platform
-then os_mlock() will fail -ENOSYS, as it does already on Windows.
+Regularize our handling of <sys/signal.h>: currently we include it in
+osdep.h, but only for OpenBSD, and we include it without an ifdef
+guard in a couple of C files.  This causes problems for Haiku, which
+doesn't have that header.
 
-This is necessary for Haiku, which does not have mlockall().
+Instead, check in configure whether sys/signal.h exists, and if it
+does then always include it from osdep.h.
 
 Signed-off-by: David Carlier <devnexen@gmail.com>
 [PMM: Expanded commit message]
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- configure  | 15 +++++++++++++++
- os-posix.c |  4 ++++
- 2 files changed, 19 insertions(+)
+ configure                   | 8 ++++++++
+ include/qemu/osdep.h        | 2 +-
+ hw/xen/xen-legacy-backend.c | 1 -
+ util/oslib-posix.c          | 1 -
+ 4 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/configure b/configure
-index 5455ae10d05..ddc53d873ef 100755
+index ddc53d873ef..d131f760d8f 100755
 --- a/configure
 +++ b/configure
-@@ -2392,6 +2392,18 @@ else
-   pty_h=no
+@@ -3212,6 +3212,11 @@ if ! check_include "ifaddrs.h" ; then
+   have_ifaddrs_h=no
  fi
  
-+cat > $TMPC <<EOF
-+#include <sys/mman.h>
-+int main(int argc, char *argv[]) {
-+    return mlockall(MCL_FUTURE);
-+}
-+EOF
-+if compile_prog "" "" ; then
-+  have_mlockall=yes
-+else
-+  have_mlockall=no
++have_sys_signal_h=no
++if check_include "sys/signal.h" ; then
++  have_sys_signal_h=yes
 +fi
 +
- #########################################
- # vhost interdependencies and host support
+ ##########################################
+ # VTE probe
  
-@@ -7865,6 +7877,9 @@ fi
- if test "$pty_h" = "yes" ; then
-   echo "CONFIG_PTY=y" >> $config_host_mak
+@@ -7398,6 +7403,9 @@ fi
+ if test "$have_broken_size_max" = "yes" ; then
+     echo "HAVE_BROKEN_SIZE_MAX=y" >> $config_host_mak
  fi
-+if test "$have_mlockall" = "yes" ; then
-+  echo "CONFIG_MLOCKALL=y" >> $config_host_mak
++if test "$have_sys_signal_h" = "yes" ; then
++    echo "CONFIG_SYS_SIGNAL=y" >> $config_host_mak
 +fi
- if test "$fuzzing" = "yes" ; then
-   if test "$have_fuzzer" = "yes"; then
-     FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
-diff --git a/os-posix.c b/os-posix.c
-index 3cd52e1e700..e02b566940c 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -337,6 +337,7 @@ bool is_daemonized(void)
  
- int os_mlock(void)
- {
-+#if defined CONFIG_MLOCKALL
-     int ret = 0;
+ # Work around a system header bug with some kernel/XFS header
+ # versions where they both try to define 'struct fsxattr':
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 0d26a1b9bd0..6e0cf9132d9 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -104,7 +104,7 @@ extern int daemon(int, int);
+ #include <setjmp.h>
+ #include <signal.h>
  
-     ret = mlockall(MCL_CURRENT | MCL_FUTURE);
-@@ -345,4 +346,7 @@ int os_mlock(void)
-     }
+-#ifdef __OpenBSD__
++#ifdef CONFIG_SYS_SIGNAL
+ #include <sys/signal.h>
+ #endif
  
-     return ret;
-+#else
-+    return -ENOSYS;
-+#endif
- }
+diff --git a/hw/xen/xen-legacy-backend.c b/hw/xen/xen-legacy-backend.c
+index 7d4b13351e0..965abe3ad34 100644
+--- a/hw/xen/xen-legacy-backend.c
++++ b/hw/xen/xen-legacy-backend.c
+@@ -23,7 +23,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include <sys/signal.h>
+ 
+ #include "hw/sysbus.h"
+ #include "hw/boards.h"
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 39ddc77c85b..7ad9195c445 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -38,7 +38,6 @@
+ #include "qemu/sockets.h"
+ #include "qemu/thread.h"
+ #include <libgen.h>
+-#include <sys/signal.h>
+ #include "qemu/cutils.h"
+ 
+ #ifdef CONFIG_LINUX
 -- 
 2.20.1
 
