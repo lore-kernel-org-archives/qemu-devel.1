@@ -2,62 +2,86 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3B9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D4FC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E843920720
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:12:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E843920720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 0F65920720
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 10:12:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxVVgkm1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F65920720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrIgZ-0005Rw-6G
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 06:12:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57594)
+	id 1jrIge-0005bp-A2
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 06:12:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrIe3-0001T4-Ij; Fri, 03 Jul 2020 06:10:11 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:53536)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrIe1-0006be-8q; Fri, 03 Jul 2020 06:10:11 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 5D064BF465;
- Fri,  3 Jul 2020 10:10:06 +0000 (UTC)
-Date: Fri, 3 Jul 2020 12:10:03 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 11/18] hw/block/nvme: add remaining mandatory
- controller parameters
-Message-ID: <20200703101003.iirx66jjnauvk7a3@apples.localdomain>
-References: <20200703063420.2241014-1-its@irrelevant.dk>
- <20200703063420.2241014-12-its@irrelevant.dk>
- <e2cbec3f-896e-fa17-2aac-2c82e0d6df60@redhat.com>
- <20200703084626.xib465ie3vvladip@apples.localdomain>
- <05eda6c8-b6fc-b034-a76d-dc563427ed35@redhat.com>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jrIbR-0003m8-9T
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:07:29 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42001
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jrIbN-0005cw-6L
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 06:07:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593770843;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+h8DgdJ/QNhxgIogOI7OC8K+gM1arOnEuxQ/Zp39QDo=;
+ b=dxVVgkm1rxmCwjiOyNadDSiS77DGV3nUpcqMx9C+6/w8mtJqtCeFgoaNazECLokWxr6zPw
+ 8CiPfIh57EIiou+msKyGodfS/KqmVCnXFYH4o0EKLNtNkesJuHZ9+awaBg5i9aTZIUAxlr
+ OeYwKKkWv5cbPaErPi0XE3qoFqnmHmI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-Ap_CO2XRNP6E7h_U_u9o8Q-1; Fri, 03 Jul 2020 06:07:19 -0400
+X-MC-Unique: Ap_CO2XRNP6E7h_U_u9o8Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 170A3186A200;
+ Fri,  3 Jul 2020 10:07:18 +0000 (UTC)
+Received: from localhost (ovpn-113-54.ams2.redhat.com [10.36.113.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5C8173FE9;
+ Fri,  3 Jul 2020 10:07:14 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 07/14] pc-bios: s390x: Move panic() into header and add
+ infinite loop
+Date: Fri,  3 Jul 2020 12:06:43 +0200
+Message-Id: <20200703100650.621212-8-cohuck@redhat.com>
+In-Reply-To: <20200703100650.621212-1-cohuck@redhat.com>
+References: <20200703100650.621212-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <05eda6c8-b6fc-b034-a76d-dc563427ed35@redhat.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:42:13
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,160 +94,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jul  3 11:21, Philippe Mathieu-Daudé wrote:
-> On 7/3/20 10:46 AM, Klaus Jensen wrote:
-> > On Jul  3 10:31, Philippe Mathieu-Daudé wrote:
-> >> On 7/3/20 8:34 AM, Klaus Jensen wrote:
-> >>> From: Klaus Jensen <k.jensen@samsung.com>
-> >>>
-> >>> Add support for any remaining mandatory controller operating parameters
-> >>> (features).
-> >>>
-> >>> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> >>> Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> >>> ---
-> >>>  hw/block/nvme.c       | 39 +++++++++++++++++++++++++++++++++------
-> >>>  hw/block/nvme.h       | 18 ++++++++++++++++++
-> >>>  hw/block/trace-events |  2 ++
-> >>>  include/block/nvme.h  |  7 +++++++
-> >>>  4 files changed, 60 insertions(+), 6 deletions(-)
-> >>>
-> >>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> >>> index ba523f6768bf..affb9a967534 100644
-> >>> --- a/hw/block/nvme.c
-> >>> +++ b/hw/block/nvme.c
-> >>> @@ -1056,8 +1056,16 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> >>>      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> >>>      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
-> >>>      uint32_t result;
-> >>> +    uint8_t fid = NVME_GETSETFEAT_FID(dw10);
-> >>> +    uint16_t iv;
-> >>>  
-> >>> -    switch (dw10) {
-> >>> +    trace_pci_nvme_getfeat(nvme_cid(req), fid, dw11);
-> >>> +
-> >>> +    if (!nvme_feature_support[fid]) {
-> >>> +        return NVME_INVALID_FIELD | NVME_DNR;
-> >>> +    }
-> >>> +
-> >>> +    switch (fid) {
-> >>>      case NVME_TEMPERATURE_THRESHOLD:
-> >>>          result = 0;
-> >>>  
-> >>> @@ -1088,14 +1096,27 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> >>>                               ((n->params.max_ioqpairs - 1) << 16));
-> >>>          trace_pci_nvme_getfeat_numq(result);
-> >>>          break;
-> >>> +    case NVME_INTERRUPT_VECTOR_CONF:
-> >>> +        iv = dw11 & 0xffff;
-> >>> +        if (iv >= n->params.max_ioqpairs + 1) {
-> >>> +            return NVME_INVALID_FIELD | NVME_DNR;
-> >>> +        }
-> >>> +
-> >>> +        result = iv;
-> >>> +        if (iv == n->admin_cq.vector) {
-> >>> +            result |= NVME_INTVC_NOCOALESCING;
-> >>> +        }
-> >>> +
-> >>> +        result = cpu_to_le32(result);
-> >>> +        break;
-> >>>      case NVME_ASYNCHRONOUS_EVENT_CONF:
-> >>>          result = cpu_to_le32(n->features.async_config);
-> >>>          break;
-> >>>      case NVME_TIMESTAMP:
-> >>>          return nvme_get_feature_timestamp(n, cmd);
-> >>>      default:
-> >>> -        trace_pci_nvme_err_invalid_getfeat(dw10);
-> >>> -        return NVME_INVALID_FIELD | NVME_DNR;
-> >>> +        result = cpu_to_le32(nvme_feature_default[fid]);
-> >>
-> >> So here we expect uninitialized fid entries to return 0, right?
-> >>
-> > 
-> > Yes, if defaults are not 0 (like NVME_ARBITRATION), it is explicitly set.
-> > 
-> >>> +        break;
-> >>>      }
-> >>>  
-> >>>      req->cqe.result = result;
-> >>> @@ -1124,8 +1145,15 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> >>>  {
-> >>>      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> >>>      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
-> >>> +    uint8_t fid = NVME_GETSETFEAT_FID(dw10);
-> >>>  
-> >>> -    switch (dw10) {
-> >>> +    trace_pci_nvme_setfeat(nvme_cid(req), fid, dw11);
-> >>> +
-> >>> +    if (!nvme_feature_support[fid]) {
-> >>> +        return NVME_INVALID_FIELD | NVME_DNR;
-> >>> +    }
-> >>> +
-> >>> +    switch (fid) {
-> >>>      case NVME_TEMPERATURE_THRESHOLD:
-> >>>          if (NVME_TEMP_TMPSEL(dw11) != NVME_TEMP_TMPSEL_COMPOSITE) {
-> >>>              break;
-> >>> @@ -1172,8 +1200,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> >>>      case NVME_TIMESTAMP:
-> >>>          return nvme_set_feature_timestamp(n, cmd);
-> >>>      default:
-> >>> -        trace_pci_nvme_err_invalid_setfeat(dw10);
-> >>> -        return NVME_INVALID_FIELD | NVME_DNR;
-> >>> +        return NVME_FEAT_NOT_CHANGEABLE | NVME_DNR;
-> >>>      }
-> >>>      return NVME_SUCCESS;
-> >>>  }
-> >>> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> >>> index f8940435f9ef..8ad1e3c89cee 100644
-> >>> --- a/hw/block/nvme.h
-> >>> +++ b/hw/block/nvme.h
-> >>> @@ -87,6 +87,24 @@ typedef struct NvmeFeatureVal {
-> >>>      uint32_t    async_config;
-> >>>  } NvmeFeatureVal;
-> 
-> What do you think about adding:
-> 
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -804,7 +804,8 @@ enum NvmeFeatureIds {
->      NVME_WRITE_ATOMICITY            = 0xa,
->      NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
->      NVME_TIMESTAMP                  = 0xe,
-> -    NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
-> +    NVME_SOFTWARE_PROGRESS_MARKER   = 0x80,
-> +    NVME_FEATURE_ID_COUNT           = 0x100
->  };
-> 
+From: Janosch Frank <frankja@linux.ibm.com>
 
-I can definitely go with that. I added it as NVME_FID_MAX.
+panic() was defined for the ccw and net bios, i.e. twice, so it's
+cleaner to rather put it into the header.
 
-> >>>  
-> >>> +static const uint32_t nvme_feature_default[0x100] = {
-> 
-> Why uint32_t and not uint16_t?
-> 
+Also let's add an infinite loop into the assembly of disabled_wait() so
+the caller doesn't need to take care of it.
 
-The feature values are by definition 32 bits wide, so even though the
-defaults here do not require it, I think uin32_t should be used.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200624075226.92728-9-frankja@linux.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/main.c     | 7 -------
+ pc-bios/s390-ccw/netmain.c  | 8 --------
+ pc-bios/s390-ccw/s390-ccw.h | 9 +++++++--
+ pc-bios/s390-ccw/start.S    | 5 +++--
+ 4 files changed, 10 insertions(+), 19 deletions(-)
 
-> With the previously suggested enum you can now replace 0x100
-> by NVME_FEATURE_ID_COUNT.
-> 
-> >>> +    [NVME_ARBITRATION]           = NVME_ARB_AB_NOLIMIT,
-> >>> +};
-> >>> +
-> >>> +static const bool nvme_feature_support[0x100] = {
-> 
-> Ditto NVME_FEATURE_ID_COUNT.
-> 
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 8b912454c940..146a50760bc7 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -46,13 +46,6 @@ void write_iplb_location(void)
+     lowcore->ptr_iplb = ptr2u32(&iplb);
+ }
+ 
+-void panic(const char *string)
+-{
+-    sclp_print(string);
+-    disabled_wait();
+-    while (1) { }
+-}
+-
+ unsigned int get_loadparm_index(void)
+ {
+     return atoui(loadparm_str);
+diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+index f1ee63577ad7..056e93a818fd 100644
+--- a/pc-bios/s390-ccw/netmain.c
++++ b/pc-bios/s390-ccw/netmain.c
+@@ -439,14 +439,6 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+     return rc;
+ }
+ 
+-void panic(const char *string)
+-{
+-    sclp_print(string);
+-    for (;;) {
+-        disabled_wait();
+-    }
+-}
+-
+ void write_subsystem_identification(void)
+ {
+     SubChannelId *schid = (SubChannelId *) 184;
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index c5820e43aed1..36b884ccedf2 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -50,12 +50,11 @@ typedef unsigned long long __u64;
+ #include "iplb.h"
+ 
+ /* start.s */
+-void disabled_wait(void);
++void disabled_wait(void) __attribute__ ((__noreturn__));
+ void consume_sclp_int(void);
+ void consume_io_int(void);
+ 
+ /* main.c */
+-void panic(const char *string);
+ void write_subsystem_identification(void);
+ void write_iplb_location(void);
+ extern char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+@@ -91,6 +90,12 @@ bool menu_is_enabled_enum(void);
+ 
+ #define MAX_BOOT_ENTRIES  31
+ 
++static inline void panic(const char *string)
++{
++    sclp_print(string);
++    disabled_wait();
++}
++
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
+diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+index aa8fceb19da2..ce519300a1f3 100644
+--- a/pc-bios/s390-ccw/start.S
++++ b/pc-bios/s390-ccw/start.S
+@@ -47,8 +47,9 @@ memsetxc:
+  */
+ 	.globl disabled_wait
+ disabled_wait:
+-        larl %r1,disabled_wait_psw
+-        lpswe   0(%r1)
++	larl	%r1,disabled_wait_psw
++	lpswe	0(%r1)
++1:	j	1b
+ 
+ 
+ /*
+-- 
+2.25.4
 
-Fixed!
 
