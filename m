@@ -2,99 +2,92 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 948C5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E682DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:51:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C35C21532
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:50:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B29E22186A
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:51:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISpQE9Yv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C35C21532
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CmKIvf/K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B29E22186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOtq-0002mk-KB
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48624)
+	id 1jrOui-0003gj-1N
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:51:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrOtD-0002Bz-0O
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:50:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56951
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jrOtB-0004x4-7O
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:50:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593795011;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AWgD8jQJihmE+kJuPthv4VtTEykSD2bnv9ikevCFQog=;
- b=ISpQE9YvzAIFjzHFrVR0EhE/ZplRXdEo6sovPbz6bAHHl65VZYUJTFKaEadFVOdhwqCs+U
- idmUlDvw69OPyMh1s7sDz9BEYSHISUfvxb2BAL081Pjee0maLaqIT3HOIka9mmVbKujUIH
- NQkXNZFcXsiWVL6dZsNPyENGip9OAq4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-hNTeajFqMsall-yrVY9vsw-1; Fri, 03 Jul 2020 12:50:09 -0400
-X-MC-Unique: hNTeajFqMsall-yrVY9vsw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F02D107B7C3;
- Fri,  3 Jul 2020 16:50:08 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B22897BD5B;
- Fri,  3 Jul 2020 16:50:01 +0000 (UTC)
-Date: Fri, 3 Jul 2020 17:49:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 2/6] migration: introduce savevm, loadvm, delvm QMP
- commands
-Message-ID: <20200703164958.GP2213227@redhat.com>
-References: <20200702175754.2211821-1-berrange@redhat.com>
- <20200702175754.2211821-3-berrange@redhat.com>
- <fcff0e8b-fd60-2897-0553-49ab24a9b7fa@redhat.com>
- <20200702182452.GP1888119@redhat.com>
- <20200703154933.GE6641@work-vm>
- <20200703160235.GM2213227@redhat.com>
- <20200703161012.GH6641@work-vm>
- <20200703161654.GN2213227@redhat.com>
- <20200703162246.GI6641@work-vm>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jrOu6-0003Ag-FM
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:51:10 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42022)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jrOu2-0005Cn-5x
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:51:10 -0400
+Received: by mail-oi1-x244.google.com with SMTP id t4so9143326oij.9
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 09:51:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2LmzC6bN6TRPuLILlxvA9/U2scMrArBZb+9KNgxoGTQ=;
+ b=CmKIvf/KppfxeYwdg2cvxELjebKMYoTXlbae1+SVVzuwR0jvIRY20s8obEeP2bF4WA
+ zHuK8tKTuvh+pzsVgsJMQuwMWBPx5f1bDDYw4teXc8LvOI+4iNouSjmAZF/vSsHNC8gz
+ BeQgFzICCXO9nTyVCms9Wlf5lNl4vZ8A9h/9S6gZgquhMBqa1UKDhO3bQISOPnnjfZS2
+ Viy3rttW2q6sGZ8jpHwi5AiKyd02ac89iJQnLV/xwezZf/vVaHoge/ClKeNlju8o7P0P
+ c+GvyZV/weUcwQpmp3lMk2lkJH+lIZDFlWxgH9K25Xwe39n24f3PpXL9banbqJZ37hWD
+ 71xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2LmzC6bN6TRPuLILlxvA9/U2scMrArBZb+9KNgxoGTQ=;
+ b=KgouwDEMqWjAgxZMNhcH9ZeXMoskGKZ/08lyCPQoMIfuVUsoMdYAzMkq+H4kLZDybP
+ 65q+rZhuDmtM6DbZARCtgOmzCJQYP/4I3gOtg/JbyMqgdEnw16KCOxZNGVwj8lcYAKuH
+ SG0edhTyhGOLYRuNtLzUC59gr0DS34uqEJipUHjOTpcDHcGXWS+5nS2uEwhiCWBU3lCX
+ qCn15O9hRTEbfhAY/VCi+D/SYIgGXJEa96BkrgPrGspINmm9WHG43aTqQ+2Cw8gwrOoX
+ AhDK9lwmhHGAMq9aqNFDYJwL7hj+DEcod8l+Ep+wa3ea7rDOL90jngMYwOjTOpYWsa69
+ wFww==
+X-Gm-Message-State: AOAM532v/J6j2iYexkn2jQFPsoOBp26RxVJGeUCDHumaQujbnZEZpyt4
+ im2POqwqByWHc3atgA5Yuaceqjz9NpUoGDQs2+kcnw==
+X-Google-Smtp-Source: ABdhPJxd/r/pxLJGZu0g2ozT+lU7Ft61mQ0a59o42m2D2e1Ha3PBCanEozfWRN6tjYgBnrhTO9zl1WdXEL0AtYuWGPc=
+X-Received: by 2002:aca:54c9:: with SMTP id
+ i192mr22045948oib.163.1593795064877; 
+ Fri, 03 Jul 2020 09:51:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200703162246.GI6641@work-vm>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200702143955.678-1-thuth@redhat.com>
+ <5EFE07BC.6040407@mindspring.com>
+ <1e699fdc-639e-ef8a-313f-7e665cad868c@redhat.com>
+ <5EFE5291.6030300@mindspring.com>
+ <975b5072-43de-da16-bf62-fc7e5a7a87f5@redhat.com>
+ <5EFF5DFC.2060006@mindspring.com>
+In-Reply-To: <5EFF5DFC.2060006@mindspring.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Jul 2020 17:50:53 +0100
+Message-ID: <CAFEAcA81y59yaOCW=QONy9EKv6Fdkkwb=XGJ786-N5du2+P9NQ@mail.gmail.com>
+Subject: Re: [PATCH] configure / util: Auto-detect the availability of
+ openpty()
+To: Michele Denber <denber@mindspring.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,122 +100,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Tribble <peter.tribble@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 03, 2020 at 05:22:46PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. BerrangÃÂ© (berrange@redhat.com) wrote:
-> > On Fri, Jul 03, 2020 at 05:10:12PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Daniel P. BerrangÃÂ© (berrange@redhat.com) wrote:
-> > > > On Fri, Jul 03, 2020 at 04:49:33PM +0100, Dr. David Alan Gilbert wrote:
-> > > > > * Daniel P. BerrangÃÂ© (berrange@redhat.com) wrote:
-> > > > > > On Thu, Jul 02, 2020 at 01:12:52PM -0500, Eric Blake wrote:
-> > > > > > > On 7/2/20 12:57 PM, Daniel P. BerrangÃÂ© wrote:
-> > > > > > > > savevm, loadvm and delvm are some of the few commands that have never
-> > > > > > > > been converted to use QMP. The primary reason for this lack of
-> > > > > > > > conversion is that they block execution of the thread for as long as
-> > > > > > > > they run.
-> > > > > > > > 
-> > > > > > > > Despite this downside, however, libvirt and applications using libvirt
-> > > > > > > > has used these commands for as long as QMP has existed, via the
-> > > > > > > > "human-monitor-command" passthrough command. IOW, while it is clearly
-> > > > > > > > desirable to be able to fix the blocking problem, this is not an
-> > > > > > > > immediate obstacle to real world usage.
-> > > > > > > > 
-> > > > > > > > Meanwhile there is a need for other features which involve adding new
-> > > > > > > > parameters to the commands. This is possible with HMP passthrough, but
-> > > > > > > > it provides no reliable way for apps to introspect features, so using
-> > > > > > > > QAPI modelling is highly desirable.
-> > > > > > > > 
-> > > > > > > > This patch thus introduces trival savevm, loadvm, delvm commands
-> > > > > > > 
-> > > > > > > trivial
-> > > > > > > 
-> > > > > > > > to QMP that are functionally identical to the HMP counterpart, including
-> > > > > > > > the blocking problem.
-> > > > > > > 
-> > > > > > > Should we name them 'x-savevm', 'x-loadvm', 'x-delvm' to give ourselves room
-> > > > > > > to change them when we DO solve the blocking issue?  Or will the solution of
-> > > > > > > the blocking issue introduce new QMP commands, at which point we can add QMP
-> > > > > > > deprecation markers on these commands to eventually retire them?
-> > > > > > 
-> > > > > > I was in two minds about this, so I'm open to arguments either way.
-> > > > > > 
-> > > > > > The primary goal is for libvirt to consume the APIs as soon as possible,
-> > > > > > and generally libvirt doesn't want todo this is they are declared experimental
-> > > > > > via a "x-" prefix. So that pushes me away from "x-".
-> > > > > > 
-> > > > > > If we don't have an "x-" prefix and want to make changes, we can add extra
-> > > > > > parameters to trigger new behaviour in backwards compatible manner. Or we can
-> > > > > > simply deprecate these commands, deleting them 2 releases later, while adding
-> > > > > > completely new commands.
-> > > > > > 
-> > > > > > If we think the prposed design will definitely need incompatible changes in
-> > > > > > a very short time frame though, that would push towards "x-".
-> > > > > > 
-> > > > > > So IMHO the right answer largely depends on whether there is a credible
-> > > > > > strategy to implement the ideal non-blocking solution in a reasonable amount
-> > > > > > of time. I can't justify spending much time on this myself, but I'm willing
-> > > > > > to consider & try proposals for solving the blocking problem if they're not
-> > > > > > too complex / invasive.
-> > > > > 
-> > > > > Remind me, what was the problem with just making a block: migration
-> > > > > channel, and then we can migrate to it?
-> > > > 
-> > > > migration only does vmstate, not disks. The current blockdev commands
-> > > > are all related to external snapshots, nothing for internal snapshots
-> > > > AFAIK. So we still need commands to load/save internal snapshots of
-> > > > the disk data in the qcow2 files.
-> > > > 
-> > > > So we could look at loadvm/savevm conceptually as a syntax sugar above
-> > > > a migration transport that targets disk images, and blockdev QMP command
-> > > > that can do internal snapshots. Neither of these exist though and feel
-> > > > like a significantly larger amount of work than using existing functionality
-> > > > that is currently working.
-> > > 
-> > > I think that's what we should aim for; adding this wrapper isn't gaining
-> > > that much without moving a bit towards that; so I would stick with the
-> > > x- for now.
-> > 
-> > The question is how much work that approach will be and whether anyone can
-> > realistically commit to doing that ? It looks like a much larger piece of
-> > work in both QEMU and libvirt side to do that. I don't want to see us stuck
-> > with a x-savevm for years because no one has resource to work on the perfect
-> > solution. If we did get a perfect solution at a point in future, we can
-> > still deprecate and then remove any "savevm" command we add to QMP.
-> 
-> I'd at least like to understand that we've got a worklist for it though.
-> We've already got qemu_fopen_bdrv - what's actually wrong with that - is
-> that enough to do the migrate to a stream (given a tiny amount of
-> syntax) ?
+On Fri, 3 Jul 2020 at 17:38, Michele Denber <denber@mindspring.com> wrote:
+>
+> Oops, I hit Send before I was done.  I tried  the Haiku patch:
+>
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index cc5e37177a..faebc13fac 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -39,7 +39,7 @@ util-obj-y += qsp.o
+>  util-obj-y += range.o
+>  util-obj-y += stats64.o
+>  util-obj-y += systemd.o
+> -util-obj-$(CONFIG_POSIX) += drm.o
+> +util-obj-$(CONFIG_LINUX) += drm.o
+>  util-obj-y += guest-random.o
+>  util-obj-$(CONFIG_GIO) += dbus.o
+>  dbus.o-cflags = $(GIO_CFLAGS)
+>
+> but it didn't work:
+>
+> root@hemlock:~/qemu-5.0.0# gpatch -p1 < Makefile.objs.patch.diff
+> patching file util/Makefile.objs
+> Hunk #1 FAILED at 39.
+> 1 out of 1 hunk FAILED -- saving rejects to file util/Makefile.objs.rej
 
-It is close. The migration code works with the QEMUFile layer, but in terms
-of the monitor commands the current framework expects a QIOChannel based
-QEMUFile. It would be possible to add new helpers to work with the bdrv
-backed QEMUFile. The ideal would be to create a QIOChannel impl that is
-backed by a block device though. At that point there would only be a single
-QEMUFile impl based on QIOChannel. 
+This is because you're trying to apply the patch to the
+5.0.0 release, but it was made against the current head-of-git,
+and this file has changed a little between the two.
+Generally we do all development against head-of-git, so
+I would suggest that you try again with that.
 
-That would be another step closer to unlocking the ability to eliminate the
-QEMUFile wrapper entirely. QEMUFile does I/O buffering too for performance,
-that could be done in a QIOChannel layer too, as that's a concept useful
-for other QIOChannel users too.
+As it happens, the current preferred fix for the drm.c issue
+is this one:
+https://patchew.org/QEMU/20200703145614.16684-1-peter.maydell@linaro.org/20200703145614.16684-10-peter.maydell@linaro.org/
 
-That's still only the vmstate part though, and a solution is needed for
-the internal snapshot handling.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+thanks
+-- PMM
 
