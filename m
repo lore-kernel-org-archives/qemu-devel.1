@@ -2,89 +2,126 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B98C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7542C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 016D12088E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0B1820772
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:25:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmN1pd7v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016D12088E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="W7Xo30Xy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B1820772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrKiJ-0002Sw-B7
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 08:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59348)
+	id 1jrKlN-00048S-W6
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 08:25:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrKgw-0001bG-4G
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 08:21:18 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60759
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrKgt-0004Zu-Am
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 08:21:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593778874;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=OFZaiDUGq9XKA6+Nv/EAsHQzDgTIil5M4zIbcIwkIqc=;
- b=gmN1pd7vWW6GzT7vRxV26a7Bikolv477Xz/Kwg/GI8KBWn0oT+qbd/vazVnQlugXwkkGxI
- SbOWhFpcL2c/Q9wGv4Rg2D3N/3btQO/yBS2/jUEUW1F+tUIuH3ucKjqmPg2iQiF/LCS+85
- puCEQ0ZKaz72A5sTwtp+XSb+Iasnqjo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-qFUObpYdN-iJbTl3QoP64A-1; Fri, 03 Jul 2020 08:21:10 -0400
-X-MC-Unique: qFUObpYdN-iJbTl3QoP64A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6447818FE861;
- Fri,  3 Jul 2020 12:21:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 367C9B3A79;
- Fri,  3 Jul 2020 12:21:09 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B7B1D1138648; Fri,  3 Jul 2020 14:21:07 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: Questionable aspects of QEMU Error's design
-References: <87o8sblgto.fsf@dusky.pond.sub.org>
- <87blo7heag.fsf@dusky.pond.sub.org>
-Date: Fri, 03 Jul 2020 14:21:07 +0200
-In-Reply-To: <87blo7heag.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Sat, 04 Apr 2020 09:59:35 +0200")
-Message-ID: <874kqooklo.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jrKkY-0003XD-3N; Fri, 03 Jul 2020 08:25:02 -0400
+Received: from mail-eopbgr150132.outbound.protection.outlook.com
+ ([40.107.15.132]:46374 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jrKkU-0005Ax-Rw; Fri, 03 Jul 2020 08:25:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FAxMXBVzmr+98vX1KpOVVqG5E4PPjq09MymQoZF7Vj72r1U2MRHtRozyw2u84furcjy2QPk3cmQanCIBH7LzpCbwZdXARWdno5mZQHQgmZ9beKUIGwhtkMtwVvTG0yzaAlolJAa03hKWgWcvKr4Nh1sHIZwQpfvQtg8/89/EvBrf1GYkiw/Io5zHjo9IkidAIVRySp/d9McVZpvCpBqnT7fjIjSJFd0AFnv2PC7a1zbjpgccCtoqMYWz/Qu3Ve62ZjJzWdE9DanFd7YSJQ987jdkLXwMu+NVXgzkpRXMLywrZKfAXFCDcAFRGQC4vgAL2lmlAo4vKGiWWFn6fSkfCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8/aAz1CE4CqHd0Mvi1SA6nXS3Wm1MOw637cfFQFWVJ8=;
+ b=UufIAgdRu82OT5Dv6DSooSnwAPS5yjFXL/ZH5uAD8FhCOGhljEJ0g5fNvkO0+FAlXMqwAUTYRVDPb9mqCYo922tMxbuXXzgx5777WuoU0ckqGu3ZFjsaSrJEhYGxuMjOS8rBuZz6TEjR9onWUWOvgus9IUFUt3tD51il3myD8z5+z5GbZm1DVhP4oZxTr3eLaWHmeY/UrJXZ/LA1ueeOfoQ81mSIgLe1jzvKOIdIJQTUDpEVROTqdgQcDBnGBJu043f43IRok6P2a5MagqwRQUhvzld3oPm3AmFLorn+cvHI1UvxA2kzOh7tgE8E5gfpZNt23++CGDTW2gkxXCO04A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8/aAz1CE4CqHd0Mvi1SA6nXS3Wm1MOw637cfFQFWVJ8=;
+ b=W7Xo30Xy0EukFkULwyV/gEGqmDWLvt9WNpDWlCATh33/+loBmeVXMAMCvkMOgHShHon445wkLl41LtUsMZqEhZsWZ0CnfTlRja6bncPNAKaMApy+HCDUdjqLHK6RNTLRuRIu2DGT5YoKw5x4IPRMjiLGMR/uxVzd1P1kpI50GAY=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3544.eurprd08.prod.outlook.com (2603:10a6:20b:4e::30)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.22; Fri, 3 Jul
+ 2020 12:24:55 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3131.028; Fri, 3 Jul 2020
+ 12:24:55 +0000
+Subject: Re: [PATCH v2 14/44] block: Avoid error accumulation in
+ bdrv_img_create()
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200702155000.3455325-1-armbru@redhat.com>
+ <20200702155000.3455325-15-armbru@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <db5330ab-8ecc-8922-f41a-b87c94620424@virtuozzo.com>
+Date: Fri, 3 Jul 2020 15:24:53 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200702155000.3455325-15-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM4PR0302CA0009.eurprd03.prod.outlook.com
+ (2603:10a6:205:2::22) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.15) by
+ AM4PR0302CA0009.eurprd03.prod.outlook.com (2603:10a6:205:2::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20 via Frontend
+ Transport; Fri, 3 Jul 2020 12:24:54 +0000
+X-Originating-IP: [185.215.60.15]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5af62f3b-3ab5-4247-51c9-08d81f4c17e8
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3544:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB354459D349B4F42F9255E7E7C16A0@AM6PR08MB3544.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3173;
+X-Forefront-PRVS: 045315E1EE
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ml7K1bzqobs8SG481F+Kkj7zhzbP4XKukr49EOhqvWID0wJeU508lJ2B8XURY0KWRANDFuAYwQaJoK8Zs1QeevAt+nbuZBPkRiqZTfwCPWuWGJHC9cuONsBPC0fRrsYEFU04fbnsKLOymcJWVoylUQB2RqVCUK8PqRde+wOKDO5kOFsGn9Q0RxJyioXuVSVaOwkpA3Tkm+PcViA3DtBhqPm4nQEVYKA/ASpOsx5HMoowQr6tX2BO4AZcbpuP/jhe3OtA8U/Hw1wPNsS1EA0swqmNe3qulsfUXO5IEo32xQ/23jXyMo/KWD3+fPOl14V3qawpcaM/9bzafODVRC1bVrD1xbs77mythXNz6X7mqFdETfukQFUXETFVSvnmb6QL
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(346002)(396003)(39840400004)(376002)(136003)(5660300002)(66476007)(8936002)(4744005)(8676002)(6486002)(478600001)(66946007)(52116002)(86362001)(31686004)(956004)(186003)(26005)(16526019)(66556008)(4326008)(31696002)(2616005)(16576012)(316002)(2906002)(36756003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: O4k+JKui53bJCyasJcVQWfF4QNYfjBIscFjTJwoJvQUhwXXT6HmUTAs/G2tOIyn5pE/Hiy70TIe1yEtG3axIpRdrvY1RI9nJRCCO654FYQr984nY3iW7qUm2GaAq20D/Mo60pW2s/A9ThcpbMV0jH9unDdoZIS0XDie3YP0ppK0PQwhqatLlxN9Gr8YQd4qYWY2lH8bo/rq9xHg/gDdHEvzPMtYqNqaj3YfPz55Hcl90gbHd4zFU9JGN/gwEye22LdSF9PRHDIQc8UUX60Uyj+y2TgVv1ZkpqBADfxLBuirVjFFYy4rdp4vtY45y6NDZzH9T8nm9DqDA7pz2oYd/xx7XgmwkMs+O9FUiqIWDu1Zp7bMv58mBGUmUS3sx/gD2QSTdqvEM5qmZpAPkCwoOK9pUVTQtsTym9SsiAECWlsXreZw6yHLZdSHQOSXUTDyZzeFF6ikmaB0kw3D4Vbr5wkgQlOqVc1xaNHI786MkrdT7OGKxb6iIqdeV+rkhw3Rs
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5af62f3b-3ab5-4247-51c9-08d81f4c17e8
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2020 12:24:55.3824 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 17lr0fPBl5TMMnOox57SgtRFul6wTV1vLMH0pgHH+L3wafWcKul9IjNjJLSQzm8AAbNTnUjreHVpmzjGL34Ltj/VJflAIRQoFZbRf7AzUFo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3544
+Received-SPF: pass client-ip=40.107.15.132;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 08:24:56
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,152 +134,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+02.07.2020 18:49, Markus Armbruster wrote:
+> When creating an image fails because the format doesn't support option
+> "backing_file" or "backing_fmt", bdrv_img_create() first has
+> qemu_opt_set() put a generic error into @local_err, then puts the real
+> error into @errp with error_setg(), and then propagates the former to
+> the latter, which throws away the generic error.  A bit complicated,
+> but works.
+> 
+> Not that qemu_opt_set() returns a useful value, we can simply ignore
+> the generic error instead.
+> 
+> Signed-off-by: Markus Armbruster<armbru@redhat.com>
+> Reviewed-by: Eric Blake<eblake@redhat.com>
 
-> Markus Armbruster <armbru@redhat.com> writes:
->
->> QEMU's Error was patterned after GLib's GError.  Differences include:
-> [...]
->> * Return value conventions
->>
->>   Common: non-void functions return a distinct error value on failure
->>   when such a value can be defined.  Patterns:
->>
->>   - Functions returning non-null pointers on success return null pointer
->>     on failure.
->>
->>   - Functions returning non-negative integers on success return a
->>     negative error code on failure.
->>
->>   Different: GLib discourages void functions, because these lead to
->>   awkward error checking code.  We have tons of them, and tons of
->>   awkward error checking code:
->>
->>     Error *err = NULL;
->>     frobnicate(arg, &err);
->>     if (err) {
->>         ... recover ...
->>         error_propagate(errp, err);
->>     }
->>
->>   instead of
->>
->>     if (!frobnicate(arg, errp))
->>         ... recover ...
->>     }
->>
->>   Can also lead to pointless creation of Error objects.
->>
->>   I consider this a design mistake.  Can we still fix it?  We have more
->>   than 2000 void functions taking an Error ** parameter...
->>
->>   Transforming code that receives and checks for errors with Coccinelle
->>   shouldn't be hard.  Transforming code that returns errors seems more
->>   difficult.  We need to transform explicit and implicit return to
->>   either return true or return false, depending on what we did to the
->>   @errp parameter on the way to the return.  Hmm.
-> [...]
->
-> To figure out what functions with an Error ** parameter return, I used
-> Coccinelle to find such function definitions and print the return types.
-> Summary of results:
->
->    2155 void
->     873 signed integer
->     494 pointer
->     153 bool
->      33 unsigned integer
->       6 enum
->    ---------------------
->    3714 total
 
-With my "[PATCH v2 00/44] Less clumsy error checking" applied, I now count
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-     1946 void
-      879 signed integer
-      484 pointer
-      301 bool
-       33 unsigned integer
-        3 GuestFsfreezeStatus
-        1 gnutls_x509_crt_t
-        1 QCryptoCipherAlgorithm
-        1 COLOMessage
-        1 BlockdevDetectZeroesOptions
-     ---------------------
-     3650 total
-
-About 7% complete for function definitions.
-
-> I then used Coccinelle to find checked calls of void functions (passing
-> &error_fatal or &error_abort is not considered "checking" here).  These
-> calls become simpler if we make the functions return a useful value.  I
-> found a bit under 600 direct calls, and some 50 indirect calls.
-
-Different method this time: I count any direct function call that takes
-&err other than &error_abort, &error_fatal, and whose value, if any, is
-not used.
-
-Current master: 1050
-
-With my "[PATCH v2 00/44] Less clumsy error checking" applied: 649
-
-About 38% complete for function calls.
-
-> Most frequent direct calls:
->
->     127 object_property_set_bool
->      27 qemu_opts_absorb_qdict
->      16 visit_type_str
->      14 visit_type_int
->      10 visit_type_uint32
-
-Top scorers master:
-
-    151 sysbus_realize()
-     34 qemu_opts_absorb_qdict()
-     29 visit_type_int()
-     24 visit_type_str()
-     23 cpu_exec_realizefn()
-     19 visit_type_size()
-     16 qdev_realize()
-     14 visit_type_bool()
-     12 visit_type_uint32()
-     11 visit_type_int32()
-     11 object_property_set_bool()
-     10 object_property_set_uint()
-     10 object_property_set_int()
-    +420 functions with fewer than 10 calls
-
-Top scorers with my patches applied:
-
-     23 cpu_exec_realizefn()
-     15 visit_type_int()
-     10 visit_type_size()
-    +387 functions with fewer than 10 calls
-
-Looks like this is going to be a long slog.
-
-With functions into buckets by same name prefix up to the first '_':
-
-     63 visit
-     57 qmp
-     33 bdrv
-     29 cpu
-     26 xen
-     25 memory
-   +113 buckets with fewer than 25 calls
-
-[...]
->
-> Please understand these are rough numbers from quick & dirty scripts.
-
-Still are.
-
+-- 
+Best regards,
+Vladimir
 
