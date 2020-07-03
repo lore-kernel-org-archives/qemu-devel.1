@@ -2,105 +2,93 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52634C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB998C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:00:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DB2520782
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 11:59:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7475B20782
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 12:00:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i91y/3O4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB2520782
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ezjgU72X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7475B20782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrKLR-0005AW-ED
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 07:59:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53720)
+	id 1jrKMM-00069A-NZ
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 08:00:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrKKW-0004O5-69
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:58:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46478
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrKLF-0005BN-M4
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:58:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21613
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jrKKT-00069R-DQ
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:58:07 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrKLD-0006E7-Lr
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 07:58:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593777484;
+ s=mimecast20190719; t=1593777530;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Sx/6iAb59Gg53NOUbQuQErDHOqbID0Col+5JOqt7qoE=;
- b=i91y/3O4wKkkaeSmVDM7JBHMENEzitiwPh1hS+/Xw3cSismd7ceoaEPgn+brqoIeRmtQXx
- urdYWRys2QRm4u/LC0NHohswSfJqrvqzcChr8/ivV2YyTOMzqnyfh9C+zjYpVQAM+HxOCg
- kjWVK3/Gp2M8/pT7sKrYFa9oviQG8GY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-SEl3SiaVOJqEHGvVZVadrA-1; Fri, 03 Jul 2020 07:57:59 -0400
-X-MC-Unique: SEl3SiaVOJqEHGvVZVadrA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 165C710059AB;
- Fri,  3 Jul 2020 11:57:58 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-131.ams2.redhat.com
- [10.36.113.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D391B1ED;
- Fri,  3 Jul 2020 11:57:56 +0000 (UTC)
-Subject: Re: [PATCH 00/19] block: LUKS encryption slot management + iotest
- tweaks
-To: qemu-block@nongnu.org
-References: <20200625125548.870061-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4f7fb12e-230a-2ef7-79ff-697793b76294@redhat.com>
-Date: Fri, 3 Jul 2020 13:57:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=6pdDhDlAqIDajDuo+6xR8NQEqRtXAfytvGwdtnppNWc=;
+ b=ezjgU72XOKKvQfRPubSltK6dkjqAgCunGCxrFjQFUnlDBRtIYnFhf7aDAMPapnC/gV7w0e
+ a4oDjl1uzHv/h4fTlh6Ta4fLBl8CxeJpTFOWNEOPWpGu5CJCMH320aHe0AhuAj3hWXNP8S
+ IxNBiwMoIDXwQEfqQGP/xeMcrLGIkSg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-N_WbiE_QNo6jGJaZgNeoRA-1; Fri, 03 Jul 2020 07:58:47 -0400
+X-MC-Unique: N_WbiE_QNo6jGJaZgNeoRA-1
+Received: by mail-wr1-f72.google.com with SMTP id y18so11690299wrq.4
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 04:58:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=6pdDhDlAqIDajDuo+6xR8NQEqRtXAfytvGwdtnppNWc=;
+ b=GHwqWkkMk4BxE6EIH/xcQTPY5UiJQDfBwRnwGvb19GfFn9DCryf5Pvrtl/+A5Ll0vh
+ j8dVnc4PbJVu56FUCtmkjq9KBL8gH+UbP52ctfWlcAjL9GbPDZpWaz/O0nLi6gh5C26z
+ 4QUX8aWiEh6wsbDaGUptj8/baiHvI2kZ4ka71FDxhM/Xfs5V3RlHT2ouGL1Sv8Rsuc2q
+ jprq3QTWFtO4/HReIN3+hK6Zrl3A/bM8Vl3PUytPdSV4hNRP8BS4PoftggWGFGOpRqga
+ vCEIihJmzLyemNC5w8MW0iWlvQYdXL2khgros3ODmS/1X6hxNGgEP+U/TEr8C1bpdiz7
+ Yq5w==
+X-Gm-Message-State: AOAM5336vwDKucgFw38iS+Qw86pRRkKcMo0YI2wOswjF7BR8jmF62mWq
+ qxYXAAlw+YFi2FZkrRS/wBIg2I3npSXwkYBt+0tduZ7Pv2dzgcyqRueqrBD9KHFVWXdVbKXS1xZ
+ 8+4oXepEEh9Nc8BM=
+X-Received: by 2002:adf:9148:: with SMTP id j66mr34064022wrj.311.1593777526090; 
+ Fri, 03 Jul 2020 04:58:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqqtoKYUekC6LG+N103Lvq4DE/bb66AS9Aos98Ufe3jFArKJJKfsp4OhsEpKjVwC/cfbc3og==
+X-Received: by 2002:adf:9148:: with SMTP id j66mr34064004wrj.311.1593777525863; 
+ Fri, 03 Jul 2020 04:58:45 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+ by smtp.gmail.com with ESMTPSA id
+ n14sm14331097wro.81.2020.07.03.04.58.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Jul 2020 04:58:45 -0700 (PDT)
+Date: Fri, 3 Jul 2020 07:58:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PULL 00/41] virtio,acpi: features, fixes, cleanups.
+Message-ID: <20200703075753-mutt-send-email-mst@kernel.org>
+References: <20200703090252.368694-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200625125548.870061-1-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="FBGQ9ckYiZumB5cYFSuZB4AZj9JkD7C4h"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:38:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -121,77 +109,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FBGQ9ckYiZumB5cYFSuZB4AZj9JkD7C4h
-Content-Type: multipart/mixed; boundary="94RtMObfM5o92Qi9CdIrXeeSegkCNGmMA"
+On Fri, Jul 03, 2020 at 05:03:31AM -0400, Michael S. Tsirkin wrote:
+> The following changes since commit fc1bff958998910ec8d25db86cd2f53ff125f7ab:
+> 
+>   hw/misc/pca9552: Add missing TypeInfo::class_size field (2020-06-29 21:16:10 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> 
+> for you to fetch changes up to 900ed7043750ae3cdf35c05da66e150a8821c3a0:
+> 
+>   vhost-vdpa: introduce vhost-vdpa net client (2020-07-03 04:59:13 -0400)
 
---94RtMObfM5o92Qi9CdIrXeeSegkCNGmMA
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I fixed up cross-build on s390 and re-pushed the same tag:
+New hash fbe08d0f39dacc996f202059a425beb13be09866
+Sorry about the noise.
 
-On 25.06.20 14:55, Max Reitz wrote:
-> Hi,
->=20
-> This series collects all patches from Maxim=E2=80=99s series =E2=80=9CLUK=
-S: encryption
-> slot management using amend interface=E2=80=9D, plus iotest patches that =
-seem
-> useful to have before it.  (And then I modified some of Maxim=E2=80=99s p=
-atches
-> to take advantage of those patches.)
->=20
-> Maxim=E2=80=99s series was here:
-> https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00330.html
->=20
-> I already posted patches 1 and 2 here:
-> https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00954.html
->=20
-> Change from the latter series:
-> - Patch 1:
->   - Use $SED instead of plain =E2=80=9Csed=E2=80=9D in one place I missed
->   - Older bash versions do not support readarray=E2=80=99s -d switch, so =
-we have
->     to separate the Formatting line by a \n instead of \0.
->     Unfortunately, that means we cannot just split by \0 and be done
->     with it, but we have to ensure we put everything before the line
->     starting by =E2=80=9CFormatting=E2=80=9D into $filename_part, and we =
-do that with a
->     loop that iterates over the split array until it finds the
->     =E2=80=9CFormatting=E2=80=9D line.
->   - Use multiple -e for grep instead of '(...|...|...)'
-> - Patch 2: Rebase fallout du to grep now using multiple -e parameters
-
-Thanks for reviewing, Maxim; (re-)applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-
---94RtMObfM5o92Qi9CdIrXeeSegkCNGmMA--
-
---FBGQ9ckYiZumB5cYFSuZB4AZj9JkD7C4h
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7/HUMACgkQ9AfbAGHV
-z0AZRQf/TMJ18ghj06mbr7iYDSA+NNY7gutkW07HFTMWqBJTXHXjUmDgiv4zNjBI
-YNrgZTxQohLLZkBXIN9Vw9hsZijiBB/gSiYaWuSqb92WzoHhXsqUnBOEoe5/N2TG
-9X1mkNQ2nsFIWbRYvMvqtbIrk9+h0LPHLlutxkvccxyL2F7qyoUmx8uuEo2HYVQ+
-2rhkoEHe8nPkGkFq6D01v5XG9xm0doxWtxe4u2lvjeyJbAVDCMT3Fp+QT1UCeHnT
-foyJskZcB8a6tZuwGj8cZI673vS44rI2X0w+YjEOETZSU7fCBjGoXhL4xdB3jupQ
-6A5i30UM4ET9OeSCXJZ5hfRVa8A3eQ==
-=TgKw
------END PGP SIGNATURE-----
-
---FBGQ9ckYiZumB5cYFSuZB4AZj9JkD7C4h--
+> ----------------------------------------------------------------
+> virtio,acpi: features, fixes, cleanups.
+> 
+> vdpa support
+> virtio-mem support
+> a handy script for disassembling acpi tables
+> misc fixes and cleanups
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ----------------------------------------------------------------
+> Andrew Jones (1):
+>       tests/acpi: remove stale allowed tables
+> 
+> Cindy Lu (11):
+>       net: introduce qemu_get_peer
+>       vhost_net: use the function qemu_get_peer
+>       vhost: introduce new VhostOps vhost_dev_start
+>       vhost: implement vhost_dev_start method
+>       vhost: introduce new VhostOps vhost_vq_get_addr
+>       vhost: implement vhost_vq_get_addr method
+>       vhost: introduce new VhostOps vhost_force_iommu
+>       vhost: implement vhost_force_iommu method
+>       vhost_net: introduce set_config & get_config
+>       vhost-vdpa: introduce vhost-vdpa backend
+>       vhost-vdpa: introduce vhost-vdpa net client
+> 
+> David Hildenbrand (22):
+>       virtio-balloon: always indicate S_DONE when migration fails
+>       pc: Support coldplugging of virtio-pmem-pci devices on all buses
+>       exec: Introduce ram_block_discard_(disable|require)()
+>       vfio: Convert to ram_block_discard_disable()
+>       accel/kvm: Convert to ram_block_discard_disable()
+>       s390x/pv: Convert to ram_block_discard_disable()
+>       virtio-balloon: Rip out qemu_balloon_inhibit()
+>       target/i386: sev: Use ram_block_discard_disable()
+>       migration/rdma: Use ram_block_discard_disable()
+>       migration/colo: Use ram_block_discard_disable()
+>       virtio-mem: Paravirtualized memory hot(un)plug
+>       virtio-pci: Proxy for virtio-mem
+>       MAINTAINERS: Add myself as virtio-mem maintainer
+>       hmp: Handle virtio-mem when printing memory device info
+>       numa: Handle virtio-mem in NUMA stats
+>       pc: Support for virtio-mem-pci
+>       virtio-mem: Allow notifiers for size changes
+>       virtio-pci: Send qapi events when the virtio-mem size changes
+>       virtio-mem: Migration sanity checks
+>       virtio-mem: Add trace events
+>       virtio-mem: Exclude unplugged memory during migration
+>       numa: Auto-enable NUMA when any memory devices are possible
+> 
+> Jason Wang (3):
+>       virtio-bus: introduce queue_enabled method
+>       virtio-pci: implement queue_enabled method
+>       vhost: check the existence of vhost_set_iotlb_callback
+> 
+> Maxime Coquelin (1):
+>       docs: vhost-user: add Virtio status protocol feature
+> 
+> Michael S. Tsirkin (2):
+>       tests: disassemble-aml.sh: generate AML in readable format
+>       Revert "tests/migration: Reduce autoconverge initial bandwidth"
+> 
+> Peter Xu (1):
+>       MAINTAINERS: add VT-d entry
+> 
+>  configure                                   |  21 +
+>  qapi/misc.json                              |  64 +-
+>  qapi/net.json                               |  28 +-
+>  hw/virtio/virtio-mem-pci.h                  |  34 ++
+>  include/exec/memory.h                       |  41 ++
+>  include/hw/boards.h                         |   1 +
+>  include/hw/pci/pci.h                        |   1 +
+>  include/hw/vfio/vfio-common.h               |   4 +-
+>  include/hw/virtio/vhost-backend.h           |  19 +-
+>  include/hw/virtio/vhost-vdpa.h              |  26 +
+>  include/hw/virtio/vhost.h                   |   7 +
+>  include/hw/virtio/virtio-bus.h              |   4 +
+>  include/hw/virtio/virtio-mem.h              |  86 +++
+>  include/migration/colo.h                    |   2 +-
+>  include/migration/misc.h                    |   2 +
+>  include/net/net.h                           |   1 +
+>  include/net/vhost-vdpa.h                    |  22 +
+>  include/net/vhost_net.h                     |   5 +
+>  include/sysemu/balloon.h                    |   2 -
+>  net/clients.h                               |   2 +
+>  tests/qtest/bios-tables-test-allowed-diff.h |  18 -
+>  accel/kvm/kvm-all.c                         |   4 +-
+>  balloon.c                                   |  17 -
+>  exec.c                                      |  52 ++
+>  hw/arm/virt.c                               |   2 +
+>  hw/core/numa.c                              |  17 +-
+>  hw/i386/microvm.c                           |   1 +
+>  hw/i386/pc.c                                |  66 ++-
+>  hw/i386/pc_piix.c                           |   1 +
+>  hw/i386/pc_q35.c                            |   1 +
+>  hw/net/vhost_net-stub.c                     |  11 +
+>  hw/net/vhost_net.c                          |  45 +-
+>  hw/net/virtio-net.c                         |  19 +
+>  hw/s390x/s390-virtio-ccw.c                  |  22 +-
+>  hw/vfio/ap.c                                |   8 +-
+>  hw/vfio/ccw.c                               |  11 +-
+>  hw/vfio/common.c                            |  53 +-
+>  hw/vfio/pci.c                               |   6 +-
+>  hw/virtio/vhost-backend.c                   |   6 +
+>  hw/virtio/vhost-vdpa.c                      | 475 +++++++++++++++
+>  hw/virtio/vhost.c                           |  52 +-
+>  hw/virtio/virtio-balloon.c                  |  36 +-
+>  hw/virtio/virtio-mem-pci.c                  | 157 +++++
+>  hw/virtio/virtio-mem.c                      | 873 ++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c                      |  13 +
+>  hw/virtio/virtio.c                          |   6 +
+>  migration/migration.c                       |  15 +-
+>  migration/postcopy-ram.c                    |  23 -
+>  migration/rdma.c                            |  18 +-
+>  migration/savevm.c                          |  11 +-
+>  monitor/hmp-cmds.c                          |  16 +
+>  monitor/monitor.c                           |   1 +
+>  net/net.c                                   |  10 +
+>  net/vhost-vdpa.c                            | 228 ++++++++
+>  target/i386/sev.c                           |   7 +
+>  tests/qtest/migration-test.c                |   2 +-
+>  MAINTAINERS                                 |  18 +
+>  docs/interop/index.rst                      |   1 +
+>  docs/interop/vhost-user.rst                 |  24 +
+>  docs/interop/vhost-vdpa.rst                 |  17 +
+>  hw/i386/Kconfig                             |   1 +
+>  hw/virtio/Kconfig                           |  11 +
+>  hw/virtio/Makefile.objs                     |   3 +
+>  hw/virtio/trace-events                      |  10 +
+>  net/Makefile.objs                           |   2 +-
+>  qemu-options.hx                             |  12 +
+>  tests/data/acpi/disassemle-aml.sh           |  52 ++
+>  tests/data/acpi/rebuild-expected-aml.sh     |   1 +
+>  68 files changed, 2640 insertions(+), 187 deletions(-)
+>  create mode 100644 hw/virtio/virtio-mem-pci.h
+>  create mode 100644 include/hw/virtio/vhost-vdpa.h
+>  create mode 100644 include/hw/virtio/virtio-mem.h
+>  create mode 100644 include/net/vhost-vdpa.h
+>  create mode 100644 hw/virtio/vhost-vdpa.c
+>  create mode 100644 hw/virtio/virtio-mem-pci.c
+>  create mode 100644 hw/virtio/virtio-mem.c
+>  create mode 100644 net/vhost-vdpa.c
+>  create mode 100644 docs/interop/vhost-vdpa.rst
+>  create mode 100755 tests/data/acpi/disassemle-aml.sh
+> 
 
 
