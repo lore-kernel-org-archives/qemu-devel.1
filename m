@@ -2,100 +2,91 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=CHARSET_FARAWAY_HEADER,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFCBC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 02:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A7C4C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 02:42:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15397206CD
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 02:18:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E85A9206B6
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 02:42:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="orPk+70X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15397206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOFYCQhV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E85A9206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrBHQ-0001Rq-9x
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 22:18:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58874)
+	id 1jrBeQ-0007mo-4w
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jul 2020 22:42:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
- id 1jrBGl-00012w-8R
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 22:17:39 -0400
-Received: from smtpbgbr2.qq.com ([54.207.22.56]:51207)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
- id 1jrBGb-0001Uz-6z
- for qemu-devel@nongnu.org; Thu, 02 Jul 2020 22:17:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
- t=1593742640; bh=Uze9wkLzTWr6wisbdzmr0zsW/dtjirrvEdb2GTbSx6k=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=orPk+70Xy1XUz2qPZvotXcD/4iEIyaTH+XybXrEfo6/+Y+UcNnv+f4LbRyqQmYf+w
- J/xsIrY0WUUd4TS4WliypJCTal0N4C/FJ9uw4Js0OERYdFDlrGsQp9gZdffs/Yr2W9
- 4gG89RhsXzib7HhfCzaH0dKV/NTPToD+K3kb6emk=
-X-QQ-FEAT: YRKDjgqgK0/UhXpYlZ9Nxc3AzzxaOmjFNRc/qrdw92QywG4HvrfIH6ueF5LMU
- 5BJznXLGDLwC5mxDqjpYvKRO+uEOLNHG06zUm+KpMHW8NNl9EwKm1px5ejtn3GCxOLf048E
- 54V2b5RH7Cg2ow4Z15bwkZtmFumXF6TNgw5oIe4l3pAhorXCFQyfASshG6DofVVV4KPOZxL
- HWlWSEKBbD1MGBvTqiWcpUDkBTwzCwWdXecMOtAQq5A/Y2kEJ/RzE2oi0msNDr3Ggb/xFM+
- QCOZJ8BPV7yOhVRjE+ttrNKCs=
-X-QQ-SSF: 00010000000000F000000000000000D
-X-QQ-XMAILINFO: N/CHHa/bwu5z1Up0w3x36pb+8uaYM8P8NoxqqFVuvE3wXG0weyPFGWHOpVG3tY
- 5VWY0AvqSCBw5zjX3y+7bPWGT3daejPj7BzqGAUhI0Z7f23yfhj/hc9wO/jem2XLvt68gQnQ890rD
- rhGwqSZieRbEtcMruS3ZnWclRcEof6RU7XbWE1D4uUpyCchdIL4+WtUX3ys51glhH4CzHK7vkrPSe
- VVxiYBP1CYjXFGqKVeGR73AbnD2FU1CpG+m7I+2ibsHoHYXOQjGJb95erAZBugG8AvYLo8kkYD/MH
- sNOE/zEDYG9C57I93NhMkKlwhRbJOD8+pACYhvLkZ5vSPWiKCbx8gI6cZKrOZrWfk8LYbr2YNg/Or
- wXQS+YKHWxgLi6wslH8yKpjzN7ySK942EPwKSjTtqxzT6r6qdWsXHshdkQTJWrEvQYn7LscCEZCKX
- l8l2IHWg0euXtWzyDWgVAE9IvEU7m0b7m5N41NlloG7XbW8Vp3n8Qbm1HQARYhkr0I+s8k0WsWTLf
- kc6l7pCxUbd4hl7nVvxifP0CNBZTTDuIOHo62FI8iKTcYGBAa7EyEOKQQTinl5YWK7vArhAZmjCb7
- Cr+/o2EWW8txHynJ+MpiUewHRDwXWAZrk7Y+W6hfBvC5yQ9jZx8ZfRl5PI7nXRcxkuKsD3b+Ay1ap
- j2B18qDfMorAnN8e6ZuYEwYrOw9cjvmxwFyFp3XhJy3vPeDulEIerIV4oQ31F8NbEl73m1yloPj6N
- q4ZU=
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 61.148.43.80
-X-QQ-STYLE: 
-X-QQ-mid: webmail725t1593742638t2698819
-From: "=?gb18030?B?Y2FzbWFj?=" <climber.cui@qq.com>
-To: "=?gb18030?B?QWxleCBCZW5uqKZl?=" <alex.bennee@linaro.org>,
- "=?gb18030?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
-Subject: =?gb18030?B?UkWjuiBIb3cgdG8gYnVpbGQgUUVNVSBwbHVnaW4g?=
- =?gb18030?B?b24gV2luZG93cyB3aXRoIG1pbmd3?=
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="gb18030"
-Content-Transfer-Encoding: base64
-Date: Fri, 3 Jul 2020 10:17:18 +0800
-X-Priority: 3
-Message-ID: <tencent_BA963B9F1DDEB069DCD31C6AAD373AD99907@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-ReplyHash: 625942493
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Fri, 03 Jul 2020 10:17:19 +0800 (CST)
-Feedback-ID: webmail:qq.com:bgforeign:bgforeign12
-X-QQ-Bgrelay: 1
-Received-SPF: pass client-ip=54.207.22.56; envelope-from=climber.cui@qq.com;
- helo=smtpbgbr2.qq.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 22:17:22
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: 1
-X-Spam_score: 0.1
-X-Spam_bar: /
-X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9, CHARSET_FARAWAY_HEADER=3.2,
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jrBdr-0007M4-Iq
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 22:41:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29593
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jrBdo-0005ru-Sp
+ for qemu-devel@nongnu.org; Thu, 02 Jul 2020 22:41:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593744087;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WVRhBo900EyrgNREuLh0mRosY73v09yxBshshJTVbp4=;
+ b=hOFYCQhV2mMND7SK7U/+TQ8IlY62Hjnc5YAW+zOjfUTpknQPDjimZ3cv4c+/x3MJHgQJLZ
+ IF3uhlj8C6QIikEgjlSO2iHvxEa7oFmvg6EHwazWhOjXp8vfdp9KhndxWdhlHli0Uywtcq
+ TIUnB8ppjjLWJrgzULKcUcC/UsyWxzw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-aY709FJLP4O0gSCF2znJMA-1; Thu, 02 Jul 2020 22:41:23 -0400
+X-MC-Unique: aY709FJLP4O0gSCF2znJMA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56472107ACCA;
+ Fri,  3 Jul 2020 02:41:22 +0000 (UTC)
+Received: from [10.72.13.231] (ovpn-13-231.pek2.redhat.com [10.72.13.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C9CF75C1D0;
+ Fri,  3 Jul 2020 02:41:20 +0000 (UTC)
+Subject: Re: Question about virtio-net: implement RX RSS processing
+To: Vincent Li <vincent.mc.li@gmail.com>, qemu-devel@nongnu.org
+References: <alpine.OSX.2.21.2007020914350.260@sea-ml-00029224.olympus.f5net.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <6657ac45-383a-4654-d5d4-be76a8fcfdfa@redhat.com>
+Date: Fri, 3 Jul 2020 10:41:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <alpine.OSX.2.21.2007020914350.260@sea-ml-00029224.olympus.f5net.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/02 22:41:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_FROM=0.001, FROM_EXCESS_BASE64=0.001, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,190 +99,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgQWxleCwKICAgVGhhbnNrIGZvciBsb29raW5nIG9uIHRoaXMgLiBJbiB0aGUgbGFzdCBt
-ZXNzYWdlLCB0aGUgY29tcGlsYXRpb24gY29tbWFuZCBpcyBhIGJpdCBtaXNsZWFkaW5nLiBJ
-IGFtIGZpbGxpbmcgaW4gbW9yZSBkZXRhaWxzLgogICAgSWYgSSBrZWVwICItV2wsLXNvbmFt
-ZSwkQCIgaW4gdGhlIGNvbW1hbmQgLCBJIGdvdCBzaW1pbGFyIGxpbmtpbmcgZXJyb3JzLgog
-IAptYWtlZmlsZTogIApTT05BTUVTIDo9ICQoYWRkc3VmZml4IC5kbGwsJChhZGRwcmVmaXgg
-bGliLCQoTkFNRVMpKSkKClFFTVVfQ0ZMQUdTICs9IC1mUElDIC1mbm8tc3RhY2stcHJvdGVj
-dG9yIC1EQlVJTERJTkdfRExMClFFTVVfQ0ZMQUdTICs9IC1JJChTUkNfUEFUSCkvaW5jbHVk
-ZS9xZW11CgphbGw6ICQoU09OQU1FUykKbGliJS5kbGw6ICUubwogICAgJChDQykgLXNoYXJl
-ZCAtV2wsLXNvbmFtZSwkQCAtbyAkQCAkXiAkKExETElCUykKCm91dHB1dDoKeDg2XzY0LXc2
-NC1taW5ndzMyLWdjYyAtc2hhcmVkIC1XbCwtc29uYW1lLGxpYmJiLmRsbCAtbyBsaWJiYi5k
-bGwgYmIubwpDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZfNjQtdzY0LW1p
-bmd3MzIvOS4zLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9sZC5leGU6
-IGJiLm86IGluIGZ1bmN0aW9uIGBnX2F1dG9wdHJfY2xlYW51cF9nZW5lcmljX2dmcmVlJzoK
-QzovbXN5czY0L21pbmd3NjQvaW5jbHVkZS9nbGliLTIuMC9nbGliL2dsaWItYXV0b2NsZWFu
-dXBzLmg6Mjg6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGdfZnJlZScKQzovbXN5czY0L21p
-bmd3NjQvYmluLy4uL2xpYi9nY2MveDg2XzY0LXc2NC1taW5ndzMyLzkuMy4wLy4uLy4uLy4u
-Ly4uL3g4Nl82NC13NjQtbWluZ3czMi9iaW4vbGQuZXhlOiBiYi5vOiBpbiBmdW5jdGlvbiBg
-cGx1Z2luX2V4aXQnOgpDOi9RUlNfUHJvamVjdC9zaW1kc3AvcWVtdS00LjIuMC90ZXN0cy9w
-bHVnaW4vYmIuYzoyNzogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgZ19zdHJkdXBfcHJpbnRm
-JwpDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZfNjQtdzY0LW1pbmd3MzIv
-OS4zLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9sZC5leGU6IEM6L1FS
-U19Qcm9qZWN0L3NpbWRzcC9xZW11LTQuMi4wL3Rlc3RzL3BsdWdpbi9iYi5jOjI5OiB1bmRl
-ZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdpbl9vdXRzJwpDOi9tc3lzNjQvbWluZ3c2
-NC9iaW4vLi4vbGliL2djYy94ODZfNjQtdzY0LW1pbmd3MzIvOS4zLjAvLi4vLi4vLi4vLi4v
-eDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9sZC5leGU6IGJiLm86IGluIGZ1bmN0aW9uIGB2Y3B1
-X3RiX3RyYW5zJzoKQzovUVJTX1Byb2plY3Qvc2ltZHNwL3FlbXUtNC4yLjAvdGVzdHMvcGx1
-Z2luL2JiLmM6NDI6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYHFlbXVfcGx1Z2luX3RiX25f
-aW5zbnMnCkM6L21zeXM2NC9taW5ndzY0L2Jpbi8uLi9saWIvZ2NjL3g4Nl82NC13NjQtbWlu
-Z3czMi85LjMuMC8uLi8uLi8uLi8uLi94ODZfNjQtdzY0LW1pbmd3MzIvYmluL2xkLmV4ZTog
-QzovUVJTX1Byb2plY3Qvc2ltZHNwL3FlbXUtNC4yLjAvdGVzdHMvcGx1Z2luL2JiLmM6NDU6
-IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYHFlbXVfcGx1Z2luX3JlZ2lzdGVyX3ZjcHVfdGJf
-ZXhlY19pbmxpbmUnCkM6L21zeXM2NC9taW5ndzY0L2Jpbi8uLi9saWIvZ2NjL3g4Nl82NC13
-NjQtbWluZ3czMi85LjMuMC8uLi8uLi8uLi8uLi94ODZfNjQtdzY0LW1pbmd3MzIvYmluL2xk
-LmV4ZTogQzovUVJTX1Byb2plY3Qvc2ltZHNwL3FlbXUtNC4yLjAvdGVzdHMvcGx1Z2luL2Ji
-LmM6NDc6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYHFlbXVfcGx1Z2luX3JlZ2lzdGVyX3Zj
-cHVfdGJfZXhlY19pbmxpbmUnCkM6L21zeXM2NC9taW5ndzY0L2Jpbi8uLi9saWIvZ2NjL3g4
-Nl82NC13NjQtbWluZ3czMi85LjMuMC8uLi8uLi8uLi8uLi94ODZfNjQtdzY0LW1pbmd3MzIv
-YmluL2xkLmV4ZTogQzovUVJTX1Byb2plY3Qvc2ltZHNwL3FlbXUtNC4yLjAvdGVzdHMvcGx1
-Z2luL2JiLmM6NTA6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYHFlbXVfcGx1Z2luX3JlZ2lz
-dGVyX3ZjcHVfdGJfZXhlY19jYicKQzovbXN5czY0L21pbmd3NjQvYmluLy4uL2xpYi9nY2Mv
-eDg2XzY0LXc2NC1taW5ndzMyLzkuMy4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3cz
-Mi9iaW4vbGQuZXhlOiBiYi5vOiBpbiBmdW5jdGlvbiBgcWVtdV9wbHVnaW5faW5zdGFsbCc6
-CkM6L1FSU19Qcm9qZWN0L3NpbWRzcC9xZW11LTQuMi4wL3Rlc3RzL3BsdWdpbi9iYi5jOjY0
-OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdpbl9yZWdpc3Rlcl92Y3B1X3Ri
-X3RyYW5zX2NiJwpDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZfNjQtdzY0
-LW1pbmd3MzIvOS4zLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9sZC5l
-eGU6IEM6L1FSU19Qcm9qZWN0L3NpbWRzcC9xZW11LTQuMi4wL3Rlc3RzL3BsdWdpbi9iYi5j
-OjY1OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdpbl9yZWdpc3Rlcl9hdGV4
-aXRfY2InCmNvbGxlY3QyLmV4ZTogZXJyb3I6IGxkIHJldHVybmVkIDEgZXhpdCBzdGF0dXMK
-CiAgICBPbiB3aW5kb3dzLCBJIHJlcGxhY2UgJExETElCUyB3aXRoICRMSUJTIGhlcmUsIGJl
-Y2F1c2UgJExETElCUyBzZWVtcyB1bmRlZmluZWQuIEJ1dCBzdGlsbCB5aWVsZHMgbGlua2lu
-ZyBlcnJvciwgZXhjZXB0LiAKICAgICBsaWIlLmRsbDogJS5vCiAgICAgICAkKENDKSAtc2hh
-cmVkIC1XbCwtc29uYW1lLCRAIC1vICRAICReICQoTElCUykiCgp4ODZfNjQtdzY0LW1pbmd3
-MzItZ2NjIC1zaGFyZWQgLVdsLC1zb25hbWUsbGliYmIuZGxsIC1vIGxpYmJiLmRsbCBiYi5v
-IC1sZGwgLUxDOi9tc3lzNjQvbWluZ3c2NC9saWIgLWx6IC1MQzovbXN5czY0L21pbmd3NjQv
-bGliIC1sZ21vZHVsZS0yLjAgLXB0aHJlYWQgLWxnbGliLTIuMCAtbGludGwgLUxDOi9tc3lz
-NjQvbWluZ3c2NC9saWIgLWxndGhyZWFkLTIuMCAtcHRocmVhZCAtbGdsaWItMi4wIC1saW50
-bCAtbHdpbm1tIC1sd3MyXzMyIC1saXBobHBhcGkKQzovbXN5czY0L21pbmd3NjQvYmluLy4u
-L2xpYi9nY2MveDg2XzY0LXc2NC1taW5ndzMyLzkuMy4wLy4uLy4uLy4uLy4uL3g4Nl82NC13
-NjQtbWluZ3czMi9iaW4vbGQuZXhlOiBiYi5vOiBpbiBmdW5jdGlvbiBgcGx1Z2luX2V4aXQn
-OgpDOi9RUlNfUHJvamVjdC9zaW1kc3AvcWVtdS00LjIuMC90ZXN0cy9wbHVnaW4vYmIuYzoy
-OTogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgcWVtdV9wbHVnaW5fb3V0cycKQzovbXN5czY0
-L21pbmd3NjQvYmluLy4uL2xpYi9nY2MveDg2XzY0LXc2NC1taW5ndzMyLzkuMy4wLy4uLy4u
-Ly4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9iaW4vbGQuZXhlOiBiYi5vOiBpbiBmdW5jdGlv
-biBgdmNwdV90Yl90cmFucyc6CkM6L1FSU19Qcm9qZWN0L3NpbWRzcC9xZW11LTQuMi4wL3Rl
-c3RzL3BsdWdpbi9iYi5jOjQyOiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdp
-bl90Yl9uX2luc25zJwpDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZfNjQt
-dzY0LW1pbmd3MzIvOS4zLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9s
-ZC5leGU6IEM6L1FSU19Qcm9qZWN0L3NpbWRzcC9xZW11LTQuMi4wL3Rlc3RzL3BsdWdpbi9i
-Yi5jOjQ1OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdpbl9yZWdpc3Rlcl92
-Y3B1X3RiX2V4ZWNfaW5saW5lJwpDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94
-ODZfNjQtdzY0LW1pbmd3MzIvOS4zLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMy
-L2Jpbi9sZC5leGU6IEM6L1FSU19Qcm9qZWN0L3NpbWRzcC9xZW11LTQuMi4wL3Rlc3RzL3Bs
-dWdpbi9iYi5jOjQ3OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdpbl9yZWdp
-c3Rlcl92Y3B1X3RiX2V4ZWNfaW5saW5lJwpDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGli
-L2djYy94ODZfNjQtdzY0LW1pbmd3MzIvOS4zLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1t
-aW5ndzMyL2Jpbi9sZC5leGU6IEM6L1FSU19Qcm9qZWN0L3NpbWRzcC9xZW11LTQuMi4wL3Rl
-c3RzL3BsdWdpbi9iYi5jOjUwOiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdp
-bl9yZWdpc3Rlcl92Y3B1X3RiX2V4ZWNfY2InCkM6L21zeXM2NC9taW5ndzY0L2Jpbi8uLi9s
-aWIvZ2NjL3g4Nl82NC13NjQtbWluZ3czMi85LjMuMC8uLi8uLi8uLi8uLi94ODZfNjQtdzY0
-LW1pbmd3MzIvYmluL2xkLmV4ZTogYmIubzogaW4gZnVuY3Rpb24gYHFlbXVfcGx1Z2luX2lu
-c3RhbGwnOgpDOi9RUlNfUHJvamVjdC9zaW1kc3AvcWVtdS00LjIuMC90ZXN0cy9wbHVnaW4v
-YmIuYzo2NDogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgcWVtdV9wbHVnaW5fcmVnaXN0ZXJf
-dmNwdV90Yl90cmFuc19jYicKQzovbXN5czY0L21pbmd3NjQvYmluLy4uL2xpYi9nY2MveDg2
-XzY0LXc2NC1taW5ndzMyLzkuMy4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9i
-aW4vbGQuZXhlOiBDOi9RUlNfUHJvamVjdC9zaW1kc3AvcWVtdS00LjIuMC90ZXN0cy9wbHVn
-aW4vYmIuYzo2NTogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgcWVtdV9wbHVnaW5fcmVnaXN0
-ZXJfYXRleGl0X2NiJwoKICAgIFRoZSBsaWJkbCBsaWJyYXJ5ICh3aGVyZSBkbG9wZW4oKSBp
-cyBkZWZpbmVkKSB3YXMgbm90IHNoaXBwZWQgd2l0aCBNU1lTMiBtaW5ndyAuIEl0IGlzIGNv
-bXBpbGVkIGZyb20gc291cmNlKGh0dHBzOi8vZ2l0aHViLmNvbS9kbGZjbi13aW4zMi9kbGZj
-bi13aW4zMiksIGFuZCBJIHBsYWNlIHRoZSBnZW5lcmF0ZWQgbGliZGwuZGxsLCBsaWJkbC5h
-LCBsaWJkbC5kbGwuYSBpbiBDOlxtc3lzNjRcbWluZ3c2NFxpbmNsdWRlLiAgZGxmY24uaCBp
-biBDOlxtc3lzNjRcbWluZ3c2NFxpbmNsdWRlLgoKcmVnYXJkcywKeGlhb2xlaQoKLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpjYXNtYWMgPGNsaW1iZXIu
-Y3VpQHFxLmNvbT4gd3JpdGVzOgoKPiBIaSBhbGwsCj4gJm5ic3A7Jm5ic3A7IEkgd2FudCB0
-byBidWlsZCBRRU1VIDQuMi4wIHdpdGggdGhlIHBsdWdpbiBtb2R1bGUgb24KPiBXaW5kb3dz
-IDcgd2l0aCBNaW5ndywgYnV0IHRoZSBidWlsZGluZyBwcm9jZXNzIGZhaWxkLiZuYnNwOwoK
-SSdtIGFmcmFpZCBJJ3ZlIG5ldmVyIHRyaWVkIHdpdGggbWluZ3cuLi4gdGhhdCBzYWlkOgoK
-VGhlIHN0ZXAgSSBmb2xsb3cgaXMgbGlzdGVkIGJlbG93Ogo+IDEuIGNyZWF0ZSAiZHNwX2J1
-aWxkIiBkaXJldG9yeSB1bmRlciBzb3VyY2UgZmlsZSBmb2xkZXIgCj4KPgo+IDIuICAgY2hh
-bmdlIGRpcmVjdG9yeSB0byBkc3BfYnVpbGQgLCBhbmQgcnVuIC4uL2NvbmZpZ3VyZSAgLS10
-YXJnZXQtbGlzdD1kc3Atc29mdG1tdSAtLWNyb3NzLXByZWZpeD14ODZfNjQtdzY0LW1pbmd3
-MzItICAtLWVuYWJsZS1ndGsgLS1lbmFibGUtc2RsIC0tZW5hYmxlLWRlYnVnIC0tZW5hYmxl
-LXBsdWdpbnMKPiAzLiBidWlsZCBxZW11IHByb2plY3QgCj4gNC4gcnVubmluZyAibWFrZSAt
-QyB0ZXN0cy9wbHVnaW4iLCB5ZWlsZHMgZXJyb3I6Jm5ic3A7IAo+ICZuYnNwOyAmbmJzcDtD
-QyZuYnNwOyAmbmJzcDsgJm5ic3A7IGJiLm8KPiAmbmJzcDtEOi9lbXVfZGV2bC9xZW11X3Ny
-Yy9xZW11LXNyLWRzcC1hL3FlbXVfdGlkc3BfYzN4L3Rlc3RzL3BsdWdpbi9iYi5jOjE3OjI0
-OiAgZXJyb3I6IHZhcmlhYmxlICdxZW11X3BsdWdpbl92ZXJzaW9uJyBkZWZpbml0aW9uIGlz
-IG1hcmtlZCBkbGxpbXBvcnQKPiAmbmJzcDsgJm5ic3A7MTcgfCBRRU1VX1BMVUdJTl9FWFBP
-UlQgaW50IHFlbXVfcGx1Z2luX3ZlcnNpb24gPSBRRU1VX1BMVUdJTl9WRVJTSU9OOwo+ICZu
-YnNwOyAmbmJzcDsgJm5ic3A7IHwmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBefn5+
-fn5+fn5+fn5+fn5+fn5+Cj4gJm5ic3A7RDovZW11X2RldmwvcWVtdV9zcmMvcWVtdS1zci1k
-c3AtYS9xZW11X3RpZHNwX2MzeC90ZXN0cy9wbHVnaW4vYmIuYzoxNzoyNDogIHdhcm5pbmc6
-ICdxZW11X3BsdWdpbl92ZXJzaW9uJyByZWRlY2xhcmVkIHdpdGhvdXQgZGxsaW1wb3J0IGF0
-dHJpYnV0ZTogIHByZXZpb3VzIGRsbGltcG9ydCBpZ25vcmVkIFstV2F0dHJpYnV0ZXNdCj4K
-Pgo+IDUuICZuYnNwOyBJIG1vZGlmaWVkIHRoZSBRRU1VX0NGTEFHUyBhbmQgdGhlIGNvbXBp
-bGF0aW9uIGNvbW1hbmQgYXJndW1lbnRzKCQoQ0MpIC4uKSBpbiZuYnNwOyB0aGUmbmJzcDsg
-bWFrZWZpbGUgOgo+Cj4KPiAJCUJVSUxEX0RJUiA6PSAkKENVUkRJUikvLi4vLi4KPgo+Cj4g
-CQlpbmNsdWRlICQoQlVJTERfRElSKS9jb25maWctaG9zdC5tYWsKPiAJCWluY2x1ZGUgJChT
-UkNfUEFUSCkvcnVsZXMubWFrCj4KPgo+IAkJJChjYWxsIHNldC12cGF0aCwgJChTUkNfUEFU
-SCkvdGVzdHMvcGx1Z2luKQo+Cj4KPiAJCU5BTUVTIDo9Cj4gCQlOQU1FUyArPSBiYgo+IAkJ
-TkFNRVMgKz0gZW1wdHkKPiAJCU5BTUVTICs9IGluc24KPiAJCU5BTUVTICs9IG1lbQo+IAkJ
-TkFNRVMgKz0gaG90YmxvY2tzCj4gCQlOQU1FUyArPSBob3d2ZWMKPiAJCU5BTUVTICs9IGhv
-dHBhZ2VzCj4KPgo+IAkJU09OQU1FUyA6PSAkKGFkZHN1ZmZpeCAuc28sJChhZGRwcmVmaXgg
-bGliLCQoTkFNRVMpKSkKPgo+Cj4gCQlRRU1VX0NGTEFHUyArPSAtZlBJQwkgLURCVUlMRElO
-R19ETEwmbmJzcDsKPiAJCSNhZGRlZCZuYnNwOyAtREJVSUxESU5HX0RMTAoKTG9va2luZyBh
-dCB0aGUgZGVmaW5pdGlvbjoKCiNpZiBkZWZpbmVkIF9XSU4zMiB8fCBkZWZpbmVkIF9fQ1lH
-V0lOX18KICAjaWZkZWYgQlVJTERJTkdfRExMCiAgICAjZGVmaW5lIFFFTVVfUExVR0lOX0VY
-UE9SVCBfX2RlY2xzcGVjKGRsbGV4cG9ydCkKICAjZWxzZQogICAgI2RlZmluZSBRRU1VX1BM
-VUdJTl9FWFBPUlQgX19kZWNsc3BlYyhkbGxpbXBvcnQpCiAgI2VuZGlmCiAgI2RlZmluZSBR
-RU1VX1BMVUdJTl9MT0NBTAojZWxzZQoKSSBleHBlY3QgQlVJTERJTkdfRExMIGlzIGZvciBl
-bnN1cmluZyBRRU1VIGl0c2VsZiBleHBvcnRzIHRoZSBwbHVnaW4KZnVuY3Rpb25zIHNvIHRo
-ZSBwbHVnaW4gY2FuIHJlZmVyIHRvIHRoZW0uIFNvIG1heWJlIHRyeToKCiAgLi9jb25maWd1
-cmUgLS1lbmFibGUtcGx1Z2lucyAtLWV4dHJhLWNmbGFncz0iLURCVUlMRElOR19ETEwiCgph
-bmQgcmVtb3ZlIHRoZSAtREJVSUxESU5HX0RMTCBmcm9tIHRoZSBwbHVnaW5zIHRoZW1zZWx2
-ZXM/CgoKPiAJCVFFTVVfQ0ZMQUdTICs9IC1JJChTUkNfUEFUSCkvaW5jbHVkZS9xZW11Cj4K
-Pgo+IAkJYWxsOiAkKFNPTkFNRVMpCj4KPgo+IAkJbGliJS5zbzogJS5vCj4gCQkJJChDQykg
-LWZQSUMgLXNoYXJlZCAtbyAkQCAkXiAkKExJQlMpIAo+IAkJCSMgb3JpZ2luYWwgY29tbWFu
-ZCA6ICQoQ0MpIC1zaGFyZWQgLVdsLC1zb25hbWUsJEAgLW8gJEAgJF4gJChMRExJQlMpCj4K
-Pgo+IDYuJm5ic3A7IEV4ZWN1dGluZyBtYWtlIHllaWxkczoKPgo+Cj4gbWFrZTogZW50ZXIm
-bmJzcDsgJm5ic3A7obAvZC9lbXVfZGV2bC9xZW11X3NyYy9xZW11LXNyLWRzcC1hL3FlbXVf
-dGlkc3BfYzN4L2J1aWxkX2RzcC90ZXN0cy9wbHVnaW6hsQo+ICZuYnNwOyBDQyZuYnNwOyAm
-bmJzcDsgJm5ic3A7IGJiLm8KPiB4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1mUElDIC1zaGFy
-ZWQgLW8gbGliYmIuc28gYmIubyZuYnNwOyAtTCAvYy9tc3lzNjQvbWluZ3c2NC9saWIvIC1s
-Z2xpYi0yLjAKPiBDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZfNjQtdzY0
-LW1pbmd3MzIvMTAuMS4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9iaW4vbGQu
-ZXhlOiAgYmIubzogaW4gZnVuY3Rpb24gYHBsdWdpbl9leGl0JzoKPiBEOi9lbXVfZGV2bC9x
-ZW11X3NyYy9xZW11LXNyLWRzcC1hL3FlbXVfdGlkc3BfYzN4L3Rlc3RzL3BsdWdpbi9iYi5j
-OjI4OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdpbl9vdXRzJwo+IEM6L21z
-eXM2NC9taW5ndzY0L2Jpbi8uLi9saWIvZ2NjL3g4Nl82NC13NjQtbWluZ3czMi8xMC4xLjAv
-Li4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9sZC5leGU6ICBEOi9lbXVfZGV2
-bC9xZW11X3NyYy9xZW11LXNyLWRzcC1hL3FlbXVfdGlkc3BfYzN4L3Rlc3RzL3BsdWdpbi9i
-Yi5jOjI5OiAgdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgX19zdGFja19jaGtfZmFpbCcKPiBD
-Oi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZfNjQtdzY0LW1pbmd3MzIvMTAu
-MS4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9iaW4vbGQuZXhlOiAgYmIubzog
-aW4gZnVuY3Rpb24gYHZjcHVfdGJfdHJhbnMnOgo+IEQ6L2VtdV9kZXZsL3FlbXVfc3JjL3Fl
-bXUtc3ItZHNwLWEvcWVtdV90aWRzcF9jM3gvdGVzdHMvcGx1Z2luL2JiLmM6NDE6IHVuZGVm
-aW5lZCByZWZlcmVuY2UgdG8gYHFlbXVfcGx1Z2luX3RiX25faW5zbnMnCj4gQzovbXN5czY0
-L21pbmd3NjQvYmluLy4uL2xpYi9nY2MveDg2XzY0LXc2NC1taW5ndzMyLzEwLjEuMC8uLi8u
-Li8uLi8uLi94ODZfNjQtdzY0LW1pbmd3MzIvYmluL2xkLmV4ZTogIEQ6L2VtdV9kZXZsL3Fl
-bXVfc3JjL3FlbXUtc3ItZHNwLWEvcWVtdV90aWRzcF9jM3gvdGVzdHMvcGx1Z2luL2JiLmM6
-NDQ6ICB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdpbl9yZWdpc3Rlcl92Y3B1
-X3RiX2V4ZWNfaW5saW5lJwo+IEM6L21zeXM2NC9taW5ndzY0L2Jpbi8uLi9saWIvZ2NjL3g4
-Nl82NC13NjQtbWluZ3czMi8xMC4xLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMy
-L2Jpbi9sZC5leGU6ICBEOi9lbXVfZGV2bC9xZW11X3NyYy9xZW11LXNyLWRzcC1hL3FlbXVf
-dGlkc3BfYzN4L3Rlc3RzL3BsdWdpbi9iYi5jOjQ2OiAgdW5kZWZpbmVkIHJlZmVyZW5jZSB0
-byBgcWVtdV9wbHVnaW5fcmVnaXN0ZXJfdmNwdV90Yl9leGVjX2lubGluZScKPiBDOi9tc3lz
-NjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZfNjQtdzY0LW1pbmd3MzIvMTAuMS4wLy4u
-Ly4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9iaW4vbGQuZXhlOiAgRDovZW11X2Rldmwv
-cWVtdV9zcmMvcWVtdS1zci1kc3AtYS9xZW11X3RpZHNwX2MzeC90ZXN0cy9wbHVnaW4vYmIu
-Yzo0OTogIHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYHFlbXVfcGx1Z2luX3JlZ2lzdGVyX3Zj
-cHVfdGJfZXhlY19jYicKPiBDOi9tc3lzNjQvbWluZ3c2NC9iaW4vLi4vbGliL2djYy94ODZf
-NjQtdzY0LW1pbmd3MzIvMTAuMS4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9i
-aW4vbGQuZXhlOiAgYmIubzogaW4gZnVuY3Rpb24gYHFlbXVfcGx1Z2luX2luc3RhbGwnOgo+
-IEQ6L2VtdV9kZXZsL3FlbXVfc3JjL3FlbXUtc3ItZHNwLWEvcWVtdV90aWRzcF9jM3gvdGVz
-dHMvcGx1Z2luL2JiLmM6NjM6ICB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxZW11X3BsdWdp
-bl9yZWdpc3Rlcl92Y3B1X3RiX3RyYW5zX2NiJwo+IGNvbGxlY3QyLmV4ZTogZXJyb3I6IGxk
-IHJldHVybmVkIDEgZXhpdCBzdGF0dXMKCi0tIApBbGV4IEJlbm6opmU=
+
+On 2020/7/3 上午1:07, Vincent Li wrote:
+> Hi,
+>
+> I noticed the [PULL V2 02/33] virtio-net: implement RX RSS processing
+> https://marc.info/?l=qemu-devel&m=159248675403246&w=2 and cloned
+> https://github.com/jasowang/qemu.git tags/net-pull-request for testing the
+> RX RSS feature, but I am not clear how to test this feature and see if it
+> meets my needs.
 
 
+Yuri may know more but I think the only driver that supports RSS is 
+Windows driver currently.
+
+
+>
+> I am running F-Stack Nginx applications
+> https://github.com/F-Stack/f-stack/tree/dev/app/nginx-1.16.1 in KVM guest,
+> F-Stack is FreeBSD TCP/IP stack ported to support DPDK, and F-Stack set
+> RSS mode as code below
+> https://github.com/F-Stack/f-stack/blob/dev/lib/ff_dpdk_if.c#L605
+>
+>       /* Set RSS mode */
+>       uint64_t default_rss_hf = ETH_RSS_PROTO_MASK;
+>       port_conf.rxmode.mq_mode = ETH_MQ_RX_RSS;
+>       port_conf.rx_adv_conf.rss_conf.rss_hf = default_rss_hf;
+>       if (dev_info.hash_key_size == 52) {
+>           port_conf.rx_adv_conf.rss_conf.rss_key = default_rsskey_52bytes;
+>           port_conf.rx_adv_conf.rss_conf.rss_key_len = 52;
+>           use_rsskey_52bytes = 1;
+>       } else {
+>           port_conf.rx_adv_conf.rss_conf.rss_key = default_rsskey_40bytes;
+>           port_conf.rx_adv_conf.rss_conf.rss_key_len = 40;
+>       }
+>       port_conf.rx_adv_conf.rss_conf.rss_hf &= dev_info.flow_type_rss_offloads;
+>       if (port_conf.rx_adv_conf.rss_conf.rss_hf != ETH_RSS_PROTO_MASK) {
+>           printf("Port %u modified RSS hash function based on hardware support,"
+>           "requested:%#"PRIx64" configured:%#"PRIx64"\n",
+>           port_id, default_rss_hf, port_conf.rx_adv_conf.rss_conf.rss_hf);
+>       }
+>
+> But  DPDK virtio PMD does not support RSS as below commit shows:
+>
+> commit 13b3137f3b7c8f866947a9b34e06a8aec0d084f7
+> Author: Dilshod Urazov
+> Date:   Wed Oct 9 13:32:07 2019 +0100
+>
+>      net/virtio: reject unsupported Rx multi-queue modes
+>      
+>      This driver supports none of DCB, RSS or VMDQ modes, therefore must
+>      check and return error if configured incorrectly.
+>      
+>      Virtio can distribute Rx packets across multi-queue, but there is
+>      no controls (algorithm, redirection table, hash function) except
+>      number of Rx queues and ETH_MQ_RX_NONE is the best fit meaning
+>      no method is enforced on how to route packets to MQs.
+>      
+>      Fixes: c1f86306a026 ("virtio: add new driver")
+>      Cc: stable@dpdk.org
+>      
+>      Signed-off-by: Dilshod Urazov
+>      Signed-off-by: Andrew Rybchenko
+>      Reviewed-by: Maxime Coquelin
+>
+> diff --git a/drivers/net/virtio/virtio_ethdev.c
+>             b/drivers/net/virtio/virtio_ethdev.c
+> index 0a2ed2e50..76bd40a3e 100644
+> --- a/drivers/net/virtio/virtio_ethdev.c
+> +++ b/drivers/net/virtio/virtio_ethdev.c
+> @@ -2066,6 +2066,13 @@ virtio_dev_configure(struct rte_eth_dev *dev)
+>          PMD_INIT_LOG(DEBUG, "configure");
+>          req_features = VIRTIO_PMD_DEFAULT_GUEST_FEATURES;
+>   
+> +       if (rxmode->mq_mode != ETH_MQ_RX_NONE) {
+> +               PMD_DRV_LOG(ERR,
+> +                       "Unsupported Rx multi queue mode %d",
+> +                       rxmode->mq_mode);
+> +               return -EINVAL;
+> +       }
+> +
+>          if (dev->data->dev_conf.intr_conf.rxq) {
+>                  ret = virtio_init_device(dev, hw->req_guest_features);
+>                  if (ret < 0)
+>
+>
+>
+> So the problem is I can't run F-Stack Applications in KVM/Qemu guest with
+> multi queue/vCPU/RSS  support, this problem seems apply to DPDK TCP
+> applications require multi queue/RSS support in KVM/Qemu guest, for
+> example mTCP https://github.com/mtcp-stack/mtcp I tested has similar
+> problem.
+>
+> I am not clear on the picture of how everything work together for  this
+> virtio-net RSS feature.
+>
+> I have read following blogs
+>
+> https://www.redhat.com/en/blog/introduction-virtio-networking-and-vhost-net
+> https://www.redhat.com/en/blog/how-vhost-user-came-being-virtio-networking-and-dpdk
+>
+> Someone told me that in order for DPDK frond end virtio PMD in guest support RSS, the backend
+> also needs to support RSS, including vhost-net and vhost-user, it should
+> have nothing to do with this Qemu virtio-net RSS, is that correct?  if
+> correct, I have following questions:
+>
+> 1, What is the use case for this Qemu virtio-net RSS?
+
+
+It's just RSS as what other device can provide for steering or balancing.
+
+
+> 2, How to test the use case?
+
+
+Need use windows guest.
+
+
+> 3, Are there any plan to improve vhost-net/vhost-user, DPDK virtio PMD to support RSS?
+
+
+For vhost-net, Sameeh posted a eBPF based solution RFC[1], we need some 
+one to carry on the work. It doesn't request any extension to vhost-net 
+thanks to the steering eBPF support in tuntap.
+
+For vhost-user, we need probably extend vhost-user protocols first.
+
+You're welcome to contribute patches.
+
+[1] https://patchwork.kernel.org/cover/10581921/
+
+Thanks
+
+
+>
+> For 3,  I think this is important for KVM/Qemu/OVS-DPDK/Vhost-net environment for DPDK TCP/UDP applications.
+>
+> Note I have no problem running F-Stack or mTCP applications in VMware ESXi
+> guest environment with multi queue/vCPU/RSS requirement since DPDK vmxnet3
+> PMD support RSS and I assume VMware ESXi backend support RSS, so it looks VMware has
+> advantage over this.
+>
+> Thank you for your patience to read this email
+>
+> Regards,
+>
+> Vincent
+>
 
 
