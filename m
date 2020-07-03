@@ -2,69 +2,56 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2F7C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF81C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:29:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 023B72073E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:29:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 023B72073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id ADF072073E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:29:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADF072073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOYd-0005vl-9e
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:28:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34142)
+	id 1jrOZG-0007M5-Ua
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:29:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jrOEt-0004fB-3J
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:08:35 -0400
-Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:51846)
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jrOHy-0001Ow-9H; Fri, 03 Jul 2020 12:11:47 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48372 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jrOEp-0001dX-Fo
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 12:08:34 -0400
-Received: from player729.ha.ovh.net (unknown [10.110.171.250])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 449A91CE4F4
- for <qemu-devel@nongnu.org>; Fri,  3 Jul 2020 18:08:24 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player729.ha.ovh.net (Postfix) with ESMTPSA id 8FD90142B67FE;
- Fri,  3 Jul 2020 16:08:22 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G0051662cabc-42a5-4d58-8653-8167c182c452,935498C186F5E237E8FBD9F7C25273B8E078CCF0)
- smtp.auth=groug@kaod.org
-Date: Fri, 3 Jul 2020 18:08:21 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v6 4/5] 9pfs: T_readdir latency optimization
-Message-ID: <20200703180821.0416ebe8@bahia.lan>
-In-Reply-To: <2036889.5PXCEd79iF@silver>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <20200702173500.27f2b0a5@bahia.lan> <5261112.usFQB0EGfy@silver>
- <2036889.5PXCEd79iF@silver>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 6338535001485908288
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrtdeigdelkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=188.165.45.168; envelope-from=groug@kaod.org;
- helo=20.mo1.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 12:08:25
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jrOHq-0002cu-VF; Fri, 03 Jul 2020 12:11:45 -0400
+Received: from [192.168.15.23] (helo=iris.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <den@openvz.org>)
+ id 1jrOHf-0005Rg-M9; Fri, 03 Jul 2020 19:11:27 +0300
+From: "Denis V. Lunev" <den@openvz.org>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 4/7] block/block-backend: remove always true check from
+ blk_save_vmstate
+Date: Fri,  3 Jul 2020 19:11:27 +0300
+Message-Id: <20200703161130.23772-5-den@openvz.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200703161130.23772-1-den@openvz.org>
+References: <20200703161130.23772-1-den@openvz.org>
+Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
+ helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 12:11:34
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,52 +65,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 03 Jul 2020 10:08:09 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+bdrv_save_vmstate() returns either error with negative return value or
+size. Thus this check is useless.
 
-> On Donnerstag, 2. Juli 2020 19:23:35 CEST Christian Schoenebeck wrote:
-> > > > Back to the actual topic: so what do we do about the mutex then? CoMutex
-> > > > for 9p2000.u and Mutex for 9p2000.L? I know you find that ugly, but it
-> > > > would just be a transitional measure.
-> > > 
-> > > That would ruin my day...
-> > > 
-> > > More seriously, the recent fix for a deadlock condition that was present
-> > > for years proves that nobody seems to be using silly clients with QEMU.
-> > > So I think we should just dump the lock and add a one-time warning in
-> > > the top level handlers when we detect a duplicate readdir request on
-> > > the same fid. This should be a very simple patch (I can take care of
-> > > it right away).
-> > 
-> > Looks like we have a consensus! Then I wait for your patch removing the
-> > lock, and for your feedback whether or not you see anything else in this
-> > patch set?
-> 
-> Please wait before you work on this patch. I really do think your patch should 
-> be based on/after this optimization patch for one reason: if (and even though 
-> it's a big if) somebody comes along with a silly client as you named it, then 
-> your patch can simply be reverted, which would not be possible if it's next.
-> 
-> So I would really suggest I change this patch here to go the ugly way with 2 
-> mutex types for readdir 9p2000.L vs 9p2000.L, and your patch would get rid of 
-> that mess by removing the lock entirely, okay?
-> 
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Suggested-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Fam Zheng <fam@euphon.net>
+CC: Juan Quintela <quintela@redhat.com>
+CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block/block-backend.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If someones ever comes along with a silly client, she will get warnings
-explaining that she might get silly results. If it turns out that we
-really need to support that for valid reasons, it will be okay to focus
-on the appropriate fix when the time comes, not now. So I don't say any
-real benefit to postponing the removal of the lock after your series, but
-I do at least see one benefit, it will reduce the level of noise.
-
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 6936b25c83..1c6e53bbde 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -2188,7 +2188,7 @@ int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+         return ret;
+     }
+ 
+-    if (ret == size && !blk->enable_write_cache) {
++    if (!blk->enable_write_cache) {
+         ret = bdrv_flush(blk_bs(blk));
+     }
+ 
+-- 
+2.17.1
 
 
