@@ -6,108 +6,67 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4173C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E8CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:07:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7203F206B7
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:04:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F1A0208E4
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:07:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H333hnM/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7203F206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="o3lKcn2M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F1A0208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrLMp-00064m-NZ
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:04:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40564)
+	id 1jrLPo-0007w6-KZ
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:07:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jrLM3-0005OW-Rj
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:03:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32927
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jrLM1-00058V-Ad
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:03:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593781423;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iWhq4FfDnH9KoI8woSV1YupzBSZVtYkBmIu4tqNTuQo=;
- b=H333hnM/twqt+TgYnizr+YYPaKL1GQgU0G/aAyrCFWjfmPbcjpTiwRHDAsl1Xu+J2O1FNw
- vDibOGDTde6ODgkQiNVpWRbcSM2u8xpbaeDHs1IqbJuN7tAyDYipDb/aLWQfVMF8EkzXzM
- zcY1LMEhy9Lh3LkvgzWTjzB4cSh7ozU=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-ClK0NMw_OxSV-cHjpqZL0A-1; Fri, 03 Jul 2020 09:03:41 -0400
-X-MC-Unique: ClK0NMw_OxSV-cHjpqZL0A-1
-Received: by mail-qt1-f197.google.com with SMTP id 71so13735220qte.5
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 06:03:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=iWhq4FfDnH9KoI8woSV1YupzBSZVtYkBmIu4tqNTuQo=;
- b=tHUI+4scpMlTU7djYWQptHxw9qkJSkhGtCEvkgokuG+QMlTP78sJsp513dFbIkGV9q
- aq7soZtzFRxyHhE/56I6BSiQCKCVoM/Pm0DBFc5sUZshMa55lIihVSa/mQmRrEn9CG0u
- cD14WAUTy8/B79z6Ohcf4Go/rkcFTNdLL7jGt08ShXufUY6etsQriNOvOM9wl7jIU2ni
- 5pTO0rsxhBu7YTuYcuecQlILtRE6KrBlE7LXP5XWZ27FXGcPqUjRGkSvRd1SpygJeTVs
- WZfI1762whiDQZua/Su8Mf/XbfIx1ucAFORDLrOhu+XJco1t9GuXMErZ4+B0RgHu+T/Z
- Klpg==
-X-Gm-Message-State: AOAM533XCZhnN8m6gZQ5K6OgyLu/5FuW0aiYtwJgcP4NQeh9ZgOB7rdu
- 9TmD1CznTSVP9QdxqqfYo7sfxrizmiSIpxDpKHvfzdULO9T0boQQAUA0pkyk1ICvw56WxALtNAm
- 0tNksrhZYIZrhjFs=
-X-Received: by 2002:a37:b341:: with SMTP id c62mr33864775qkf.128.1593781421459; 
- Fri, 03 Jul 2020 06:03:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMlo1kfXFWeU40ku7LjJTPNjwch/ocUesU5bl+xtAjGFvhfX839XqVcRdQTu12b4oOHUiR2w==
-X-Received: by 2002:a37:b341:: with SMTP id c62mr33864734qkf.128.1593781421128; 
- Fri, 03 Jul 2020 06:03:41 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id u5sm10808462qke.32.2020.07.03.06.03.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 06:03:40 -0700 (PDT)
-Date: Fri, 3 Jul 2020 09:03:38 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-Message-ID: <20200703130338.GD6677@xz-x1>
-References: <8cf25190-53e6-8cbb-372b-e3d4ec714dc5@redhat.com>
- <20200628144746.GA239443@xz-x1>
- <54d2cdfd-97b8-9e1d-a607-d7a5e96be3a1@redhat.com>
- <20200629133403.GA266532@xz-x1>
- <2589d0e9-cc5b-a4df-8790-189b49f1a40e@redhat.com>
- <20200630153911.GD3138@xz-x1>
- <69f6d6e7-a0b1-abae-894e-4e81b7e0cc90@redhat.com>
- <ff9e7af0-18c4-57e8-fc94-904fdce1123a@redhat.com>
- <20200702154540.GI40675@xz-x1>
- <34fe0e55-c0ae-8e56-462b-6281b6cca4f5@redhat.com>
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jrLPE-0007QW-T3; Fri, 03 Jul 2020 09:07:04 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:54033)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jrLPB-0006DU-5m; Fri, 03 Jul 2020 09:07:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=Q5F2RGlY7GUZ1Aqrq6hsVGl+3Ta+Jdogdakkoj9zcng=; 
+ b=o3lKcn2MLVn+A0DAyiiHG7cZmO6b3792AvR2TlGWF0/wE8lxfHowAFwQ2f0Vq6VFWAqgVfOnZeLYrjifA5sOvWO6gCnXw/PbUBIbWxoTzzkq+mZ7av42gytPjER8S5RL1pZpUDQbn6gOQZvqy35AHW5sUvAXLpsKBue7BEmSPnw84cR4YJ6LAm6ejgRKXxanXloHANHA6YBAklrWQmMb8kO4z+TQ2pwdA7owQRjdqZf+4Oj7sRWsDGa9IkslkPQGC1ShYvlsVlAoWfpaPepnBQgYtYl+/rQ+v2O1b5omhmOdUbPGLovMC4K9PL8azf2yMWM3m/kfYyPtRzOpc+xh2w==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jrLP6-000881-Tw; Fri, 03 Jul 2020 15:06:56 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jrLP6-0002wf-JS; Fri, 03 Jul 2020 15:06:56 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v9 34/34] iotests: Add tests for qcow2 images with
+ extended L2 entries
+In-Reply-To: <2a791051-5967-0279-75a1-4a44817b83b3@redhat.com>
+References: <cover.1593342067.git.berto@igalia.com>
+ <536717bef174a2d5405647bf9ecf899e0aafadbb.1593342067.git.berto@igalia.com>
+ <2a791051-5967-0279-75a1-4a44817b83b3@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 03 Jul 2020 15:06:56 +0200
+Message-ID: <w51o8owwxvz.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <34fe0e55-c0ae-8e56-462b-6281b6cca4f5@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 08:43:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,55 +79,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 03, 2020 at 03:24:19PM +0800, Jason Wang wrote:
-> 
-> On 2020/7/2 下午11:45, Peter Xu wrote:
-> > On Thu, Jul 02, 2020 at 11:01:54AM +0800, Jason Wang wrote:
-> > > So I think we agree that a new notifier is needed?
-> > Good to me, or a new flag should be easier (IOMMU_NOTIFIER_DEV_IOTLB)?
-> 
-> 
-> That should work but I wonder something as following is better.
-> 
-> Instead of introducing new flags, how about carry the type of event in the
-> notifier then the device (vhost) can choose the message it want to process
-> like:
-> 
-> static vhost_iommu_event(IOMMUNotifier *n, IOMMUTLBEvent *event)
-> 
-> {
-> 
-> switch (event->type) {
-> 
-> case IOMMU_MAP:
-> case IOMMU_UNMAP:
-> case IOMMU_DEV_IOTLB_UNMAP:
-> ...
-> 
-> }
+On Fri 03 Jul 2020 11:49:14 AM CEST, Max Reitz wrote:
+>> +_supported_fmt qcow2
+>> +_supported_proto file nfs
+>> +_supported_os Linux
+>> +_unsupported_imgopts extended_l2 compat=3D0.10 cluster_size data_file
+>
+> I=E2=80=99d also add a 'refcount_bits=3D1[^0-9]', because this test doesn=
+=E2=80=99t pass
+> with refcount-bits=3D1 (due to taking a snapshot at one point).
 
-Looks ok to me, though imo we should still keep the registration information,
-so VT-d knows which notifiers is interested in which events.  E.g., we can
-still do something like vtd_as_has_map_notifier().
+Ok
 
-So these are probably two different things: the new IOMMU_NOTIFIER_DEV_IOTLB
-flag is one as discussed; the other one is whether we would like to introduce
-IOMMUTLBEvent to include the type, so that we can avoid introduce two notifiers
-for one device majorly to identify dev-iotlb from unmaps.
+>> +    expected_bitmap=3D0
+>> +    for bit in $expected_alloc; do
+>> +        expected_bitmap=3D$(($expected_bitmap | (1 << $bit)))
+>> +    done
+>> +    for bit in $expected_zero; do
+>> +        expected_bitmap=3D$(($expected_bitmap | (1 << (32 + $bit))))
+>> +    done
+>> +    printf -v expected_bitmap "%llu" $expected_bitmap # Convert to unsi=
+gned
+>
+> Does the length modifier =E2=80=9Cll=E2=80=9D actually do anything?
+>
+>> +
+>> +    printf "L2 entry #%d: 0x%016lx %016lx\n" "$entry_no" "$entry" "$bit=
+map"
+>
+> Or the =E2=80=9Cl=E2=80=9D here?
 
-Thanks,
+Actually they don't (I just tested in i386 and x86_64), I assumed that
+it would require the length modifiers like in C.
 
--- 
-Peter Xu
+I'm tempted to leave them for clarity (using 'll' in both cases),
+opinions?
 
+Berto
 
