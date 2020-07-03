@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91ECCC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C66C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A99420702
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:45:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A99420702
+	by mail.kernel.org (Postfix) with ESMTPS id 1E8B220702
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 06:46:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E8B220702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrFS2-0006IB-J8
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:45:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54764)
+	id 1jrFSf-00072P-BJ
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 02:46:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFII-0007Al-LS; Fri, 03 Jul 2020 02:35:31 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:53152)
+ id 1jrFIG-00078m-Ec; Fri, 03 Jul 2020 02:35:28 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:53128)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jrFID-00038I-SK; Fri, 03 Jul 2020 02:35:30 -0400
+ id 1jrFIC-00037z-U2; Fri, 03 Jul 2020 02:35:28 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id F0A70BF84C;
+ by charlie.dont.surf (Postfix) with ESMTPSA id 11344BF628;
  Fri,  3 Jul 2020 06:35:03 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 18/18] hw/block/nvme: bump supported version to v1.3
-Date: Fri,  3 Jul 2020 08:34:20 +0200
-Message-Id: <20200703063420.2241014-19-its@irrelevant.dk>
+Subject: [PATCH v2 16/18] hw/block/nvme: enforce valid queue creation sequence
+Date: Fri,  3 Jul 2020 08:34:18 +0200
+Message-Id: <20200703063420.2241014-17-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200703063420.2241014-1-its@irrelevant.dk>
 References: <20200703063420.2241014-1-its@irrelevant.dk>
@@ -52,7 +52,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,44 +77,66 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Bump the supported NVM Express version to v1.3.
+Support returning Command Sequence Error if Set Features on Number of
+Queues is called after queues have been created.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/nvme.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 12 ++++++++++++
+ hw/block/nvme.h |  1 +
+ 2 files changed, 13 insertions(+)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 5bbb6aa0efc3..204032aac2c8 100644
+index 0dac7a41ddae..8138baa6fbd8 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -57,6 +57,7 @@
- #define NVME_MAX_IOQPAIRS 0xffff
- #define NVME_REG_SIZE 0x1000
- #define NVME_DB_SIZE  4
-+#define NVME_SPEC_VER 0x00010300
- #define NVME_CMB_BIR 2
- #define NVME_PMR_BIR 2
- #define NVME_TEMPERATURE 0x143
-@@ -2106,6 +2107,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     id->ieee[0] = 0x00;
-     id->ieee[1] = 0x02;
-     id->ieee[2] = 0xb3;
-+    id->ver = cpu_to_le32(NVME_SPEC_VER);
-     id->oacs = cpu_to_le16(0);
- 
-     /*
-@@ -2151,7 +2153,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     NVME_CAP_SET_CSS(n->bar.cap, 1);
-     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
- 
--    n->bar.vs = 0x00010200;
-+    n->bar.vs = NVME_SPEC_VER;
-     n->bar.intmc = n->bar.intms = 0;
+@@ -910,6 +910,13 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+     cq = g_malloc0(sizeof(*cq));
+     nvme_init_cq(cq, n, prp1, cqid, vector, qsize + 1,
+         NVME_CQ_FLAGS_IEN(qflags));
++
++    /*
++     * It is only required to set qs_created when creating a completion queue;
++     * creating a submission queue without a matching completion queue will
++     * fail.
++     */
++    n->qs_created = true;
+     return NVME_SUCCESS;
  }
  
+@@ -1301,6 +1308,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+         break;
+     case NVME_NUMBER_OF_QUEUES:
++        if (n->qs_created) {
++            return NVME_CMD_SEQ_ERROR | NVME_DNR;
++        }
++
+         /*
+          * NVMe v1.3, Section 5.21.1.7: 0xffff is not an allowed value for NCQR
+          * and NSQR.
+@@ -1433,6 +1444,7 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
+ 
+     n->aer_queued = 0;
+     n->outstanding_aers = 0;
++    n->qs_created = false;
+ 
+     blk_flush(n->conf.blk);
+     n->bar.cc = 0;
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 450e4294193a..668d2cd3df16 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -121,6 +121,7 @@ typedef struct NvmeCtrl {
+     BlockConf    conf;
+     NvmeParams   params;
+ 
++    bool        qs_created;
+     uint32_t    page_size;
+     uint16_t    page_bits;
+     uint16_t    max_prp_ents;
 -- 
 2.27.0
 
