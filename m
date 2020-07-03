@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED637C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0517C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:26:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCC0920782
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:25:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAD8020782
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:26:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMsdntsC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCC0920782
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ITNDKWEF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD8020782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrSFn-0003ui-1W
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:25:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35298)
+	id 1jrSGJ-00053N-12
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:26:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9g-0008Au-IW; Fri, 03 Jul 2020 16:19:28 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:55106)
+ id 1jrS9o-0008UE-Pj; Fri, 03 Jul 2020 16:19:36 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:33036)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9f-0001Vd-4I; Fri, 03 Jul 2020 16:19:28 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id o8so33101691wmh.4;
- Fri, 03 Jul 2020 13:19:26 -0700 (PDT)
+ id 1jrS9n-0001Wr-Dl; Fri, 03 Jul 2020 16:19:36 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id a6so22968452wmm.0;
+ Fri, 03 Jul 2020 13:19:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=my+2I7oEcIoGWnbLn8sq/+Zy6t716yBT3j4+w3PES+4=;
- b=jMsdntsCkNXisGBb8CWMLEwcMT5w5vt3Sf5OaNZ9pzAtgCTTUxi5pfTcmNNtU+aeYs
- wEr4QCmswYd+71G3yezbvj1mMfMVZtHHeGtkyC7UuxeJ+LKj/cLVHMXAN+003sXUtWBh
- dimsIGOni4BsEQsiwyDzR8GGjEo8g261ygPJxPmfelMqA2wJiLXJ+F+IYolgMxNeL0s8
- h2savXhtsNvan343BBx6k+lcOig6zXVV+7g4WTtLu/ukI0NgwbTRzYkod3gpbONdd15q
- CvKcbi3VOuRytEWpLnBhrTu+RR5WFS8hZDz2nwrs8bce3NicYV7C7OHlhYuxEPjQVe+u
- 1bQA==
+ bh=jeW/GRxnLMmqDw4B0N8/mDODSvUKWFLcdDlvxS2B7CU=;
+ b=ITNDKWEFzb20yVGDnibyFXcdzaggcn+3JcT6AcoWLM/MjAydtvTa1IgpjrJaiGfUK5
+ VmlIjPK8JrWIOqLysFKBY0ky6GOiXz0Adc95Pl2KoPzskzhEizFPsnMrpKYbzNNMZdfI
+ PR8hlVXPP75osVcjgjGXuLhFqErYFpcTsw5QrVwbeSB+rsZBW6guKRLbajRC7FpJlktp
+ D1Ga8IwqOy27G6L9J5nEnlsoHuuzYfSuhjDvnMHpbPZLvXEDCpA8sXYJXMV6mtPDiUEd
+ F96U1u5915cvO+ob7orI0C93IM5+FvqNz9jS5uVP/DHyEGv07e8HaepkKZ83NwWbesJX
+ oJIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=my+2I7oEcIoGWnbLn8sq/+Zy6t716yBT3j4+w3PES+4=;
- b=Rjg0Zo1APAbGgM9xgSTeSD0x8LuPXVqY0osVlRozTJn1FceAb3w5RFowJpmzQmSBMl
- rySILM2A/3emOI2cSlGtAy5CsrmMD7eHu8OURZiCn/nIZPn1WsPgxPgvjkCwDVsd6bwp
- eYNLUoNLlsg3vYu3RIMpFxUBSalRoOtn1akUaMJOJYLGgTV8+CDEE7pefo2COrkNFV5F
- kVcyQD/68j6sUqrBK0SBli2+Rek3kSyHfYrbfbq7ylZtf4VMjWZzLuzd9+M5ylYRvGMe
- RF3O5VKfAbP+GVHDYsLZsocL2ENsqSppGraqax6I5JuZLB4o+9jS3BHETN1mudAQdOzm
- 1MbQ==
-X-Gm-Message-State: AOAM5309oHwLAMQAdJ9CsufvzuvsiJV1TTLjToDb51sM0YI0Axf9JAKT
- 2aff12JttUQkxBnEh+6nRsqIw4Xrfp8=
-X-Google-Smtp-Source: ABdhPJxmeyPqHpEMctz7hcbDpSQ57jL1oBVn5E+qjNvJuB1N1xdseIfddj8uVI/c3QjqZcUu8RekZA==
-X-Received: by 2002:a1c:7209:: with SMTP id n9mr10149730wmc.150.1593807565301; 
- Fri, 03 Jul 2020 13:19:25 -0700 (PDT)
+ bh=jeW/GRxnLMmqDw4B0N8/mDODSvUKWFLcdDlvxS2B7CU=;
+ b=q5btc3omZPuzDnfnE1WcBkyBUd/kFDfxE22SVb1m2DPqZRrcGdYiFjYgI6P6n81JcQ
+ lV5ejtAgrqpyNNNfB6ud/CZUDi1uGNj7LitX9dXRx+qZYsjdnKj9NP87ZlCUPTD0Zw0M
+ R2bl/PhqNl8iQRjFAPl6OtShQjzRAUB2xYnTpzhGQwytmf+rKqATYbfAcqnrpbalnK4X
+ mSn7cNuNzhYCppTeUz6gbxthJQpxF+ksQjhOnNOT2Dzp24wqSou1jvjqKne0xKLX0Jwo
+ +J2AKo4YT6fdFHLedeb2qdphak49n2I0Zt+mhaj6zjOg3ZQO80ru3U666gAUGjVuvezo
+ 2RuA==
+X-Gm-Message-State: AOAM533fi6IRuifMeHREU/tsEehkPuq6XplfoGGDkbzocwOAnIHYClOM
+ F4A4QAfc+pmGjc2mL6xTrReZ3JnRIAg=
+X-Google-Smtp-Source: ABdhPJwd/hJIaqXoG8NMZE/HeZQseKgWihtcixE9JZ8XNVhrUANZhBAnhpsLkGVs0oHyDnVNIlGlZA==
+X-Received: by 2002:a7b:c259:: with SMTP id b25mr14334703wmj.107.1593807573687; 
+ Fri, 03 Jul 2020 13:19:33 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.23
+ by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 13:19:24 -0700 (PDT)
+ Fri, 03 Jul 2020 13:19:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 08/18] hw/core/split-irq: Mark the device with no migratable
- fields
-Date: Fri,  3 Jul 2020 22:19:01 +0200
-Message-Id: <20200703201911.26573-9-f4bug@amsat.org>
+Subject: [PATCH 14/18] hw/misc/iotkit-sysinfo: Mark the device with no
+ migratable fields
+Date: Fri,  3 Jul 2020 22:19:07 +0200
+Message-Id: <20200703201911.26573-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200703201911.26573-1-f4bug@amsat.org>
 References: <20200703201911.26573-1-f4bug@amsat.org>
@@ -124,21 +124,21 @@ by using vmstate_qdev_no_state_to_migrate.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/core/split-irq.c | 1 +
+ hw/misc/iotkit-sysinfo.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/hw/core/split-irq.c b/hw/core/split-irq.c
-index 3b90af2e8f..a7072f922c 100644
---- a/hw/core/split-irq.c
-+++ b/hw/core/split-irq.c
-@@ -71,6 +71,7 @@ static void split_irq_class_init(ObjectClass *klass, void *data)
-     /* No state to reset or migrate */
-     device_class_set_props(dc, split_irq_properties);
-     dc->realize = split_irq_realize;
+diff --git a/hw/misc/iotkit-sysinfo.c b/hw/misc/iotkit-sysinfo.c
+index b2dcfc4376..8bb9a2ef8b 100644
+--- a/hw/misc/iotkit-sysinfo.c
++++ b/hw/misc/iotkit-sysinfo.c
+@@ -120,6 +120,7 @@ static void iotkit_sysinfo_class_init(ObjectClass *klass, void *data)
+      * This device has no guest-modifiable state and so it
+      * does not need a reset function or VMState.
+      */
 +    dc->vmsd = vmstate_qdev_no_state_to_migrate;
  
-     /* Reason: Needs to be wired up to work */
-     dc->user_creatable = false;
+     device_class_set_props(dc, iotkit_sysinfo_props);
+ }
 -- 
 2.21.3
 
