@@ -2,131 +2,95 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F51C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E787C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:35:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1801221531
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D12921531
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:35:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVlfRVBl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1801221531
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pToxCEM/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D12921531
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrNiC-0006zL-Az
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:34:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51302)
+	id 1jrNiO-0007PA-B8
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:35:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrNcl-0000eA-Hf
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:29:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40728
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrNcj-0006p0-Sj
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:29:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593790149;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=LOB0SWEuMVyGY4su8Kj1BvaONtT+bGp5fFHzTY7W+ks=;
- b=OVlfRVBlUrPiKJ6bYG7cwq/1XTY4gNU88Vjq2DMaqriLkzm51aKk7tD+fG0VW8G2j1Lxpa
- 25SMBPUvDayzSI11FZRBGkY625qKgU0nKW/rCkZGa4D/Oof5YJB75qLYPDPzx66TFbhNT4
- LmDklCxVA/mfd4zZXpJyzQgZPAx+1gM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-ldl8eqaDPqaIJTsyCKuggg-1; Fri, 03 Jul 2020 11:29:07 -0400
-X-MC-Unique: ldl8eqaDPqaIJTsyCKuggg-1
-Received: by mail-wm1-f71.google.com with SMTP id o13so35408505wmh.9
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 08:29:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jrNhN-00069S-NB
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:33:57 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:52001)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jrNhL-0000gt-An
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 11:33:57 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id 22so32411792wmg.1
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 08:33:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=CeG9nlQhToqpHzt8UXhXcJictiL/725CMXkORsMubBY=;
+ b=pToxCEM/mRyigrmcs+ehq8V3y1Rb4vU5fmKmHJFWf+wpuig/Cz0DNVO+MGo8d1pIXb
+ XVmcO69SOYsVsTM2zfgLamtEqfiJEYWbhFst9L+L7AqqMrMo8+FuTG/x2BmYwoKhSO5I
+ 3QnftWDaLIXj95uYl/oi/WvCjwv7q36t94apMPQt3NwhVbhXkuwIk2MfDxSQT/+Lw2hd
+ i+PbeMuOoU+bjaM/mKfB3GiklHnfLdFLQrkUlI+PIWOUBe7AKUsF8fc46a+FF4nXe7aO
+ I2V9R3BirK3tTVVXfZJhXhfGA1EAyWfah8NCCQ9vq+0R64uidQW8Cb2hs7gVY0CRTmZF
+ UPpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=LOB0SWEuMVyGY4su8Kj1BvaONtT+bGp5fFHzTY7W+ks=;
- b=giLC8wXxRWj1BpHjAfpT5SEV+fYlHNgfQdg8My1tzf8UPh57DdrXHhuLWpL7CoSOHN
- ON+KRNJE6iXvKxWcMZ80i6+6oDiNfH4egja2cXJFgZEK9ws/o4zlX/uPwwgWx4c4chkM
- aUL9ZauO0lWAnc6IGP+NJRRdk3K8fjjRmp78eh92cc8rig5n6kfTxKWWYSZSjTItxlAE
- Uy6nn1HNbe3+4lK67ZAOT7Tw97MKNKHoYdeVRiVRnHBVEaHoQLdDV1YeCxpEYN6ed61I
- D2Qx6tMgwUTyzLYRwt5TONGL2dPZFcs2eRlGdY2meb0Ov4k8ENq9/4Q9HD8v7KJHdPbY
- FMkA==
-X-Gm-Message-State: AOAM533/UvTP8r0jnLOX7LzYZyKE7Idfgv6NlLdumE84U0bPoHGZVySW
- DJj3CDwn/lpZPZ35vuk7pnzza4ScgYqz8FnZoXIsJGXaR6O2aQpQHpQd+V8tYuslDqQUrcO8LQy
- QQmg5CfASgwS8IyY=
-X-Received: by 2002:adf:e2c9:: with SMTP id d9mr37004153wrj.227.1593790146757; 
- Fri, 03 Jul 2020 08:29:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwwqqFCXkNU5EL4shCPl+cvnlxqswnUQzjo8ouZMyuNQtVv6wUp6tFeIYV9CzQjR3byAXIm+Q==
-X-Received: by 2002:adf:e2c9:: with SMTP id d9mr37004140wrj.227.1593790146558; 
- Fri, 03 Jul 2020 08:29:06 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id 14sm13383766wmk.19.2020.07.03.08.29.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jul 2020 08:29:06 -0700 (PDT)
-Subject: Re: [PATCH v3 7/9] util/compatfd.c: Only include <sys/syscall.h> if
- CONFIG_SIGNALFD
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200703145614.16684-1-peter.maydell@linaro.org>
- <20200703145614.16684-8-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <4da522b2-1843-cd51-6c91-8b9e7402050b@redhat.com>
-Date: Fri, 3 Jul 2020 17:29:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=CeG9nlQhToqpHzt8UXhXcJictiL/725CMXkORsMubBY=;
+ b=uUrBHLA23CIacVjDGdSdVWFlBBXT3zt96s5iq5lV9ddy4i6xhAookR4G7fj5RmsFlS
+ MsHTwBIISxXw6VgaNfqWgHJrkSHdA6Eaug63uG1cQKCGz2U1LbXWOE3gNUjeMREvgUOd
+ g5xVNG7Jg6j87x31Ask4+8ZAvzHlrNIMupM4+u5xUlWJmlwiyDP7q9rQymqtQfItscEL
+ DjGtK6NBz+GSzHW2nMunBg2r0jJSRP4NppHdv4m9bL/E4xnpPcKMJc3e+qBR0XEXyu7z
+ ILvMyPtoFCHHHedUwGSp7cyUgUfh4+q07f62HK5DsCdXG/TLwumFWeQkjMAuq4Gyv1Wj
+ 0cng==
+X-Gm-Message-State: AOAM532YFdWKnr99PH1Rt8q/RjV+jDJ3V4XsKgWDkcVNel5V9F/dowkc
+ rNRG3KFyr74DRxttCQ57N7UN6g==
+X-Google-Smtp-Source: ABdhPJxiAq8zKlQbiiXspIXPb01nRK16PNgxheehueYUUDkeSC4zhSlH5ke/nh9a1xZj0TKOTCuklg==
+X-Received: by 2002:a1c:398b:: with SMTP id g133mr36067091wma.76.1593790432943; 
+ Fri, 03 Jul 2020 08:33:52 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v6sm1987631wrr.85.2020.07.03.08.33.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 03 Jul 2020 08:33:51 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0A78D1FF7E;
+ Fri,  3 Jul 2020 16:33:51 +0100 (BST)
+References: <159357217483.1717.4076077243388027502.malonedeb@chaenomeles.canonical.com>
+ <159378865160.17942.5070159367065081063.malone@soybean.canonical.com>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bug 1885827 <1885827@bugs.launchpad.net>
+Subject: Re: [Bug 1885827] Re: building plugin failed on Windows with mingw
+In-reply-to: <159378865160.17942.5070159367065081063.malone@soybean.canonical.com>
+Date: Fri, 03 Jul 2020 16:33:50 +0100
+Message-ID: <877dvkpq8x.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200703145614.16684-8-peter.maydell@linaro.org>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 02:53:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,47 +103,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Carlier <devnexen@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Emilio G . Cota" <cota@braap.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/20 4:56 PM, Peter Maydell wrote:
-> From: David CARLIER <devnexen@gmail.com>
-> 
-> util/compatfd.c includes <sys/syscall.h> so that the CONFIG_SIGNALFD
-> code can use SYS_signalfd. Guard the #include with CONFIG_SIGNALFD
-> to avoid portability issues on hosts like Haiku which do not
-> provide that header file.
-> 
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> [PMM: Expanded commit message]
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  util/compatfd.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/util/compatfd.c b/util/compatfd.c
-> index c296f55d148..ee47dd80897 100644
-> --- a/util/compatfd.c
-> +++ b/util/compatfd.c
-> @@ -16,7 +16,9 @@
->  #include "qemu/osdep.h"
->  #include "qemu/thread.h"
->  
-> +#if defined(CONFIG_SIGNALFD)
 
-Most of the code base guards <sys/syscall.h> with '#ifdef CONFIG_LINUX',
-bsd-user/strace.c is the BSD exception.
+Xiaolei <1885827@bugs.launchpad.net> writes:
 
-CONFIG_SIGNALFD guards SYS_signalfd.
+> If I keep "-Wl,-soname,$@" in the command , I got similar linking errors.
+>=20=20
+> makefile:=20
+> SONAMES :=3D $(addsuffix .dll,$(addprefix lib,$(NAMES)))
+>
+> QEMU_CFLAGS +=3D -fPIC -fno-stack-protector -DBUILDING_DLL
+> QEMU_CFLAGS +=3D -I$(SRC_PATH)/include/qemu
+>
+> all: $(SONAMES)
+> lib%.dll: %.o
+>     $(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
+>
+> output:
+> x86_64-w64-mingw32-gcc -shared -Wl,-soname,libbb.dll -o libbb.dll bb.o
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: bb.o: in function `g_autoptr_cleanup_generic_gf=
+ree':
+> C:/msys64/mingw64/include/glib-2.0/glib/glib-autocleanups.h:28: undefined=
+ reference to `g_free'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: bb.o: in function `plugin_exit':
+> C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.c:27: undefined referenc=
+e to `g_strdup_printf'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/b=
+b.c:29: undefined reference to `qemu_plugin_outs'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: bb.o: in function `vcpu_tb_trans':
+> C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.c:42: undefined referenc=
+e to `qemu_plugin_tb_n_insns'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/b=
+b.c:45: undefined reference to `qemu_plugin_register_vcpu_tb_exec_inline'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/b=
+b.c:47: undefined reference to `qemu_plugin_register_vcpu_tb_exec_inline'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/b=
+b.c:50: undefined reference to `qemu_plugin_register_vcpu_tb_exec_cb'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: bb.o: in function `qemu_plugin_install':
+> C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.c:64: undefined referenc=
+e to `qemu_plugin_register_vcpu_tb_trans_cb'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/b=
+b.c:65: undefined reference to `qemu_plugin_register_atexit_cb'
+> collect2.exe: error: ld returned 1 exit status
 
->  #include <sys/syscall.h>
-> +#endif
->  
->  struct sigfd_compat_info
->  {
-> 
+Cc'ing Emilio as he wrote the initial code so I assume built it at one poin=
+t.
 
+--=20
+Alex Benn=C3=A9e
 
