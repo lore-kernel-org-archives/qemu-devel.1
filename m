@@ -2,86 +2,89 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D80D4C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B4B4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:04:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A822520870
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:56:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 483BC20737
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 14:04:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OWuXsgZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A822520870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CEqNbE9g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483BC20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrMBC-0002Lb-0X
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53974)
+	id 1jrMIm-0005cw-DA
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 10:04:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrM7g-0005Xu-Ak
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:53:00 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34170)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrM7e-0000wT-CD
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:53:00 -0400
-Received: by mail-ot1-x342.google.com with SMTP id n5so26785922otj.1
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 06:52:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Wpc26K4vIHW7s7G0jjwpwG5GXL2DZyAsm9Rh8wYBjkg=;
- b=OWuXsgZ6qUv8VQXPhEX+8AscWWs5PL3NntUQhLvZ4GuEpjGOlb63s6YYatjndc0M5N
- RK8Rgl7z2B3gzV3ukQIsrOUFGEgVepOfl2cGlWifOW1VoCBaCnDmQSRU50JZrHALoc25
- 2LYg1kuvjKDYl/B2wqRLBLlrneLQCTrFcuHLpIEl7zpYJzeOP1d49F3yLu3kSWMRvZRm
- iBQ5LvK0iwgRj+iMGubkwDccQtuSL85idPCrN6sak8u7F0cQ/Y6V3m1c4B3W/z5qgUy9
- eD/Mnlun6Qa1EWxwAQC+y8h55BW8ge5ougjtX3qW3IOJtMtdLXL/0AozsKh7l6hXMZ0+
- M01g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Wpc26K4vIHW7s7G0jjwpwG5GXL2DZyAsm9Rh8wYBjkg=;
- b=JWHa+mn1XzzwXwVQyWTjZnmLITCXm09IOp/fCIQN2AYoDMI4I56/vQqCjMmOSU50Gw
- YQjpFPRXZkD10rfuWtC9CcA1EINboTZWXTs5zXt9hQpEfz0eK5PIPzYDOugfinLRFhBu
- gd+J59Op/cqEAD/kucM0MydHZDRK5Ubqas3mZ6xdTQ1CUbeMlvCC1sS/YdOyHESOWRwQ
- zkNijk3H6pCJYJ3nHD/ucVx+lGs+Z0/3lagCQhaoBd5pMcHcr37ynI0pH8AvtfML5VRX
- icw60IUFxX7V7F0JYCYUDywzC07eSIPB+B2O8lpC+ID1D0AiZOHWFR2V+9pWQ+qLJ3sM
- MvIg==
-X-Gm-Message-State: AOAM533Q6MpktaWQYRsQpprtZ8lv/A9H0C6yrapQsgnV1g688ojA6qjx
- w3G6KZMZrPAW6N3KOLoKGKomihuH4gWewsM5Nsy3ZuzIj+M=
-X-Google-Smtp-Source: ABdhPJznsJBmGYE4zSd/XdE2aIPEEd/jodkGDBzTkq1kv3V+w+EKHhDpkc5o834osixtxkFltZcEcJepCtzAW9MYyc0=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr28478686ota.91.1593784377356; 
- Fri, 03 Jul 2020 06:52:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jrMIC-0005CT-82
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:03:52 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54917
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jrMI9-0002T0-Mc
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:03:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593785028;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RDUlctDVRYseK62Y7Vsmjo4FnU9Xx/FySZzX+/fNYY8=;
+ b=CEqNbE9gQQBrVihA1ydoG7G0sk+/Z3zMIylkpcftDFeGERLxd9zIs0kw5bZhn2/n27+15P
+ lwh/s0t7TO7t+DfyFA9Ybc4I7SEMzuywGjCoWiHbnOA0Z+EqNMvWypA6JpZZr8glk8fGXF
+ 2aN7/PW6ahNaqoiihPwfkFjr7DAAlUo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-464-65CS4xhpNoCJCWrRasmi9g-1; Fri, 03 Jul 2020 10:03:44 -0400
+X-MC-Unique: 65CS4xhpNoCJCWrRasmi9g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97C96186A206;
+ Fri,  3 Jul 2020 14:03:42 +0000 (UTC)
+Received: from gondolin (ovpn-113-54.ams2.redhat.com [10.36.113.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 361FC6AD0C;
+ Fri,  3 Jul 2020 14:03:35 +0000 (UTC)
+Date: Fri, 3 Jul 2020 16:03:32 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 0/2] two atomic_cmpxchg() related fixes
+Message-ID: <20200703160332.78301244.cohuck@redhat.com>
+In-Reply-To: <20200703153711.3aa18ac7.pasic@linux.ibm.com>
+References: <20200616045035.51641-1-pasic@linux.ibm.com>
+ <20200701140106.004a3da2.cohuck@redhat.com>
+ <3674a552-fdf3-ffad-a729-efcb730adf1c@de.ibm.com>
+ <20200703153711.3aa18ac7.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <CA+XhMqzmb0K5HaOBNy31rNU0F0O4kq+B6eeYCUXiJJE6ENDsYw@mail.gmail.com>
-In-Reply-To: <CA+XhMqzmb0K5HaOBNy31rNU0F0O4kq+B6eeYCUXiJJE6ENDsYw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Jul 2020 14:52:46 +0100
-Message-ID: <CAFEAcA_O0NZgjz=q8cG-wL6ZNMS6rt2kO5VwTr_KLMsh1v6BJg@mail.gmail.com>
-Subject: Re: [PATCH 9/9] Implementing qemu_init_exec_dir.
-To: David CARLIER <devnexen@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 03:17:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,26 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 at 01:46, David CARLIER <devnexen@gmail.com> wrote:
->
-> From fcdb25804af98329b52a04e7a4e5191135aac4f6 Mon Sep 17 00:00:00 2001
-> From: David Carlier <devnexen@gmail.com>
-> Date: Mon, 29 Jun 2020 22:36:03 +0000
-> Subject: [PATCH 9/9] Implementing qemu_init_exec_dir.
->
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
->  util/oslib-posix.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->
+On Fri, 3 Jul 2020 15:37:11 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> On Wed, 1 Jul 2020 14:06:11 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+> > 
+> > 
+> > On 01.07.20 14:01, Cornelia Huck wrote:  
+> > > On Tue, 16 Jun 2020 06:50:33 +0200
+> > > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > >   
+> > >> The story short: compiler can generate code that does two
+> > >> distinct fetches of *ind_addr for old and _old. If that happens we can
+> > >> not figure out if we had the desired xchg or not.
+> > >>
+> > >> Halil Pasic (2):
+> > >>   virtio-ccw: fix virtio_set_ind_atomic
+> > >>   s390x/pci: fix set_ind_atomic
+> > >>
+> > >>  hw/s390x/s390-pci-bus.c | 16 +++++++++-------
+> > >>  hw/s390x/virtio-ccw.c   | 18 ++++++++++--------
+> > >>  2 files changed, 19 insertions(+), 15 deletions(-)
+> > >>
+> > >>
+> > >> base-commit: 7d3660e79830a069f1848bb4fa1cdf8f666424fb  
+> > > 
+> > > Have we managed to reach any kind of agreement on this? (A v2?)
+> > > 
+> > > We can still get in fixes post-softfreeze, of course.  
+> > 
+> > Unless Halil has a v2 ready, 
+> > I think the current patch is fine as is as a fix. I would suggest
+> > to go with that and we can then do more beautification later when
+> > necessary.
+> > 
+> >   
+> 
+> I think we were waiting for Paolo to chime in regarding the barrier().
+> The thing I could beautify is using atomic_read(), but frankly I'm not
+> sure about it, especially considering multi-proccess. My understanding of
+> volatile is better than my understanding of atomic_read(). On the other
+> hand, same multi-process question can be asked about atomic_cmpxchg()
+> and __atomic_compare_exchange_n()...
 
-thanks
--- PMM
+We can just improve the code on top later. Having something that
+works now beats something not yet developed that might be nicer :)
+
+(But yes, it also might be good to look at non-s390 examples of this
+pattern and check if something can be done in a more central place.)
+
 
