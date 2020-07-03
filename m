@@ -2,77 +2,79 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A8FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7489AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:00:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F24320772
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:00:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43EA920772
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 15:00:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C5x2pbNo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F24320772
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LZ7AoHVC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43EA920772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrNB3-0000dp-EA
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:00:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42578)
+	id 1jrNB6-0000dm-HD
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 11:00:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrN6z-0003cc-26
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:21 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43615)
+ id 1jrN70-0003fp-G6
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:22 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35680)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrN6x-0006iJ-49
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:20 -0400
-Received: by mail-wr1-x441.google.com with SMTP id j4so30572236wrp.10
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 07:56:18 -0700 (PDT)
+ id 1jrN6y-0006ib-Lq
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 10:56:22 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z2so10754799wrp.2
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 07:56:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=dwHxgRpIhgy32L2UboBlwqmEEDE7UdGELHgh689+HHI=;
- b=C5x2pbNoUsjYAJR/IeEcCn3nGGauTVM4zcjUv4iqxVATPZJfZlB7DIEOismAOK97mL
- e+AvFL/8koPgoouYtpOGvN36buTF1She00QXOelQaElL8lxLtc1DIwm//w8jRhOen731
- RW7MNsZbSt4Efs608EyRtZQPz6dmUHvZCgJ/wWylfLp7fRXyowVPrnFIFx3OP+Z2Pd7i
- I9etJZFEuhm5XbMwITwJXRJeCdKXanDTw2MwNVBRMpjZmBT5P6OlOj8ysiKsN9z/avxR
- SXQdTxmWkgNGT6Mr6YhcM3H+pRCNTpZkwijMvalb+vntzjGtQtDBBLBe9p0l1HnGbhGX
- n3dg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=pTkmSlbOfuTPhMuEdajkOu0uB2oGQShiEgcGQkMuHKs=;
+ b=LZ7AoHVCsQPNasBYn0ShGPO+4UEJmYlV4arLMrZec3Z0AI3FTt9Ole8f3B4SFSUUsj
+ j2kbzq0GHVhduevJCm2Z9Khgpo4A09/1l7kCONDZ5z/HmPk0GootXEc8Yv1ceCXJZ28G
+ xsCx38LxMX4tlUSccQYW9sLEysmCSBdDUdEEBro1Idnk+SFt1h5eee8UugFscKZtqQ2Y
+ Uw6X6+JiPDErvTVC2Cx2uBccIylaeFC626gOt46oR0zFuonqDFNeIdh8Jyc2694lYFN8
+ XKco9Qrt4TjVvUWnWWv9DIqnO/T8ndWFQxtP7EKVf3iXSFl8d1gCH9SWqXUwUGMzwZMR
+ mZXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=dwHxgRpIhgy32L2UboBlwqmEEDE7UdGELHgh689+HHI=;
- b=t7EFmgzlm0oLaha4Oc3t/sOvCxuLHHBx9KeW2MHRrUgGxBbsvAG30hyQxjAik5d5jb
- 0Qu3WtLtLPFJHkfdsyyz00qvFcBMbnUHqWzMNcyieJc8xC/gFIeWOQ1mrQTw0v4lnSng
- z6De+iRFf2VvJ8HSRcIDjSAqcgV98xgMWyT0ZpztsFDRYw/H4uz16YO5BqB1HDgRcoAL
- sbktoP5LWOxSguslR5CaQQlCJMYyU9WkSe8i3Rh6/VToEJTzSxot0EvHUfUSkIWzMJ9E
- BtjX+nC9gt0aW3EmZqfD3tXPV1afYOdpaME6kjtv+gtxQAy/rDaQYrgq48Z87ZT8HGEZ
- IA6w==
-X-Gm-Message-State: AOAM531pecLzQ1jyZmHwO9DbblnwN7ubn6wM6DVz2sEvDFVx3oXC9gCZ
- QTUOTKHesekRaLkU6vA9f42zLRn73w06yg==
-X-Google-Smtp-Source: ABdhPJwMY0ZZkwk3JC3c0OaRzkykJQUBHVngw3R1EfPKquJWHQfoHbEizRKFInfKcuyDUHM/yJiOnA==
-X-Received: by 2002:adf:c142:: with SMTP id w2mr35234593wre.337.1593788176589; 
- Fri, 03 Jul 2020 07:56:16 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=pTkmSlbOfuTPhMuEdajkOu0uB2oGQShiEgcGQkMuHKs=;
+ b=La/pTn77CnDv2RcvT2kPOCCPINbjOueRAArnUTHJ0FoWV7oDpzFJJrJrpo3xHh8g5C
+ CzO0U2N9VPfWlyMvXF8/8Xqf3Kw99d037rTJB8ndjNzDzlstHGpkVQs6+3d2L8PLQ1S5
+ B9veuIkYg64rpm+VLn05XDDcxFLhHUD4cQva7agAYV30MH6Xq6/ZvByBFfj2iC48iry2
+ f2j+XPrtANrSdN/AnKvqyh9n7e1drVt8KKCUB4LZ0CiQhdWabaFSaPF8Wtx5yTYib2jC
+ z6IYrMYctQ+PJ43+7f/BA29jyVHEBxh3P0ZU+QgORn28hD1NfCNiR3Cds3HpjpBOJKjU
+ 1NLw==
+X-Gm-Message-State: AOAM532LAB3jsrZapavxu2Cz1iLWimRR1rRgiP8KqdEaCu2tP9XFcghG
+ 2rBH+KkoMWj/5tiWpAc93nVHE6ENF6o4ig==
+X-Google-Smtp-Source: ABdhPJw9v6DPoqmTOa2hgPCg9FgRZjD7Gow8VNxlGk3A+LWEX+uihYxafpsoCaTKsr3k2RrU2rSj+g==
+X-Received: by 2002:a5d:664a:: with SMTP id f10mr37110886wrw.300.1593788178940; 
+ Fri, 03 Jul 2020 07:56:18 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s10sm14078347wme.31.2020.07.03.07.56.15
+ by smtp.gmail.com with ESMTPSA id s10sm14078347wme.31.2020.07.03.07.56.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 07:56:16 -0700 (PDT)
+ Fri, 03 Jul 2020 07:56:18 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/9] Build fixes for Haiku
-Date: Fri,  3 Jul 2020 15:56:05 +0100
-Message-Id: <20200703145614.16684-1-peter.maydell@linaro.org>
+Subject: [PATCH v3 2/9] util/qemu-openpty.c: Don't assume pty.h is glibc-only
+Date: Fri,  3 Jul 2020 15:56:07 +0100
+Message-Id: <20200703145614.16684-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200703145614.16684-1-peter.maydell@linaro.org>
+References: <20200703145614.16684-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2a00:1450:4864:20::441;
  envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
@@ -102,46 +104,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchset is essentially a resend of David Carlier's build fixes
-for the Haiku platform. I've taken David's patches and put them together
-into a set of emails threaded in the way our CI tools expect, as the
-easiest way to get the patchew robot to run the build tests so we can
-check they didn't accidentally break one of the BSDs. I've also put
-in the patch from Gerd that fixes the drm.c issue. I've also expanded
-on the commit messages for all the patches so that we have a record
-of why we made the changes if we need to look back at it in future.
+From: David CARLIER <devnexen@gmail.com>
 
-Assuming no issues turn up, I'll arrange to get these into master
-at some point before the 5.1 release.
+Instead of using an OS-specific ifdef test to select the "openpty()
+is in pty.h" codepath, make configure check for the existence of
+the header and use the new CONFIG_PTY instead.
 
-Thanks for reporting these problems and providing the fixes, David.
+This is necessary to build on Haiku, which also provides openpty()
+via pty.h.
 
--- PMM
+Signed-off-by: David Carlier <devnexen@gmail.com>
+[PMM: Expanded commit message]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ configure           | 9 +++++++++
+ util/qemu-openpty.c | 2 +-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-David CARLIER (8):
-  build: Enable BSD symbols for Haiku
-  util/qemu-openpty.c: Don't assume pty.h is glibc-only
-  build: Check that mlockall() exists
-  osdep.h: Always include <sys/signal.h> if it exists
-  osdep.h: For Haiku, define SIGIO as equivalent to SIGPOLL
-  bswap.h: Include <endian.h> on Haiku for bswap operations
-  util/compatfd.c: Only include <sys/syscall.h> if CONFIG_SIGNALFD
-  util/oslib-posix.c: Implement qemu_init_exec_dir() for Haiku
-
-Gerd Hoffmann (1):
-  util/drm: make portable by avoiding struct dirent d_type
-
- configure                   | 36 ++++++++++++++++++++++++++++++++++--
- include/qemu/bswap.h        |  2 ++
- include/qemu/osdep.h        |  6 +++++-
- hw/xen/xen-legacy-backend.c |  1 -
- os-posix.c                  |  4 ++++
- util/compatfd.c             |  2 ++
- util/drm.c                  | 19 ++++++++++++++-----
- util/oslib-posix.c          | 20 +++++++++++++++++++-
- util/qemu-openpty.c         |  2 +-
- 9 files changed, 81 insertions(+), 11 deletions(-)
-
+diff --git a/configure b/configure
+index c9c135b70bc..5455ae10d05 100755
+--- a/configure
++++ b/configure
+@@ -2386,6 +2386,12 @@ else
+   l2tpv3=no
+ fi
+ 
++if check_include "pty.h" ; then
++  pty_h=yes
++else
++  pty_h=no
++fi
++
+ #########################################
+ # vhost interdependencies and host support
+ 
+@@ -7856,6 +7862,9 @@ fi
+ if test "$sheepdog" = "yes" ; then
+   echo "CONFIG_SHEEPDOG=y" >> $config_host_mak
+ fi
++if test "$pty_h" = "yes" ; then
++  echo "CONFIG_PTY=y" >> $config_host_mak
++fi
+ if test "$fuzzing" = "yes" ; then
+   if test "$have_fuzzer" = "yes"; then
+     FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
+diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+index 2e8b43bdf57..9d8ad6905e0 100644
+--- a/util/qemu-openpty.c
++++ b/util/qemu-openpty.c
+@@ -35,7 +35,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ 
+-#if defined(__GLIBC__)
++#if defined CONFIG_PTY
+ # include <pty.h>
+ #elif defined CONFIG_BSD
+ # include <termios.h>
 -- 
 2.20.1
 
