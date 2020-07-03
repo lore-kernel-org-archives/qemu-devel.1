@@ -2,135 +2,60 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFBEC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CF6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:39:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98EAA2084C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:38:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ern1VgmU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98EAA2084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B2BC2073E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 09:39:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B2BC2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ucloud.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrI8v-00037b-T9
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42524)
+	id 1jrIAU-0004vt-VA
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 05:39:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jrI4B-000271-Ea
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:33:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33979
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jrI3y-0003fF-7T
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:33:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593768773;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=/h8hSh1DauZ6Ru4bBBqPc6jTYPCjb2A85Ri3QPbmLDs=;
- b=Ern1VgmUcoK7T2KWv6gVoubA7JZkAT9N0xxmamrQy5+VDIABxP0nyKNITMwSR9pD64Mm2D
- lpS0lf6c6USCeBZ0oZKmoFT9VCXqQCKj1ZJo2wat8PCyWcaqM1AbqAiPsk5ngxygGpdoeA
- hruVDqku5vgU1ZNTZykLzIrg/Q7Q3tU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-9Xfv5SIIPOGir0mhCtCbHg-1; Fri, 03 Jul 2020 05:32:51 -0400
-X-MC-Unique: 9Xfv5SIIPOGir0mhCtCbHg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55B0718A8249;
- Fri,  3 Jul 2020 09:32:50 +0000 (UTC)
-Received: from [10.36.114.0] (ovpn-114-0.ams2.redhat.com [10.36.114.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C5CF45C221;
- Fri,  3 Jul 2020 09:32:45 +0000 (UTC)
-Subject: Re: [PULL 13/41] virtio-mem: Paravirtualized memory hot(un)plug
-From: David Hildenbrand <david@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-References: <20200703090252.368694-1-mst@redhat.com>
- <20200703090252.368694-14-mst@redhat.com>
- <3691367f-9b31-dfa2-f180-823b1f080c09@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <2d233963-effc-5238-8125-c56dc6d93700@redhat.com>
-Date: Fri, 3 Jul 2020 11:32:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <3691367f-9b31-dfa2-f180-823b1f080c09@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 01:34:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <owen.si@ucloud.cn>) id 1jrI9t-0004Hb-HO
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:39:01 -0400
+Received: from m9785.mail.qiye.163.com ([220.181.97.85]:61376)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <owen.si@ucloud.cn>) id 1jrI9n-0005cs-GU
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 05:39:00 -0400
+Received: from localhost.localdomain (unknown [106.75.220.3])
+ by m9785.mail.qiye.163.com (Hmail) with ESMTPA id DE2BE5C161B
+ for <qemu-devel@nongnu.org>; Fri,  3 Jul 2020 17:29:00 +0800 (CST)
+From: Bingsong Si <owen.si@ucloud.cn>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] ram: add support for dirty page tracking
+Date: Fri,  3 Jul 2020 17:28:53 +0800
+Message-Id: <20200703092853.1448582-1-owen.si@ucloud.cn>
+X-Mailer: git-send-email 2.18.4
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZSFVITUhCQkJDT0hOQkxPSllXWShZQU
+ lCN1dZLVlBSVdZDwkaFQgSH1lBWR0iNQs4HDlIDQMfGFANTh4BEhUzOhxWVlVMSUsoSVlXWQkOFx
+ 4IWUFZNTQpNjo3JCkuNz5ZV1kWGg8SFR0UWUFZNDBZBg++
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Pgw6NBw6Lj8aGBRDShMWCk5C
+ Qw0wChdVSlVKTkJITE1DTk9KSEpLVTMWGhIXVRQMHhVVCBI7DhgXFA4fVRgVRVlXWRILWUFZSktN
+ VUxOVUlJS1VIWVdZCAFZQUJISUo3Bg++
+X-HM-Tid: 0a731401fb092087kuqyde2be5c161b
+Received-SPF: pass client-ip=220.181.97.85; envelope-from=owen.si@ucloud.cn;
+ helo=m9785.mail.qiye.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 05:29:02
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,354 +68,307 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03.07.20 11:18, David Hildenbrand wrote:
-> On 03.07.20 11:04, Michael S. Tsirkin wrote:
->> From: David Hildenbrand <david@redhat.com>
->>
->> This is the very basic/initial version of virtio-mem. An introduction to
->> virtio-mem can be found in the Linux kernel driver [1]. While it can be
->> used in the current state for hotplug of a smaller amount of memory, it
->> will heavily benefit from resizeable memory regions in the future.
->>
->> Each virtio-mem device manages a memory region (provided via a memory
->> backend). After requested by the hypervisor ("requested-size"), the
->> guest can try to plug/unplug blocks of memory within that region, in order
->> to reach the requested size. Initially, and after a reboot, all memory is
->> unplugged (except in special cases - reboot during postcopy).
->>
->> The guest may only try to plug/unplug blocks of memory within the usable
->> region size. The usable region size is a little bigger than the
->> requested size, to give the device driver some flexibility. The usable
->> region size will only grow, except on reboots or when all memory is
->> requested to get unplugged. The guest can never plug more memory than
->> requested. Unplugged memory will get zapped/discarded, similar to in a
->> balloon device.
->>
->> The block size is variable, however, it is always chosen in a way such that
->> THP splits are avoided (e.g., 2MB). The state of each block
->> (plugged/unplugged) is tracked in a bitmap.
->>
->> As virtio-mem devices (e.g., virtio-mem-pci) will be memory devices, we now
->> expose "VirtioMEMDeviceInfo" via "query-memory-devices".
->>
->> --------------------------------------------------------------------------
->>
->> There are two important follow-up items that are in the works:
->> 1. Resizeable memory regions: Use resizeable allocations/RAM blocks to
->>    grow/shrink along with the usable region size. This avoids creating
->>    initially very big VMAs, RAM blocks, and KVM slots.
->> 2. Protection of unplugged memory: Make sure the gust cannot actually
->>    make use of unplugged memory.
->>
->> Other follow-up items that are in the works:
->> 1. Exclude unplugged memory during migration (via precopy notifier).
->> 2. Handle remapping of memory.
->> 3. Support for other architectures.
->>
->> --------------------------------------------------------------------------
->>
->> Example usage (virtio-mem-pci is introduced in follow-up patches):
->>
->> Start QEMU with two virtio-mem devices (one per NUMA node):
->>  $ qemu-system-x86_64 -m 4G,maxmem=20G \
->>   -smp sockets=2,cores=2 \
->>   -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
->>   [...]
->>   -object memory-backend-ram,id=mem0,size=8G \
->>   -device virtio-mem-pci,id=vm0,memdev=mem0,node=0,requested-size=0M \
->>   -object memory-backend-ram,id=mem1,size=8G \
->>   -device virtio-mem-pci,id=vm1,memdev=mem1,node=1,requested-size=1G
->>
->> Query the configuration:
->>  (qemu) info memory-devices
->>  Memory device [virtio-mem]: "vm0"
->>    memaddr: 0x140000000
->>    node: 0
->>    requested-size: 0
->>    size: 0
->>    max-size: 8589934592
->>    block-size: 2097152
->>    memdev: /objects/mem0
->>  Memory device [virtio-mem]: "vm1"
->>    memaddr: 0x340000000
->>    node: 1
->>    requested-size: 1073741824
->>    size: 1073741824
->>    max-size: 8589934592
->>    block-size: 2097152
->>    memdev: /objects/mem1
->>
->> Add some memory to node 0:
->>  (qemu) qom-set vm0 requested-size 500M
->>
->> Remove some memory from node 1:
->>  (qemu) qom-set vm1 requested-size 200M
->>
->> Query the configuration again:
->>  (qemu) info memory-devices
->>  Memory device [virtio-mem]: "vm0"
->>    memaddr: 0x140000000
->>    node: 0
->>    requested-size: 524288000
->>    size: 524288000
->>    max-size: 8589934592
->>    block-size: 2097152
->>    memdev: /objects/mem0
->>  Memory device [virtio-mem]: "vm1"
->>    memaddr: 0x340000000
->>    node: 1
->>    requested-size: 209715200
->>    size: 209715200
->>    max-size: 8589934592
->>    block-size: 2097152
->>    memdev: /objects/mem1
->>
->> [1] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Eric Blake <eblake@redhat.com>
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> Message-Id: <20200626072248.78761-11-david@redhat.com>
->> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>  qapi/misc.json                 |  39 +-
->>  include/hw/virtio/virtio-mem.h |  78 ++++
->>  hw/virtio/virtio-mem.c         | 724 +++++++++++++++++++++++++++++++++
->>  hw/virtio/Kconfig              |  11 +
->>  hw/virtio/Makefile.objs        |   1 +
->>  5 files changed, 852 insertions(+), 1 deletion(-)
->>  create mode 100644 include/hw/virtio/virtio-mem.h
->>  create mode 100644 hw/virtio/virtio-mem.c
->>
->> diff --git a/qapi/misc.json b/qapi/misc.json
->> index a5a0beb902..65ca3edf32 100644
->> --- a/qapi/misc.json
->> +++ b/qapi/misc.json
->> @@ -1356,19 +1356,56 @@
->>            }
->>  }
->>  
->> +##
->> +# @VirtioMEMDeviceInfo:
->> +#
->> +# VirtioMEMDevice state information
->> +#
->> +# @id: device's ID
->> +#
->> +# @memaddr: physical address in memory, where device is mapped
->> +#
->> +# @requested-size: the user requested size of the device
->> +#
->> +# @size: the (current) size of memory that the device provides
->> +#
->> +# @max-size: the maximum size of memory that the device can provide
->> +#
->> +# @block-size: the block size of memory that the device provides
->> +#
->> +# @node: NUMA node number where device is assigned to
->> +#
->> +# @memdev: memory backend linked with the region
->> +#
->> +# Since: 5.1
->> +##
->> +{ 'struct': 'VirtioMEMDeviceInfo',
->> +  'data': { '*id': 'str',
->> +            'memaddr': 'size',
->> +            'requested-size': 'size',
->> +            'size': 'size',
->> +            'max-size': 'size',
->> +            'block-size': 'size',
->> +            'node': 'int',
->> +            'memdev': 'str'
->> +          }
->> +}
->> +
->>  ##
->>  # @MemoryDeviceInfo:
->>  #
->>  # Union containing information about a memory device
->>  #
->>  # nvdimm is included since 2.12. virtio-pmem is included since 4.1.
->> +# virtio-mem is included since 5.1.
->>  #
->>  # Since: 2.1
->>  ##
->>  { 'union': 'MemoryDeviceInfo',
->>    'data': { 'dimm': 'PCDIMMDeviceInfo',
->>              'nvdimm': 'PCDIMMDeviceInfo',
->> -            'virtio-pmem': 'VirtioPMEMDeviceInfo'
->> +            'virtio-pmem': 'VirtioPMEMDeviceInfo',
->> +            'virtio-mem': 'VirtioMEMDeviceInfo'
->>            }
->>  }
->>  
->> diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
->> new file mode 100644
->> index 0000000000..6981096f7c
->> --- /dev/null
->> +++ b/include/hw/virtio/virtio-mem.h
->> @@ -0,0 +1,78 @@
->> +/*
->> + * Virtio MEM device
->> + *
->> + * Copyright (C) 2020 Red Hat, Inc.
->> + *
->> + * Authors:
->> + *  David Hildenbrand <david@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#ifndef HW_VIRTIO_MEM_H
->> +#define HW_VIRTIO_MEM_H
->> +
->> +#include "standard-headers/linux/virtio_mem.h"
->> +#include "hw/virtio/virtio.h"
->> +#include "qapi/qapi-types-misc.h"
->> +#include "sysemu/hostmem.h"
->> +
->> +#define TYPE_VIRTIO_MEM "virtio-mem"
->> +
->> +#define VIRTIO_MEM(obj) \
->> +        OBJECT_CHECK(VirtIOMEM, (obj), TYPE_VIRTIO_MEM)
->> +#define VIRTIO_MEM_CLASS(oc) \
->> +        OBJECT_CLASS_CHECK(VirtIOMEMClass, (oc), TYPE_VIRTIO_MEM)
->> +#define VIRTIO_MEM_GET_CLASS(obj) \
->> +        OBJECT_GET_CLASS(VirtIOMEMClass, (obj), TYPE_VIRTIO_MEM)
->> +
->> +#define VIRTIO_MEM_MEMDEV_PROP "memdev"
->> +#define VIRTIO_MEM_NODE_PROP "node"
->> +#define VIRTIO_MEM_SIZE_PROP "size"
->> +#define VIRTIO_MEM_REQUESTED_SIZE_PROP "requested-size"
->> +#define VIRTIO_MEM_BLOCK_SIZE_PROP "block-size"
->> +#define VIRTIO_MEM_ADDR_PROP "memaddr"
->> +
->> +typedef struct VirtIOMEM {
->> +    VirtIODevice parent_obj;
->> +
->> +    /* guest -> host request queue */
->> +    VirtQueue *vq;
->> +
->> +    /* bitmap used to track unplugged memory */
->> +    int32_t bitmap_size;
->> +    unsigned long *bitmap;
->> +
->> +    /* assigned memory backend and memory region */
->> +    HostMemoryBackend *memdev;
->> +
->> +    /* NUMA node */
->> +    uint32_t node;
->> +
->> +    /* assigned address of the region in guest physical memory */
->> +    uint64_t addr;
->> +
->> +    /* usable region size (<= region_size) */
->> +    uint64_t usable_region_size;
->> +
->> +    /* actual size (how much the guest plugged) */
->> +    uint64_t size;
->> +
->> +    /* requested size */
->> +    uint64_t requested_size;
->> +
->> +    /* block size and alignment */
->> +    uint64_t block_size;
->> +} VirtIOMEM;
->> +
->> +typedef struct VirtIOMEMClass {
->> +    /* private */
->> +    VirtIODevice parent;
->> +
->> +    /* public */
->> +    void (*fill_device_info)(const VirtIOMEM *vmen, VirtioMEMDeviceInfo *vi);
->> +    MemoryRegion *(*get_memory_region)(VirtIOMEM *vmem, Error **errp);
->> +} VirtIOMEMClass;
->> +
->> +#endif
->> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
->> new file mode 100644
->> index 0000000000..d8a0c974d3
->> --- /dev/null
->> +++ b/hw/virtio/virtio-mem.c
->> @@ -0,0 +1,724 @@
->> +/*
->> + * Virtio MEM device
->> + *
->> + * Copyright (C) 2020 Red Hat, Inc.
->> + *
->> + * Authors:
->> + *  David Hildenbrand <david@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu-common.h"
->> +#include "qemu/iov.h"
->> +#include "qemu/cutils.h"
->> +#include "qemu/error-report.h"
->> +#include "qemu/units.h"
->> +#include "sysemu/numa.h"
->> +#include "sysemu/sysemu.h"
->> +#include "sysemu/reset.h"
->> +#include "hw/virtio/virtio.h"
->> +#include "hw/virtio/virtio-bus.h"
->> +#include "hw/virtio/virtio-access.h"
->> +#include "hw/virtio/virtio-mem.h"
->> +#include "qapi/error.h"
->> +#include "qapi/visitor.h"
->> +#include "exec/ram_addr.h"
->> +#include "migration/misc.h"
->> +#include "hw/boards.h"
->> +#include "hw/qdev-properties.h"
->> +#include "config-devices.h"
->> +
->> +/*
->> + * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
->> + * memory (e.g., 2MB on x86_64).
->> + */
->> +#define VIRTIO_MEM_MIN_BLOCK_SIZE QEMU_VMALLOC_ALIGN
->> +/*
->> + * Size the usable region bigger than the requested size if possible. Esp.
->> + * Linux guests will only add (aligned) memory blocks in case they fully
->> + * fit into the usable region, but plug+online only a subset of the pages.
->> + * The memory block size corresponds mostly to the section size.
->> + *
->> + * This allows e.g., to add 20MB with a section size of 128MB on x86_64, and
->> + * a section size of 1GB on arm64 (as long as the start address is properly
->> + * aligned, similar to ordinary DIMMs).
->> + *
->> + * We can change this at any time and maybe even make it configurable if
->> + * necessary (as the section size can change). But it's more likely that the
->> + * section size will rather get smaller and not bigger over time.
->> + */
->> +#if defined(__x86_64__)
->> +#define VIRTIO_MEM_USABLE_EXTENT (2 * (128 * MiB))
-> 
-> I just did a cross-compile on s390x and noticed that this should be
-> guarded by defined(TARGET_X86_64) (it's target dependent).
+In production, the VM with insentive memory activity maybe failed to migrate,
+because of the change of memory in the VM greater than the throughtput of the
+network interface, and we want to identify it before migration.
 
-#if defined(TARGET_X86_64) || defined(TARGET_I386)
+1. dirty tracking start:
+virsh qemu-monitor-command <domain> --hmp dirty_track
 
-to be precise.
+2. wait some time, stop dirty tracking:
+virsh qemu-monitor-command <domain> --hmp dirty_track_stop
+Dirty rate: 607 pages/s
 
+Signed-off-by: Bingsong Si <owen.si@ucloud.cn>
+---
+ hmp-commands.hx       | 26 ++++++++++++++
+ include/monitor/hmp.h |  2 ++
+ migration/migration.c |  5 +++
+ migration/ram.c       | 65 +++++++++++++++++++++++++++++++++
+ migration/ram.h       |  5 +++
+ migration/savevm.c    | 83 +++++++++++++++++++++++++++++++++++++++++++
+ migration/savevm.h    |  2 ++
+ 7 files changed, 188 insertions(+)
 
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 60f395c276..05a688286b 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1819,6 +1819,32 @@ SRST
+   Set QOM property *property* of object at location *path* to value *value*
+ ERST
+ 
++    {
++        .name       = "dirty_track",
++        .args_type  = "",
++        .params     = "",
++        .help       = "track dirty pages rate",
++        .cmd        = hmp_dirty_track,
++    },
++
++SRST
++``dirty_track``
++  Track dirty pages rate.
++ERST
++
++    {
++        .name       = "dirty_track_stop",
++        .args_type  = "",
++        .params     = "",
++        .help       = "stop current dirty pages track",
++        .cmd        = hmp_dirty_track_stop,
++    },
++
++SRST
++``dirty_track_stop``
++  Stop current dirty pages track.
++ERST
++
+     {
+         .name       = "info",
+         .args_type  = "item:s?",
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index c986cfd28b..c139fe8758 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -130,5 +130,7 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+ void hmp_info_sev(Monitor *mon, const QDict *qdict);
++void hmp_dirty_track(Monitor *mon, const QDict *qdict);
++void hmp_dirty_track_stop(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/migration/migration.c b/migration/migration.c
+index 481a590f72..5550afafe6 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1964,6 +1964,11 @@ static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
+ {
+     Error *local_err = NULL;
+ 
++    if (dirty_track_is_running()) {
++        error_setg(errp, "There is a dirty tracking process in progress");
++        return false;
++    }
++
+     if (resume) {
+         if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
+             error_setg(errp, "Cannot resume if there is no "
+diff --git a/migration/ram.c b/migration/ram.c
+index 069b6e30bc..03a5e44617 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3780,6 +3780,71 @@ static int ram_resume_prepare(MigrationState *s, void *opaque)
+     return 0;
+ }
+ 
++void dirty_track_init(void)
++{
++    RAMBlock *block;
++
++    if (ram_bytes_total()) {
++        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++            unsigned long pages = block->max_length >> TARGET_PAGE_BITS;
++
++            block->bmap = bitmap_new(pages);
++            bitmap_set(block->bmap, 0, pages);
++        }
++    }
++    ram_state = g_new0(RAMState, 1);
++    ram_state->migration_dirty_pages = 0;
++    memory_global_dirty_log_start();
++}
++
++uint64_t dirty_track_dirty_pages(void)
++{
++    return ram_state->migration_dirty_pages;
++}
++
++void dirty_track_sync(void)
++{
++    RAMBlock *block = NULL;
++    unsigned long offset = 0;
++
++    memory_global_dirty_log_sync();
++    rcu_read_lock();
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++       ramblock_sync_dirty_bitmap(ram_state, block);
++    }
++    rcu_read_unlock();
++
++    rcu_read_lock();
++    block = QLIST_FIRST_RCU(&ram_list.blocks);
++
++    while (block) {
++        offset = migration_bitmap_find_dirty(ram_state, block, offset);
++
++        if (offset << TARGET_PAGE_BITS >= block->used_length) {
++            offset = 0;
++            block = QLIST_NEXT_RCU(block, next);
++        } else {
++            test_and_clear_bit(offset, block->bmap);
++        }
++    }
++
++    rcu_read_unlock();
++}
++
++void dirty_track_cleanup(void)
++{
++    RAMBlock *block;
++
++    memory_global_dirty_log_stop();
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++        g_free(block->bmap);
++        block->bmap = NULL;
++    }
++
++    g_free(ram_state);
++    ram_state = NULL;
++}
++
+ static SaveVMHandlers savevm_ram_handlers = {
+     .save_setup = ram_save_setup,
+     .save_live_iterate = ram_save_iterate,
+diff --git a/migration/ram.h b/migration/ram.h
+index 2eeaacfa13..104c48285c 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -69,4 +69,9 @@ void colo_flush_ram_cache(void);
+ void colo_release_ram_cache(void);
+ void colo_incoming_start_dirty_log(void);
+ 
++void dirty_track_init(void);
++uint64_t dirty_track_dirty_pages(void);
++void dirty_track_sync(void);
++void dirty_track_cleanup(void);
++
+ #endif
+diff --git a/migration/savevm.c b/migration/savevm.c
+index b979ea6e7f..0be70e6528 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -63,6 +63,8 @@
+ #include "migration/colo.h"
+ #include "qemu/bitmap.h"
+ #include "net/announce.h"
++#include "monitor/monitor.h"
++#include "monitor/hmp.h"
+ 
+ const unsigned int postcopy_ram_discard_version = 0;
+ 
+@@ -171,6 +173,15 @@ static QEMUFile *qemu_fopen_bdrv(BlockDriverState *bs, int is_writable)
+     return qemu_fopen_ops(bs, &bdrv_read_ops);
+ }
+ 
++static struct DirtyTrackState {
++    QemuThread thread;
++    int dirty_pages_rate;
++    bool quit;
++} current_dirty_track_state = {
++    { .thread = 0 },
++    .dirty_pages_rate = 0,
++    .quit = false,
++};
+ 
+ /* QEMUFile timer support.
+  * Not in qemu-file.c to not add qemu-timer.c as dependency to qemu-file.c
+@@ -2747,6 +2758,78 @@ int save_snapshot(const char *name, Error **errp)
+     return ret;
+ }
+ 
++static void *dirty_track_thread(void *opaque)
++{
++    int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    struct DirtyTrackState *s = opaque;
++    int64_t current_time;
++    uint64_t time_spent;
++
++    for (;;) {
++        dirty_track_sync();
++        if (s->quit) {
++            current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++            time_spent = current_time - initial_time;
++
++            if (time_spent) {
++                s->dirty_pages_rate = dirty_track_dirty_pages() * 1000 /
++                    time_spent;
++            }
++            break;
++        }
++        usleep(1000 * 100);
++    }
++    return NULL;
++}
++
++bool dirty_track_is_running(void)
++{
++    return !!current_dirty_track_state.thread.thread;
++}
++
++void hmp_dirty_track(Monitor *mon, const QDict *qdict)
++{
++    MigrationState *s = migrate_get_current();
++
++    if (migration_is_running(s->state)) {
++        error_report(QERR_MIGRATION_ACTIVE);
++        return;
++    }
++
++    if (runstate_check(RUN_STATE_INMIGRATE)) {
++        error_report("Guest is waiting for an incoming migration");
++        return;
++    }
++
++    if (dirty_track_is_running()) {
++        error_report("There is a dirty tracking process in progress");
++        return;
++    }
++
++    dirty_track_init();
++    qemu_thread_create(&current_dirty_track_state.thread, "dirty tracking",
++                       dirty_track_thread, &current_dirty_track_state,
++                       QEMU_THREAD_JOINABLE);
++}
++
++void hmp_dirty_track_stop(Monitor *mon, const QDict *qdict)
++{
++    if (current_dirty_track_state.thread.thread == 0) {
++        error_report("There is no dirty tracking process in progress");
++        return;
++    }
++
++    current_dirty_track_state.quit = true;
++    qemu_thread_join(&current_dirty_track_state.thread);
++    monitor_printf(mon, "Dirty rate: %d pages/s\n",
++                   current_dirty_track_state.dirty_pages_rate);
++
++    dirty_track_cleanup();
++    current_dirty_track_state.thread.thread = 0;
++    current_dirty_track_state.dirty_pages_rate = 0;
++    current_dirty_track_state.quit = false;
++}
++
+ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+                                 Error **errp)
+ {
+diff --git a/migration/savevm.h b/migration/savevm.h
+index ba64a7e271..216b9b7396 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -65,4 +65,6 @@ void qemu_loadvm_state_cleanup(void);
+ int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+ int qemu_load_device_state(QEMUFile *f);
+ 
++bool dirty_track_is_running(void);
++
+ #endif
 -- 
-Thanks,
-
-David / dhildenb
+2.18.4
 
 
