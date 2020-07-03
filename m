@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB0DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A4DCC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:17:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 552B8208C7
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 216B020884
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 16:17:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="NMNXT8SD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 552B8208C7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="n86WlUZ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216B020884
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrOMm-00082i-HO
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59264)
+	id 1jrONJ-0000qR-7u
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 12:17:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5v-0003ot-5G; Fri, 03 Jul 2020 11:59:19 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41786)
+ id 1jrO5w-0003s4-7B; Fri, 03 Jul 2020 11:59:20 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:41866)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jrO5l-0007SG-CH; Fri, 03 Jul 2020 11:59:18 -0400
+ id 1jrO5n-0007Tn-6R; Fri, 03 Jul 2020 11:59:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=AKq1liNiIlpycmW0vLctLS4HS3x7bj+Fnq8JkmEcyxA=; 
- b=NMNXT8SDida0PBtcniBoTw93OGlbY4utqmwHxtL4cO7pawyQH+lCw31CfprWs8ACDssyFuuQSHiEDU01ONQUe0NsLOdqe/UDURov9e8EpilIRu9oP5cvR699idfdw/CqCLcHdlQR20iuZUU5XMEQS8lH8rnR8uERNZEntpjnn0OBP4XI1zwyAp0G8lp3HpS5DbxjF4lm2Hyuadc+vWOuzDyHd+Qp6cQYwzfW5ZhdbhkYI49fDyaIRmB5eDMHGV+zM6ghym7unYzyq/8t9kqp6RGA1G8QWTZ1SKLiszQ+SionbNySBhZuEnRTaFEoSmUCXCJ+JEK/wvhhmO4R0iePHA==;
+ bh=UJ94cjrau9nMETSeokuoH2oiJCkftu1TXvt5g3O0JmY=; 
+ b=n86WlUZ0iitosSHnTEgYVUJqzVg3G5AoRZTlHqWn2RzjH8OTYv2XFtbbyH8AYyJOq+7DUwUGfDojmeaSHFwRWC1DBVk2Hnr/AOD5/KjL+wlgZa+AELVUqACeVJqcGh4xrqIRtsjISleM2fZQNniEnGGHBmqXNmA1i5HFHVu9lsO+ppKgHHLKGbOoq1j26Pavi1a77JrznV1gEek9dEHrj6oqznT2RT58zBGc3YZWPJVeRDPElSSPwsUPZxsGFeM5BtfkfwORTOFJHF95wyU7M/Bmc9zSZ4QSLrbwYQY/kKCOE8bUQ6G2qXQvQuq6gWqt5HOJ+srEwpKCZudWNlThUw==;
 Received: from [81.0.49.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jrO5L-0001Rl-Vv; Fri, 03 Jul 2020 17:58:44 +0200
+ id 1jrO5P-0001So-P0; Fri, 03 Jul 2020 17:58:48 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jrO52-0007Ql-JZ; Fri, 03 Jul 2020 17:58:24 +0200
+ id 1jrO52-0007Qc-GY; Fri, 03 Jul 2020 17:58:24 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 34/34] iotests: Add tests for qcow2 images with extended
- L2 entries
-Date: Fri,  3 Jul 2020 17:58:20 +0200
-Message-Id: <005fe0f46ca2fbcf1ee9a40a03e4bc6bc2112748.1593791819.git.berto@igalia.com>
+Subject: [PATCH v10 31/34] qcow2: Add the 'extended_l2' option and the
+ QCOW2_INCOMPAT_EXTL2 bit
+Date: Fri,  3 Jul 2020 17:58:17 +0200
+Message-Id: <7bd13895731899d66f75d4f6790957aefc5ba353.1593791819.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1593791819.git.berto@igalia.com>
 References: <cover.1593791819.git.berto@igalia.com>
@@ -85,1664 +85,1560 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- tests/qemu-iotests/271     | 901 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/271.out | 724 +++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 1626 insertions(+)
- create mode 100755 tests/qemu-iotests/271
- create mode 100644 tests/qemu-iotests/271.out
+Now that the implementation of subclusters is complete we can finally
+add the necessary options to create and read images with this feature,
+which we call "extended L2 entries".
 
-diff --git a/tests/qemu-iotests/271 b/tests/qemu-iotests/271
-new file mode 100755
-index 0000000000..39ff462328
---- /dev/null
-+++ b/tests/qemu-iotests/271
-@@ -0,0 +1,901 @@
-+#!/bin/bash
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ qapi/block-core.json             |   7 +++
+ block/qcow2.h                    |   8 ++-
+ include/block/block_int.h        |   1 +
+ block/qcow2.c                    |  74 ++++++++++++++++++++--
+ tests/qemu-iotests/031.out       |   8 +--
+ tests/qemu-iotests/036.out       |   4 +-
+ tests/qemu-iotests/049.out       | 102 +++++++++++++++----------------
+ tests/qemu-iotests/060.out       |   1 +
+ tests/qemu-iotests/061.out       |  20 +++---
+ tests/qemu-iotests/065           |  12 ++--
+ tests/qemu-iotests/082.out       |  48 ++++++++++++---
+ tests/qemu-iotests/085.out       |  38 ++++++------
+ tests/qemu-iotests/144.out       |   4 +-
+ tests/qemu-iotests/182.out       |   2 +-
+ tests/qemu-iotests/185.out       |   8 +--
+ tests/qemu-iotests/198.out       |   2 +
+ tests/qemu-iotests/206.out       |   4 ++
+ tests/qemu-iotests/242.out       |   5 ++
+ tests/qemu-iotests/255.out       |   8 +--
+ tests/qemu-iotests/274.out       |  49 ++++++++-------
+ tests/qemu-iotests/280.out       |   2 +-
+ tests/qemu-iotests/291.out       |   6 +-
+ tests/qemu-iotests/common.filter |   1 +
+ 23 files changed, 272 insertions(+), 142 deletions(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0e1c6a59f2..24e002ebae 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -66,6 +66,9 @@
+ #                 standalone (read-only) raw image without looking at qcow2
+ #                 metadata (since: 4.0)
+ #
++# @extended-l2: true if the image has extended L2 entries; only valid for
++#               compat >= 1.1 (since 5.1)
 +#
-+# Test qcow2 images with extended L2 entries
-+#
-+# Copyright (C) 2019-2020 Igalia, S.L.
-+# Author: Alberto Garcia <berto@igalia.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=berto@igalia.com
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+        _cleanup_test_img
-+        rm -f "$TEST_IMG.raw"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file nfs
-+_supported_os Linux
-+_unsupported_imgopts extended_l2 compat=0.10 cluster_size data_file refcount_bits=1[^0-9]
-+
-+l2_offset=$((0x40000))
-+
-+_verify_img()
-+{
-+    $QEMU_IMG compare "$TEST_IMG" "$TEST_IMG.raw" | grep -v 'Images are identical'
-+    $QEMU_IMG check "$TEST_IMG" | _filter_qemu_img_check | \
-+        grep -v 'No errors were found on the image'
-+}
-+
-+# Compare the bitmap of an extended L2 entry against an expected value
-+_verify_l2_bitmap()
-+{
-+    entry_no="$1"            # L2 entry number, starting from 0
-+    expected_alloc="$alloc"  # Space-separated list of allocated subcluster indexes
-+    expected_zero="$zero"    # Space-separated list of zero subcluster indexes
-+
-+    offset=$(($l2_offset + $entry_no * 16))
-+    entry=$(peek_file_be "$TEST_IMG" $offset 8)
-+    offset=$(($offset + 8))
-+    bitmap=$(peek_file_be "$TEST_IMG" $offset 8)
-+
-+    expected_bitmap=0
-+    for bit in $expected_alloc; do
-+        expected_bitmap=$(($expected_bitmap | (1 << $bit)))
-+    done
-+    for bit in $expected_zero; do
-+        expected_bitmap=$(($expected_bitmap | (1 << (32 + $bit))))
-+    done
-+    printf -v expected_bitmap "%u" $expected_bitmap # Convert to unsigned
-+
-+    printf "L2 entry #%d: 0x%016x %016x\n" "$entry_no" "$entry" "$bitmap"
-+    if [ "$bitmap" != "$expected_bitmap" ]; then
-+        printf "ERROR: expecting bitmap       0x%016x\n" "$expected_bitmap"
-+    fi
-+}
-+
-+# This should be called as _run_test c=XXX sc=XXX off=XXX len=XXX cmd=XXX
-+# c:   cluster number (0 if unset)
-+# sc:  subcluster number inside cluster @c (0 if unset)
-+# off: offset inside subcluster @sc, in kilobytes (0 if unset)
-+# len: request length, passed directly to qemu-io (e.g: 256, 4k, 1M, ...)
-+# cmd: the command to pass to qemu-io, must be one of
-+#      write    -> write
-+#      zero     -> write -z
-+#      unmap    -> write -z -u
-+#      compress -> write -c
-+#      discard  -> discard
-+_run_test()
-+{
-+    unset c sc off len cmd
-+    for var in "$@"; do eval "$var"; done
-+    case "${cmd:-write}" in
-+        zero)
-+            cmd="write -q -z";;
-+        unmap)
-+            cmd="write -q -z -u";;
-+        compress)
-+            pat=$((${pat:-0} + 1))
-+            cmd="write -q -c -P ${pat}";;
-+        write)
-+            pat=$((${pat:-0} + 1))
-+            cmd="write -q -P ${pat}";;
-+        discard)
-+            cmd="discard -q";;
-+        *)
-+            echo "Unknown option $cmd"
-+            exit 1;;
-+    esac
-+    c="${c:-0}"
-+    sc="${sc:-0}"
-+    off="${off:-0}"
-+    offset="$(($c * 64 + $sc * 2 + $off))"
-+    [ "$offset" != 0 ] && offset="${offset}k"
-+    cmd="$cmd ${offset} ${len}"
-+    raw_cmd=$(echo $cmd | sed s/-c//) # Raw images don't support -c
-+    echo $cmd | sed 's/-P [0-9][0-9]\?/-P PATTERN/'
-+    $QEMU_IO -c "$cmd" "$TEST_IMG" | _filter_qemu_io
-+    $QEMU_IO -c "$raw_cmd" -f raw "$TEST_IMG.raw" | _filter_qemu_io
-+    _verify_img
-+    _verify_l2_bitmap "$c"
-+}
-+
-+_reset_img()
-+{
-+    size="$1"
-+    $QEMU_IMG create -f raw "$TEST_IMG.raw" "$size" | _filter_img_create
-+    if [ "$use_backing_file" = "yes" ]; then
-+        $QEMU_IMG create -f raw "$TEST_IMG.base" "$size" | _filter_img_create
-+        $QEMU_IO -c "write -q -P 0xFF 0 $size" -f raw "$TEST_IMG.base" | _filter_qemu_io
-+        $QEMU_IO -c "write -q -P 0xFF 0 $size" -f raw "$TEST_IMG.raw" | _filter_qemu_io
-+        _make_test_img -o extended_l2=on -F raw -b "$TEST_IMG.base" "$size"
-+    else
-+        _make_test_img -o extended_l2=on "$size"
-+    fi
-+}
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+# Test that writing to an image with subclusters produces the expected
-+# results, in images with and without backing files
-+for use_backing_file in yes no; do
-+    echo
-+    echo "### Standard write tests (backing file: $use_backing_file) ###"
-+    echo
-+    _reset_img 1M
-+    ### Write subcluster #0 (beginning of subcluster) ###
-+    alloc="0"; zero=""
-+    _run_test sc=0 len=1k
-+
-+    ### Write subcluster #1 (middle of subcluster) ###
-+    alloc="0 1"; zero=""
-+    _run_test sc=1 off=1 len=512
-+
-+    ### Write subcluster #2 (end of subcluster) ###
-+    alloc="0 1 2"; zero=""
-+    _run_test sc=2 off=1 len=1k
-+
-+    ### Write subcluster #3 (full subcluster) ###
-+    alloc="0 1 2 3"; zero=""
-+    _run_test sc=3 len=2k
-+
-+    ### Write subclusters #4-6 (full subclusters) ###
-+    alloc="$(seq 0 6)"; zero=""
-+    _run_test sc=4 len=6k
-+
-+    ### Write subclusters #7-9 (partial subclusters) ###
-+    alloc="$(seq 0 9)"; zero=""
-+    _run_test sc=7 off=1 len=4k
-+
-+    ### Write subcluster #16 (partial subcluster) ###
-+    alloc="$(seq 0 9) 16"; zero=""
-+    _run_test sc=16 len=1k
-+
-+    ### Write subcluster #31-#33 (cluster overlap) ###
-+    alloc="$(seq 0 9) 16 31"; zero=""
-+    _run_test sc=31 off=1 len=4k
-+    alloc="0 1" ; zero=""
-+    _verify_l2_bitmap 1
-+
-+    ### Zero subcluster #1
-+    alloc="0 $(seq 2 9) 16 31"; zero="1"
-+    _run_test sc=1 len=2k cmd=zero
-+
-+    ### Zero cluster #0
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test sc=0 len=64k cmd=zero
-+
-+    ### Fill cluster #0 with data
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test sc=0 len=64k
-+
-+    ### Zero and unmap half of cluster #0 (this won't unmap it)
-+    alloc="$(seq 16 31)"; zero="$(seq 0 15)"
-+    _run_test sc=0 len=32k cmd=unmap
-+
-+    ### Zero and unmap cluster #0
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test sc=0 len=64k cmd=unmap
-+
-+    ### Write subcluster #1 (middle of subcluster)
-+    alloc="1"; zero="0 $(seq 2 31)"
-+    _run_test sc=1 off=1 len=512
-+
-+    ### Fill cluster #0 with data
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test sc=0 len=64k
-+
-+    ### Discard cluster #0
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test sc=0 len=64k cmd=discard
-+
-+    ### Write compressed data to cluster #0
-+    alloc=""; zero=""
-+    _run_test sc=0 len=64k cmd=compress
-+
-+    ### Write subcluster #1 (middle of subcluster)
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test sc=1 off=1 len=512
-+done
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+# calculate_l2_meta() checks if none of the clusters affected by a
-+# write operation need COW or changes to their L2 metadata and simply
-+# returns when they don't. This is a test for that optimization.
-+# Here clusters #0-#3 are overwritten but only #1 and #2 need changes.
-+echo
-+echo '### Overwriting several clusters without COW ###'
-+echo
-+use_backing_file="no" _reset_img 1M
-+# Write cluster #0, subclusters #12-#31
-+alloc="$(seq 12 31)"; zero=""
-+_run_test sc=12 len=40k
-+
-+# Write cluster #1, subcluster #13
-+alloc="13"; zero=""
-+_run_test c=1 sc=13 len=2k
-+
-+# Zeroize cluster #2, subcluster #14
-+alloc="14"; zero=""
-+_run_test c=2 sc=14 len=2k
-+alloc=""; zero="14"
-+_run_test c=2 sc=14 len=2k cmd=zero
-+
-+# Write cluster #3, subclusters #0-#16
-+alloc="$(seq 0 16)"; zero=""
-+_run_test c=3 sc=0 len=34k
-+
-+# Write from cluster #0, subcluster #12 to cluster #3, subcluster #11
-+alloc="$(seq 12 31)"; zero=""
-+_run_test sc=12 len=192k
-+alloc="$(seq 0 31)"; zero=""
-+_verify_l2_bitmap 1
-+_verify_l2_bitmap 2
-+
-+alloc="$(seq 0 16)"; zero=""
-+_verify_l2_bitmap 3
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+# Test different patterns of writing zeroes
-+for use_backing_file in yes no; do
-+    echo
-+    echo "### Writing zeroes 1: unallocated clusters (backing file: $use_backing_file) ###"
-+    echo
-+    # Note that the image size is not a multiple of the cluster size
-+    _reset_img 2083k
-+
-+    # Cluster-aligned request from clusters #0 to #2
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test c=0 sc=0 len=192k cmd=zero
-+    _verify_l2_bitmap 1
-+    _verify_l2_bitmap 2
-+
-+    # Subcluster-aligned request from clusters #3 to #5
-+    alloc=""; zero="$(seq 16 31)"
-+    _run_test c=3 sc=16 len=128k cmd=zero
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 4
-+    alloc=""; zero="$(seq 0 15)"
-+    _verify_l2_bitmap 5
-+
-+    # Unaligned request from clusters #6 to #8
-+    if [ "$use_backing_file" = "yes" ]; then
-+        alloc="15"; zero="$(seq 16 31)" # copy-on-write happening here
-+    else
-+        alloc=""; zero="$(seq 15 31)"
-+    fi
-+    _run_test c=6 sc=15 off=1 len=128k cmd=zero
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 7
-+    if [ "$use_backing_file" = "yes" ]; then
-+        alloc="15"; zero="$(seq 0 14)" # copy-on-write happening here
-+    else
-+        alloc=""; zero="$(seq 0 15)"
-+    fi
-+    _verify_l2_bitmap 8
-+
-+    echo
-+    echo "### Writing zeroes 2: allocated clusters (backing file: $use_backing_file) ###"
-+    echo
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test c=9 sc=0 len=576k
-+    _verify_l2_bitmap 10
-+    _verify_l2_bitmap 11
-+    _verify_l2_bitmap 12
-+    _verify_l2_bitmap 13
-+    _verify_l2_bitmap 14
-+    _verify_l2_bitmap 15
-+    _verify_l2_bitmap 16
-+    _verify_l2_bitmap 17
-+
-+    # Cluster-aligned request from clusters #9 to #11
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test c=9 sc=0 len=192k cmd=zero
-+    _verify_l2_bitmap 10
-+    _verify_l2_bitmap 11
-+
-+    # Subcluster-aligned request from clusters #12 to #14
-+    alloc="$(seq 0 15)"; zero="$(seq 16 31)"
-+    _run_test c=12 sc=16 len=128k cmd=zero
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 13
-+    alloc="$(seq 16 31)"; zero="$(seq 0 15)"
-+    _verify_l2_bitmap 14
-+
-+    # Unaligned request from clusters #15 to #17
-+    alloc="$(seq 0 15)"; zero="$(seq 16 31)"
-+    _run_test c=15 sc=15 off=1 len=128k cmd=zero
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 16
-+    alloc="$(seq 15 31)"; zero="$(seq 0 14)"
-+    _verify_l2_bitmap 17
-+
-+    echo
-+    echo "### Writing zeroes 3: compressed clusters (backing file: $use_backing_file) ###"
-+    echo
-+    alloc=""; zero=""
-+    for c in $(seq 18 28); do
-+        _run_test c=$c sc=0 len=64k cmd=compress
-+    done
-+
-+    # Cluster-aligned request from clusters #18 to #20
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test c=18 sc=0 len=192k cmd=zero
-+    _verify_l2_bitmap 19
-+    _verify_l2_bitmap 20
-+
-+    # Subcluster-aligned request from clusters #21 to #23.
-+    # We cannot partially zero a compressed cluster so the code
-+    # returns -ENOTSUP, which means copy-on-write of the compressed
-+    # data and fill the rest with actual zeroes on disk.
-+    # TODO: cluster #22 should use the 'all zeroes' bits.
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test c=21 sc=16 len=128k cmd=zero
-+    _verify_l2_bitmap 22
-+    _verify_l2_bitmap 23
-+
-+    # Unaligned request from clusters #24 to #26
-+    # In this case QEMU internally sends a 1k request followed by a
-+    # subcluster-aligned 128k request. The first request decompresses
-+    # cluster #24, but that's not enough to perform the second request
-+    # efficiently because it partially writes to cluster #26 (which is
-+    # compressed) so we hit the same problem as before.
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test c=24 sc=15 off=1 len=129k cmd=zero
-+    _verify_l2_bitmap 25
-+    _verify_l2_bitmap 26
-+
-+    # Unaligned request from clusters #27 to #29
-+    # Similar to the previous case, but this time the tail of the
-+    # request does not correspond to a compressed cluster, so it can
-+    # be zeroed efficiently.
-+    # Note that the very last subcluster is partially written, so if
-+    # there's a backing file we need to perform cow.
-+    alloc="$(seq 0 15)"; zero="$(seq 16 31)"
-+    _run_test c=27 sc=15 off=1 len=128k cmd=zero
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 28
-+    if [ "$use_backing_file" = "yes" ]; then
-+        alloc="15"; zero="$(seq 0 14)" # copy-on-write happening here
-+    else
-+        alloc=""; zero="$(seq 0 15)"
-+    fi
-+    _verify_l2_bitmap 29
-+
-+    echo
-+    echo "### Writing zeroes 4: other tests (backing file: $use_backing_file) ###"
-+    echo
-+    # Unaligned request in the middle of cluster #30.
-+    # If there's a backing file we need to allocate and do
-+    # copy-on-write on the partially zeroed subclusters.
-+    # If not we can set the 'all zeroes' bit on them.
-+    if [ "$use_backing_file" = "yes" ]; then
-+        alloc="15 19"; zero="$(seq 16 18)" # copy-on-write happening here
-+    else
-+        alloc=""; zero="$(seq 15 19)"
-+    fi
-+    _run_test c=30 sc=15 off=1 len=8k cmd=zero
-+
-+    # Fill the last cluster with zeroes, up to the end of the image
-+    # (the image size is not a multiple of the cluster or subcluster size).
-+    alloc=""; zero="$(seq 0 17)"
-+    _run_test c=32 sc=0 len=35k cmd=zero
-+done
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+# Zero + unmap
-+for use_backing_file in yes no; do
-+    echo
-+    echo "### Zero + unmap 1: allocated clusters (backing file: $use_backing_file) ###"
-+    echo
-+    # Note that the image size is not a multiple of the cluster size
-+    _reset_img 2083k
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test c=9 sc=0 len=576k
-+    _verify_l2_bitmap 10
-+    _verify_l2_bitmap 11
-+    _verify_l2_bitmap 12
-+    _verify_l2_bitmap 13
-+    _verify_l2_bitmap 14
-+    _verify_l2_bitmap 15
-+    _verify_l2_bitmap 16
-+    _verify_l2_bitmap 17
-+
-+    # Cluster-aligned request from clusters #9 to #11
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test c=9 sc=0 len=192k cmd=unmap
-+    _verify_l2_bitmap 10
-+    _verify_l2_bitmap 11
-+
-+    # Subcluster-aligned request from clusters #12 to #14
-+    alloc="$(seq 0 15)"; zero="$(seq 16 31)"
-+    _run_test c=12 sc=16 len=128k cmd=unmap
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 13
-+    alloc="$(seq 16 31)"; zero="$(seq 0 15)"
-+    _verify_l2_bitmap 14
-+
-+    # Unaligned request from clusters #15 to #17
-+    alloc="$(seq 0 15)"; zero="$(seq 16 31)"
-+    _run_test c=15 sc=15 off=1 len=128k cmd=unmap
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 16
-+    alloc="$(seq 15 31)"; zero="$(seq 0 14)"
-+    _verify_l2_bitmap 17
-+
-+    echo
-+    echo "### Zero + unmap 2: compressed clusters (backing file: $use_backing_file) ###"
-+    echo
-+    alloc=""; zero=""
-+    for c in $(seq 18 28); do
-+        _run_test c=$c sc=0 len=64k cmd=compress
-+    done
-+
-+    # Cluster-aligned request from clusters #18 to #20
-+    alloc=""; zero="$(seq 0 31)"
-+    _run_test c=18 sc=0 len=192k cmd=unmap
-+    _verify_l2_bitmap 19
-+    _verify_l2_bitmap 20
-+
-+    # Subcluster-aligned request from clusters #21 to #23.
-+    # We cannot partially zero a compressed cluster so the code
-+    # returns -ENOTSUP, which means copy-on-write of the compressed
-+    # data and fill the rest with actual zeroes on disk.
-+    # TODO: cluster #22 should use the 'all zeroes' bits.
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test c=21 sc=16 len=128k cmd=unmap
-+    _verify_l2_bitmap 22
-+    _verify_l2_bitmap 23
-+
-+    # Unaligned request from clusters #24 to #26
-+    # In this case QEMU internally sends a 1k request followed by a
-+    # subcluster-aligned 128k request. The first request decompresses
-+    # cluster #24, but that's not enough to perform the second request
-+    # efficiently because it partially writes to cluster #26 (which is
-+    # compressed) so we hit the same problem as before.
-+    alloc="$(seq 0 31)"; zero=""
-+    _run_test c=24 sc=15 off=1 len=129k cmd=unmap
-+    _verify_l2_bitmap 25
-+    _verify_l2_bitmap 26
-+
-+    # Unaligned request from clusters #27 to #29
-+    # Similar to the previous case, but this time the tail of the
-+    # request does not correspond to a compressed cluster, so it can
-+    # be zeroed efficiently.
-+    # Note that the very last subcluster is partially written, so if
-+    # there's a backing file we need to perform cow.
-+    alloc="$(seq 0 15)"; zero="$(seq 16 31)"
-+    _run_test c=27 sc=15 off=1 len=128k cmd=unmap
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 28
-+    if [ "$use_backing_file" = "yes" ]; then
-+        alloc="15"; zero="$(seq 0 14)" # copy-on-write happening here
-+    else
-+        alloc=""; zero="$(seq 0 15)"
-+    fi
-+    _verify_l2_bitmap 29
-+done
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+# Test qcow2_cluster_discard() with full and normal discards
-+for use_backing_file in yes no; do
-+    echo
-+    echo "### Discarding clusters with non-zero bitmaps (backing file: $use_backing_file) ###"
-+    echo
-+    if [ "$use_backing_file" = "yes" ]; then
-+        _make_test_img -o extended_l2=on -F raw -b "$TEST_IMG.base" 1M
-+    else
-+        _make_test_img -o extended_l2=on 1M
-+    fi
-+    # Write clusters #0-#2 and then discard them
-+    $QEMU_IO -c 'write -q 0 128k' "$TEST_IMG"
-+    $QEMU_IO -c 'discard -q 0 128k' "$TEST_IMG"
-+    # 'qemu-io discard' doesn't do a full discard, it zeroizes the
-+    # cluster, so both clusters have all zero bits set now
-+    alloc=""; zero="$(seq 0 31)"
-+    _verify_l2_bitmap 0
-+    _verify_l2_bitmap 1
-+    # Now mark the 2nd half of the subclusters from cluster #0 as unallocated
-+    poke_file "$TEST_IMG" $(($l2_offset+8)) "\x00\x00"
-+    # Discard cluster #0 again to see how the zero bits have changed
-+    $QEMU_IO -c 'discard -q 0 64k' "$TEST_IMG"
-+    # And do a full discard of cluster #1 by shrinking and growing the image
-+    $QEMU_IMG resize --shrink "$TEST_IMG" 64k
-+    $QEMU_IMG resize "$TEST_IMG" 1M
-+    # A normal discard sets all 'zero' bits only if the image has a
-+    # backing file, otherwise it won't touch them.
-+    if [ "$use_backing_file" = "yes" ]; then
-+        alloc=""; zero="$(seq 0 31)"
-+    else
-+        alloc=""; zero="$(seq 0 15)"
-+    fi
-+    _verify_l2_bitmap 0
-+    # A full discard should clear the L2 entry completely. However
-+    # when growing an image with a backing file the new clusters are
-+    # zeroized to hide the stale data from the backing file
-+    if [ "$use_backing_file" = "yes" ]; then
-+        alloc=""; zero="$(seq 0 31)"
-+    else
-+        alloc=""; zero=""
-+    fi
-+    _verify_l2_bitmap 1
-+done
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+# Test that corrupted L2 entries are detected in both read and write
-+# operations
-+for corruption_test_cmd in read write; do
-+    echo
-+    echo "### Corrupted L2 entries - $corruption_test_cmd test (allocated) ###"
-+    echo
-+    echo "# 'cluster is zero' bit set on the standard cluster descriptor"
-+    echo
-+    # We actually don't consider this a corrupted image.
-+    # The 'cluster is zero' bit is unused in extended L2 entries so
-+    # QEMU ignores it.
-+    # TODO: maybe treat the image as corrupted and make qemu-img check fix it?
-+    _make_test_img -o extended_l2=on 1M
-+    $QEMU_IO -c 'write -q -P 0x11 0 2k' "$TEST_IMG"
-+    poke_file "$TEST_IMG" $(($l2_offset+7)) "\x01"
-+    alloc="0"; zero=""
-+    _verify_l2_bitmap 0
-+    $QEMU_IO -c "$corruption_test_cmd -q -P 0x11 0 1k" "$TEST_IMG"
-+    if [ "$corruption_test_cmd" = "write" ]; then
-+        alloc="0"; zero=""
-+    fi
-+    _verify_l2_bitmap 0
-+
-+    echo
-+    echo "# Both 'subcluster is zero' and 'subcluster is allocated' bits set"
-+    echo
-+    _make_test_img -o extended_l2=on 1M
-+    # Write from the middle of cluster #0 to the middle of cluster #2
-+    $QEMU_IO -c 'write -q 32k 128k' "$TEST_IMG"
-+    # Corrupt the L2 entry from cluster #1
-+    poke_file_be "$TEST_IMG" $(($l2_offset+24)) 4 1
-+    alloc="$(seq 0 31)"; zero="0"
-+    _verify_l2_bitmap 1
-+    $QEMU_IO -c "$corruption_test_cmd 0 192k" "$TEST_IMG"
-+
-+    echo
-+    echo "### Corrupted L2 entries - $corruption_test_cmd test (unallocated) ###"
-+    echo
-+    echo "# 'cluster is zero' bit set on the standard cluster descriptor"
-+    echo
-+    # We actually don't consider this a corrupted image.
-+    # The 'cluster is zero' bit is unused in extended L2 entries so
-+    # QEMU ignores it.
-+    # TODO: maybe treat the image as corrupted and make qemu-img check fix it?
-+    _make_test_img -o extended_l2=on 1M
-+    # We want to modify the (empty) L2 entry from cluster #0,
-+    # but we write to #4 in order to initialize the L2 table first
-+    $QEMU_IO -c 'write -q 256k 1k' "$TEST_IMG"
-+    poke_file "$TEST_IMG" $(($l2_offset+7)) "\x01"
-+    alloc=""; zero=""
-+    _verify_l2_bitmap 0
-+    $QEMU_IO -c "$corruption_test_cmd -q 0 1k" "$TEST_IMG"
-+    if [ "$corruption_test_cmd" = "write" ]; then
-+        alloc="0"; zero=""
-+    fi
-+    _verify_l2_bitmap 0
-+
-+    echo
-+    echo "# 'subcluster is allocated' bit set"
-+    echo
-+    _make_test_img -o extended_l2=on 1M
-+    # We want to corrupt the (empty) L2 entry from cluster #0,
-+    # but we write to #4 in order to initialize the L2 table first
-+    $QEMU_IO -c 'write -q 256k 1k' "$TEST_IMG"
-+    poke_file "$TEST_IMG" $(($l2_offset+15)) "\x01"
-+    alloc="0"; zero=""
-+    _verify_l2_bitmap 0
-+    $QEMU_IO -c "$corruption_test_cmd 0 1k" "$TEST_IMG"
-+
-+    echo
-+    echo "# Both 'subcluster is zero' and 'subcluster is allocated' bits set"
-+    echo
-+    _make_test_img -o extended_l2=on 1M
-+    # We want to corrupt the (empty) L2 entry from cluster #1,
-+    # but we write to #4 in order to initialize the L2 table first
-+    $QEMU_IO -c 'write -q 256k 1k' "$TEST_IMG"
-+    # Corrupt the L2 entry from cluster #1
-+    poke_file_be "$TEST_IMG" $(($l2_offset+24)) 8 $(((1 << 32) | 1))
-+    alloc="0"; zero="0"
-+    _verify_l2_bitmap 1
-+    $QEMU_IO -c "$corruption_test_cmd 0 192k" "$TEST_IMG"
-+
-+    echo
-+    echo "### Compressed cluster with subcluster bitmap != 0 - $corruption_test_cmd test ###"
-+    echo
-+    # We actually don't consider this a corrupted image.
-+    # The bitmap in compressed clusters is unused so QEMU should just ignore it.
-+    _make_test_img -o extended_l2=on 1M
-+    $QEMU_IO -c 'write -q -P 11 -c 0 64k' "$TEST_IMG"
-+    # Change the L2 bitmap to allocate subcluster #31 and zeroize subcluster #0
-+    poke_file "$TEST_IMG" $(($l2_offset+11)) "\x01\x80"
-+    alloc="31"; zero="0"
-+    _verify_l2_bitmap 0
-+    $QEMU_IO -c "$corruption_test_cmd -P 11 0 64k" "$TEST_IMG" | _filter_qemu_io
-+    # Writing allocates a new uncompressed cluster so we get a new bitmap
-+    if [ "$corruption_test_cmd" = "write" ]; then
-+        alloc="$(seq 0 31)"; zero=""
-+    fi
-+    _verify_l2_bitmap 0
-+done
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+echo
-+echo "### Detect and repair unaligned clusters ###"
-+echo
-+# Create a backing file and fill it with data
-+$QEMU_IMG create -f raw "$TEST_IMG.base" 128k | _filter_img_create
-+$QEMU_IO -c "write -q -P 0xff 0 128k" -f raw "$TEST_IMG.base" | _filter_qemu_io
-+
-+echo "# Corrupted L2 entry, allocated subcluster #"
-+# Create a new image, allocate a cluster and write some data to it
-+_make_test_img -o extended_l2=on -F raw -b "$TEST_IMG.base"
-+$QEMU_IO -c 'write -q -P 1 4k 2k' "$TEST_IMG"
-+# Corrupt the L2 entry by making the offset unaligned
-+poke_file "$TEST_IMG" "$(($l2_offset+6))" "\x02"
-+# This cannot be repaired, qemu-img check will fail to fix it
-+_check_test_img -r all
-+# Attempting to read the image will still show that it's corrupted
-+$QEMU_IO -c 'read -q 0 2k' "$TEST_IMG"
-+
-+echo "# Corrupted L2 entry, no allocated subclusters #"
-+# Create a new image, allocate a cluster and zeroize subcluster #2
-+_make_test_img -o extended_l2=on -F raw -b "$TEST_IMG.base"
-+$QEMU_IO -c 'write -q -P 1 4k 2k' "$TEST_IMG"
-+$QEMU_IO -c 'write -q -z   4k 2k' "$TEST_IMG"
-+# Corrupt the L2 entry by making the offset unaligned
-+poke_file "$TEST_IMG" "$(($l2_offset+6))" "\x02"
-+# This time none of the subclusters are allocated so we can repair the image
-+_check_test_img -r all
-+# And the data can be read normally
-+$QEMU_IO -c 'read -q -P 0xff  0   4k' "$TEST_IMG"
-+$QEMU_IO -c 'read -q -P 0x00 4k   2k' "$TEST_IMG"
-+$QEMU_IO -c 'read -q -P 0xff 6k 122k' "$TEST_IMG"
-+
-+############################################################
-+############################################################
-+############################################################
-+
-+echo
-+echo "### Image creation options ###"
-+echo
-+echo "# cluster_size < 16k"
-+_make_test_img -o extended_l2=on,cluster_size=8k 1M
-+
-+echo "# backing file and preallocation=metadata"
-+# For preallocation with backing files, create a backing file first
-+$QEMU_IMG create -f raw "$TEST_IMG.base" 1M | _filter_img_create
-+$QEMU_IO -c "write -q -P 0xff 0 1M" -f raw "$TEST_IMG.base" | _filter_qemu_io
-+
-+_make_test_img -o extended_l2=on,preallocation=metadata -F raw -b "$TEST_IMG.base" 512k
-+$QEMU_IMG resize "$TEST_IMG" 1M
-+$QEMU_IO -c 'read -P 0xff    0 512k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 512k 512k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map "$TEST_IMG" | _filter_testdir
-+
-+echo "# backing file and preallocation=falloc"
-+_make_test_img -o extended_l2=on,preallocation=falloc -F raw -b "$TEST_IMG.base" 512k
-+$QEMU_IMG resize "$TEST_IMG" 1M
-+$QEMU_IO -c 'read -P 0xff    0 512k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 512k 512k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map "$TEST_IMG" | _filter_testdir
-+
-+echo "# backing file and preallocation=full"
-+_make_test_img -o extended_l2=on,preallocation=full -F raw -b "$TEST_IMG.base" 512k
-+$QEMU_IMG resize "$TEST_IMG" 1M
-+$QEMU_IO -c 'read -P 0xff    0 512k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 512k 512k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map "$TEST_IMG" | _filter_testdir
-+
-+echo
-+echo "### Image resizing with preallocation and backing files ###"
-+echo
-+# In this case the new subclusters must have the 'all zeroes' bit set
-+echo "# resize --preallocation=metadata"
-+_make_test_img -o extended_l2=on -F raw -b "$TEST_IMG.base" 503k
-+$QEMU_IMG resize --preallocation=metadata "$TEST_IMG" 1013k
-+$QEMU_IO -c 'read -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 503k 510k' "$TEST_IMG" | _filter_qemu_io
-+
-+# In this case and the next one the new subclusters must be allocated
-+echo "# resize --preallocation=falloc"
-+_make_test_img -o extended_l2=on -F raw -b "$TEST_IMG.base" 503k
-+$QEMU_IMG resize --preallocation=falloc "$TEST_IMG" 1013k
-+$QEMU_IO -c 'read -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 503k 510k' "$TEST_IMG" | _filter_qemu_io
-+
-+echo "# resize --preallocation=full"
-+_make_test_img -o extended_l2=on -F raw -b "$TEST_IMG.base" 503k
-+$QEMU_IMG resize --preallocation=full "$TEST_IMG" 1013k
-+$QEMU_IO -c 'read -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 503k 510k' "$TEST_IMG" | _filter_qemu_io
-+
-+echo
-+echo "### Image resizing with preallocation without backing files ###"
-+echo
-+# In this case the new subclusters must have the 'all zeroes' bit set
-+echo "# resize --preallocation=metadata"
-+_make_test_img -o extended_l2=on 503k
-+$QEMU_IO -c 'write -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG resize --preallocation=metadata "$TEST_IMG" 1013k
-+$QEMU_IO -c 'read -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 503k 510k' "$TEST_IMG" | _filter_qemu_io
-+
-+# In this case and the next one the new subclusters must be allocated
-+echo "# resize --preallocation=falloc"
-+_make_test_img -o extended_l2=on 503k
-+$QEMU_IO -c 'write -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG resize --preallocation=falloc "$TEST_IMG" 1013k
-+$QEMU_IO -c 'read -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 503k 510k' "$TEST_IMG" | _filter_qemu_io
-+
-+echo "# resize --preallocation=full"
-+_make_test_img -o extended_l2=on 503k
-+$QEMU_IO -c 'write -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG resize --preallocation=full "$TEST_IMG" 1013k
-+$QEMU_IO -c 'read -P 0xff    0 503k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c 'read -P 0x00 503k 510k' "$TEST_IMG" | _filter_qemu_io
-+
-+echo
-+echo "### qemu-img measure ###"
-+echo
-+echo "# 512MB, extended_l2=off" # This needs one L2 table
-+$QEMU_IMG measure --size 512M -O qcow2 -o extended_l2=off
-+echo "# 512MB, extended_l2=on"  # This needs two L2 tables
-+$QEMU_IMG measure --size 512M -O qcow2 -o extended_l2=on
-+
-+echo "# 16K clusters, 64GB, extended_l2=off" # This needs one full L1 table cluster
-+$QEMU_IMG measure --size 64G -O qcow2 -o cluster_size=16k,extended_l2=off
-+echo "# 16K clusters, 64GB, extended_l2=on"  # This needs two full L2 table clusters
-+$QEMU_IMG measure --size 64G -O qcow2 -o cluster_size=16k,extended_l2=on
-+
-+echo "# 8k clusters" # This should fail
-+$QEMU_IMG measure --size 1M -O qcow2 -o cluster_size=8k,extended_l2=on
-+
-+echo "# 1024 TB" # Maximum allowed size with extended_l2=on and 64K clusters
-+$QEMU_IMG measure --size 1024T -O qcow2 -o extended_l2=on
-+echo "# 1025 TB" # This should fail
-+$QEMU_IMG measure --size 1025T -O qcow2 -o extended_l2=on
-+
-+echo
-+echo "### qemu-img amend ###"
-+echo
-+_make_test_img -o extended_l2=on 1M
-+$QEMU_IMG amend -o extended_l2=off "$TEST_IMG" && echo "Unexpected pass"
-+
-+_make_test_img -o extended_l2=off 1M
-+$QEMU_IMG amend -o extended_l2=on "$TEST_IMG" && echo "Unexpected pass"
-+
-+echo
-+echo "### Test copy-on-write on an image with snapshots ###"
-+echo
-+_make_test_img -o extended_l2=on 1M
-+
-+# For each cluster from #0 to #9 this loop zeroes subcluster #7
-+# and allocates subclusters #13 and #18.
-+alloc="13 18"; zero="7"
-+for c in $(seq 0 9); do
-+    $QEMU_IO -c "write -q -z $((64*$c+14))k 2k" \
-+             -c "write -q -P $((0xd0+$c)) $((64*$c+26))k 2k" \
-+             -c "write -q -P $((0xe0+$c)) $((64*$c+36))k 2k" "$TEST_IMG"
-+    _verify_l2_bitmap "$c"
-+done
-+
-+# Create a snapshot and set l2_offset to the new L2 table
-+$QEMU_IMG snapshot -c snap1 "$TEST_IMG"
-+l2_offset=$((0x110000))
-+
-+# Write different patterns to each one of the clusters
-+# in order to see how copy-on-write behaves in each case.
-+$QEMU_IO -c "write -q -P 0xf0 $((64*0+30))k 1k" \
-+         -c "write -q -P 0xf1 $((64*1+20))k 1k" \
-+         -c "write -q -P 0xf2 $((64*2+40))k 1k" \
-+         -c "write -q -P 0xf3 $((64*3+26))k 1k" \
-+         -c "write -q -P 0xf4 $((64*4+14))k 1k" \
-+         -c "write -q -P 0xf5 $((64*5+1))k  1k" \
-+         -c "write -q -z      $((64*6+30))k 3k" \
-+         -c "write -q -z      $((64*7+26))k 2k" \
-+         -c "write -q -z      $((64*8+26))k 1k" \
-+         -c "write -q -z      $((64*9+12))k 1k" \
-+         "$TEST_IMG"
-+alloc="$(seq 13 18)"; zero="7" _verify_l2_bitmap 0
-+alloc="$(seq 10 18)"; zero="7" _verify_l2_bitmap 1
-+alloc="$(seq 13 20)"; zero="7" _verify_l2_bitmap 2
-+alloc="$(seq 13 18)"; zero="7" _verify_l2_bitmap 3
-+alloc="$(seq 7 18)";  zero=""  _verify_l2_bitmap 4
-+alloc="$(seq 0 18)";  zero=""  _verify_l2_bitmap 5
-+alloc="13 18";  zero="7 15 16" _verify_l2_bitmap 6
-+alloc="18";        zero="7 13" _verify_l2_bitmap 7
-+alloc="$(seq 13 18)"; zero="7" _verify_l2_bitmap 8
-+alloc="13 18";      zero="6 7" _verify_l2_bitmap 9
-+
-+echo
-+echo "### Test concurrent requests ###"
-+echo
-+
-+_concurrent_io()
-+{
-+# Allocate three subclusters in the same cluster.
-+# This works because handle_dependencies() checks whether the requests
-+# allocate the same cluster, even if the COW regions don't overlap (in
-+# this case they don't).
-+cat <<EOF
-+open -o driver=$IMGFMT blkdebug::$TEST_IMG
-+break write_aio A
-+aio_write -P 10 30k 2k
-+wait_break A
-+aio_write -P 11 20k 2k
-+aio_write -P 12 40k 2k
-+resume A
-+aio_flush
-+EOF
-+}
-+
-+_concurrent_verify()
-+{
-+cat <<EOF
-+open -o driver=$IMGFMT $TEST_IMG
-+read -q -P 10 30k 2k
-+read -q -P 11 20k 2k
-+read -q -P 12 40k 2k
-+EOF
-+}
-+
-+_make_test_img -o extended_l2=on 1M
-+_concurrent_io     | $QEMU_IO | _filter_qemu_io
-+_concurrent_verify | $QEMU_IO | _filter_qemu_io
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/271.out b/tests/qemu-iotests/271.out
-new file mode 100644
-index 0000000000..07c1e7b46d
---- /dev/null
-+++ b/tests/qemu-iotests/271.out
-@@ -0,0 +1,724 @@
-+QA output created by 271
-+
-+### Standard write tests (backing file: yes) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=raw size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+write -q -P PATTERN 0 1k
-+L2 entry #0: 0x8000000000050000 0000000000000001
-+write -q -P PATTERN 3k 512
-+L2 entry #0: 0x8000000000050000 0000000000000003
-+write -q -P PATTERN 5k 1k
-+L2 entry #0: 0x8000000000050000 0000000000000007
-+write -q -P PATTERN 6k 2k
-+L2 entry #0: 0x8000000000050000 000000000000000f
-+write -q -P PATTERN 8k 6k
-+L2 entry #0: 0x8000000000050000 000000000000007f
-+write -q -P PATTERN 15k 4k
-+L2 entry #0: 0x8000000000050000 00000000000003ff
-+write -q -P PATTERN 32k 1k
-+L2 entry #0: 0x8000000000050000 00000000000103ff
-+write -q -P PATTERN 63k 4k
-+L2 entry #0: 0x8000000000050000 00000000800103ff
-+L2 entry #1: 0x8000000000060000 0000000000000003
-+write -q -z 2k 2k
-+L2 entry #0: 0x8000000000050000 00000002800103fd
-+write -q -z 0 64k
-+L2 entry #0: 0x8000000000050000 ffffffff00000000
-+write -q -P PATTERN 0 64k
-+L2 entry #0: 0x8000000000050000 00000000ffffffff
-+write -q -z -u 0 32k
-+L2 entry #0: 0x8000000000050000 0000ffffffff0000
-+write -q -z -u 0 64k
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+write -q -P PATTERN 3k 512
-+L2 entry #0: 0x8000000000050000 fffffffd00000002
-+write -q -P PATTERN 0 64k
-+L2 entry #0: 0x8000000000050000 00000000ffffffff
-+discard -q 0 64k
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+write -q -c -P PATTERN 0 64k
-+L2 entry #0: 0x4000000000050000 0000000000000000
-+write -q -P PATTERN 3k 512
-+L2 entry #0: 0x8000000000070000 00000000ffffffff
-+
-+### Standard write tests (backing file: no) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+write -q -P PATTERN 0 1k
-+L2 entry #0: 0x8000000000050000 0000000000000001
-+write -q -P PATTERN 3k 512
-+L2 entry #0: 0x8000000000050000 0000000000000003
-+write -q -P PATTERN 5k 1k
-+L2 entry #0: 0x8000000000050000 0000000000000007
-+write -q -P PATTERN 6k 2k
-+L2 entry #0: 0x8000000000050000 000000000000000f
-+write -q -P PATTERN 8k 6k
-+L2 entry #0: 0x8000000000050000 000000000000007f
-+write -q -P PATTERN 15k 4k
-+L2 entry #0: 0x8000000000050000 00000000000003ff
-+write -q -P PATTERN 32k 1k
-+L2 entry #0: 0x8000000000050000 00000000000103ff
-+write -q -P PATTERN 63k 4k
-+L2 entry #0: 0x8000000000050000 00000000800103ff
-+L2 entry #1: 0x8000000000060000 0000000000000003
-+write -q -z 2k 2k
-+L2 entry #0: 0x8000000000050000 00000002800103fd
-+write -q -z 0 64k
-+L2 entry #0: 0x8000000000050000 ffffffff00000000
-+write -q -P PATTERN 0 64k
-+L2 entry #0: 0x8000000000050000 00000000ffffffff
-+write -q -z -u 0 32k
-+L2 entry #0: 0x8000000000050000 0000ffffffff0000
-+write -q -z -u 0 64k
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+write -q -P PATTERN 3k 512
-+L2 entry #0: 0x8000000000050000 fffffffd00000002
-+write -q -P PATTERN 0 64k
-+L2 entry #0: 0x8000000000050000 00000000ffffffff
-+discard -q 0 64k
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+write -q -c -P PATTERN 0 64k
-+L2 entry #0: 0x4000000000050000 0000000000000000
-+write -q -P PATTERN 3k 512
-+L2 entry #0: 0x8000000000070000 00000000ffffffff
-+
-+### Overwriting several clusters without COW ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+write -q -P PATTERN 24k 40k
-+L2 entry #0: 0x8000000000050000 00000000fffff000
-+write -q -P PATTERN 90k 2k
-+L2 entry #1: 0x8000000000060000 0000000000002000
-+write -q -P PATTERN 156k 2k
-+L2 entry #2: 0x8000000000070000 0000000000004000
-+write -q -z 156k 2k
-+L2 entry #2: 0x8000000000070000 0000400000000000
-+write -q -P PATTERN 192k 34k
-+L2 entry #3: 0x8000000000080000 000000000001ffff
-+write -q -P PATTERN 24k 192k
-+L2 entry #0: 0x8000000000050000 00000000fffff000
-+L2 entry #1: 0x8000000000060000 00000000ffffffff
-+L2 entry #2: 0x8000000000070000 00000000ffffffff
-+L2 entry #3: 0x8000000000080000 000000000001ffff
-+
-+### Writing zeroes 1: unallocated clusters (backing file: yes) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=2132992
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=raw size=2132992
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2132992 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+write -q -z 0 192k
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+L2 entry #1: 0x0000000000000000 ffffffff00000000
-+L2 entry #2: 0x0000000000000000 ffffffff00000000
-+write -q -z 224k 128k
-+L2 entry #3: 0x0000000000000000 ffff000000000000
-+L2 entry #4: 0x0000000000000000 ffffffff00000000
-+L2 entry #5: 0x0000000000000000 0000ffff00000000
-+write -q -z 415k 128k
-+L2 entry #6: 0x8000000000050000 ffff000000008000
-+L2 entry #7: 0x0000000000000000 ffffffff00000000
-+L2 entry #8: 0x8000000000060000 00007fff00008000
-+
-+### Writing zeroes 2: allocated clusters (backing file: yes) ###
-+
-+write -q -P PATTERN 576k 576k
-+L2 entry #9: 0x8000000000070000 00000000ffffffff
-+L2 entry #10: 0x8000000000080000 00000000ffffffff
-+L2 entry #11: 0x8000000000090000 00000000ffffffff
-+L2 entry #12: 0x80000000000a0000 00000000ffffffff
-+L2 entry #13: 0x80000000000b0000 00000000ffffffff
-+L2 entry #14: 0x80000000000c0000 00000000ffffffff
-+L2 entry #15: 0x80000000000d0000 00000000ffffffff
-+L2 entry #16: 0x80000000000e0000 00000000ffffffff
-+L2 entry #17: 0x80000000000f0000 00000000ffffffff
-+write -q -z 576k 192k
-+L2 entry #9: 0x8000000000070000 ffffffff00000000
-+L2 entry #10: 0x8000000000080000 ffffffff00000000
-+L2 entry #11: 0x8000000000090000 ffffffff00000000
-+write -q -z 800k 128k
-+L2 entry #12: 0x80000000000a0000 ffff00000000ffff
-+L2 entry #13: 0x80000000000b0000 ffffffff00000000
-+L2 entry #14: 0x80000000000c0000 0000ffffffff0000
-+write -q -z 991k 128k
-+L2 entry #15: 0x80000000000d0000 ffff00000000ffff
-+L2 entry #16: 0x80000000000e0000 ffffffff00000000
-+L2 entry #17: 0x80000000000f0000 00007fffffff8000
-+
-+### Writing zeroes 3: compressed clusters (backing file: yes) ###
-+
-+write -q -c -P PATTERN 1152k 64k
-+L2 entry #18: 0x4000000000100000 0000000000000000
-+write -q -c -P PATTERN 1216k 64k
-+L2 entry #19: 0x4000000000110000 0000000000000000
-+write -q -c -P PATTERN 1280k 64k
-+L2 entry #20: 0x4000000000120000 0000000000000000
-+write -q -c -P PATTERN 1344k 64k
-+L2 entry #21: 0x4000000000130000 0000000000000000
-+write -q -c -P PATTERN 1408k 64k
-+L2 entry #22: 0x4000000000140000 0000000000000000
-+write -q -c -P PATTERN 1472k 64k
-+L2 entry #23: 0x4000000000150000 0000000000000000
-+write -q -c -P PATTERN 1536k 64k
-+L2 entry #24: 0x4000000000160000 0000000000000000
-+write -q -c -P PATTERN 1600k 64k
-+L2 entry #25: 0x4000000000170000 0000000000000000
-+write -q -c -P PATTERN 1664k 64k
-+L2 entry #26: 0x4000000000180000 0000000000000000
-+write -q -c -P PATTERN 1728k 64k
-+L2 entry #27: 0x4000000000190000 0000000000000000
-+write -q -c -P PATTERN 1792k 64k
-+L2 entry #28: 0x40000000001a0000 0000000000000000
-+write -q -z 1152k 192k
-+L2 entry #18: 0x0000000000000000 ffffffff00000000
-+L2 entry #19: 0x0000000000000000 ffffffff00000000
-+L2 entry #20: 0x0000000000000000 ffffffff00000000
-+write -q -z 1376k 128k
-+L2 entry #21: 0x8000000000100000 00000000ffffffff
-+L2 entry #22: 0x8000000000110000 00000000ffffffff
-+L2 entry #23: 0x8000000000120000 00000000ffffffff
-+write -q -z 1567k 129k
-+L2 entry #24: 0x8000000000130000 00000000ffffffff
-+L2 entry #25: 0x8000000000140000 00000000ffffffff
-+L2 entry #26: 0x8000000000150000 00000000ffffffff
-+write -q -z 1759k 128k
-+L2 entry #27: 0x8000000000160000 ffff00000000ffff
-+L2 entry #28: 0x0000000000000000 ffffffff00000000
-+L2 entry #29: 0x8000000000170000 00007fff00008000
-+
-+### Writing zeroes 4: other tests (backing file: yes) ###
-+
-+write -q -z 1951k 8k
-+L2 entry #30: 0x8000000000180000 0007000000088000
-+write -q -z 2048k 35k
-+L2 entry #32: 0x0000000000000000 0003ffff00000000
-+
-+### Writing zeroes 1: unallocated clusters (backing file: no) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=2132992
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2132992
-+write -q -z 0 192k
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+L2 entry #1: 0x0000000000000000 ffffffff00000000
-+L2 entry #2: 0x0000000000000000 ffffffff00000000
-+write -q -z 224k 128k
-+L2 entry #3: 0x0000000000000000 ffff000000000000
-+L2 entry #4: 0x0000000000000000 ffffffff00000000
-+L2 entry #5: 0x0000000000000000 0000ffff00000000
-+write -q -z 415k 128k
-+L2 entry #6: 0x0000000000000000 ffff800000000000
-+L2 entry #7: 0x0000000000000000 ffffffff00000000
-+L2 entry #8: 0x0000000000000000 0000ffff00000000
-+
-+### Writing zeroes 2: allocated clusters (backing file: no) ###
-+
-+write -q -P PATTERN 576k 576k
-+L2 entry #9: 0x8000000000050000 00000000ffffffff
-+L2 entry #10: 0x8000000000060000 00000000ffffffff
-+L2 entry #11: 0x8000000000070000 00000000ffffffff
-+L2 entry #12: 0x8000000000080000 00000000ffffffff
-+L2 entry #13: 0x8000000000090000 00000000ffffffff
-+L2 entry #14: 0x80000000000a0000 00000000ffffffff
-+L2 entry #15: 0x80000000000b0000 00000000ffffffff
-+L2 entry #16: 0x80000000000c0000 00000000ffffffff
-+L2 entry #17: 0x80000000000d0000 00000000ffffffff
-+write -q -z 576k 192k
-+L2 entry #9: 0x8000000000050000 ffffffff00000000
-+L2 entry #10: 0x8000000000060000 ffffffff00000000
-+L2 entry #11: 0x8000000000070000 ffffffff00000000
-+write -q -z 800k 128k
-+L2 entry #12: 0x8000000000080000 ffff00000000ffff
-+L2 entry #13: 0x8000000000090000 ffffffff00000000
-+L2 entry #14: 0x80000000000a0000 0000ffffffff0000
-+write -q -z 991k 128k
-+L2 entry #15: 0x80000000000b0000 ffff00000000ffff
-+L2 entry #16: 0x80000000000c0000 ffffffff00000000
-+L2 entry #17: 0x80000000000d0000 00007fffffff8000
-+
-+### Writing zeroes 3: compressed clusters (backing file: no) ###
-+
-+write -q -c -P PATTERN 1152k 64k
-+L2 entry #18: 0x40000000000e0000 0000000000000000
-+write -q -c -P PATTERN 1216k 64k
-+L2 entry #19: 0x40000000000f0000 0000000000000000
-+write -q -c -P PATTERN 1280k 64k
-+L2 entry #20: 0x4000000000100000 0000000000000000
-+write -q -c -P PATTERN 1344k 64k
-+L2 entry #21: 0x4000000000110000 0000000000000000
-+write -q -c -P PATTERN 1408k 64k
-+L2 entry #22: 0x4000000000120000 0000000000000000
-+write -q -c -P PATTERN 1472k 64k
-+L2 entry #23: 0x4000000000130000 0000000000000000
-+write -q -c -P PATTERN 1536k 64k
-+L2 entry #24: 0x4000000000140000 0000000000000000
-+write -q -c -P PATTERN 1600k 64k
-+L2 entry #25: 0x4000000000150000 0000000000000000
-+write -q -c -P PATTERN 1664k 64k
-+L2 entry #26: 0x4000000000160000 0000000000000000
-+write -q -c -P PATTERN 1728k 64k
-+L2 entry #27: 0x4000000000170000 0000000000000000
-+write -q -c -P PATTERN 1792k 64k
-+L2 entry #28: 0x4000000000180000 0000000000000000
-+write -q -z 1152k 192k
-+L2 entry #18: 0x0000000000000000 ffffffff00000000
-+L2 entry #19: 0x0000000000000000 ffffffff00000000
-+L2 entry #20: 0x0000000000000000 ffffffff00000000
-+write -q -z 1376k 128k
-+L2 entry #21: 0x80000000000e0000 00000000ffffffff
-+L2 entry #22: 0x80000000000f0000 00000000ffffffff
-+L2 entry #23: 0x8000000000100000 00000000ffffffff
-+write -q -z 1567k 129k
-+L2 entry #24: 0x8000000000110000 00000000ffffffff
-+L2 entry #25: 0x8000000000120000 00000000ffffffff
-+L2 entry #26: 0x8000000000130000 00000000ffffffff
-+write -q -z 1759k 128k
-+L2 entry #27: 0x8000000000140000 ffff00000000ffff
-+L2 entry #28: 0x0000000000000000 ffffffff00000000
-+L2 entry #29: 0x0000000000000000 0000ffff00000000
-+
-+### Writing zeroes 4: other tests (backing file: no) ###
-+
-+write -q -z 1951k 8k
-+L2 entry #30: 0x0000000000000000 000f800000000000
-+write -q -z 2048k 35k
-+L2 entry #32: 0x0000000000000000 0003ffff00000000
-+
-+### Zero + unmap 1: allocated clusters (backing file: yes) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=2132992
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=raw size=2132992
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2132992 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+write -q -P PATTERN 576k 576k
-+L2 entry #9: 0x8000000000050000 00000000ffffffff
-+L2 entry #10: 0x8000000000060000 00000000ffffffff
-+L2 entry #11: 0x8000000000070000 00000000ffffffff
-+L2 entry #12: 0x8000000000080000 00000000ffffffff
-+L2 entry #13: 0x8000000000090000 00000000ffffffff
-+L2 entry #14: 0x80000000000a0000 00000000ffffffff
-+L2 entry #15: 0x80000000000b0000 00000000ffffffff
-+L2 entry #16: 0x80000000000c0000 00000000ffffffff
-+L2 entry #17: 0x80000000000d0000 00000000ffffffff
-+write -q -z -u 576k 192k
-+L2 entry #9: 0x0000000000000000 ffffffff00000000
-+L2 entry #10: 0x0000000000000000 ffffffff00000000
-+L2 entry #11: 0x0000000000000000 ffffffff00000000
-+write -q -z -u 800k 128k
-+L2 entry #12: 0x8000000000080000 ffff00000000ffff
-+L2 entry #13: 0x0000000000000000 ffffffff00000000
-+L2 entry #14: 0x80000000000a0000 0000ffffffff0000
-+write -q -z -u 991k 128k
-+L2 entry #15: 0x80000000000b0000 ffff00000000ffff
-+L2 entry #16: 0x0000000000000000 ffffffff00000000
-+L2 entry #17: 0x80000000000d0000 00007fffffff8000
-+
-+### Zero + unmap 2: compressed clusters (backing file: yes) ###
-+
-+write -q -c -P PATTERN 1152k 64k
-+L2 entry #18: 0x4000000000050000 0000000000000000
-+write -q -c -P PATTERN 1216k 64k
-+L2 entry #19: 0x4000000000060000 0000000000000000
-+write -q -c -P PATTERN 1280k 64k
-+L2 entry #20: 0x4000000000070000 0000000000000000
-+write -q -c -P PATTERN 1344k 64k
-+L2 entry #21: 0x4000000000090000 0000000000000000
-+write -q -c -P PATTERN 1408k 64k
-+L2 entry #22: 0x40000000000c0000 0000000000000000
-+write -q -c -P PATTERN 1472k 64k
-+L2 entry #23: 0x40000000000e0000 0000000000000000
-+write -q -c -P PATTERN 1536k 64k
-+L2 entry #24: 0x40000000000f0000 0000000000000000
-+write -q -c -P PATTERN 1600k 64k
-+L2 entry #25: 0x4000000000100000 0000000000000000
-+write -q -c -P PATTERN 1664k 64k
-+L2 entry #26: 0x4000000000110000 0000000000000000
-+write -q -c -P PATTERN 1728k 64k
-+L2 entry #27: 0x4000000000120000 0000000000000000
-+write -q -c -P PATTERN 1792k 64k
-+L2 entry #28: 0x4000000000130000 0000000000000000
-+write -q -z -u 1152k 192k
-+L2 entry #18: 0x0000000000000000 ffffffff00000000
-+L2 entry #19: 0x0000000000000000 ffffffff00000000
-+L2 entry #20: 0x0000000000000000 ffffffff00000000
-+write -q -z -u 1376k 128k
-+L2 entry #21: 0x8000000000050000 00000000ffffffff
-+L2 entry #22: 0x8000000000060000 00000000ffffffff
-+L2 entry #23: 0x8000000000070000 00000000ffffffff
-+write -q -z -u 1567k 129k
-+L2 entry #24: 0x8000000000090000 00000000ffffffff
-+L2 entry #25: 0x80000000000e0000 00000000ffffffff
-+L2 entry #26: 0x80000000000f0000 00000000ffffffff
-+write -q -z -u 1759k 128k
-+L2 entry #27: 0x80000000000c0000 ffff00000000ffff
-+L2 entry #28: 0x0000000000000000 ffffffff00000000
-+L2 entry #29: 0x8000000000100000 00007fff00008000
-+
-+### Zero + unmap 1: allocated clusters (backing file: no) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=2132992
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2132992
-+write -q -P PATTERN 576k 576k
-+L2 entry #9: 0x8000000000050000 00000000ffffffff
-+L2 entry #10: 0x8000000000060000 00000000ffffffff
-+L2 entry #11: 0x8000000000070000 00000000ffffffff
-+L2 entry #12: 0x8000000000080000 00000000ffffffff
-+L2 entry #13: 0x8000000000090000 00000000ffffffff
-+L2 entry #14: 0x80000000000a0000 00000000ffffffff
-+L2 entry #15: 0x80000000000b0000 00000000ffffffff
-+L2 entry #16: 0x80000000000c0000 00000000ffffffff
-+L2 entry #17: 0x80000000000d0000 00000000ffffffff
-+write -q -z -u 576k 192k
-+L2 entry #9: 0x0000000000000000 ffffffff00000000
-+L2 entry #10: 0x0000000000000000 ffffffff00000000
-+L2 entry #11: 0x0000000000000000 ffffffff00000000
-+write -q -z -u 800k 128k
-+L2 entry #12: 0x8000000000080000 ffff00000000ffff
-+L2 entry #13: 0x0000000000000000 ffffffff00000000
-+L2 entry #14: 0x80000000000a0000 0000ffffffff0000
-+write -q -z -u 991k 128k
-+L2 entry #15: 0x80000000000b0000 ffff00000000ffff
-+L2 entry #16: 0x0000000000000000 ffffffff00000000
-+L2 entry #17: 0x80000000000d0000 00007fffffff8000
-+
-+### Zero + unmap 2: compressed clusters (backing file: no) ###
-+
-+write -q -c -P PATTERN 1152k 64k
-+L2 entry #18: 0x4000000000050000 0000000000000000
-+write -q -c -P PATTERN 1216k 64k
-+L2 entry #19: 0x4000000000060000 0000000000000000
-+write -q -c -P PATTERN 1280k 64k
-+L2 entry #20: 0x4000000000070000 0000000000000000
-+write -q -c -P PATTERN 1344k 64k
-+L2 entry #21: 0x4000000000090000 0000000000000000
-+write -q -c -P PATTERN 1408k 64k
-+L2 entry #22: 0x40000000000c0000 0000000000000000
-+write -q -c -P PATTERN 1472k 64k
-+L2 entry #23: 0x40000000000e0000 0000000000000000
-+write -q -c -P PATTERN 1536k 64k
-+L2 entry #24: 0x40000000000f0000 0000000000000000
-+write -q -c -P PATTERN 1600k 64k
-+L2 entry #25: 0x4000000000100000 0000000000000000
-+write -q -c -P PATTERN 1664k 64k
-+L2 entry #26: 0x4000000000110000 0000000000000000
-+write -q -c -P PATTERN 1728k 64k
-+L2 entry #27: 0x4000000000120000 0000000000000000
-+write -q -c -P PATTERN 1792k 64k
-+L2 entry #28: 0x4000000000130000 0000000000000000
-+write -q -z -u 1152k 192k
-+L2 entry #18: 0x0000000000000000 ffffffff00000000
-+L2 entry #19: 0x0000000000000000 ffffffff00000000
-+L2 entry #20: 0x0000000000000000 ffffffff00000000
-+write -q -z -u 1376k 128k
-+L2 entry #21: 0x8000000000050000 00000000ffffffff
-+L2 entry #22: 0x8000000000060000 00000000ffffffff
-+L2 entry #23: 0x8000000000070000 00000000ffffffff
-+write -q -z -u 1567k 129k
-+L2 entry #24: 0x8000000000090000 00000000ffffffff
-+L2 entry #25: 0x80000000000e0000 00000000ffffffff
-+L2 entry #26: 0x80000000000f0000 00000000ffffffff
-+write -q -z -u 1759k 128k
-+L2 entry #27: 0x80000000000c0000 ffff00000000ffff
-+L2 entry #28: 0x0000000000000000 ffffffff00000000
-+L2 entry #29: 0x0000000000000000 0000ffff00000000
-+
-+### Discarding clusters with non-zero bitmaps (backing file: yes) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+L2 entry #1: 0x0000000000000000 ffffffff00000000
-+Image resized.
-+Image resized.
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+L2 entry #1: 0x0000000000000000 ffffffff00000000
-+
-+### Discarding clusters with non-zero bitmaps (backing file: no) ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x0000000000000000 ffffffff00000000
-+L2 entry #1: 0x0000000000000000 ffffffff00000000
-+Image resized.
-+Image resized.
-+L2 entry #0: 0x0000000000000000 0000ffff00000000
-+L2 entry #1: 0x0000000000000000 0000000000000000
-+
-+### Corrupted L2 entries - read test (allocated) ###
-+
-+# 'cluster is zero' bit set on the standard cluster descriptor
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x8000000000050001 0000000000000001
-+L2 entry #0: 0x8000000000050001 0000000000000001
-+
-+# Both 'subcluster is zero' and 'subcluster is allocated' bits set
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #1: 0x8000000000060000 00000001ffffffff
-+qcow2: Marking image as corrupt: Invalid cluster entry found  (L2 offset: 0x40000, L2 index: 0x1); further corruption events will be suppressed
-+read failed: Input/output error
-+
-+### Corrupted L2 entries - read test (unallocated) ###
-+
-+# 'cluster is zero' bit set on the standard cluster descriptor
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x0000000000000001 0000000000000000
-+L2 entry #0: 0x0000000000000001 0000000000000000
-+
-+# 'subcluster is allocated' bit set
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x0000000000000000 0000000000000001
-+qcow2: Marking image as corrupt: Invalid cluster entry found  (L2 offset: 0x40000, L2 index: 0); further corruption events will be suppressed
-+read failed: Input/output error
-+
-+# Both 'subcluster is zero' and 'subcluster is allocated' bits set
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #1: 0x0000000000000000 0000000100000001
-+qcow2: Marking image as corrupt: Invalid cluster entry found  (L2 offset: 0x40000, L2 index: 0x1); further corruption events will be suppressed
-+read failed: Input/output error
-+
-+### Compressed cluster with subcluster bitmap != 0 - read test ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x4000000000050000 0000000180000000
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+L2 entry #0: 0x4000000000050000 0000000180000000
-+
-+### Corrupted L2 entries - write test (allocated) ###
-+
-+# 'cluster is zero' bit set on the standard cluster descriptor
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x8000000000050001 0000000000000001
-+L2 entry #0: 0x8000000000050001 0000000000000001
-+
-+# Both 'subcluster is zero' and 'subcluster is allocated' bits set
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #1: 0x8000000000060000 00000001ffffffff
-+qcow2: Marking image as corrupt: Invalid cluster entry found  (L2 offset: 0x40000, L2 index: 0x1); further corruption events will be suppressed
-+write failed: Input/output error
-+
-+### Corrupted L2 entries - write test (unallocated) ###
-+
-+# 'cluster is zero' bit set on the standard cluster descriptor
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x0000000000000001 0000000000000000
-+L2 entry #0: 0x8000000000060000 0000000000000001
-+
-+# 'subcluster is allocated' bit set
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x0000000000000000 0000000000000001
-+qcow2: Marking image as corrupt: Invalid cluster entry found  (L2 offset: 0x40000, L2 index: 0); further corruption events will be suppressed
-+write failed: Input/output error
-+
-+# Both 'subcluster is zero' and 'subcluster is allocated' bits set
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #1: 0x0000000000000000 0000000100000001
-+qcow2: Marking image as corrupt: Invalid cluster entry found  (L2 offset: 0x40000, L2 index: 0x1); further corruption events will be suppressed
-+write failed: Input/output error
-+
-+### Compressed cluster with subcluster bitmap != 0 - write test ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x4000000000050000 0000000180000000
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+L2 entry #0: 0x8000000000060000 00000000ffffffff
-+
-+### Detect and repair unaligned clusters ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=raw size=131072
-+# Corrupted L2 entry, allocated subcluster #
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+ERROR offset=50200: Data cluster is not properly aligned; L2 entry corrupted.
-+ERROR cluster 6 refcount=0 reference=1
-+Rebuilding refcount structure
-+ERROR offset=50200: Data cluster is not properly aligned; L2 entry corrupted.
-+Repairing cluster 1 refcount=1 reference=0
-+Repairing cluster 2 refcount=1 reference=0
-+ERROR offset=50200: Data cluster is not properly aligned; L2 entry corrupted.
-+The following inconsistencies were found and repaired:
-+
-+    0 leaked clusters
-+    1 corruptions
-+
-+Double checking the fixed image now...
-+
-+1 errors were found on the image.
-+Data may be corrupted, or further writes to the image may corrupt it.
-+qcow2: Marking image as corrupt: Cluster allocation offset 0x50200 unaligned (L2 offset: 0x40000, L2 index: 0); further corruption events will be suppressed
-+read failed: Input/output error
-+# Corrupted L2 entry, no allocated subclusters #
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+Repairing offset=50200: Preallocated cluster is not properly aligned; L2 entry corrupted.
-+Leaked cluster 5 refcount=1 reference=0
-+Repairing cluster 5 refcount=1 reference=0
-+The following inconsistencies were found and repaired:
-+
-+    1 leaked clusters
-+    1 corruptions
-+
-+Double checking the fixed image now...
-+No errors were found on the image.
-+
-+### Image creation options ###
-+
-+# cluster_size < 16k
-+qemu-img: TEST_DIR/t.IMGFMT: Extended L2 entries are only supported with cluster sizes of at least 16384 bytes
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+# backing file and preallocation=metadata
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=raw size=1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=524288 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw preallocation=metadata
-+Image resized.
-+read 524288/524288 bytes at offset 0
-+512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 524288/524288 bytes at offset 524288
-+512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          Mapped to       File
-+0               0x80000        0               TEST_DIR/t.qcow2.base
-+# backing file and preallocation=falloc
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=524288 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw preallocation=falloc
-+Image resized.
-+read 524288/524288 bytes at offset 0
-+512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 524288/524288 bytes at offset 524288
-+512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          Mapped to       File
-+0               0x80000        0               TEST_DIR/t.qcow2.base
-+# backing file and preallocation=full
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=524288 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw preallocation=full
-+Image resized.
-+read 524288/524288 bytes at offset 0
-+512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 524288/524288 bytes at offset 524288
-+512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          Mapped to       File
-+0               0x80000        0               TEST_DIR/t.qcow2.base
-+
-+### Image resizing with preallocation and backing files ###
-+
-+# resize --preallocation=metadata
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=515072 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+Image resized.
-+read 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 522240/522240 bytes at offset 515072
-+510 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+# resize --preallocation=falloc
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=515072 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+Image resized.
-+read 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 522240/522240 bytes at offset 515072
-+510 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+# resize --preallocation=full
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=515072 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
-+Image resized.
-+read 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 522240/522240 bytes at offset 515072
-+510 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+### Image resizing with preallocation without backing files ###
-+
-+# resize --preallocation=metadata
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=515072
-+wrote 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Image resized.
-+read 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 522240/522240 bytes at offset 515072
-+510 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+# resize --preallocation=falloc
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=515072
-+wrote 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Image resized.
-+read 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 522240/522240 bytes at offset 515072
-+510 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+# resize --preallocation=full
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=515072
-+wrote 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Image resized.
-+read 515072/515072 bytes at offset 0
-+503 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 522240/522240 bytes at offset 515072
-+510 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+### qemu-img measure ###
-+
-+# 512MB, extended_l2=off
-+required size: 327680
-+fully allocated size: 537198592
-+# 512MB, extended_l2=on
-+required size: 393216
-+fully allocated size: 537264128
-+# 16K clusters, 64GB, extended_l2=off
-+required size: 42008576
-+fully allocated size: 68761485312
-+# 16K clusters, 64GB, extended_l2=on
-+required size: 75579392
-+fully allocated size: 68795056128
-+# 8k clusters
-+qemu-img: Extended L2 entries are only supported with cluster sizes of at least 16384 bytes
-+# 1024 TB
-+required size: 309285027840
-+fully allocated size: 1126209191870464
-+# 1025 TB
-+qemu-img: The image size is too large (try using a larger cluster size)
-+
-+### qemu-img amend ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+qemu-img: Toggling extended L2 entries is not supported
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+qemu-img: Toggling extended L2 entries is not supported
-+
-+### Test copy-on-write on an image with snapshots ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+L2 entry #0: 0x8000000000050000 0000008000042000
-+L2 entry #1: 0x8000000000060000 0000008000042000
-+L2 entry #2: 0x8000000000070000 0000008000042000
-+L2 entry #3: 0x8000000000080000 0000008000042000
-+L2 entry #4: 0x8000000000090000 0000008000042000
-+L2 entry #5: 0x80000000000a0000 0000008000042000
-+L2 entry #6: 0x80000000000b0000 0000008000042000
-+L2 entry #7: 0x80000000000c0000 0000008000042000
-+L2 entry #8: 0x80000000000d0000 0000008000042000
-+L2 entry #9: 0x80000000000e0000 0000008000042000
-+L2 entry #0: 0x8000000000120000 000000800007e000
-+L2 entry #1: 0x8000000000130000 000000800007fc00
-+L2 entry #2: 0x8000000000140000 00000080001fe000
-+L2 entry #3: 0x8000000000150000 000000800007e000
-+L2 entry #4: 0x8000000000160000 000000000007ff80
-+L2 entry #5: 0x8000000000170000 000000000007ffff
-+L2 entry #6: 0x00000000000b0000 0001808000042000
-+L2 entry #7: 0x00000000000c0000 0000208000040000
-+L2 entry #8: 0x8000000000180000 000000800007e000
-+L2 entry #9: 0x00000000000e0000 000000c000042000
-+
-+### Test concurrent requests ###
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+blkdebug: Suspended request 'A'
-+blkdebug: Resuming request 'A'
-+wrote 2048/2048 bytes at offset 30720
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2048/2048 bytes at offset 20480
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2048/2048 bytes at offset 40960
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index d886fa0cb3..68f6c2074a 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -284,6 +284,7 @@
- 267 rw auto quick snapshot
- 268 rw auto quick
- 270 rw backing quick
-+271 rw auto
- 272 rw
- 273 backing quick
- 274 rw backing
+ # @lazy-refcounts: on or off; only valid for compat >= 1.1
+ #
+ # @corrupt: true if the image has been marked corrupt; only valid for
+@@ -87,6 +90,7 @@
+       'compat': 'str',
+       '*data-file': 'str',
+       '*data-file-raw': 'bool',
++      '*extended-l2': 'bool',
+       '*lazy-refcounts': 'bool',
+       '*corrupt': 'bool',
+       'refcount-bits': 'int',
+@@ -4318,6 +4322,8 @@
+ # @data-file-raw: True if the external data file must stay valid as a
+ #                 standalone (read-only) raw image without looking at qcow2
+ #                 metadata (default: false; since: 4.0)
++# @extended-l2      True to make the image have extended L2 entries
++#                   (default: false; since 5.1)
+ # @size: Size of the virtual disk in bytes
+ # @version: Compatibility level (default: v3)
+ # @backing-file: File name of the backing file if a backing file
+@@ -4338,6 +4344,7 @@
+   'data': { 'file':             'BlockdevRef',
+             '*data-file':       'BlockdevRef',
+             '*data-file-raw':   'bool',
++            '*extended-l2':     'bool',
+             'size':             'size',
+             '*version':         'BlockdevQcow2Version',
+             '*backing-file':    'str',
+diff --git a/block/qcow2.h b/block/qcow2.h
+index f3499e53bf..065ec3df0b 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -246,15 +246,18 @@ enum {
+     QCOW2_INCOMPAT_CORRUPT_BITNR    = 1,
+     QCOW2_INCOMPAT_DATA_FILE_BITNR  = 2,
+     QCOW2_INCOMPAT_COMPRESSION_BITNR = 3,
++    QCOW2_INCOMPAT_EXTL2_BITNR      = 4,
+     QCOW2_INCOMPAT_DIRTY            = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
+     QCOW2_INCOMPAT_CORRUPT          = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
+     QCOW2_INCOMPAT_DATA_FILE        = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
+     QCOW2_INCOMPAT_COMPRESSION      = 1 << QCOW2_INCOMPAT_COMPRESSION_BITNR,
++    QCOW2_INCOMPAT_EXTL2            = 1 << QCOW2_INCOMPAT_EXTL2_BITNR,
+ 
+     QCOW2_INCOMPAT_MASK             = QCOW2_INCOMPAT_DIRTY
+                                     | QCOW2_INCOMPAT_CORRUPT
+                                     | QCOW2_INCOMPAT_DATA_FILE
+-                                    | QCOW2_INCOMPAT_COMPRESSION,
++                                    | QCOW2_INCOMPAT_COMPRESSION
++                                    | QCOW2_INCOMPAT_EXTL2,
+ };
+ 
+ /* Compatible feature bits */
+@@ -581,8 +584,7 @@ typedef enum QCow2MetadataOverlap {
+ 
+ static inline bool has_subclusters(BDRVQcow2State *s)
+ {
+-    /* FIXME: Return false until this feature is complete */
+-    return false;
++    return s->incompatible_features & QCOW2_INCOMPAT_EXTL2;
+ }
+ 
+ static inline size_t l2_entry_size(BDRVQcow2State *s)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 791de6a59c..36e1993788 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -58,6 +58,7 @@
+ #define BLOCK_OPT_DATA_FILE         "data_file"
+ #define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
+ #define BLOCK_OPT_COMPRESSION_TYPE  "compression_type"
++#define BLOCK_OPT_EXTL2             "extended_l2"
+ 
+ #define BLOCK_PROBE_BUF_SIZE        512
+ 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 04572f39e1..3dfb56ccca 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1438,6 +1438,12 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+     s->subcluster_size = s->cluster_size / s->subclusters_per_cluster;
+     s->subcluster_bits = ctz32(s->subcluster_size);
+ 
++    if (s->subcluster_size < (1 << MIN_CLUSTER_BITS)) {
++        error_setg(errp, "Unsupported subcluster size: %d", s->subcluster_size);
++        ret = -EINVAL;
++        goto fail;
++    }
++
+     /* Check support for various header values */
+     if (header.refcount_order > 6) {
+         error_setg(errp, "Reference count entry width too large; may not "
+@@ -2924,6 +2930,11 @@ int qcow2_update_header(BlockDriverState *bs)
+                 .bit  = QCOW2_INCOMPAT_COMPRESSION_BITNR,
+                 .name = "compression type",
+             },
++            {
++                .type = QCOW2_FEAT_TYPE_INCOMPATIBLE,
++                .bit  = QCOW2_INCOMPAT_EXTL2_BITNR,
++                .name = "extended L2 entries",
++            },
+             {
+                 .type = QCOW2_FEAT_TYPE_COMPATIBLE,
+                 .bit  = QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
+@@ -3271,7 +3282,8 @@ static int64_t qcow2_calc_prealloc_size(int64_t total_size,
+     return meta_size + aligned_total_size;
+ }
+ 
+-static bool validate_cluster_size(size_t cluster_size, Error **errp)
++static bool validate_cluster_size(size_t cluster_size, bool extended_l2,
++                                  Error **errp)
+ {
+     int cluster_bits = ctz32(cluster_size);
+     if (cluster_bits < MIN_CLUSTER_BITS || cluster_bits > MAX_CLUSTER_BITS ||
+@@ -3281,16 +3293,28 @@ static bool validate_cluster_size(size_t cluster_size, Error **errp)
+                    "%dk", 1 << MIN_CLUSTER_BITS, 1 << (MAX_CLUSTER_BITS - 10));
+         return false;
+     }
++
++    if (extended_l2) {
++        unsigned min_cluster_size =
++            (1 << MIN_CLUSTER_BITS) * QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER;
++        if (cluster_size < min_cluster_size) {
++            error_setg(errp, "Extended L2 entries are only supported with "
++                       "cluster sizes of at least %u bytes", min_cluster_size);
++            return false;
++        }
++    }
++
+     return true;
+ }
+ 
+-static size_t qcow2_opt_get_cluster_size_del(QemuOpts *opts, Error **errp)
++static size_t qcow2_opt_get_cluster_size_del(QemuOpts *opts, bool extended_l2,
++                                             Error **errp)
+ {
+     size_t cluster_size;
+ 
+     cluster_size = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE,
+                                          DEFAULT_CLUSTER_SIZE);
+-    if (!validate_cluster_size(cluster_size, errp)) {
++    if (!validate_cluster_size(cluster_size, extended_l2, errp)) {
+         return 0;
+     }
+     return cluster_size;
+@@ -3405,7 +3429,20 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+         cluster_size = DEFAULT_CLUSTER_SIZE;
+     }
+ 
+-    if (!validate_cluster_size(cluster_size, errp)) {
++    if (!qcow2_opts->has_extended_l2) {
++        qcow2_opts->extended_l2 = false;
++    }
++    if (qcow2_opts->extended_l2) {
++        if (version < 3) {
++            error_setg(errp, "Extended L2 entries are only supported with "
++                       "compatibility level 1.1 and above (use version=v3 or "
++                       "greater)");
++            ret = -EINVAL;
++            goto out;
++        }
++    }
++
++    if (!validate_cluster_size(cluster_size, qcow2_opts->extended_l2, errp)) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -3556,6 +3593,11 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+             cpu_to_be64(QCOW2_INCOMPAT_COMPRESSION);
+     }
+ 
++    if (qcow2_opts->extended_l2) {
++        header->incompatible_features |=
++            cpu_to_be64(QCOW2_INCOMPAT_EXTL2);
++    }
++
+     ret = blk_pwrite(blk, 0, header, cluster_size, 0);
+     g_free(header);
+     if (ret < 0) {
+@@ -3736,6 +3778,7 @@ static int coroutine_fn qcow2_co_create_opts(BlockDriver *drv,
+         { BLOCK_OPT_BACKING_FMT,        "backing-fmt" },
+         { BLOCK_OPT_CLUSTER_SIZE,       "cluster-size" },
+         { BLOCK_OPT_LAZY_REFCOUNTS,     "lazy-refcounts" },
++        { BLOCK_OPT_EXTL2,              "extended-l2" },
+         { BLOCK_OPT_REFCOUNT_BITS,      "refcount-bits" },
+         { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
+         { BLOCK_OPT_COMPAT_LEVEL,       "version" },
+@@ -4854,11 +4897,14 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     PreallocMode prealloc;
+     bool has_backing_file;
+     bool has_luks;
+-    bool extended_l2 = false; /* Set to false until the option is added */
++    bool extended_l2;
+     size_t l2e_size;
+ 
+     /* Parse image creation options */
+-    cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
++    extended_l2 = qemu_opt_get_bool_del(opts, BLOCK_OPT_EXTL2, false);
++
++    cluster_size = qcow2_opt_get_cluster_size_del(opts, extended_l2,
++                                                  &local_err);
+     if (local_err) {
+         goto err;
+     }
+@@ -5062,6 +5108,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+             .corrupt            = s->incompatible_features &
+                                   QCOW2_INCOMPAT_CORRUPT,
+             .has_corrupt        = true,
++            .has_extended_l2    = true,
++            .extended_l2        = has_subclusters(s),
+             .refcount_bits      = s->refcount_bits,
+             .has_bitmaps        = !!bitmaps,
+             .bitmaps            = bitmaps,
+@@ -5491,6 +5539,14 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+                                  "is not supported");
+                 return -ENOTSUP;
+             }
++        } else if (!strcmp(desc->name, BLOCK_OPT_EXTL2)) {
++            bool extended_l2 = qemu_opt_get_bool(opts, BLOCK_OPT_EXTL2,
++                                                 has_subclusters(s));
++            if (extended_l2 != has_subclusters(s)) {
++                error_setg(errp, "Toggling extended L2 entries "
++                           "is not supported");
++                return -ENOTSUP;
++            }
+         } else {
+             /* if this point is reached, this probably means a new option was
+              * added without having it covered here */
+@@ -5751,6 +5807,12 @@ static QemuOptsList qcow2_create_opts = {
+             .help = "Postpone refcount updates",
+             .def_value_str = "off"
+         },
++        {
++            .name = BLOCK_OPT_EXTL2,
++            .type = QEMU_OPT_BOOL,
++            .help = "Extended L2 tables",
++            .def_value_str = "off"
++        },
+         {
+             .name = BLOCK_OPT_REFCOUNT_BITS,
+             .type = QEMU_OPT_NUMBER,
+diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
+index 4b21d6a9ba..0054c2ed97 100644
+--- a/tests/qemu-iotests/031.out
++++ b/tests/qemu-iotests/031.out
+@@ -117,7 +117,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ Header extension:
+@@ -150,7 +150,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ Header extension:
+@@ -164,7 +164,7 @@ No errors were found on the image.
+ 
+ magic                     0x514649fb
+ version                   3
+-backing_file_offset       0x210
++backing_file_offset       0x240
+ backing_file_size         0x17
+ cluster_bits              16
+ size                      67108864
+@@ -188,7 +188,7 @@ data                      'host_device'
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ Header extension:
+diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
+index a9bed828e5..1fa7cad28d 100644
+--- a/tests/qemu-iotests/036.out
++++ b/tests/qemu-iotests/036.out
+@@ -26,7 +26,7 @@ compatible_features       []
+ autoclear_features        [63]
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ 
+@@ -38,7 +38,7 @@ compatible_features       []
+ autoclear_features        []
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ *** done
+diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
+index c54ae21b86..c8356be551 100644
+--- a/tests/qemu-iotests/049.out
++++ b/tests/qemu-iotests/049.out
+@@ -4,90 +4,90 @@ QA output created by 049
+ == 1. Traditional size parameter ==
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024b
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1k
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1K
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1G
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1T
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0b
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5k
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5K
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5G
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5T
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ == 2. Specifying size via -o ==
+ 
+ qemu-img create -f qcow2 -o size=1024 TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1024b TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1k TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1K TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1M TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1G TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1T TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1024.0 TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1024.0b TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1.5k TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1.5K TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1.5M TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1.5G TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o size=1.5T TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ == 3. Invalid sizes ==
+ 
+@@ -129,84 +129,84 @@ qemu-img: TEST_DIR/t.qcow2: The image size must be specified only once
+ == Check correct interpretation of suffixes for cluster size ==
+ 
+ qemu-img create -f qcow2 -o cluster_size=1024 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=1024b TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=1k TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=1K TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=1M TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1048576 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1048576 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=1024.0 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=1024.0b TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=0.5k TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=0.5K TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o cluster_size=0.5M TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=524288 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=524288 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ == Check compat level option ==
+ 
+ qemu-img create -f qcow2 -o compat=0.10 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o compat=1.1 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o compat=0.42 TEST_DIR/t.qcow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Invalid parameter '0.42'
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o compat=foobar TEST_DIR/t.qcow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Invalid parameter 'foobar'
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ == Check preallocation option ==
+ 
+ qemu-img create -f qcow2 -o preallocation=off TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=off lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=off lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o preallocation=metadata TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=metadata lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o preallocation=1234 TEST_DIR/t.qcow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Invalid parameter '1234'
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=1234 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=1234 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ == Check encryption option ==
+ 
+ qemu-img create -f qcow2 -o encryption=off TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 --object secret,id=sec0,data=123456 -o encryption=on,encrypt.key-secret=sec0 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=on encrypt.key-secret=sec0 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=on encrypt.key-secret=sec0 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ == Check lazy_refcounts option (only with v3) ==
+ 
+ qemu-img create -f qcow2 -o compat=1.1,lazy_refcounts=off TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o compat=1.1,lazy_refcounts=on TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=on refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=on extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=off TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=on TEST_DIR/t.qcow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibility level 1.1 and above (use version=v3 or greater)
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=on refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=on extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ *** done
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index fa3d68f0df..bb98fa5db8 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -21,6 +21,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: true
++    extended l2: false
+ qemu-io: can't open device TEST_DIR/t.IMGFMT: IMGFMT: Image is corrupt; cannot be opened read/write
+ no file open, try 'help open'
+ read 512/512 bytes at offset 0
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index 2f03cf045c..f618259d47 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -26,7 +26,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ magic                     0x514649fb
+@@ -84,7 +84,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ magic                     0x514649fb
+@@ -140,7 +140,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ ERROR cluster 5 refcount=0 reference=1
+@@ -195,7 +195,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ magic                     0x514649fb
+@@ -264,7 +264,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ read 65536/65536 bytes at offset 44040192
+@@ -326,7 +326,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ ERROR cluster 5 refcount=0 reference=1
+@@ -355,7 +355,7 @@ header_length             112
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ read 131072/131072 bytes at offset 0
+@@ -525,6 +525,7 @@ Format specific information:
+     data file: TEST_DIR/t.IMGFMT.data
+     data file raw: false
+     corrupt: false
++    extended l2: false
+ No errors were found on the image.
+ 
+ === Try changing the external data file ===
+@@ -546,6 +547,7 @@ Format specific information:
+     data file: foo
+     data file raw: false
+     corrupt: false
++    extended l2: false
+ 
+ qemu-img: Could not open 'TEST_DIR/t.IMGFMT': 'data-file' is required for this image
+ image: TEST_DIR/t.IMGFMT
+@@ -559,6 +561,7 @@ Format specific information:
+     refcount bits: 16
+     data file raw: false
+     corrupt: false
++    extended l2: false
+ 
+ === Clearing and setting data-file-raw ===
+ 
+@@ -575,6 +578,7 @@ Format specific information:
+     data file: TEST_DIR/t.IMGFMT.data
+     data file raw: true
+     corrupt: false
++    extended l2: false
+ No errors were found on the image.
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+@@ -588,6 +592,7 @@ Format specific information:
+     data file: TEST_DIR/t.IMGFMT.data
+     data file raw: false
+     corrupt: false
++    extended l2: false
+ No errors were found on the image.
+ qemu-img: data-file-raw cannot be set on existing images
+ image: TEST_DIR/t.IMGFMT
+@@ -602,5 +607,6 @@ Format specific information:
+     data file: TEST_DIR/t.IMGFMT.data
+     data file raw: false
+     corrupt: false
++    extended l2: false
+ No errors were found on the image.
+ *** done
+diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
+index 18dc488c7a..29a7f7ad60 100755
+--- a/tests/qemu-iotests/065
++++ b/tests/qemu-iotests/065
+@@ -98,20 +98,20 @@ class TestQCow3NotLazy(TestQemuImgInfo):
+     img_options = 'compat=1.1,lazy_refcounts=off'
+     json_compare = { 'compat': '1.1', 'lazy-refcounts': False,
+                      'refcount-bits': 16, 'corrupt': False,
+-                     'compression-type': 'zlib' }
++                     'compression-type': 'zlib', 'extended-l2': False }
+     human_compare = [ 'compat: 1.1', 'compression type: zlib',
+                       'lazy refcounts: false', 'refcount bits: 16',
+-                      'corrupt: false' ]
++                      'corrupt: false', 'extended l2: false' ]
+ 
+ class TestQCow3Lazy(TestQemuImgInfo):
+     '''Testing a qcow2 version 3 image with lazy refcounts enabled'''
+     img_options = 'compat=1.1,lazy_refcounts=on'
+     json_compare = { 'compat': '1.1', 'lazy-refcounts': True,
+                      'refcount-bits': 16, 'corrupt': False,
+-                     'compression-type': 'zlib' }
++                     'compression-type': 'zlib', 'extended-l2': False }
+     human_compare = [ 'compat: 1.1', 'compression type: zlib',
+                       'lazy refcounts: true', 'refcount bits: 16',
+-                      'corrupt: false' ]
++                      'corrupt: false', 'extended l2: false' ]
+ 
+ class TestQCow3NotLazyQMP(TestQMP):
+     '''Testing a qcow2 version 3 image with lazy refcounts disabled, opening
+@@ -120,7 +120,7 @@ class TestQCow3NotLazyQMP(TestQMP):
+     qemu_options = 'lazy-refcounts=on'
+     compare = { 'compat': '1.1', 'lazy-refcounts': False,
+                 'refcount-bits': 16, 'corrupt': False,
+-                'compression-type': 'zlib' }
++                'compression-type': 'zlib', 'extended-l2': False }
+ 
+ 
+ class TestQCow3LazyQMP(TestQMP):
+@@ -130,7 +130,7 @@ class TestQCow3LazyQMP(TestQMP):
+     qemu_options = 'lazy-refcounts=off'
+     compare = { 'compat': '1.1', 'lazy-refcounts': True,
+                 'refcount-bits': 16, 'corrupt': False,
+-                'compression-type': 'zlib' }
++                'compression-type': 'zlib', 'extended-l2': False }
+ 
+ TestImageInfoSpecific = None
+ TestQemuImgInfo = None
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index 529a1214e1..efc0328e8d 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -3,14 +3,14 @@ QA output created by 082
+ === create: Options specified more than once ===
+ 
+ Testing: create -f foo -f qcow2 TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+ cluster_size: 65536
+ 
+ Testing: create -f qcow2 -o cluster_size=4k -o lazy_refcounts=on TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=4096 lazy_refcounts=on refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=4096 lazy_refcounts=on extended_l2=off refcount_bits=16 compression_type=zlib
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+@@ -21,9 +21,10 @@ Format specific information:
+     lazy refcounts: true
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Testing: create -f qcow2 -o cluster_size=4k -o lazy_refcounts=on -o cluster_size=8k TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=8192 lazy_refcounts=on refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=8192 lazy_refcounts=on extended_l2=off refcount_bits=16 compression_type=zlib
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+@@ -34,9 +35,10 @@ Format specific information:
+     lazy refcounts: true
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Testing: create -f qcow2 -o cluster_size=4k,cluster_size=8k TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=8192 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=8192 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+@@ -62,6 +64,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -86,6 +89,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -110,6 +114,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -134,6 +139,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -158,6 +164,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -182,6 +189,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -206,6 +214,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -230,6 +239,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -237,10 +247,10 @@ Supported options:
+   size=<size>            - Virtual disk size
+ 
+ Testing: create -f qcow2 -u -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,help cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,help cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ Testing: create -f qcow2 -u -o backing_file=TEST_DIR/t.qcow2,,? TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,? cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,? cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2, -o help TEST_DIR/t.qcow2 128M
+ qemu-img: Invalid option list: backing_file=TEST_DIR/t.qcow2,
+@@ -269,6 +279,7 @@ Supported qcow2 options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -290,7 +301,7 @@ qemu-img: Format driver 'bochs' does not support image creation
+ === convert: Options specified more than once ===
+ 
+ Testing: create -f qcow2 TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ Testing: convert -f foo -f qcow2 TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ image: TEST_DIR/t.IMGFMT.base
+@@ -314,6 +325,7 @@ Format specific information:
+     lazy refcounts: true
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k -o lazy_refcounts=on -o cluster_size=8k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ image: TEST_DIR/t.IMGFMT.base
+@@ -326,6 +338,7 @@ Format specific information:
+     lazy refcounts: true
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Testing: convert -O qcow2 -o cluster_size=4k,cluster_size=8k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ image: TEST_DIR/t.IMGFMT.base
+@@ -353,6 +366,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -377,6 +391,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -401,6 +416,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -425,6 +441,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -449,6 +466,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -473,6 +491,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -497,6 +516,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -521,6 +541,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -560,6 +581,7 @@ Supported qcow2 options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -605,6 +627,7 @@ Format specific information:
+     lazy refcounts: true
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Testing: amend -f qcow2 -o size=130M -o lazy_refcounts=off TEST_DIR/t.qcow2
+ image: TEST_DIR/t.IMGFMT
+@@ -617,6 +640,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Testing: amend -f qcow2 -o size=8M -o lazy_refcounts=on -o size=132M TEST_DIR/t.qcow2
+ image: TEST_DIR/t.IMGFMT
+@@ -629,6 +653,7 @@ Format specific information:
+     lazy refcounts: true
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Testing: amend -f qcow2 -o size=4M,size=148M TEST_DIR/t.qcow2
+ image: TEST_DIR/t.IMGFMT
+@@ -656,6 +681,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -681,6 +707,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -706,6 +733,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -731,6 +759,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -756,6 +785,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -781,6 +811,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -806,6 +837,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -831,6 +863,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+@@ -873,6 +906,7 @@ Creation options for 'qcow2':
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extended_l2=<bool (on/off)> - Extended L2 tables
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+   refcount_bits=<num>    - Width of a reference count entry in bits
+diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
+index a822ff4ef6..0431743808 100644
+--- a/tests/qemu-iotests/085.out
++++ b/tests/qemu-iotests/085.out
+@@ -13,7 +13,7 @@ Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=134217728
+ === Create a single snapshot on virtio0 ===
+ 
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0', 'snapshot-file':'TEST_DIR/1-snapshot-v0.IMGFMT', 'format': 'IMGFMT' } }
+-Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.1 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.1 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ 
+ === Invalid command - missing device and nodename ===
+@@ -30,40 +30,40 @@ Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file
+ === Create several transactional group snapshots ===
+ 
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/2-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/2-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/2-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/1-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/2-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/2-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/1-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/2-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/3-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/3-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/3-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/3-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/3-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/3-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/4-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/4-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/4-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/4-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/4-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/4-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/5-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/5-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/5-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/5-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/5-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/5-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/6-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/6-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/6-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/6-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/6-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/6-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/7-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/7-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/7-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/7-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/7-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/7-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/8-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/8-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/8-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/8-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/8-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/8-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/9-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/9-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/9-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/9-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/9-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/9-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR/10-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/10-snapshot-v1.IMGFMT' } } ] } }
+-Formatting 'TEST_DIR/10-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+-Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/10-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ 
+ === Create a couple of snapshots using blockdev-snapshot ===
+diff --git a/tests/qemu-iotests/144.out b/tests/qemu-iotests/144.out
+index 885a8874a5..a2627f0cc5 100644
+--- a/tests/qemu-iotests/144.out
++++ b/tests/qemu-iotests/144.out
+@@ -9,7 +9,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=536870912
+ { 'execute': 'qmp_capabilities' }
+ {"return": {}}
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0', 'snapshot-file':'TEST_DIR/tmp.IMGFMT', 'format': 'IMGFMT' } }
+-Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ 
+ === Performing block-commit on active layer ===
+@@ -31,6 +31,6 @@ Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/
+ === Performing Live Snapshot 2 ===
+ 
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0', 'snapshot-file':'TEST_DIR/tmp2.IMGFMT', 'format': 'IMGFMT' } }
+-Formatting 'TEST_DIR/tmp2.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/tmp2.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ *** done
+diff --git a/tests/qemu-iotests/182.out b/tests/qemu-iotests/182.out
+index ae43654d32..e4290ec028 100644
+--- a/tests/qemu-iotests/182.out
++++ b/tests/qemu-iotests/182.out
+@@ -13,7 +13,7 @@ Is another process using the image [TEST_DIR/t.qcow2]?
+ {'execute': 'blockdev-add', 'arguments': { 'node-name': 'node0', 'driver': 'file', 'filename': 'TEST_DIR/t.IMGFMT', 'locking': 'on' } }
+ {"return": {}}
+ {'execute': 'blockdev-snapshot-sync', 'arguments': { 'node-name': 'node0', 'snapshot-file': 'TEST_DIR/t.IMGFMT.overlay', 'snapshot-node-name': 'node1' } }
+-Formatting 'TEST_DIR/t.qcow2.overlay', fmt=qcow2 size=197120 backing_file=TEST_DIR/t.qcow2 backing_fmt=file cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2.overlay', fmt=qcow2 size=197120 backing_file=TEST_DIR/t.qcow2 backing_fmt=file cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ {'execute': 'blockdev-add', 'arguments': { 'node-name': 'node1', 'driver': 'file', 'filename': 'TEST_DIR/t.IMGFMT', 'locking': 'on' } }
+ {"return": {}}
+diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
+index ac5ab16bc8..4e0f018bf2 100644
+--- a/tests/qemu-iotests/185.out
++++ b/tests/qemu-iotests/185.out
+@@ -9,14 +9,14 @@ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
+ === Creating backing chain ===
+ 
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'disk', 'snapshot-file': 'TEST_DIR/t.IMGFMT.mid', 'format': 'IMGFMT', 'mode': 'absolute-paths' } }
+-Formatting 'TEST_DIR/t.qcow2.mid', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.base backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2.mid', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.base backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ { 'execute': 'human-monitor-command', 'arguments': { 'command-line': 'qemu-io disk "write 0 4M"' } }
+ wrote 4194304/4194304 bytes at offset 0
+ 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": ""}
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'disk', 'snapshot-file': 'TEST_DIR/t.IMGFMT', 'format': 'IMGFMT', 'mode': 'absolute-paths' } }
+-Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.mid backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.mid backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"return": {}}
+ 
+ === Start commit job and exit qemu ===
+@@ -48,7 +48,7 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
+ { 'execute': 'qmp_capabilities' }
+ {"return": {}}
+ { 'execute': 'drive-mirror', 'arguments': { 'device': 'disk', 'target': 'TEST_DIR/t.IMGFMT.copy', 'format': 'IMGFMT', 'sync': 'full', 'speed': 65536 } }
+-Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
+ {"return": {}}
+@@ -62,7 +62,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
+ { 'execute': 'qmp_capabilities' }
+ {"return": {}}
+ { 'execute': 'drive-backup', 'arguments': { 'device': 'disk', 'target': 'TEST_DIR/t.IMGFMT.copy', 'format': 'IMGFMT', 'sync': 'full', 'speed': 65536 } }
+-Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "disk"}}
+diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
+index 6280ae6eed..821a052bb1 100644
+--- a/tests/qemu-iotests/198.out
++++ b/tests/qemu-iotests/198.out
+@@ -73,6 +73,7 @@ Format specific information:
+                 key offset: 1810432
+         payload offset: 2068480
+         master key iters: 1024
++    extended l2: false
+ 
+ == checking image layer ==
+ image: json:{ /* filtered */ }
+@@ -117,4 +118,5 @@ Format specific information:
+                 key offset: 1810432
+         payload offset: 2068480
+         master key iters: 1024
++    extended l2: false
+ *** done
+diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
+index 1a14255a83..363c5abe35 100644
+--- a/tests/qemu-iotests/206.out
++++ b/tests/qemu-iotests/206.out
+@@ -22,6 +22,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ === Successful image creation (inline blockdev-add, explicit defaults) ===
+ 
+@@ -45,6 +46,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ === Successful image creation (v3 non-default options) ===
+ 
+@@ -68,6 +70,7 @@ Format specific information:
+     lazy refcounts: true
+     refcount bits: 1
+     corrupt: false
++    extended l2: false
+ 
+ === Successful image creation (v2 non-default options) ===
+ 
+@@ -146,6 +149,7 @@ Format specific information:
+         payload offset: 528384
+         master key iters: XXX
+     corrupt: false
++    extended l2: false
+ 
+ === Invalid BlockdevRef ===
+ 
+diff --git a/tests/qemu-iotests/242.out b/tests/qemu-iotests/242.out
+index 091b9126ce..3759c99284 100644
+--- a/tests/qemu-iotests/242.out
++++ b/tests/qemu-iotests/242.out
+@@ -16,6 +16,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ No bitmap in JSON format output
+ 
+@@ -42,6 +43,7 @@ Format specific information:
+             granularity: 32768
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ The same bitmaps in JSON format:
+ [
+@@ -80,6 +82,7 @@ Format specific information:
+             granularity: 65536
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ The same bitmaps in JSON format:
+ [
+@@ -123,6 +126,7 @@ Format specific information:
+             granularity: 65536
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ The same bitmaps in JSON format:
+ [
+@@ -167,5 +171,6 @@ Format specific information:
+             granularity: 16384
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ Test complete
+diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
+index a3c99fd62e..38ac1a4e95 100644
+--- a/tests/qemu-iotests/255.out
++++ b/tests/qemu-iotests/255.out
+@@ -3,9 +3,9 @@ Finishing a commit job with background reads
+ 
+ === Create backing chain and start VM ===
+ 
+-Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ === Start background read requests ===
+ 
+@@ -23,9 +23,9 @@ Closing the VM while a job is being cancelled
+ 
+ === Create images and start VM ===
+ 
+-Formatting 'TEST_DIR/PID-src.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-src.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-dst.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-dst.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/274.out b/tests/qemu-iotests/274.out
+index d24ff681af..47edc3c423 100644
+--- a/tests/qemu-iotests/274.out
++++ b/tests/qemu-iotests/274.out
+@@ -1,9 +1,9 @@
+ == Commit tests ==
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 2097152/2097152 bytes at offset 0
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -56,6 +56,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -64,11 +65,11 @@ read 1048576/1048576 bytes at offset 1048576
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ === Testing HMP commit (top -> mid) ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 2097152/2097152 bytes at offset 0
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -86,6 +87,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -94,11 +96,11 @@ read 1048576/1048576 bytes at offset 1048576
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ === Testing QMP active commit (top -> mid) ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 2097152/2097152 bytes at offset 0
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -122,6 +124,7 @@ Format specific information:
+     lazy refcounts: false
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ 
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -131,9 +134,9 @@ read 1048576/1048576 bytes at offset 1048576
+ 
+ == Resize tests ==
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=6442450944 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=6442450944 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=1073741824 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=1073741824 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 65536/65536 bytes at offset 5368709120
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -150,9 +153,9 @@ read 65536/65536 bytes at offset 5368709120
+ { "start": 1073741824, "length": 7516192768, "depth": 0, "zero": true, "data": false}]
+ 
+ === preallocation=metadata ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=34359738368 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=34359738368 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=32212254720 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=32212254720 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 65536/65536 bytes at offset 33285996544
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -174,9 +177,9 @@ read 65536/65536 bytes at offset 33285996544
+ { "start": 34896609280, "length": 536870912, "depth": 0, "zero": true, "data": false, "offset": 2685075456}]
+ 
+ === preallocation=falloc ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=10485760 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=10485760 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=5242880 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=5242880 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 65536/65536 bytes at offset 9437184
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -193,9 +196,9 @@ read 65536/65536 bytes at offset 9437184
+ { "start": 5242880, "length": 10485760, "depth": 0, "zero": false, "data": true, "offset": 327680}]
+ 
+ === preallocation=full ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=16777216 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=16777216 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=8388608 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=8388608 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 65536/65536 bytes at offset 11534336
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -212,9 +215,9 @@ read 65536/65536 bytes at offset 11534336
+ { "start": 8388608, "length": 4194304, "depth": 0, "zero": false, "data": true, "offset": 327680}]
+ 
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=393216 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=393216 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=259072 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=259072 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 65536/65536 bytes at offset 259072
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -232,9 +235,9 @@ read 65536/65536 bytes at offset 259072
+ { "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": false}]
+ 
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=409600 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=409600 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=262144 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=262144 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 65536/65536 bytes at offset 344064
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -251,9 +254,9 @@ read 65536/65536 bytes at offset 344064
+ { "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": false}]
+ 
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=524288 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=524288 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=262144 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=262144 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ wrote 65536/65536 bytes at offset 446464
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/280.out b/tests/qemu-iotests/280.out
+index 92e4d14079..372e9f70ad 100644
+--- a/tests/qemu-iotests/280.out
++++ b/tests/qemu-iotests/280.out
+@@ -1,4 +1,4 @@
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off extended_l2=off refcount_bits=16 compression_type=zlib
+ 
+ === Launch VM ===
+ Enabling migration QMP events on VM...
+diff --git a/tests/qemu-iotests/291.out b/tests/qemu-iotests/291.out
+index 08bfaaaa6b..83e3ec821c 100644
+--- a/tests/qemu-iotests/291.out
++++ b/tests/qemu-iotests/291.out
+@@ -22,7 +22,7 @@ data                      'qcow2'
+ 
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ Header extension:
+@@ -60,6 +60,7 @@ Format specific information:
+             granularity: 65536
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 10 MiB (10485760 bytes)
+@@ -84,10 +85,11 @@ Format specific information:
+             granularity: 65536
+     refcount bits: 16
+     corrupt: false
++    extended l2: false
+ Check resulting qcow2 header extensions:
+ Header extension:
+ magic                     0x6803f857 (Feature table)
+-length                    336
++length                    384
+ data                      <binary>
+ 
+ Header extension:
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 03e4f71808..2ca66de0f0 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -146,6 +146,7 @@ _filter_img_create()
+         -e "s# adapter_type=[^ ]*##g" \
+         -e "s# hwversion=[^ ]*##g" \
+         -e "s# lazy_refcounts=\\(on\\|off\\)##g" \
++        -e "s# extended_l2=\\(on\\|off\\)##g" \
+         -e "s# block_size=[0-9]\\+##g" \
+         -e "s# block_state_zero=\\(on\\|off\\)##g" \
+         -e "s# log_size=[0-9]\\+##g" \
 -- 
 2.20.1
 
