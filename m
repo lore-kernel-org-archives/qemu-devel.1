@@ -2,76 +2,76 @@ Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD849C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 769EDC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:53:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A827720870
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 417F720870
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 13:53:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Eiag0zTB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A827720870
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aVMVFWSL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 417F720870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrM7R-0004NV-U9
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:52:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53488)
+	id 1jrM7w-0005g0-Gr
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 09:53:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrM6S-0002WW-If
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:51:44 -0400
-Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:39996)
+ id 1jrM6p-0003IL-3R
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:52:07 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43962)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrM6R-0000Bt-1g
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:51:44 -0400
-Received: by mail-oo1-xc44.google.com with SMTP id p26so371119oos.7
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 06:51:42 -0700 (PDT)
+ id 1jrM6n-0000HH-6m
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 09:52:06 -0400
+Received: by mail-oi1-x243.google.com with SMTP id x83so19002956oif.10
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 06:52:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MepMru1D/YzxkLb8PygMuGCrjLYZWIayt5cr0f568H8=;
- b=Eiag0zTBE7cpOlvQwPP1wlqH/nJvE860KgI7Qvwy3oOSwmCnv0g/jHFHNIfCotvG02
- oo40uCwywc1u23IvObbezda7CqxlRfesRRrV80Fc5cyvjUWVCX733dZcwLzscPgH9HQ3
- m7ZYk17+3a8IIAAGV0kcYXEBa1kMBwmXJMRPLX5EOpDAWansDbqL0DOp70DxoZ4+nVcU
- 4QxmggfY3YbBZ47+vWrcCv8VKi+xOchADhIYGhUC1cMCV9lgR0g79sgo17MZhjXd4gJP
- M6aHz6G/1WwXndqCX/vqNuwl7SwpA5p4+rjCMfYKPL/okHt01RvtX3/0Ppvci1erUM04
- U6ow==
+ :cc; bh=/Zg4UaLRNsQxpF3+LRuH3eHHCTSLdGm80tI92zWvhdk=;
+ b=aVMVFWSL03y4QZugioqAliSJKlOl/uapAJXCTjfmTQSzJ2UyYV1yAdgJDkojq7aylj
+ nQK5tYsZIAPA4Y0kLzCQWBup+2njzbIj7Bsyt3UDSdkZJnxAwf02hDIvA1eqSDoaYmB0
+ B2ciuOtNtcOCAuhCpo+eeixsgFtYC6dap9b8ePSwBNYkiNHGPagdjFSS5H594Ih41zhY
+ VKmt1UepyFGDwPVRNCwZIdXpqQSMZusqtYBxdhdKGG3BnoAyuGLeS8vksVX4z+EzmXWh
+ WXb/xcOtaVblKkBZjA5q7ZTcqPJd/air4/g1zw8a9CbuvfdaKS+aSNapJG7zgVTAP36n
+ +s5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=MepMru1D/YzxkLb8PygMuGCrjLYZWIayt5cr0f568H8=;
- b=oKmA7q+E27h1xVcqrzF+0juayWg6iYWqxoq4725aw3Oku9Cj+GWtDwAT0IiYUEHuXi
- /5B1UEfMRe6sr2KRPLHNzrK0x+IxU9J1ZbRBWT0PkYbGTFrzM6vegAb9Is2DtVsdtdEP
- UOhHPJ7flmVwkRA1eJD2EHWtvSsYymReAqU7sizyAhzDyCkASUmrbVLT3Lz3J48a51Od
- EovZvLtevVtp7FuKIfm0RSAd3N4EFxrvapo7PTEDxo0bCHe8o5xVWf3O0G/XL5K+EOv5
- HxOj2+mNYcO83GRYZtn9ToMs/UkTCuwy6en8bRZAy9EM5gXKKsb+mwQhXrkk0xuHOWZV
- KJmw==
-X-Gm-Message-State: AOAM533pFRtqqMmnPM4ti+P31qv8IwLaNwpVjEjzZ2BkwpYqDSqP044H
- sdA+f933z3igMTX05Ch93jDUTUajO+IoGmlpStYgRA==
-X-Google-Smtp-Source: ABdhPJz6P3hDD/Jv0VznMIYmst/45TfzXqmMJVCvH5SfRtuWzNifw3TYD+S03wq+ekS47qi3e8rQTX7OlLO3s51xpY8=
-X-Received: by 2002:a4a:9653:: with SMTP id r19mr9262711ooi.85.1593784301704; 
- Fri, 03 Jul 2020 06:51:41 -0700 (PDT)
+ bh=/Zg4UaLRNsQxpF3+LRuH3eHHCTSLdGm80tI92zWvhdk=;
+ b=r5ZALTE3ngM5b8PqYIpYwl38Wk++oOGvRNzNgpjrNmdZo/WDQgNoQJjRF5/95blsYH
+ eJM/4uK0LW2q428tsQIVudIGo1c0DR37MUmNJqDrCGfbafi7OxBZf+SRI2AJQZm+mpC6
+ fqVP2lcgC0Bsd8k5qFwnFEzQQ6WE1xJFXdZpsAviWqCY1djgzzz/LJ0EPmhbd1NDyswN
+ PosyH6I86M68/vUcdx2hMA+ifRnFIpmupkgi9rJunGqJ9dhE9tblpB0l9/gg99LI1sog
+ wyOJ0n7NkLe4IEGPkuVgZizUfpgH/tgXxZv40diSWjFei2QGc7RIDrBSFhm8J9jRucvC
+ Tazw==
+X-Gm-Message-State: AOAM532f9c3lmpX8sh1rFH9BzfYVf4H+TjHjcpKO5HFcbGzvKSjv5mNX
+ kKFUN/KSZwDoz0OcD18iaqcjeQOXSq3+sRWk8QyX4g==
+X-Google-Smtp-Source: ABdhPJyWY99WUs5pLqoCEAGBC6Yg11BTQVfQnDWRftWcFEgdXaQApPDhLXlnz/oaFNS/Tg9Q/lZXtGnFjGrkxOa8Fzg=
+X-Received: by 2002:aca:1706:: with SMTP id j6mr588271oii.146.1593784324148;
+ Fri, 03 Jul 2020 06:52:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+XhMqztrEOU5KQQ91qkNMrXZOxfnKQDFhC_UiJP8MkoyVoquw@mail.gmail.com>
-In-Reply-To: <CA+XhMqztrEOU5KQQ91qkNMrXZOxfnKQDFhC_UiJP8MkoyVoquw@mail.gmail.com>
+References: <CA+XhMqyoDM3EZwvP353aMAELYZ85RF_4vsOw0A=HD1_rSgfrDA@mail.gmail.com>
+In-Reply-To: <CA+XhMqyoDM3EZwvP353aMAELYZ85RF_4vsOw0A=HD1_rSgfrDA@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Jul 2020 14:51:30 +0100
-Message-ID: <CAFEAcA9X12n5XE1Jx9rgHLUt_hE6Tgc2QcsyDxAcow4zSjxZJw@mail.gmail.com>
-Subject: Re: [PATCH 4/9] Checking sys/signal.h presence.
+Date: Fri, 3 Jul 2020 14:51:53 +0100
+Message-ID: <CAFEAcA_d8YYbb+T0iWci8ukRS=TA1gGf4Ky8T717hWnbP1jJUg@mail.gmail.com>
+Subject: Re: [PATCH 5/9] Define SIGIO constant with SIGPOLL equivalence
 To: David CARLIER <devnexen@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,14 +98,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 at 01:46, David CARLIER <devnexen@gmail.com> wrote:
+On Tue, 30 Jun 2020 at 01:47, David CARLIER <devnexen@gmail.com> wrote:
 >
-> From 9d43c8cd1611d0347db9066b1df1dc34431b2028 Mon Sep 17 00:00:00 2001
+> From 93c001e7da19c76a73a687dc6584bc31385a2693 Mon Sep 17 00:00:00 2001
 > From: David Carlier <devnexen@gmail.com>
-> Date: Mon, 29 Jun 2020 22:17:53 +0000
-> Subject: [PATCH 4/9] Checking sys/signal.h presence.
+> Date: Mon, 29 Jun 2020 22:18:32 +0000
+> Subject: [PATCH 5/9] Define SIGIO constant with SIGPOLL equivalence,
 >
 > Signed-off-by: David Carlier <devnexen@gmail.com>
+> ---
+>  include/qemu/osdep.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 6e0cf9132d..e090ead826 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -425,6 +425,10 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #define HAVE_CHARDEV_PARPORT 1
+>  #endif
+>
+> +#if defined(__HAIKU__)
+> +#define SIGIO SIGPOLL
+> +#endif
+> +
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
