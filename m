@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08BDFC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 149CEC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:23:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C360920782
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:22:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D072C20782
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 20:23:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ldiTWbkd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C360920782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T5deevcT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D072C20782
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrSCU-0005le-Mr
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35312)
+	id 1jrSDu-0008FI-2y
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 16:23:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9i-0008F3-3T; Fri, 03 Jul 2020 16:19:30 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34537)
+ id 1jrS9c-00080f-4S; Fri, 03 Jul 2020 16:19:24 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37180)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrS9g-0001Vr-KU; Fri, 03 Jul 2020 16:19:29 -0400
-Received: by mail-wm1-x341.google.com with SMTP id g10so11555568wmc.1;
- Fri, 03 Jul 2020 13:19:27 -0700 (PDT)
+ id 1jrS9a-0001V0-O8; Fri, 03 Jul 2020 16:19:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a6so33946289wrm.4;
+ Fri, 03 Jul 2020 13:19:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5zz83s2aXXms/dZv8O4WT0VV9oFnKrxqm4zzQa37/7Q=;
- b=ldiTWbkdIwLYF3/DPDYXuf8mdH+9ddp6gI13TA9WuTbp0Wz4tqBi/J9Ba7Yrsd/FMx
- Q6B3uWhQEzhyEB6XBDiyupi1GwCfLZVnEFjR6D6+X2e5whIAJTzipK0bSw7sk71/RiWW
- nNMxEgAdFfhTdxHI5pebLbMhqWGSNTGOHSxgn1sAxqUzmu67mgn5awBaFbh4+CWK9AT5
- qQpSDu0nWqjW8ikXe0n/rPyGLT+et/XaMuPTcjOdMMM+B338RXSCpu+HRxfKnj7PlfUD
- w3GNmY4SOp0woMJyqHvQfX2qHkEIRTMx6oxvDkJBOKseCzCo31K/PfRmTFenn+lQBHbP
- FCvg==
+ bh=hDAjsWCo4muYV2UGuHt56RhWysQG9sjw6uJx4BVOBUQ=;
+ b=T5deevcTXhgqKXgllHmkBGEkLA9yEGSlNTkrTEWmGqAibvBGJXinmQw7EaBFlyTNcX
+ N0sRPe0rSHqTYpHtPhOf39NM378uLokFNzcYPeOuMcHDGluWC6EUmzK3bMaJLaqkgw3T
+ MUbCA+wfdNOV+ZOP0ifhVZ5eIO/KBWY38sKtMGjZzyt0iT08x5XxyYp6woFtAFKZrzHx
+ UcSyT4BvtjLQm70bi/4V8MeVmqsp3bPeEGbVoD1GltkmklBrJL21wcqb4TaHVhg1+gFt
+ 2pXauzM2Z6kZRn9d0fuDY5WLfJJQ3g/0H0qO/B7u2y5oUmcBSN9Z4OGGDvOZsUmFE7Ac
+ mERQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=5zz83s2aXXms/dZv8O4WT0VV9oFnKrxqm4zzQa37/7Q=;
- b=E05uuifwNb4ev/WN4r2/Fs0PPiFjy8DQopPhc0DI9sY1/qs0Ce+wdkYD81pU1CaZhn
- Pjh768vpq8kniF1cFyYti4fpIZRnVTpcpuOKiVnqHBOaHZC7EU5Xa8gF/yvM/tnCIx4o
- zI76dfTuxwMqtVvGQ76Ko92zBpkRTz6mNc9Dc8fseK7WcoPr26zObxaliA5hJ56wriFz
- b8wg1F8iM8VFgb+Xz5bQMwu+KOKuXOghnyqQEWJH7x5AQYfQu8wU0/pYS/UkSrYBKyeY
- RCziNWu4c5VIw+UGSLn+xAbsguoEH24G+WeAxxAiNVbd43cHjlccOsk0typcAEbC036e
- hq6w==
-X-Gm-Message-State: AOAM531wf+ZEByXfRo2aDoXE71akdmq0XrYKlUqrt5760OkRYfj4oOZu
- 3iOIXLkZZVOQ3GQqe27izIJdddmywY4=
-X-Google-Smtp-Source: ABdhPJwle8wm1WDLa2CYtkDoT4ukCNEWe6/zVb2J5uM9dMvViSCaSD0jgR9OOhzBfMZmLGovKMU/2w==
-X-Received: by 2002:a1c:6354:: with SMTP id x81mr36687795wmb.98.1593807566780; 
- Fri, 03 Jul 2020 13:19:26 -0700 (PDT)
+ bh=hDAjsWCo4muYV2UGuHt56RhWysQG9sjw6uJx4BVOBUQ=;
+ b=mnMDt4FO5AU2sfuFPbiepoF1CQhxWK+4wZXeg/+PhN+dE/o/BRyjHig4TGajz+VJA0
+ ng+ff2RuvDDyA4iQLRBVq03m+OpTsJACtWqsas4+7Bh2d+ut8pKGAsg7Txrsly6WjIsN
+ h/Rv3scdgLvlN/s4ieSAontiIPoUxg2jIFpKzC5kj6DZRZshavup1lILjOgVNIzz1xMP
+ 6Z5dL/BWW7R5B23GMdQNeEQpSW+wDnTyswXyLdBbQcYqe2yNpHgWWVWqkJPqq+DmWZzG
+ ne65Mb1nTTlGo53ruG0SsHBe+JrsAWOGkLSFn6vQk1sQ6+9ZxQpsDG/F7D0SWRamb7oh
+ MAjQ==
+X-Gm-Message-State: AOAM531ky9GF+ixjyZKF7FyxpO4hn+eNC7g8m+3up7q2NNtVllpOyY+a
+ +SUPLPPfvxWtLIjCg4EnF1h+OlLgwGA=
+X-Google-Smtp-Source: ABdhPJzRNrtwZQ56e6eQM6fJRfBWPZw8hDCvTQd2nhysuIrrXXxKO1yOwGigr8QXfyscSFSlmafmFg==
+X-Received: by 2002:a5d:474f:: with SMTP id o15mr35354909wrs.306.1593807560975; 
+ Fri, 03 Jul 2020 13:19:20 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.25
+ by smtp.gmail.com with ESMTPSA id u65sm14229625wmg.5.2020.07.03.13.19.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jul 2020 13:19:26 -0700 (PDT)
+ Fri, 03 Jul 2020 13:19:20 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 09/18] hw/cpu/a9mpcore: Mark the device with no migratable
+Subject: [PATCH 05/18] hw/arm/aspeed_soc: Mark the device with no migratable
  fields
-Date: Fri,  3 Jul 2020 22:19:02 +0200
-Message-Id: <20200703201911.26573-10-f4bug@amsat.org>
+Date: Fri,  3 Jul 2020 22:18:58 +0200
+Message-Id: <20200703201911.26573-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200703201911.26573-1-f4bug@amsat.org>
 References: <20200703201911.26573-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -122,42 +122,21 @@ Sender: "Qemu-devel"
 This device doesn't have fields to migrate. Be explicit
 by using vmstate_qdev_no_state_to_migrate.
 
-Add a more descriptive comment to keep a clear separation
-between static property vs runtime changeable.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/cpu/a9mpcore.h | 3 ++-
- hw/cpu/a9mpcore.c         | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ hw/arm/aspeed_soc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/cpu/a9mpcore.h b/include/hw/cpu/a9mpcore.h
-index 5d67ca22c4..212f5db391 100644
---- a/include/hw/cpu/a9mpcore.h
-+++ b/include/hw/cpu/a9mpcore.h
-@@ -25,10 +25,11 @@ typedef struct A9MPPrivState {
-     SysBusDevice parent_obj;
-     /*< public >*/
- 
-+    /* Properties */
-     uint32_t num_cpu;
--    MemoryRegion container;
-     uint32_t num_irq;
- 
-+    MemoryRegion container;
-     A9SCUState scu;
-     GICState gic;
-     A9GTimerState gtimer;
-diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
-index 642363d2f4..5012c7a81a 100644
---- a/hw/cpu/a9mpcore.c
-+++ b/hw/cpu/a9mpcore.c
-@@ -176,6 +176,7 @@ static void a9mp_priv_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->realize = a9mp_priv_realize;
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 311458aa76..b15984e4d3 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -442,6 +442,7 @@ static void aspeed_soc_class_init(ObjectClass *oc, void *data)
+     dc->realize = aspeed_soc_realize;
+     /* Reason: Uses serial_hds and nd_table in realize() directly */
+     dc->user_creatable = false;
 +    dc->vmsd = vmstate_qdev_no_state_to_migrate;
-     device_class_set_props(dc, a9mp_priv_properties);
+     device_class_set_props(dc, aspeed_soc_properties);
  }
  
 -- 
