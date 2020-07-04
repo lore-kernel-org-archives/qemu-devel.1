@@ -2,95 +2,79 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28792C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4756C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:14:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D84E62145D
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CE5B2145D
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:14:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u6n2jsij"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D84E62145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mindspring.com header.i=@mindspring.com header.b="lEirzSmO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CE5B2145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mindspring.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrmfH-0005Ly-4C
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:13:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37236)
+	id 1jrmgC-0006H7-Qd
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:14:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrmeZ-0004jg-1H; Sat, 04 Jul 2020 14:12:43 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41358)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrmeX-00078Q-1h; Sat, 04 Jul 2020 14:12:42 -0400
-Received: by mail-wr1-x441.google.com with SMTP id z15so24790543wrl.8;
- Sat, 04 Jul 2020 11:12:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=dR5yAbM94Oarj3h8zuGYtWJaMflsDMqLOxHo7EbP8gI=;
- b=u6n2jsij5oAqs6s+fzbL8Jk30AKCjpTP3V+d/MUa3F29sfC+NU3p0TuAHlBJq2tUXI
- w4/BoQpthsGaZdYWUW/T07EpyNQYh2q78UumTwp2KNxsFe8vAKl0sdK6cW8/DjaCYo8i
- FwNSf77oq4kAprNundvFZWgHGL43IdYtGMXQ6Ma1XGcD0UTOnIlj4Z4cyt+wDLnFhA5T
- HkponJU6Rv5WH2YRA5Yw5K0ZQFfRJULheyqYSM9WaDlvPw2gIXeToIlFgtRhpW9PhCTA
- 0RnkOXfCJfxLyoqm/dRKGk/YefB9WtZN41MLkmeSfDaEgoPZqF/gyLBU9WIJPNIFZ55I
- uIwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=dR5yAbM94Oarj3h8zuGYtWJaMflsDMqLOxHo7EbP8gI=;
- b=Wzp4GiGx8V1trrrYVlDSeU7zvVfnQ6uBUq4tRBhIW4aLMF1mDa3CmNmmf4GaJblwhh
- pRj1BGk5StMfeBAYdDoiRsXYQXFmloNt+e8sbnUbGqpY3L9jAyTbHs+EgLO2lGxuy7OQ
- opxynPw0pPdSiEfRDnvOCWOCMzEfl59+zLI2j/EIb0e/Hb2wspwfeZ/CVkVupDBp3VKj
- olVsEC16Csoz6wdmGUZDsvTkIELAQVvufC7SfDfEtJbmdlBxa3dj9pRU0bnYEobe5e7M
- fin0AsRmQu9WgRHQXbEuElxy4Y/tznGdFhpuVmBMJ7K7CIYosmEvLGKuhCeCtd+gynPV
- cLkg==
-X-Gm-Message-State: AOAM532Jffkpr1KfSMbMM66i7nR9J7IMN+Oxy9aYDrVBEzdr5S6Nwpwm
- 9HYZ24UzQDwSt73t6uDxSSA=
-X-Google-Smtp-Source: ABdhPJxOLfAMmahMaoYf1dyoxeHrbYNeWnj1XcQlMEhgj7aLv2DVhmCoQZ8rP4y0uYhA5TedskmrPw==
-X-Received: by 2002:adf:c44d:: with SMTP id a13mr42892704wrg.205.1593886358792; 
- Sat, 04 Jul 2020 11:12:38 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id h13sm17258467wml.42.2020.07.04.11.12.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 04 Jul 2020 11:12:37 -0700 (PDT)
-Subject: Re: [PATCH 24/26] hw/usb/usb-hcd: Use UHCI type definitions
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20200704144943.18292-1-f4bug@amsat.org>
- <20200704144943.18292-25-f4bug@amsat.org>
- <alpine.BSF.2.22.395.2007041916060.92265@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f19dc1c9-8b72-695b-bce1-660e547e5658@amsat.org>
-Date: Sat, 4 Jul 2020 20:12:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <denber@mindspring.com>)
+ id 1jrmfd-0005nP-Dc; Sat, 04 Jul 2020 14:13:49 -0400
+Received: from elasmtp-dupuy.atl.sa.earthlink.net ([209.86.89.62]:50706)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <denber@mindspring.com>)
+ id 1jrmfb-0007Bb-ET; Sat, 04 Jul 2020 14:13:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mindspring.com;
+ s=dk12062016; t=1593886427; bh=YGMKMa+vTB4LsPWqzqVkOcc2TiujminyZma1
+ ZHPHpGw=; h=Received:Message-ID:Date:From:User-Agent:MIME-Version:
+ To:CC:Subject:References:In-Reply-To:Content-Type:X-ELNK-Trace:
+ X-Originating-IP; b=lEirzSmOrM+h4w4uVYO6dqWytEAcQg+Nn5vSx+ceFeqNyH
+ es8dlBNemj5q878ngPhXeh5nHgPsdOW+o/4EEAJDoh8jBrThRUmtSKFnJKlVh3Up5LG
+ TNYoOhWWSOrbubox1Kxkwo7VcSWjvFKwJqJkxPdP41r168SzEQtBoLcot2I1GuFNPd7
+ sGe0pSnfJTPSa3FA5Hl2yEt4oWDhH9X/rmnSatbqSQG73O2HUuKbRhBxmu6gIGG+83c
+ VJkAKLQm0IZYB/VoAX8qHyI4Of0lJs+FkJPo8ONNLn3P6xCH7Le5Xd9Yw30HKQ+jx6p
+ SAF7Mo1onq6DcFDTuFD4YkqnFyaA==
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws;
+ s=dk12062016; d=mindspring.com;
+ b=bCx5X2QuJU3ex2VJL8TOfgbThc5EQvaBJVCug+LfS4qwiwV1SfAoF3eLbpQc3nGpjrdQ9pbARN1Z7IUJfGejouoy+cSRH0Zkv0luq/a4UsMcdhrckzNO1vDhErGJ5mYX7JJix5hzIrrs1fdasie8H8f+RyeA5TxAPB2nWqjcuYVYfIEoMqD0BjsIyE91uXiJcFuWKGur2JvUt/TqOBhzS93WML2U9Kqkeo4c6+xXb5DEyGitAbhPiXBdOqxmd4afVG2MKKbw0sjVTUyknElMgl4F5LsWM57ZAUdYUFI6NDHkdec+w6GUF9ZWGiiCHxxq8jOeUTmeBgzBuPlkI4kTqg==;
+ h=Received:Message-ID:Date:From:User-Agent:MIME-Version:To:CC:Subject:References:In-Reply-To:Content-Type:X-ELNK-Trace:X-Originating-IP;
+Received: from [8.9.81.230] (helo=[192.168.0.78])
+ by elasmtp-dupuy.atl.sa.earthlink.net with esmtpa (Exim 4)
+ (envelope-from <denber@mindspring.com>)
+ id 1jrmfX-000BZw-Jb; Sat, 04 Jul 2020 14:13:43 -0400
+Message-ID: <5F00C6D6.8010001@mindspring.com>
+Date: Sat, 04 Jul 2020 14:13:42 -0400
+From: Michele Denber <denber@mindspring.com>
+User-Agent: Mozilla/5.0 (X11; SunOS sun4v;
+ rv:10.0.7) Gecko/20121005 Thunderbird/10.0.7
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2007041916060.92265@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] net/tap-solaris.c: Include qemu-common.h for TFR macro
+References: <20200704092317.12943-1-peter.maydell@linaro.org>
+ <c247fc94-f8f7-efe1-017f-fc1c03fee811@redhat.com>
+In-Reply-To: <c247fc94-f8f7-efe1-017f-fc1c03fee811@redhat.com>
+Content-Type: multipart/alternative;
+ boundary="------------030702040502050707010206"
+X-ELNK-Trace: 17a948d2f1835c375e89bb4777695beb24867385ea7beca53bfc07c2c7148f61e09c666de9206b95350badd9bab72f9c350badd9bab72f9c350badd9bab72f9c
+X-Originating-IP: 8.9.81.230
+Received-SPF: pass client-ip=209.86.89.62; envelope-from=denber@mindspring.com;
+ helo=elasmtp-dupuy.atl.sa.earthlink.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 14:13:44
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,282 +88,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Huacai Chen <chenhc@lemote.com>, Stefano Stabellini <sstabellini@kernel.org>,
- xen-devel@lists.xenproject.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- Paul Durrant <paul@xen.org>, Magnus Damm <magnus.damm@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Leif Lindholm <leif@nuviainc.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Paul Zimmerman <pauldzim@gmail.com>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org,
+ =?UTF-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/4/20 7:17 PM, BALATON Zoltan wrote:
-> On Sat, 4 Jul 2020, Philippe Mathieu-Daudé wrote:
->> Various machine/board/soc models create UHCI device instances
->> with the generic QDEV API, and don't need to access USB internals.
+This is a multi-part message in MIME format.
+--------------030702040502050707010206
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 07/04/20 13:11, Thomas Huth wrote:
+> On 04/07/2020 11.23, Peter Maydell wrote:
+>> In commit a8d2532645cf5ce4 we cleaned up usage of the qemu-common.h header
+>> so that it was always included from .c files and never from other .h files.
+>> We missed adding it to net/tap-solaris.c (which previously was pulling it
+>> in via tap-int.h), which broke building on Solaris hosts.
 >>
->> Simplify header inclusions by moving the QOM type names into a
->> simple header, with no need to include other "hw/usb" headers.
->>
->> Suggested-by: BALATON Zoltan <balaton@eik.bme.hu>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Fixes: a8d2532645cf5ce4
+>> Reported-by: Michele Denber<denber@mindspring.com>
+>> Signed-off-by: Peter Maydell<peter.maydell@linaro.org>
 >> ---
->> include/hw/usb/usb-hcd.h |  6 ++++++
->> hw/i386/pc_piix.c        |  3 ++-
->> hw/i386/pc_q35.c         | 13 +++++++------
->> hw/isa/piix4.c           |  3 ++-
->> hw/mips/fuloong2e.c      |  5 +++--
->> hw/usb/hcd-uhci.c        | 19 ++++++++++---------
->> 6 files changed, 30 insertions(+), 19 deletions(-)
+>> Untested: Michele, could you give this a try?
+>> ---
+>>   net/tap-solaris.c | 1 +
+>>   1 file changed, 1 insertion(+)
 >>
->> diff --git a/include/hw/usb/usb-hcd.h b/include/hw/usb/usb-hcd.h
->> index 74af3a4533..c9d0a88984 100644
->> --- a/include/hw/usb/usb-hcd.h
->> +++ b/include/hw/usb/usb-hcd.h
->> @@ -24,4 +24,10 @@
->> #define TYPE_FUSBH200_EHCI          "fusbh200-ehci-usb"
->> #define TYPE_CHIPIDEA               "usb-chipidea"
+>> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+>> index 4725d2314ee..d03165c57c9 100644
+>> --- a/net/tap-solaris.c
+>> +++ b/net/tap-solaris.c
+>> @@ -27,6 +27,7 @@
+>>   #include "tap_int.h"
+>>   #include "qemu/ctype.h"
+>>   #include "qemu/cutils.h"
+>> +#include "qemu-common.h"
 >>
->> +/* UHCI */
->> +#define TYPE_PIIX3_USB_UHCI         "piix3-usb-uhci"
->> +#define TYPE_PIIX4_USB_UHCI         "piix4-usb-uhci"
->> +#define TYPE_VT82C686B_USB_UHCI     "vt82c686b-usb-uhci"
->> +#define TYPE_ICH9_USB_UHCI(n)       "ich9-usb-uhci" #n
-> 
-> What is that #n at the end? Looks like a typo. Does it break compilation?
+>>   #include<sys/ethernet.h>
+>>   #include<sys/sockio.h>
+>>
+I can confirm that this works in Solaris 11.4:
 
-#n is a C preprocessor feature that expand the 'n' argument to a "n"
-string, so:
+root@hemlock:~/qemu-5.0.0# gpatch -p1 < tap-solaris.patch.diff
+patching file net/tap-solaris.c
+root@hemlock:~/qemu-5.0.0#
 
-TYPE_ICH9_USB_UHCI(1) = "ich9-usb-uhci" #1
-                      = "ich9-usb-uhci" "1"
-                      = "ich9-usb-uhci1"
 
-I'm pretty sure we use that elsewhere. If not, I can add a definition
-for each 1 ... 6 typenames.
+             - Michele
 
-> 
-> Regards,
-> BALATON Zoltan
-> 
->> +
->> #endif
->> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->> index 4d1de7cfab..0024c346c6 100644
->> --- a/hw/i386/pc_piix.c
->> +++ b/hw/i386/pc_piix.c
->> @@ -37,6 +37,7 @@
->> #include "hw/pci/pci.h"
->> #include "hw/pci/pci_ids.h"
->> #include "hw/usb/usb.h"
->> +#include "hw/usb/usb-hcd.h"
->> #include "net/net.h"
->> #include "hw/ide/pci.h"
->> #include "hw/irq.h"
->> @@ -275,7 +276,7 @@ static void pc_init1(MachineState *machine,
->> #endif
->>
->>     if (pcmc->pci_enabled && machine_usb(machine)) {
->> -        pci_create_simple(pci_bus, piix3_devfn + 2, "piix3-usb-uhci");
->> +        pci_create_simple(pci_bus, piix3_devfn + 2,
->> TYPE_PIIX3_USB_UHCI);
->>     }
->>
->>     if (pcmc->pci_enabled &&
->> x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
->> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
->> index b985f5bea1..a80527e6ed 100644
->> --- a/hw/i386/pc_q35.c
->> +++ b/hw/i386/pc_q35.c
->> @@ -51,6 +51,7 @@
->> #include "hw/ide/pci.h"
->> #include "hw/ide/ahci.h"
->> #include "hw/usb/usb.h"
->> +#include "hw/usb/usb-hcd.h"
->> #include "qapi/error.h"
->> #include "qemu/error-report.h"
->> #include "sysemu/numa.h"
->> @@ -68,15 +69,15 @@ struct ehci_companions {
->> };
->>
->> static const struct ehci_companions ich9_1d[] = {
->> -    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
->> -    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
->> -    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
->> +    { .name = TYPE_ICH9_USB_UHCI(1), .func = 0, .port = 0 },
->> +    { .name = TYPE_ICH9_USB_UHCI(2), .func = 1, .port = 2 },
->> +    { .name = TYPE_ICH9_USB_UHCI(3), .func = 2, .port = 4 },
->> };
->>
->> static const struct ehci_companions ich9_1a[] = {
->> -    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
->> -    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
->> -    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
->> +    { .name = TYPE_ICH9_USB_UHCI(4), .func = 0, .port = 0 },
->> +    { .name = TYPE_ICH9_USB_UHCI(5), .func = 1, .port = 2 },
->> +    { .name = TYPE_ICH9_USB_UHCI(6), .func = 2, .port = 4 },
->> };
->>
->> static int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
->> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
->> index f634bcb2d1..e11e5fae21 100644
->> --- a/hw/isa/piix4.c
->> +++ b/hw/isa/piix4.c
->> @@ -29,6 +29,7 @@
->> #include "hw/southbridge/piix.h"
->> #include "hw/pci/pci.h"
->> #include "hw/isa/isa.h"
->> +#include "hw/usb/usb-hcd.h"
->> #include "hw/sysbus.h"
->> #include "hw/intc/i8259.h"
->> #include "hw/dma/i8257.h"
->> @@ -255,7 +256,7 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus
->> **isa_bus, I2CBus **smbus)
->>     pci = pci_create_simple(pci_bus, devfn + 1, "piix4-ide");
->>     pci_ide_create_devs(pci);
->>
->> -    pci_create_simple(pci_bus, devfn + 2, "piix4-usb-uhci");
->> +    pci_create_simple(pci_bus, devfn + 2, TYPE_PIIX4_USB_UHCI);
->>     if (smbus) {
->>         *smbus = piix4_pm_init(pci_bus, devfn + 3, 0x1100,
->>                                isa_get_irq(NULL, 9), NULL, 0, NULL);
->> diff --git a/hw/mips/fuloong2e.c b/hw/mips/fuloong2e.c
->> index 8ca31e5162..b6d33dd2cd 100644
->> --- a/hw/mips/fuloong2e.c
->> +++ b/hw/mips/fuloong2e.c
->> @@ -33,6 +33,7 @@
->> #include "hw/mips/mips.h"
->> #include "hw/mips/cpudevs.h"
->> #include "hw/pci/pci.h"
->> +#include "hw/usb/usb-hcd.h"
->> #include "qemu/log.h"
->> #include "hw/loader.h"
->> #include "hw/ide/pci.h"
->> @@ -258,8 +259,8 @@ static void vt82c686b_southbridge_init(PCIBus
->> *pci_bus, int slot, qemu_irq intc,
->>     dev = pci_create_simple(pci_bus, PCI_DEVFN(slot, 1), "via-ide");
->>     pci_ide_create_devs(dev);
->>
->> -    pci_create_simple(pci_bus, PCI_DEVFN(slot, 2),
->> "vt82c686b-usb-uhci");
->> -    pci_create_simple(pci_bus, PCI_DEVFN(slot, 3),
->> "vt82c686b-usb-uhci");
->> +    pci_create_simple(pci_bus, PCI_DEVFN(slot, 2),
->> TYPE_VT82C686B_USB_UHCI);
->> +    pci_create_simple(pci_bus, PCI_DEVFN(slot, 3),
->> TYPE_VT82C686B_USB_UHCI);
->>
->>     *i2c_bus = vt82c686b_pm_init(pci_bus, PCI_DEVFN(slot, 4), 0xeee1,
->> NULL);
->>
->> diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
->> index 1d4dd33b6c..da078dc3fa 100644
->> --- a/hw/usb/hcd-uhci.c
->> +++ b/hw/usb/hcd-uhci.c
->> @@ -39,6 +39,7 @@
->> #include "qemu/main-loop.h"
->> #include "qemu/module.h"
->> #include "usb-internal.h"
->> +#include "hw/usb/usb-hcd.h"
->>
->> #define FRAME_TIMER_FREQ 1000
->>
->> @@ -1358,21 +1359,21 @@ static void uhci_data_class_init(ObjectClass
->> *klass, void *data)
->>
->> static UHCIInfo uhci_info[] = {
->>     {
->> -        .name       = "piix3-usb-uhci",
->> +        .name      = TYPE_PIIX3_USB_UHCI,
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82371SB_2,
->>         .revision  = 0x01,
->>         .irq_pin   = 3,
->>         .unplug    = true,
->>     },{
->> -        .name      = "piix4-usb-uhci",
->> +        .name      = TYPE_PIIX4_USB_UHCI,
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82371AB_2,
->>         .revision  = 0x01,
->>         .irq_pin   = 3,
->>         .unplug    = true,
->>     },{
->> -        .name      = "vt82c686b-usb-uhci",
->> +        .name      = TYPE_VT82C686B_USB_UHCI,
->>         .vendor_id = PCI_VENDOR_ID_VIA,
->>         .device_id = PCI_DEVICE_ID_VIA_UHCI,
->>         .revision  = 0x01,
->> @@ -1380,42 +1381,42 @@ static UHCIInfo uhci_info[] = {
->>         .realize   = usb_uhci_vt82c686b_realize,
->>         .unplug    = true,
->>     },{
->> -        .name      = "ich9-usb-uhci1", /* 00:1d.0 */
->> +        .name      = TYPE_ICH9_USB_UHCI(1), /* 00:1d.0 */
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82801I_UHCI1,
->>         .revision  = 0x03,
->>         .irq_pin   = 0,
->>         .unplug    = false,
->>     },{
->> -        .name      = "ich9-usb-uhci2", /* 00:1d.1 */
->> +        .name      = TYPE_ICH9_USB_UHCI(2), /* 00:1d.1 */
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82801I_UHCI2,
->>         .revision  = 0x03,
->>         .irq_pin   = 1,
->>         .unplug    = false,
->>     },{
->> -        .name      = "ich9-usb-uhci3", /* 00:1d.2 */
->> +        .name      = TYPE_ICH9_USB_UHCI(3), /* 00:1d.2 */
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82801I_UHCI3,
->>         .revision  = 0x03,
->>         .irq_pin   = 2,
->>         .unplug    = false,
->>     },{
->> -        .name      = "ich9-usb-uhci4", /* 00:1a.0 */
->> +        .name      = TYPE_ICH9_USB_UHCI(4), /* 00:1a.0 */
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82801I_UHCI4,
->>         .revision  = 0x03,
->>         .irq_pin   = 0,
->>         .unplug    = false,
->>     },{
->> -        .name      = "ich9-usb-uhci5", /* 00:1a.1 */
->> +        .name      = TYPE_ICH9_USB_UHCI(5), /* 00:1a.1 */
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82801I_UHCI5,
->>         .revision  = 0x03,
->>         .irq_pin   = 1,
->>         .unplug    = false,
->>     },{
->> -        .name      = "ich9-usb-uhci6", /* 00:1a.2 */
->> +        .name      = TYPE_ICH9_USB_UHCI(6), /* 00:1a.2 */
->>         .vendor_id = PCI_VENDOR_ID_INTEL,
->>         .device_id = PCI_DEVICE_ID_INTEL_82801I_UHCI6,
->>         .revision  = 0x03,
->>
+
+--------------030702040502050707010206
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  </head>
+  <body text="#000000" bgcolor="#FFFFFF">
+    On 07/04/20 13:11, Thomas Huth wrote:
+    <blockquote
+      cite="mid:c247fc94-f8f7-efe1-017f-fc1c03fee811@redhat.com"
+      type="cite">
+      <pre wrap="">On 04/07/2020 11.23, Peter Maydell wrote:
+</pre>
+      <blockquote type="cite">
+        <pre wrap="">In commit a8d2532645cf5ce4 we cleaned up usage of the qemu-common.h header
+so that it was always included from .c files and never from other .h files.
+We missed adding it to net/tap-solaris.c (which previously was pulling it
+in via tap-int.h), which broke building on Solaris hosts.
+
+Fixes: a8d2532645cf5ce4
+Reported-by: Michele Denber <a class="moz-txt-link-rfc2396E" href="mailto:denber@mindspring.com">&lt;denber@mindspring.com&gt;</a>
+Signed-off-by: Peter Maydell <a class="moz-txt-link-rfc2396E" href="mailto:peter.maydell@linaro.org">&lt;peter.maydell@linaro.org&gt;</a>
+---
+Untested: Michele, could you give this a try?
+---
+ net/tap-solaris.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+index 4725d2314ee..d03165c57c9 100644
+--- a/net/tap-solaris.c
++++ b/net/tap-solaris.c
+@@ -27,6 +27,7 @@
+ #include "tap_int.h"
+ #include "qemu/ctype.h"
+ #include "qemu/cutils.h"
++#include "qemu-common.h"
+ 
+ #include &lt;sys/ethernet.h&gt;
+ #include &lt;sys/sockio.h&gt;
+
+</pre>
+      </blockquote>
+    </blockquote>
+    I can confirm that this works in Solaris 11.4:<br>
+    <br>
+    <small><font face="Courier New, Courier, monospace"><a class="moz-txt-link-abbreviated" href="mailto:root@hemlock:~/qemu-5.0.0#">root@hemlock:~/qemu-5.0.0#</a>
+        gpatch -p1 &lt; tap-solaris.patch.diff<br>
+        patching file net/tap-solaris.c<br>
+        <a class="moz-txt-link-abbreviated" href="mailto:root@hemlock:~/qemu-5.0.0#">root@hemlock:~/qemu-5.0.0#</a> </font></small><br>
+    <br>
+    <br>
+                - Michele<br>
+    <br>
+  </body>
+</html>
+
+--------------030702040502050707010206--
 
