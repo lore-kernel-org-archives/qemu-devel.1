@@ -2,95 +2,93 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22667C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C88DBC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F35A20724
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:51:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9184C20724
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:51:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLotX1Vl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F35A20724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h5y8CPzB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9184C20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrnG3-0002ZB-Kq
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:51:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40050)
+	id 1jrnGA-0002q9-QD
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:51:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmwE-0004vx-Qw
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60639
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrn8X-0002zM-Va
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:43:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42904
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmwD-0001h8-7W
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:58 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrn8V-0003yk-KK
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:43:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593887456;
+ s=mimecast20190719; t=1593888218;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=WXw9VMdMEtGhEWjld76yv/MTPIVm1m5S/D9V6O7qby8=;
- b=OLotX1VlwcbUqIlvLOm4HJfP1x5X/D0V3URNcUOZhvExRwLiP/+V7mWuOfpOfJPkh+uZht
- FKr/5TkoLnXRTmOztJlDMVW0gwxT7eeKZdMoJYe6bZ6cXi328UWtD6lrn4TP+KGewSjJqS
- DeqYxYUd3Vs2+HgxK8KQUSmbGUjhCQY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-z9rkV1D2MJyCFKIe41snOw-1; Sat, 04 Jul 2020 14:30:54 -0400
-X-MC-Unique: z9rkV1D2MJyCFKIe41snOw-1
-Received: by mail-wm1-f71.google.com with SMTP id y204so29100986wmd.2
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:30:54 -0700 (PDT)
+ bh=0PJpX4jH/bGy20P0EXe9TKnieR941CAQOK9+CesVaJI=;
+ b=h5y8CPzBpqQpsV1HSJldLP8Y6jaUO36KqfEgeEHVF0J2IbA8OUoTU9MnroZoT9Me63X5Ad
+ vrOaKUphNfOo614+8kPrpEf2Uap198ze+hOWprL6VOEoB0h0C/VX1YU6xAHrvTAYj0aO0F
+ lBUs+yLnf5wyHFGfHtWSvxi14LeLooY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-ybZKD55HMEqw_ItlWmTI1A-1; Sat, 04 Jul 2020 14:43:37 -0400
+X-MC-Unique: ybZKD55HMEqw_ItlWmTI1A-1
+Received: by mail-wm1-f72.google.com with SMTP id v24so40263701wmh.3
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:43:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=WXw9VMdMEtGhEWjld76yv/MTPIVm1m5S/D9V6O7qby8=;
- b=RVk0U0ttbbiomHaM2RjilZZpmub2U+kUKRfXyoaaO2nZm89yyxY73oeXWSkTe/u2aw
- UztkMEuBEw1V6t9z7vVzYjwWQ9w/8mV1T85UedBDn+C4wA8IQ6vZvSIGWO4tKGgTEOna
- opMZTcvfR1WfIRyU11m8bC+1M1+znAvSRm49EwnVRcgZ36ZayHFYFbo31zQx2FPgGYue
- wWIKIQ7Ztb1Nd6ldMquE2ZqH2T0xhPI79Hh6DcmLoRfexToWtvM/FmRJmY7n1FG+soex
- neYalGUUX0VlL0pRx/7zl8dwwsNALu7i2TfGpjZCzU9RRP0AVgKzqInzPkP/NwCeeRGt
- MKPA==
-X-Gm-Message-State: AOAM530E1IxD9kfDW65w7FiGANFyY7SBJr9GWghE1ysuN+Cv/D1+yQif
- fIf6PfjbQxiyUBn0VhAQOJd4+xUJ6+EPbIQY/vEGFXtcMfhekgpQa1IWW+fBkzT2RV1DiKRzLjz
- rrvkzkGyYnJCRR7Y=
-X-Received: by 2002:adf:f452:: with SMTP id f18mr41472711wrp.78.1593887453450; 
- Sat, 04 Jul 2020 11:30:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzMUUkKR2FR/4a/FOgvRSi3jH3V1HWgotgH50pe/qlYlknuFEqkGC3qbeUc9NAUvfNoYt1n9Q==
-X-Received: by 2002:adf:f452:: with SMTP id f18mr41472699wrp.78.1593887453252; 
- Sat, 04 Jul 2020 11:30:53 -0700 (PDT)
+ bh=0PJpX4jH/bGy20P0EXe9TKnieR941CAQOK9+CesVaJI=;
+ b=qd82y0DvQwGN5UPjzbCpcZRaXrM9rG7l6d9vQ2L+oMXQqSvFrL0EPpt4IsXq6LrU4h
+ R9OIg2JmMPXayOo0xK3XjqhMCN+HDAoP4hR1Lox8URWASL+iD9GVpZZnKuonWdK3JzPT
+ 8XRQ86zlJRcGmb1khIgS8WJ9J47PwlvU+BxJ+CmKh4pLIPrS2t7nhLb3QjHYK7LwQIVX
+ T9R5wtZuulMgY7MrjBRrcpnvBgC9r4HT29oCKtTMJ6/bp1K2QTGh7W8TOGi389xZlJ0S
+ PWmvp5oM5Ve2waE0sRXVxjHicGOP7BqmOT6v0g34Bw+fTjFlYrM677r1EcIfhCN8Um81
+ O/BQ==
+X-Gm-Message-State: AOAM530ZhmrCxQKW/lQ8Ct1GmU1DV66gqY47kzXRjY2VIOgLUZmsz81W
+ Mzbi9A7mb3EtB7EA8/5P81EWh6v7Qgj5ep8FOWg0FCi9MrdxLVWggkjscH5F+GmeICL5pNDf2KL
+ vGfNSuysIoumtV+U=
+X-Received: by 2002:adf:ed02:: with SMTP id a2mr41172922wro.110.1593888216081; 
+ Sat, 04 Jul 2020 11:43:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2slL7S/h3ZGpf/wt+mPN0ZE2v4S0v8e3BlBgiliKgWtFIMaKr5EJuVqZcz+z5C3THCAkzCA==
+X-Received: by 2002:adf:ed02:: with SMTP id a2mr41172907wro.110.1593888215885; 
+ Sat, 04 Jul 2020 11:43:35 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- 59sm18305862wrj.37.2020.07.04.11.30.52
+ k185sm17320859wmk.47.2020.07.04.11.43.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 11:30:52 -0700 (PDT)
-Date: Sat, 4 Jul 2020 14:30:51 -0400
+ Sat, 04 Jul 2020 11:43:35 -0700 (PDT)
+Date: Sat, 4 Jul 2020 14:43:32 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 34/41] vhost: implement vhost_dev_start method
-Message-ID: <20200704182750.1088103-35-mst@redhat.com>
-References: <20200704182750.1088103-1-mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC] virt/acpi: set PSCI flag even when psci_conduit is disabled
+Message-ID: <20200704144228-mutt-send-email-mst@kernel.org>
+References: <1593769409-13534-1-git-send-email-guoheyi@linux.alibaba.com>
+ <CAFEAcA8RU6fS8PX7LMhn4U33nKoRvcO_mnyBFcmW3iOpA40sCQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200704182750.1088103-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+In-Reply-To: <CAFEAcA8RU6fS8PX7LMhn4U33nKoRvcO_mnyBFcmW3iOpA40sCQ@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:14
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -111,53 +109,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Cindy Lu <lulu@redhat.com>
+Cc: yitian.ly@alibaba-inc.com, QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Heyi Guo <guoheyi@linux.alibaba.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cindy Lu <lulu@redhat.com>
+On Fri, Jul 03, 2020 at 11:37:02AM +0100, Peter Maydell wrote:
+> On Fri, 3 Jul 2020 at 10:44, Heyi Guo <guoheyi@linux.alibaba.com> wrote:
+> >
+> > vms->psci_conduit being disabled only means PSCI is not implemented by
+> > qemu; it doesn't mean PSCI is not supported on this virtual machine.
+> > Actually vms->psci_conduit is set to disabled when vms->secure and
+> > firmware_loaded are both set, which means we will run ARM trusted
+> > firmware, which will definitely provide PSCI.
+> >
+> > The issue can be reproduced when running qemu in TCG mode with secure
+> > enabled, while using ARM trusted firmware + qemu virt UEFI as firmware
+> > binaries, and we can see secondary cores will not be waken up.
+> 
+> If you're using a real EL3 guest firmware then it's the job of
+> the guest firmware to provide a DTB to the guest EL2/EL1 that says
+> "and I support PSCI" if it supports PSCI, surely? QEMU can't tell
+> whether the EL3 code does or doesn't do that...
+> 
+> thanks
+> -- PMM
 
-use the vhost_dev_start callback to send the status to backend
+I guess this means qemu needs to find this out from firmware?
+Perhaps through fwcfg ...
+Don't really know about PSCI specifically, just a general
+comment from ACPI POV.
 
-Signed-off-by: Cindy Lu <lulu@redhat.com>
-Message-Id: <20200701145538.22333-8-lulu@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- hw/virtio/vhost.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 10304b583e..32809e54b5 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1685,7 +1685,12 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-             goto fail_log;
-         }
-     }
--
-+    if (hdev->vhost_ops->vhost_dev_start) {
-+        r = hdev->vhost_ops->vhost_dev_start(hdev, true);
-+        if (r) {
-+            goto fail_log;
-+        }
-+    }
-     if (vhost_dev_has_iommu(hdev) &&
-         hdev->vhost_ops->vhost_set_iotlb_callback) {
-             hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
-@@ -1723,6 +1728,9 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev)
-     /* should only be called after backend is connected */
-     assert(hdev->vhost_ops);
- 
-+    if (hdev->vhost_ops->vhost_dev_start) {
-+        hdev->vhost_ops->vhost_dev_start(hdev, false);
-+    }
-     for (i = 0; i < hdev->nvqs; ++i) {
-         vhost_virtqueue_stop(hdev,
-                              vdev,
 -- 
 MST
 
