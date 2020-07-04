@@ -2,59 +2,58 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	URI_WP_DIRINDEX,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 196A4C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 11:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D511C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 11:38:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E22612084C
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 11:37:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E22612084C
+	by mail.kernel.org (Postfix) with ESMTPS id 41A612084C
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 11:38:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41A612084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrgUC-00062v-Ud
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 07:37:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52688)
+	id 1jrgUk-00077j-Gc
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 07:38:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1jrgO6-0001ef-Iz
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 07:31:18 -0400
-Received: from mga05.intel.com ([192.55.52.43]:24796)
+ id 1jrgNJ-0000ey-32
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 07:30:29 -0400
+Received: from mga05.intel.com ([192.55.52.43]:24797)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1jrgO3-0004KB-Gf
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 07:31:18 -0400
-IronPort-SDR: G9tOqUAmnnm9SVrvue7lDZRNfXKVkzXSW1/0tDCjlpsQVJya3oJbbrb6qgIFcm9YrhSyEzAUfj
- gClhd396TxoA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9671"; a="232105536"
-X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; d="scan'208";a="232105536"
+ id 1jrgNG-0004KM-Fz
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 07:30:28 -0400
+IronPort-SDR: k5qwpGMlEtn+DL8NLKkkYcpAHqvIXDaLKXJNETKyDzT6LnHKmhX/EL6C3mDeBMpb7TwPB28qL5
+ /DQWgcMpiCmQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9671"; a="232105523"
+X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; d="scan'208";a="232105523"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jul 2020 04:30:25 -0700
-IronPort-SDR: 1CzQiAvKzcWNiI3KEiWW85GeqPuYhG1tbntFI84kRt7wfoHMBzrtnOV/Vl0B4Lv+6s9qZ7iUUe
- zShnUkUaIMyg==
+ 04 Jul 2020 04:30:18 -0700
+IronPort-SDR: d0zCX2rN50OO2ySpU9hS6OXqCF8QS2T7TaG/EMwx/AoJx2IZ/WobwtlTHhsLOgtdXo2Awksg/P
+ ElqQBUH8S8yw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; d="scan'208";a="266146834"
+X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; d="scan'208";a="266146795"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by fmsmga007.fm.intel.com with ESMTP; 04 Jul 2020 04:30:24 -0700
+ by fmsmga007.fm.intel.com with ESMTP; 04 Jul 2020 04:30:17 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [RFC v7 19/25] intel_iommu: replay pasid binds after context cache
- invalidation
-Date: Sat,  4 Jul 2020 04:36:43 -0700
-Message-Id: <1593862609-36135-20-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v7 08/25] hw/iommu: introduce HostIOMMUContext
+Date: Sat,  4 Jul 2020 04:36:32 -0700
+Message-Id: <1593862609-36135-9-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1593862609-36135-1-git-send-email-yi.l.liu@intel.com>
 References: <1593862609-36135-1-git-send-email-yi.l.liu@intel.com>
@@ -62,11 +61,12 @@ Received-SPF: pass client-ip=192.55.52.43; envelope-from=yi.l.liu@intel.com;
  helo=mga05.intel.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 07:30:14
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
+ URI_WP_DIRINDEX=1 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,163 +80,280 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, jasowang@redhat.com, Richard Henderson <rth@twiddle.net>,
- david@gibson.dropbear.id.au
+ hao.wu@intel.com, jasowang@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch replays guest pasid bindings after context cache
-invalidation. This is a behavior to ensure safety. Actually,
-programmer should issue pasid cache invalidation with proper
-granularity after issuing a context cache invalidation.
+Currently, many platform vendors provide the capability of dual stage
+DMA address translation in hardware. For example, nested translation
+on Intel VT-d scalable mode, nested stage translation on ARM SMMUv3,
+and etc. In dual stage DMA address translation, there are two stages
+address translation, stage-1 (a.k.a first-level) and stage-2 (a.k.a
+second-level) translation structures. Stage-1 translation results are
+also subjected to stage-2 translation structures. Take vSVA (Virtual
+Shared Virtual Addressing) as an example, guest IOMMU driver owns
+stage-1 translation structures (covers GVA->GPA translation), and host
+IOMMU driver owns stage-2 translation structures (covers GPA->HPA
+translation). VMM is responsible to bind stage-1 translation structures
+to host, thus hardware could achieve GVA->GPA and then GPA->HPA
+translation. For more background on SVA, refer the below links.
+ - https://www.youtube.com/watch?v=Kq_nfGK5MwQ
+ - https://events19.lfasiallc.com/wp-content/uploads/2017/11/\
+Shared-Virtual-Memory-in-KVM_Yi-Liu.pdf
+
+In QEMU, vIOMMU emulators expose IOMMUs to VM per their own spec (e.g.
+Intel VT-d spec). Devices are pass-through to guest via device pass-
+through components like VFIO. VFIO is a userspace driver framework
+which exposes host IOMMU programming capability to userspace in a
+secure manner. e.g. IOVA MAP/UNMAP requests. Information, different
+from map/unmap notifications need to be passed from QEMU vIOMMU device
+to/from the host IOMMU driver through the VFIO/IOMMU layer:
+ 1) PASID allocation (allow host to intercept in PASID allocation)
+ 2) bind stage-1 translation structures to host
+ 3) propagate stage-1 cache invalidation to host
+ 4) DMA address translation fault (I/O page fault) servicing etc.
+
+With the above new interactions in QEMU, it requires an abstract layer
+to facilitate the above operations and expose to vIOMMU emulators as an
+explicit way for vIOMMU emulators call into VFIO. This patch introduces
+HostIOMMUContext to serve it. The HostIOMMUContext is an object which
+allows to manage the stage-1 translation when a vIOMMU is implemented
+upon physical IOMMU nested paging (VFIO case). It is an abstract object
+which needs to be derived for each vIOMMU immplementation based on
+physical nested paging. An HostIOMMUContext derived object will be passed
+to each VFIO device protected by a vIOMMU using physical nested paging.
+
+This patchg also introduces HostIOMMUContextClass to provide methods for
+vIOMMU emulators to propagate dual-stage translation related requests to
+host. As a beginning, PASID allocation/free are defined to propagate PASID
+allocation/free requests to host which is required for the vendors which
+manage PASID in system-wide.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c          | 50 ++++++++++++++++++++++++++++++++++++++++++
- hw/i386/intel_iommu_internal.h |  1 +
- hw/i386/trace-events           |  1 +
- 3 files changed, 52 insertions(+)
+ hw/Makefile.objs                      |  1 +
+ hw/iommu/Makefile.objs                |  1 +
+ hw/iommu/host_iommu_context.c         | 97 +++++++++++++++++++++++++++++++++++
+ include/hw/iommu/host_iommu_context.h | 75 +++++++++++++++++++++++++++
+ 4 files changed, 174 insertions(+)
+ create mode 100644 hw/iommu/Makefile.objs
+ create mode 100644 hw/iommu/host_iommu_context.c
+ create mode 100644 include/hw/iommu/host_iommu_context.h
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index cf0dad8..9977e70 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -68,6 +68,10 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s);
- static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n);
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 4cbe5e4..d272f3d 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -40,6 +40,7 @@ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
+ devices-dirs-$(CONFIG_NUBUS) += nubus/
+ devices-dirs-y += semihosting/
+ devices-dirs-y += smbios/
++devices-dirs-y += iommu/
+ endif
  
- static void vtd_pasid_cache_reset(IntelIOMMUState *s);
-+static void vtd_pasid_cache_sync(IntelIOMMUState *s,
-+                                 VTDPASIDCacheInfo *pc_info);
-+static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
-+                                  VTDBus *vtd_bus, uint16_t devfn);
- 
- static void vtd_panic_require_caching_mode(void)
- {
-@@ -1853,7 +1857,10 @@ static void vtd_iommu_replay_all(IntelIOMMUState *s)
- 
- static void vtd_context_global_invalidate(IntelIOMMUState *s)
- {
-+    VTDPASIDCacheInfo pc_info;
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/iommu/Makefile.objs b/hw/iommu/Makefile.objs
+new file mode 100644
+index 0000000..e6eed4e
+--- /dev/null
++++ b/hw/iommu/Makefile.objs
+@@ -0,0 +1 @@
++obj-y += host_iommu_context.o
+diff --git a/hw/iommu/host_iommu_context.c b/hw/iommu/host_iommu_context.c
+new file mode 100644
+index 0000000..5fb2223
+--- /dev/null
++++ b/hw/iommu/host_iommu_context.c
+@@ -0,0 +1,97 @@
++/*
++ * QEMU abstract of Host IOMMU
++ *
++ * Copyright (C) 2020 Intel Corporation.
++ *
++ * Authors: Liu Yi L <yi.l.liu@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 +
-     trace_vtd_inv_desc_cc_global();
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
 +
-     /* Protects context cache */
-     vtd_iommu_lock(s);
-     s->context_cache_gen++;
-@@ -1870,6 +1877,9 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
-      * VT-d emulation codes.
-      */
-     vtd_iommu_replay_all(s);
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+    pc_info.type = VTD_PASID_CACHE_GLOBAL_INV;
-+    vtd_pasid_cache_sync(s, &pc_info);
- }
- 
- /**
-@@ -2006,6 +2016,21 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-                  * happened.
-                  */
-                 vtd_sync_shadow_page_table(vtd_as);
-+                /*
-+                 * Per spec, context flush should also followed with PASID
-+                 * cache and iotlb flush. Regards to a device selective
-+                 * context cache invalidation:
-+                 * if (emaulted_device)
-+                 *    invalidate pasid cahce and pasid-based iotlb
-+                 * else if (assigned_device)
-+                 *    check if the device has been bound to any pasid
-+                 *    invoke pasid_unbind regards to each bound pasid
-+                 * Here, we have vtd_pasid_cache_devsi() to invalidate pasid
-+                 * caches, while for piotlb in QEMU, we don't have it yet, so
-+                 * no handling. For assigned device, host iommu driver would
-+                 * flush piotlb when a pasid unbind is pass down to it.
-+                 */
-+                 vtd_pasid_cache_devsi(s, vtd_bus, devfn_it);
-             }
-         }
-     }
-@@ -2620,6 +2645,12 @@ static gboolean vtd_flush_pasid(gpointer key, gpointer value,
-         /* Fall through */
-     case VTD_PASID_CACHE_GLOBAL_INV:
-         break;
-+    case VTD_PASID_CACHE_DEVSI:
-+        if (pc_info->vtd_bus != vtd_bus ||
-+            pc_info->devfn != devfn) {
-+            return false;
-+        }
-+        break;
-     default:
-         error_report("invalid pc_info->type");
-         abort();
-@@ -2819,6 +2850,11 @@ static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
-     case VTD_PASID_CACHE_GLOBAL_INV:
-         /* loop all assigned devices */
-         break;
-+    case VTD_PASID_CACHE_DEVSI:
-+        walk_info.vtd_bus = pc_info->vtd_bus;
-+        walk_info.devfn = pc_info->devfn;
-+        vtd_replay_pasid_bind_for_dev(s, start, end, &walk_info);
-+        return;
-     case VTD_PASID_CACHE_FORCE_RESET:
-         /* For force reset, no need to go further replay */
-         return;
-@@ -2904,6 +2940,20 @@ static void vtd_pasid_cache_sync(IntelIOMMUState *s,
-     vtd_iommu_unlock(s);
- }
- 
-+static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
-+                                  VTDBus *vtd_bus, uint16_t devfn)
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qom/object.h"
++#include "qapi/visitor.h"
++#include "hw/iommu/host_iommu_context.h"
++
++int host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx, uint32_t min,
++                               uint32_t max, uint32_t *pasid)
 +{
-+    VTDPASIDCacheInfo pc_info;
++    HostIOMMUContextClass *hicxc;
 +
-+    trace_vtd_pasid_cache_devsi(devfn);
++    if (!iommu_ctx) {
++        return -EINVAL;
++    }
 +
-+    pc_info.type = VTD_PASID_CACHE_DEVSI;
-+    pc_info.vtd_bus = vtd_bus;
-+    pc_info.devfn = devfn;
++    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
 +
-+    vtd_pasid_cache_sync(s, &pc_info);
++    if (!hicxc) {
++        return -EINVAL;
++    }
++
++    if (!(iommu_ctx->flags & HOST_IOMMU_PASID_REQUEST) ||
++        !hicxc->pasid_alloc) {
++        return -EINVAL;
++    }
++
++    return hicxc->pasid_alloc(iommu_ctx, min, max, pasid);
 +}
 +
- /**
-  * Caller of this function should hold iommu_lock
-  */
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 51691d0..9805b84 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -548,6 +548,7 @@ typedef enum VTDPCInvType {
-     VTD_PASID_CACHE_FORCE_RESET = 0,
-     /* pasid cache invalidation rely on guest PASID entry */
-     VTD_PASID_CACHE_GLOBAL_INV,
-+    VTD_PASID_CACHE_DEVSI,
-     VTD_PASID_CACHE_DOMSI,
-     VTD_PASID_CACHE_PASIDSI,
- } VTDPCInvType;
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 60d20c1..3853fa8 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -26,6 +26,7 @@ vtd_pasid_cache_gsi(void) ""
- vtd_pasid_cache_reset(void) ""
- vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
- vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
-+vtd_pasid_cache_devsi(uint16_t devfn) "Dev selective PC invalidation dev: 0x%"PRIx16
- vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
- vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
- vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
++int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid)
++{
++    HostIOMMUContextClass *hicxc;
++
++    if (!iommu_ctx) {
++        return -EINVAL;
++    }
++
++    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
++    if (!hicxc) {
++        return -EINVAL;
++    }
++
++    if (!(iommu_ctx->flags & HOST_IOMMU_PASID_REQUEST) ||
++        !hicxc->pasid_free) {
++        return -EINVAL;
++    }
++
++    return hicxc->pasid_free(iommu_ctx, pasid);
++}
++
++void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
++                         const char *mrtypename,
++                         uint64_t flags)
++{
++    HostIOMMUContext *iommu_ctx;
++
++    object_initialize(_iommu_ctx, instance_size, mrtypename);
++    iommu_ctx = HOST_IOMMU_CONTEXT(_iommu_ctx);
++    iommu_ctx->flags = flags;
++    iommu_ctx->initialized = true;
++}
++
++static const TypeInfo host_iommu_context_info = {
++    .parent             = TYPE_OBJECT,
++    .name               = TYPE_HOST_IOMMU_CONTEXT,
++    .class_size         = sizeof(HostIOMMUContextClass),
++    .instance_size      = sizeof(HostIOMMUContext),
++    .abstract           = true,
++};
++
++static void host_iommu_ctx_register_types(void)
++{
++    type_register_static(&host_iommu_context_info);
++}
++
++type_init(host_iommu_ctx_register_types)
+diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
+new file mode 100644
+index 0000000..35c4861
+--- /dev/null
++++ b/include/hw/iommu/host_iommu_context.h
+@@ -0,0 +1,75 @@
++/*
++ * QEMU abstraction of Host IOMMU
++ *
++ * Copyright (C) 2020 Intel Corporation.
++ *
++ * Authors: Liu Yi L <yi.l.liu@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef HW_IOMMU_CONTEXT_H
++#define HW_IOMMU_CONTEXT_H
++
++#include "qemu/queue.h"
++#include "qemu/thread.h"
++#include "qom/object.h"
++#include <linux/iommu.h>
++#ifndef CONFIG_USER_ONLY
++#include "exec/hwaddr.h"
++#endif
++
++#define TYPE_HOST_IOMMU_CONTEXT "qemu:host-iommu-context"
++#define HOST_IOMMU_CONTEXT(obj) \
++        OBJECT_CHECK(HostIOMMUContext, (obj), TYPE_HOST_IOMMU_CONTEXT)
++#define HOST_IOMMU_CONTEXT_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(HostIOMMUContextClass, (obj), \
++                         TYPE_HOST_IOMMU_CONTEXT)
++
++typedef struct HostIOMMUContext HostIOMMUContext;
++
++typedef struct HostIOMMUContextClass {
++    /* private */
++    ObjectClass parent_class;
++
++    /* Allocate pasid from HostIOMMUContext (a.k.a. host software) */
++    int (*pasid_alloc)(HostIOMMUContext *iommu_ctx,
++                       uint32_t min,
++                       uint32_t max,
++                       uint32_t *pasid);
++    /* Reclaim pasid from HostIOMMUContext (a.k.a. host software) */
++    int (*pasid_free)(HostIOMMUContext *iommu_ctx,
++                      uint32_t pasid);
++} HostIOMMUContextClass;
++
++/*
++ * This is an abstraction of host IOMMU with dual-stage capability
++ */
++struct HostIOMMUContext {
++    Object parent_obj;
++#define HOST_IOMMU_PASID_REQUEST (1ULL << 0)
++    uint64_t flags;
++    bool initialized;
++};
++
++int host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx, uint32_t min,
++                               uint32_t max, uint32_t *pasid);
++int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid);
++
++void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
++                         const char *mrtypename,
++                         uint64_t flags);
++void host_iommu_ctx_destroy(HostIOMMUContext *iommu_ctx);
++
++#endif
 -- 
 2.7.4
 
