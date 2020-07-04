@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7722C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B055C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91FE7207D4
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:45:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C93EE207D4
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:46:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h7KWcpfm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91FE7207D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EklGo+n/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C93EE207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrkMS-0002bl-QN
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 11:45:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40218)
+	id 1jrkN7-0003y1-WB
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 11:46:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGU-0001Fa-Qc
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:39:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60238
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGv-0001rs-FN
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:40:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31964
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGQ-0007Vs-WA
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:39:42 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGs-0007gO-Dx
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:40:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593877178;
+ s=mimecast20190719; t=1593877203;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wUMsI8pPCoJLWJQxhYCjSGYgbzwxCwXM4hINsxgIP8Y=;
- b=h7KWcpfm9KduiEDZxR5gYa6nx79ZGGIqdfCoa13ugWsdMpkjWs2R27EESXegfbvsxBTR+j
- WTw0ki31XCNKiFr8EF115b52ZVh4oq3QtyF6UN9Bk0zCHAhZ/zJJJmP0rYrP9wIvgLOGLL
- NsrqxjPVCEqp7xGgY64EQrBXHzQ2yVo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-VAB2_2eYMIGT9-fGAUjYkQ-1; Sat, 04 Jul 2020 11:39:34 -0400
-X-MC-Unique: VAB2_2eYMIGT9-fGAUjYkQ-1
-Received: by mail-wr1-f69.google.com with SMTP id y13so35955446wrp.13
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 08:39:34 -0700 (PDT)
+ bh=wevOFGWECaRJOmLpbzON6N0ynWLO2tBiVdtI/WyaADw=;
+ b=EklGo+n/WnsSnP4RjPQNewp1EUQG6IfrToSDa9IY0SGXbCeFYXuSELk8OdGuaxxFIGDv9n
+ pEJkO/sjLXdR7vmI06WWc0C8kKlTZsbM1TZ3+c80iaUIahNWhjWrTm/fl9uU6o/eyb/mA+
+ UV53MJ+eA4qkJwZmrqZ/7yuve5EALe8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-tPuFxYhQMo2tsWT4m7kYyQ-1; Sat, 04 Jul 2020 11:40:02 -0400
+X-MC-Unique: tPuFxYhQMo2tsWT4m7kYyQ-1
+Received: by mail-wm1-f71.google.com with SMTP id y204so28646509wmd.2
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 08:40:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=wUMsI8pPCoJLWJQxhYCjSGYgbzwxCwXM4hINsxgIP8Y=;
- b=OuVZUYzAIpV9y4hfqTPrESBw0+ocvBmQs/jEN+wsUhROlghrnEW6azb8ChqYwbb1c2
- /OLOGdnG9rsKTCP5BalHrwafXGEQsAmh+Go04NCtnHGl63tpSDVywZcIYERMfq3UKAii
- wNxKVC5OzgFPpmEK0Phg8cjdECAjyrjtUineL6ULaz2/DnD2sG6HGe4qhnRtL0apEp5+
- n071KrMU9uFMld7u6/InJv3uubLZKh795X8vJ90m16OvlI/NGzKIYqrvJrLvwyW0lZyz
- /3cNcs9zsQy0Wc65YZ12hv/nzGU2avyWFbNqmWrSvXYXzdHWrr/ER8Pd5hSkAIQ438Yq
- uiMw==
-X-Gm-Message-State: AOAM531OX+u7Thw/EcESCLm2kwOkbjFtapD1HvdQiOTmaHARqwa0cNWY
- ETpqF8sDwKZDGEqBRbKxOqpruVMMQ0DHEDnHCUZ9cOTwpH4zIgDNTfgiHJYmfc/zP+R5R49rLti
- kURisU1JYCinW0bg=
-X-Received: by 2002:a05:6000:111:: with SMTP id
- o17mr43727444wrx.178.1593877173364; 
- Sat, 04 Jul 2020 08:39:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzhZpaC4/kffjhUCkKRReiugjCiLRymQ9MrOurXjYEblSE5KLvKS6tusliBNPYaGxM9snMfzQ==
-X-Received: by 2002:a05:6000:111:: with SMTP id
- o17mr43727419wrx.178.1593877173151; 
- Sat, 04 Jul 2020 08:39:33 -0700 (PDT)
+ bh=wevOFGWECaRJOmLpbzON6N0ynWLO2tBiVdtI/WyaADw=;
+ b=WrugTm95GO8fjgjqi8VX12zRXAplHpkZ8F2fDULHpYYztXduBCK6IM0cMdnQFXlZi8
+ JYa2uS89vj4oVW/UQ2C5pWcqA0lABGXpLiNyN7FOqv0TTt/fwyeuVJxkFBXlnXJFethG
+ qFefWT1M9py83535kpWUbxXeB1rVdVF+4FLPwVKw9QJJFnHL/spdQJNojwBevcAwiuKo
+ iWKZPouwvCJBWAkx2T3EGCe29lkAFxkmbP5XURrDwrw5g7N3n79uI/3wVj0an1mghOFR
+ rl2dV+LvYQlyJFJVxxpcoqBZvUbfKMPR0cFBBbf8ockVep0zOyp5cZ1JDHVUiON5mfHB
+ s7XA==
+X-Gm-Message-State: AOAM531kwIUHhqXtTACiyj5nfAxrIt5cB4LS+NZUD5a7CzVP1ZrVxF3F
+ yqR7nI2eZRRW7HJifUqhDMZmpY0gU04/p1jGOKLPUcckLijBWh1S0XdElz5l7e8yIpqteH9HndI
+ Qfe4lzNn9S/BS/jQ=
+X-Received: by 2002:adf:e701:: with SMTP id c1mr42222368wrm.350.1593877200718; 
+ Sat, 04 Jul 2020 08:40:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7bRq3+QaGDlbCyiTBMme4FfYVY7TosEB0YYMwsTU9tY8KuV4ltQNPb9RIjotuQTPhhrgyYQ==
+X-Received: by 2002:adf:e701:: with SMTP id c1mr42222337wrm.350.1593877200575; 
+ Sat, 04 Jul 2020 08:40:00 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id e5sm17685316wrs.33.2020.07.04.08.39.31
+ by smtp.gmail.com with ESMTPSA id n14sm17970909wro.81.2020.07.04.08.39.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 08:39:32 -0700 (PDT)
+ Sat, 04 Jul 2020 08:40:00 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 04/23] hw/arm/pxa2xx: Emit warning when old code is used
-Date: Sat,  4 Jul 2020 17:38:49 +0200
-Message-Id: <20200704153908.12118-5-philmd@redhat.com>
+Subject: [RFC PATCH v2 09/23] hw/display/tc6393xb: Emit warning when old code
+ is used
+Date: Sat,  4 Jul 2020 17:38:54 +0200
+Message-Id: <20200704153908.12118-10-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200704153908.12118-1-philmd@redhat.com>
 References: <20200704153908.12118-1-philmd@redhat.com>
@@ -138,74 +137,30 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/arm/pxa2xx.c          | 3 +++
- hw/display/pxa2xx_lcd.c  | 3 +++
- hw/input/pxa2xx_keypad.c | 3 +++
- 3 files changed, 9 insertions(+)
+ hw/display/tc6393xb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index f104a33463..adc7263e59 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -27,6 +27,7 @@
- #include "sysemu/qtest.h"
- #include "qemu/cutils.h"
- #include "qemu/log.h"
-+#include "hw/qdev-deprecated.h"
- 
- static struct {
-     hwaddr io_base;
-@@ -1768,6 +1769,8 @@ static PXA2xxI2SState *pxa2xx_i2s_init(MemoryRegion *sysmem,
- {
-     PXA2xxI2SState *s = g_new0(PXA2xxI2SState, 1);
- 
-+    qdev_warn_deprecated_function_used();
-+
-     s->irq = irq;
-     s->rx_dma = rx_dma;
-     s->tx_dma = tx_dma;
-diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
-index ff90104b80..cf6241ff21 100644
---- a/hw/display/pxa2xx_lcd.c
-+++ b/hw/display/pxa2xx_lcd.c
-@@ -20,6 +20,7 @@
- /* FIXME: For graphic_rotate. Should probably be done in common code.  */
- #include "sysemu/sysemu.h"
- #include "framebuffer.h"
-+#include "hw/qdev-deprecated.h"
- 
- struct DMAChannel {
-     uint32_t branch;
-@@ -1011,6 +1012,8 @@ PXA2xxLCDState *pxa2xx_lcdc_init(MemoryRegion *sysmem,
-     PXA2xxLCDState *s;
-     DisplaySurface *surface;
- 
-+    qdev_warn_deprecated_function_used();
-+
-     s = (PXA2xxLCDState *) g_malloc0(sizeof(PXA2xxLCDState));
-     s->invalidated = 1;
-     s->irq = irq;
-diff --git a/hw/input/pxa2xx_keypad.c b/hw/input/pxa2xx_keypad.c
-index 62aa6f6b15..6de1e9e4bb 100644
---- a/hw/input/pxa2xx_keypad.c
-+++ b/hw/input/pxa2xx_keypad.c
-@@ -17,6 +17,7 @@
- #include "migration/vmstate.h"
- #include "hw/arm/pxa.h"
+diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
+index 49a676d1b0..e4900e9502 100644
+--- a/hw/display/tc6393xb.c
++++ b/hw/display/tc6393xb.c
+@@ -21,6 +21,7 @@
  #include "ui/console.h"
+ #include "ui/pixel_ops.h"
+ #include "sysemu/blockdev.h"
 +#include "hw/qdev-deprecated.h"
  
- /*
-  * Keypad
-@@ -316,6 +317,8 @@ PXA2xxKeyPadState *pxa27x_keypad_init(MemoryRegion *sysmem,
- {
-     PXA2xxKeyPadState *s;
+ #define IRQ_TC6393_NAND		0
+ #define IRQ_TC6393_MMC		1
+@@ -556,6 +557,8 @@ TC6393xbState *tc6393xb_init(MemoryRegion *sysmem, uint32_t base, qemu_irq irq)
+         },
+     };
  
 +    qdev_warn_deprecated_function_used();
 +
-     s = (PXA2xxKeyPadState *) g_malloc0(sizeof(PXA2xxKeyPadState));
+     s = (TC6393xbState *) g_malloc0(sizeof(TC6393xbState));
      s->irq = irq;
- 
+     s->gpio_in = qemu_allocate_irqs(tc6393xb_gpio_set, s, TC6393XB_GPIOS);
 -- 
 2.21.3
 
