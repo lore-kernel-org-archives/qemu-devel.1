@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B055C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B905C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C93EE207D4
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:46:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22DAD207D4
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:47:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EklGo+n/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C93EE207D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QTvGTbU0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22DAD207D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrkN7-0003y1-WB
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 11:46:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40534)
+	id 1jrkOA-0006hh-Al
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 11:47:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGv-0001rs-FN
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:40:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31964
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGx-0001xX-P9
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:40:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21220
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGs-0007gO-Dx
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:40:09 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGv-0007j6-C4
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:40:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593877203;
+ s=mimecast20190719; t=1593877208;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wevOFGWECaRJOmLpbzON6N0ynWLO2tBiVdtI/WyaADw=;
- b=EklGo+n/WnsSnP4RjPQNewp1EUQG6IfrToSDa9IY0SGXbCeFYXuSELk8OdGuaxxFIGDv9n
- pEJkO/sjLXdR7vmI06WWc0C8kKlTZsbM1TZ3+c80iaUIahNWhjWrTm/fl9uU6o/eyb/mA+
- UV53MJ+eA4qkJwZmrqZ/7yuve5EALe8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-tPuFxYhQMo2tsWT4m7kYyQ-1; Sat, 04 Jul 2020 11:40:02 -0400
-X-MC-Unique: tPuFxYhQMo2tsWT4m7kYyQ-1
-Received: by mail-wm1-f71.google.com with SMTP id y204so28646509wmd.2
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 08:40:01 -0700 (PDT)
+ bh=faJPKsgnKj1MSj1B3bxzpLa01+W3HhU/7Hynie77jqI=;
+ b=QTvGTbU0FsA594nbpizQXCxVMsQeofTLwepRpExoxQp+2hOdJNxMbsl5+Pbnzo1hhKbvei
+ Yu1EAO+1isTSs0V/IjI9WJ2Pedg/K0nuNny9adg1fWWrvxSkw20QAUYKzAiMtFttXk8RFB
+ DtCUNIiOIGkqAayZJyKsSoZLx363CoQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-H-bzotlxMsKaQ64L0sXSHw-1; Sat, 04 Jul 2020 11:40:07 -0400
+X-MC-Unique: H-bzotlxMsKaQ64L0sXSHw-1
+Received: by mail-wr1-f69.google.com with SMTP id j5so35937404wro.6
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 08:40:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=wevOFGWECaRJOmLpbzON6N0ynWLO2tBiVdtI/WyaADw=;
- b=WrugTm95GO8fjgjqi8VX12zRXAplHpkZ8F2fDULHpYYztXduBCK6IM0cMdnQFXlZi8
- JYa2uS89vj4oVW/UQ2C5pWcqA0lABGXpLiNyN7FOqv0TTt/fwyeuVJxkFBXlnXJFethG
- qFefWT1M9py83535kpWUbxXeB1rVdVF+4FLPwVKw9QJJFnHL/spdQJNojwBevcAwiuKo
- iWKZPouwvCJBWAkx2T3EGCe29lkAFxkmbP5XURrDwrw5g7N3n79uI/3wVj0an1mghOFR
- rl2dV+LvYQlyJFJVxxpcoqBZvUbfKMPR0cFBBbf8ockVep0zOyp5cZ1JDHVUiON5mfHB
- s7XA==
-X-Gm-Message-State: AOAM531kwIUHhqXtTACiyj5nfAxrIt5cB4LS+NZUD5a7CzVP1ZrVxF3F
- yqR7nI2eZRRW7HJifUqhDMZmpY0gU04/p1jGOKLPUcckLijBWh1S0XdElz5l7e8yIpqteH9HndI
- Qfe4lzNn9S/BS/jQ=
-X-Received: by 2002:adf:e701:: with SMTP id c1mr42222368wrm.350.1593877200718; 
- Sat, 04 Jul 2020 08:40:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw7bRq3+QaGDlbCyiTBMme4FfYVY7TosEB0YYMwsTU9tY8KuV4ltQNPb9RIjotuQTPhhrgyYQ==
-X-Received: by 2002:adf:e701:: with SMTP id c1mr42222337wrm.350.1593877200575; 
- Sat, 04 Jul 2020 08:40:00 -0700 (PDT)
+ bh=faJPKsgnKj1MSj1B3bxzpLa01+W3HhU/7Hynie77jqI=;
+ b=DStzH4UrU8FaLtHWkOulGZcdgwxEYtfdMahSo5h59TTOD0R0zaIUCnin6wn3cs/Y4m
+ eoGXUR+bBexWK39LXmhMTMEoPfSibCxjDI71EpHoPHpRfexWcTnnu779H7awoS0aIQbi
+ 2fH6y8YEqDOqn6N7FUC2eve6fv7Z7ZJgtC7C4iS7K5PvRL1CmOj/HMACNzzuRqH+6mJJ
+ yxQVua/EQg/SqA9WAG1uW3kpI15WcbJk61/RC+f8bOKCjyp7R8njSbtqZ+xonSNz7FvB
+ qLEVKkMor+yF3rUPPZqvCDYVRThCmMNX4rVRz7POwTGV5AJRpkv5Tmrhfru10xMOKCz6
+ O0eQ==
+X-Gm-Message-State: AOAM530S2QC6V97YR3d/0gvr0q6vxKcxhY7LvosYLvmyj5lDExqyQSgc
+ GWoHswPZQBY0K/JJkD08N+Kr9TQyz4/ApKuSQoBXeeinOjcphNd6vda7U+QTyPwTw/6Egf2aYo3
+ I72+pG3ZWDom+09Q=
+X-Received: by 2002:adf:e44c:: with SMTP id t12mr13768479wrm.103.1593877205945; 
+ Sat, 04 Jul 2020 08:40:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy098jPxb/frQeho469Gp43aPTWxVhQy55qlR1MGFXuliyYTgtCF30tAWMv6lLp78b+1yIBsQ==
+X-Received: by 2002:adf:e44c:: with SMTP id t12mr13768451wrm.103.1593877205790; 
+ Sat, 04 Jul 2020 08:40:05 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id n14sm17970909wro.81.2020.07.04.08.39.59
+ by smtp.gmail.com with ESMTPSA id f186sm16650455wmf.29.2020.07.04.08.40.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 08:40:00 -0700 (PDT)
+ Sat, 04 Jul 2020 08:40:05 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 09/23] hw/display/tc6393xb: Emit warning when old code
- is used
-Date: Sat,  4 Jul 2020 17:38:54 +0200
-Message-Id: <20200704153908.12118-10-philmd@redhat.com>
+Subject: [RFC PATCH v2 10/23] hw/display/vga-isa-mm: Emit warning when old
+ code is used
+Date: Sat,  4 Jul 2020 17:38:55 +0200
+Message-Id: <20200704153908.12118-11-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200704153908.12118-1-philmd@redhat.com>
 References: <20200704153908.12118-1-philmd@redhat.com>
@@ -90,9 +90,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:20
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -137,30 +137,61 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/display/tc6393xb.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/display/vga-isa-mm.c | 5 +++++
+ hw/display/vga.c        | 3 +++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
-index 49a676d1b0..e4900e9502 100644
---- a/hw/display/tc6393xb.c
-+++ b/hw/display/tc6393xb.c
-@@ -21,6 +21,7 @@
- #include "ui/console.h"
+diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
+index 7321b7a06d..3e62389b63 100644
+--- a/hw/display/vga-isa-mm.c
++++ b/hw/display/vga-isa-mm.c
+@@ -29,6 +29,7 @@
+ #include "hw/display/vga.h"
+ #include "vga_int.h"
  #include "ui/pixel_ops.h"
- #include "sysemu/blockdev.h"
 +#include "hw/qdev-deprecated.h"
  
- #define IRQ_TC6393_NAND		0
- #define IRQ_TC6393_MMC		1
-@@ -556,6 +557,8 @@ TC6393xbState *tc6393xb_init(MemoryRegion *sysmem, uint32_t base, qemu_irq irq)
-         },
-     };
+ #define VGA_RAM_SIZE (8 * MiB)
+ 
+@@ -71,6 +72,8 @@ static void vga_mm_init(ISAVGAMMState *s, hwaddr vram_base,
+ {
+     MemoryRegion *s_ioport_ctrl, *vga_io_memory;
  
 +    qdev_warn_deprecated_function_used();
 +
-     s = (TC6393xbState *) g_malloc0(sizeof(TC6393xbState));
-     s->irq = irq;
-     s->gpio_in = qemu_allocate_irqs(tc6393xb_gpio_set, s, TC6393XB_GPIOS);
+     s->it_shift = it_shift;
+     s_ioport_ctrl = g_malloc(sizeof(*s_ioport_ctrl));
+     memory_region_init_io(s_ioport_ctrl, NULL, &vga_mm_ctrl_ops, s,
+@@ -99,6 +102,8 @@ int isa_vga_mm_init(hwaddr vram_base,
+ 
+     s = g_malloc0(sizeof(*s));
+ 
++    qdev_warn_deprecated_function_used();
++
+     s->vga.vram_size_mb = VGA_RAM_SIZE / MiB;
+     s->vga.global_vmstate = true;
+     vga_common_init(&s->vga, NULL);
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 061fd9ab8f..d59a9c896b 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -35,6 +35,7 @@
+ #include "hw/xen/xen.h"
+ #include "migration/vmstate.h"
+ #include "trace.h"
++#include "hw/qdev-deprecated.h"
+ 
+ //#define DEBUG_VGA_MEM
+ //#define DEBUG_VGA_REG
+@@ -2262,6 +2263,8 @@ MemoryRegion *vga_init_io(VGACommonState *s, Object *obj,
+ {
+     MemoryRegion *vga_mem;
+ 
++    qdev_warn_deprecated_function_used();
++
+     *vga_ports = vga_portio_list;
+     *vbe_ports = vbe_portio_list;
+ 
 -- 
 2.21.3
 
