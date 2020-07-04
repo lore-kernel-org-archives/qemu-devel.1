@@ -2,103 +2,80 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 144B8C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 00:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7C9C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 03:26:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1BCF206DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 00:51:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dDrVjpDQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1BCF206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3CC792064C
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 03:26:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC792064C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrWOS-0005n8-5T
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 20:51:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50488)
+	id 1jrYol-000807-Fh
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 23:26:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jrWNp-0005G2-CC
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 20:50:21 -0400
-Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:32895)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jrYo5-0007Wt-6Z
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 23:25:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51854)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jrWNl-00075W-5q
- for qemu-devel@nongnu.org; Fri, 03 Jul 2020 20:50:21 -0400
-Received: by mail-vs1-xe43.google.com with SMTP id u133so4360190vsc.0
- for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 17:50:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=oM8V3dJ30E+i8OPC6HeE0rR8gA6+16SARIhE7deSAUE=;
- b=dDrVjpDQPtxQv578OZtNU8Txdaa9h+WE3aBfMAHcPW3di1BS16bMDLZBkyfSM75I0M
- fhmI52UOUHXgE88ONkrPxp8It2rAbcHinoUPyQcP0aGeaGgSLYiTdny6ZtXy8QfphUej
- lZzX61d3BznQhcw1hhqlj75elB/kC/frIBylay/V77GN3xovt7QZ7aHMQMF7MU99PZTq
- Choluo5Ymc/x18MeAPm0xLhZepz5oal8MdI5GKm7YcgwqBpIy/rj98bYUrEH4sFvp+WT
- 5/bRo4NpzCYBGTEpDy/kpYOXBMxMG2p5Mta7RMDhQutXu2cUSFk5iLPfe6rppzW5LMVl
- pJTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=oM8V3dJ30E+i8OPC6HeE0rR8gA6+16SARIhE7deSAUE=;
- b=IA7elA8qfkWIQJrd2lYsNBv8LuqOaGZe8dLPP8lZokJuOZ4Aay1BJHsyKBjaTtYZwa
- kMOdlMh7bUVC1ZVZWZZeXVxHw9nGVooO+le6jIwAfVPCUcKQlkV9EtEel5suNSclyxhe
- H2ADeGrNDVCWrni1AbCcgWkGyJ3sR58AsBPYEax0rzZWv1ygTLt7f0t1PLzHRUpThh9B
- SwwCVuXWgHrQpgHQAjvSbac0KUwUDv8VbZVJ/tky7JvHuegGkP7nl1HA1NBFVj4KTU9Q
- An50376+my6SrNj0IPOtj+Ht4b8uk6f8vByRQDcn+p5CnUfTWHWTWyYzLbWDmNqDwTa4
- 1sDg==
-X-Gm-Message-State: AOAM531b88ZViS30wTCejcL213IqYt8CsEzD8NNKYbSwP8dWOFxbFJz5
- g7aoMTR4ENs4ro9Tk8NsPI8TdEoBkk4FC2wb02wCAw==
-X-Google-Smtp-Source: ABdhPJxolP+smVhTa9sVL76bobePEsTo5TvIYqCq6ZfQ9RykAixUtyL5XXL1UFD44V9bxH6VcfPI3tvXGn0g7g2mzbk=
-X-Received: by 2002:a67:1b85:: with SMTP id
- b127mr24937666vsb.152.1593823815770; 
- Fri, 03 Jul 2020 17:50:15 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jrYo2-0006wn-Rz
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 23:25:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jrYo0-00060J-S6
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 03:25:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CA22D2E806D
+ for <qemu-devel@nongnu.org>; Sat,  4 Jul 2020 03:25:32 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200626235519.591734-1-hskinnemoen@google.com>
- <20200626235519.591734-9-hskinnemoen@google.com>
- <abdb209d-7268-7997-2caa-95cb984269da@amsat.org>
- <CAFQmdRYZWhA-957jRHfiRHfYoOk-c2TJVtqoz6LMOhDgJwMiCg@mail.gmail.com>
- <9f8c6cb0-cac3-2afe-a98a-c627cb04bd4b@amsat.org>
-In-Reply-To: <9f8c6cb0-cac3-2afe-a98a-c627cb04bd4b@amsat.org>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Fri, 3 Jul 2020 17:50:03 -0700
-Message-ID: <CAFQmdRZ79Fx-tdVaEjiAR=5ignn_Rw95HT7sjDxs7rYtD4ADTg@mail.gmail.com>
-Subject: Re: [PATCH v3 08/12] hw/nvram: NPCM7xx OTP device model
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
- Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, 
- QEMU Developers <qemu-devel@nongnu.org>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
- CS20 KFTing <kfting@nuvoton.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e43;
- envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+Date: Sat, 04 Jul 2020 03:16:29 -0000
+From: "Emilio G. Cota" <1885827@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: plugins windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee casmac cota
+X-Launchpad-Bug-Reporter: Xiaolei (casmac)
+X-Launchpad-Bug-Modifier: Emilio G. Cota (cota)
+References: <159357217483.1717.4076077243388027502.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159383259009.1717.14099413077282497580.malone@chaenomeles.canonical.com>
+Subject: [Bug 1885827] Re: building plugin failed on Windows with mingw
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c6bbccaed8849b2455bd6e0ed522b9e6bac89a23
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/03 23:25:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,94 +84,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1885827 <1885827@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 3, 2020 at 3:24 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> On 7/3/20 11:07 PM, Havard Skinnemoen wrote:
-> > On Fri, Jul 3, 2020 at 6:46 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat=
-.org> wrote:
-> >>
-> >> On 6/27/20 1:55 AM, Havard Skinnemoen wrote:
-> >>> +static void npcm7xx_otp_realize(DeviceState *dev, Error **errp)
-> >>> +{
-> >>> +    NPCM7xxOTPClass *oc =3D NPCM7XX_OTP_GET_CLASS(dev);
-> >>> +    NPCM7xxOTPState *s =3D NPCM7XX_OTP(dev);
-> >>> +    SysBusDevice *sbd =3D &s->parent;
-> >>> +
-> >>> +    s->array =3D g_malloc0(NPCM7XX_OTP_ARRAY_BYTES);
-> >>
-> >> The possibility to reuse persistent OTP seems important.
-> >> This can be added later of course.
-> >
-> > Agree, it's an important part of the behavior of the module. But it's
-> > not essential to be able to boot a BMC firmware image, so I left it
-> > out initially.
->
-> This is not a problem until someone else try to use it. And OTP/NVRAM
-> are devices currently in hype. Meanwhile we have another technical debt.
-> I am just giving generic review comments.
->
-> What bugs me particularly is the OTP content zeroed at reset without
-> any warning. Maybe you can add something like:
->
->   qemu_log_mask(LOG_UNIMP,
->                 "Persistence not supported, OTP content erased!\n");
->
-> in npcm7xx_otp_enter_reset().
+I never built the plugin code on anything other than Linux :(
+All I did for Windows is to try to follow https://gcc.gnu.org/wiki/Visibili=
+ty
 
-Ah, but it only zeroes the registers. The OTP array is only zeroed in reali=
-ze().
+Can you please try the following patch (with no other changes)?
+The patch applies on top of v4.2.0.
 
-But I see your point about persistence. I will work on that.
+diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+index 75467b6db8..5b3611ad63 100644
+--- a/tests/plugin/Makefile
++++ b/tests/plugin/Makefile
+@@ -16,7 +16,7 @@ NAMES +=3D hotpages
 
-One possible complication is that real boards are expected to be
-programmed a certain way, so some reasonable defaults need to be
-loaded when the user doesn't specify an image (and perhaps also if the
-user specifies an "uninitialized" image, if there's any way to detect
-that). Would it make sense to add pc-bios blobs that can be loaded by
-default, and used as a starting point or backing file for users that
-need persistent OTP arrays? Or maybe just OR the factory-programmed
-bits into the user-provided image, since that would match the OTP
-nature of those bits.
+ SONAMES :=3D $(addsuffix .so,$(addprefix lib,$(NAMES)))
 
-> >
-> >> See simple example in hw/nvram/eeprom_at24c.c which use
-> >> a BlockBackend so the OTP content is not lost after reset
-> >> or migration.
-> >
-> > I'll take a look at that, thanks!
-> >
-> >>> +
-> >>> +    memory_region_init_io(&s->mmio, OBJECT(s), oc->mmio_ops, s, "reg=
-s",
-> >>> +                          NPCM7XX_OTP_REGS_SIZE);
-> >>> +    sysbus_init_mmio(sbd, &s->mmio);
-> >>> +}
-> >>> +
-> >>> +static void npcm7xx_otp_class_init(ObjectClass *klass, void *data)
-> >>> +{
-> >>> +    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
-> >>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >>> +
-> >>
-> >> Missing migration vmstate for NPCM7xxOTPState::regs[].
-> >
-> > Ah, you're right. This is probably true for most of the peripherals in
-> > this series. I'll see if I can get it sorted out for the next
-> > iteration.
->
-> IIUC Peter is ready to queue your series on Monday if you fix the
-> license, but he usually doesn't accept devices without vmstate via
-> his tree, you got lucky ;) See:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg643089.html
->
-> Adding the vmstate is not a hard task. If you need to respin,
-> I strongly recommend you to consider adding them.
+-QEMU_CFLAGS +=3D -fPIC
++QEMU_CFLAGS +=3D -fPIC -DBUILDING_DLL
+ QEMU_CFLAGS +=3D -I$(SRC_PATH)/include/qemu
 
-Yeah, I'll add vmstate for v4. Thanks for the blog link, that looks
-like what I need.
+ all: $(SONAMES)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885827
+
+Title:
+  building plugin failed on Windows with mingw
+
+Status in QEMU:
+  New
+
+Bug description:
+  I want to build QEMU 4.2.0's plugin module on Windows 7/10 with Mingw, bu=
+t the building process faild.
+   =
+
+  The step I follow is listed below:
+  1. create "dsp_build" diretory under source file folder
+
+  2.  change directory to dsp_build , and run ../configure --target-list=3D=
+dsp-softmmu --cross-prefix=3Dx86_64-w64-mingw32- --enable-gtk --enable-sdl =
+--enable-debug --enable-plugins
+  3. build qemu project
+  4. switch dir to /dsp_build, make -C tests/plugin, yeilds error: =
+
+     CC      bb.o
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:17:2=
+4: error: variable 'qemu_plugin_version' definition is marked dllimport
+     17 | QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSIO=
+N;
+        |                        ^~~~~~~~~~~~~~~~~~~
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:17:2=
+4: warning: 'qemu_plugin_version' redeclared without dllimport attribute: p=
+revious dllimport ignored [-Wattributes]
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c: In =
+function 'vcpu_tb_exec':
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:33:2=
+9: warning: cast from pointer to integer of different size [-Wpointer-to-in=
+t-cast]
+     33 |     unsigned long n_insns =3D (unsigned long)udata;
+        |                             ^
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c: In =
+function 'vcpu_tb_trans':
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:51:4=
+6: warning: cast to pointer from integer of different size [-Wint-to-pointe=
+r-cast]
+     51 |                                              (void *)n_insns);
+
+  5.  Then , I modified the QEMU_flags and the compilation command
+  arguments($(CC) ..) in  the  makefile :
+
+                  BUILD_DIR :=3D $(CURDIR)/../..
+
+  		include $(BUILD_DIR)/config-host.mak
+  		include $(SRC_PATH)/rules.mak
+
+                  $(call set-vpath, $(SRC_PATH)/tests/plugin)
+
+  		NAMES :=3D
+  		NAMES +=3D bb
+  		NAMES +=3D empty
+  		NAMES +=3D insn
+  		NAMES +=3D mem
+  		NAMES +=3D hotblocks
+  		NAMES +=3D howvec
+  		NAMES +=3D hotpages
+
+                  SONAMES :=3D $(addsuffix .so,$(addprefix lib,$(NAMES)))
+
+  		QEMU_CFLAGS +=3D -fPIC	-DBUILDING_DLL  		#added  -DBUILDING_DLL
+  		QEMU_CFLAGS +=3D -I$(SRC_PATH)/include/qemu
+
+                  all: $(SONAMES)
+
+  		lib%.so: %.o
+  			$(CC) -fPIC -shared -o $@ $^ $(LDLIBS) -L /c/msys64/mingw64/lib/ -lgli=
+b-2.0
+  			# original cmd: $(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
+
+  		clean:
+  			rm -f *.o *.so *.d
+  			rm -Rf .libs
+
+                  .PHONY: all clean
+
+  6.  Executing make yeilds:
+
+  make: enter   =E2=80=9C/d/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/=
+build_dsp/tests/plugin=E2=80=9D
+    CC      bb.o
+  x86_64-w64-mingw32-gcc -fPIC -shared -o libbb.so bb.o  -L /c/msys64/mingw=
+64/lib/ -lglib-2.0
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o: in function `plugin_exit':
+  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:28: u=
+ndefined reference to `qemu_plugin_outs'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:29: undefined reference to `__stack_chk_fail'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o: in function `vcpu_tb_trans':
+  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:41: u=
+ndefined reference to `qemu_plugin_tb_n_insns'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:44: undefined reference to `qemu_plugin_register_vcpu=
+_tb_exec_inline'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:46: undefined reference to `qemu_plugin_register_vcpu=
+_tb_exec_inline'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:49: undefined reference to `qemu_plugin_register_vcpu=
+_tb_exec_cb'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o: in function `qemu_plugin_install':
+  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:63: u=
+ndefined reference to `qemu_plugin_register_vcpu_tb_trans_cb'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:64: undefined reference to `qemu_plugin_register_atex=
+it_cb'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o:bb.c:(.rdata$.refptr.__stack_chk_guard[.r=
+efptr.__stack_chk_guard]+0x0): undefined reference to `__stack_chk_guard'
+  collect2.exe: error: ld returned 1 exit status
+
+     It looks like linking problem(fail to link functions defined in api.c,=
+ core.c...), but I have no idea what goes wrong. If I mannualy add api.o, c=
+ore.o in the compilation command, still get error like undefined reference =
+to '__stack_chk_guard'. =
+
+     My collegue can build 4.2.0  plugins on Ubuntu Linux without any probl=
+em.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885827/+subscriptions
 
