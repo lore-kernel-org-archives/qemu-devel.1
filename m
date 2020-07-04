@@ -2,75 +2,75 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A58C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E74C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:57:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D4921927
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EDBB2158C
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:57:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gODFZA0N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D4921927
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XuFU4CBE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EDBB2158C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrjaO-0004hV-J9
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:56:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57726)
+	id 1jrjbx-0007FF-Gw
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:57:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrjUX-0001dM-UB; Sat, 04 Jul 2020 10:50:09 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42047)
+ id 1jrjUk-00026x-A7; Sat, 04 Jul 2020 10:50:23 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46063)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrjUW-0003fP-9Q; Sat, 04 Jul 2020 10:50:09 -0400
-Received: by mail-wr1-x433.google.com with SMTP id o11so35781109wrv.9;
- Sat, 04 Jul 2020 07:50:07 -0700 (PDT)
+ id 1jrjUi-0003nE-Cs; Sat, 04 Jul 2020 10:50:21 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s10so35719344wrw.12;
+ Sat, 04 Jul 2020 07:50:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6Mlo0AeYRU65Ls2fCVkmevBd3nH8ZXr33Z7OmOj+vXU=;
- b=gODFZA0NwiEg34xoLUZooBEFePqRiHvzOgk7GoIz2n1rFGd4QSl0yPFHs0kMpTwfun
- VxbOHiWGiK7hGkJcR55uhGHJOkSnTOylYJNNNeJNFX5MQ1AJWFLxthC0JxYRXwwA8UD6
- 0T4W6OXB8JWENKKs9BjOmQtMx26PqxWLkNEqphVLzbN6BpKPqkGpMh3IysQmS3XaqFCH
- w/AkpcTcynoV0yqxNIqLzGxVmIkT1wEWEZ/2m+7m7ZFEkqqyiCInBV+iToCedjNeVAij
- I8W2Zmy8BwxXfoflWqBcUrD9nDoivwv8OJoVTnLun2Tiql7zQaqUo+6b6+3cW7+Kchj4
- DYZA==
+ bh=F2y1uml1RkFfNsOb+m2iyzdDwj1uXo3NnuLQTrqdA9s=;
+ b=XuFU4CBE8JCcfpdI/mR5sE2jyMeyBckQOwPMTtzwJf8CjscRTofonY09HxmwJm00NE
+ hgXaGKtjBGKgBEytwuJ+1LT1UMvcBupnCU5041RZtHT4vwcBWQo/M/+GghnU6sLvVTLF
+ Y0OX5yURCQg13pYSivq8FFPYj7wg8wOD1j0jENHOgxaRTzOtllVlw7cjPNFn2IWH1BIq
+ Sm6KuoljtLR0LbF6gX5rfDBtKX6CprkJZYeXQzCIGgZcLZdQ6vORkbiRnRe5hvsbF/uS
+ OWFgKWrvnxxqFL1fM5rMPeqOvIkLQG0cFB/v/CHa/YpQquR2m9B6/D1fPzqQ7wWU0wd9
+ 8j+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6Mlo0AeYRU65Ls2fCVkmevBd3nH8ZXr33Z7OmOj+vXU=;
- b=OnJyCOpxOezA+oK2xG2fQHPbzVctIj3eOHxobCBvyqqiDQZ8Vkm+y8CY7UzBWMTJ8U
- EGCBhWheA31Yw+aYMoHz3c/Dc4FL9Cmok6TWDsB+Zy19wAxI4FtVgeq+H2/WzCnhPc/L
- sI6l0BnB9Ra7e5t9+UeIhnTwBpDsusFY4QmXwBpk5Sr3ljOwuqgO/d6s66lY8uLH1pzZ
- 7ija/d0za5wu2GLHfDW7m+VyH7Cs8XUN11vJhx6BgLnG6Wb5xDaZ/yjH0sFNqd7zRfch
- r8CD3FO4vP/Kv4QsMkVADhd+MFpXY6YZgN2QDPgTvYTWYvQM539LNmSgJvyfB7SnLl7E
- p9jw==
-X-Gm-Message-State: AOAM531I7dbAbCTVuwboODU5P0kSPZL/NwmdA/jmV/7CgwNODQo9D/o6
- aFJq4KkUHFd9GXGgGTWXSeysfjw66lA=
-X-Google-Smtp-Source: ABdhPJx90xoS99/KVAVNosR0acMctdxAlHMTJW7Yd8LCiWu1nVe8JG8D7h3cg324kUXYXFvYsOB19w==
-X-Received: by 2002:adf:f504:: with SMTP id q4mr40505370wro.163.1593874206130; 
- Sat, 04 Jul 2020 07:50:06 -0700 (PDT)
+ bh=F2y1uml1RkFfNsOb+m2iyzdDwj1uXo3NnuLQTrqdA9s=;
+ b=pv44Hed7e11VRFYiGl8UVgkq++UfjT45DGAmMYNHhJiII+W9DhZ3P1w2K/CyIFDl6o
+ NhSOhgJnUZJfP36rE5MkzbJklQ7XCO/BcQbGuZVLSzw6GBc2I2nEn4/Sd6KEUhzRKudn
+ yqA/lCL1wn2947pSbKjcyhx5qRWZvVfoYzRDDyocMMajyunA2TlWTShSeOT5e+bngFik
+ nz7uX6mhr5dSd5lMKFQ6BwaMcx+32uMUenUdFg+Mu5bwExQ1HmJ2qXjQYSmbM2ODMF74
+ 2jCSlaGlthOQC7Fw4CYbxBJldBhxHw4u4RH0s1NVvMbdclC9G6Ok4+kdPFMx2cmSsVeY
+ etzA==
+X-Gm-Message-State: AOAM530BXLfTbMt7KzcB17RL3jZZE2Rm225HDmKjWib0F3xXKej4AMj/
+ nqEQQilgr+Ifx0of7B5JMHBco5xQF8o=
+X-Google-Smtp-Source: ABdhPJyq/7eRAGeHxJJ4O+Zutc0Mt3EntxvTem4i1yYIv/0yUmC2RdRBoUXQL+VySe0UhHY6Lv3gOQ==
+X-Received: by 2002:a5d:6a01:: with SMTP id m1mr43778986wru.115.1593874218068; 
+ Sat, 04 Jul 2020 07:50:18 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r10sm17135019wrm.17.2020.07.04.07.50.04
+ by smtp.gmail.com with ESMTPSA id r10sm17135019wrm.17.2020.07.04.07.50.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 07:50:05 -0700 (PDT)
+ Sat, 04 Jul 2020 07:50:17 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH 09/26] hw/usb/hcd-ehci: Remove unnecessary include
-Date: Sat,  4 Jul 2020 16:49:26 +0200
-Message-Id: <20200704144943.18292-10-f4bug@amsat.org>
+Subject: [PATCH 15/26] hw/usb: Add new 'usb-quirks.h' local header
+Date: Sat,  4 Jul 2020 16:49:32 +0200
+Message-Id: <20200704144943.18292-16-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200704144943.18292-1-f4bug@amsat.org>
 References: <20200704144943.18292-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::433;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x433.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -133,25 +133,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As "qemu/main-loop.h" is not used, remove it.
+Only redirect.c consumes the quirks API. Reduce the big "hw/usb.h"
+header by moving the quirks related declaration into their own
+header. As nothing out of hw/usb/ requires it, keep it local.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/usb/hcd-ehci.c | 1 -
- 1 file changed, 1 deletion(-)
+ hw/usb/usb-quirks.h | 27 +++++++++++++++++++++++++++
+ include/hw/usb.h    | 11 -----------
+ hw/usb/quirks.c     |  1 +
+ hw/usb/redirect.c   |  1 +
+ 4 files changed, 29 insertions(+), 11 deletions(-)
+ create mode 100644 hw/usb/usb-quirks.h
 
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index 1495e8f7fa..256fb91e0c 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -34,7 +34,6 @@
- #include "migration/vmstate.h"
- #include "trace.h"
- #include "qemu/error-report.h"
--#include "qemu/main-loop.h"
- #include "sysemu/runstate.h"
+diff --git a/hw/usb/usb-quirks.h b/hw/usb/usb-quirks.h
+new file mode 100644
+index 0000000000..542889efc4
+--- /dev/null
++++ b/hw/usb/usb-quirks.h
+@@ -0,0 +1,27 @@
++/*
++ * USB quirk handling
++ *
++ * Copyright (c) 2012 Red Hat, Inc.
++ *
++ * Red Hat Authors:
++ * Hans de Goede <hdegoede@redhat.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#ifndef HW_USB_QUIRKS_H
++#define HW_USB_QUIRKS_H
++
++/* In bulk endpoints are streaming data sources (iow behave like isoc eps) */
++#define USB_QUIRK_BUFFER_BULK_IN        0x01
++/* Bulk pkts in FTDI format, need special handling when combining packets */
++#define USB_QUIRK_IS_FTDI               0x02
++
++int usb_get_quirks(uint16_t vendor_id, uint16_t product_id,
++                   uint8_t interface_class, uint8_t interface_subclass,
++                   uint8_t interface_protocol);
++
++#endif
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index 18f1349bdc..8c3bc920ff 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -549,15 +549,4 @@ int usb_device_alloc_streams(USBDevice *dev, USBEndpoint **eps, int nr_eps,
+                              int streams);
+ void usb_device_free_streams(USBDevice *dev, USBEndpoint **eps, int nr_eps);
  
- #define FRAME_TIMER_FREQ 1000
+-/* quirks.c */
+-
+-/* In bulk endpoints are streaming data sources (iow behave like isoc eps) */
+-#define USB_QUIRK_BUFFER_BULK_IN	0x01
+-/* Bulk pkts in FTDI format, need special handling when combining packets */
+-#define USB_QUIRK_IS_FTDI		0x02
+-
+-int usb_get_quirks(uint16_t vendor_id, uint16_t product_id,
+-                   uint8_t interface_class, uint8_t interface_subclass,
+-                   uint8_t interface_protocol);
+-
+ #endif
+diff --git a/hw/usb/quirks.c b/hw/usb/quirks.c
+index 655b36f2d5..b0d0f87e35 100644
+--- a/hw/usb/quirks.c
++++ b/hw/usb/quirks.c
+@@ -15,6 +15,7 @@
+ #include "qemu/osdep.h"
+ #include "quirks.inc.c"
+ #include "hw/usb.h"
++#include "usb-quirks.h"
+ 
+ static bool usb_id_match(const struct usb_device_id *ids,
+                          uint16_t vendor_id, uint16_t product_id,
+diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+index 417a60a2e6..4c5925a039 100644
+--- a/hw/usb/redirect.c
++++ b/hw/usb/redirect.c
+@@ -45,6 +45,7 @@
+ #include "hw/usb.h"
+ #include "migration/qemu-file-types.h"
+ #include "migration/vmstate.h"
++#include "usb-quirks.h"
+ 
+ /* ERROR is defined below. Remove any previous definition. */
+ #undef ERROR
 -- 
 2.21.3
 
