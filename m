@@ -2,73 +2,131 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76173C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9A3C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:32:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4259F20724
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:31:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4259F20724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id E8C6320724
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:32:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbpEl2TI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8C6320724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrl4X-0005Hz-Du
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:31:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50152)
+	id 1jrl5j-0006UB-2P
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:32:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzS-0005NQ-B5
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:11 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:57527)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzP-0002PJ-Kx
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:10 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MORIm-1kHgGB2rVO-00PuDf; Sat, 04 Jul 2020 18:25:58 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 04/12] linux-user: Extend strace support to enable argument
- printing after syscall execution
-Date: Sat,  4 Jul 2020 18:25:37 +0200
-Message-Id: <20200704162545.311133-5-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200704162545.311133-1-laurent@vivier.eu>
-References: <20200704162545.311133-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrl2D-0002pI-8N
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:29:01 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43403
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrl28-0002hJ-2f
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:29:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593880134;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=3zBmqB6JDEohAkPJJvciyzQ+ZFRo2muu4VpiNKOg47w=;
+ b=CbpEl2TIkf0i9r4PYpTY+FGf9aIRJvb7x28X7QjC5YTuNAyGOIpz+WvFn92cfCdAU/zV+Z
+ tWqjv0lXm27PyMfl5Ymx6pxSIMvT0mRkavuyswKrz1Ec1RguxSfyHlpcfx+FYHYoeLVYBG
+ 9ZCZjhyAvtllxCSiT06PnYI/IMSH9bU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-GZ6QL5eRNBW-Bdm-lqIrTw-1; Sat, 04 Jul 2020 12:28:50 -0400
+X-MC-Unique: GZ6QL5eRNBW-Bdm-lqIrTw-1
+Received: by mail-wm1-f71.google.com with SMTP id t18so39850237wmj.5
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 09:28:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=3zBmqB6JDEohAkPJJvciyzQ+ZFRo2muu4VpiNKOg47w=;
+ b=IQN4LBjycToGtZo+E7PTrpRm616/ypE/7d0ljOqDXWPX8K2Wh+a2Vmrd2jbn8jRo83
+ brwcegd/Sl8PAGntSZqQJGYAiIkUErHSHBIRzMXIA5nN9X5r5RY/zc+W8YCLKxpS3+r2
+ Vn1qia2epgcjvCNJ56MQgdvXKVS+FKGZl0Jz7iD5wdp8HFkATr1pKnJnSzzNfE2PK7uS
+ Ro4FCLXIucHFOpwB/OoG1Cnj3IP8Q55SoAV0V3VEGbEZqEF1vcfKqAYp23OxlrAisGRO
+ LlSiufdkeoq+P41GIdEmcFuLW4S17M+8FDWLswjO3rpMhvKfQdoSlthCjudcC/2uRxe2
+ 7V2A==
+X-Gm-Message-State: AOAM531In34H2HGUdYsxkk+3GvHf7rKty/73HjaMe+30soWXnPha7O02
+ 3hCir3cUTaSE/iK1rqotGrqy1oEC2j5RqaUqVetWUH1Z7ZI69qfZmDexLajP9hZACvjxrUZ8iPU
+ 75cx8CVhapGPKWMs=
+X-Received: by 2002:a1c:4d11:: with SMTP id o17mr40737816wmh.134.1593880129177; 
+ Sat, 04 Jul 2020 09:28:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5r/BEoDdO+r+x4DSU5aTPxh812DNK8YR0qbf9RNidJPO4yCjOHBXFK12UGCba7L6ZBmaZNQ==
+X-Received: by 2002:a1c:4d11:: with SMTP id o17mr40737798wmh.134.1593880128874; 
+ Sat, 04 Jul 2020 09:28:48 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id g145sm8772530wmg.23.2020.07.04.09.28.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 04 Jul 2020 09:28:48 -0700 (PDT)
+Subject: Re: [PATCH v11 3/8] SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200703090816.3295-1-vsementsov@virtuozzo.com>
+ <20200703090816.3295-4-vsementsov@virtuozzo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <7cd9eb58-06c1-15a6-3c68-a7977ed55d3b@redhat.com>
+Date: Sat, 4 Jul 2020 18:28:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200703090816.3295-4-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:M5B1LK085gQ1Z3csJthheFo055SJx8H0gNzV/IKO46xVff1HWNR
- INeszLe2G90j9/BWlD5JYW/fUwkqdSyZ4wZodlroK1TSgPny8GCibA8oWANkYdWJCC09mMx
- TXgADmrgAnEzwiOfSGrxdEPnMFMDxNC+U8IMqTYpX0pXOzktqsVov7rmzTzluGkT8UYIx0j
- KBg3QV/xJ/ZAXqZDGaVQA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sEESX7mjVsU=:asGfKS8yNSX8gonHBQnTk0
- eOCSgQhySebXQ/6gnmCXxVmJ1daUmPuPYKW8gbgdHtKj4UVtXucFTQis/Upu3pWp6/zw85C4w
- qldQHI4faiZt2029Oc/1+OiHXnGrdzv3ktxU7l59EMxzkYHHEAwvDKYOjRnZaK1EFk4x9lv5w
- 6qFdAf9h2TfTpfRX6KlfeF4XultAU+TJMnDkpEicl2vg/IQuPPq4DqJi1ixKuoat5Ml4EaNWS
- qcGemdhsZaaRQ4Kg98AUNzRMQifusSWluYVshmZDcGdU7E2DndPD2KR611BYfWSc/hnxSnDYF
- biuQUVSNie+RCu7r/T1VOt00afXpmnF2lZPQ34OnwlEr587WAxX+lyogFXjQ56UsHe8Oq/JyY
- 1tv+JMkFs1/QhDdMlX2OofpiJ03wANjC3xRahbtK0rOGlPq4nvMCoTmvLKcAfScq3i46K67ae
- Usf9+A8z24777VqFTOVS6G2Y3CUHRCxHRZOM392TW5FY8fLV5WUjj0G8cr7CxKA2Cfmzw8xZb
- P/kfE8KgYi0pQ88A5dfI99Mq3aCDqjtGO4muoEUJeQ2uq3iCyfGkizOhnLbRZeTxWTsTivTDD
- cYAUImdlDZTOBSffLy1AAfBlVX6m+ROU/sASGM9kVapRNwz6pARQfiCA+duL/06o9b4Bmsx1C
- Uho7heh/jHqy2GgAv+5o2WftgyucBW4fy8ltJRIAoA/o/xI+4sz1M4KWGCtc0fNgH1JqqYUBp
- pHE1f8BOonpnfYrDyvMQ42f2+eMBwYjuhocmpYtGsktxA5oEnWbXr9NC272EUm4AiB2QDVsmX
- LH9YAmKEVX+S4apwbmnv0LUH27AQaDbB7CQZOJYYi+3xMTUy84=
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:26:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 08:57:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,263 +139,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>, Riku Voipio <riku.voipio@iki.fi>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, armbru@redhat.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+On 7/3/20 11:08 AM, Vladimir Sementsov-Ogievskiy wrote:
+> If we want to add some info to errp (by error_prepend() or
+> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+> Otherwise, this info will not be added when errp == &error_fatal
+> (the program will exit prior to the error_append_hint() or
+> error_prepend() call).  Fix such cases.
+> 
+> If we want to check error after errp-function call, we need to
+> introduce local_err and then propagate it to errp. Instead, use
+> ERRP_AUTO_PROPAGATE macro, benefits are:
+> 1. No need of explicit error_propagate call
+> 2. No need of explicit local_err variable: use errp directly
+> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+>    &error_fatal, this means that we don't break error_abort
+>    (we'll abort on error_set, not on error_propagate)
+> 
+> This commit is generated by command
+> 
+>     sed -n '/^SD (Secure Card)$/,/^$/{s/^F: //p}' \
+>         MAINTAINERS | \
+>     xargs git ls-files | grep '\.[hc]$' | \
+>     xargs spatch \
+>         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>         --macro-file scripts/cocci-macro-file.h \
+>         --in-place --no-show-diff --max-width 80
+> 
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-    Structure "struct syscallname" in file "strace.c" is used for "-strace"
-    to print arguments and return values of syscalls. The last field of
-    this structure "result" represents the calling function that prints the
-    return values. This field was extended in this patch so that this function
-    takes all syscalls arguments beside the return value. In this way, it enables
-    "-strace" to print arguments of syscalls that have changed after the syscall
-    execution. This extension will be useful as there are many syscalls that
-    return values inside their arguments (i.e. listxattr() that returns the list
-    of extended attributes inside the "list" argument).
+If possible 's/SD (Secure Card)/sd/' in subject.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Implementation notes:
-
-    Since there are already three existing "print_syscall_ret*" functions inside
-    "strace.c" ("print_syscall_ret_addr()", "print_syscall_ret_adjtimex()",
-    "print_syscall_ret_newselect()"), they were changed to have all syscall arguments
-    beside the return value. This was done so that these functions don't cause build
-    errors (even though syscall arguments are not used in these functions).
-    There is code repetition in these functions for checking the return value
-    and printing the approppriate error message (this code is also located in
-    print_syscall_ret() at the end of "strace.c"). That is the reason why a
-    function "syscall_print_err()" was added for this code and put inside these
-    functions. Functions "print_newselect()" and "print_syscall_ret_newselect()"
-    were changed to use this new implemented functionality and not store the syscall
-    argument values in separate static variables.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200619123331.17387-2-filip.bozuta@syrmia.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/qemu.h    |   4 +-
- linux-user/strace.c  | 110 ++++++++++++++++++++++---------------------
- linux-user/syscall.c |   2 +-
- 3 files changed, 61 insertions(+), 55 deletions(-)
-
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index ce902f5132a6..8f938b8105b3 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -383,7 +383,9 @@ int host_to_target_waitstatus(int status);
- void print_syscall(int num,
-                    abi_long arg1, abi_long arg2, abi_long arg3,
-                    abi_long arg4, abi_long arg5, abi_long arg6);
--void print_syscall_ret(int num, abi_long arg1);
-+void print_syscall_ret(int num, abi_long ret,
-+                       abi_long arg1, abi_long arg2, abi_long arg3,
-+                       abi_long arg4, abi_long arg5, abi_long arg6);
- /**
-  * print_taken_signal:
-  * @target_signum: target signal being taken
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 0d9095c674f4..62117e8555f6 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -19,7 +19,9 @@ struct syscallname {
-     void (*call)(const struct syscallname *,
-                  abi_long, abi_long, abi_long,
-                  abi_long, abi_long, abi_long);
--    void (*result)(const struct syscallname *, abi_long);
-+    void (*result)(const struct syscallname *, abi_long,
-+                   abi_long, abi_long, abi_long,
-+                   abi_long, abi_long, abi_long);
- };
- 
- #ifdef __GNUC__
-@@ -631,18 +633,12 @@ print_clockid(int clockid, int last)
- 
- /* select */
- #ifdef TARGET_NR__newselect
--static long newselect_arg1 = 0;
--static long newselect_arg2 = 0;
--static long newselect_arg3 = 0;
--static long newselect_arg4 = 0;
--static long newselect_arg5 = 0;
--
- static void
- print_newselect(const struct syscallname *name,
-                 abi_long arg1, abi_long arg2, abi_long arg3,
-                 abi_long arg4, abi_long arg5, abi_long arg6)
- {
--    qemu_log("%s(" TARGET_ABI_FMT_ld ",", name->name, arg1);
-+    print_syscall_prologue(name);
-     print_fdset(arg1, arg2);
-     qemu_log(",");
-     print_fdset(arg1, arg3);
-@@ -650,14 +646,7 @@ print_newselect(const struct syscallname *name,
-     print_fdset(arg1, arg4);
-     qemu_log(",");
-     print_timeval(arg5, 1);
--    qemu_log(")");
--
--    /* save for use in the return output function below */
--    newselect_arg1=arg1;
--    newselect_arg2=arg2;
--    newselect_arg3=arg3;
--    newselect_arg4=arg4;
--    newselect_arg5=arg5;
-+    print_syscall_epilogue(name);
- }
- #endif
- 
-@@ -736,17 +725,29 @@ print_ipc(const struct syscallname *name,
-  */
- 
- static void
--print_syscall_ret_addr(const struct syscallname *name, abi_long ret)
-+print_syscall_err(abi_long ret)
- {
-     const char *errstr = NULL;
- 
-+    qemu_log(" = ");
-     if (ret < 0) {
-+        qemu_log("-1 errno=%d", errno);
-         errstr = target_strerror(-ret);
-+        if (errstr) {
-+            qemu_log(" (%s)", errstr);
-+        }
-     }
--    if (errstr) {
--        qemu_log(" = -1 errno=%d (%s)\n", (int)-ret, errstr);
--    } else {
--        qemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", ret);
-+}
-+
-+static void
-+print_syscall_ret_addr(const struct syscallname *name, abi_long ret,
-+                       abi_long arg0, abi_long arg1, abi_long arg2,
-+                       abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_err(ret);
-+
-+    if (ret >= 0) {
-+        qemu_log("0x" TARGET_ABI_FMT_lx "\n", ret);
-     }
- }
- 
-@@ -760,17 +761,25 @@ print_syscall_ret_raw(struct syscallname *name, abi_long ret)
- 
- #ifdef TARGET_NR__newselect
- static void
--print_syscall_ret_newselect(const struct syscallname *name, abi_long ret)
--{
--    qemu_log(" = 0x" TARGET_ABI_FMT_lx " (", ret);
--    print_fdset(newselect_arg1,newselect_arg2);
--    qemu_log(",");
--    print_fdset(newselect_arg1,newselect_arg3);
--    qemu_log(",");
--    print_fdset(newselect_arg1,newselect_arg4);
--    qemu_log(",");
--    print_timeval(newselect_arg5, 1);
--    qemu_log(")\n");
-+print_syscall_ret_newselect(const struct syscallname *name, abi_long ret,
-+                            abi_long arg0, abi_long arg1, abi_long arg2,
-+                            abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_err(ret);
-+
-+    if (ret >= 0) {
-+        qemu_log(" = 0x" TARGET_ABI_FMT_lx " (", ret);
-+        print_fdset(arg0, arg1);
-+        qemu_log(",");
-+        print_fdset(arg0, arg2);
-+        qemu_log(",");
-+        print_fdset(arg0, arg3);
-+        qemu_log(",");
-+        print_timeval(arg4, 1);
-+        qemu_log(")");
-+    }
-+
-+    qemu_log("\n");
- }
- #endif
- 
-@@ -783,18 +792,13 @@ print_syscall_ret_newselect(const struct syscallname *name, abi_long ret)
- #define TARGET_TIME_ERROR    5   /* clock not synchronized */
- #ifdef TARGET_NR_adjtimex
- static void
--print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret)
-+print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret,
-+                           abi_long arg0, abi_long arg1, abi_long arg2,
-+                           abi_long arg3, abi_long arg4, abi_long arg5)
- {
--    const char *errstr = NULL;
-+    print_syscall_err(ret);
- 
--    qemu_log(" = ");
--    if (ret < 0) {
--        qemu_log("-1 errno=%d", errno);
--        errstr = target_strerror(-ret);
--        if (errstr) {
--            qemu_log(" (%s)", errstr);
--        }
--    } else {
-+    if (ret >= 0) {
-         qemu_log(TARGET_ABI_FMT_ld, ret);
-         switch (ret) {
-         case TARGET_TIME_OK:
-@@ -2847,25 +2851,25 @@ print_syscall(int num,
- 
- 
- void
--print_syscall_ret(int num, abi_long ret)
-+print_syscall_ret(int num, abi_long ret,
-+                  abi_long arg1, abi_long arg2, abi_long arg3,
-+                  abi_long arg4, abi_long arg5, abi_long arg6)
- {
-     int i;
--    const char *errstr = NULL;
- 
-     for(i=0;i<nsyscalls;i++)
-         if( scnames[i].nr == num ) {
-             if( scnames[i].result != NULL ) {
--                scnames[i].result(&scnames[i], ret);
-+                scnames[i].result(&scnames[i], ret,
-+                                  arg1, arg2, arg3,
-+                                  arg4, arg5, arg6);
-             } else {
--                if (ret < 0) {
--                    errstr = target_strerror(-ret);
--                }
--                if (errstr) {
--                    qemu_log(" = -1 errno=" TARGET_ABI_FMT_ld " (%s)\n",
--                             -ret, errstr);
--                } else {
--                    qemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
-+                print_syscall_err(ret);
-+
-+                if (ret >= 0) {
-+                    qemu_log(TARGET_ABI_FMT_ld, ret);
-                 }
-+                qemu_log("\n");
-             }
-             break;
-         }
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 17ed7f8d6b59..1b971c06b270 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -12565,7 +12565,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                       arg5, arg6, arg7, arg8);
- 
-     if (unlikely(qemu_loglevel_mask(LOG_STRACE))) {
--        print_syscall_ret(num, ret);
-+        print_syscall_ret(num, ret, arg1, arg2, arg3, arg4, arg5, arg6);
-     }
- 
-     record_syscall_return(cpu, num, ret);
--- 
-2.26.2
+> ---
+>  hw/sd/sdhci-pci.c |  7 +++----
+>  hw/sd/sdhci.c     | 21 +++++++++------------
+>  hw/sd/ssi-sd.c    | 10 +++++-----
+>  3 files changed, 17 insertions(+), 21 deletions(-)
+> 
+> diff --git a/hw/sd/sdhci-pci.c b/hw/sd/sdhci-pci.c
+> index 4f5977d487..38ec572fc6 100644
+> --- a/hw/sd/sdhci-pci.c
+> +++ b/hw/sd/sdhci-pci.c
+> @@ -29,13 +29,12 @@ static Property sdhci_pci_properties[] = {
+>  
+>  static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      SDHCIState *s = PCI_SDHCI(dev);
+> -    Error *local_err = NULL;
+>  
+>      sdhci_initfn(s);
+> -    sdhci_common_realize(s, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    sdhci_common_realize(s, errp);
+> +    if (*errp) {
+>          return;
+>      }
+>  
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index eb2be6529e..be1928784d 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1288,7 +1288,7 @@ static const MemoryRegionOps sdhci_mmio_ops = {
+>  
+>  static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+>  {
+> -    Error *local_err = NULL;
+> +    ERRP_AUTO_PROPAGATE();
+>  
+>      switch (s->sd_spec_version) {
+>      case 2 ... 3:
+> @@ -1299,9 +1299,8 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+>      }
+>      s->version = (SDHC_HCVER_VENDOR << 8) | (s->sd_spec_version - 1);
+>  
+> -    sdhci_check_capareg(s, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    sdhci_check_capareg(s, errp);
+> +    if (*errp) {
+>          return;
+>      }
+>  }
+> @@ -1332,11 +1331,10 @@ void sdhci_uninitfn(SDHCIState *s)
+>  
+>  void sdhci_common_realize(SDHCIState *s, Error **errp)
+>  {
+> -    Error *local_err = NULL;
+> +    ERRP_AUTO_PROPAGATE();
+>  
+> -    sdhci_init_readonly_registers(s, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    sdhci_init_readonly_registers(s, errp);
+> +    if (*errp) {
+>          return;
+>      }
+>      s->buf_maxsz = sdhci_get_fifolen(s);
+> @@ -1456,13 +1454,12 @@ static void sdhci_sysbus_finalize(Object *obj)
+>  
+>  static void sdhci_sysbus_realize(DeviceState *dev, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      SDHCIState *s = SYSBUS_SDHCI(dev);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> -    Error *local_err = NULL;
+>  
+> -    sdhci_common_realize(s, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    sdhci_common_realize(s, errp);
+> +    if (*errp) {
+>          return;
+>      }
+>  
+> diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+> index e0fb9f3093..43e5730b00 100644
+> --- a/hw/sd/ssi-sd.c
+> +++ b/hw/sd/ssi-sd.c
+> @@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd = {
+>  
+>  static void ssi_sd_realize(SSISlave *d, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
+>      DeviceState *carddev;
+>      DriveInfo *dinfo;
+> -    Error *err = NULL;
+>  
+>      qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+>                          DEVICE(d), "sd-bus");
+> @@ -255,23 +255,23 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
+>      carddev = qdev_new(TYPE_SD_CARD);
+>      if (dinfo) {
+>          if (!qdev_prop_set_drive_err(carddev, "drive",
+> -                                     blk_by_legacy_dinfo(dinfo), &err)) {
+> +                                     blk_by_legacy_dinfo(dinfo), errp)) {
+>              goto fail;
+>          }
+>      }
+>  
+> -    if (!object_property_set_bool(OBJECT(carddev), "spi", true, &err)) {
+> +    if (!object_property_set_bool(OBJECT(carddev), "spi", true, errp)) {
+>          goto fail;
+>      }
+>  
+> -    if (!qdev_realize_and_unref(carddev, BUS(&s->sdbus), &err)) {
+> +    if (!qdev_realize_and_unref(carddev, BUS(&s->sdbus), errp)) {
+>          goto fail;
+>      }
+>  
+>      return;
+>  
+>  fail:
+> -    error_propagate_prepend(errp, err, "failed to init SD card: ");
+> +    error_prepend(errp, "failed to init SD card: ");
+>  }
+>  
+>  static void ssi_sd_reset(DeviceState *dev)
+> 
 
 
