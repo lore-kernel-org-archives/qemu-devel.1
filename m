@@ -2,66 +2,66 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEED8C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC27C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:27:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2287206B6
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:27:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2287206B6
+	by mail.kernel.org (Postfix) with ESMTPS id D8BB5206B6
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:27:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8BB5206B6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrl0W-0007Vd-TJ
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:27:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50100)
+	id 1jrl0a-0007dB-4H
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:27:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzH-00051n-M3
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:25:59 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:35905)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzI-00052r-KZ
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:00 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:36099)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzF-0002NS-Ie
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:25:59 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzF-0002NX-Uy
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:00 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Ml6du-1kcrvA3sOS-00lVVF; Sat, 04 Jul 2020 18:25:53 +0200
+ id 1MPXlM-1kEOTD2cFe-00Mbtr; Sat, 04 Jul 2020 18:25:53 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/12] Linux user for 5.1 patches
-Date: Sat,  4 Jul 2020 18:25:33 +0200
-Message-Id: <20200704162545.311133-1-laurent@vivier.eu>
+Subject: [PULL 01/12] target/sparc: Translate flushw opcode
+Date: Sat,  4 Jul 2020 18:25:34 +0200
+Message-Id: <20200704162545.311133-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200704162545.311133-1-laurent@vivier.eu>
+References: <20200704162545.311133-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:DyAl4jXY7pcs43sR5xil5cMxatHIJcMNTpbbIMUdN5uXgPOpE/X
- JIvrNAzcSxE4FWpXcVsi5zQoiF1EkxSx81zX+rJGVyx4PAGpa3ymb2uSgNma+IhY72NZ5AW
- 90Ir2ZUhUCjEpJJBV8q7e7irZf1ckiE9jqWRPRI32Mt7LJvEt8+CCWqjDcTIELMDRT6aqaT
- BBnnd7i5U8TFV6TbLL/8w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6bOnKVBOyTk=:+ahR54q1o07kjkMxGcN+YZ
- qx/9lzuUu3fMSd5Ez5Kz5Kn9e/YpcAvtPvis0jgo/x6GUvDu8skqgaxyi98VSyzmpLqxFTNxu
- c6cL5pZza1x6Cx3w1MQ/eIf4SlCBq/HNXp+90Uc94iSoeEwjkQ6zCa/Oysj1EOZHkaAtx340B
- SMVeNYjplXJa/tAgVmzyrYM8MMr9Iif5p2/KoxyaFYOh7GOxNrqEeTDsq5gLHRKVzmYrXG6Cz
- 651B7bniAbf+JzM0hB5fekHeKVF03t68NrXpVay63VV1qkerO5B93qiLdBRoNkRq+iDgwsX06
- kBpOAmmdyoBLsPHI4fFPbyCckcxu1qfUgFnx0OwdnnMvpa+iA0wEFJ05SBptoorcjtjtrIE9x
- PHRMLz4+Jh97uvbdU6IKRBz71zq+qWsQUjkxm2zMdDxGqJn2h1WgR3Ny9aY7QbgQF6BOs01JP
- vUISOpjUvNsS/ZHwTkbHe9UjiW9OJJcPssiL3al0C5B1zc3jc1CGuc35ZzeeRrGL1rUjwxKIC
- WPZvm1y/VD3fi0ceWw998itp0r9xZFXMCARvz3SKMzBibExrPr3FXiMcuaQS2NrseYAd4lH74
- wJMIHe6AE0fOk3lE9yo+IEGga+TDTXyXYX2EM40U545G0zlqpMvJB5TcxxirfnlrMXCgVovyZ
- glxNwFgNytn/A+o7jB9s+r+WTPcdEBYboQfEYGXJ99rZmHvq3/+vY4N4lQsHisMwmlJQhMCjp
- PRpO72C9rP/sY9MXGP1bTHeUzkUU1LvyTwNc+mn2wzXBp0i0ICdUaOSXgAExgnCmvNKevY6Qs
- hX0hrh1Q9evy7i6KGcvVj3TeEBRjtHeNyhVYRlkZPqAi/uOKn0=
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:zJMSMPD1WCs2H/7T1KaIqqNDXh4awHcxaW3nmKyDH0rv+EUv9xx
+ G88TlDnAcjdphBJcwk1Icj299tS5X61pBIaDFUMqHr8p7oB4Z4RL9U8gEGKBOINW09YIY9d
+ KiCWRl5UZkU9iiplnFa8QItDyGjSW+MQxi7xttDhiINbMIOrf4dNuI6hoAtbrBy+iJGEsVm
+ nEA7a9lJxbjyeHNlNEyXg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:20r6uQB412g=:qONXXoXnJ+VoT+YBMvr5R9
+ SecnkV9lLrXKO8m4n0ENqQW14OAXPQ4gkIPI1sYvA0Ojnw0AZVvyF4nVhzSJ21jdTqzel+Y/t
+ c3S2lfUPVzYQja2bydWQZTl+RPkrlnZMKG81Il3P8Q8Ai9KwJlWZ5lUoNbI0lTM7i2oqV1Jy9
+ I5oy+fcFtLiw3jxtngXsCuyiSR+1SGJQnBa9nGDd7n/EWUtYCsDyKUHNr4vVIj1tXyw7yLVyg
+ YTbZLTxVX0vhElwHX/hmCGwEwnfysWb2AMFMo/PoT5OA2LOTfuzXszmg25Ads+6hes/zY7CDe
+ H43AbnFVwvzNaDbSpVndmu7pR95ceh39HASy+utnDV1ws5u1bSczTsIla1XjLotjqc/9YQf5H
+ ohW+3NQWhWOU3kWomANsswSSAnfZmDezhmJ/02/tPVCtftS69B2nXMKheigUUOUKU1WZi0gHL
+ v704e32nISjgygk8J9dBB7Xx2KDqAewvgH0nUpHJKVQnbaLnMKfEh/r48+nuIezw7Vamm5F5b
+ Js0KqnBQZDFJUyZT5FrSP/G7PA66nrwee5Vab1pkdtI6yeT0gfxz9WxospALkqDTFO9hupcKk
+ XnMIAeIwGKpvcnHQ0NHnEqX8wPhG360KAPAAguhCwxAwvPBWbOrBnysZmuCOEXuAcf+2sratw
+ LrvWHAdAkV6QiHqhHql05NtrYkwI31nQ5V49JrqtRIQ1hvJed+2EQTatVhQFxqiSu4DUZu53x
+ pXzTwHupe49AVIDZUiNbrUBauvN6yMOaCJkkA9UEw7Cz5nUoQCyMKKolSIoMYkxHrpV7uH+Sb
+ UE2R5JR429d08JKHZo5nqaYQ1Sdo2uwJMIIAhPbpyFfg9gFkzE=
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:25:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:25:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -80,77 +80,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
+Cc: Giuseppe Musacchio <thatlemon@gmail.com>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit e7651153a8801dad6805d450ea8bef9b46c1adf5=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-gsoc-queue-jun-=
-27-2020' into staging (2020-06-27 22:57:36 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/vivier/qemu.git tags/linux-user-for-5.1-pull-request=0D
-=0D
-for you to fetch changes up to 8f902c540eccd72086e8f67d977e30e05659783f:=0D
-=0D
-  MAINTAINERS: update linux-user maintainer (2020-07-04 18:09:29 +0200)=0D
-=0D
-----------------------------------------------------------------=0D
-linux-user pull request 2020-07-02=0D
-=0D
-Update linux-user maintainer=0D
-Improve strace output for some syscalls=0D
-Display contents of ioctl() parameters=0D
-Fix sparc64 flushw operation=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Chen Gang (1):=0D
-  linux-user: syscall: ioctls: support DRM_IOCTL_VERSION=0D
-=0D
-Filip Bozuta (8):=0D
-  linux-user: Extend strace support to enable argument printing after=0D
-    syscall execution=0D
-  linux-user: Add strace support for a group of syscalls=0D
-  linux-user: Add strace support for printing argument of syscalls used=0D
-    for extended attributes=0D
-  linux-user: Add strace support for printing arguments of lseek()=0D
-  linux-user: Add strace support for printing arguments of=0D
-    chown()/lchown()=0D
-  linux-user: Add strace support for printing arguments of fallocate()=0D
-  linux-user: Add thunk argument types for SIOCGSTAMP and SIOCGSTAMPNS=0D
-  linux-user: Add strace support for printing arguments of ioctl()=0D
-=0D
-Giuseppe Musacchio (2):=0D
-  target/sparc: Translate flushw opcode=0D
-  linux-user/sparc64: Fix the handling of window spill trap=0D
-=0D
-Riku Voipio (1):=0D
-  MAINTAINERS: update linux-user maintainer=0D
-=0D
- MAINTAINERS                 |   3 +-=0D
- bsd-user/main.c             |   6 +-=0D
- configure                   |  10 +=0D
- include/exec/user/thunk.h   |   1 +=0D
- linux-user/ioctls.h         |  17 +-=0D
- linux-user/qemu.h           |  40 +++-=0D
- linux-user/sparc/cpu_loop.c |   6 +-=0D
- linux-user/strace.c         | 435 +++++++++++++++++++++++++++++++-----=0D
- linux-user/strace.list      |  40 ++--=0D
- linux-user/syscall.c        | 136 ++++++++---=0D
- linux-user/syscall_defs.h   |  15 ++=0D
- linux-user/syscall_types.h  |  33 +++=0D
- target/sparc/translate.c    |   2 +=0D
- thunk.c                     | 154 +++++++++++++=0D
- 14 files changed, 782 insertions(+), 116 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+From: Giuseppe Musacchio <thatlemon@gmail.com>
+
+The ifdef logic should unconditionally compile in the `xop == 0x2b` case
+when targeting sparc64.
+
+Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200625091204.3186186-2-laurent@vivier.eu>
+---
+ target/sparc/translate.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index 9416a551cf46..1a4efd4ed665 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -3663,6 +3663,8 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+ #endif
+                 gen_store_gpr(dc, rd, cpu_tmp0);
+                 break;
++#endif
++#if defined(TARGET_SPARC64) || !defined(CONFIG_USER_ONLY)
+             } else if (xop == 0x2b) { /* rdtbr / V9 flushw */
+ #ifdef TARGET_SPARC64
+                 gen_helper_flushw(cpu_env);
+-- 
+2.26.2
+
 
