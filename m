@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C87FC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F82C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:34:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F53520724
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:34:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F53520724
+	by mail.kernel.org (Postfix) with ESMTPS id CE96C20724
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:34:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE96C20724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrl76-0000rF-9f
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:34:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50254)
+	id 1jrl7V-0001fw-2K
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:34:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzb-0005ax-JA
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:19 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:57367)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzX-0005Tw-Na
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:15 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:51321)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzS-0002Pd-Ak
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:18 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzQ-0002PP-HT
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:14 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MqJyX-1kepBq0PLv-00nSNG; Sat, 04 Jul 2020 18:26:01 +0200
+ id 1MulyX-1kjJJN21z9-00rnzO; Sat, 04 Jul 2020 18:25:58 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/12] linux-user: Add strace support for printing arguments of
- fallocate()
-Date: Sat,  4 Jul 2020 18:25:42 +0200
-Message-Id: <20200704162545.311133-10-laurent@vivier.eu>
+Subject: [PULL 05/12] linux-user: Add strace support for a group of syscalls
+Date: Sat,  4 Jul 2020 18:25:38 +0200
+Message-Id: <20200704162545.311133-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200704162545.311133-1-laurent@vivier.eu>
 References: <20200704162545.311133-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:7XmTRK8VlOZpkscqkLnES9Gyntcavkz6rWMS0o7riS0XVxq4SQ9
- eTbdSCRO//59HhlEcqNxCxYhKt6zm7bWFsjQcLd0P4NFxR5hEjduPLt8wHoP3OQAPkPWGHi
- R3vj4HYcNLzHZG8b/osaSNUCdrW7H5TN0nEYe3JgKyjFgMhWDSVgRyh+Zp8qNCZIn9JLH8L
- FaAbGlIbot7g8voJPIIqA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:d/l9t9vXShE=:6UFHjv4pdA6mR8XQD1cddt
- GqyDbN7EpEzpN5ARAh4ql/qAcva6vOnpQBVIrNHxuo271yGdFZuEPh9db4nalOhSoBCprgCQG
- m1mTlIaXeS+GLD86wrSIOU7+UF8icQSiLaMuoTHioZ5tVE7gbF4vZIKecVHYzJbCVb/acnEPN
- 0L3WCFgF7ZLjjoc+Wbmr9b/fUU9s1dcMyXT+hYjRJ2hm6btBA1jX8S6s3BLzDdLR4zEOgD+8o
- SI3KbPMLM4rAjZFCbmCJceFashP2x8OGBHTfBm0wLAGbIsb6OWdir4Eo1+gf7hVRg1a6x8UfN
- R3f2U3Wmo+wYEh8TE3xZihHoiw8IjmndlfKrpH9bOjG1DTC+DHcp8S/PhL1rsq6ArF/zXTD3b
- uYQLjnukKpcsKYbNpu+kzAy2j8OXKZLQZrOBmk3wMKZnOxDTsoKT2FXUaEeWddU3p/rgQPKIw
- GQtvqc05IEwLwOFXeqc76b/kXHpw6Cd+YBhOPtWl11slqf1yir9EaYRqq7gU/6LuToXUoew/S
- 7NPd2A0EUQ77ofpwekR2qKINq6+E8yfU4ZEMCdSDBs81Z2GU8oveZw0GTXnqJEO1T7GaGf3NC
- pPplzNA1idygZ3onC+rTKmJL6opq0Gtgfzi4HX0Js3CTtDt5RrG2byxVCod/mG328MO4f35cf
- aAQEDDnwYrWnj9C3mfmwLiUOWGjBfBo8M/TSFGOviH1DWWl+5aF9YpYYvnK8fxsnoYQP5uIvR
- 8oNxUUNO/rOBvw2np5VYcQR7mCY9T6LJiS7yBFoh9uDzMqqApdAL1gXiNWwLp8RlhDTtN/Bf8
- AU0tqh6lnjOoI+X7p4w5hHGssmBqHWvaKZzrGcW8jZsRVqc1GA=
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:qe57hQRhfBDJQOgfjZj7Dgsl40shKE68Jo0N/0JuhK0mjBPtIcy
+ rss6qmCcWiImDOp6cKRsP/NbNF3+Q3UMlnGX/5oV9RzmYo7NTWC+cevpxg05lvbd742OrQe
+ JeSycWR7c5Ptemwk1yti4MiUZ9Dln4HavW6czkibASrcfYr2uWfxVT7fH4Osf6JtP1MnO39
+ XwEfZJlbS9Jk0zxb+T/dA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Bot2vp0/3eY=:QDiOupgX6JcGXkUGe2ABfn
+ R7sDzSOI8hxFevjYrWsINImzd8kW6/bbDxJdl/LhSwRNBN+wmloFyiVTMro4ygqb3+CWFvC3z
+ 8MEnvUXm6w7MkYGJh0uDgKzenF2ARSE4tDl3zVES88RtmTeRZP8r7BkxPY2zVZ7oELzmDNPgl
+ DOWMXYsd/eqrtDsj+p1BpMXRPGS58KhWHoS5Njf67+MHngq5f/l4cBjXqjIwf7nrfL0qDXHci
+ sEhMc/sdEH9pTppJ+ECnT2Dz7AeEl/X3RMam8939KeGmmcuTXlnnthEop14eEapt4YOIyC+KE
+ 20PIcnaX/qGNfl4U4MsX6Sx1SZzqL/LxY84aQtcm4IPOasPtduHyHwPanDhRskN354M58dCsd
+ JvMTczHjameAe6rAFgZoYLFxGaJpwCPxov+013RsOT9ftHWH2dloW2fYr9MhH5QIQHn0Y5U43
+ vXZYFRkbbS2MZlbW7cKcH+mOooU2U8MfNZs6QxXXADLCLonqBPYsDn+J//Ql+EFTbP9ARHAcJ
+ MgkMjSSZHhE9ZCep6NdxdlcZuzbJFONJNd8GRk/PFJESMW/kI1wyWrtkqatNaOQpLxQx97CXv
+ wHJejzpLJ3inBEzdMim9qGKVOK8z6fvZPsbOSERuLBehzUxe6YoBqfNKLc5bdj6eRIXMlctmV
+ Pn7BO8/ZsrEZjZPYkKJqsmoXmACl8mjjY0TLuwZBy1n0MEI4we/kzj3ur0hAnIGrR4iW0NyJ4
+ dgj4pNWyaH3/a0PeXYtX3SOQEP00xMkRzPHNksQ+HiAIsfvBeZTk6Cn66Uqms9ymvLqBpeiZo
+ M3F4D/JBVUm/D+VWV87QJmoOxewd/zA9Xw12ZCwhg4k2FxA8PY=
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:26:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:25:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -91,166 +90,114 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch implements strace argument printing functionality for following syscall:
+This patch implements strace argument printing functionality for following syscalls:
 
-    *fallocate - manipulate file space
+    *acct - switch process accounting on or off
 
-        int fallocate(int fd, int mode, off_t offset, off_t len)
-        man page: https://www.man7.org/linux/man-pages/man2/fallocate.2.html
+        int acct(const char *filename)
+        man page: https://www.man7.org/linux/man-pages/man2/acct.2.html
+
+    *fsync, fdatasync - synchronize a file's in-core state with storage device
+
+        int fsync(int fd)
+        int fdatasync(int fd)
+        man page: https://www.man7.org/linux/man-pages/man2/fsync.2.html
+
+    *listen - listen for connections on a socket
+
+        int listen(int sockfd, int backlog)
+        man page: https://www.man7.org/linux/man-pages/man2/listen.2.html
 
 Implementation notes:
 
-    This syscall's second argument "mode" is composed of predefined values
-    which represent flags that determine the type of operation that is
-    to be performed on the file space. For that reason, a printing
-    function "print_fallocate" was stated in file "strace.list". This printing
-    function uses an already existing function "print_flags()" to print flags of
-    the "mode" argument. These flags are stated inside an array "falloc_flags"
-    that contains values of type "struct flags". These values are instantiated
-    using an existing macro "FLAG_GENERIC()". Most of these flags are defined
-    after kernel version 3.0 which is why they are enwrapped in an #ifdef
-    directive.
-    The syscall's third ant fourth argument are of type "off_t" which can
-    cause variations between 32/64-bit architectures. To handle this variation,
-    function "target_offset64()" was copied from file "strace.c" and used in
-    "print_fallocate" to print "off_t" arguments for 32-bit architectures.
+    Syscall acct() takes string as its only argument and thus a separate
+    print function "print_acct" is stated in file "strace.list". This
+    function is defined and implemented in "strace.c" by using an
+    existing function used to print string arguments: "print_string()".
+    All the other syscalls have only primitive argument types, so the
+    rest of the implementation was handled by stating an appropriate
+    printing format in file "strace.list".
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200619123331.17387-7-filip.bozuta@syrmia.com>
+Message-Id: <20200619123331.17387-3-filip.bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/qemu.h      | 16 ++++++++++++++++
- linux-user/strace.c    | 40 ++++++++++++++++++++++++++++++++++++++++
- linux-user/strace.list |  2 +-
- linux-user/syscall.c   | 16 ----------------
- 4 files changed, 57 insertions(+), 17 deletions(-)
+ linux-user/strace.c    | 13 ++++++++++++-
+ linux-user/strace.list |  8 ++++----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 8f938b8105b3..be67391ba49d 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -670,6 +670,22 @@ static inline int is_error(abi_long ret)
-     return (abi_ulong)ret >= (abi_ulong)(-4096);
- }
- 
-+#if TARGET_ABI_BITS == 32
-+static inline uint64_t target_offset64(uint32_t word0, uint32_t word1)
-+{
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    return ((uint64_t)word0 << 32) | word1;
-+#else
-+    return ((uint64_t)word1 << 32) | word0;
-+#endif
-+}
-+#else /* TARGET_ABI_BITS == 32 */
-+static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
-+{
-+    return word0;
-+}
-+#endif /* TARGET_ABI_BITS != 32 */
-+
- /**
-  * preexit_cleanup: housekeeping before the guest exits
-  *
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 957f08f1adf2..32e5e987acbb 100644
+index 62117e8555f6..123e022c35bf 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1135,6 +1135,26 @@ UNUSED static struct flags statx_mask[] = {
-     FLAG_END,
- };
- 
-+UNUSED static struct flags falloc_flags[] = {
-+    FLAG_GENERIC(FALLOC_FL_KEEP_SIZE),
-+    FLAG_GENERIC(FALLOC_FL_PUNCH_HOLE),
-+#ifdef FALLOC_FL_NO_HIDE_STALE
-+    FLAG_GENERIC(FALLOC_FL_NO_HIDE_STALE),
-+#endif
-+#ifdef FALLOC_FL_COLLAPSE_RANGE
-+    FLAG_GENERIC(FALLOC_FL_COLLAPSE_RANGE),
-+#endif
-+#ifdef FALLOC_FL_ZERO_RANGE
-+    FLAG_GENERIC(FALLOC_FL_ZERO_RANGE),
-+#endif
-+#ifdef FALLOC_FL_INSERT_RANGE
-+    FLAG_GENERIC(FALLOC_FL_INSERT_RANGE),
-+#endif
-+#ifdef FALLOC_FL_UNSHARE_RANGE
-+    FLAG_GENERIC(FALLOC_FL_UNSHARE_RANGE),
-+#endif
-+};
-+
- /*
-  * print_xxx utility functions.  These are used to print syscall
-  * parameters in certain format.  All of these have parameter
-@@ -1552,6 +1572,26 @@ print_faccessat(const struct syscallname *name,
+@@ -1357,6 +1357,18 @@ print_access(const struct syscallname *name,
  }
  #endif
  
-+#ifdef TARGET_NR_fallocate
++#ifdef TARGET_NR_acct
 +static void
-+print_fallocate(const struct syscallname *name,
++print_acct(const struct syscallname *name,
 +    abi_long arg0, abi_long arg1, abi_long arg2,
 +    abi_long arg3, abi_long arg4, abi_long arg5)
 +{
 +    print_syscall_prologue(name);
-+    print_raw_param("%d", arg0, 0);
-+    print_flags(falloc_flags, arg1, 0);
-+#if TARGET_ABI_BITS == 32
-+    print_raw_param("%" PRIu64, target_offset64(arg2, arg3), 0);
-+    print_raw_param("%" PRIu64, target_offset64(arg4, arg5), 1);
-+#else
-+    print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
-+    print_raw_param(TARGET_ABI_FMT_ld, arg3, 1);
-+#endif
++    print_string(arg0, 1);
 +    print_syscall_epilogue(name);
 +}
 +#endif
 +
- #ifdef TARGET_NR_fchmodat
+ #ifdef TARGET_NR_brk
  static void
- print_fchmodat(const struct syscallname *name,
+ print_brk(const struct syscallname *name,
+@@ -1621,7 +1633,6 @@ print_fcntl(const struct syscallname *name,
+ #define print_fcntl64   print_fcntl
+ #endif
+ 
+-
+ #ifdef TARGET_NR_futimesat
+ static void
+ print_futimesat(const struct syscallname *name,
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index e99030c9ef39..ebb713252ce3 100644
+index 9281c0a75828..8a887fc16dcc 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -182,7 +182,7 @@
- { TARGET_NR_fadvise64_64, "fadvise64_64" , NULL, NULL, NULL },
+@@ -13,7 +13,7 @@
+ { TARGET_NR_access, "access" , NULL, print_access, NULL },
  #endif
- #ifdef TARGET_NR_fallocate
--{ TARGET_NR_fallocate, "fallocate" , NULL, NULL, NULL },
-+{ TARGET_NR_fallocate, "fallocate" , NULL, print_fallocate, NULL },
+ #ifdef TARGET_NR_acct
+-{ TARGET_NR_acct, "acct" , NULL, NULL, NULL },
++{ TARGET_NR_acct, "acct" , NULL, print_acct, NULL },
  #endif
- #ifdef TARGET_NR_fanotify_init
- { TARGET_NR_fanotify_init, "fanotify_init" , NULL, NULL, NULL },
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 1b971c06b270..506b94a12c1e 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6712,22 +6712,6 @@ void syscall_init(void)
-     }
- }
- 
--#if TARGET_ABI_BITS == 32
--static inline uint64_t target_offset64(uint32_t word0, uint32_t word1)
--{
--#ifdef TARGET_WORDS_BIGENDIAN
--    return ((uint64_t)word0 << 32) | word1;
--#else
--    return ((uint64_t)word1 << 32) | word0;
--#endif
--}
--#else /* TARGET_ABI_BITS == 32 */
--static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
--{
--    return word0;
--}
--#endif /* TARGET_ABI_BITS != 32 */
--
- #ifdef TARGET_NR_truncate64
- static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
-                                          abi_long arg2,
+ #ifdef TARGET_NR_add_key
+ { TARGET_NR_add_key, "add_key" , NULL, NULL, NULL },
+@@ -215,7 +215,7 @@
+ { TARGET_NR_fcntl64, "fcntl64" , NULL, print_fcntl64, NULL },
+ #endif
+ #ifdef TARGET_NR_fdatasync
+-{ TARGET_NR_fdatasync, "fdatasync" , NULL, NULL, NULL },
++{ TARGET_NR_fdatasync, "fdatasync" , "%s(%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_fgetxattr
+ { TARGET_NR_fgetxattr, "fgetxattr" , NULL, NULL, NULL },
+@@ -251,7 +251,7 @@
+ { TARGET_NR_fstatfs64, "fstatfs64" , "%s(%d,%p)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_fsync
+-{ TARGET_NR_fsync, "fsync" , NULL, NULL, NULL },
++{ TARGET_NR_fsync, "fsync" , "%s(%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_ftime
+ { TARGET_NR_ftime, "ftime" , NULL, NULL, NULL },
+@@ -492,7 +492,7 @@
+ { TARGET_NR_Linux, "Linux" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_listen
+-{ TARGET_NR_listen, "listen" , NULL, NULL, NULL },
++{ TARGET_NR_listen, "listen" , "%s(%d,%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_listxattr
+ { TARGET_NR_listxattr, "listxattr" , NULL, NULL, NULL },
 -- 
 2.26.2
 
