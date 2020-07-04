@@ -2,121 +2,88 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F147C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 327ECC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A4ED20723
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:37:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E44E320723
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:41:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OE9D2gJO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A4ED20723
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZqJWyWy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E44E320723
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrlA2-00067Z-Cu
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:37:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51696)
+	id 1jrlDo-0001JD-4d
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:41:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrl9E-00052Y-O2
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:36:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41743
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrlCT-00085e-DJ
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:39:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27763
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrl9D-0004U4-8V
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:36:16 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrlCR-0005QG-N0
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:39:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593880574;
+ s=mimecast20190719; t=1593880775;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=SqXz38wdz/FD+LnrCe+KuV6IAZbK6L/A1oUQpL8mo44=;
- b=OE9D2gJO4RXBY9MpxpMxfvnKjoRJFGWP2j/3SM7dtXoGcU/c72Ln/Ia6wMyZ7lY79Ano4D
- 6Pjqsv27zaow/JfmE7EGysCiEYBZ9Bga7e8G/lkNj+/2dJnq9ZKT20k61Hmo4rqgPAq1Z6
- fBrsO5u2HTwVBXS/bNT4Ucdu7WyS950=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-gosUtmDBMYCT2V8BWR2Bow-1; Sat, 04 Jul 2020 12:36:10 -0400
-X-MC-Unique: gosUtmDBMYCT2V8BWR2Bow-1
-Received: by mail-wr1-f70.google.com with SMTP id j3so16484944wrq.9
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 09:36:10 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=m/8i0LkIgAAfDamFS/UoGLAcNvDFvKkvrvuq5rOxecw=;
+ b=FZqJWyWyWLCSdugc1Cj8GsO9xqoXXtCzdtlRcni7v9fMAzOu6mt0TGAzQ7LdXOdXSRFHl3
+ cOPPIyqrg8UBPTYpXigT+qjkqH2G33d+otqMfDo+p0axVDFztfpb/bpApp3qiPSmh1VqJN
+ MxWA6g9FvykUOWmG465TBrgTQp9SmrI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-J_wXVpGyO1KuIRpsn9plug-1; Sat, 04 Jul 2020 12:39:31 -0400
+X-MC-Unique: J_wXVpGyO1KuIRpsn9plug-1
+Received: by mail-wm1-f72.google.com with SMTP id g187so39872975wme.0
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 09:39:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=SqXz38wdz/FD+LnrCe+KuV6IAZbK6L/A1oUQpL8mo44=;
- b=aR/dxQrbfzz+9n94MEBmTgKSzARucCavof1Y4VrleipKz8G4vSNDO/kPJeLt6GY9yr
- 3ACKB3dT0t0+eTy+LEwIZYWn9H0TH7e5JgkdgwB3heQ/aHRQ1irIcjTO86MHREYvfByQ
- GKPT56ZUXOUTlNHFRGxCqAgCKAM9Usg323o4jnsPlVLRi/VVVNlVFGN5JTG2952syIJ6
- 8dZY3sHFvsH4mILyzg1Rr85V2Xq1Bb6veFkcFrMXQUoD19zsGliuhVgVO3kQpV1pGCHc
- 0cHUarSbaDwkIegNrpEjO67zSWaSZ/ac+/yEHRtxTT67kJuMUBpaT9oYnhWiPrE12dhL
- 8nfg==
-X-Gm-Message-State: AOAM5334TYmWO3YJJfRZL8SJSHzegcdiLyLcqIPvViSAt+7AkzsNVHvM
- WMrEliSe/Ctj95Kh91wQc/LJf1BlGqB4fMu1LgMeIseREjWn+okErW1HJf/4mdEBRpTg+88YEgK
- 7tASNQKWW3ynMynM=
-X-Received: by 2002:a05:6000:d0:: with SMTP id
- q16mr8556956wrx.166.1593880569211; 
- Sat, 04 Jul 2020 09:36:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxwOJi6CsXPd0bz+EEZxRlnsYFe4x67mZFFceVXWJFwu9AHH7lmdGkjXYPqrDUEAhIfJcjFGQ==
-X-Received: by 2002:a05:6000:d0:: with SMTP id
- q16mr8556917wrx.166.1593880568935; 
- Sat, 04 Jul 2020 09:36:08 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=m/8i0LkIgAAfDamFS/UoGLAcNvDFvKkvrvuq5rOxecw=;
+ b=J4AP25B+ylId+2KxACies2u054bLP4dxIDMSqpVFcuxSqO/EYQkoWQcBXD63uYhMCG
+ E2ovjB1+Wbf22UamAianR6fJS8hhPfxPUansafFwBvmnNc3j00AU4YFIw3A16pUCUMbp
+ 0ZdZ3Eu52Jd1BScwC3GFtDcvkBkn8azMxdr0l5OvJoD44qKVceEDNLXMLaHrw2vmRivn
+ sBY7WXgR/Po669UA2C3dMy9i9lCu4RQWU0tsUG9U7lfK7KarKkzTYZ+KE/v8cT8qGssO
+ JWPK8eH425C7NyGPrKqC0APBYYXSThD8NV7BZWx7LDb9We5us+ON/0TfAgoXpUpoZuX5
+ 3gGQ==
+X-Gm-Message-State: AOAM533ceE0/pGh/M6lNyQsr6+TCz89fTJm6/YA1Vqw4XVrwmp6SjoZX
+ u4K8XxcbocxKJ+LbdaoFalfDP4WHxtYwWpLAKHFFUAO8ONYFLE7Ap1D6FKH1B9bi4z72689majJ
+ dkmOC+lDB7xsfMl4=
+X-Received: by 2002:adf:9c8c:: with SMTP id d12mr40620122wre.369.1593880770468; 
+ Sat, 04 Jul 2020 09:39:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzwdSrWlbD0y8K7SIiOWIB9JDF+2vzfGIJ9rTYKHuJWyfjQTVxiWmXR7iMBDpRLWN9uV+bUAA==
+X-Received: by 2002:adf:9c8c:: with SMTP id d12mr40620110wre.369.1593880770282; 
+ Sat, 04 Jul 2020 09:39:30 -0700 (PDT)
+Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r11sm16595203wmh.1.2020.07.04.09.36.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 04 Jul 2020 09:36:08 -0700 (PDT)
-Subject: Re: [PATCH v11 8/8] xen: introduce ERRP_AUTO_PROPAGATE
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200703090816.3295-1-vsementsov@virtuozzo.com>
- <20200703090816.3295-9-vsementsov@virtuozzo.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <e2b4f10a-162c-ebb8-3232-381c4d820f9f@redhat.com>
-Date: Sat, 4 Jul 2020 18:36:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by smtp.gmail.com with ESMTPSA id z1sm17576747wru.30.2020.07.04.09.39.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 04 Jul 2020 09:39:29 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/5] fw_cfg/crypto patches for 5.1 soft freeze
+Date: Sat,  4 Jul 2020 18:39:22 +0200
+Message-Id: <20200704163927.28188-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200703090816.3295-9-vsementsov@virtuozzo.com>
-Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -128,7 +95,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,60 +108,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-block@nongnu.org, Paul Durrant <paul@xen.org>, groug@kaod.org,
- armbru@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/20 11:08 AM, Vladimir Sementsov-Ogievskiy wrote:
-> If we want to add some info to errp (by error_prepend() or
-> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-> Otherwise, this info will not be added when errp == &error_fatal
-> (the program will exit prior to the error_append_hint() or
-> error_prepend() call).  Fix such cases.
-> 
-> If we want to check error after errp-function call, we need to
-> introduce local_err and then propagate it to errp. Instead, use
-> ERRP_AUTO_PROPAGATE macro, benefits are:
-> 1. No need of explicit error_propagate call
-> 2. No need of explicit local_err variable: use errp directly
-> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
->    &error_fatal, this means that we don't break error_abort
->    (we'll abort on error_set, not on error_propagate)
-> 
-> This commit is generated by command
-> 
->     sed -n '/^X86 Xen CPUs$/,/^$/{s/^F: //p}' MAINTAINERS | \
->     xargs git ls-files | grep '\.[hc]$' | \
->     xargs spatch \
->         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->         --macro-file scripts/cocci-macro-file.h \
->         --in-place --no-show-diff --max-width 80
-> 
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  hw/block/dataplane/xen-block.c |  17 +++---
->  hw/block/xen-block.c           | 102 ++++++++++++++-------------------
->  hw/pci-host/xen_igd_pt.c       |   7 +--
->  hw/xen/xen-backend.c           |   7 +--
->  hw/xen/xen-bus.c               |  92 +++++++++++++----------------
->  hw/xen/xen-host-pci-device.c   |  27 +++++----
->  hw/xen/xen_pt.c                |  25 ++++----
->  hw/xen/xen_pt_config_init.c    |  17 +++---
->  8 files changed, 128 insertions(+), 166 deletions(-)
+The following changes since commit 4abf70a661a5df3886ac9d7c19c3617fa92b922a:
 
-Without the description, this patch has 800 lines of diff...
-It killed me, I don't have the energy to review patch #7 of this
-series after that, sorry.
-Consider splitting such mechanical patches next time. Here it
-could have been hw/block, hw/pci-host, hw/xen.
+  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-06-24' =
+into staging (2020-07-03 15:34:45 +0100)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+are available in the Git repository at:
+
+  https://gitlab.com/philmd/qemu.git tags/fw_cfg-20200704
+
+for you to fetch changes up to 69699f3055a59e24f1153c329ae6eff4b9a343e0:
+
+  crypto/tls-cipher-suites: Produce fw_cfg consumable blob (2020-07-03 18:16:=
+01 +0200)
+
+----------------------------------------------------------------
+firmware (and crypto) patches
+
+- add the tls-cipher-suites object,
+- add the ability to QOM objects to produce data consumable
+  by the fw_cfg device,
+- let the tls-cipher-suites object implement the
+  FW_CFG_DATA_GENERATOR interface.
+
+This is required by EDK2 'HTTPS Boot' feature of OVMF to tell
+the guest which TLS ciphers it can use.
+
+CI jobs results:
+  https://travis-ci.org/github/philmd/qemu/builds/704724619
+  https://gitlab.com/philmd/qemu/-/pipelines/162938106
+  https://cirrus-ci.com/build/4682977303068672
+
+----------------------------------------------------------------
+
+Philippe Mathieu-Daud=C3=A9 (5):
+  crypto: Add tls-cipher-suites object
+  hw/nvram/fw_cfg: Add the FW_CFG_DATA_GENERATOR interface
+  softmmu/vl: Let -fw_cfg option take a 'gen_id' argument
+  softmmu/vl: Allow -fw_cfg 'gen_id' option to use the 'etc/' namespace
+  crypto/tls-cipher-suites: Produce fw_cfg consumable blob
+
+ docs/specs/fw_cfg.txt              |  13 ++-
+ include/crypto/tls-cipher-suites.h |  39 +++++++++
+ include/hw/nvram/fw_cfg.h          |  43 ++++++++++
+ crypto/tls-cipher-suites.c         | 126 +++++++++++++++++++++++++++++
+ hw/nvram/fw_cfg.c                  |  35 ++++++++
+ softmmu/vl.c                       |  37 ++++++---
+ crypto/Makefile.objs               |   1 +
+ crypto/trace-events                |   5 ++
+ qemu-options.hx                    |  37 +++++++++
+ 9 files changed, 326 insertions(+), 10 deletions(-)
+ create mode 100644 include/crypto/tls-cipher-suites.h
+ create mode 100644 crypto/tls-cipher-suites.c
+
+--=20
+2.21.3
 
 
