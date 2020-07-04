@@ -2,82 +2,81 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E504C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B82DBC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECD3920720
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:31:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 833AF20720
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:31:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjWEb9ve"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD3920720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LA3aDlf1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 833AF20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrmwM-0004cw-6j
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39592)
+	id 1jrmwT-0004sY-MZ
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:31:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvA-0002jG-Cs
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:29:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36346
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvJ-0002ty-9U
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35966
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmuq-0001I2-8O
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:29:52 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvH-0001Lz-Fc
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593887370;
+ s=mimecast20190719; t=1593887398;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=kwK+YtoN3ISvSonZG8pWmnKbUjP97LUVMTrPci50qGM=;
- b=UjWEb9vekL43tkOZmb/O4s1CzGV4doJSeBzQnpx6XU1QOmq7p6AnWZ03K7xrelejj13gOb
- M/O7JD2ZzkV8xMz7c6MkbCy16BW2Bp17ImnPEbDlEkwtEsQ19oKWc1caPP2PCPRYYF6QLz
- q/7i/QyuIUcFvN0sXU9zBQe/Q7Fumx4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-iLM0IORvP-mCWBxMxLk9cA-1; Sat, 04 Jul 2020 14:29:29 -0400
-X-MC-Unique: iLM0IORvP-mCWBxMxLk9cA-1
-Received: by mail-wr1-f72.google.com with SMTP id d11so18926535wrw.12
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:29:29 -0700 (PDT)
+ bh=rnwhkibuuryD3VaVsetE4dEaQSFYlxZxsA4QPNf181w=;
+ b=LA3aDlf1JdiUzt/kHAdQklil35gXSvC3Mwzj0aEWEV/jHqc0po35HRCq5+SK3NVjyeEPK5
+ F9KBsqwd1++WVt6qHWcD4xcAzf0nVoEFCXE54SGTURUgk0SUr8Cqmgk4Ga8QfBXBs/qhnn
+ RwyO101IAD4kDhdCR1GZ3U9T7drQjiM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-bqjU5aL7N4OiD5aHIShOzg-1; Sat, 04 Jul 2020 14:29:56 -0400
+X-MC-Unique: bqjU5aL7N4OiD5aHIShOzg-1
+Received: by mail-wr1-f71.google.com with SMTP id v3so6664119wrq.10
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:29:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=kwK+YtoN3ISvSonZG8pWmnKbUjP97LUVMTrPci50qGM=;
- b=pNkas4nMATVznWYmyTy0jymvhU0BUnxIPjIo0xd3/EeUhJK3Zr51J9qPrHK/LLGMjw
- vAhPO6/k3AQ38M/Dz55cS820xwS/iV1fKz52h9W6GJHS0Usxxlkcrqkg6+2pSq8fkSE+
- 764hNnSwMeN+9IlSC/HHaUHQrnzeL+H/nKSHJvzZlvhjB0FPJgQsEZ1yvhqX+HHYiT0W
- iJz7gpq3QOoWLDJ4RCP5SYaFgm7cJLyOESsEOmd65871YmUBD0nA8T7ZCisqmFUQbpSK
- m8H3Iq3L2eVMYPgH4dvRLE1rN0mQO0rhO8ESnh/5TIiXj5B5OTYVVUYE3h0G8cbMckJd
- xZdQ==
-X-Gm-Message-State: AOAM530wMM8a4fHq6iuorhVvtIlJQCpo1U3YaI4G9QqQfKJaXlsu2jeO
- G7cRrL4Aw1+V/gXICyknRHzqjIaLNfMttiI0OFXk1mA+cNApkQsBB2SIC256mvPjbg0yifb6eL9
- SAK4vbv+MB7+VQ1o=
-X-Received: by 2002:a7b:c94a:: with SMTP id i10mr18599107wml.183.1593887367709; 
- Sat, 04 Jul 2020 11:29:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxt0y7gHWJp9A2EIGhHYdo5s+mqBkChaOATIHmPLhIaZpHaTCjIzsPNPsHTRkp2srZxgMMPVg==
-X-Received: by 2002:a7b:c94a:: with SMTP id i10mr18599085wml.183.1593887367342; 
- Sat, 04 Jul 2020 11:29:27 -0700 (PDT)
+ bh=rnwhkibuuryD3VaVsetE4dEaQSFYlxZxsA4QPNf181w=;
+ b=UHg4UHeHTa7c+5svaQvOVOQ82RXWhdl4oWQ1tE00FWrBDPrXE+vukCu6AR1H9EsoXZ
+ laxhn+14tdtNx6P3CINBJVpMpbm/bW/iRfV0HT7GQdKMpWsRNbDZATVdQnSPpZQjfhgI
+ t6ftu787tVgjpoGqqsltOtDvM08+EnW0XBGJMaqbfOi4HmDZ1k1+B99hB+7XdXaqSiTR
+ O/TlcuzigW24ZUOQzpcO6wLwoepF/evCHfjSgMxAgATMIwFdLziLst6MYYtJ5c3h+X3d
+ J0RF0i0OQzXqJ0+1QcMs/52HmH4Wa8AMxFRUGBh3zYvwHFAvu7iZlUe4nuFy5J9SsqJm
+ n0zw==
+X-Gm-Message-State: AOAM530V5d+5+HZJFN1AXdP1+vfiXtYquLGTR578+eR90lkk5BXA6W2e
+ yHSF2NK00jZWKv7h3gCktGmTUyDI2H/sgQ5Hsaw2ymDXLRT+JohU3lIGDEer/4KjWsofSfhxGuH
+ bNgI6RrU2UojwJCo=
+X-Received: by 2002:adf:f60a:: with SMTP id t10mr33810099wrp.64.1593887394482; 
+ Sat, 04 Jul 2020 11:29:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxkm5yQ1qWIomDDGcWAn4+HbF2EUljM6ONyprgX/l9v5ui6ZJIYpxHdFnFzm7gk0vsOvVd3zA==
+X-Received: by 2002:adf:f60a:: with SMTP id t10mr33810092wrp.64.1593887394338; 
+ Sat, 04 Jul 2020 11:29:54 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- c11sm16764510wmb.45.2020.07.04.11.29.26
+ 1sm16942120wmf.21.2020.07.04.11.29.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 11:29:26 -0700 (PDT)
-Date: Sat, 4 Jul 2020 14:29:25 -0400
+ Sat, 04 Jul 2020 11:29:53 -0700 (PDT)
+Date: Sat, 4 Jul 2020 14:29:52 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 01/41] tests: disassemble-aml.sh: generate AML in readable
- format
-Message-ID: <20200704182750.1088103-2-mst@redhat.com>
+Subject: [PULL v2 11/41] migration/rdma: Use ram_block_discard_disable()
+Message-ID: <20200704182750.1088103-12-mst@redhat.com>
 References: <20200704182750.1088103-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200704182750.1088103-1-mst@redhat.com>
@@ -98,7 +97,8 @@ X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_PASS=-0.001, T_SPF_HELO_TEMPERROR=0.01 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,93 +112,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>
+ Juan Quintela <quintela@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On systems where the IASL tool exists, we can convert
-extected ACPI tables to ASL format, which is useful
-for debugging and documentation purposes.
-This script does this for all ACPI tables under tests/data/acpi/.
+From: David Hildenbrand <david@redhat.com>
 
+RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
+to disable RAM block discards - however, to keep it simple use
+ram_block_discard_is_required() instead of inhibiting.
+
+Note: It is not sufficient to limit disabling to pin_all. Even when only
+conditionally pinning 1 MB chunks, as soon as one page within such a
+chunk was discarded and one page not, the discarded pages will be pinned
+as well.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200626072248.78761-9-david@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/data/acpi/disassemle-aml.sh       | 52 +++++++++++++++++++++++++
- tests/data/acpi/rebuild-expected-aml.sh |  1 +
- 2 files changed, 53 insertions(+)
- create mode 100755 tests/data/acpi/disassemle-aml.sh
+ migration/rdma.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/tests/data/acpi/disassemle-aml.sh b/tests/data/acpi/disassemle-aml.sh
-new file mode 100755
-index 0000000000..1d8a4d0301
---- /dev/null
-+++ b/tests/data/acpi/disassemle-aml.sh
-@@ -0,0 +1,52 @@
-+#!/usr/bin/bash
-+
-+outdir=
-+while getopts "o:" arg; do
-+  case ${arg} in
-+    o )
-+        outdir=$OPTARG
-+        ;;
-+    \? )
-+        echo "Usage: ./tests/data/acpi/disassemle-aml.sh [-o <output-directory>]"
-+        exit 1
-+        ;;
-+
-+  esac
-+done
-+
-+for machine in tests/data/acpi/*
-+do
-+    if [[ ! -d "$machine" ]];
-+    then
-+        continue
-+    fi
-+
-+    if [[ "${outdir}" ]];
-+    then
-+        mkdir -p "${outdir}"/${machine} || exit $?
-+    fi
-+    for aml in $machine/*
-+    do
-+        if [[ "$aml" == $machine/*.dsl ]];
-+        then
-+            continue
-+        fi
-+        if [[ "$aml" == $machine/SSDT*.* ]];
-+        then
-+            dsdt=${aml/SSDT*./DSDT.}
-+            extra="-e ${dsdt}"
-+        elif [[ "$aml" == $machine/SSDT* ]];
-+        then
-+            dsdt=${aml/SSDT*/DSDT};
-+            extra="-e ${dsdt}"
-+        else
-+            extra=""
-+        fi
-+        asl=${aml}.dsl
-+        if [[ "${outdir}" ]];
-+        then
-+            asl="${outdir}"/${machine}/${asl}
-+        fi
-+        iasl -d -p ${asl} ${extra} ${aml}
-+    done
-+done
-diff --git a/tests/data/acpi/rebuild-expected-aml.sh b/tests/data/acpi/rebuild-expected-aml.sh
-index 9cbaab1a4d..76cd797d1e 100755
---- a/tests/data/acpi/rebuild-expected-aml.sh
-+++ b/tests/data/acpi/rebuild-expected-aml.sh
-@@ -36,6 +36,7 @@ old_allowed_dif=`grep -v -e 'List of comma-separated changed AML files to ignore
- echo '/* List of comma-separated changed AML files to ignore */' > ${SRC_PATH}/tests/qtest/bios-tables-test-allowed-diff.h
+diff --git a/migration/rdma.c b/migration/rdma.c
+index ec45d33ba3..bbe6f36627 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -29,6 +29,7 @@
+ #include "qemu/sockets.h"
+ #include "qemu/bitmap.h"
+ #include "qemu/coroutine.h"
++#include "exec/memory.h"
+ #include <sys/socket.h>
+ #include <netdb.h>
+ #include <arpa/inet.h>
+@@ -4017,8 +4018,14 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+     Error *local_err = NULL;
  
- echo "The files were rebuilt and can be added to git."
-+echo "You can use ${SRC_PATH}/tests/data/acpi/disassemle-aml.sh to disassemble them to ASL."
+     trace_rdma_start_incoming_migration();
+-    rdma = qemu_rdma_data_init(host_port, &local_err);
  
- if [ -z "$old_allowed_dif" ]; then
-     echo "Note! Please do not commit expected files with source changes"
++    /* Avoid ram_block_discard_disable(), cannot change during migration. */
++    if (ram_block_discard_is_required()) {
++        error_setg(errp, "RDMA: cannot disable RAM discard");
++        return;
++    }
++
++    rdma = qemu_rdma_data_init(host_port, &local_err);
+     if (rdma == NULL) {
+         goto err;
+     }
+@@ -4067,10 +4074,17 @@ void rdma_start_outgoing_migration(void *opaque,
+                             const char *host_port, Error **errp)
+ {
+     MigrationState *s = opaque;
+-    RDMAContext *rdma = qemu_rdma_data_init(host_port, errp);
+     RDMAContext *rdma_return_path = NULL;
++    RDMAContext *rdma;
+     int ret = 0;
+ 
++    /* Avoid ram_block_discard_disable(), cannot change during migration. */
++    if (ram_block_discard_is_required()) {
++        error_setg(errp, "RDMA: cannot disable RAM discard");
++        return;
++    }
++
++    rdma = qemu_rdma_data_init(host_port, errp);
+     if (rdma == NULL) {
+         goto err;
+     }
 -- 
 MST
 
