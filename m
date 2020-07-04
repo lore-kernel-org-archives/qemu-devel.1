@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE66C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21905C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:29:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CC12206B6
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:29:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC12206B6
+	by mail.kernel.org (Postfix) with ESMTPS id EFE4C20782
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:29:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE4C20782
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrl2S-0002Yj-DB
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:29:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50206)
+	id 1jrl2V-0002gn-8e
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:29:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzW-0005Sb-34
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:14 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:42245)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzX-0005UJ-Qv
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:15 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:49483)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzR-0002PS-Vg
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:13 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jrkzT-0002Pj-V3
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:26:15 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mq2rM-1keYCr3T1O-00nBG7; Sat, 04 Jul 2020 18:26:00 +0200
+ id 1Mq2rM-1keYCx3cLS-00nBG7; Sat, 04 Jul 2020 18:26:02 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/12] linux-user: Add strace support for printing arguments of
- lseek()
-Date: Sat,  4 Jul 2020 18:25:40 +0200
-Message-Id: <20200704162545.311133-8-laurent@vivier.eu>
+Subject: [PULL 10/12] linux-user: Add thunk argument types for SIOCGSTAMP and
+ SIOCGSTAMPNS
+Date: Sat,  4 Jul 2020 18:25:43 +0200
+Message-Id: <20200704162545.311133-11-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200704162545.311133-1-laurent@vivier.eu>
 References: <20200704162545.311133-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:6ExM+EIb8avJ3JyTQbsZEpcNibGSfYsBF2ON6SMDwHW5Alh18y8
- Jq1bCQLjM7SlpZv1ukTAh5QOAi4vpmJvn1hv6P5K14DZVW76mlQCaEGG6T2g8F+/klaLba5
- dZO8aAUmlJVSJVZENnPE/HPpxGcQrHDRl5SxoIwvs5q7W53IM3WIEZ8+vYRVm+sM5DaQrq0
- /npOVAldix6EymIHLx/5g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:c5WfpDzHTmU=:LyfsDKluSBP60gLGWZfrV7
- MCCd+DR3OWix77hihDwR2/5AxyqAFAhtgim+yb8rDf7fqtpKESV6+KlW4uWgrDlK/ykhzOsGh
- B18FrC8+QbYwaUdE+2Q8sSeKEQVUbggmcixX0T1uPTy4can3223cd9fs/f/aKOQ1iK+r0DL6O
- CpFMy2hJTYtw55TBbnZZHw8nUoCTQIP2CPzIwdM7slsYiIHnvQ1DWK8G4uCWxHUXOctQ/qCbr
- zJ3QOti473+X6sfk0mvKdKQXpZJpiTRoWz3IiL/8thf9ZMudZiLsndNURSqhHo6q6FYV5Kffw
- PNdvJkQaJA+tMkOFH46nTYQ1LLMNLu0X4RUJuoHRc1h9Xel2cWXOwUuJYwUqAIuvZNSbKOOFw
- XHaFfkAy6DwLVNUHSM8IEv6qtXn5R8zgb9QzvcVuGCet9zd2Ky89BMB9O4zNKBaS0xbNMsbOG
- IYYd7k2qEuTLRZQyB2wdePgEyosux6Ae8APkbwQKtgLhu5aJ7be6zCt5HRzhXBkC/9hMZV+Aj
- panxqDZ4zd7oEQ9MmnpRuqlG4iVLHzllv3JeBAF2qxXGqLX0pITxRZtJ7dOVArwdcl0ggbQCS
- 0iNoLapByHLIQt/vHS4u/F9BGfcV7pDo0EFhSZr4iAoIW4SazlZRM0YTwjC9KxuxWEuVaD1y6
- QJGNTNnqhi18rXL9hkNQsnWdG7BqpDOqSk4sRZfvx3axa8DPq+sndtDFv+8+OA+5iASV3s7hP
- GJXZL8JlW6m5nS45TFzNAs+Pm/x6G/SxN1xyjdIW2NEzex7a61bH9FPQNid4scgAUQQpgVWCv
- Df4kAVti60HiwBcq0kAAafK3ZdkCdJbzTRc7qBXZNcpATahLc4=
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:pTTCOxm2ObIFqhLPF/KT8+Fby1UqCBeHIhaRvTpY31mrNZRQrPT
+ iMsJmXhASEu77lIURFFp52J8U9lPS1MrSkOVXVu8/BAqOxi1hYrF9lfd7Lq6cZDYMIq0oyZ
+ KqFS/wN2TZZVuX3RVe8CXi9JWe4kwJ3oBBqsMoV66wXTGuJdKq56gWKJoKbJEuQcA2L+tN5
+ ups1U59LsX+M3KSYJvyYA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Rv6DaqYj6K4=:6xM3IcwC1R7bl+7SQ0VJuJ
+ 2zkPdYL9kOAYwmY+Dm0uMg7LVmBxsRm9kag+gmWfZmSYFjbSxHiQMifr4tUGEHf4FGvboUutZ
+ oq5Rzgr5Uue35Ql33bGXAscW12omMGjUEwpChwcIcwWfWthD1W6/TM8Zy3BN0GZj2oIMwBd+V
+ 21h0AoQQXrSVd3IBmB6ioIgOcR4jV/B7Oyp7vipkZYOtHHY+kUttiBAMmYeIFmowUfd8/1Yrp
+ I3Qr51yWO6t8vGdUe8B6JIu91hVG3louz0/XKkllytzdDwZJLW157jqZGAQiSjW67ZtklPSbL
+ oRTC3n398ux2PpbBm97kb0spyY+AfiH3yHEQsOfG+RD9J25u3WOlNI1fikCB87D/vQBoTjaAf
+ Dlx791k8kWIFJPWG4Be4mpuu8rW3u9uEi6YewHJVi+C/6oVUtqa9H/AwvDI9gbZNZwP5n7lXN
+ 0EvWRqifkISyjjPzrvaUD/ZSjPAqYOr8rt7I469Gb4kC18BQeCPsMVHGpv5MsAv83krBuhKUn
+ RNIXlQVQwttPQDZMnZIvcg2ERyArPId+D5WH5usOHT+qwwSkUqDSNOZ/1aPOjfXRMWQjgb5p/
+ CqAYNY39WF70u6Q9vWv+g14USqzhQJGli44blwnEjvP/FpLMAVAnmWrP/Xf1VVuYm/91Nh3D1
+ PICJq9YAj25dXcdO++sgjwJchGin9tf4arjKdSI2wjaLXH7jNgEVo31nvq5gle9ye2HbCcTvF
+ dv6KAoEw6PsOJnlOWslW+FMuuncU+431DOt+PyMehowcid2o9Hq5sUDDKSiOjQVg6PMwzvE/x
+ FeOXypCf2oWJdn/eDfXLPGyYdTBgrbqa6n3FyxmvVrZ5fLiMHM=
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:26:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:25:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
 X-Spam_bar: --
 X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,90 +90,101 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch implements strace argument printing functionality for syscall:
-
-    *lseek - reposition read/write file offset
-
-         off_t lseek(int fd, off_t offset, int whence)
-         man page: https://www.man7.org/linux/man-pages/man2/lseek.2.html
+Socket ioctls SIOCGSTAMP and SIOCGSTAMPNS, used for timestamping the socket
+connection, are defined in file "ioctls.h" differently from other ioctls.
+The reason for this difference is explained in the comments above their definition.
+These ioctls didn't have defined thunk argument types before changes from this
+patch. They have special handling functions ("do_ioctl_SIOCGSTAMP" and
+"do_ioctl_SIOCGSTAMPNS") that take care of setting values for approppriate argument
+types (struct timeval and struct timespec) and thus no thunk argument types were
+needed for their implementation. But this patch adds those argument type definitions
+in file "syscall_types.h" and "ioctls.h" as it is needed for printing arguments
+of these ioctls with strace.
 
 Implementation notes:
 
-    The syscall's third argument "whence" has predefined values:
-    "SEEK_SET","SEEK_CUR","SEEK_END","SEEK_DATA","SEEK_HOLE"
-    and thus a separate printing function "print_lseek" was stated
-    in file "strace.list". This function is defined in "strace.c"
-    by using an existing function "print_raw_param()" to print
-    the first and second argument and a switch(case) statement
-    for the predefined values of the third argument.
-    Values "SEEK_DATA" and "SEEK_HOLE" are defined in kernel version 3.1.
-    That is the reason why case statements for these values are
-    enwrapped in #ifdef directive.
+    There are two variants of these ioctls: SIOCGSTAMP_OLD/SIOCGSTAM_NEW and
+    SIOCGSTAMPNS_OLD/SIOCGSTAMPNS_NEW. One is the old existing definition and the
+    other is the 2038 safe variant used for 32-bit architectures. Corresponding
+    structure definitions STRUCT_timespec/STRUCT__kernel_timespec and
+    STRUCT_timeval/STRUCT__kernel_sock_timeval were added for these variants.
+    STRUCT_timeval definition was already inside the file as it is used by
+    another implemented ioctl. Two cases were added for definitions
+    STRUCT_timeval/STRUCT__kernel_sock_timeval to manage the case when the
+    "u_sec" field of the timeval structure is of type int.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200619123331.17387-5-filip.bozuta@syrmia.com>
+Message-Id: <20200619124727.18080-2-filip.bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/strace.c    | 31 +++++++++++++++++++++++++++++++
- linux-user/strace.list |  2 +-
- 2 files changed, 32 insertions(+), 1 deletion(-)
+ linux-user/ioctls.h        | 12 ++++++++----
+ linux-user/syscall_types.h | 22 ++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 760020132b5a..a26736516bab 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -1833,6 +1833,37 @@ print__llseek(const struct syscallname *name,
- }
- #endif
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index f2e2fa9c878b..0713ae131162 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -279,13 +279,17 @@
+    * FIXME: create a macro to define this kind of entry
+    */
+   { TARGET_SIOCGSTAMP_OLD, TARGET_SIOCGSTAMP_OLD,
+-    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP },
++    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP,
++    { MK_PTR(MK_STRUCT(STRUCT_timeval)) } },
+   { TARGET_SIOCGSTAMPNS_OLD, TARGET_SIOCGSTAMPNS_OLD,
+-    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS },
++    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS,
++    { MK_PTR(MK_STRUCT(STRUCT_timespec)) } },
+   { TARGET_SIOCGSTAMP_NEW, TARGET_SIOCGSTAMP_NEW,
+-    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP },
++    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP,
++    { MK_PTR(MK_STRUCT(STRUCT__kernel_sock_timeval)) } },
+   { TARGET_SIOCGSTAMPNS_NEW, TARGET_SIOCGSTAMPNS_NEW,
+-    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS },
++    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS,
++    { MK_PTR(MK_STRUCT(STRUCT__kernel_timespec)) } },
  
-+#ifdef TARGET_NR_lseek
-+static void
-+print_lseek(const struct syscallname *name,
-+    abi_long arg0, abi_long arg1, abi_long arg2,
-+    abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_raw_param("%d", arg0, 0);
-+    print_raw_param(TARGET_ABI_FMT_ld, arg1, 0);
-+    switch (arg2) {
-+    case SEEK_SET:
-+        qemu_log("SEEK_SET"); break;
-+    case SEEK_CUR:
-+        qemu_log("SEEK_CUR"); break;
-+    case SEEK_END:
-+        qemu_log("SEEK_END"); break;
-+#ifdef SEEK_DATA
-+    case SEEK_DATA:
-+        qemu_log("SEEK_DATA"); break;
-+#endif
-+#ifdef SEEK_HOLE
-+    case SEEK_HOLE:
-+        qemu_log("SEEK_HOLE"); break;
-+#endif
-+    default:
-+        print_raw_param("%#x", arg2, 1);
-+    }
-+    print_syscall_epilogue(name);
-+}
+   IOCTL(RNDGETENTCNT, IOC_R, MK_PTR(TYPE_INT))
+   IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index e2b0484f50e5..3f1f0334649b 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -137,10 +137,32 @@ STRUCT(snd_timer_params,
+        TYPE_INT, /* filter */
+        MK_ARRAY(TYPE_CHAR, 60)) /* reserved */
+ 
++#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
++STRUCT(timeval,
++       TYPE_LONG, /* tv_sec */
++       TYPE_INT) /* tv_usec */
++
++STRUCT(_kernel_sock_timeval,
++       TYPE_LONG, /* tv_sec */
++       TYPE_INT) /* tv_usec */
++#else
++STRUCT(timeval,
++       TYPE_LONG, /* tv_sec */
++       TYPE_LONG) /* tv_usec */
++
++STRUCT(_kernel_sock_timeval,
++       TYPE_LONGLONG, /* tv_sec */
++       TYPE_LONGLONG) /* tv_usec */
 +#endif
 +
- #if defined(TARGET_NR_socket)
- static void
- print_socket(const struct syscallname *name,
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index d04ad507b0fb..a4a8c61969cd 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -516,7 +516,7 @@
- { TARGET_NR_lremovexattr, "lremovexattr" , NULL, print_lremovexattr, NULL },
- #endif
- #ifdef TARGET_NR_lseek
--{ TARGET_NR_lseek, "lseek" , NULL, NULL, NULL },
-+{ TARGET_NR_lseek, "lseek" , NULL, print_lseek, NULL },
- #endif
- #ifdef TARGET_NR_lsetxattr
- { TARGET_NR_lsetxattr, "lsetxattr" , NULL, NULL, NULL },
+ STRUCT(timespec,
+        TYPE_LONG, /* tv_sec */
+        TYPE_LONG) /* tv_nsec */
+ 
++STRUCT(_kernel_timespec,
++       TYPE_LONGLONG, /* tv_sec */
++       TYPE_LONGLONG) /* tv_nsec */
++
+ STRUCT(snd_timer_status,
+        MK_STRUCT(STRUCT_timespec), /* tstamp */
+        TYPE_INT, /* resolution */
 -- 
 2.26.2
 
