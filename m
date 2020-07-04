@@ -2,105 +2,73 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7542EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011DEC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:43:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 426CA20724
+	by mail.kernel.org (Postfix) with ESMTPS id CF25720724
 	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:43:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vw49s+CT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 426CA20724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF25720724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrlG0-00052p-F7
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:43:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52588)
+	id 1jrlG1-00056L-3Z
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:43:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrlCl-000071-V1
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:39:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20779
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jrlDO-0001G4-9T
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:40:34 -0400
+Resent-Date: Sat, 04 Jul 2020 12:40:34 -0400
+Resent-Message-Id: <E1jrlDO-0001G4-9T@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21362)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrlCj-0005SH-Dw
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:39:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593880792;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uLixvpNJpQxN4tT2DsMy+7dKl6K2fJXcgmydaNhaJeY=;
- b=Vw49s+CTVDI3CEzu23pnI3UL/ak1nQHSRRbi850xyLy4FMC5Tip3pYfEGQzSK43Odrq48Y
- CD6hiRx9k9Zp/xUH21r6FChxUc07XAUeANL4RJgDe4I+Du47niDLvm6BkVkYAKO4eRzhv6
- tZ3Pp/ld2HXrqhVmMJbr9ECkU2IagQY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-E_rAndy4MjSdeuhPIX60Zw-1; Sat, 04 Jul 2020 12:39:50 -0400
-X-MC-Unique: E_rAndy4MjSdeuhPIX60Zw-1
-Received: by mail-wr1-f72.google.com with SMTP id j3so16494708wrq.9
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 09:39:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uLixvpNJpQxN4tT2DsMy+7dKl6K2fJXcgmydaNhaJeY=;
- b=ZPabgXfiYlPZmNOKRqaRrVLEr75dTt2JATGCpx3FL/1/CFb8aIo7x7JEYZPqQVLKXq
- LR4dy1eoME7euwobFeU+tmZ6ueguBXOorp6KfUjeph4Fapmt9YwYoUukK6Ei505UAg//
- BxQCOHjQcVUo9w9Ho5E6rGOUKrjNMRrMXDtH07lW1WQvC0hTD0Q3Cz6/ANCrhwWEqOx+
- N1JrsVEDmFwO6qWEE1feWCBji0eIiGX0MfU7ba7wanCCy/ifk3MiwnT7ZI2AGwimzRGr
- KFyGXHC61KXpnobWOG8RF00DlBZNK7bc77YV0oNPZSUqwXTB4ncuZwtwossArIYp1hjz
- ak+w==
-X-Gm-Message-State: AOAM532o+vMZVsGl1IMIl2du+wuASmy/XfKwlxYg9uXZ5VswdQ+sKzOJ
- IINrxV6aORsyjdgho5l5Ttg5fruXA5lVCWCC45NLFshe+XP706dzRdVAZyt4ja1xjeAEjHJYrbF
- YvLJ2wLlhkkKUXzA=
-X-Received: by 2002:adf:8168:: with SMTP id 95mr42230307wrm.104.1593880789192; 
- Sat, 04 Jul 2020 09:39:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/OkON3+vkcSs96FPZYD4K5p222dIH+82xd59DrfBq/WyafmFq0U4r/bOf4qSqal6vtDjLlg==
-X-Received: by 2002:adf:8168:: with SMTP id 95mr42230298wrm.104.1593880789034; 
- Sat, 04 Jul 2020 09:39:49 -0700 (PDT)
-Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id l8sm17362051wrq.15.2020.07.04.09.39.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 09:39:48 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 4/5] softmmu/vl: Allow -fw_cfg 'gen_id' option to use the
- 'etc/' namespace
-Date: Sat,  4 Jul 2020 18:39:26 +0200
-Message-Id: <20200704163927.28188-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200704163927.28188-1-philmd@redhat.com>
-References: <20200704163927.28188-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jrlDL-0005kZ-DY
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:40:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1593880814; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=iV/OlEsR8NDvNEOZZf7QF+InBBCzgofyDfk149qEpkm20KxOormN1wV+xWUcclZtwR2XuBI3uaNbEN8tSXpSWwb2JQEIpTb6liABWxXMpPo3jiFznMSh5kC6KRPV3cLOospzEPBdO1dL4pg5v/GXWr6DFittslqUzDATTUkGbJU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1593880814;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=RzSLpZmSfUsnZA5hsSF0U1zNV2V126gZjLegWzow7U4=; 
+ b=i1T2t5m3DQJJ04W8z4fQTNXmXaK2x1gE6xu8LcPI0o72stKWsOZ+HZ/LPtIB8LRJFgiaR8Sh3twMlmNXfFdfebYSxtpI57lX7DndjaYaOnfhYOPj80/qIPP5M+igm+P4JjdL8cZhmsiTTHpmcsjfkWsHX3dukTJCuDwvmP4z8Yw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1593880811323408.7232443661711;
+ Sat, 4 Jul 2020 09:40:11 -0700 (PDT)
+Message-ID: <159388081008.22113.3452498152146061351@d1fd068a5071>
+Subject: Re: [PULL 00/12] Linux user for 5.1 patches
+In-Reply-To: <20200704162545.311133-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Sat, 4 Jul 2020 09:40:11 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:40:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,60 +81,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ atar4qemu@gmail.com, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Names of user-provided fw_cfg items are supposed to start
-with "opt/". However FW_CFG_DATA_GENERATOR items are generated
-by QEMU, so allow the "etc/" namespace in this specific case.
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200623172726.21040-5-philmd@redhat.com>
----
- docs/specs/fw_cfg.txt | 4 ++++
- softmmu/vl.c          | 8 +++++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
-index bc16daa38a..3e6d586f66 100644
---- a/docs/specs/fw_cfg.txt
-+++ b/docs/specs/fw_cfg.txt
-@@ -258,4 +258,8 @@ Prefix "opt/org.qemu/" is reserved for QEMU itself.
- Use of names not beginning with "opt/" is potentially dangerous and
- entirely unsupported.  QEMU will warn if you try.
- 
-+Use of names not beginning with "opt/" is tolerated with 'gen_id' (that
-+is, the warning is suppressed), but you must know exactly what you're
-+doing.
-+
- All externally provided fw_cfg items are read-only to the guest.
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 13cada39d6..159f0352a9 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -2049,7 +2049,13 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
-                    FW_CFG_MAX_FILE_PATH - 1);
-         return -1;
-     }
--    if (strncmp(name, "opt/", 4) != 0) {
-+    if (nonempty_str(gen_id)) {
-+        /*
-+         * In this particular case where the content is populated
-+         * internally, the "etc/" namespace protection is relaxed,
-+         * so do not emit a warning.
-+         */
-+    } else if (strncmp(name, "opt/", 4) != 0) {
-         warn_report("externally provided fw_cfg item names "
-                     "should be prefixed with \"opt/\"");
-     }
--- 
-2.21.3
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwNDE2MjU0NS4zMTEx
+MzMtMS1sYXVyZW50QHZpdmllci5ldS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMTJdIExpbnV4IHVzZXIgZm9yIDUuMSBwYXRj
+aGVzClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDcwNDE2MjU0NS4zMTExMzMtMS1sYXVy
+ZW50QHZpdmllci5ldQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
+cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
+cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
+ICAgIHBhdGNoZXcvMjAyMDA3MDQxNjI1NDUuMzExMTMzLTEtbGF1cmVudEB2aXZpZXIuZXUgLT4g
+cGF0Y2hldy8yMDIwMDcwNDE2MjU0NS4zMTExMzMtMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNiM2E0ZmMgTUFJTlRBSU5FUlM6IHVwZGF0ZSBsaW51
+eC11c2VyIG1haW50YWluZXIKN2IzZjZjZCBsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQg
+Zm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBpb2N0bCgpCjlkMTdiYmMgbGludXgtdXNlcjogQWRk
+IHRodW5rIGFyZ3VtZW50IHR5cGVzIGZvciBTSU9DR1NUQU1QIGFuZCBTSU9DR1NUQU1QTlMKNThk
+ODQ3ZCBsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50
+cyBvZiBmYWxsb2NhdGUoKQowM2JjMDI4IGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBm
+b3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGNob3duKCkvbGNob3duKCkKNTNhZDI2MiBsaW51eC11
+c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBsc2Vlaygp
+CjNmNjdiYTQgbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1
+bWVudCBvZiBzeXNjYWxscyB1c2VkIGZvciBleHRlbmRlZCBhdHRyaWJ1dGVzCjE2MWFlMTkgbGlu
+dXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBhIGdyb3VwIG9mIHN5c2NhbGxzCmRiNGMx
+N2QgbGludXgtdXNlcjogRXh0ZW5kIHN0cmFjZSBzdXBwb3J0IHRvIGVuYWJsZSBhcmd1bWVudCBw
+cmludGluZyBhZnRlciBzeXNjYWxsIGV4ZWN1dGlvbgoyMmJjODEyIGxpbnV4LXVzZXI6IHN5c2Nh
+bGw6IGlvY3Rsczogc3VwcG9ydCBEUk1fSU9DVExfVkVSU0lPTgplOTcxOTVlIGxpbnV4LXVzZXIv
+c3BhcmM2NDogRml4IHRoZSBoYW5kbGluZyBvZiB3aW5kb3cgc3BpbGwgdHJhcAo1NzVlMGFkIHRh
+cmdldC9zcGFyYzogVHJhbnNsYXRlIGZsdXNodyBvcGNvZGUKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMTIgQ2hlY2tpbmcgY29tbWl0IDU3NWUwYWRmN2Q3ZSAodGFyZ2V0L3NwYXJjOiBUcmFuc2xh
+dGUgZmx1c2h3IG9wY29kZSkKMi8xMiBDaGVja2luZyBjb21taXQgZTk3MTk1ZWMzMWQ3IChsaW51
+eC11c2VyL3NwYXJjNjQ6IEZpeCB0aGUgaGFuZGxpbmcgb2Ygd2luZG93IHNwaWxsIHRyYXApCjMv
+MTIgQ2hlY2tpbmcgY29tbWl0IDIyYmM4MTIyNDI2OCAobGludXgtdXNlcjogc3lzY2FsbDogaW9j
+dGxzOiBzdXBwb3J0IERSTV9JT0NUTF9WRVJTSU9OKQo0LzEyIENoZWNraW5nIGNvbW1pdCBkYjRj
+MTdkNDA0ZjIgKGxpbnV4LXVzZXI6IEV4dGVuZCBzdHJhY2Ugc3VwcG9ydCB0byBlbmFibGUgYXJn
+dW1lbnQgcHJpbnRpbmcgYWZ0ZXIgc3lzY2FsbCBleGVjdXRpb24pCjUvMTIgQ2hlY2tpbmcgY29t
+bWl0IDE2MWFlMTkyY2ViZCAobGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBhIGdy
+b3VwIG9mIHN5c2NhbGxzKQo2LzEyIENoZWNraW5nIGNvbW1pdCAzZjY3YmE0ZGRhZTAgKGxpbnV4
+LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnQgb2Ygc3lzY2Fs
+bHMgdXNlZCBmb3IgZXh0ZW5kZWQgYXR0cmlidXRlcykKNy8xMiBDaGVja2luZyBjb21taXQgNTNh
+ZDI2MjMwMGY0IChsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFy
+Z3VtZW50cyBvZiBsc2VlaygpKQo4LzEyIENoZWNraW5nIGNvbW1pdCAwM2JjMDI4MThlNWYgKGxp
+bnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGNo
+b3duKCkvbGNob3duKCkpCjkvMTIgQ2hlY2tpbmcgY29tbWl0IDU4ZDg0N2QwZThlYiAobGludXgt
+dXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgZmFsbG9j
+YXRlKCkpCkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9m
+IHRoZSBkZWNsYXJhdGlvbgojNzI6IEZJTEU6IGxpbnV4LXVzZXIvc3RyYWNlLmM6MTEzODoKK1VO
+VVNFRCBzdGF0aWMgc3RydWN0IGZsYWdzIGZhbGxvY19mbGFnc1tdID0gewoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCAxMDQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8xMiBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKMTAvMTIgQ2hlY2tpbmcgY29tbWl0IDlkMTdiYmNhMmNhYiAobGlu
+dXgtdXNlcjogQWRkIHRodW5rIGFyZ3VtZW50IHR5cGVzIGZvciBTSU9DR1NUQU1QIGFuZCBTSU9D
+R1NUQU1QTlMpCjExLzEyIENoZWNraW5nIGNvbW1pdCA3YjNmNmNkMWY1M2QgKGxpbnV4LXVzZXI6
+IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGlvY3RsKCkpCjEy
+LzEyIENoZWNraW5nIGNvbW1pdCBjYjNhNGZjYWI2M2EgKE1BSU5UQUlORVJTOiB1cGRhdGUgbGlu
+dXgtdXNlciBtYWludGFpbmVyKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
+Y2hldy5vcmcvbG9ncy8yMDIwMDcwNDE2MjU0NS4zMTExMzMtMS1sYXVyZW50QHZpdmllci5ldS90
+ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
