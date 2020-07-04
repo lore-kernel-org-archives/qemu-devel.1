@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 137BCC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C1DC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D40512070C
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:51:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F8BB2070C
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:52:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCSMbVvH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40512070C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQJg1+Wh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8BB2070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrjVX-0003VA-2J
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:51:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57616)
+	id 1jrjWr-0006bx-4u
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrjUH-0000zx-Dc; Sat, 04 Jul 2020 10:49:53 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33682)
+ id 1jrjUN-0001DL-HT; Sat, 04 Jul 2020 10:49:59 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33683)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrjUG-0003d6-2b; Sat, 04 Jul 2020 10:49:53 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f18so27701619wrs.0;
- Sat, 04 Jul 2020 07:49:51 -0700 (PDT)
+ id 1jrjUM-0003e7-2g; Sat, 04 Jul 2020 10:49:59 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f18so27701779wrs.0;
+ Sat, 04 Jul 2020 07:49:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=1LONYHTd7jeNrmu8RfEJNRKaqa+4/OTfMiA08MmDC4w=;
- b=LCSMbVvH8N0ZbcZUYZvlwl0/LtuSzor2alX6qtutU+9ODMj8+C2lynOKjaqj8fXnEI
- Up7WQjLdb8bh14eYdbzmWq0pniHymCkqwLxs7uZhzz+SQeCK8ybk5MN0Zyhj8Eee+SQj
- wRrntXxiS8ThEJ3VSHHvZJ08OGnA1vj0opel3/dZthPvXbGAIhhQVqi63UTc46zKMF8g
- WrVDYhnL59CSHsALtHCZR8uG2+fDNJPpG55w+1h1DIiM4zmD5wiPD6EKOmnxiehzG+GO
- tiIAW62Y9YFjeqMNBorgEysK6Wv7zhm124e0UVH2qXSktIEDr+5rtVe5ZIRMCgW9yetf
- 3gAA==
+ bh=Oswm/m1DAWqBYNXr2uTrm9A1MHSMTs1YgVZvoQJC8bI=;
+ b=gQJg1+Wh58x4r1H2OG452+zx84IaV+E1T+M1C2BaKGGeGjGLijbGT/5fa47rZbH8+0
+ wx3oFF6OQ4YShJqliLGLwkPIB5oJdoms+e1FUh9KOzyP0OaQJPWoQRUIivVmvk/OIni+
+ pIzj1GiWmXLxj18zi7ZWsi1d3bC0/vHZhYuKuqhtZGYCTA6vwHL3QyRfwCu4wrFZiM4w
+ nFj0qm+tx7V6fzx/zRQcGItYIzadZOv9ExIOm820D40RuWqtW4US5zoVgHElBrDFWXJU
+ AbeBG/uIbXymxcCdns7Thwq8fUZU4bxlC2yWqkCy++/qfZTE6Jfr1HmDinGWpjPF9fWy
+ Rs2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=1LONYHTd7jeNrmu8RfEJNRKaqa+4/OTfMiA08MmDC4w=;
- b=WjFSHpQCbi0hgVyl2+PCPXyBespUMq6EmjfHHuxf8MOuqCV3iQcZuCIVxVPR7pTqVA
- KHpStFcIYuJKa1rorFP5Qrz53FHhnQ/fiVlrLdMSlU1WCpuErTtYtrsgz4XObbPhdSjR
- 3XrnnMLfMug1dKSvlMPDgI5/JSdSGcJbZQjHKmKJ+ulxp/Jk0+sNG8UiZH1DS4GtIO6v
- WHHO4rtjeAH7xP0SrmjD3eE32Y2IuDIQUyEtQDHW940/s48bdyb14TRT6O0TFKoRqGHo
- pMVOC1DK4D7Ixo7DBOC1c9LERFoZbBamL9yVdg6Gutfki5j59SMR9EAyEAIObFRkjEe6
- 0C8w==
-X-Gm-Message-State: AOAM530ZZh5ofHfGQP2RAkubTPEJsM8lOsUKyU0mhnSkIkcHDdYRi6eu
- +cX9Nt1C9L5SziVePa8mnI5PDuBnIE4=
-X-Google-Smtp-Source: ABdhPJyhL9pSuntp8VeiIjIT6N9OP48blUH4lL3NMOGJ+4E4luyAkGU/9nzb7bgsn2yWXLxxbe616w==
-X-Received: by 2002:adf:f54b:: with SMTP id j11mr41454017wrp.206.1593874189885; 
- Sat, 04 Jul 2020 07:49:49 -0700 (PDT)
+ bh=Oswm/m1DAWqBYNXr2uTrm9A1MHSMTs1YgVZvoQJC8bI=;
+ b=Gv8fiPiykCWNZIbv3RETfbZ3UModcW8+HsOh/FMYRvR5/TPaqEDIQ2orBy5V/BqeIY
+ V64I2yjDS0FrdGMfwQW5cTKMw+3KYBv1KN/5iD2R33BR2QT4j9bjCX04o+3AoXsBBRQF
+ SYbQRmvc5uM8aqv+fxmojeTMbpcvf9JOKiW24y9kc4WvP6VLUTLqMVS5iRthAN5ebRM/
+ Dr5tQvc/VYIAU1+O6Ngkc8IjWZdyjBXvGTFuUGvXgp1HHKTIMivny2S7YL3j2LdJNsH/
+ aWfnsTNtDNhOqwj4ts205637u6U9Qkc4YKyCWWHgnLH/u2Q7JeiysCis+IgIs2Ej9Sj2
+ 45Pw==
+X-Gm-Message-State: AOAM531K0xUGZeDAEWjGOXUefsnDWCIPjjodPlIPmGKXlhnYqmLJCtzB
+ F+0yz52yBSxBXudKb15/tTkUjsIbXH4=
+X-Google-Smtp-Source: ABdhPJwNyiTXMTeB3cC7VryyLyGzYsyh9YLCpLFWWlt+IfdrZqIJno2o/CWRvBISeVrXF/zuyPa+Cw==
+X-Received: by 2002:adf:9561:: with SMTP id 88mr11042389wrs.240.1593874195987; 
+ Sat, 04 Jul 2020 07:49:55 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r10sm17135019wrm.17.2020.07.04.07.49.48
+ by smtp.gmail.com with ESMTPSA id r10sm17135019wrm.17.2020.07.04.07.49.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 07:49:49 -0700 (PDT)
+ Sat, 04 Jul 2020 07:49:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH 01/26] hw/arm/sbsa-ref: Remove unused 'hw/usb.h' header
-Date: Sat,  4 Jul 2020 16:49:18 +0200
-Message-Id: <20200704144943.18292-2-f4bug@amsat.org>
+Subject: [PATCH 04/26] hw/usb: Reduce 'exec/memory.h' inclusion
+Date: Sat,  4 Jul 2020 16:49:21 +0200
+Message-Id: <20200704144943.18292-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200704144943.18292-1-f4bug@amsat.org>
 References: <20200704144943.18292-1-f4bug@amsat.org>
@@ -133,26 +133,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This file doesn't access anything from "hw/usb.h", remove its
-inclusion.
+"exec/memory.h" is only required by "hw/usb/hcd-musb.h".
+Include it there directly.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/sbsa-ref.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/hw/usb.h          | 1 -
+ include/hw/usb/hcd-musb.h | 2 ++
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index e40c868a82..021e7c1b8b 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -38,7 +38,6 @@
- #include "hw/loader.h"
- #include "hw/pci-host/gpex.h"
- #include "hw/qdev-properties.h"
--#include "hw/usb.h"
- #include "hw/char/pl011.h"
- #include "net/net.h"
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index 4f04a1a879..15b2ef300a 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -25,7 +25,6 @@
+  * THE SOFTWARE.
+  */
  
+-#include "exec/memory.h"
+ #include "hw/qdev-core.h"
+ #include "qemu/iov.h"
+ #include "qemu/queue.h"
+diff --git a/include/hw/usb/hcd-musb.h b/include/hw/usb/hcd-musb.h
+index c874b9f292..ec3ee5c4b0 100644
+--- a/include/hw/usb/hcd-musb.h
++++ b/include/hw/usb/hcd-musb.h
+@@ -13,6 +13,8 @@
+ #ifndef HW_USB_MUSB_H
+ #define HW_USB_MUSB_H
+ 
++#include "exec/memory.h"
++
+ enum musb_irq_source_e {
+     musb_irq_suspend = 0,
+     musb_irq_resume,
 -- 
 2.21.3
 
