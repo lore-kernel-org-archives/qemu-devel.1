@@ -2,81 +2,83 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,TVD_SUBJ_WIPE_DEBT,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C23C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B722DC433E0
 	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:39:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C220A20747
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:39:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8602F20747
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:39:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZR6PEBea"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C220A20747
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edc4sSsu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8602F20747
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrn4E-0002po-2h
+	id 1jrn4E-0002t6-QO
 	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:39:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39598)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvB-0002jz-J8
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:29:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27351
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvt-00048t-5F
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58296
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmv9-0001Kq-3g
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:29:53 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvr-0001Tq-H3
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593887389;
+ s=mimecast20190719; t=1593887434;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=+xCzX5pjcy148tNCg3zvK7ruz7b/+qmBTdtfJlorfws=;
- b=ZR6PEBeaX3eYlW2P3pB2PvvNykjbilmMPabM/8whGM6hNKAfvmxI1POGPB1+fiueLWm/4+
- M9ASU2qiDKV8UApAWhC2TBp6T7IwNth0l41rP5+1BR/lKp46zp6diWhNCiq0LZN9lZTgCx
- uDcUwecOfqS60af44GA+YcLWB+V+cVw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-3bPySYUwMKaRmG9kgSfoKw-1; Sat, 04 Jul 2020 14:29:45 -0400
-X-MC-Unique: 3bPySYUwMKaRmG9kgSfoKw-1
-Received: by mail-wm1-f69.google.com with SMTP id t18so40173030wmj.5
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:29:45 -0700 (PDT)
+ bh=60yJhhl8dxn2TqcFbclvoZcJECXRC60a4szFbHzWcWo=;
+ b=edc4sSsuhKUbusEx/YfHS5XjBWRkH+BvkmH/PLYBGbXj6S2Pxa5IZPU9A27IoYbRivBZHB
+ L6tmYD2ulLVHXaPnvxBDY+N1+An5E/m45+cQnx4OIKyGXvWw61w9as/jOnhZWXMpefLYT4
+ Ticny7pTbXZkFPmYpFKWVFq+ty4xhNw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-LgZZ6kRHNMSyBNcwB5vkKA-1; Sat, 04 Jul 2020 14:30:33 -0400
+X-MC-Unique: LgZZ6kRHNMSyBNcwB5vkKA-1
+Received: by mail-wm1-f72.google.com with SMTP id h6so40143249wmb.7
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:30:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=+xCzX5pjcy148tNCg3zvK7ruz7b/+qmBTdtfJlorfws=;
- b=Iy4F+tnw8oCFvaEJm41CFMnpuC8dQdj4Jh5BcFxpCvVWEmcqbwp73qFwr2VBfKZ5S2
- BDP6Cr4EGeTUw6YVphRmvUdvT9h6B7hPhKEtG/K1msxpb9jwxG5uUDY2eq9fY/M0gSC5
- shHV+D3PK4XUsMSm2bm+q4GXcBh/7nwLIZPuxFP+Qvx3YJm1RPEDi7Z2rwyDeD+WUdUq
- pRvFT521vgWNlOSlMrZojfBuZPLKGNbwj37vfObMQC7I+S65Hi7wD9PPMoX0h/QY9okY
- AFPorbnqUjF6vuJw/4l/PuV0qy4c/qjGTUmMUVYieo1SDoBlin44NZXEPSU5T8HdWQyJ
- NOuw==
-X-Gm-Message-State: AOAM530462Jvp/ypJho0g/+FqjzAD9FlgFWvxJnCGl2aNUDlVAh8oxGN
- UG56eBgWZK9GhJlH6o5+c37owHrY0twjDcKyQ3ZHZBY5P8wfmtrgMov+pdbJDPknmJyCmwkXIRM
- Yq3uLEWQ0xPwSI7A=
-X-Received: by 2002:a7b:c5c4:: with SMTP id n4mr41024451wmk.67.1593887383900; 
- Sat, 04 Jul 2020 11:29:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzyZyhovHtwPT8kE0hmJqiRfbF25fSUFZBtXZC1AiAdPjMmXjWkRVXCdBx0KDBob2c9vz1Gng==
-X-Received: by 2002:a7b:c5c4:: with SMTP id n4mr41024439wmk.67.1593887383699; 
- Sat, 04 Jul 2020 11:29:43 -0700 (PDT)
+ bh=60yJhhl8dxn2TqcFbclvoZcJECXRC60a4szFbHzWcWo=;
+ b=lYhdSnRkyuXxnnydAomKmqPt030y06mDIjPNehSPPnMAlnNnZlFCvWO2cbNI19B7zV
+ hUUyPY88ctKDvDCXXGvF/HljHhw30dwM2QFxSYp8bFLKfyM3OPpmPnofkMNPbdx+Jnb+
+ TdeDdpJVz1btPhfetJ/bd8OBuGr5yoeP8L2y6xdTVnn/kvY2EHV2NVmspO0fg48JnwUM
+ PWa/HCurtu6/g5AmoRhU+kxtE/Bgm9x5BVS5yDTVTEhdsBg4HgJMJgcmzBODPnCn2/nX
+ 6fIhAwDw2fHKPcA7u8YX7+jxjDPVoC/Akt87Ld9cK8s92O3MZgIHPjfcB/uI3nLAsGTg
+ 4EKA==
+X-Gm-Message-State: AOAM533zTKT9TqUU2vEUrDFe+0LM0Z5PZXPc3iF8wr2n4SRa4nj/BEdb
+ wfAQv6XuIhBat7UfadPPVASjoAMas7D/z/xTwjh/2gAdMCHDmxfdNOslgyHiLzBgL9pFmvXRXyt
+ H/lVqe1LuQGrvbIY=
+X-Received: by 2002:a1c:dfc5:: with SMTP id
+ w188mr12494695wmg.182.1593887431647; 
+ Sat, 04 Jul 2020 11:30:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx149yEMsm8MhTNYtnrIEgwNmK+jlhZLTOPwFecN/e87VSgUfRGE0ayITB8TAoeEQqsYdSofg==
+X-Received: by 2002:a1c:dfc5:: with SMTP id
+ w188mr12494685wmg.182.1593887431500; 
+ Sat, 04 Jul 2020 11:30:31 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- s203sm8617891wms.32.2020.07.04.11.29.42
+ g144sm48583037wme.2.2020.07.04.11.30.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 11:29:43 -0700 (PDT)
-Date: Sat, 4 Jul 2020 14:29:41 -0400
+ Sat, 04 Jul 2020 11:30:31 -0700 (PDT)
+Date: Sat, 4 Jul 2020 14:30:29 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 07/41] accel/kvm: Convert to ram_block_discard_disable()
-Message-ID: <20200704182750.1088103-8-mst@redhat.com>
+Subject: [PULL v2 25/41] tests/acpi: remove stale allowed tables
+Message-ID: <20200704182750.1088103-26-mst@redhat.com>
 References: <20200704182750.1088103-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200704182750.1088103-1-mst@redhat.com>
@@ -88,17 +90,18 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 08:57:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ TVD_SUBJ_WIPE_DEBT=1.004 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,51 +114,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
 
-Discarding memory does not work as expected. At the time this is called,
-we cannot have anyone active that relies on discards to work properly.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200626072248.78761-5-david@redhat.com>
+Fixes: 93dd625f8bf7 ("tests/acpi: update expected data files")
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Message-Id: <20200629140938.17566-2-drjones@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- accel/kvm/kvm-all.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 18 ------------------
+ 1 file changed, 18 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index d54a8701d8..ab36fbfa0c 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -40,7 +40,6 @@
- #include "trace.h"
- #include "hw/irq.h"
- #include "sysemu/sev.h"
--#include "sysemu/balloon.h"
- #include "qapi/visitor.h"
- #include "qapi/qapi-types-common.h"
- #include "qapi/qapi-visit-common.h"
-@@ -2229,7 +2228,8 @@ static int kvm_init(MachineState *ms)
- 
-     s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
-     if (!s->sync_mmu) {
--        qemu_balloon_inhibit(true);
-+        ret = ram_block_discard_disable(true);
-+        assert(!ret);
-     }
- 
-     return 0;
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index 8992f1f12b..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,19 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/pc/DSDT",
+-"tests/data/acpi/pc/DSDT.acpihmat",
+-"tests/data/acpi/pc/DSDT.bridge",
+-"tests/data/acpi/pc/DSDT.cphp",
+-"tests/data/acpi/pc/DSDT.dimmpxm",
+-"tests/data/acpi/pc/DSDT.ipmikcs",
+-"tests/data/acpi/pc/DSDT.memhp",
+-"tests/data/acpi/pc/DSDT.numamem",
+-"tests/data/acpi/q35/DSDT",
+-"tests/data/acpi/q35/DSDT.acpihmat",
+-"tests/data/acpi/q35/DSDT.bridge",
+-"tests/data/acpi/q35/DSDT.cphp",
+-"tests/data/acpi/q35/DSDT.dimmpxm",
+-"tests/data/acpi/q35/DSDT.ipmibt",
+-"tests/data/acpi/q35/DSDT.memhp",
+-"tests/data/acpi/q35/DSDT.mmio64",
+-"tests/data/acpi/q35/DSDT.numamem",
+-"tests/data/acpi/q35/DSDT.tis",
 -- 
 MST
 
