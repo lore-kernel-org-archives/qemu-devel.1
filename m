@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52684C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CB6C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1781820747
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 910E320747
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:41:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1YulLyX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1781820747
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkzdohkF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 910E320747
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrn6q-0006oG-By
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:41:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39944)
+	id 1jrn6s-0006rT-QS
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:41:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvz-0004Ln-1H
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51546
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvH-0002qe-LS
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:29:59 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54413
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvw-0001XX-FT
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:42 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvE-0001Li-2g
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:29:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593887439;
+ s=mimecast20190719; t=1593887395;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=b+cCdkPsrD4TM/VrIcZdX3Ig4P6coUYr9PkA+fapcI0=;
- b=e1YulLyXiCpI2QJ9eiDHP3JpdkO+9llBtnwK4W0yHpC6fl75YShZj30NXWfQNVu9pMoKbT
- HJtD0QoWZ3Q96i9LyF1czXcli52mfZ2ywLkiQMfbusmELqmft9Ax2gbSHisbMwqXHYGGzs
- o6QbfVtfdeOsM/iap6LgX9mekhusREM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-AFZcn_qtODmrmunOpxQmPQ-1; Sat, 04 Jul 2020 14:30:38 -0400
-X-MC-Unique: AFZcn_qtODmrmunOpxQmPQ-1
-Received: by mail-wm1-f70.google.com with SMTP id q20so30339225wme.3
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:30:37 -0700 (PDT)
+ bh=zm5yAzYb8Njf/7lXhPa4kHkewLVdbaNS9bfJJo2eVkw=;
+ b=PkzdohkFNB7e6FDivAsHkrQtKhWn5vgVTFFaI49cGauy/LibYxZaKmkaQko/hUk3gGNgFB
+ 6/5N7B2VCWim2fzkYhHuE9rssN/Kd4POeburrJ/z+d7N9WXc3Aot9HoSWYKHYLpeZPa+zS
+ 9VTJbYTD25UjdiLWyqLVkxx7zzAc1oA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-6PnnhoqqN--y9A0MwQKy8A-1; Sat, 04 Jul 2020 14:29:51 -0400
+X-MC-Unique: 6PnnhoqqN--y9A0MwQKy8A-1
+Received: by mail-wr1-f70.google.com with SMTP id o25so36283134wro.16
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:29:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=b+cCdkPsrD4TM/VrIcZdX3Ig4P6coUYr9PkA+fapcI0=;
- b=RXXqrn9kuiNPohMw3uD/XlwZ6ybWLSUTe2I1v0OboHY+CHsxLj4P3M4sDpXkHL3Xg+
- pDFkjHfjyo725QmtzhJReeVUUXGQN934Fgrvcakxx5W8ffizJnITZaiZGE4oD+wz4Ckd
- sQjAypYM7EaY6GH09EFpecD4btFVd8EnKE7IfRhZHQRZ4GJjctOzgp98fSIkrbeV+oQl
- FQpICKe4duBygvlKMRpcoJzn2Ai4yg7cv8G2ISGuGwyDRsNeqJwwfb2oB3V/LBjDDzKt
- +YeEpRFz50/Fm583RUFcTZ0eVVWa3F8i+xEtg/80rIgVi6icqnLjEU/8u52Lw9zDyRrz
- jMNA==
-X-Gm-Message-State: AOAM532tivUtbk5cobPG+KsSXXcOriQ3fEc27b6Qhpa4iVg4hBiNRngB
- IuvZxhdk6nvhfuGhypFY6XZ/ssFu3PYlez8NZQ7c34QWeLRQBBwEaWt3DEv61PXN6Qve29QONZ/
- bdB8mIc1u4JmoREg=
-X-Received: by 2002:a5d:6412:: with SMTP id z18mr40873158wru.310.1593887436656; 
- Sat, 04 Jul 2020 11:30:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJySJsC7pHE2exasR13nd1GGexOVm/Dg/X6BKJ49WB11jxf2N6CmEnfOyBDnB1jiIhqj3HGKbg==
-X-Received: by 2002:a5d:6412:: with SMTP id z18mr40873143wru.310.1593887436533; 
- Sat, 04 Jul 2020 11:30:36 -0700 (PDT)
+ bh=zm5yAzYb8Njf/7lXhPa4kHkewLVdbaNS9bfJJo2eVkw=;
+ b=dvklGdJEtLq8anZHGStF2PMCSGmkupYZty3U0mRxGnvMjtx05YbrTSmGxACcmlxSOh
+ DZOFYH6nWngfenNGvF/Pq88he9KdOGump0C2eVl7tOQjAZhx7jTnx2f+AlAgSMVDfh4i
+ tKyDdIaMH11CjLKsqng0b1TqIR48CeWdxztxXt8nMzMq00KmC6e+pLN4UC4uMR7Sks3l
+ YI6Ew0DkB3DDsdJNakEle4lmP7GWoHhS+Z42EL0kLmfcRYU2n4WRs7MXfC2UOCkqL1bG
+ D8cdkJXyDFm8RSmXn2b/ymcRswEw18BmvZAUbB2Jweyxmu52M4TLyLl8RmiV0dgfwSvo
+ k81g==
+X-Gm-Message-State: AOAM5305DbiVF2l4Qt9FjjPpdHEqSnpASlhA1Q5Es07XiRUAwZIO1hi7
+ +03QUiUV7rnhvxePmoqUWT7q2KMzFpvIhVx59vb3IV3CD3mysdmbdPZ462TEsChsDsnzk2zZ3LA
+ AnJcjy8nzmQzXPT8=
+X-Received: by 2002:adf:c542:: with SMTP id s2mr14595704wrf.132.1593887389564; 
+ Sat, 04 Jul 2020 11:29:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPUkCORtKWBkbPb/6lzKY9n4UPADzPmD5jdzm4j4bGl4Uqu9HPX/MWRmFRj8tbWrSy7WBCIg==
+X-Received: by 2002:adf:c542:: with SMTP id s2mr14595689wrf.132.1593887389195; 
+ Sat, 04 Jul 2020 11:29:49 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- h13sm17293163wml.42.2020.07.04.11.30.35
+ k126sm17561156wmf.3.2020.07.04.11.29.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 11:30:36 -0700 (PDT)
-Date: Sat, 4 Jul 2020 14:30:34 -0400
+ Sat, 04 Jul 2020 11:29:48 -0700 (PDT)
+Date: Sat, 4 Jul 2020 14:29:47 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 27/41] MAINTAINERS: add VT-d entry
-Message-ID: <20200704182750.1088103-28-mst@redhat.com>
+Subject: [PULL v2 09/41] virtio-balloon: Rip out qemu_balloon_inhibit()
+Message-ID: <20200704182750.1088103-10-mst@redhat.com>
 References: <20200704182750.1088103-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200704182750.1088103-1-mst@redhat.com>
@@ -88,9 +88,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 08:57:02
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -112,52 +112,202 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Peter Xu <peterx@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Juan Quintela <quintela@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-Add this entry as suggested by Jason and Michael.
+The only remaining special case is postcopy. It cannot handle
+concurrent discards yet, which would result in requesting already sent
+pages from the source. Special-case it in virtio-balloon instead.
 
-CC: Jason Wang <jasowang@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20200701124418.63060-1-peterx@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
+Introduce migration_in_incoming_postcopy(), to find out if incoming
+postcopy is active.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200626072248.78761-7-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ include/migration/misc.h   |  2 ++
+ include/sysemu/balloon.h   |  2 --
+ balloon.c                  | 18 ------------------
+ hw/virtio/virtio-balloon.c | 10 ++++++++--
+ migration/migration.c      |  7 +++++++
+ migration/postcopy-ram.c   | 23 -----------------------
+ 6 files changed, 17 insertions(+), 45 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5f02160436..49a0d837d7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2624,6 +2624,15 @@ F: tests/uefi-test-tools/
- F: .gitlab-ci.d/edk2.yml
- F: .gitlab-ci.d/edk2/
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index d2762257aa..34e7d75713 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -69,6 +69,8 @@ bool migration_has_failed(MigrationState *);
+ /* ...and after the device transmission */
+ bool migration_in_postcopy_after_devices(MigrationState *);
+ void migration_global_dump(Monitor *mon);
++/* True if incomming migration entered POSTCOPY_INCOMING_DISCARD */
++bool migration_in_incoming_postcopy(void);
  
-+VT-d Emulation
-+M: Michael S. Tsirkin <mst@redhat.com>
-+M: Peter Xu <peterx@redhat.com>
-+R: Jason Wang <jasowang@redhat.com>
-+S: Supported
-+F: hw/i386/intel_iommu.c
-+F: hw/i386/intel_iommu_internal.h
-+F: include/hw/i386/intel_iommu.h
+ /* migration/block-dirty-bitmap.c */
+ void dirty_bitmap_mig_init(void);
+diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
+index aea0c44985..20a2defe3a 100644
+--- a/include/sysemu/balloon.h
++++ b/include/sysemu/balloon.h
+@@ -23,7 +23,5 @@ typedef void (QEMUBalloonStatus)(void *opaque, BalloonInfo *info);
+ int qemu_add_balloon_handler(QEMUBalloonEvent *event_func,
+                              QEMUBalloonStatus *stat_func, void *opaque);
+ void qemu_remove_balloon_handler(void *opaque);
+-bool qemu_balloon_is_inhibited(void);
+-void qemu_balloon_inhibit(bool state);
+ 
+ #endif
+diff --git a/balloon.c b/balloon.c
+index 5fff79523a..354408c6ea 100644
+--- a/balloon.c
++++ b/balloon.c
+@@ -36,24 +36,6 @@
+ static QEMUBalloonEvent *balloon_event_fn;
+ static QEMUBalloonStatus *balloon_stat_fn;
+ static void *balloon_opaque;
+-static int balloon_inhibit_count;
+-
+-bool qemu_balloon_is_inhibited(void)
+-{
+-    return atomic_read(&balloon_inhibit_count) > 0 ||
+-           ram_block_discard_is_disabled();
+-}
+-
+-void qemu_balloon_inhibit(bool state)
+-{
+-    if (state) {
+-        atomic_inc(&balloon_inhibit_count);
+-    } else {
+-        atomic_dec(&balloon_inhibit_count);
+-    }
+-
+-    assert(atomic_read(&balloon_inhibit_count) >= 0);
+-}
+ 
+ static bool have_balloon(Error **errp)
+ {
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 8a84718490..ae31f0817a 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -63,6 +63,12 @@ static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
+     return pbp->base_gpa == base_gpa;
+ }
+ 
++static bool virtio_balloon_inhibited(void)
++{
++    /* Postcopy cannot deal with concurrent discards, so it's special. */
++    return ram_block_discard_is_disabled() || migration_in_incoming_postcopy();
++}
 +
- Usermode Emulation
- ------------------
- Overall usermode emulation
+ static void balloon_inflate_page(VirtIOBalloon *balloon,
+                                  MemoryRegion *mr, hwaddr mr_offset,
+                                  PartiallyBalloonedPage *pbp)
+@@ -336,7 +342,7 @@ static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
+          * accessible by another device or process, or if the guest is
+          * expecting it to retain a non-zero value.
+          */
+-        if (qemu_balloon_is_inhibited() || dev->poison_val) {
++        if (virtio_balloon_inhibited() || dev->poison_val) {
+             goto skip_element;
+         }
+ 
+@@ -421,7 +427,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+ 
+             trace_virtio_balloon_handle_output(memory_region_name(section.mr),
+                                                pa);
+-            if (!qemu_balloon_is_inhibited()) {
++            if (!virtio_balloon_inhibited()) {
+                 if (vq == s->ivq) {
+                     balloon_inflate_page(s, section.mr,
+                                          section.offset_within_region, &pbp);
+diff --git a/migration/migration.c b/migration/migration.c
+index 481a590f72..d365d82209 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1772,6 +1772,13 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
+     return migration_in_postcopy() && s->postcopy_after_devices;
+ }
+ 
++bool migration_in_incoming_postcopy(void)
++{
++    PostcopyState ps = postcopy_state_get();
++
++    return ps >= POSTCOPY_INCOMING_DISCARD && ps < POSTCOPY_INCOMING_END;
++}
++
+ bool migration_is_idle(void)
+ {
+     MigrationState *s = current_migration;
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a36402722b..b41a9fe2fd 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -27,7 +27,6 @@
+ #include "qemu/notify.h"
+ #include "qemu/rcu.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/balloon.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ #include "hw/boards.h"
+@@ -520,20 +519,6 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+     return 0;
+ }
+ 
+-/*
+- * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
+- * last caller wins.
+- */
+-static void postcopy_balloon_inhibit(bool state)
+-{
+-    static bool cur_state = false;
+-
+-    if (state != cur_state) {
+-        qemu_balloon_inhibit(state);
+-        cur_state = state;
+-    }
+-}
+-
+ /*
+  * At the end of a migration where postcopy_ram_incoming_init was called.
+  */
+@@ -565,8 +550,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+         mis->have_fault_thread = false;
+     }
+ 
+-    postcopy_balloon_inhibit(false);
+-
+     if (enable_mlock) {
+         if (os_mlock() < 0) {
+             error_report("mlock: %s", strerror(errno));
+@@ -1160,12 +1143,6 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
+     }
+     memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
+ 
+-    /*
+-     * Ballooning can mark pages as absent while we're postcopying
+-     * that would cause false userfaults.
+-     */
+-    postcopy_balloon_inhibit(true);
+-
+     trace_postcopy_ram_enable_notify();
+ 
+     return 0;
 -- 
 MST
 
