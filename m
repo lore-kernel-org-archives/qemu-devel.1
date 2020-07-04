@@ -2,63 +2,86 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB522C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D3B7C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:27:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 981A22073E
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:23:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 981A22073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 47C3C20772
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:27:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pjF0PMXk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C3C20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrkwb-0003QB-Tb
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:23:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49440)
+	id 1jrl0I-0006UN-FW
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:27:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jrkvt-0002jH-Hu; Sat, 04 Jul 2020 12:22:29 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:50256)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jrkvq-0000qv-IK; Sat, 04 Jul 2020 12:22:28 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id DA98374594E;
- Sat,  4 Jul 2020 18:22:22 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 72A64745702; Sat,  4 Jul 2020 18:22:22 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 7030A7456F8;
- Sat,  4 Jul 2020 18:22:22 +0200 (CEST)
-Date: Sat, 4 Jul 2020 18:22:22 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [RFC PATCH v2 02/23] hw/core/qdev: Add
- qdev_warn_deprecated_function_used() helper
-In-Reply-To: <20200704153908.12118-3-philmd@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2007041810050.92265@zero.eik.bme.hu>
-References: <20200704153908.12118-1-philmd@redhat.com>
- <20200704153908.12118-3-philmd@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jrkys-0004Y2-V6; Sat, 04 Jul 2020 12:25:34 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:35354)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jrkyr-0002DO-62; Sat, 04 Jul 2020 12:25:34 -0400
+Received: by mail-io1-xd43.google.com with SMTP id v8so35175238iox.2;
+ Sat, 04 Jul 2020 09:25:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=siYZvVhE9VeBBvLQIX/nnAed+rLIHn4bVXcuyvDsWaw=;
+ b=pjF0PMXkE9pbfyA44NA0kCnTofn8BML3M2OwLhH+Sqsxxe1sGclQdp8aRABF6oUm7p
+ jl3jluIF8Iod+vAQYD9a9T9hizpvwz6WnAjoWUqHG6YxzqwkxwFtal6rAmecurpCeu63
+ HodGkRhRHtWuT2Pe9TYLrfl5xbRYOk9LLYdPHTMPdK0DhgKFqlWb+OJKfZYFsG/Mgude
+ iMrzKgB1Y747nHlXa24vTJmzsISKSK+ZiOvur0XiEJN8zeFh9UgKrjT9VXbPu7hZm6iB
+ 4IkItqkdEv9WRqjf/co0WnxmfLXBQ+uTU17T3TFxcuXcGW+OlroDBON4fZDJU7C+YvxT
+ s7rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=siYZvVhE9VeBBvLQIX/nnAed+rLIHn4bVXcuyvDsWaw=;
+ b=Ur1TxrUvsEojZNOW1oH3y523YTzrUAodO1m2GD8Yk2/NVggs7/CEtFMzqMnCsEzl28
+ xXtbf0OddWquERw7B03dj0cfY9+CQQ1+hxtJi9neg2RYijQAeuiezQr48KkJYxBpg1Jt
+ PsWdlrcjZ8k3GQkftK5IEvxdx0sYVFkL+sCQolLWYj4Mj/gAaxFeou9JFnogszvD8HCY
+ eoxXqdBQAKFbj2oluxLngQ/WjULyfJK7YqEsWRLoXPVp2ASBCNta3VZ7stNsddQ/jXAg
+ snnkzgh9aIsDdh9nZ3nqo9MXO8gc9cQNDw5zA+9gke+IQnSEx5G2rE+PLXoD1QiNb44U
+ 4rsA==
+X-Gm-Message-State: AOAM531gkq379GngljReOhM3QtxZXrqfCCiyfjwmBGVOuRYlt8HqUxO1
+ JxnI5ppPm0Xp0hRcMk2+4nIvXuiJmTHMzQqnA90=
+X-Google-Smtp-Source: ABdhPJwZwrn7vzEIJbGYJoQZG3XTTSfTQJEX4yl2ivSAb5nZSnnjPxLr+c9nvkov/DkXTccC1tmUb5GLEFGW3coDSTU=
+X-Received: by 2002:a6b:8e56:: with SMTP id q83mr17709001iod.61.1593879930979; 
+ Sat, 04 Jul 2020 09:25:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1579046126-1593879742=:92265"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:22:23
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200704144943.18292-1-f4bug@amsat.org>
+ <20200704144943.18292-27-f4bug@amsat.org>
+In-Reply-To: <20200704144943.18292-27-f4bug@amsat.org>
+From: Paul Zimmerman <pauldzim@gmail.com>
+Date: Sat, 4 Jul 2020 09:25:20 -0700
+Message-ID: <CADBGO7832C0Rw+RbZBRuDAGGtwhk9RV+bHVBHe+EXxLupbqfig@mail.gmail.com>
+Subject: Re: [PATCH 26/26] MAINTAINERS: Cover dwc-hsotg (dwc2) USB host
+ controller emulation
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: multipart/alternative; boundary="00000000000019cac205a9a017dd"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=pauldzim@gmail.com; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,174 +95,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Yoshinori Sato <ysato@users.sourceforge.jp>,
- Magnus Damm <magnus.damm@gmail.com>,
- =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ xen-devel@lists.xenproject.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Richard Henderson <rth@twiddle.net>, Paul Durrant <paul@xen.org>,
+ Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Leif Lindholm <leif@nuviainc.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
  Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- qemu-riscv@nongnu.org, Stafford Horne <shorne@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
  David Gibson <david@gibson.dropbear.id.au>,
- =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+--00000000000019cac205a9a017dd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---3866299591-1579046126-1593879742=:92265
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+On Sat, Jul 4, 2020 at 7:50 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+>
+wrote:
 
-On Sat, 4 Jul 2020, Philippe Mathieu-Daudé wrote:
-> When built with --enable-qdev-deprecation-warning, calling
-> qdev_warn_deprecated_function_used() will emit a warning such:
+> Add an section for the dwc2 host controller emulation
+> introduced in commit 153ef1662c.
 >
->  $ qemu-system-arm -M verdex ...
->  qemu-system-arm: warning: use of deprecated non-qdev/non-qom code in pxa2xx_lcdc_init()
->  qemu-system-arm: warning: use of deprecated non-qdev/non-qom code in pxa2xx_i2s_init()
->  qemu-system-arm: warning: use of deprecated non-qdev/non-qom code in pxa27x_keypad_init()
->
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Cc: Paul Zimmerman <pauldzim@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
-> I'd rather use --enable-qdev-debug suggested here:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg719802.html
-> ---
-> configure                    |  8 ++++++++
-> include/hw/qdev-deprecated.h | 26 ++++++++++++++++++++++++++
-> hw/core/qdev.c               |  8 ++++++++
-> 3 files changed, 42 insertions(+)
-> create mode 100644 include/hw/qdev-deprecated.h
+>  MAINTAINERS | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
-> diff --git a/configure b/configure
-> index 8a65240d4a..aac3dc0767 100755
-> --- a/configure
-> +++ b/configure
-> @@ -441,6 +441,7 @@ edk2_blobs="no"
-> pkgversion=""
-> pie=""
-> qom_cast_debug="yes"
-> +qdev_deprecation_warning="no"
-> trace_backends="log"
-> trace_file="trace"
-> spice=""
-> @@ -1124,6 +1125,8 @@ for opt do
->   ;;
->   --enable-qom-cast-debug) qom_cast_debug="yes"
->   ;;
-> +  --enable-qdev-deprecation-warning) qdev_deprecation_warning="yes"
-> +  ;;
->   --disable-virtfs) virtfs="no"
->   ;;
->   --enable-virtfs) virtfs="yes"
-> @@ -1915,6 +1918,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->   virglrenderer   virgl rendering support
->   xfsctl          xfsctl support
->   qom-cast-debug  cast debugging support
-> +  qdev-deprecation-warning display qdev deprecation warnings
->   tools           build qemu-io, qemu-nbd and qemu-img tools
->   vxhs            Veritas HyperScale vDisk backend support
->   bochs           bochs image format support
-> @@ -6966,6 +6970,7 @@ echo "gcov enabled      $gcov"
-> echo "TPM support       $tpm"
-> echo "libssh support    $libssh"
-> echo "QOM debugging     $qom_cast_debug"
-> +echo "QDEV deprecation warnings $qdev_deprecation_warning"
-> echo "Live block migration $live_block_migration"
-> echo "lzo support       $lzo"
-> echo "snappy support    $snappy"
-> @@ -7594,6 +7599,9 @@ fi
-> if test "$qom_cast_debug" = "yes" ; then
->   echo "CONFIG_QOM_CAST_DEBUG=y" >> $config_host_mak
-> fi
-> +if test "$qdev_deprecation_warning" = "yes" ; then
-> +  echo "CONFIG_QDEV_DEPRECATION_WARNING=y" >> $config_host_mak
-> +fi
-> if test "$rbd" = "yes" ; then
->   echo "CONFIG_RBD=m" >> $config_host_mak
->   echo "RBD_CFLAGS=$rbd_cflags" >> $config_host_mak
-> diff --git a/include/hw/qdev-deprecated.h b/include/hw/qdev-deprecated.h
-> new file mode 100644
-> index 0000000000..b815f62dae
-> --- /dev/null
-> +++ b/include/hw/qdev-deprecated.h
-> @@ -0,0 +1,26 @@
-> +/*
-> + * QEMU QOM qdev deprecation helpers
-> + *
-> + * Copyright (c) 2020 Red Hat, Inc.
-> + *
-> + * Author:
-> + *   Philippe Mathieu-Daudé <philmd@redhat.com>
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef HW_QDEV_DEPRECATED_H
-> +#define HW_QDEV_DEPRECATED_H
-> +
-> +/**
-> + * qdev_warn_deprecated_function_used:
-> + *
-> + * Display a warning that deprecated code is used.
-> + */
-> +#define qdev_warn_deprecated_function_used() \
-> +    qdev_warn_deprecated_function(__func__)
-> +void qdev_warn_deprecated_function(const char *function);
-> +
-> +#endif
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 2131c7f951..1134f46631 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -35,6 +35,7 @@
-> #include "hw/hotplug.h"
-> #include "hw/irq.h"
-> #include "hw/qdev-properties.h"
-> +#include "hw/qdev-deprecated.h"
-> #include "hw/boards.h"
-> #include "hw/sysbus.h"
-> #include "hw/qdev-clock.h"
-> @@ -838,6 +839,13 @@ void qdev_alias_all_properties(DeviceState *target, Object *source)
->     } while (class != object_class_by_name(TYPE_DEVICE));
-> }
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 2566566d72..e3f895bc6e 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1651,6 +1651,12 @@ M: Samuel Thibault <samuel.thibault@ens-lyon.org>
+>  S: Maintained
+>  F: hw/usb/dev-serial.c
 >
-> +void qdev_warn_deprecated_function(const char *function)
-> +{
-> +#ifdef CONFIG_QDEV_DEPRECATION_WARNING
-> +    warn_report("use of deprecated non-qdev/non-qom code in %s()", function);
-> +#endif
-> +}
+> +USB dwc-hsotg (dwc2)
+> +M: Gerd Hoffmann <kraxel@redhat.com>
+> +R: Paul Zimmerman <pauldzim@gmail.com>
+> +S: Maintained
+> +F: hw/usb/*dwc2*
 > +
-> static bool device_get_realized(Object *obj, Error **errp)
-> {
->     DeviceState *dev = DEVICE(obj);
+>  VFIO
+>  M: Alex Williamson <alex.williamson@redhat.com>
+>  S: Supported
+
+
+Acked-by: Paul Zimmerman <pauldzim@gmail.com>
+
+
+> --
+> 2.21.3
+>
 >
 
-I haven't noticed this series before so sorry that I only comment now. I 
-was first thinking maybe you could use qdev_log_mask with some LOG_* value 
-instead of #ifdef and warn_report so it can be enabled during runtime with 
-some -d option but then I saw that this does not magically detect the 
-sites that should be warned about but has to be added manually everywhere. 
-In that case, it's probably easier to just add a FIXME comment to the 
-places you'd call this function because that's where developers who could 
-convert these will see it and probably more effective than having them to 
-enable an option that they may not even know about and then search for 
-where the warnings are coming from. So likely they'll just see the call in 
-source for which a comment is also suffucient and then you can drop this 
-patch but keep the rest and not throw away the work of identifying all the 
-places that need to be modernised that you've done.
+--00000000000019cac205a9a017dd
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-BALATON Zoltan
---3866299591-1579046126-1593879742=:92265--
+<div><br></div><div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">On Sat, Jul 4, 2020 at 7:50 AM Philippe Mathieu-Daud=C3=A9 =
+&lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; wrote:<br></=
+div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-lef=
+t:1px #ccc solid;padding-left:1ex">Add an section for the dwc2 host control=
+ler emulation<br>
+introduced in commit 153ef1662c.<br>
+<br>
+Cc: Paul Zimmerman &lt;<a href=3D"mailto:pauldzim@gmail.com" target=3D"_bla=
+nk">pauldzim@gmail.com</a>&gt;<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
+t.org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br>
+---<br>
+=C2=A0MAINTAINERS | 6 ++++++<br>
+=C2=A01 file changed, 6 insertions(+)<br>
+<br>
+diff --git a/MAINTAINERS b/MAINTAINERS<br>
+index 2566566d72..e3f895bc6e 100644<br>
+--- a/MAINTAINERS<br>
++++ b/MAINTAINERS<br>
+@@ -1651,6 +1651,12 @@ M: Samuel Thibault &lt;<a href=3D"mailto:samuel.thib=
+ault@ens-lyon.org" target=3D"_blank">samuel.thibault@ens-lyon.org</a>&gt;<b=
+r>
+=C2=A0S: Maintained<br>
+=C2=A0F: hw/usb/dev-serial.c<br>
+<br>
++USB dwc-hsotg (dwc2)<br>
++M: Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com" target=3D"_blank=
+">kraxel@redhat.com</a>&gt;<br>
++R: Paul Zimmerman &lt;<a href=3D"mailto:pauldzim@gmail.com" target=3D"_bla=
+nk">pauldzim@gmail.com</a>&gt;<br>
++S: Maintained<br>
++F: hw/usb/*dwc2*<br>
++<br>
+=C2=A0VFIO<br>
+=C2=A0M: Alex Williamson &lt;<a href=3D"mailto:alex.williamson@redhat.com" =
+target=3D"_blank">alex.williamson@redhat.com</a>&gt;<br>
+=C2=A0S: Supported</blockquote><div dir=3D"auto"><br></div><div dir=3D"auto=
+">Acked-by: Paul Zimmerman &lt;<a href=3D"mailto:pauldzim@gmail.com">pauldz=
+im@gmail.com</a>&gt;</div><div dir=3D"auto"><br></div><blockquote class=3D"=
+gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-=
+left:1ex"><br>
+-- <br>
+2.21.3<br>
+<br>
+</blockquote></div></div>
+
+--00000000000019cac205a9a017dd--
 
