@@ -2,86 +2,92 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5394FC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B270C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:08:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E6AA20885
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:06:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1CAD20885
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:08:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KnZDacPn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E6AA20885
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P46uEWPG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1CAD20885
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrio9-0003jN-Bt
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:06:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50954)
+	id 1jripr-0005Wt-0I
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:08:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrinO-00038W-71
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 10:05:34 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36118)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jrinM-0002YF-FA
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 10:05:33 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 72so28549282otc.3
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 07:05:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sFUZCl0KMC9nTTAaIIN2Hx6Kvt8fNuST0u9ocgRC/YM=;
- b=KnZDacPnKuHkZ0PtuG/ipGtLvC7PPxTmZ63sA46EwoB9ADy2IQjCa+0P2dO/QZs/P9
- uSxFmxkePZ0PZ6/aKfdZ3S/iq2Z3M3++UJMEve2TDFUWJ3ovDl0+yeRceZvqhqPO34Ij
- dnpGL/5pUcTBJLQioIEik+inLjrasc+McXLwMI8RLNDxtHMm9oduruC2Fs9dNFII6jJX
- B5hgwX1jvB8RZgHjIgYbZun5Nbu3+4mboftkhjag2UUoDn9tS9CS0OWvdytK0HEkJNzk
- Vk5Or/e/2mZlcXdhNE8PMiHkN+KM2PRT9PwoZ8+/ErfGK29KofI/GK01mkJrz8rICNKL
- znuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=sFUZCl0KMC9nTTAaIIN2Hx6Kvt8fNuST0u9ocgRC/YM=;
- b=ovoZ1zQ3VdVamNs0nz/o4oJa+VLXeVNf39LNEuWR0pNJsG4Ad0V+xkJtfZOTsAB7J9
- EQtC6gp5Gx6PbOgQw244cut009A/19FtvFjHPKvcMJoF90qY37zwk13v+dt7a2BcpfQ+
- OUN2xwXMhCaWBY1/ke4nSY/2J5bVXhl8UPUjCs8kPTd/X05zSMJFOtpE+s78f+Hogt5z
- JBOU6hfe0mJYjHFjzM/tav16EyFTqX+cC0C1jqUJn2hnkfPsLQaGXVbrnIjfQsHEPjU7
- 50+XNf1PcAyzKxJ81qH+y60LB0JqmEJ3nlvGr7HUDCKPyr8bckIYwfor1WvEBsM6hvo+
- h1Jg==
-X-Gm-Message-State: AOAM530uFOGN76Z+0wygDg6v+jZQMvaXWHePpOXO7Oo3oZNwDEaN8TZg
- 3+vXqhEeFjCq3+BRpDZ721j6dj01iS+f7VL2pdYu9Uoyzj1WHw==
-X-Google-Smtp-Source: ABdhPJz+LKVFzrxN0DQoBiY9+Dnue4JipesxRN5DHeH8bp1vuJGgsb4YyFQjGK58ESdCD9t2ec5GrrMklscMxkfXOQ0=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr27155945oto.135.1593871530841; 
- Sat, 04 Jul 2020 07:05:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrioa-0004I8-8N
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 10:06:48 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30395
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jrioX-0002x2-Qf
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 10:06:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593871604;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mgEyP99ISKv8sNfQMqbinuAqxbaqDMiVX8j6M5W8r8I=;
+ b=P46uEWPG5czG2Q+uXDRbg+4n66xMfuZTOtyr3noiGiNqFDNVv9qTwlUcIukHnoZwMK3LiV
+ jg/EpUMZDooML43O0BiPeO23z4410emvbgcJKk6+fEY4s/jByhu5PS9YTBKerjtsNGlC/S
+ 4JE+chasuzbmXtIsbNx+EufZier0ENw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421-WBqqh4DFPe6ijZIsQ7hMgA-1; Sat, 04 Jul 2020 10:06:38 -0400
+X-MC-Unique: WBqqh4DFPe6ijZIsQ7hMgA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 928611005510;
+ Sat,  4 Jul 2020 14:06:37 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F2AF5D9CA;
+ Sat,  4 Jul 2020 14:06:37 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E0BFE1138648; Sat,  4 Jul 2020 16:06:35 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v2 25/44] qom: Use return values to check for error where
+ that's simpler
+References: <20200702155000.3455325-1-armbru@redhat.com>
+ <20200702155000.3455325-26-armbru@redhat.com>
+ <3468bdbe-2e7d-3a51-4c2e-5f188ca092fd@virtuozzo.com>
+Date: Sat, 04 Jul 2020 16:06:35 +0200
+In-Reply-To: <3468bdbe-2e7d-3a51-4c2e-5f188ca092fd@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Fri, 3 Jul 2020 19:06:04 +0300")
+Message-ID: <87wo3jml1w.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200703090252.368694-1-mst@redhat.com>
-In-Reply-To: <20200703090252.368694-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 4 Jul 2020 15:05:19 +0100
-Message-ID: <CAFEAcA8gW6yGD_g7LLR9BeuEehtSWb+x3iPvDg+zbVr77cn-pg@mail.gmail.com>
-Subject: Re: [PULL 00/41] virtio,acpi: features, fixes, cleanups.
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 08:57:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,45 +100,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 3 Jul 2020 at 10:03, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> The following changes since commit fc1bff958998910ec8d25db86cd2f53ff125f7ab:
->
->   hw/misc/pca9552: Add missing TypeInfo::class_size field (2020-06-29 21:16:10 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 900ed7043750ae3cdf35c05da66e150a8821c3a0:
->
->   vhost-vdpa: introduce vhost-vdpa net client (2020-07-03 04:59:13 -0400)
->
-> ----------------------------------------------------------------
-> virtio,acpi: features, fixes, cleanups.
->
-> vdpa support
-> virtio-mem support
-> a handy script for disassembling acpi tables
-> misc fixes and cleanups
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-Hi; this fails to build on OSX and the BSDs:
+> 02.07.2020 18:49, Markus Armbruster wrote:
+>> When using the Error object to check for error, we need to receive it
+>> into a local variable, then propagate() it to @errp.
+>>
+>> Using the return value permits allows receiving it straight to @errp.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   qom/object.c | 16 +++++++++-------
+>>   1 file changed, 9 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/qom/object.c b/qom/object.c
+>> index 0808da2767..56d858b6a5 100644
+>> --- a/qom/object.c
+>> +++ b/qom/object.c
+>> @@ -549,8 +549,7 @@ void object_initialize_child_with_propsv(Object *parentobj,
+>>       object_initialize(childobj, size, type);
+>>       obj = OBJECT(childobj);
+>>   -    object_set_propv(obj, &local_err, vargs);
+>> -    if (local_err) {
+>> +    if (object_set_propv(obj, errp, vargs) < 0) {
+>>           goto out;
+>>       }
+>>   @@ -743,7 +742,7 @@ Object *object_new_with_propv(const char
+>> *typename,
+>>       }
+>>       obj = object_new_with_type(klass->type);
+>>   -    if (object_set_propv(obj, &local_err, vargs) < 0) {
+>> +    if (object_set_propv(obj, errp, vargs) < 0) {
+>>           goto error;
+>>       }
+>>   @@ -1767,14 +1766,17 @@ static void
+>> object_set_link_property(Object *obj, Visitor *v,
+>>       char *path = NULL;
+>>         visit_type_str(v, name, &path, &local_err);
+>
+> why not use return value of visit_type_str ?
 
-In file included from /home/qemu/qemu-test.TcQYno/src/hw/net/vhost_net.c:23:
-/home/qemu/qemu-test.TcQYno/src/linux-headers/linux/vhost.h:14:10:
-fatal error: 'linux/vhost_types.h' file not found
-#include <linux/vhost_types.h>
-         ^~~~~~~~~~~~~~~~~~~~~
-1 error generated.
+Yes, that's better.
 
-thanks
--- PMM
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>>   -    if (!local_err && strcmp(path, "") != 0) {
+>> -        new_target = object_resolve_link(obj, name, path, &local_err);
+>> +    if (strcmp(path, "") != 0) {
+>> +        new_target = object_resolve_link(obj, name, path, errp);
+>>       }
+>
+> Hmmm. You actually change the logic when visit_type_str succeeded but path equal to "":
+>
+> prepatch, we continue processing with new_target == NULL, after the patch we just do nothing and report success (errp == NULL).
+>
+> I don't know whether pre-patch or after-patch behavior is correct, but if it is a logic change, let's note it in the commit message, if path equal to "" actually impossible, let's assert it. Or just keep old logic as is, by moving return (together with duplicated g_free(path) of course) into "if (strcmp(path, "") != 0) {".
+
+After having another stare at the function, I conclude it's awful before
+the patch, and only slightly less awful but also wrong after.
+
+>>         g_free(path);
+>> -    if (local_err) {
+>> -        error_propagate(errp, local_err);
+>> +    if (!new_target) {
+>>           return;
+>>       }
+
+What about this:
+
+   @@ -1763,20 +1762,24 @@ static void object_set_link_property(Object *obj, Visitor *v,
+        LinkProperty *prop = opaque;
+        Object **targetp = object_link_get_targetp(obj, prop);
+        Object *old_target = *targetp;
+   -    Object *new_target = NULL;
+   +    Object *new_target;
+        char *path = NULL;
+
+   -    visit_type_str(v, name, &path, &local_err);
+   +    if (!visit_type_str(v, name, &path, errp)) {
+   +        return;
+   +    }
+
+   -    if (!local_err && strcmp(path, "") != 0) {
+   -        new_target = object_resolve_link(obj, name, path, &local_err);
+   +    if (*path) {
+   +        new_target = object_resolve_link(obj, name, path, errp);
+   +        if (!new_target) {
+   +            g_free(path);
+   +            return;
+   +        }
+   +    } else {
+   +        new_target = NULL;
+        }
+
+        g_free(path);
+   -    if (local_err) {
+   -        error_propagate(errp, local_err);
+   -        return;
+   -    }
+
+        prop->check(obj, name, new_target, &local_err);
+        if (local_err) {
+
 
