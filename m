@@ -2,73 +2,96 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8CDC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F4CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73E2120674
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:53:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E2120674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 160F920674
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 16:54:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b4cS1wby"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 160F920674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrlQF-0004Wk-Pk
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:53:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54702)
+	id 1jrlRE-0005ah-DU
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 12:54:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jrlPj-00045p-3u
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:53:19 -0400
-Resent-Date: Sat, 04 Jul 2020 12:53:19 -0400
-Resent-Message-Id: <E1jrlPj-00045p-3u@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21355)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jrlPf-0008HO-QB
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 12:53:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593881582; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=AnZeoG15KPbemKaqdBNGwqMOQ56ixb5kms+k7icpUt7gOBEED6+IDn0J6vQXKtSkN9augev3yaVlUt1lXyShKVHXkCHcBz3NFfQ4DvPrGHQqVX0V1MJqvtG2nv9aDqns6hsr2kyc4rToWB4gGlHXbIv/gm7ZUFXWKgVXnh6+mLM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1593881582;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=IBOJnpAeJIkwZ1ZN7S6c9+Bxs5jS8psXK7cNzSD+tUc=; 
- b=TiXOmCq+5F9Wk6SxZRwySZ2lt+0ozARgy5jY6oijsbkso3WCCDkp2mP2b8/JFwrtXwEhAJqyPvoTQYS10kepiKIfydwKpyb886YZqzuIPCBPr6W3Cql3MVZ7hbnCix4XkXxsgWWQI6qKrUHJWs+haSR19b7nJhvgmf3KZFYOzPs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1593881580386505.02970155101957;
- Sat, 4 Jul 2020 09:53:00 -0700 (PDT)
-Message-ID: <159388157913.22113.1206281745620963878@d1fd068a5071>
-Subject: Re: [PULL 00/12] Linux user for 5.1 patches
-In-Reply-To: <20200704162545.311133-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jrlQg-00053c-IL; Sat, 04 Jul 2020 12:54:18 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33564)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jrlQe-0008Kc-Vj; Sat, 04 Jul 2020 12:54:18 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f18so27893726wrs.0;
+ Sat, 04 Jul 2020 09:54:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fO+tXrfCfBSO/ZEgw8svjFvRYJwYMgQJLIxHnOYe2QA=;
+ b=b4cS1wbyFlKgeRS6fOi/7BE/y4cILmkgaLe8ywltjleByv5tVXzq+MOjAQn/TICclJ
+ aSEAz9RjoTo8x7XaZnWNVd263VskNO7z4pBqoNFPsrxTsxSugFRwMk5Y1rF3HGdQ+WxP
+ duX0UUHqfuq6uFpyYEJBqHg6OWsHMfhV9atKYcKtJn5h9JuZ1EGjiLwXiaNtsKDgZfLy
+ jGAY8R3oMHaVdXWgLpQMO2k0bpzlT0931Fx9q6rIDMNzRFQz/1UKW2a7WRCc9cu++n7e
+ NB+fr/93R8ppmWn9lkNYbEbomHEnJibmRmBaoheRNHhrzcUzs7EbLrgsZtpMDiliAxQW
+ vbTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fO+tXrfCfBSO/ZEgw8svjFvRYJwYMgQJLIxHnOYe2QA=;
+ b=fon9qA6RkGil+opfyHXApq6hHldB07psIcekCA8rhhbJrwXGHrmvGCB1EW+jSWpk99
+ lG5YVGIrvG1kcECluDiwZ44nxzRPfFGtbxdUOOD3bMO/7G0PwVdCBqSpmvTQBCs3BF38
+ HBDuni+s8Ol27+HiNOGk7D0m157EAankxiq3LbAL/2/McquD5Alh34PZ/oNtqqkJKx+0
+ g2QWF6wZRq0QTogpdkLJ+o44VOzPr0u/FcNnNvU3XAKsrUADGS5ZtFOD1GOP9qxzdgF2
+ 0V761XpyhxucgzBCZBtd4c1uKztxXNAQBaDm8RedpT8sv+34zF1629jOhjewSm2rxAys
+ ky6Q==
+X-Gm-Message-State: AOAM530xnjAUDEn7IBN1yXvHJn/+LstJ5A8UdVS8FlhGBaf80c7j0Fme
+ 2xywA+xT/3+FtxCWbXd+3ZQ=
+X-Google-Smtp-Source: ABdhPJwLtPgQKKFlia7fAFYeW0e+JRhaA1BKx8fZjMex8iHmmeZUSyKMOrT+S8iUOPQalHzIBRC6wg==
+X-Received: by 2002:adf:ee05:: with SMTP id y5mr43094676wrn.185.1593881654865; 
+ Sat, 04 Jul 2020 09:54:14 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id r1sm16903548wrw.24.2020.07.04.09.54.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 04 Jul 2020 09:54:14 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 3/3] hw/misc/auxbus: Fix MOT/classic I2C mode
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <20200623063123.20776-1-f4bug@amsat.org>
+ <20200623063123.20776-4-f4bug@amsat.org>
+ <alpine.BSF.2.22.395.2006231304300.23200@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <04fd281c-4d52-5121-c38d-237ed65883d1@amsat.org>
+Date: Sat, 4 Jul 2020 18:54:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Sat, 4 Jul 2020 09:53:00 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 12:40:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <alpine.BSF.2.22.395.2006231304300.23200@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,81 +104,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- atar4qemu@gmail.com, laurent@vivier.eu
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, Frederic Konrad <konrad@adacore.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwNDE2MjU0NS4zMTEx
-MzMtMS1sYXVyZW50QHZpdmllci5ldS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMTJdIExpbnV4IHVzZXIgZm9yIDUuMSBwYXRj
-aGVzClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDcwNDE2MjU0NS4zMTExMzMtMS1sYXVy
-ZW50QHZpdmllci5ldQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
-cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0
-Y2hldy8yMDIwMDcwMzA5MDgxNi4zMjk1LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tIC0+IHBh
-dGNoZXcvMjAyMDA3MDMwOTA4MTYuMzI5NS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQogLSBb
-dGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwNzA0MTQ0OTQzLjE4MjkyLTEtZjRidWdAYW1z
-YXQub3JnIC0+IHBhdGNoZXcvMjAyMDA3MDQxNDQ5NDMuMTgyOTItMS1mNGJ1Z0BhbXNhdC5vcmcK
-IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDcwNDE2MjU0NS4zMTExMzMtMS1sYXVy
-ZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMjAwNzA0MTYyNTQ1LjMxMTEzMy0xLWxhdXJlbnRA
-dml2aWVyLmV1CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA3MDQxNjM5MjcuMjgx
-ODgtMS1waGlsbWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwNzA0MTYzOTI3LjI4MTg4LTEt
-cGhpbG1kQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2OTRmNTY4
-IE1BSU5UQUlORVJTOiB1cGRhdGUgbGludXgtdXNlciBtYWludGFpbmVyCjE3MWM5OTAgbGludXgt
-dXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgaW9jdGwo
-KQphNDI0YmI2IGxpbnV4LXVzZXI6IEFkZCB0aHVuayBhcmd1bWVudCB0eXBlcyBmb3IgU0lPQ0dT
-VEFNUCBhbmQgU0lPQ0dTVEFNUE5TCjI3YmYzMTAgbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBw
-b3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgZmFsbG9jYXRlKCkKZjFiMTIwNiBsaW51eC11
-c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBjaG93bigp
-L2xjaG93bigpCjkzOTZmMDMgbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBwcmlu
-dGluZyBhcmd1bWVudHMgb2YgbHNlZWsoKQo1YzcwNGNmIGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ug
-c3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnQgb2Ygc3lzY2FsbHMgdXNlZCBmb3IgZXh0ZW5k
-ZWQgYXR0cmlidXRlcwo3NzYyYTNkIGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3Ig
-YSBncm91cCBvZiBzeXNjYWxscwplOTBkODZjIGxpbnV4LXVzZXI6IEV4dGVuZCBzdHJhY2Ugc3Vw
-cG9ydCB0byBlbmFibGUgYXJndW1lbnQgcHJpbnRpbmcgYWZ0ZXIgc3lzY2FsbCBleGVjdXRpb24K
-N2I4OGM5NyBsaW51eC11c2VyOiBzeXNjYWxsOiBpb2N0bHM6IHN1cHBvcnQgRFJNX0lPQ1RMX1ZF
-UlNJT04KOGY0ZWRlOSBsaW51eC11c2VyL3NwYXJjNjQ6IEZpeCB0aGUgaGFuZGxpbmcgb2Ygd2lu
-ZG93IHNwaWxsIHRyYXAKZmJmNzIxNiB0YXJnZXQvc3BhcmM6IFRyYW5zbGF0ZSBmbHVzaHcgb3Bj
-b2RlCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEyIENoZWNraW5nIGNvbW1pdCBmYmY3MjE2MzE1
-MmIgKHRhcmdldC9zcGFyYzogVHJhbnNsYXRlIGZsdXNodyBvcGNvZGUpCjIvMTIgQ2hlY2tpbmcg
-Y29tbWl0IDhmNGVkZTkyZjVjYiAobGludXgtdXNlci9zcGFyYzY0OiBGaXggdGhlIGhhbmRsaW5n
-IG9mIHdpbmRvdyBzcGlsbCB0cmFwKQozLzEyIENoZWNraW5nIGNvbW1pdCA3Yjg4Yzk3NTUyZjcg
-KGxpbnV4LXVzZXI6IHN5c2NhbGw6IGlvY3Rsczogc3VwcG9ydCBEUk1fSU9DVExfVkVSU0lPTikK
-NC8xMiBDaGVja2luZyBjb21taXQgZTkwZDg2Yzk2ZDk2IChsaW51eC11c2VyOiBFeHRlbmQgc3Ry
-YWNlIHN1cHBvcnQgdG8gZW5hYmxlIGFyZ3VtZW50IHByaW50aW5nIGFmdGVyIHN5c2NhbGwgZXhl
-Y3V0aW9uKQo1LzEyIENoZWNraW5nIGNvbW1pdCA3NzYyYTNkOTA2MmYgKGxpbnV4LXVzZXI6IEFk
-ZCBzdHJhY2Ugc3VwcG9ydCBmb3IgYSBncm91cCBvZiBzeXNjYWxscykKNi8xMiBDaGVja2luZyBj
-b21taXQgNWM3MDRjZjQ0MzQ1IChsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHBy
-aW50aW5nIGFyZ3VtZW50IG9mIHN5c2NhbGxzIHVzZWQgZm9yIGV4dGVuZGVkIGF0dHJpYnV0ZXMp
-CjcvMTIgQ2hlY2tpbmcgY29tbWl0IDkzOTZmMDM3NTE2MiAobGludXgtdXNlcjogQWRkIHN0cmFj
-ZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgbHNlZWsoKSkKOC8xMiBDaGVja2lu
-ZyBjb21taXQgZjFiMTIwNjUzZmUxIChsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9y
-IHByaW50aW5nIGFyZ3VtZW50cyBvZiBjaG93bigpL2xjaG93bigpKQo5LzEyIENoZWNraW5nIGNv
-bW1pdCAyN2JmMzEwZjZmOGYgKGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJp
-bnRpbmcgYXJndW1lbnRzIG9mIGZhbGxvY2F0ZSgpKQpFUlJPUjogc3RvcmFnZSBjbGFzcyBzaG91
-bGQgYmUgYXQgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzcyOiBGSUxFOiBsaW51
-eC11c2VyL3N0cmFjZS5jOjExMzg6CitVTlVTRUQgc3RhdGljIHN0cnVjdCBmbGFncyBmYWxsb2Nf
-ZmxhZ3NbXSA9IHsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTA0IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDkvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEwLzEyIENoZWNraW5n
-IGNvbW1pdCBhNDI0YmI2MjVhNjggKGxpbnV4LXVzZXI6IEFkZCB0aHVuayBhcmd1bWVudCB0eXBl
-cyBmb3IgU0lPQ0dTVEFNUCBhbmQgU0lPQ0dTVEFNUE5TKQoxMS8xMiBDaGVja2luZyBjb21taXQg
-MTcxYzk5MGY2ODYzIChsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5n
-IGFyZ3VtZW50cyBvZiBpb2N0bCgpKQoxMi8xMiBDaGVja2luZyBjb21taXQgNjk0ZjU2OGNhYjMw
-IChNQUlOVEFJTkVSUzogdXBkYXRlIGxpbnV4LXVzZXIgbWFpbnRhaW5lcikKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3MDQxNjI1NDUuMzEx
-MTMzLTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On 6/23/20 1:06 PM, BALATON Zoltan wrote:
+> On Tue, 23 Jun 2020, Philippe Mathieu-Daudé wrote:
+>> Since its introduction in commit 6fc7f77fd2 i2c_start_transfer()
+>> uses incorrectly the direction of the transfer. Fix it now.
+>>
+>> Fixes: 6fc7f77fd2 ("introduce aux-bus")
+>> Reported-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Suggested-by: BALATON Zoltan <balaton@eik.bme.hu>
+> 
+> One of the above is probably enough, maybe Reported-by because I wasn't
+> sure what's the solution. I'm also happy with your changes to the whole
+> series, thanks for fixing it.
+
+Hopefully the maintainer taking this series can simply remove
+the Suggested-by tag directly. Else I can respin if it is easier.
+
+> 
+> Regards,
+> BALATON Zoltan
+> 
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> RFC because untested (probably never was anyway)
+>> Cc: Frederic Konrad <konrad@adacore.com>
+>> Cc: Alistair Francis <alistair@alistair23.me>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> hw/misc/auxbus.c | 6 +++---
+>> 1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+>> index cef0d0d6d0..dc4a5dd10d 100644
+>> --- a/hw/misc/auxbus.c
+>> +++ b/hw/misc/auxbus.c
+>> @@ -141,7 +141,7 @@ AUXReply aux_request(AUXBus *bus, AUXCommand cmd,
+>> uint32_t address,
+>>             i2c_end_transfer(i2c_bus);
+>>         }
+>>
+>> -        if (i2c_start_transfer(i2c_bus, address, is_write)) {
+>> +        if (i2c_start_transfer(i2c_bus, address, !is_write)) {
+>>             ret = AUX_I2C_NACK;
+>>             break;
+>>         }
+>> @@ -172,7 +172,7 @@ AUXReply aux_request(AUXBus *bus, AUXCommand cmd,
+>> uint32_t address,
+>>             /*
+>>              * No transactions started..
+>>              */
+>> -            if (i2c_start_transfer(i2c_bus, address, is_write)) {
+>> +            if (i2c_start_transfer(i2c_bus, address, !is_write)) {
+>>                 break;
+>>             }
+>>         } else if ((address != bus->last_i2c_address) ||
+>> @@ -181,7 +181,7 @@ AUXReply aux_request(AUXBus *bus, AUXCommand cmd,
+>> uint32_t address,
+>>              * Transaction started but we need to restart..
+>>              */
+>>             i2c_end_transfer(i2c_bus);
+>> -            if (i2c_start_transfer(i2c_bus, address, is_write)) {
+>> +            if (i2c_start_transfer(i2c_bus, address, !is_write)) {
+>>                 break;
+>>             }
+>>         }
+>>
 
