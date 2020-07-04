@@ -2,95 +2,95 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFAFC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 389D2C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:47:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A09C20771
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:47:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0196C20771
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:47:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ik9Zcy3d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A09C20771
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AObpbMYK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0196C20771
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrnC1-0001cY-8k
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:47:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40668)
+	id 1jrnCZ-00038K-5Z
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:47:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmzN-0002SM-HO
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:34:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49208
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmw1-0004SD-D5
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:45 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39782
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmzL-00026L-Nc
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:34:13 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvz-0001ZW-If
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593887651;
+ s=mimecast20190719; t=1593887442;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=cjzZWxnnykq05TtdjmaRFa55dc9c5bd35Z/S8rumoHc=;
- b=Ik9Zcy3dg98CP6v3E9il4UU7/yYZ+zdvYii+46o5BDiQvi9PxXDs8JCsNKELhLbKfBnNFx
- bWeMZsL7wOEBlYX55GDusTIqTawGNs90t27uB/9GQIZcGvjc/ZvM1vxqD7tb8bJQf8yjKc
- WoaFCCsLx8Yu8dmhEueeZfI2QuCTXM8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-bkvge0pENIGthhw1pd_WFw-1; Sat, 04 Jul 2020 14:34:09 -0400
-X-MC-Unique: bkvge0pENIGthhw1pd_WFw-1
-Received: by mail-wm1-f70.google.com with SMTP id v24so40251086wmh.3
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:34:08 -0700 (PDT)
+ bh=J87y6/ALZV5j2hxcU6iv08lRd5sVzb2p1LKaAZ1dyww=;
+ b=AObpbMYK9w23uBXh5hkHDf8+Br5CubFu1BgE2C5bFB/lOnPsAbQA79WERoE2R7XNfnGYl8
+ rvC2t8WOobkIf9Zc6WnYxnabdOElT4bW4HGdpZJArv11i5ZPCbLuGBMx0l7C8BRLDlXdNr
+ 9fLQ99bSS5deUEpzhlbK/Ajy2fp3mCI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-AyTozNeVMruuGKquHZNywA-1; Sat, 04 Jul 2020 14:30:40 -0400
+X-MC-Unique: AyTozNeVMruuGKquHZNywA-1
+Received: by mail-wr1-f71.google.com with SMTP id o12so36257246wrj.23
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:30:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=cjzZWxnnykq05TtdjmaRFa55dc9c5bd35Z/S8rumoHc=;
- b=l9tLWinNQJPjvbXRUrFN1OH4/2Ax283vUWhU5F9HG7wh+QEtLGgu2P2AirzNTwi5Ov
- +d9gXejMc3H03umrxOPZz7kcp0FwwTo9vi8RUU8A1G1gGlaksoPdZgfHnLKrd5zxyLpf
- 0XgH+iDnaNBTM8pUr6WXwYR1gi6cSrw/a/3mHO65bQ66rEct+DyOFTGw3llRCde4vebp
- gYs1bs4RTrEpcxk9HOibwNDNla4B/AnvJqPBt1s7h+lclxpvM+io/tHX4J6SJGiALC3U
- VXWqlO9k97jvFKQfnDbgGCOAzsfnRtH9raCk2ZAyOF6F7+LLqlh4x5gbG1p2Jr0l6Wef
- taQA==
-X-Gm-Message-State: AOAM533VhL/3KP5urX/tam9VBTRChpuAqsvsjAF539QQ820187ri6VRF
- nB2SlQJKTpHRvKc1AnJOiLTZkE06DAiX0O4to6MMZqUuyECeCXn9ntTj8XNHweHkT9X8kU+bb3G
- YEsInuZOOfGMDr20=
-X-Received: by 2002:a1c:dd86:: with SMTP id
- u128mr41891253wmg.123.1593887647998; 
- Sat, 04 Jul 2020 11:34:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx+hxeVv9tyaPjISHwSpdkExcuyq92d2WV1GUELBTtxzAm0ZJ+X1l2dd6Kqevu7loZ8P/3jeA==
-X-Received: by 2002:a1c:dd86:: with SMTP id
- u128mr41891236wmg.123.1593887647826; 
- Sat, 04 Jul 2020 11:34:07 -0700 (PDT)
+ bh=J87y6/ALZV5j2hxcU6iv08lRd5sVzb2p1LKaAZ1dyww=;
+ b=GSmyXOXsADFlUcdT8EPOOYeZ/SpQx89t9Pt1ACfomy1z5ylPA2g/ZIKu3rVlnYLFJJ
+ xvhgsDlXwpQ+8uhL8JzG910/hRQLj5Px7afUTBhbrzbzYknf3joBeHYLKW9GO2pDGCqJ
+ /WYi/z3YMCvipHISTCkRWtegVXVjTkXjwoPLktl6Zv3v3v47jUJ77coLk+I8cRrkojdf
+ JVOiHved2gruRRhxjyvvvsX03WWP4KtpHI9eOMXlzOwqd3XeXA7byW9Wrh8KX/mbKfX6
+ mm0WWaN1Zo3lZCyelhuFYOP8vzq4D/t4feoljGZeqqPAjKGDXifv3FfgbqfQPz5QOX8J
+ UgSw==
+X-Gm-Message-State: AOAM533CHY+CK3wa2kV5QuOEwN6RTmGJagT9rsPiJN9OeEi8qAT81VlX
+ hVcTQHckxeYPVHnNuNzri/KKDFf2RAr2xRsZDwGS/CPy9IrPGinD2RCTfjGqXSaWO3cg3+nkAbT
+ fjcW5xGiedFMyUnQ=
+X-Received: by 2002:a5d:650e:: with SMTP id x14mr43960653wru.187.1593887439019; 
+ Sat, 04 Jul 2020 11:30:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyz3RWqFKTy2s8oJKuCMlVvqwFDWvlkuJXUzDI5CtWR4SB6EfithsyyitDICz3+tQY78T651A==
+X-Received: by 2002:a5d:650e:: with SMTP id x14mr43960644wru.187.1593887438879; 
+ Sat, 04 Jul 2020 11:30:38 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- v6sm5249119wrr.85.2020.07.04.11.34.06
+ n5sm17021025wmi.34.2020.07.04.11.30.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 11:34:07 -0700 (PDT)
-Date: Sat, 4 Jul 2020 14:34:04 -0400
+ Sat, 04 Jul 2020 11:30:38 -0700 (PDT)
+Date: Sat, 4 Jul 2020 14:30:36 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH 1/2] virtio-ccw: fix virtio_set_ind_atomic
-Message-ID: <20200704143126-mutt-send-email-mst@kernel.org>
-References: <20200616045035.51641-1-pasic@linux.ibm.com>
- <20200616045035.51641-2-pasic@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 28/41] net: introduce qemu_get_peer
+Message-ID: <20200704182750.1088103-29-mst@redhat.com>
+References: <20200704182750.1088103-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200616045035.51641-2-pasic@linux.ibm.com>
+In-Reply-To: <20200704182750.1088103-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:14
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -111,86 +111,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Cindy Lu <lulu@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 16, 2020 at 06:50:34AM +0200, Halil Pasic wrote:
-> The atomic_cmpxchg() loop is broken because we occasionally end up with
-> old and _old having different values (a legit compiler can generate code
-> that accessed *ind_addr again to pick up a value for _old instead of
-> using the value of old that was already fetched according to the
-> rules of the abstract machine). This means the underlying CS instruction
-> may use a different old (_old) than the one we intended to use if
-> atomic_cmpxchg() performed the xchg part.
+From: Cindy Lu <lulu@redhat.com>
 
-And was this ever observed in the field? Or is this a theoretical issue?
-commit log should probably say ...
+This is a small function that can get the peer
+from given NetClientState and queue_index
 
-> 
-> Let us use volatile to force the rules of the abstract machine for
-> accesses to *ind_addr. Let us also rewrite the loop so, we that the
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+Message-Id: <20200701145538.22333-2-lulu@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+---
+ include/net/net.h | 1 +
+ net/net.c         | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-we that -> we know that?
-
-> new old is used to compute the new desired value if the xchg part
-> is not performed.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reported-by: Andre Wild <Andre.Wild1@ibm.com>
-> Fixes: 7e7494627f ("s390x/virtio-ccw: Adapter interrupt support.")
-> ---
->  hw/s390x/virtio-ccw.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index c1f4bb1d33..3c988a000b 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -786,9 +786,10 @@ static inline VirtioCcwDevice *to_virtio_ccw_dev_fast(DeviceState *d)
->  static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                                       uint8_t to_be_set)
->  {
-> -    uint8_t ind_old, ind_new;
-> +    uint8_t expected, actual;
->      hwaddr len = 1;
-> -    uint8_t *ind_addr;
-> +    /* avoid  multiple fetches */
-> +    uint8_t volatile *ind_addr;
->  
->      ind_addr = cpu_physical_memory_map(ind_loc, &len, true);
->      if (!ind_addr) {
-> @@ -796,14 +797,15 @@ static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                       __func__, sch->cssid, sch->ssid, sch->schid);
->          return -1;
->      }
-> +    actual = *ind_addr;
->      do {
-> -        ind_old = *ind_addr;
-> -        ind_new = ind_old | to_be_set;
-> -    } while (atomic_cmpxchg(ind_addr, ind_old, ind_new) != ind_old);
-> -    trace_virtio_ccw_set_ind(ind_loc, ind_old, ind_new);
-> -    cpu_physical_memory_unmap(ind_addr, len, 1, len);
-> +        expected = actual;
-> +        actual = atomic_cmpxchg(ind_addr, expected, expected | to_be_set);
-> +    } while (actual != expected);
-> +    trace_virtio_ccw_set_ind(ind_loc, actual, actual | to_be_set);
-> +    cpu_physical_memory_unmap((void *)ind_addr, len, 1, len);
->  
-> -    return ind_old;
-> +    return actual;
->  }
-
-I wonder whether cpuXX APIs should accept volatile pointers, too:
-casting away volatile is always suspicious.
-But that is a separate issue ...
-
->  static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-> -- 
-> 2.17.1
+diff --git a/include/net/net.h b/include/net/net.h
+index 39085d9444..e7ef42d62b 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -176,6 +176,7 @@ void hmp_info_network(Monitor *mon, const QDict *qdict);
+ void net_socket_rs_init(SocketReadState *rs,
+                         SocketReadStateFinalize *finalize,
+                         bool vnet_hdr);
++NetClientState *qemu_get_peer(NetClientState *nc, int queue_index);
+ 
+ /* NIC info */
+ 
+diff --git a/net/net.c b/net/net.c
+index d1130296e1..9099a327dd 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -325,6 +325,13 @@ void *qemu_get_nic_opaque(NetClientState *nc)
+     return nic->opaque;
+ }
+ 
++NetClientState *qemu_get_peer(NetClientState *nc, int queue_index)
++{
++    assert(nc != NULL);
++    NetClientState *ncs = nc + queue_index;
++    return ncs->peer;
++}
++
+ static void qemu_cleanup_net_client(NetClientState *nc)
+ {
+     QTAILQ_REMOVE(&net_clients, nc, next);
+-- 
+MST
 
 
