@@ -2,85 +2,81 @@ Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E716C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75107C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:41:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D787C208D5
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42921208D5
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 15:41:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZ7x3F0K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D787C208D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XA789/g+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42921208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrkI5-00036f-1H
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 11:41:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39958)
+	id 1jrkI8-0003Db-HV
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 11:41:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkGA-0000fB-GC
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:39:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47545
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkG7-0000c1-Ff
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:39:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24081
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkG8-0007So-UG
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:39:22 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jrkG3-0007Rl-Rq
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 11:39:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593877160;
+ s=mimecast20190719; t=1593877154;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4VxXE4SCiQENXjR0p5gMwHzmkYsDqhVYN6kqXLwme2s=;
- b=OZ7x3F0KfnBBeJLBGBYSuRS4OwXUIkoslH2dy+3a4HMwnQ77x9699ExR1sJz6nY59V/Ot2
- dpArIDx9FLxEgFQq/C5ES7oKzfBaEC94rZ4sRkJTmmv9oR8MUiuEG1FpZjazzoaSy1SEz5
- GmWjp07TcZKqcnxNGwsjtUKMtbGmaW8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-gubUxzL4Pa6OyAD0pp2lAA-1; Sat, 04 Jul 2020 11:39:18 -0400
-X-MC-Unique: gubUxzL4Pa6OyAD0pp2lAA-1
-Received: by mail-wr1-f69.google.com with SMTP id g14so35924862wrp.8
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 08:39:18 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=nr0/mEmyL3K5IVI928eiIdMK3sHSZE7ocqWvKvjJWbw=;
+ b=XA789/g+G/703P6JpzMerPYGQLeqlqY5/dNDidjYPxVs5Y2cYil9ky7NFkE10wsBVougtg
+ gZsQZZLFxh4LoZTzK5MmmSOLdnLqnIg0mEs2JvGbRwDWUuTjUgo4qgaGBDPRbNII52E2S3
+ eFf11/XNqx55KG4wEUxjVKDwmzNXSB4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-myde3emWNDulc1y454sZxA-1; Sat, 04 Jul 2020 11:39:13 -0400
+X-MC-Unique: myde3emWNDulc1y454sZxA-1
+Received: by mail-wr1-f71.google.com with SMTP id y16so35853584wrr.20
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 08:39:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=4VxXE4SCiQENXjR0p5gMwHzmkYsDqhVYN6kqXLwme2s=;
- b=s/K2CZEwcQrCOrd5UXOhQyEpX3akg7DckT9AFWWVUjC8C46RMudjeyagowC6yVhJXI
- fco6ncdgbO8Cq8dVcJiC+/Ef7sa6dmdVNGTnRCLBYZXjRQ+0QAKsIYszcPVlRet2rroP
- VUctE/eh/RsdjOb9aqdITqBmJsYt2uptHlcdraMZmNbS7IHNF09jiwykyPD9GYeVruB6
- wtHGZFs0e+L7H9I2jagjwP3iaukX9XSkzn/d/kJEaB0fh3GRuO0hC+tgSd6u6hDdh/Bm
- fMSqa7CLoVkrZ36UIhj6lPic9QuYYzcjEFzxKM6abFCbUCMhlTGkgyBHgYHjb+Q0ccOY
- NStg==
-X-Gm-Message-State: AOAM532NR3+q7S5NO+x8rFx3r7bIkSsnRK9vLBo1JLyc+N+13IkN2SuN
- MMlBTeSPKGEeGwIDEaZ2cY3GwpSsnInfGAX4coXBXzluaoChJmuN7+nqdVN1YTG+nldrDSogNMH
- 9bCv9HDzTcPDOjc4=
-X-Received: by 2002:a7b:cf10:: with SMTP id l16mr41861939wmg.93.1593877157274; 
- Sat, 04 Jul 2020 08:39:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBJo4FUom82vRU8/5mP45VfvlfhObz1DhaGdrkvZdmWsyz2BGimXVJAaF2JPT0rdOWUhT2Jg==
-X-Received: by 2002:a7b:cf10:: with SMTP id l16mr41861890wmg.93.1593877156946; 
- Sat, 04 Jul 2020 08:39:16 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nr0/mEmyL3K5IVI928eiIdMK3sHSZE7ocqWvKvjJWbw=;
+ b=F3rybbL5dc2jvXhgd35K3pjxIus7j3vDdPwZdCg+i3gViITAf49WuUxmxWyie6b9KV
+ 130aR3TP83OiDSiOGhSye4/y+dhcILdG4IzJpIPoJ3WcZGt7HgKsn0S4c2v0dEJh8Gkx
+ x6UHsvhLNddflBdwrPYHtoSCbY1QpMgNc/jD8iA+barcdjvuvo7IDXYjAZax+Y/7nBQ5
+ Gi2NafHJb3jQYaDvjXuBD5h5c86uVB/tJh87NuIX3cJYtEjSIZJYfMYNPvVtw9m+pcET
+ DEBLCCs4BX9RS3aWQBomIkjml2woBmi6574d1exgKzGTw85xnQ0342sYcpMmeGSUPi2g
+ yKfg==
+X-Gm-Message-State: AOAM531CCu1vA1YCbTEJByoGqPGSXtfca08BQ2c6c48qT7rTmyZv5R1s
+ WPnYpjekS/s1fy5aGAT4Pzt6jFFCaaj8gmtsBIszWBds23ubHeaXlbD3ncP6VOEFrkpizbfM08m
+ km1IaJg85LR7ACZc=
+X-Received: by 2002:a5d:60c5:: with SMTP id x5mr6714553wrt.67.1593877151762;
+ Sat, 04 Jul 2020 08:39:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyqAVYRFYzqVU2yC5gJD1uy3EIPuKDi0xg+WN1Yf+AhcuCgCujLfggwqGqEhizhBOScVaPpFw==
+X-Received: by 2002:a5d:60c5:: with SMTP id x5mr6714516wrt.67.1593877151479;
+ Sat, 04 Jul 2020 08:39:11 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id m10sm17446986wru.4.2020.07.04.08.39.15
+ by smtp.gmail.com with ESMTPSA id u8sm16658341wrt.28.2020.07.04.08.39.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 08:39:16 -0700 (PDT)
+ Sat, 04 Jul 2020 08:39:10 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/23] qom/object: Update documentation
-Date: Sat,  4 Jul 2020 17:38:46 +0200
-Message-Id: <20200704153908.12118-2-philmd@redhat.com>
+Subject: [RFC PATCH v2 00/23] hw/qdev: Warn when using pre-qdev/QOM devices
+Date: Sat,  4 Jul 2020 17:38:45 +0200
+Message-Id: <20200704153908.12118-1-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200704153908.12118-1-philmd@redhat.com>
-References: <20200704153908.12118-1-philmd@redhat.com>
 MIME-Version: 1.0
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -89,9 +85,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -132,46 +128,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The documentation was introduced in 2f28d2ff9dc, then
-0d09e41a51 and a27bd6c77 moved the headers around.
-Update the comment.
+This is a trivial RFC series to anotate pre-qdev/QOM devices
+so developers using them without knowing they are not QOM'ified
+yet can realize it and convert them if/when they have time.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- include/qom/object.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+qdev/QOM devices are introspectable, so easier to test
+or even fuzz.
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 94a61ccc3f..03dcd3623e 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -43,7 +43,7 @@ typedef struct InterfaceInfo InterfaceInfo;
-  * <example>
-  *   <title>Creating a minimal type</title>
-  *   <programlisting>
-- * #include "qdev.h"
-+ * #include "hw/qdev-core.h"
-  *
-  * #define TYPE_MY_DEVICE "my-device"
-  *
-@@ -144,7 +144,7 @@ typedef struct InterfaceInfo InterfaceInfo;
-  * <example>
-  *   <title>Overriding a virtual function</title>
-  *   <programlisting>
-- * #include "qdev.h"
-+ * #include "hw/qdev-core.h"
-  *
-  * void my_device_class_init(ObjectClass *klass, void *class_data)
-  * {
-@@ -168,7 +168,7 @@ typedef struct InterfaceInfo InterfaceInfo;
-  * <example>
-  *   <title>Defining an abstract class</title>
-  *   <programlisting>
-- * #include "qdev.h"
-+ * #include "hw/qdev-core.h"
-  *
-  * typedef struct MyDeviceClass
-  * {
+Since RFC v1:
+- Addressed bonzini comments, removed invalid patches
+- Addressed thuth comment
+
+Philippe Mathieu-Daudé (23):
+  qom/object: Update documentation
+  hw/core/qdev: Add qdev_warn_deprecated_function_used() helper
+  hw/arm/omap: Emit warning when old code is used
+  hw/arm/pxa2xx: Emit warning when old code is used
+  hw/arm/nseries: Emit warning when old code is used
+  hw/char/parallel: Emit warning when old code is used
+  hw/display/blizzard: Emit warning when old code is used
+  hw/display/ramfb: Emit warning when old code is used
+  hw/display/tc6393xb: Emit warning when old code is used
+  hw/display/vga-isa-mm: Emit warning when old code is used
+  hw/dma/etraxfs_dma: Emit warning when old code is used
+  hw/dma/soc_dma: Emit warning when old code is used
+  hw/input/lasips2: Emit warning when old code is used
+  hw/input/tsc2005: Emit warning when old code is used
+  hw/m68k/mcf520x: Emit warning when old code is used
+  hw/misc/cbus: Emit warning when old code is used
+  hw/nvram/eeprom93xx: Emit warning when old code is used
+  hw/openrisc/cputimer: Emit warning when old code is used
+  hw/ppc/ppc4xx: Emit warning when old code is used
+  hw/sh4: Emit warning when old code is used
+  hw/riscv: Emit warning when old code is used
+  hw/usb/hcd-musb: Emit warning when old code is used
+  hw/xtensa/xtfpga: Emit warning when old code is used
+
+ configure                    |  8 ++++++++
+ include/hw/qdev-deprecated.h | 26 ++++++++++++++++++++++++++
+ include/qom/object.h         |  6 +++---
+ hw/arm/nseries.c             |  2 ++
+ hw/arm/omap1.c               |  6 ++++++
+ hw/arm/pxa2xx.c              |  3 +++
+ hw/char/omap_uart.c          |  5 +++++
+ hw/char/parallel.c           |  3 +++
+ hw/char/sh_serial.c          |  3 +++
+ hw/core/qdev.c               |  8 ++++++++
+ hw/display/blizzard.c        |  3 +++
+ hw/display/pxa2xx_lcd.c      |  3 +++
+ hw/display/ramfb.c           |  3 +++
+ hw/display/tc6393xb.c        |  3 +++
+ hw/display/vga-isa-mm.c      |  5 +++++
+ hw/display/vga.c             |  3 +++
+ hw/dma/etraxfs_dma.c         |  4 +++-
+ hw/dma/soc_dma.c             |  3 +++
+ hw/input/lasips2.c           |  4 +++-
+ hw/input/pxa2xx_keypad.c     |  3 +++
+ hw/input/tsc2005.c           |  3 +++
+ hw/intc/sh_intc.c            |  3 +++
+ hw/m68k/mcf5206.c            |  5 +++++
+ hw/m68k/mcf5208.c            |  3 +++
+ hw/misc/cbus.c               |  3 +++
+ hw/misc/omap_gpmc.c          |  3 +++
+ hw/misc/omap_l4.c            |  3 +++
+ hw/misc/omap_sdrc.c          |  3 +++
+ hw/nvram/eeprom93xx.c        |  3 +++
+ hw/openrisc/cputimer.c       |  3 +++
+ hw/ppc/ppc405_boards.c       |  5 +++++
+ hw/ppc/ppc405_uc.c           | 21 +++++++++++++++++++++
+ hw/ppc/ppc4xx_devs.c         |  7 +++++++
+ hw/riscv/riscv_htif.c        |  4 ++++
+ hw/riscv/sifive_uart.c       |  4 ++++
+ hw/sd/omap_mmc.c             |  5 +++++
+ hw/sh4/r2d.c                 |  3 +++
+ hw/sh4/sh7750.c              |  4 ++++
+ hw/ssi/omap_spi.c            |  3 +++
+ hw/timer/omap_synctimer.c    |  4 ++++
+ hw/timer/sh_timer.c          |  5 +++++
+ hw/usb/hcd-musb.c            |  3 +++
+ hw/xtensa/xtfpga.c           |  3 +++
+ 43 files changed, 202 insertions(+), 5 deletions(-)
+ create mode 100644 include/hw/qdev-deprecated.h
+
 -- 
 2.21.3
 
