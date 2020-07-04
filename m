@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C051C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA6BEC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:46:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67C4A20771
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6440320771
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 18:46:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqsPYe1p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67C4A20771
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JLo6mZ/2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6440320771
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrnAB-0006AH-Nt
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:45:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40118)
+	id 1jrnB8-0007zA-8y
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 14:46:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmwR-0005Nl-TM
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:31:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47218
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvo-0003vJ-Ks
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:32 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44007
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmwQ-0001iG-0G
- for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:31:11 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jrmvm-0001RI-Fs
+ for qemu-devel@nongnu.org; Sat, 04 Jul 2020 14:30:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593887469;
+ s=mimecast20190719; t=1593887429;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=bXQcnI6PvYNrc0EdCBus9d90Kc/4/S8iNwGC64RK2O8=;
- b=DqsPYe1pGOWsxNUlZTDqpfhKfgg0LLFvRX5aXHgpXSqAGAJLffJs/07QrQt7/zYjILPeop
- kquk4RsTqnaD3S5mqcqbgMjtZ8BSetTnkFOy1/x5rGMeECFBJif2pRfwCms5ozdDUVQime
- /bp6yaOL9lEDNx5G7kq+2Kt55ugK/7A=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-TQuGDHkIPA2ACPiEORkUFA-1; Sat, 04 Jul 2020 14:31:04 -0400
-X-MC-Unique: TQuGDHkIPA2ACPiEORkUFA-1
-Received: by mail-wr1-f70.google.com with SMTP id b14so36495575wrp.0
- for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:31:04 -0700 (PDT)
+ bh=84z48SEDVIW4lHeSX/JWrxebkeh/PVqSS0PAVUgtM8I=;
+ b=JLo6mZ/24MQCs4AXwIAUSXr7r9dd0Ro7E12sIP2uiQyduIAr/4PfB+tw82PCgdBxvO4rL2
+ dXvQBi1ZG3g7xjl0sY5wj/nGgdvEUUa6ueusdyd2KgcvGdu/7F986QZCSJgxi7vJW3GGqR
+ K1dGdQN16zUE13XOOMRJruiiKYz3zK8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-a_3ua2UjPuWPZdA0SB0H-w-1; Sat, 04 Jul 2020 14:30:27 -0400
+X-MC-Unique: a_3ua2UjPuWPZdA0SB0H-w-1
+Received: by mail-wr1-f69.google.com with SMTP id g14so36341439wrp.8
+ for <qemu-devel@nongnu.org>; Sat, 04 Jul 2020 11:30:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=bXQcnI6PvYNrc0EdCBus9d90Kc/4/S8iNwGC64RK2O8=;
- b=V9626T96YR6r/CbrPNvh5uLzOnuBoVlzlMlwDrSe2EWMAviWLG3BweP8KQWJVIpU5/
- RUHenAlgEpkwXJD6kR1Q/JeWZPXVHSvlceR1QLSF/ueUYMIt8I9xXuYBqWL//ZTpYt8V
- Wpg99VfR1tcGiZ2wOvxCXJCbamW0qDdftUfqsliq5DIR/EoDOVrJ5rX6lENoVkZC1lAz
- isk4Fl0OLvph3R8JaqYYCS1FaZMr1VrZn5DCwAxXVpZWZTQsRTBKQfGodTMu3wtdTZhu
- 2e9YYcfH6SrQ7XJRq5BpEXXy35NNHy48ZhJhUS09xH5XroGWWzV0TiiQIER2G+4uHvQ7
- c3sg==
-X-Gm-Message-State: AOAM532mkRIJoqxCqmfA0K1rRAnqo0WpChWAR+M0zeYFNkvnBtWQntQJ
- CtQfj7Z7tk+CA7f/GHWjQfivuJWwUGsnmGueob0AlDa0L/4dvSY69LrPVn/8JYUf2zPHneYZuNg
- x1i4hW13S9K5pM5o=
-X-Received: by 2002:a5d:6912:: with SMTP id t18mr41081832wru.411.1593887462976; 
- Sat, 04 Jul 2020 11:31:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyu/tTGeWJsYhj0Mcg34Kyyo5pdZZFzN1ONJp3PYv0w110/HS05zTw3svSK1EkwmbP5ZFIjxg==
-X-Received: by 2002:a5d:6912:: with SMTP id t18mr41081828wru.411.1593887462840; 
- Sat, 04 Jul 2020 11:31:02 -0700 (PDT)
+ bh=84z48SEDVIW4lHeSX/JWrxebkeh/PVqSS0PAVUgtM8I=;
+ b=nujsIOjand6hj+9ms2NvNdT1YnTAv+xWVbyOTT45mMYO35LBQpBEngy1OEoNDBEHlv
+ sAeG5F2BLgfvlqFnwT8R94KjGXJefQi+HdoyhNgonWtydMf3giFbIQPT2hSrBK1XC11Q
+ /KP4LR9QmRt/0TMl3nb0plaI7xXMAges9y63ZEbt5O1xwNMWrAJc2crz/fK2r3Kr6lNj
+ EWRFBt4mZaDRCkBFfV29idZfAw/GtUbwD9GKKLcr0tgcVq24R5mMdhwgjqATyhOtONxx
+ 7NLXR6bAV5cQAXY9sAOCKZYJKPoyfR7p+8GOIevvjNkgzrkNqN6si2GsclmVUGzId5rh
+ vaGw==
+X-Gm-Message-State: AOAM532o2/Np/UI2roDBb6E7IzHPRQYlID0TUPq/g/zTh6dunsg4Inqw
+ b/WIiCWGJBtv+9EkuyKEvzIu72aijhxJ+o7DesoQQcjTmW1N2yN4ckQEBuFaiQJ1FdEMbCMGc51
+ tb6qiWPsJOLGaTjQ=
+X-Received: by 2002:a1c:99c2:: with SMTP id b185mr44654505wme.52.1593887426468; 
+ Sat, 04 Jul 2020 11:30:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyCryA6dX+fL8OLR9fS6X8IAgPieuRlD7P/JDWyluu3Ky07a5hGBsjv+Vy4/u11a5MxEI8B2w==
+X-Received: by 2002:a1c:99c2:: with SMTP id b185mr44654495wme.52.1593887426294; 
+ Sat, 04 Jul 2020 11:30:26 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
  by smtp.gmail.com with ESMTPSA id
- u8sm17007683wrt.28.2020.07.04.11.31.01
+ 63sm18751488wra.86.2020.07.04.11.30.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 11:31:02 -0700 (PDT)
-Date: Sat, 4 Jul 2020 14:31:00 -0400
+ Sat, 04 Jul 2020 11:30:25 -0700 (PDT)
+Date: Sat, 4 Jul 2020 14:30:24 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 38/41] vhost: implement vhost_force_iommu method
-Message-ID: <20200704182750.1088103-39-mst@redhat.com>
+Subject: [PULL v2 23/41] virtio-mem: Exclude unplugged memory during migration
+Message-ID: <20200704182750.1088103-24-mst@redhat.com>
 References: <20200704182750.1088103-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200704182750.1088103-1-mst@redhat.com>
@@ -88,9 +88,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:15
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/04 11:39:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -111,41 +111,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Cindy Lu <lulu@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cindy Lu <lulu@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-use the vhost_force_iommu callback to force enable feature bit VIRTIO_F_IOMMU_PLATFORM
+The content of unplugged memory is undefined and should not be migrated,
+ever. Exclude all unplugged memory during precopy using the precopy notifier
+infrastructure introduced for free page hinting in virtio-balloon.
 
-Signed-off-by: Cindy Lu <lulu@redhat.com>
-Message-Id: <20200701145538.22333-12-lulu@redhat.com>
+Unplugged memory is marked as "not dirty", meaning it won't be
+considered for migration.
+
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200626072248.78761-21-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/virtio/vhost.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/hw/virtio/virtio-mem.h |  3 ++
+ hw/virtio/virtio-mem.c         | 54 +++++++++++++++++++++++++++++++++-
+ 2 files changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 1e083a8976..1a1384e7a6 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -810,6 +810,11 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
-     if (!vhost_dev_has_iommu(dev)) {
-         features &= ~(0x1ULL << VIRTIO_F_IOMMU_PLATFORM);
-     }
-+    if (dev->vhost_ops->vhost_force_iommu) {
-+        if (dev->vhost_ops->vhost_force_iommu(dev) == true) {
-+            features |= 0x1ULL << VIRTIO_F_IOMMU_PLATFORM;
-+       }
+diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
+index b74c77cd42..0778224964 100644
+--- a/include/hw/virtio/virtio-mem.h
++++ b/include/hw/virtio/virtio-mem.h
+@@ -67,6 +67,9 @@ typedef struct VirtIOMEM {
+ 
+     /* notifiers to notify when "size" changes */
+     NotifierList size_change_notifiers;
++
++    /* don't migrate unplugged memory */
++    NotifierWithReturn precopy_notifier;
+ } VirtIOMEM;
+ 
+ typedef struct VirtIOMEMClass {
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index 1ab9ef17fa..65850530e7 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -62,8 +62,14 @@ static bool virtio_mem_is_busy(void)
+     /*
+      * Postcopy cannot handle concurrent discards and we don't want to migrate
+      * pages on-demand with stale content when plugging new blocks.
++     *
++     * For precopy, we don't want unplugged blocks in our migration stream, and
++     * when plugging new blocks, the page content might differ between source
++     * and destination (observable by the guest when not initializing pages
++     * after plugging them) until we're running on the destination (as we didn't
++     * migrate these blocks when they were unplugged).
+      */
+-    return migration_in_incoming_postcopy();
++    return migration_in_incoming_postcopy() || !migration_is_idle();
+ }
+ 
+ static bool virtio_mem_test_bitmap(VirtIOMEM *vmem, uint64_t start_gpa,
+@@ -475,6 +481,7 @@ static void virtio_mem_device_realize(DeviceState *dev, Error **errp)
+     host_memory_backend_set_mapped(vmem->memdev, true);
+     vmstate_register_ram(&vmem->memdev->mr, DEVICE(vmem));
+     qemu_register_reset(virtio_mem_system_reset, vmem);
++    precopy_add_notifier(&vmem->precopy_notifier);
+ }
+ 
+ static void virtio_mem_device_unrealize(DeviceState *dev)
+@@ -482,6 +489,7 @@ static void virtio_mem_device_unrealize(DeviceState *dev)
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VirtIOMEM *vmem = VIRTIO_MEM(dev);
+ 
++    precopy_remove_notifier(&vmem->precopy_notifier);
+     qemu_unregister_reset(virtio_mem_system_reset, vmem);
+     vmstate_unregister_ram(&vmem->memdev->mr, DEVICE(vmem));
+     host_memory_backend_set_mapped(vmem->memdev, false);
+@@ -757,12 +765,56 @@ static void virtio_mem_set_block_size(Object *obj, Visitor *v, const char *name,
+     vmem->block_size = value;
+ }
+ 
++static void virtio_mem_precopy_exclude_unplugged(VirtIOMEM *vmem)
++{
++    void * const host = qemu_ram_get_host_addr(vmem->memdev->mr.ram_block);
++    unsigned long first_zero_bit, last_zero_bit;
++    uint64_t offset, length;
++
++    /*
++     * Find consecutive unplugged blocks and exclude them from migration.
++     *
++     * Note: Blocks cannot get (un)plugged during precopy, no locking needed.
++     */
++    first_zero_bit = find_first_zero_bit(vmem->bitmap, vmem->bitmap_size);
++    while (first_zero_bit < vmem->bitmap_size) {
++        offset = first_zero_bit * vmem->block_size;
++        last_zero_bit = find_next_bit(vmem->bitmap, vmem->bitmap_size,
++                                      first_zero_bit + 1) - 1;
++        length = (last_zero_bit - first_zero_bit + 1) * vmem->block_size;
++
++        qemu_guest_free_page_hint(host + offset, length);
++        first_zero_bit = find_next_zero_bit(vmem->bitmap, vmem->bitmap_size,
++                                            last_zero_bit + 2);
 +    }
-     r = dev->vhost_ops->vhost_set_features(dev, features);
-     if (r < 0) {
-         VHOST_OPS_DEBUG("vhost_set_features failed");
++}
++
++static int virtio_mem_precopy_notify(NotifierWithReturn *n, void *data)
++{
++    VirtIOMEM *vmem = container_of(n, VirtIOMEM, precopy_notifier);
++    PrecopyNotifyData *pnd = data;
++
++    switch (pnd->reason) {
++    case PRECOPY_NOTIFY_SETUP:
++        precopy_enable_free_page_optimization();
++        break;
++    case PRECOPY_NOTIFY_AFTER_BITMAP_SYNC:
++        virtio_mem_precopy_exclude_unplugged(vmem);
++        break;
++    default:
++        break;
++    }
++
++    return 0;
++}
++
+ static void virtio_mem_instance_init(Object *obj)
+ {
+     VirtIOMEM *vmem = VIRTIO_MEM(obj);
+ 
+     vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
+     notifier_list_init(&vmem->size_change_notifiers);
++    vmem->precopy_notifier.notify = virtio_mem_precopy_notify;
+ 
+     object_property_add(obj, VIRTIO_MEM_SIZE_PROP, "size", virtio_mem_get_size,
+                         NULL, NULL, NULL);
 -- 
 MST
 
