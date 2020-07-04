@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C68DC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:59:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E8BFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E74882158C
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:59:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A8C22158C
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 14:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGjxAbMk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E74882158C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zzt2Ao+q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A8C22158C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrjdM-0001oE-6W
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:59:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57842)
+	id 1jrjdd-0002Bo-CW
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jul 2020 10:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrjUi-00024i-5m; Sat, 04 Jul 2020 10:50:20 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38205)
+ id 1jrjUo-0002AQ-L9; Sat, 04 Jul 2020 10:50:27 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38103)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrjUg-0003jd-Fs; Sat, 04 Jul 2020 10:50:19 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f18so37074331wml.3;
- Sat, 04 Jul 2020 07:50:17 -0700 (PDT)
+ id 1jrjUm-0003rV-C1; Sat, 04 Jul 2020 10:50:26 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z13so35769451wrw.5;
+ Sat, 04 Jul 2020 07:50:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xjjAqG2L8PiyECLv8vWl/nPN8wdvqzFPKnLDYj57EWU=;
- b=kGjxAbMk0Y+V1ZM0jG8F7zrUJeEpbEY2rUuWHyvQnUy2BC4TEa4D9G84sW8qU3Tnyi
- hXyLAakl5TAVaESh9mwcqIkW9kPRuFhF1CPBo0iqa9EzqOeUO8dcJwyom69eu1X7is1K
- GI/h4RCMamXhRltfPP+anRNrC4T3Xl/b+bRd7v5Nxqs6IBSrpiZ+NfMzkc3fyOz+zG/O
- qhZVj0cz4AUqg4attnXMbE/OWUZmlqtkxjHzNmmPiDdGXYHh9wyMp7La7dx/LG+WG1y0
- 7hKot5Tx+EVBqxTjnBKGlFKxDUcrNR10Wub/RcuZ75CfRChXgIvTj2rJ1blM2eTTB1qV
- uPjQ==
+ bh=bNYiPy+H907R6GvRggaZDEAvq/yJ89RNH5vqYDziYiQ=;
+ b=Zzt2Ao+qbpw+PyTf0gj3H8RK9KRIom4jWcvpaKOt4s1hW0V1FcCCbKJ+J1H1BoamQa
+ X7yQWbLBOiWHDKwtYXNcSlpsadQlqloNBTBk3OoIeHNh7YjvW7yMB0amtIHW7A3uKNrF
+ KIuBad86H5R6+A+garcJYO5R0cc0W1dnCsIKjrMacUlgm36Fhjt7sIWGaJjruzORr6Mw
+ tCeATKmk7k/LQ9OiBic3Z6q8k1mV35zARhSfEfSLPMbQtj1CaWLLBsqEXHNhY7FCgnTB
+ UPsPUgFVXy+a2LKVM7IwIcL6sBQUgKI3uk0ZNyDH/kMyxLLse6a/v9qA5iUjYWAwTnNg
+ EH5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=xjjAqG2L8PiyECLv8vWl/nPN8wdvqzFPKnLDYj57EWU=;
- b=DsxGZ58tcbMVgprV0RiBT6eKszIJWBi0hweXYCfw5k6dxZrNUS3cieI3PF8lE5/YIY
- 3vvWbcw9DXnz6evxs4GgB47G71m7L+VsQLuq7aORv1/RqsR8e0YSqtG8RmMAnbTBikPe
- Sqw2n7Q/LmmJkRY8z58RqRTZdFBHMlfiNOGWuS/dhfKHpFQk169TbRO8Mlf5hGMdqxy7
- PhFmrQNntpld09S8GKrZgBkanSB4uQNr8YZ3ZERDRpRGK5n/D+EmVwS5yOB+vvsplMdI
- ZFDD7tP0TCr1KtIHU1/DpCiP+qJGayqj2Z9uzfN8HYyiQKFNi/5N96wemyxQszL9vqNV
- wTwA==
-X-Gm-Message-State: AOAM533kb4Xy5Crf8AtrEbfs/Eea4BGx2eXw8I4mxz/5zQFqVJahuJUy
- TMxs6efJ8Kuv30Z29pve1GNWUjge+4s=
-X-Google-Smtp-Source: ABdhPJyylaQ90oaFVpyNttGYGyUpJwJRvbiuNFcOgPIhMsiwGOGXapRLVUD2ADJD/bSRm2sJT5Aq2g==
-X-Received: by 2002:a1c:6788:: with SMTP id
- b130mr42706142wmc.100.1593874216169; 
- Sat, 04 Jul 2020 07:50:16 -0700 (PDT)
+ bh=bNYiPy+H907R6GvRggaZDEAvq/yJ89RNH5vqYDziYiQ=;
+ b=II66UvMQVxzrR3ZWp9oAXjw8zYByE+Rg0Nohw1w/nWghUnsrJdp+sUh9Q5k5C8KlN2
+ C4JPOe/js9EnASubm1nyc2Y9+1RqZSvHDGQ7yFuY2yl45NQ8qMW4ZGd20KgSUpGie5K8
+ PRst6FvBTDwQTGNocVtkmDmKK6bYguUyoGHkDHmTNIgalRvr9H42V3tCJ2Fhk3praH0/
+ YgDtniE7ZY8mqy4ppyHw6hS/EtOjjiCGyVlFc+r/8pWFefYOP4aQF80yYhWCRNiHld3k
+ a95g/hLXALMJ28mXwUdbU2eC0woyqgLeNBb7s/KpWIfsLn9z8ZKtSd/4UIcwtnQHKfd9
+ bUyw==
+X-Gm-Message-State: AOAM530U7Fdg2/eLplpES5zG8B55LMhIvdBgGb4p00tu6pBdrJ3eak6E
+ gUmtPKQl13ZUXbyhjuwGoDv1UsbgMnI=
+X-Google-Smtp-Source: ABdhPJx8cXLO5EiX1MZNGYDXemombuB+cpvmJcqKanQIPyybTeiASdt/aAvkPNB3j02DjAjdPJizlA==
+X-Received: by 2002:adf:e74e:: with SMTP id c14mr43510389wrn.143.1593874222155; 
+ Sat, 04 Jul 2020 07:50:22 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r10sm17135019wrm.17.2020.07.04.07.50.14
+ by smtp.gmail.com with ESMTPSA id r10sm17135019wrm.17.2020.07.04.07.50.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 07:50:15 -0700 (PDT)
+ Sat, 04 Jul 2020 07:50:21 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH 14/26] hw/usb/quirks: Rename included source with '.inc.c'
- suffix
-Date: Sat,  4 Jul 2020 16:49:31 +0200
-Message-Id: <20200704144943.18292-15-f4bug@amsat.org>
+Subject: [PATCH 17/26] hw/usb/bus: Rename usb_get_dev_path() as
+ usb_get_full_dev_path()
+Date: Sat,  4 Jul 2020 16:49:34 +0200
+Message-Id: <20200704144943.18292-18-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200704144943.18292-1-f4bug@amsat.org>
 References: <20200704144943.18292-1-f4bug@amsat.org>
@@ -80,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -135,54 +134,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This file is not a header, but contains source code which is
-included and compiled once. We use the '.inc.c' suffix in few
-other cases in the repository. Follow the same convention with
-this file.
+If the device has USB_DEV_FLAG_FULL_PATH set, usb_get_dev_path()
+returns the full port path. Rename the function accordingly.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/usb/quirks.c                   | 2 +-
- hw/usb/{quirks.h => quirks.inc.c} | 5 -----
- 2 files changed, 1 insertion(+), 6 deletions(-)
- rename hw/usb/{quirks.h => quirks.inc.c} (99%)
+ hw/usb/bus.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/usb/quirks.c b/hw/usb/quirks.c
-index 23ea7a23ea..655b36f2d5 100644
---- a/hw/usb/quirks.c
-+++ b/hw/usb/quirks.c
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index f8901e822c..fad8194bf5 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
 @@ -13,7 +13,7 @@
-  */
  
- #include "qemu/osdep.h"
--#include "quirks.h"
-+#include "quirks.inc.c"
- #include "hw/usb.h"
+ static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
  
- static bool usb_id_match(const struct usb_device_id *ids,
-diff --git a/hw/usb/quirks.h b/hw/usb/quirks.inc.c
-similarity index 99%
-rename from hw/usb/quirks.h
-rename to hw/usb/quirks.inc.c
-index 50ef2f9c2e..004b228aba 100644
---- a/hw/usb/quirks.h
-+++ b/hw/usb/quirks.inc.c
-@@ -12,9 +12,6 @@
-  * (at your option) any later version.
-  */
+-static char *usb_get_dev_path(DeviceState *dev);
++static char *usb_get_full_dev_path(DeviceState *dev);
+ static char *usb_get_fw_dev_path(DeviceState *qdev);
+ static void usb_qdev_unrealize(DeviceState *qdev);
  
--#ifndef HW_USB_QUIRKS_H
--#define HW_USB_QUIRKS_H
--
- /* 1 on 1 copy of linux/drivers/usb/serial/ftdi_sio_ids.h */
- #include "quirks-ftdi-ids.h"
- /* 1 on 1 copy of linux/drivers/usb/serial/pl2303.h */
-@@ -915,5 +912,3 @@ static const struct usb_device_id usbredir_ftdi_serial_ids[] = {
+@@ -33,7 +33,7 @@ static void usb_bus_class_init(ObjectClass *klass, void *data)
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
  
- #undef USB_DEVICE
- #undef USB_DEVICE_AND_INTERFACE_INFO
--
--#endif
+     k->print_dev = usb_bus_dev_print;
+-    k->get_dev_path = usb_get_dev_path;
++    k->get_dev_path = usb_get_full_dev_path;
+     k->get_fw_dev_path = usb_get_fw_dev_path;
+     hc->unplug = qdev_simple_device_unplug_cb;
+ }
+@@ -577,7 +577,7 @@ static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent)
+                    dev->attached ? ", attached" : "");
+ }
+ 
+-static char *usb_get_dev_path(DeviceState *qdev)
++static char *usb_get_full_dev_path(DeviceState *qdev)
+ {
+     USBDevice *dev = USB_DEVICE(qdev);
+ 
 -- 
 2.21.3
 
