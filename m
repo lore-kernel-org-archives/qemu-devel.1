@@ -1,122 +1,100 @@
-Return-Path: <SRS0=4umr=AO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=gOAu=AP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 607FBC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 23:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 144B8C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 00:51:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21F3720826
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jul 2020 23:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1BCF206DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jul 2020 00:51:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9uI4vNX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F3720826
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dDrVjpDQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1BCF206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jrVL3-0006x1-CZ
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 19:43:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42490)
+	id 1jrWOS-0005n8-5T
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jul 2020 20:51:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrVKM-0006S4-El; Fri, 03 Jul 2020 19:42:42 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40003)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jrWNp-0005G2-CC
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 20:50:21 -0400
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:32895)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jrVKK-0001sm-NW; Fri, 03 Jul 2020 19:42:42 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f139so35671647wmf.5;
- Fri, 03 Jul 2020 16:42:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RzXv0/aKMQdbFXDbikxnemBRNYBqAR193rNV/2PPACw=;
- b=W9uI4vNXyvQG38IgrbvCuOwfPLqd7GGdJMNNuElYOwJlG3hDh05XkY1z24mKRN/yE0
- QaemcBkv/qxGh/prS0LXQi0dNXqwrHhw2tPS2fUlB++wmoE/c5WQSiSCymoCJMqiroW5
- aU7n6YeziCcttKlu6o3kbKqF/tkQ3z6BLzSC8UbXPuj5IdgUeMalWcETi3iKmJUMH5Ml
- HeNl6Nl7+fwjoM7GyykFEDO6GA/p/3Jd5O2SM00SkC4+5eJAM+ZwUzB/sdKa8JZ2M4uR
- cdGuz4kGm1Mar/DxueVMM+PkdHrhNx9i63UAJ6T8jh1gIEsrEwADq4irGo6yyF90G/v2
- VYbg==
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jrWNl-00075W-5q
+ for qemu-devel@nongnu.org; Fri, 03 Jul 2020 20:50:21 -0400
+Received: by mail-vs1-xe43.google.com with SMTP id u133so4360190vsc.0
+ for <qemu-devel@nongnu.org>; Fri, 03 Jul 2020 17:50:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=oM8V3dJ30E+i8OPC6HeE0rR8gA6+16SARIhE7deSAUE=;
+ b=dDrVjpDQPtxQv578OZtNU8Txdaa9h+WE3aBfMAHcPW3di1BS16bMDLZBkyfSM75I0M
+ fhmI52UOUHXgE88ONkrPxp8It2rAbcHinoUPyQcP0aGeaGgSLYiTdny6ZtXy8QfphUej
+ lZzX61d3BznQhcw1hhqlj75elB/kC/frIBylay/V77GN3xovt7QZ7aHMQMF7MU99PZTq
+ Choluo5Ymc/x18MeAPm0xLhZepz5oal8MdI5GKm7YcgwqBpIy/rj98bYUrEH4sFvp+WT
+ 5/bRo4NpzCYBGTEpDy/kpYOXBMxMG2p5Mta7RMDhQutXu2cUSFk5iLPfe6rppzW5LMVl
+ pJTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=RzXv0/aKMQdbFXDbikxnemBRNYBqAR193rNV/2PPACw=;
- b=R5by7bz9iDurw4m0Cn00L01CdmixfWP5vCujGR3GLbyjvpAEkE0Nzdm3zdDqattv8M
- KJLQls+u11G4yOqp1Q67NB4sV6S/PFL5RKwlNpVN5jy/pyzwEGcyN+VNC+o5QovzHs73
- 13fhitTrGS3YKzuNRVreT/N+lAexzR2j1WY8PacZfr9U7bfpzhhlAGiwN8MzJoe+e1zr
- 0u0tPIc8sFaVgcxBRLLF4bECsYcdvrSP3K7930MpbozMaCSb6f51jpx/Ny4dxboMBX/6
- /6VY8uLrRwksdmT5N7nQ2dYngQl0DOP3+LXhbNBKDTOt7CZne0PmHkDrOB0oqi0QajjX
- de9w==
-X-Gm-Message-State: AOAM533L4r7LHnDs0ULcLEVps2b+PA+9XMTHQQjHbV7xUbP4Z9v86Ak+
- PslqkZDU2JSU9JgE5p8Rbrc=
-X-Google-Smtp-Source: ABdhPJx9AoFau9gmO+9MJxLCSmAcfYtslnTb2XpANtSimYS8MmmXn9SBR4RhqUlO51OGhvywBJ2fdg==
-X-Received: by 2002:a1c:5418:: with SMTP id i24mr37303059wmb.47.1593819758741; 
- Fri, 03 Jul 2020 16:42:38 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id x124sm10244394wmx.16.2020.07.03.16.42.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jul 2020 16:42:38 -0700 (PDT)
-Subject: Re: [PATCH v7 09/17] hw/sd/sdcard: Special case the -ENOMEDIUM error
-To: Philippe Mathieu Daude <philmd@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200630133912.9428-1-f4bug@amsat.org>
- <20200630133912.9428-10-f4bug@amsat.org>
- <CAFEAcA_dhbr6cjK40H0=e39sD2r8ERTZYrY5nhJtx81Rk+RmUg@mail.gmail.com>
- <2c77e134-4762-89b2-b60d-aabde740f25f@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <2a6b8801-038e-d67c-6d96-a3df526c44a0@amsat.org>
-Date: Sat, 4 Jul 2020 01:42:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=oM8V3dJ30E+i8OPC6HeE0rR8gA6+16SARIhE7deSAUE=;
+ b=IA7elA8qfkWIQJrd2lYsNBv8LuqOaGZe8dLPP8lZokJuOZ4Aay1BJHsyKBjaTtYZwa
+ kMOdlMh7bUVC1ZVZWZZeXVxHw9nGVooO+le6jIwAfVPCUcKQlkV9EtEel5suNSclyxhe
+ H2ADeGrNDVCWrni1AbCcgWkGyJ3sR58AsBPYEax0rzZWv1ygTLt7f0t1PLzHRUpThh9B
+ SwwCVuXWgHrQpgHQAjvSbac0KUwUDv8VbZVJ/tky7JvHuegGkP7nl1HA1NBFVj4KTU9Q
+ An50376+my6SrNj0IPOtj+Ht4b8uk6f8vByRQDcn+p5CnUfTWHWTWyYzLbWDmNqDwTa4
+ 1sDg==
+X-Gm-Message-State: AOAM531b88ZViS30wTCejcL213IqYt8CsEzD8NNKYbSwP8dWOFxbFJz5
+ g7aoMTR4ENs4ro9Tk8NsPI8TdEoBkk4FC2wb02wCAw==
+X-Google-Smtp-Source: ABdhPJxolP+smVhTa9sVL76bobePEsTo5TvIYqCq6ZfQ9RykAixUtyL5XXL1UFD44V9bxH6VcfPI3tvXGn0g7g2mzbk=
+X-Received: by 2002:a67:1b85:: with SMTP id
+ b127mr24937666vsb.152.1593823815770; 
+ Fri, 03 Jul 2020 17:50:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2c77e134-4762-89b2-b60d-aabde740f25f@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+References: <20200626235519.591734-1-hskinnemoen@google.com>
+ <20200626235519.591734-9-hskinnemoen@google.com>
+ <abdb209d-7268-7997-2caa-95cb984269da@amsat.org>
+ <CAFQmdRYZWhA-957jRHfiRHfYoOk-c2TJVtqoz6LMOhDgJwMiCg@mail.gmail.com>
+ <9f8c6cb0-cac3-2afe-a98a-c627cb04bd4b@amsat.org>
+In-Reply-To: <9f8c6cb0-cac3-2afe-a98a-c627cb04bd4b@amsat.org>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Fri, 3 Jul 2020 17:50:03 -0700
+Message-ID: <CAFQmdRZ79Fx-tdVaEjiAR=5ignn_Rw95HT7sjDxs7rYtD4ADTg@mail.gmail.com>
+Subject: Re: [PATCH v3 08/12] hw/nvram: NPCM7xx OTP device model
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
+ Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::e43;
+ envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,80 +107,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eddie James <eajames@linux.vnet.ibm.com>, Cedric Le Goater <clg@fr.ibm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/20 5:16 PM, Philippe Mathieu-Daudé wrote:
-> On 7/3/20 3:23 PM, Peter Maydell wrote:
->> On Tue, 30 Jun 2020 at 14:39, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>
->>> As we have no interest in the underlying block geometry,
->>> directly call blk_getlength(). We have to care about machines
->>> creating SD card with not drive attached (probably incorrect
->>> API use). Simply emit a warning when such Frankenstein cards
->>> of zero size are reset.
->>
->> Which machines create SD cards without a backing block device?
-> 
-> The Aspeed machines:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg718116.html
-> 
->> I have a feeling that also the monitor "change" and "eject"
->> commands can remove the backing block device from the SD card
->> object.
-> 
-> This is what I wanted to talk about on IRC. This seems wrong to me,
-> we should eject the card and destroy it, and recreate a new card
-> when plugging in another backing block device.
-> 
-> Keep the reparenting on the bus layer, not on the card.
+On Fri, Jul 3, 2020 at 3:24 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>
+> On 7/3/20 11:07 PM, Havard Skinnemoen wrote:
+> > On Fri, Jul 3, 2020 at 6:46 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat=
+.org> wrote:
+> >>
+> >> On 6/27/20 1:55 AM, Havard Skinnemoen wrote:
+> >>> +static void npcm7xx_otp_realize(DeviceState *dev, Error **errp)
+> >>> +{
+> >>> +    NPCM7xxOTPClass *oc =3D NPCM7XX_OTP_GET_CLASS(dev);
+> >>> +    NPCM7xxOTPState *s =3D NPCM7XX_OTP(dev);
+> >>> +    SysBusDevice *sbd =3D &s->parent;
+> >>> +
+> >>> +    s->array =3D g_malloc0(NPCM7XX_OTP_ARRAY_BYTES);
+> >>
+> >> The possibility to reuse persistent OTP seems important.
+> >> This can be added later of course.
+> >
+> > Agree, it's an important part of the behavior of the module. But it's
+> > not essential to be able to boot a BMC firmware image, so I left it
+> > out initially.
+>
+> This is not a problem until someone else try to use it. And OTP/NVRAM
+> are devices currently in hype. Meanwhile we have another technical debt.
+> I am just giving generic review comments.
+>
+> What bugs me particularly is the OTP content zeroed at reset without
+> any warning. Maybe you can add something like:
+>
+>   qemu_log_mask(LOG_UNIMP,
+>                 "Persistence not supported, OTP content erased!\n");
+>
+> in npcm7xx_otp_enter_reset().
 
-I was wrong, the current code is correct:
+Ah, but it only zeroes the registers. The OTP array is only zeroed in reali=
+ze().
 
-void sdbus_reparent_card(SDBus *from, SDBus *to)
-{
-    SDState *card = get_card(from);
-    SDCardClass *sc;
-    bool readonly;
+But I see your point about persistence. I will work on that.
 
-    /* We directly reparent the card object rather than implementing this
-     * as a hotpluggable connection because we don't want to expose SD cards
-     * to users as being hotpluggable, and we can get away with it in this
-     * limited use case. This could perhaps be implemented more cleanly in
-     * future by adding support to the hotplug infrastructure for "device
-     * can be hotplugged only via code, not by user".
-     */
+One possible complication is that real boards are expected to be
+programmed a certain way, so some reasonable defaults need to be
+loaded when the user doesn't specify an image (and perhaps also if the
+user specifies an "uninitialized" image, if there's any way to detect
+that). Would it make sense to add pc-bios blobs that can be loaded by
+default, and used as a starting point or backing file for users that
+need persistent OTP arrays? Or maybe just OR the factory-programmed
+bits into the user-provided image, since that would match the OTP
+nature of those bits.
 
-    if (!card) {
-        return;
-    }
+> >
+> >> See simple example in hw/nvram/eeprom_at24c.c which use
+> >> a BlockBackend so the OTP content is not lost after reset
+> >> or migration.
+> >
+> > I'll take a look at that, thanks!
+> >
+> >>> +
+> >>> +    memory_region_init_io(&s->mmio, OBJECT(s), oc->mmio_ops, s, "reg=
+s",
+> >>> +                          NPCM7XX_OTP_REGS_SIZE);
+> >>> +    sysbus_init_mmio(sbd, &s->mmio);
+> >>> +}
+> >>> +
+> >>> +static void npcm7xx_otp_class_init(ObjectClass *klass, void *data)
+> >>> +{
+> >>> +    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
+> >>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> >>> +
+> >>
+> >> Missing migration vmstate for NPCM7xxOTPState::regs[].
+> >
+> > Ah, you're right. This is probably true for most of the peripherals in
+> > this series. I'll see if I can get it sorted out for the next
+> > iteration.
+>
+> IIUC Peter is ready to queue your series on Monday if you fix the
+> license, but he usually doesn't accept devices without vmstate via
+> his tree, you got lucky ;) See:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg643089.html
+>
+> Adding the vmstate is not a hard task. If you need to respin,
+> I strongly recommend you to consider adding them.
 
-    sc = SD_CARD_GET_CLASS(card);
-    readonly = sc->get_readonly(card);
-
-    sdbus_set_inserted(from, false);
-    qdev_set_parent_bus(DEVICE(card), &to->qbus);
-    sdbus_set_inserted(to, true);
-    sdbus_set_readonly(to, readonly);
-}
-
-What I don't understand is why create a sdcard with no block backend.
-
-Maybe this is old code before the null-co block backend existed? I
-haven't checked the git history yet.
-
-I'll try to restrict sdcard with only block backend and see if
-something break (I doubt) at least it simplifies the code.
-But I need to update the Aspeed machines first.
-
-The problem when not using block backend, is the size is 0,
-so the next patch abort in sd_reset() due to:
-
-  static uint64_t sd_addr_to_wpnum(SDState *sd, uint64_t addr)
-  {
-      assert(addr < sd->size);
+Yeah, I'll add vmstate for v4. Thanks for the blog link, that looks
+like what I need.
 
