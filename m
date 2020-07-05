@@ -1,98 +1,100 @@
 Return-Path: <SRS0=SLMP=AQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9E8C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 10:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68630C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 11:15:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A0CC20771
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 10:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 308CD2075B
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 11:15:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grSourta"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0CC20771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8mnoYYK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308CD2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1js1XH-00007J-Na
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 06:06:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46136)
+	id 1js2cf-0007UW-Gx
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 07:15:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1js1Wb-0007qJ-J6
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 06:05:29 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38205)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1js1Wa-0005Ua-4z
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 06:05:29 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z13so37623857wrw.5
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 03:05:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sOiudD6UnkfYQ00aHXb4AplIZ1c3HvlkDvFtFJnR8oU=;
- b=grSourtatMVtm9YcV69XJvKUe3foimVrp82j6BETFpw2uaYMiHajLt7jDUJtQFpFxd
- J6RPD0oIHWQDzlSpjtZJrHr92oQ7f/T9kajKrEcmh8L8oLmPadhnYl7qd8OSgoHDOV/5
- dVaWQpQNQV47ouB9a/ty43UfgGoiAorZbpZyN6GQUrE/G5S1gW58B4Qc19l121Ez0jAY
- YrRV0lyaSGiu3MN4i7jAAM6otIOIq+ZLcR8PtYgrJgWzLwpuRL0wyfXhesEzyKR00Jss
- 3rU9EMQJQLt8HIdmEcfoqJXx4KZPCa9MZZznc/YaPpxHzPoR3n+VsJ6GXjYj/DPj2zWR
- pW/A==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1js2bi-00074P-09
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 07:14:50 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43508
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1js2bd-0001qA-Aw
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 07:14:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593947684;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0PbXWcgLxb27F1D3aXU2CE3bsYmKHtG1LHDWVLxzNhY=;
+ b=J8mnoYYK7vVZdiRRLkHj7Fe+o/S3OTl8a80KsMSzGuukDrzo8fbHZE4IVgAnBfcIwb6hhn
+ ceVTKOZBy/h/P1/x4GIJuY7+2Tzp4e749gEm1ak0ziMTC5QN62vLjXVuW3474MUJKBOjRP
+ gVmCAyROuOJQXFD5ZmVHcW6yxv6A1I4=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-eV0uyt_ONvOgsUTyuP17tQ-1; Sun, 05 Jul 2020 07:14:42 -0400
+X-MC-Unique: eV0uyt_ONvOgsUTyuP17tQ-1
+Received: by mail-ej1-f71.google.com with SMTP id yw17so31592234ejb.12
+ for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 04:14:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sOiudD6UnkfYQ00aHXb4AplIZ1c3HvlkDvFtFJnR8oU=;
- b=ZNkV2Ovjyw1OZYzIG+Oqt+3vkCkQTaTon6kf6nRPrfRBNnP2Nn4tEuGyJGAta1cJyO
- NTgncS+c3Hp8M4woY/aahdL0PQeMVgNvOxb16nto/LIR4iYxDvREnSEhEVbiq/fGJu6m
- ABelJDz7ByQcOXi5O3bJfjnk56oYcW5tZvI+fd4D//8fOna2fYyHWWeN41G2+nO6zYU6
- QWOOYy8m2YSVTGfpJWBDbX2XYGWcCre9lRP+3P6y0N63KFUXUdxapXS9deZc63duNmqh
- lTw1lCZqxQwVjWeiDvuDYeReHTo1T1sJmt6UlYiURZSWTJSU6j5gdZ+XT9tLKiEZFy6I
- B7yQ==
-X-Gm-Message-State: AOAM53272l8WT6vqgd5UXw6BPoMyq9Ik3tVo7ZvWUu35vwT5j0EtYOYF
- qESABjUKUyunJTvZQ1gae6w=
-X-Google-Smtp-Source: ABdhPJyIJfwNQE90PrJJWZ6AFU355vBJX+2ien78sVs2GeUF2dKKHanlvL4Y0FUFFdatAvKOLc+S9w==
-X-Received: by 2002:a5d:4991:: with SMTP id r17mr16328722wrq.1.1593943525661; 
- Sun, 05 Jul 2020 03:05:25 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
- [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id v24sm22864525wrd.92.2020.07.05.03.05.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 05 Jul 2020 03:05:24 -0700 (PDT)
-Subject: Re: [PATCH] hw/core/qdev: Increase qdev_realize() kindness
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0PbXWcgLxb27F1D3aXU2CE3bsYmKHtG1LHDWVLxzNhY=;
+ b=YDvt4vljvclm2cdATykFAzbqQMKqY9DytvOQsztzpq1tdrFMR88ZR2EynnYkC3gVKj
+ OQwYSQ+Er5WmuSNsoFa8fMj/A4rPeppXOA8x14y8pMF60vetVaFDodVk7krS8Hi24+ym
+ GBmROF2JyzvbB5UXUlOQ663A4LN8qF+97zNLP016zyWIdbuIiB5L8Bz2rGibokvD+Uei
+ CnYdqgRw/fTex43Aa//iIETcfyNIF8I5Ys19uQo9QBLes34NPs2uEtJOE1cMHOb3QMGy
+ nmujVkj/8PzYGBQhdRd3PI2hd4S+PuPjV3NvGqifKNljW9tX9xxDQteCCOjpvyy66QTt
+ t18Q==
+X-Gm-Message-State: AOAM531/n5YZ2lOeeiQ0TjieBHtsE/DOXKwoKvFB07W3FPZWS0HZU+gy
+ eydtDkX9pPzYsmK6iJV9mmcPtNXcWTa0YhBhgb/5De8PixBF7Zffesd2GGUXxoDC+JLTRfzV0nU
+ 06g4esSLtivYcseFifpSnjssnf+LERFs=
+X-Received: by 2002:aa7:db4f:: with SMTP id n15mr33849953edt.193.1593947681649; 
+ Sun, 05 Jul 2020 04:14:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzLVehjagcitC8Xw0UVl322KO242LVw+VfHrCb8xTMkrOeozfMZN4e4ZEdVIDwr9IBClUwxOsw/zw8CcJML/88=
+X-Received: by 2002:aa7:db4f:: with SMTP id n15mr33849935edt.193.1593947681443; 
+ Sun, 05 Jul 2020 04:14:41 -0700 (PDT)
+MIME-Version: 1.0
 References: <20200620153837.14222-1-f4bug@amsat.org>
  <c0366cb5-fcb0-ff62-8ab5-92722a47d4e7@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <65937a53-5430-e5df-a5f0-de93dad315f2@amsat.org>
-Date: Sun, 5 Jul 2020 12:05:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <c0366cb5-fcb0-ff62-8ab5-92722a47d4e7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ <65937a53-5430-e5df-a5f0-de93dad315f2@amsat.org>
+In-Reply-To: <65937a53-5430-e5df-a5f0-de93dad315f2@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 5 Jul 2020 13:14:29 +0200
+Message-ID: <CABgObfYbqHh6JZZ4z_KUovekUH2yac17oQr0WH6K9GkdEz6rkg@mail.gmail.com>
+Subject: Re: [PATCH] hw/core/qdev: Increase qdev_realize() kindness
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="00000000000057e27905a9afddeb"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 05:57:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,28 +107,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/5/20 7:46 AM, Paolo Bonzini wrote:
-> On 20/06/20 17:38, Philippe Mathieu-Daudé wrote:
->> -    } else {
->> -        assert(!DEVICE_GET_CLASS(dev)->bus_type);
->> +    } else if (DEVICE_GET_CLASS(dev)->bus_type) {
->> +        error_report("%s: Unexpected bus '%s' for device '%s'",
->> +                     __func__, DEVICE_GET_CLASS(dev)->bus_type,
->> +                     object_get_typename(OBJECT(dev)));
->> +        abort();
->>      }
->>  
-> 
-> Since there is an errp, should we use it and be even kinder?
+--00000000000057e27905a9afddeb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is a programming error, not an user triggerable condition,
-so I'm not sure. IOW this must not happen, but if it does, then
-the error message helps the developer to notice the problem without
-having to use gdb.
+Are we sure that qdev_realize is never called with user-provided input? If
+it's a programming error, the call chain will end up passing &error_abort
+anyway, won't it?
+
+Paolo
+
+Il dom 5 lug 2020, 12:05 Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> ha
+scritto:
+
+> On 7/5/20 7:46 AM, Paolo Bonzini wrote:
+> > On 20/06/20 17:38, Philippe Mathieu-Daud=C3=A9 wrote:
+> >> -    } else {
+> >> -        assert(!DEVICE_GET_CLASS(dev)->bus_type);
+> >> +    } else if (DEVICE_GET_CLASS(dev)->bus_type) {
+> >> +        error_report("%s: Unexpected bus '%s' for device '%s'",
+> >> +                     __func__, DEVICE_GET_CLASS(dev)->bus_type,
+> >> +                     object_get_typename(OBJECT(dev)));
+> >> +        abort();
+> >>      }
+> >>
+> >
+> > Since there is an errp, should we use it and be even kinder?
+>
+> This is a programming error, not an user triggerable condition,
+> so I'm not sure. IOW this must not happen, but if it does, then
+> the error message helps the developer to notice the problem without
+> having to use gdb.
+>
+>
+
+--00000000000057e27905a9afddeb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto">Are we sure that qdev_realize is never called with user-p=
+rovided input? If it&#39;s a programming error, the call chain will end up =
+passing &amp;error_abort anyway, won&#39;t it?<div dir=3D"auto"><br></div><=
+div dir=3D"auto">Paolo</div></div><br><div class=3D"gmail_quote"><div dir=
+=3D"ltr" class=3D"gmail_attr">Il dom 5 lug 2020, 12:05 Philippe Mathieu-Dau=
+d=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; ha s=
+critto:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8=
+ex;border-left:1px #ccc solid;padding-left:1ex">On 7/5/20 7:46 AM, Paolo Bo=
+nzini wrote:<br>
+&gt; On 20/06/20 17:38, Philippe Mathieu-Daud=C3=A9 wrote:<br>
+&gt;&gt; -=C2=A0 =C2=A0 } else {<br>
+&gt;&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 assert(!DEVICE_GET_CLASS(dev)-&gt;bus=
+_type);<br>
+&gt;&gt; +=C2=A0 =C2=A0 } else if (DEVICE_GET_CLASS(dev)-&gt;bus_type) {<br=
+>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;%s: Unexpected bus=
+ &#39;%s&#39; for device &#39;%s&#39;&quot;,<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0__func__, DEVICE_GET_CLASS(dev)-&gt;bus_type,<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0object_get_typename(OBJECT(dev)));<br>
+&gt;&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 abort();<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;&gt;=C2=A0 <br>
+&gt; <br>
+&gt; Since there is an errp, should we use it and be even kinder?<br>
+<br>
+This is a programming error, not an user triggerable condition,<br>
+so I&#39;m not sure. IOW this must not happen, but if it does, then<br>
+the error message helps the developer to notice the problem without<br>
+having to use gdb.<br>
+<br>
+</blockquote></div>
+
+--00000000000057e27905a9afddeb--
+
 
