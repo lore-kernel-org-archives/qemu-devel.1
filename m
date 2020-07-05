@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDEFC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C741C433E1
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28E2520724
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:06:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E2520724
+	by mail.kernel.org (Postfix) with ESMTPS id EABB320724
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:06:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EABB320724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1js5HW-0004An-6h
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 10:06:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54012)
+	id 1js5HZ-0004FY-4I
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 10:06:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5F1-00077z-3E
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:35 -0400
-Received: from mail-ej1-f48.google.com ([209.85.218.48]:46610)
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5F7-0007N1-Lx
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:41 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:33398)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5Ey-0008I1-IC
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:34 -0400
-Received: by mail-ej1-f48.google.com with SMTP id p20so39621476ejd.13
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 07:03:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5F5-0008JY-Oj
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:41 -0400
+Received: by mail-ed1-f65.google.com with SMTP id h28so32284277edz.0
+ for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 07:03:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=1CySjLgGRRVRRw0BBDjUZQRjIzzmMdiS8rvXA+PsrzM=;
- b=luC3rwO0KBINnhCwDTzv3qqmHPp/6aKZsfil6JS4xnDHBUX7IPLMJXltZ+yuEtt5jF
- LkDkGxThhNwiMzKijHlqSei/Fp5ilixsrAImKCX6Yegul/vEgqHRj/wWSHWWDDVYPabG
- Mz1Jvmo7n24D++sWnGlj5n8xs/Ug4K5bRX0YTWjF9Ot3UXVEfOf+Ty6H4EEhFagAOTCH
- UFwrRaLdafqSIcTs3Q4xfx6Dp5IO8ViIPzx/E8YOd7s46V4NOm9OX1LnRvSZAf4ovI+4
- Uy+lUT8BRwiLyeXotvBT+niwcRraQ99qnE2j5v+MediU7qkWSJcy1WrudwvK+siYoyVc
- ezxg==
-X-Gm-Message-State: AOAM532pvlZL2G4HWwDJ7BM7Fw0mYtiN4PZXPFralzYWxHt+mQ7F7T9D
- 4NvBRsBF6R9xlN5HhpYvtRAw7uOe
-X-Google-Smtp-Source: ABdhPJxJldG3/UIGmJsjiYlDq4aei619IxfZhqx5itmpheD17ojc181bV+CUpWtO4FLPItYHtCbrvw==
-X-Received: by 2002:a17:906:6d56:: with SMTP id
- a22mr41137488ejt.440.1593957810975; 
- Sun, 05 Jul 2020 07:03:30 -0700 (PDT)
+ bh=hSGYUn8SW9XmH4sqQFlaKxAI1GVeOrhRmnongJWKY7k=;
+ b=SgE08gDTDwj6YUOjUECcw6LrgWz4PSmBkB7hFr3WvIAcBzACc5Q/HyWNnt94bZ6IrR
+ PPuczj2uVzKv+9YXdJeF72WuhDOgx80XUiRIJuraBv43atbIffiDgVVy3u2aFymFP//+
+ O0cBR39mzyqHwaPehoemez2Z9+21BY14BQG3KUBBxPlE6zp6QTa9rAVdv7ULT9pUZjuH
+ xBxDqfzTy18SH0M8Kkmlc1SQ/KdEejKKwwsBPG7smyaxEKhTPnLwW0PQAzpJao2mrEbX
+ vybsPKHKan11IQyvdwWr4sGPEDG8pvy41eXE3iBmvaU/NzlRhfkLsXeWc6uhvkbGUktu
+ keWQ==
+X-Gm-Message-State: AOAM530OCPcSutqXCGTPILL6xtpuQ7YcDxa6qFjW7yXEw3ugDa71N1VZ
+ rTgyHFDdmwqwr/6XenT8gDG18rIL
+X-Google-Smtp-Source: ABdhPJwJFZ7/bmEalBKw0HVSpsCCO4m1PmCB38INeLrAKwBQ4wnImRp1nQtnEFLaC8M4vIZ/FJwClQ==
+X-Received: by 2002:aa7:db57:: with SMTP id n23mr50113705edt.235.1593957818191; 
+ Sun, 05 Jul 2020 07:03:38 -0700 (PDT)
 Received: from thl530.multi.box (pd9e83654.dip0.t-ipconnect.de.
  [217.232.54.84])
- by smtp.gmail.com with ESMTPSA id bq8sm10941776ejb.103.2020.07.05.07.03.30
+ by smtp.gmail.com with ESMTPSA id bq8sm10941776ejb.103.2020.07.05.07.03.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jul 2020 07:03:30 -0700 (PDT)
+ Sun, 05 Jul 2020 07:03:37 -0700 (PDT)
 From: Thomas Huth <huth@tuxfamily.org>
 To: qemu-devel@nongnu.org, Michael Rolnik <mrolnik@gmail.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Richard Henderson <rth@twiddle.net>
-Subject: [PATCH rc6 03/30] target/avr: CPU class: Add interrupt handling
- support
-Date: Sun,  5 Jul 2020 16:02:48 +0200
-Message-Id: <20200705140315.260514-4-huth@tuxfamily.org>
+Subject: [PATCH rc6 14/30] target/avr: Add instruction translation - Bit and
+ Bit-test Instructions
+Date: Sun,  5 Jul 2020 16:02:59 +0200
+Message-Id: <20200705140315.260514-15-huth@tuxfamily.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200705140315.260514-1-huth@tuxfamily.org>
 References: <20200705140315.260514-1-huth@tuxfamily.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.218.48; envelope-from=th.huth@gmail.com;
- helo=mail-ej1-f48.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 10:03:31
+Received-SPF: pass client-ip=209.85.208.65; envelope-from=th.huth@gmail.com;
+ helo=mail-ed1-f65.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 10:03:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -8
 X-Spam_score: -0.9
@@ -97,133 +96,301 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-This patch introduces functions avr_cpu_do_interrupt() and
-avr_cpu_exec_interrupt() that are part of AVR CPU class object.
+This includes:
+    - LSR, ROR
+    - ASR
+    - SWAP
+    - SBI, CBI
+    - BST, BLD
+    - BSET, BCLR
 
-[AM: Split a larger AVR introduction patch into logical units]
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
 ---
- target/avr/cpu.c    |  2 +
- target/avr/helper.c | 89 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+)
- create mode 100644 target/avr/helper.c
+ target/avr/insn.decode |  14 +++
+ target/avr/translate.c | 247 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 261 insertions(+)
 
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index 1e9b099263..8305a3a85d 100644
---- a/target/avr/cpu.c
-+++ b/target/avr/cpu.c
-@@ -199,6 +199,8 @@ static void avr_cpu_class_init(ObjectClass *oc, void *data)
-     cc->class_by_name = avr_cpu_class_by_name;
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+index 341b55210c..8141e180d2 100644
+--- a/target/avr/insn.decode
++++ b/target/avr/insn.decode
+@@ -163,3 +163,17 @@ XCH             1001 001 rd:5 0100
+ LAC             1001 001 rd:5 0110
+ LAS             1001 001 rd:5 0101
+ LAT             1001 001 rd:5 0111
++
++#
++# Bit and Bit-test Instructions
++#
++LSR             1001 010 rd:5 0110
++ROR             1001 010 rd:5 0111
++ASR             1001 010 rd:5 0101
++SWAP            1001 010 rd:5 0010
++SBI             1001 1010 reg:5 bit:3
++CBI             1001 1000 reg:5 bit:3
++BST             1111 101 rd:5 0 bit:3
++BLD             1111 100 rd:5 0 bit:3
++BSET            1001 0100 0 bit:3 1000
++BCLR            1001 0100 1 bit:3 1000
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 63b4e16169..315f534f66 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -2500,3 +2500,250 @@ static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
  
-     cc->has_work = avr_cpu_has_work;
-+    cc->do_interrupt = avr_cpu_do_interrupt;
-+    cc->cpu_exec_interrupt = avr_cpu_exec_interrupt;
-     cc->dump_state = avr_cpu_dump_state;
-     cc->set_pc = avr_cpu_set_pc;
-     cc->disas_set_info = avr_cpu_disas_set_info;
-diff --git a/target/avr/helper.c b/target/avr/helper.c
-new file mode 100644
-index 0000000000..731a9ee27f
---- /dev/null
-+++ b/target/avr/helper.c
-@@ -0,0 +1,89 @@
+     return true;
+ }
++
 +/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ * Bit and Bit-test Instructions
 + */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "exec/helper-proto.h"
-+
-+bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++static void gen_rshift_ZNVSf(TCGv R)
 +{
-+    bool ret = false;
-+    CPUClass *cc = CPU_GET_CLASS(cs);
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
-+
-+    if (interrupt_request & CPU_INTERRUPT_RESET) {
-+        if (cpu_interrupts_enabled(env)) {
-+            cs->exception_index = EXCP_RESET;
-+            cc->do_interrupt(cs);
-+
-+            cs->interrupt_request &= ~CPU_INTERRUPT_RESET;
-+
-+            ret = true;
-+        }
-+    }
-+    if (interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
-+            int index = ctz32(env->intsrc);
-+            cs->exception_index = EXCP_INT(index);
-+            cc->do_interrupt(cs);
-+
-+            env->intsrc &= env->intsrc - 1; /* clear the interrupt */
-+            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
-+
-+            ret = true;
-+        }
-+    }
-+    return ret;
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
++    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
++    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
 +}
 +
-+void avr_cpu_do_interrupt(CPUState *cs)
++/*
++ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
++ *  loaded into the C Flag of the SREG. This operation effectively divides an
++ *  unsigned value by two. The C Flag can be used to round the result.
++ */
++static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
 +{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
++    TCGv Rd = cpu_r[a->rd];
 +
-+    uint32_t ret = env->pc_w;
-+    int vector = 0;
-+    int size = avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
-+    int base = 0;
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++    tcg_gen_shri_tl(Rd, Rd, 1);
 +
-+    if (cs->exception_index == EXCP_RESET) {
-+        vector = 0;
-+    } else if (env->intsrc != 0) {
-+        vector = ctz32(env->intsrc) + 1;
++    /* update status register */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
++    tcg_gen_movi_tl(cpu_Nf, 0);
++    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
++    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
++
++    return true;
++}
++
++/*
++ *  Shifts all bits in Rd one place to the right. The C Flag is shifted into
++ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, combined
++ *  with ASR, effectively divides multi-byte signed values by two. Combined with
++ *  LSR it effectively divides multi-byte unsigned values by two. The Carry Flag
++ *  can be used to round the result.
++ */
++static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++
++    tcg_gen_shli_tl(t0, cpu_Cf, 7);
++
++    /* update status register */
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++
++    /* update output register */
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++
++    /* update status register */
++    gen_rshift_ZNVSf(Rd);
++
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++/*
++ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant. Bit 0
++ *  is loaded into the C Flag of the SREG. This operation effectively divides a
++ *  signed value by two without changing its sign. The Carry Flag can be used to
++ *  round the result.
++ */
++static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++
++    /* update status register */
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
++
++    /* update output register */
++    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++
++    /* update status register */
++    gen_rshift_ZNVSf(Rd);
++
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++/*
++ *  Swaps high and low nibbles in a register.
++ */
++static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    tcg_gen_andi_tl(t0, Rd, 0x0f);
++    tcg_gen_shli_tl(t0, t0, 4);
++    tcg_gen_andi_tl(t1, Rd, 0xf0);
++    tcg_gen_shri_tl(t1, t1, 4);
++    tcg_gen_or_tl(Rd, t0, t1);
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++/*
++ *  Sets a specified bit in an I/O Register. This instruction operates on
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
++{
++    TCGv data = tcg_temp_new_i32();
++    TCGv port = tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_ori_tl(data, data, 1 << a->bit);
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(port);
++    tcg_temp_free_i32(data);
++
++    return true;
++}
++
++/*
++ *  Clears a specified bit in an I/O Register. This instruction operates on
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
++{
++    TCGv data = tcg_temp_new_i32();
++    TCGv port = tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(data);
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++/*
++ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
++ */
++static bool trans_BST(DisasContext *ctx, arg_BST *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++
++    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
++    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
++
++    return true;
++}
++
++/*
++ *  Copies the T Flag in the SREG (Status Register) to bit b in register Rd.
++ */
++static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t1 = tcg_temp_new_i32();
++
++    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
++    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
++    tcg_gen_or_tl(Rd, Rd, t1);
++
++    tcg_temp_free_i32(t1);
++
++    return true;
++}
++
++/*
++ *  Sets a single Flag or bit in SREG.
++ */
++static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x01);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x01);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x01);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x01);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x01);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x01);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x01);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x01);
++        break;
 +    }
 +
-+    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-+        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
-+    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-+    } else {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++    return true;
++}
++
++/*
++ *  Clears a single Flag in SREG.
++ */
++static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x00);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x00);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x00);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x00);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x00);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x00);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x00);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x00);
++        break;
 +    }
 +
-+    env->pc_w = base + vector * size;
-+    env->sregI = 0; /* clear Global Interrupt Flag */
-+
-+    cs->exception_index = -1;
++    return true;
 +}
 -- 
 2.26.2
