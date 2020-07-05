@@ -2,90 +2,95 @@ Return-Path: <SRS0=SLMP=AQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E1FC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 18:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A858C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 18:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C69120720
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 18:17:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 483D620720
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 18:17:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSWiZTFq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C69120720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="YDqgHOls"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483D620720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1js9Cy-0003VN-J1
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 14:17:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45908)
+	id 1js9D8-0002zo-DS
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 14:17:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1js9C5-0002zI-M4; Sun, 05 Jul 2020 14:16:49 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:39155)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1js9C4-0003KT-9G; Sun, 05 Jul 2020 14:16:49 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id b92so16025265pjc.4;
- Sun, 05 Jul 2020 11:16:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vzwXKwBxzMlfQOfpm981coONyXr9PQ6P2V2Qm8gfRoI=;
- b=fSWiZTFqoTFCNo1uejRPO6gY/DMUIc0LgWA4QJYi4qEyT4pqlgqWpa6U60DMWlbraD
- xDdJlUG+sQdIxn4tChskQGNVVqToIOJWLNdWvyxMMTq6w5H5x2g7SZA6CgsG4pq2KzLQ
- U9JT/Hze3meujLQtqA5Dm1tftVwszrRMM5y9D/DX5m9NajahWjOtTbGpIoiF2BP75Cq6
- W5CdCLzo6tlJcD7X6ld3zCXrYQTghT0ybwvO2BqqtUcZWjig0lF6wGNWQUOnADO8e70q
- UA/ILs/H8KaRH2/SkieTcH+dBGJX/WX/J/yW6hrVCy6lmanLKJzXD+C7x0gBf7osSyJc
- pRlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vzwXKwBxzMlfQOfpm981coONyXr9PQ6P2V2Qm8gfRoI=;
- b=XxwrnCz1uuZWhMXEvJ4kRDfwJGEcR+OYgf9CciYxtoKppCpMqoig/SY0Uojcy9I8oX
- CBw4Ry5+jnrhLbDBHFPPohXD36De2KJfeOPVRolokxB2dRqN4dJdBoWtaU5s857E5xH0
- 3Lgv6ouJxxeBz/5DZzAtWeHDpl7RegSiC6O/x4E8P7tB+ATivxCZHfM7wvadxMypYysG
- Wb2pGhjpBn2OZ0cBOMsWz+qFUfYayiGxSD1VYBktQX76/N97R7sy4qV262omiHhqpqos
- ICiJbDHWfl7XSaw0r8xIch16OXio8KUtudSY16ej7Yya20rbLimsMHhgMDkomF37cFxZ
- fUzw==
-X-Gm-Message-State: AOAM532K3HpURYYsajgcYA6d3o6z1Bq6gCw6Qv6ZcAcjKb/OQOdyGoE+
- LrLuafMGVnEN4Uwq/zYujyN4ojdEHq0STzdgh+0=
-X-Google-Smtp-Source: ABdhPJwp0YshKfHrboJI+dbiYHih4Fj+ess4NkMwddohSRmrXCMLjxW4gKo9lrk+B3OdrWJNyAVpBfyqhQ1tcEq5IV0=
-X-Received: by 2002:a17:902:b694:: with SMTP id
- c20mr37838996pls.123.1593973006134; 
- Sun, 05 Jul 2020 11:16:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jan.kiszka@web.de>) id 1js99O-00027c-89
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 14:14:02 -0400
+Received: from mout.web.de ([212.227.15.4]:51367)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jan.kiszka@web.de>) id 1js99L-0002Uk-PZ
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 14:14:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1593972833;
+ bh=i5ZF77LVkPyx2p971BzRknEGkCUrnCoKdbrEJ8v2r8I=;
+ h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
+ b=YDqgHOlspWGqXa775TtexF8WV1V7aX+YLAcjQvLEabGkvIoGnVuo74cV4JeS7jgfN
+ qiz9c9qmcgk4j8w6uv6tCbd9QM+Z/f7t0e825ey6kXY9/zp3tlSlmN2NsXyovWqCJq
+ QjcwRJH81vQSUzN//6mp8kPWt61SgcnKU7SKT7+s=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.2.196] ([92.210.73.173]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MKaHP-1jsylK1BzT-001wr8; Sun, 05
+ Jul 2020 20:13:53 +0200
+Subject: Re: [PATCH v2] apic: Report current_count via 'info lapic'
+From: Jan Kiszka <jan.kiszka@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+References: <e00e2896-ca5b-a929-de7a-8e5762f0c1c2@siemens.com>
+Message-ID: <ca8656e4-5f1d-7b41-7020-482fb2e2fe4e@web.de>
+Date: Sun, 5 Jul 2020 20:13:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200629160535.3910-1-wentong.wu@intel.com>
- <20200629160535.3910-3-wentong.wu@intel.com>
- <3260735e-05ab-2d42-f7e4-914ad804f543@linaro.org>
- <CAFEAcA_+e7hrA5GRGb=gv3GxJRL77ARP34vyudRbiqhdsNVKwg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_+e7hrA5GRGb=gv3GxJRL77ARP34vyudRbiqhdsNVKwg@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 5 Jul 2020 11:16:34 -0700
-Message-ID: <CAMo8BfLVDEFCXWNffVJaRb31UOTPO1iXNz5StexoKvWqQYzg6g@mail.gmail.com>
-Subject: Re: [PATCH 3/3] target/nios2: Use gen_io_start around wrctl
- instruction
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+In-Reply-To: <e00e2896-ca5b-a929-de7a-8e5762f0c1c2@siemens.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Gqs/2Rqc6l1yr/YqfEqmbc8tDa7F5X5ToTV3I5G7cJTxwM9CG2S
+ QVRW8tG4ZkeKaKc5hs3n+Rn6t0nonhbx5QGNRlIglEpQ9KQ/rUG4zD1fDCDGtmGuiuMSFMF
+ AIGoeUvp6l6ot8PbUCETTMG8KA2og4+Vy+myNUkZwCe3c+BnWAJ7ywfchjxq1e17oonQKJk
+ 1/oBZr9faCzgeVf8Z3GwQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ghA0quksZVQ=:+JLEJaOmvKJ/kFQy6l60UJ
+ SqcL/AnDpw3gqviO7E2+IH0m0DRux23QGRrcECZ65h/fqQ2xdbcpRi4KJRj+C8UAQFsJ5ffCY
+ t8hnTmYadOeQ4Ply+FXmaTCz5QZbXq7N1HlqOTB1w/O4HmRwOxfqygLtHRpq/4E5Be7VGTZXo
+ 3E3NTIzqrBheGmUGHBP8KM0c4cmElLouq599dfwbmFcbrUnODUIiMf7RXQIcoPVcAgvSmyNa4
+ PBwcdI1I7I92iTSyqaBqrS29F71EOJqSA+388CE4qhHviMCVZPh1ms2B897j8VZKsVSPR47Z9
+ iEtmA3LedG0noFGLo75Jeh0m/6pLWhh1ugFltFIA0oKZSqoGbivXIFgdqqbzY4jE3ZYSeGsln
+ 4SRD3K9luFqEQLHu4dqMcBxv5xYmOO9eJeBUibOo6Dvl2vEONJyy7PVEP7+9C7C9TG2htN5xQ
+ zDqhZWLssXMF+48PhDZgzNGHeV0ShKS0mbrV8nnY49G21QCCxHJmvSHKTds/fr/6r7g4d2UtA
+ 2SF159+UT01QdZBeyi8vwi/fqEV2IqnbdjvOGKaa5Mv2A9JKaCDcd1DiMZRcyRtQvGqNBiHo8
+ SNi2d3XFPBU0krI7zvHLQafbhcoujy3P9QX/ExJfE3yo7m+8Vyitjtwv+CEgGaVGMso9CHJIE
+ bLabUhAq2PMQh+NM/sHomiw3bWKBIUbM1jVuJxK8bNgshnz6Hsgi5SixpoQx31eJrqNXKdUOg
+ KEzcxyEPZuq66Tf3pXxPutoEcRGU/22s4YvuX2PPtP04S6Ig/cmdc+20kkgW+DxJT4ZdHa/57
+ Sqce39zuPnYGcL+PRoRVohSynyuOCDx9anjWSUf5iEXvCkKzqj63R0fYVxLVe6Ca4gOQUNB8I
+ tv51BNrlRh84Cu/vhbmmceEddE7bd6otSyft4VID3cfJnGHiTh2T2iI8dtYuDZ+u77r/eysME
+ 2RvcUzM93E3ozC2CiGxmsWZVGFVfESfrbxXSKUeIaBbjlaV7AGhqywtb9gA9w/m1Knq7upv9X
+ gbDLg23TpIzAwF+DoYyEcB6yTKcwE25HpcclsfPX1JgtQ69p7DpP0mFtwyJoaJ+Png2QR4mq0
+ ZHCOggDl+EytW/ezDxWYdTktW4G6LvjvlZByZcOZcR9SIoHsKxtV1/uanlVME9VjWIyI27U7Z
+ ChsrrO4Kx1mCFVeE6e9RUwUNcqvo+DzhbVVDBIKt4M18bJgCugr7GzP8QM2+16jrYVqHUWB8D
+ omYeAWsOoY+PONVF1fEh2RRYCfY39OxWtnHPPjA==
+Received-SPF: pass client-ip=212.227.15.4; envelope-from=jan.kiszka@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 14:13:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,68 +103,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>, Wentong Wu <wentong.wu@intel.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jul 5, 2020 at 10:09 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> On Thu, 2 Jul 2020 at 19:53, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> > This isn't right.  Not so much the gen_io_start portion, but the entire
-> > existence of helper_check_interrupt.
+On 07.02.20 07:43, Jan Kiszka wrote:
+> From: Jan Kiszka <jan.kiszka@siemens.com>
 >
-> I agree that it looks bogus (xtensa has a similar helper as well, incidentally),
+> This is helpful when debugging stuck guest timers.
+>
+> As we need apic_get_current_count for that, and it is really not
+> emulation specific, move it to apic_common.c and export it. Fix its
+> style at this chance as well.
+>
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>
+> Changes in v2:
+>   - fix style of apic_get_current_count
+>
+>   hw/intc/apic.c                  | 18 ------------------
+>   hw/intc/apic_common.c           | 19 +++++++++++++++++++
+>   include/hw/i386/apic_internal.h |  1 +
+>   target/i386/helper.c            |  5 +++--
+>   4 files changed, 23 insertions(+), 20 deletions(-)
+>
+> diff --git a/hw/intc/apic.c b/hw/intc/apic.c
+> index bd40467965..f2207d0ace 100644
+> --- a/hw/intc/apic.c
+> +++ b/hw/intc/apic.c
+> @@ -615,24 +615,6 @@ int apic_accept_pic_intr(DeviceState *dev)
+>       return 0;
+>   }
+>
+> -static uint32_t apic_get_current_count(APICCommonState *s)
+> -{
+> -    int64_t d;
+> -    uint32_t val;
+> -    d =3D (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - s->initial_count_loa=
+d_time) >>
+> -        s->count_shift;
+> -    if (s->lvt[APIC_LVT_TIMER] & APIC_LVT_TIMER_PERIODIC) {
+> -        /* periodic */
+> -        val =3D s->initial_count - (d % ((uint64_t)s->initial_count + 1=
+));
+> -    } else {
+> -        if (d >=3D s->initial_count)
+> -            val =3D 0;
+> -        else
+> -            val =3D s->initial_count - d;
+> -    }
+> -    return val;
+> -}
+> -
+>   static void apic_timer_update(APICCommonState *s, int64_t current_time=
+)
+>   {
+>       if (apic_next_timer(s, current_time)) {
+> diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> index 9ec0f2deb2..fb432e83f2 100644
+> --- a/hw/intc/apic_common.c
+> +++ b/hw/intc/apic_common.c
+> @@ -189,6 +189,25 @@ bool apic_next_timer(APICCommonState *s, int64_t cu=
+rrent_time)
+>       return true;
+>   }
+>
+> +uint32_t apic_get_current_count(APICCommonState *s)
+> +{
+> +    int64_t d;
+> +    uint32_t val;
+> +    d =3D (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - s->initial_count_loa=
+d_time) >>
+> +        s->count_shift;
+> +    if (s->lvt[APIC_LVT_TIMER] & APIC_LVT_TIMER_PERIODIC) {
+> +        /* periodic */
+> +        val =3D s->initial_count - (d % ((uint64_t)s->initial_count + 1=
+));
+> +    } else {
+> +        if (d >=3D s->initial_count) {
+> +            val =3D 0;
+> +        } else {
+> +            val =3D s->initial_count - d;
+> +        }
+> +    }
+> +    return val;
+> +}
+> +
+>   void apic_init_reset(DeviceState *dev)
+>   {
+>       APICCommonState *s;
+> diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_inte=
+rnal.h
+> index b04bdd947f..2597000e03 100644
+> --- a/include/hw/i386/apic_internal.h
+> +++ b/include/hw/i386/apic_internal.h
+> @@ -211,6 +211,7 @@ void vapic_report_tpr_access(DeviceState *dev, CPUSt=
+ate *cpu, target_ulong ip,
+>                                TPRAccess access);
+>
+>   int apic_get_ppr(APICCommonState *s);
+> +uint32_t apic_get_current_count(APICCommonState *s);
+>
+>   static inline void apic_set_bit(uint32_t *tab, int index)
+>   {
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index c3a6e4fabe..e3c3726c29 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -370,10 +370,11 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, i=
+nt flags)
+>       dump_apic_lvt("LVTTHMR", lvt[APIC_LVT_THERMAL], false);
+>       dump_apic_lvt("LVTT", lvt[APIC_LVT_TIMER], true);
+>
+> -    qemu_printf("Timer\t DCR=3D0x%x (divide by %u) initial_count =3D %u=
+\n",
+> +    qemu_printf("Timer\t DCR=3D0x%x (divide by %u) initial_count =3D %u=
+"
+> +                " current_count =3D %u\n",
+>                   s->divide_conf & APIC_DCR_MASK,
+>                   divider_conf(s->divide_conf),
+> -                s->initial_count);
+> +                s->initial_count, apic_get_current_count(s));
+>
+>       qemu_printf("SPIV\t 0x%08x APIC %s, focus=3D%s, spurious vec %u\n"=
+,
+>                   s->spurious_vec,
+>
 
-I think there was a reason for it. According to Richard
+Ping.
 
-> The correct way to acknowledge interrupts after changing an interrupt mask bit
-> is to exit the TB back to the cpu main loop.
-
-But if I do this change for Xtensa I get a bunch of test_interrupt failures
-that indicate that the interrupt that should have been taken wasn't taken.
-FTR here's the change that I tested, did I miss something?
-
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index fdf47642e6f1..85e8d65f169d 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -631,18 +631,10 @@ static int gen_postprocess(DisasContext *dc, int slot)
- {
-     uint32_t op_flags = dc->op_flags;
-
--#ifndef CONFIG_USER_ONLY
--    if (op_flags & XTENSA_OP_CHECK_INTERRUPTS) {
--        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
--            gen_io_start();
--        }
--        gen_helper_check_interrupts(cpu_env);
--    }
--#endif
-     if (op_flags & XTENSA_OP_SYNC_REGISTER_WINDOW) {
-         gen_helper_sync_windowbase(cpu_env);
-     }
--    if (op_flags & XTENSA_OP_EXIT_TB_M1) {
-+    if (op_flags & (XTENSA_OP_EXIT_TB_M1 | XTENSA_OP_CHECK_INTERRUPTS)) {
-         slot = -1;
-     }
-     return slot;
-@@ -1175,7 +1167,7 @@ static void disas_xtensa_insn(CPUXtensaState
-*env, DisasContext *dc)
-     if (dc->base.is_jmp == DISAS_NEXT) {
-         gen_postprocess(dc, 0);
-         dc->op_flags = 0;
--        if (op_flags & XTENSA_OP_EXIT_TB_M1) {
-+        if (op_flags & (XTENSA_OP_EXIT_TB_M1 | XTENSA_OP_CHECK_INTERRUPTS)) {
-             /* Change in mmu index, memory mapping or tb->flags; exit tb */
-             gen_jumpi_check_loop_end(dc, -1);
-         } else if (op_flags & XTENSA_OP_EXIT_TB_0) {
-
-
--- 
-Thanks.
--- Max
+Jan
 
