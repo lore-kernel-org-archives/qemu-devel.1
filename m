@@ -2,83 +2,85 @@ Return-Path: <SRS0=SLMP=AQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A155C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0876C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:11:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28DEC20739
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:11:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79AA520739
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:11:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBNPBoSt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28DEC20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aRn2T70d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79AA520739
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsBvT-0000rS-D2
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 17:11:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54770)
+	id 1jsBvZ-0000w2-GA
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 17:11:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsBu2-0007Bk-Jz
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:22 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35285)
+ id 1jsBu6-0007Cb-P3
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:26 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53527)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsBu0-0004ot-Uo
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:22 -0400
-Received: by mail-wr1-x443.google.com with SMTP id z2so16512997wrp.2
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 14:10:20 -0700 (PDT)
+ id 1jsBu3-0004rr-WA
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:25 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j18so37117815wmi.3
+ for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 14:10:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=nNzM5/93dUYll+2DdWYX0zojdbNWRAz6yoQKex94XlY=;
- b=mBNPBoStoEYwHsybcQAC7801f54RH3gT39zO6q8g16E6gDOh6ZtLzwFTref/aoLd2z
- JMpUNnp1pflYiHGWkA+aZ1khMjj88L7rExbNJD69cRQbX4qj2OvdFFuoJ1lPUSbNNIua
- 4CSJPGhapAxhn6LESAycA2eZHjMb6OGB2kA+bG0vxc+SqE5Ay9BdarMhL8ADwi/fjz3r
- 5eT4NGFgSmDl5Rv4wa4U0yWuIDldmOZAe1GI5ystJjzfl+NKGicbZUqBn6ydE2+l+cgt
- RCGLznN9vTT52HX6M43Ka7j3y92HpFLMZo03FSlOLlE8rNeLDQlVaKivpQSseHytfTcL
- 4dTg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=USmnM0sdBNCY4V6MFVCaDnSU9PQa4HFTC5SUnR3ioHU=;
+ b=aRn2T70dr+tLX6R/ToDrhbt4Eyy9mIow/saapukBfQyUcmKImpV6D2cGbXTwuPTJkf
+ Yqxf/PsIjtxyK7KidPrXMsJbDMtcoHxtWhkjRBW8j0hoxREcVHyjJj/sAdjxSM+nCy+p
+ EpWpGQ6Ge1lBHZkyPg3/5D1WYRzhDKUUobruMFWtzl128SumCUSwq6YfUFufjnascyd7
+ WaGCuQ6V+/8++gSpYEDcsSFEfFzVfPIalTtO7uEct83Kd6MDTbW/HmZmc7f56GfRj7d8
+ rCPg6lgPK73y1oOrAsB/SWTrbMosG0YbDR5YmUBbHvHqku8fVJg22Tb3OWWN1V8fwvZf
+ GpTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=nNzM5/93dUYll+2DdWYX0zojdbNWRAz6yoQKex94XlY=;
- b=MIiN2pkpSCuVV6jGTt24rzHWygYLlHATwV+POgD+0E4BvzaP/TXOFXHkbr8TvDZS6t
- /odP6ccgdbwMXtlz1HGPQFKREEEPeJFsDn3lbkqNIF3cV0u3d8gW1FD1PGyPlQy8lKN3
- B6/wmYmFNIpZ5Y9ubaqIos3e48Dz4xFgFCpnIG0jJzxmtTb/6VF+sC6eAstnfqwfv+Ct
- QjlLw7VcbcuMEN+KrtW3xg/1gPyjXLZDwOLxvchzjm8wMvAh1a4eRkZ3GHdo3/Y4EuVD
- WiAkbeF7CogoClhwqarMV3xBhUdbdLfoMfVzAfZPwXT4Dy7qnpM2X2rsqmBMK4cAm0TR
- jm7g==
-X-Gm-Message-State: AOAM530nn485khewKS4/39eAZ0OqZSCkau79vP9WewTTptVRwhMSr81h
- qKcXfGlSaZ9AYFG5ImJjyxuUE4HL/ok=
-X-Google-Smtp-Source: ABdhPJz2zec1peohHykuLQkc45XnnPU8+pv3yxsdcxxO9plwIbk8BL/ffh7CDNYAckQJ2w/RmdMVSQ==
-X-Received: by 2002:adf:82b8:: with SMTP id 53mr49526845wrc.172.1593983418975; 
- Sun, 05 Jul 2020 14:10:18 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=USmnM0sdBNCY4V6MFVCaDnSU9PQa4HFTC5SUnR3ioHU=;
+ b=OZ5gO/BtwW6SUnj+aLl6M0VtlS83ZmezFpFky2OtYY697xm9G33ZASg/d8tHMrv0+T
+ 6KVYlR5Ll9LgjBNTJvsOJhs4biSCIMRSN8ATAAHczRwD9wYI0xstNZXoMPlyuqAmJ9rv
+ qU2DVKg8rVlSVunh30Ru/MYD244XWNMtpu+umd/4MqzMjAOlI7ya95PmrTMn9UJtNUrH
+ ha6VwhvyrGjW+atr+EKSleH9HL9XKu6nHJgvMMgR0dV19z179CLyOgElaQQewgYrY+2O
+ noXitCYuyitCM7fv269QV8TP5qOnPg8+Bq6PMhF2/x0R3j9lK7bvCzSWtndR0aNRxBVt
+ F7cw==
+X-Gm-Message-State: AOAM531zwoWvWuzd59vyKIosi9jB0KLosLzSJB+mH4x31myWTPQY7ktD
+ LPfvB5GOmbpMaHY/5pbEMJjTnadBPi0=
+X-Google-Smtp-Source: ABdhPJwQuzpQBiEmalIjadR3IXS6fJMe7GkesAKQx1BtbbrGjWQDgTvpwFIBVY3vlo5b4wP/h11k1A==
+X-Received: by 2002:a1c:dd09:: with SMTP id u9mr44695796wmg.70.1593983422134; 
+ Sun, 05 Jul 2020 14:10:22 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r8sm21102004wrp.40.2020.07.05.14.10.18
+ by smtp.gmail.com with ESMTPSA id r8sm21102004wrp.40.2020.07.05.14.10.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jul 2020 14:10:18 -0700 (PDT)
+ Sun, 05 Jul 2020 14:10:21 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] hw/sd/milkymist: Do not create SD card within the SDHCI
- controller
-Date: Sun,  5 Jul 2020 23:10:12 +0200
-Message-Id: <20200705211016.15241-1-f4bug@amsat.org>
+Subject: [PATCH 3/4] hw/sd/milkymist: Create the SDBus at init()
+Date: Sun,  5 Jul 2020 23:10:15 +0200
+Message-Id: <20200705211016.15241-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200705211016.15241-1-f4bug@amsat.org>
+References: <20200705211016.15241-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -107,27 +109,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SDHCI controllers provide a SD Bus to plug SD cards, but don't
-come with SD card plugged in :)
+We don't need to wait until realize() to create the SDBus,
+create it in init() directly.
 
-This series move the SD card creation to the machine/board code.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sd/milkymist-memcard.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (4):
-  hw/lm32/milkymist: Un-inline milkymist_memcard_create()
-  hw/lm32/milkymist: Comment to remember some IRQs lines are left
-    unwired
-  hw/sd/milkymist: Create the SDBus at init()
-  hw/sd/milkymist: Do not create SD card within the SDHCI controller
-
- hw/lm32/milkymist-hw.h    | 11 --------
- hw/lm32/milkymist.c       | 25 +++++++++++++++++
- hw/sd/milkymist-memcard.c | 57 ++++++++++++++++++++++-----------------
- 3 files changed, 58 insertions(+), 35 deletions(-)
-
+diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+index afdb8aa0c0..fb02309f07 100644
+--- a/hw/sd/milkymist-memcard.c
++++ b/hw/sd/milkymist-memcard.c
+@@ -261,6 +261,9 @@ static void milkymist_memcard_init(Object *obj)
+     memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops, s,
+             "milkymist-memcard", R_MAX * 4);
+     sysbus_init_mmio(dev, &s->regs_region);
++
++    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
++                        DEVICE(obj), "sd-bus");
+ }
+ 
+ static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+@@ -271,9 +274,6 @@ static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+     DriveInfo *dinfo;
+     Error *err = NULL;
+ 
+-    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+-                        dev, "sd-bus");
+-
+     /* Create and plug in the sd card */
+     /* FIXME use a qdev drive property instead of drive_get_next() */
+     dinfo = drive_get_next(IF_SD);
 -- 
 2.21.3
 
