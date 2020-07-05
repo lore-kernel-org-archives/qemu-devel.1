@@ -8,75 +8,76 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C997EC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 15:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D8AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 16:47:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 589B820739
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 15:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0FED20737
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 16:47:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="toiFi3mA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 589B820739
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kl+1ET7U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0FED20737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1js6Xr-0000vH-Hu
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 11:27:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42268)
+	id 1js7o0-0001A4-28
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 12:47:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1js6WY-0008QI-En
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 11:25:47 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32854)
+ id 1js7n5-0000Ta-Fc
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 12:46:55 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35591)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1js6WR-0000s6-5Z
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 11:25:46 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f18so30001612wrs.0
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 08:25:38 -0700 (PDT)
+ id 1js7mx-0001yv-ST
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 12:46:54 -0400
+Received: by mail-wr1-x443.google.com with SMTP id z2so15950081wrp.2
+ for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 09:46:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=pGzYKFmuqOEtMUiDwRVTevzN3SW1yRGNXVN7ByQ04to=;
- b=toiFi3mASEk+mXjIEb0XpD0ibwvIA9EAdG+UctcE4nMfFYUa3xA3mw9ocU8+89tYfa
- qoTke7i7DGP5QlaMddTRqoElk2tZiNwcHTTUQJJubk803KizwKP1+3zfbdBKzwMiIQOs
- wVSxtLSFMpoYm0zTkx9ZEgJFrvEjyyx4D0Wp7y+MgrZh6kfUY9IqSbgciXB/ZjMchTIk
- l1ogI5blVvZ/ugyrGppqPjKIokwqvFSV+VkW9R2OnfjomSKsqt+SiUyqBRvC9Ya3KWJm
- VDVxeZYQBzkkb144iLG9p2/7jeaCTGe5lzMfz4rBUGznpAxHa/jWb9V9GOVH66NoTRpe
- Fvtw==
+ :cc; bh=R65HIkkdDNPwAixggaCYaxUvI4XRU04XG2MQLNxRLDw=;
+ b=kl+1ET7UX9Y61S1QORUxbgIg9jDmB9QEjt5vzCOyTBTg/b511O9udGlipLv1bVBO46
+ trecJevcmknzraGQnLirYfmDGvSqvDfSWl/0Z2/SPoZgMA4PzUClTjBbH4bEXaQqkdN4
+ tEbxhXONuiOpzbmbONOFg82lUnWcif7GELsYSm16qwcFpjoqNvIIvI77AiHdoKn6Bjin
+ 96zeOt8iAFonhqDJk1Js/7GSyv9nz2FAjI6u5tUI0xqAYW6GJ23nAEEE37CR3seE5aOg
+ 3144Bkk3yoUuf/9/mIHWS2X5nt+N1BkU4JTBA3+hxOZgvY9tWXaxpeWWR92Ekf5J1fxN
+ lVAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=pGzYKFmuqOEtMUiDwRVTevzN3SW1yRGNXVN7ByQ04to=;
- b=E3ottlyHyS7c9kELGzOBOrBlFfpTCuToQXaTugCqY620jfAQ3BoVvFug8eDWPhKv2+
- 3DDxJUazvieOTdUnXBc9L6muqkk4bDLDC0biNL6jMbDFOw45hn3aqAk8C9txYvuVcIoK
- vmQuJqrN1UfN11ESIa581wM60ZA3pUPQgDQYEFNaEC4/agiE8YQuy13Hm0A5T4LUP4Hp
- B0HjBo3nqSeBqFN/Yubnjgj6khQ9o2U3krDYiaNI4rQ4RFBYaGFaNHnhO5qgj7dsCOHP
- WSAmqKJGoEnHvuFUbU9hyM9OtAUu//3egBvSWhB9P5JfZZybwW+hKhTG8oLwkJlGNbW/
- ijKw==
-X-Gm-Message-State: AOAM532ux2qdN9cIDD+nb4oEGJDMpHkkrQnNYXZA3pmmTRr54C+ielDu
- vEh0VoPgOGKbiKf1cI/py9jFbLD2hoy1L7d02ds=
-X-Google-Smtp-Source: ABdhPJxvyBkbcuaPGltfGrzmT9Q9ZmWztQ45W5X6XnMwXpbPJavkFMicqIP31tfWeZCZj9JtmG/KOVx3K4myQhIxsyg=
-X-Received: by 2002:a5d:4f8b:: with SMTP id d11mr20504399wru.147.1593962736867; 
- Sun, 05 Jul 2020 08:25:36 -0700 (PDT)
+ bh=R65HIkkdDNPwAixggaCYaxUvI4XRU04XG2MQLNxRLDw=;
+ b=oDeNwNu9UermTWQ8cjGYxHek+x8VXR6KpPcFezPCCYoDdFJz0sd0Q9VLEpTJM1JMJE
+ sG9KFnd8kQ8gRkc0S8BNxa5a8qAqy7VwpoFZmQl4LbcPqZBG5fqtLFGX1BiIlyJ4i7yB
+ 9PWmVzOepXKVrgmETNNrCn1uOqdXusgqCiC4Wcbrz2M5BZg3QhryVV34eQ5FemmzFAgC
+ P3hEpYOL74Rh4mRzBMSll04qOsRi+nwcel2WgffVseGMNB7cIAz1nD0MZse1Hx6VQP1T
+ PRGjKyoKZRhXo/g0ZWHHL3umx4eHoFqIhtqW9/wGfRBx35TRiYLKM9ZB/CbcpAuFahep
+ Jdrw==
+X-Gm-Message-State: AOAM530GJyHwrFV+gNGhrblt/be5Pe4R6ilOs/QBqyW/TIwa9sOh9+tC
+ Ymn6hKYTD6offZfIk8svPdWsn669eRP6IdrG0kI=
+X-Google-Smtp-Source: ABdhPJxz+QG9njdDsQF/jGOlu8cbtMd193l6FOLXAQ1j+p8BDRK9rUgTMdaP4y8TLf8apgZ89g9qEZoiKujg9qj5vME=
+X-Received: by 2002:adf:f885:: with SMTP id u5mr44179287wrp.402.1593967606088; 
+ Sun, 05 Jul 2020 09:46:46 -0700 (PDT)
 MIME-Version: 1.0
 Received: by 2002:a1c:b407:0:0:0:0:0 with HTTP;
- Sun, 5 Jul 2020 08:25:36 -0700 (PDT)
-In-Reply-To: <CAHiYmc4bcYx6O1fekPbTj3SVZn+ZbnHgFXUUgb3Ym75w-h7-5g@mail.gmail.com>
+ Sun, 5 Jul 2020 09:46:45 -0700 (PDT)
+In-Reply-To: <CAHiYmc4YhTJUUhkN9DqMo_b=rZ4grTr+Hv=c5yjDSmKgb5wc1g@mail.gmail.com>
 References: <20200703104409.6986-1-stefan.brankovic@syrmia.com>
  <20200703104409.6986-2-stefan.brankovic@syrmia.com>
  <CAHiYmc4bcYx6O1fekPbTj3SVZn+ZbnHgFXUUgb3Ym75w-h7-5g@mail.gmail.com>
+ <CAHiYmc4YhTJUUhkN9DqMo_b=rZ4grTr+Hv=c5yjDSmKgb5wc1g@mail.gmail.com>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Sun, 5 Jul 2020 17:25:36 +0200
-Message-ID: <CAHiYmc4YhTJUUhkN9DqMo_b=rZ4grTr+Hv=c5yjDSmKgb5wc1g@mail.gmail.com>
+Date: Sun, 5 Jul 2020 18:46:45 +0200
+Message-ID: <CAHiYmc6kQxAYOYgbBMKboQoR=8+MiL2cjt2s6B3HFh_UpeEBig@mail.gmail.com>
 Subject: Re: [PATCH v2 1/1] disas: mips: Add Loongson 2F disassembler
 To: Stefan Brankovic <stefanbrankovic96@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000b7611305a9b35e3a"
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
+Content-Type: multipart/alternative; boundary="000000000000f1c82a05a9b480be"
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -107,2039 +108,2057 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b7611305a9b35e3a
+--000000000000f1c82a05a9b480be
 Content-Type: text/plain; charset="UTF-8"
 
-On Saturday, July 4, 2020, Aleksandar Markovic <
+On Sunday, July 5, 2020, Aleksandar Markovic <
 aleksandar.qemu.devel@gmail.com> wrote:
 
 >
 >
-> On Friday, July 3, 2020, Stefan Brankovic <stefanbrankovic96@gmail.com>
-> wrote:
+> On Saturday, July 4, 2020, Aleksandar Markovic <
+> aleksandar.qemu.devel@gmail.com> wrote:
 >
->> Add disassembler for Loongson 2F instruction set.
 >>
->> Testing is done by comparing qemu disassembly output, obtained by
->> using -d in_asm command line option, with appropriate objdump output.
 >>
->> This disassembler is written as a generic disassembler that can be
->> integrated into other projects. In this case, it is integrated into
->> QEMU. One of initial key requirements was that it uses C++ as its
->> language.
+>> On Friday, July 3, 2020, Stefan Brankovic <stefanbrankovic96@gmail.com>
+>> wrote:
 >>
->> Signed-off-by: Stefan Brankovic <stefan.brankovic@syrmia.com>
->> ---
->
->
->
-I did some basic tests, and the output matches objdump's.
-
-Apart from the mentioned cosmetic changes with ALIAS_MAX_LEN, there is one
-function invocation that should be under "ifdef", similar to the nanomips
-counterpart case.
-
-Otherwise:
-
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-
-
-
-> Thank you, Stefan!
->
-> I am going to dor some independant testing in next few days, including
-> building on systems without g++ (build should be successful, and the
-> disassembler should fallback on the current one).
->
-> I noticed some cosmetic improvements may still be done, like, for example,
-> using [ALIAS_MAX_LEN] instead of [5] in numerous places. But, there is no
-> need to respin (send a new version) just for this. Overall, the code looks
-> well-organized and clean.
->
-> An interesting topic for future work would be the automation of QEMU
-> disassembler testing. Not only for this dissasembler, but for any supported
-> disassembler in QEMU. I don't say you should do it, this is just a
-> brainstorming idea, somebody may hopefully pick it up.
->
-> Congratulations on this interesting work!
->
-> Aleksandar
->
->
->
->
->>  MAINTAINERS             |    1 +
->>  configure               |    1 +
->>  disas/Makefile.objs     |    1 +
->>  disas/loongson2f.cpp    | 8154 +++++++++++++++++++++++++++++++++++++++
->>  disas/loongson2f.h      | 2562 ++++++++++++
->>  include/disas/dis-asm.h |    1 +
->>  include/exec/poison.h   |    1 +
->>  target/mips/cpu.c       |    4 +
->>  8 files changed, 10725 insertions(+)
->>  create mode 100644 disas/loongson2f.cpp
->>  create mode 100644 disas/loongson2f.h
+>>> Add disassembler for Loongson 2F instruction set.
+>>>
+>>> Testing is done by comparing qemu disassembly output, obtained by
+>>> using -d in_asm command line option, with appropriate objdump output.
+>>>
+>>> This disassembler is written as a generic disassembler that can be
+>>> integrated into other projects. In this case, it is integrated into
+>>> QEMU. One of initial key requirements was that it uses C++ as its
+>>> language.
+>>>
+>>> Signed-off-by: Stefan Brankovic <stefan.brankovic@syrmia.com>
+>>> ---
 >>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 3abe3faa4e..913ed2a6d3 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -219,6 +219,7 @@ S: Maintained
->>  F: target/mips/
->>  F: default-configs/*mips*
->>  F: disas/*mips*
->> +F: disas/loongson*
->>  F: docs/system/cpu-models-mips.rst.inc
->>  F: hw/intc/mips_gic.c
->>  F: hw/mips/
->> diff --git a/configure b/configure
->> index 597e909b53..e163dac53e 100755
->> --- a/configure
->> +++ b/configure
->> @@ -8102,6 +8102,7 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
->>      disas_config "MIPS"
->>      if test -n "${cxx}"; then
->>        disas_config "NANOMIPS"
->> +      disas_config "LOONGSON2F"
->>      fi
->>    ;;
->>    moxie*)
->> diff --git a/disas/Makefile.objs b/disas/Makefile.objs
->> index 3c1cdce026..0d5ee1e038 100644
->> --- a/disas/Makefile.objs
->> +++ b/disas/Makefile.objs
->> @@ -14,6 +14,7 @@ common-obj-$(CONFIG_I386_DIS) += i386.o
->>  common-obj-$(CONFIG_M68K_DIS) += m68k.o
->>  common-obj-$(CONFIG_MICROBLAZE_DIS) += microblaze.o
->>  common-obj-$(CONFIG_MIPS_DIS) += mips.o
->> +common-obj-$(CONFIG_LOONGSON2F_DIS) += loongson2f.o
->>  common-obj-$(CONFIG_NANOMIPS_DIS) += nanomips.o
->>  common-obj-$(CONFIG_NIOS2_DIS) += nios2.o
->>  common-obj-$(CONFIG_MOXIE_DIS) += moxie.o
->> diff --git a/disas/loongson2f.cpp b/disas/loongson2f.cpp
->> new file mode 100644
->> index 0000000000..e84a2c0f09
->> --- /dev/null
->> +++ b/disas/loongson2f.cpp
->> @@ -0,0 +1,8154 @@
->> +/*
->> + *  Source file for Loongson 2F disassembler component of QEMU
->> + *
->> + *  Copyright (C) 2020  Stefan Brankovic <stefan.brankovic@syrmia.com>
->> + *
->> + *  This program is free software: you can redistribute it and/or modify
->> + *  it under the terms of the GNU General Public License as published by
->> + *  the Free Software Foundation, either version 2 of the License, or
->> + *  (at your option) any later version.
->> + *
->> + *  This program is distributed in the hope that it will be useful,
->> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + *  GNU General Public License for more details.
->> + *
->> + *  You should have received a copy of the GNU General Public License
->> + *  along with this program.  If not, see <https://www.gnu.org/licenses/
->> >.
->> + *
->> + */
->> +
->> +extern "C" {
->> +#include "qemu/osdep.h"
->> +#include "qemu/bitops.h"
->> +#include "disas/dis-asm.h"
->> +}
->> +
->> +#include "loongson2f.h"
->> +
->> +int print_insn_loongson2f(bfd_vma addr, disassemble_info *info)
->> +{
->> +    bfd_byte buffer[4];
->> +    uint32_t insn32;
->> +    int status;
->> +    Decoder *decoder = new Decoder();
->> +
->> +    status = info->read_memory_func(addr, buffer, 4, info);
->> +    if (status != 0) {
->> +        info->memory_error_func(status, addr, info);
->> +        return -1;
->> +    }
->> +    if (info->endian == BFD_ENDIAN_BIG) {
->> +        insn32 = bfd_getb32(buffer);
->> +    } else {
->> +        insn32 = bfd_getl32(buffer);
->> +    }
->> +
->> +    status = decoder->decode32(info, insn32);
->> +
->> +    delete decoder;
->> +
->> +    return status == 0 ? -1 : 4;
->> +}
->> +
->> +int Fields32RdRsRt::getRd()
->> +{
->> +    return this->rd;
->> +}
->> +
->> +int Fields32RdRsRt::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32RdRsRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32ImmRsRt::getImm()
->> +{
->> +    return this->imm;
->> +}
->> +
->> +int Fields32ImmRsRt::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32ImmRsRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32RdRs::getRd()
->> +{
->> +    return this->rd;
->> +}
->> +
->> +int Fields32RdRs::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32Rs::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32BaseOffsetRt::getBase()
->> +{
->> +    return this->base;
->> +}
->> +
->> +int Fields32BaseOffsetRt::getOffset()
->> +{
->> +    return this->offset;
->> +}
->> +
->> +int Fields32BaseOffsetRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32ImmRt::getImm()
->> +{
->> +    return this->imm;
->> +}
->> +
->> +int Fields32ImmRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32Rd::getRd()
->> +{
->> +    return this->rd;
->> +}
->> +
->> +int Fields32Stype::getStype()
->> +{
->> +    return this->stype;
->> +}
->> +
->> +int Fields32CodeRsRt::getCode()
->> +{
->> +    return this->code;
->> +}
->> +
->> +int Fields32CodeRsRt::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32CodeRsRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32ImmRs::getImm()
->> +{
->> +    return this->imm;
->> +}
->> +
->> +int Fields32ImmRs::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32FdFs::getFd()
->> +{
->> +    return this->fd;
->> +}
->> +
->> +int Fields32FdFs::getFs()
->> +{
->> +    return this->fs;
->> +}
->> +
->> +int Fields32FdFsFt::getFd()
->> +{
->> +    return this->fd;
->> +}
->> +
->> +int Fields32FdFsFt::getFs()
->> +{
->> +    return this->fs;
->> +}
->> +
->> +int Fields32FdFsFt::getFt()
->> +{
->> +    return this->ft;
->> +}
->> +
->> +int Fields32Offset::getOffset()
->> +{
->> +    return this->offset;
->> +}
->> +
->> +int Fields32FsFt::getFs()
->> +{
->> +    return this->fs;
->> +}
->> +
->> +int Fields32FsFt::getFt()
->> +{
->> +    return this->ft;
->> +}
->> +
->> +int Fields32FsRt::getFs()
->> +{
->> +    return this->fs;
->> +}
->> +
->> +int Fields32FsRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32BaseFtOffset::getBase()
->> +{
->> +    return this->base;
->> +}
->> +
->> +int Fields32BaseFtOffset::getFt()
->> +{
->> +    return this->ft;
->> +}
->> +
->> +int Fields32BaseFtOffset::getOffset()
->> +{
->> +    return this->offset;
->> +}
->> +
->> +int Fields32OffsetRsRt::getOffset()
->> +{
->> +    return this->offset;
->> +}
->> +
->> +int Fields32OffsetRsRt::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32OffsetRsRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32OffsetRs::getOffset()
->> +{
->> +    return this->offset;
->> +}
->> +
->> +int Fields32OffsetRs::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32Code::getCode()
->> +{
->> +    return this->code;
->> +}
->> +
->> +int Fields32Cop_fun::getCop_fun()
->> +{
->> +    return this->cop_fun;
->> +}
->> +
->> +int Fields32RsRt::getRs()
->> +{
->> +    return this->rs;
->> +}
->> +
->> +int Fields32RsRt::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32RdRtSa::getRd()
->> +{
->> +    return this->rd;
->> +}
->> +
->> +int Fields32RdRtSa::getRt()
->> +{
->> +    return this->rt;
->> +}
->> +
->> +int Fields32RdRtSa::getSa()
->> +{
->> +    return this->sa;
->> +}
->> +
->> +int Fields32Instr_index::getInstr_index()
->> +{
->> +    return this->instr_index;
->> +}
->> +
->> +void Fields32RdRsRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->rd = extract32(insn, 11, 5);
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32ImmRsRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->imm = sextract32(insn, 0, 16);
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32RdRsD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rd = extract32(insn, 11, 5);
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32RsD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32BaseOffsetRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->base = extract32(insn, 21, 5);
->> +    this->offset = sextract32(insn, 0, 16);
->> +}
->> +
->> +void Fields32ImmRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->imm = extract32(insn, 0, 16);
->> +}
->> +
->> +void Fields32RdD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rd = extract32(insn, 11, 5);
->> +}
->> +
->> +void Fields32StypeD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->stype = extract32(insn, 6, 5);
->> +}
->> +
->> +void Fields32CodeRsRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->code = extract32(insn, 6, 10);
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32ImmRsD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->imm = sextract32(insn, 0, 16);
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32FdFsD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->fs = extract32(insn, 11, 5);
->> +    this->fd = extract32(insn, 6, 5);
->> +}
->> +
->> +void Fields32FdFsFtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->ft = extract32(insn, 16, 5);
->> +    this->fs = extract32(insn, 11, 5);
->> +    this->fd = extract32(insn, 6, 5);
->> +}
->> +
->> +void Fields32ImmRsRtD1::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->imm = extract32(insn, 0, 16);
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32OffsetD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->offset = sextract32(insn, 0, 16);
->> +}
->> +
->> +void Fields32FsFtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->fs = extract32(insn, 11, 5);
->> +    this->ft = extract32(insn, 16, 5);
->> +}
->> +
->> +void Fields32FsRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->fs = extract32(insn, 11, 5);
->> +}
->> +
->> +void Fields32BaseFtOffsetD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->base = extract32(insn, 21, 5);
->> +    this->ft = extract32(insn, 16, 5);
->> +    this->offset = sextract32(insn, 0, 16);
->> +}
->> +
->> +void Fields32OffsetRsRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->rs = extract32(insn, 21, 5);
->> +    this->offset = sextract32(insn, 0, 16);
->> +}
->> +
->> +void Fields32OffsetRsD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rs = extract32(insn, 21, 5);
->> +    this->offset = sextract32(insn, 0, 16);
->> +}
->> +
->> +void Fields32CodeD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->code = extract32(insn, 6, 20);
->> +}
->> +
->> +void Fields32Cop_funD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->cop_fun = extract32(insn, 0, 26);
->> +}
->> +
->> +void Fields32RsRtD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->rs = extract32(insn, 21, 5);
->> +}
->> +
->> +void Fields32RdRtSaD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->rt = extract32(insn, 16, 5);
->> +    this->rd = extract32(insn, 11, 5);
->> +    this->sa = extract32(insn, 6, 5);
->> +}
->> +
->> +void Fields32Instr_indexD0::decode_fields32(uint32_t insn)
->> +{
->> +    this->instr_index = extract32(insn, 0, 26);
->> +}
->> +
->> +void Instruction32::getAlias(char *buffer, int regNo)
->> +{
->> +    switch (regNo) {
->> +    case 0:
->> +        strncpy(buffer, "zero", 5);
->> +        break;
->> +    case 1:
->> +        strncpy(buffer, "at", 5);
->> +        break;
->> +    case 2:
->> +    case 3:
->> +        sprintf(buffer, "v%d", regNo - 2);
->> +        break;
->> +    case 4:
->> +    case 5:
->> +    case 6:
->> +    case 7:
->> +    case 8:
->> +    case 9:
->> +    case 10:
->> +    case 11:
->> +        sprintf(buffer, "a%d", regNo - 4);
->> +        break;
->> +    case 12:
->> +    case 13:
->> +    case 14:
->> +    case 15:
->> +        sprintf(buffer, "t%d", regNo - 12);
->> +        break;
->> +    case 16:
->> +    case 17:
->> +    case 18:
->> +    case 19:
->> +    case 20:
->> +    case 21:
->> +    case 22:
->> +    case 23:
->> +        sprintf(buffer, "s%d", regNo - 16);
->> +        break;
->> +    case 24:
->> +    case 25:
->> +        sprintf(buffer, "t%d", regNo - 16);
->> +        break;
->> +    case 28:
->> +        strncpy(buffer, "gp", 5);
->> +        break;
->> +    case 29:
->> +        strncpy(buffer, "sp", 5);
->> +        break;
->> +    case 30:
->> +        strncpy(buffer, "s8", 5);
->> +        break;
->> +    case 31:
->> +        strncpy(buffer, "ra", 5);
->> +        break;
->> +    default:
->> +        sprintf(buffer, "r%d", regNo);
->> +        break;
->> +    }
->> +}
->> +
->> +Instruction32::~Instruction32() {}
->> +
->> +ADD::ADD(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool ADD::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "ADD",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +ADDI::ADDI(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32ImmRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool ADDI::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ADDI",
->> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
->> +    return true;
->> +}
->> +
->> +ADDIU::ADDIU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32ImmRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool ADDIU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ADDIU",
->> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
->> +    return true;
->> +}
->> +
->> +ADDU::ADDU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool ADDU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "ADDU",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +AND::AND(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool AND::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "AND",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +ANDI::ANDI(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32ImmRsRtD1();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool ANDI::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ANDI",
->> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
->> +    return true;
->> +}
->> +
->> +BEQ::BEQ(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BEQ::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BEQ",
->> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
->> ));
->> +    return true;
->> +}
->> +
->> +BEQL::BEQL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BEQL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BEQL",
->> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
->> ));
->> +    return true;
->> +}
->> +
->> +BGEZ::BGEZ(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BGEZ::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZ",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BGEZAL::BGEZAL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BGEZAL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZAL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BGEZALL::BGEZALL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BGEZALL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZALL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BGEZL::BGEZL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BGEZL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BGTZ::BGTZ(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BGTZ::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGTZ",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BGTZL::BGTZL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BGTZL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGTZL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BLEZ::BLEZ(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BLEZ::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLEZ",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BLEZL::BLEZL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BLEZL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLEZL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BLTZ::BLTZ(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BLTZ::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZ",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BLTZAL::BLTZAL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BLTZAL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZAL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BLTZALL::BLTZALL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BLTZALL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZALL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BLTZL::BLTZL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BLTZL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZL",
->> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
->> +    return true;
->> +}
->> +
->> +BNE::BNE(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BNE::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BNE",
->> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
->> ));
->> +    return true;
->> +}
->> +
->> +BNEL::BNEL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32OffsetRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BNEL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BNEL",
->> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
->> ));
->> +    return true;
->> +}
->> +
->> +BREAK::BREAK(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32CodeD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool BREAK::disas_output(disassemble_info *info)
->> +{
->> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "BREAK",
->> +     ((Fields32Code *)this->fields32)->getCode()));
->> +    return true;
->> +}
->> +
->> +COP0::COP0(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32Cop_funD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool COP0::disas_output(disassemble_info *info)
->> +{
->> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "COP0",
->> +     ((Fields32Cop_fun *)this->fields32)->getCop_fun()));
->> +    return true;
->> +}
->> +
->> +COP3::COP3(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32Cop_funD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool COP3::disas_output(disassemble_info *info)
->> +{
->> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "COP3",
->> +     ((Fields32Cop_fun *)this->fields32)->getCop_fun()));
->> +    return true;
->> +}
->> +
->> +DADD::DADD(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DADD::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DADD",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +DADDI::DADDI(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32ImmRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DADDI::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DADDI",
->> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
->> +    return true;
->> +}
->> +
->> +DADDIU::DADDIU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32ImmRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DADDIU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DADDIU",
->> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
->> +    return true;
->> +}
->> +
->> +DADDU::DADDU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DADDU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DADDU",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +DDIV::DDIV(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DDIV::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DDIV",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +DDIVU::DDIVU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DDIVU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DDIVU",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +DIV::DIV(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DIV::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DIV",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +DIVU::DIVU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DIVU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DIVU",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +DMULT::DMULT(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DMULT::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DMULT",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +DMULTU::DMULTU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DMULTU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DMULTU",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +DSLL::DSLL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRtSaD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSLL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSLL",
->> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
->> +    return true;
->> +}
->> +
->> +DSLL32::DSLL32(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRtSaD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSLL32::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSLL32",
->> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
->> +    return true;
->> +}
->> +
->> +DSLLV::DSLLV(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSLLV::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSLLV",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +DSRA::DSRA(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRtSaD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSRA::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSRA",
->> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
->> +    return true;
->> +}
->> +
->> +DSRA32::DSRA32(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRtSaD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSRA32::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSRA32",
->> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
->> +    return true;
->> +}
->> +
->> +DSRAV::DSRAV(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSRAV::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSRAV",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +DSRL::DSRL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRtSaD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSRL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSRL",
->> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
->> +    return true;
->> +}
->> +
->> +DSRL32::DSRL32(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRtSaD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSRL32::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSRL32",
->> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
->> +    return true;
->> +}
->> +
->> +DSRLV::DSRLV(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSRLV::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSRLV",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +DSUB::DSUB(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSUB::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSUB",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +DSUBU::DSUBU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool DSUBU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSUBU",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +J::J(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32Instr_indexD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool J::disas_output(disassemble_info *info)
->> +{
->> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "J",
->> +     ((Fields32Instr_index *)this->fields32)->getInstr_index()));
->> +    return true;
->> +}
->> +
->> +JAL::JAL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32Instr_indexD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool JAL::disas_output(disassemble_info *info)
->> +{
->> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "JAL",
->> +     ((Fields32Instr_index *)this->fields32)->getInstr_index()));
->> +    return true;
->> +}
->> +
->> +JALR::JALR(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool JALR::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RdRs *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "JALR",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +JR::JR(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool JR::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32Rs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "JR",
->> +     alias1));
->> +    return true;
->> +}
->> +
->> +LB::LB(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LB::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LB",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LBU::LBU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LBU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LBU",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LD::LD(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LD::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LD",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LDC2::LDC2(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LDC2::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LDC2",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LDL::LDL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LDL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LDL",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LDR::LDR(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LDR::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LDR",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LH::LH(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LH::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LH",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LHU::LHU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LHU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LHU",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LL::LL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LL",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LLD::LLD(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LLD::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LLD",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LUI::LUI(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32ImmRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LUI::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32ImmRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "LUI",
->> +     alias1, ((Fields32ImmRt *)this->fields32)->getImm()));
->> +    return true;
->> +}
->> +
->> +LW::LW(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LW::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LW",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LWC2::LWC2(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LWC2::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWC2",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LWC3::LWC3(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LWC3::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWC3",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LWL::LWL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LWL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWL",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LWR::LWR(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LWR::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWR",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +LWU::LWU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool LWU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWU",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +MFHI::MFHI(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool MFHI::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32Rd *)this->fields32)->getRd());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MFHI",
->> +     alias1));
->> +    return true;
->> +}
->> +
->> +MFLO::MFLO(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool MFLO::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32Rd *)this->fields32)->getRd());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MFLO",
->> +     alias1));
->> +    return true;
->> +}
->> +
->> +MTHI::MTHI(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool MTHI::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32Rs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MTHI",
->> +     alias1));
->> +    return true;
->> +}
->> +
->> +MTLO::MTLO(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool MTLO::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    getAlias(alias1, ((Fields32Rs *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MTLO",
->> +     alias1));
->> +    return true;
->> +}
->> +
->> +MULT::MULT(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool MULT::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "MULT",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +MULTU::MULTU(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool MULTU::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
->> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "MULTU",
->> +     alias1, alias2));
->> +    return true;
->> +}
->> +
->> +NOR::NOR(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool NOR::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "NOR",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +OR::OR(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32RdRsRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool OR::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    char alias3[5];
->> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
->> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
->> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "OR",
->> +     alias1, alias2, alias3));
->> +    return true;
->> +}
->> +
->> +ORI::ORI(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32ImmRsRtD1();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool ORI::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ORI",
->> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
->> +    return true;
->> +}
->> +
->> +SB::SB(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool SB::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SB",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +SC::SC(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool SC::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SC",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +SCD::SCD(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool SCD::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SCD",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +SD::SD(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool SD::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SD",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +SDC2::SDC2(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool SDC2::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SDC2",
->> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
->> alias2));
->> +    return true;
->> +}
->> +
->> +SDL::SDL(uint32_t insn)
->> +{
->> +    this->fields32 = new Fields32BaseOffsetRtD0();
->> +    this->fields32->decode_fields32(insn);
->> +}
->> +
->> +bool SDL::disas_output(disassemble_info *info)
->> +{
->> +    char alias1[5];
->> +    char alias2[5];
->> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
->> +    getAlias(alias2, ((Fields32BaseOffsetRt
->> *)this->fields32)->getBase());
->> +    (info->fprintf_func(info->stream, "%-9s"
+>>
+>>
+> I did some basic tests, and the output matches objdump's.
+>
+> Apart from the mentioned cosmetic changes with ALIAS_MAX_LEN, there is one
+> function invocation that should be under "ifdef", similar to the nanomips
+> counterpart case.
+>
+> Otherwise:
+>
+> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 >
 >
+I plan to select this patch for the next MIPS + TCG Continuous Benchmarking
+pull request.
 
---000000000000b7611305a9b35e3a
+
+>
+>
+>> Thank you, Stefan!
+>>
+>> I am going to dor some independant testing in next few days, including
+>> building on systems without g++ (build should be successful, and the
+>> disassembler should fallback on the current one).
+>>
+>> I noticed some cosmetic improvements may still be done, like, for
+>> example, using [ALIAS_MAX_LEN] instead of [5] in numerous places. But,
+>> there is no need to respin (send a new version) just for this. Overall, the
+>> code looks well-organized and clean.
+>>
+>> An interesting topic for future work would be the automation of QEMU
+>> disassembler testing. Not only for this dissasembler, but for any supported
+>> disassembler in QEMU. I don't say you should do it, this is just a
+>> brainstorming idea, somebody may hopefully pick it up.
+>>
+>> Congratulations on this interesting work!
+>>
+>> Aleksandar
+>>
+>>
+>>
+>>
+>>>  MAINTAINERS             |    1 +
+>>>  configure               |    1 +
+>>>  disas/Makefile.objs     |    1 +
+>>>  disas/loongson2f.cpp    | 8154 +++++++++++++++++++++++++++++++++++++++
+>>>  disas/loongson2f.h      | 2562 ++++++++++++
+>>>  include/disas/dis-asm.h |    1 +
+>>>  include/exec/poison.h   |    1 +
+>>>  target/mips/cpu.c       |    4 +
+>>>  8 files changed, 10725 insertions(+)
+>>>  create mode 100644 disas/loongson2f.cpp
+>>>  create mode 100644 disas/loongson2f.h
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 3abe3faa4e..913ed2a6d3 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -219,6 +219,7 @@ S: Maintained
+>>>  F: target/mips/
+>>>  F: default-configs/*mips*
+>>>  F: disas/*mips*
+>>> +F: disas/loongson*
+>>>  F: docs/system/cpu-models-mips.rst.inc
+>>>  F: hw/intc/mips_gic.c
+>>>  F: hw/mips/
+>>> diff --git a/configure b/configure
+>>> index 597e909b53..e163dac53e 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -8102,6 +8102,7 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+>>>      disas_config "MIPS"
+>>>      if test -n "${cxx}"; then
+>>>        disas_config "NANOMIPS"
+>>> +      disas_config "LOONGSON2F"
+>>>      fi
+>>>    ;;
+>>>    moxie*)
+>>> diff --git a/disas/Makefile.objs b/disas/Makefile.objs
+>>> index 3c1cdce026..0d5ee1e038 100644
+>>> --- a/disas/Makefile.objs
+>>> +++ b/disas/Makefile.objs
+>>> @@ -14,6 +14,7 @@ common-obj-$(CONFIG_I386_DIS) += i386.o
+>>>  common-obj-$(CONFIG_M68K_DIS) += m68k.o
+>>>  common-obj-$(CONFIG_MICROBLAZE_DIS) += microblaze.o
+>>>  common-obj-$(CONFIG_MIPS_DIS) += mips.o
+>>> +common-obj-$(CONFIG_LOONGSON2F_DIS) += loongson2f.o
+>>>  common-obj-$(CONFIG_NANOMIPS_DIS) += nanomips.o
+>>>  common-obj-$(CONFIG_NIOS2_DIS) += nios2.o
+>>>  common-obj-$(CONFIG_MOXIE_DIS) += moxie.o
+>>> diff --git a/disas/loongson2f.cpp b/disas/loongson2f.cpp
+>>> new file mode 100644
+>>> index 0000000000..e84a2c0f09
+>>> --- /dev/null
+>>> +++ b/disas/loongson2f.cpp
+>>> @@ -0,0 +1,8154 @@
+>>> +/*
+>>> + *  Source file for Loongson 2F disassembler component of QEMU
+>>> + *
+>>> + *  Copyright (C) 2020  Stefan Brankovic <stefan.brankovic@syrmia.com>
+>>> + *
+>>> + *  This program is free software: you can redistribute it and/or modify
+>>> + *  it under the terms of the GNU General Public License as published by
+>>> + *  the Free Software Foundation, either version 2 of the License, or
+>>> + *  (at your option) any later version.
+>>> + *
+>>> + *  This program is distributed in the hope that it will be useful,
+>>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>> + *  GNU General Public License for more details.
+>>> + *
+>>> + *  You should have received a copy of the GNU General Public License
+>>> + *  along with this program.  If not, see <
+>>> https://www.gnu.org/licenses/>.
+>>> + *
+>>> + */
+>>> +
+>>> +extern "C" {
+>>> +#include "qemu/osdep.h"
+>>> +#include "qemu/bitops.h"
+>>> +#include "disas/dis-asm.h"
+>>> +}
+>>> +
+>>> +#include "loongson2f.h"
+>>> +
+>>> +int print_insn_loongson2f(bfd_vma addr, disassemble_info *info)
+>>> +{
+>>> +    bfd_byte buffer[4];
+>>> +    uint32_t insn32;
+>>> +    int status;
+>>> +    Decoder *decoder = new Decoder();
+>>> +
+>>> +    status = info->read_memory_func(addr, buffer, 4, info);
+>>> +    if (status != 0) {
+>>> +        info->memory_error_func(status, addr, info);
+>>> +        return -1;
+>>> +    }
+>>> +    if (info->endian == BFD_ENDIAN_BIG) {
+>>> +        insn32 = bfd_getb32(buffer);
+>>> +    } else {
+>>> +        insn32 = bfd_getl32(buffer);
+>>> +    }
+>>> +
+>>> +    status = decoder->decode32(info, insn32);
+>>> +
+>>> +    delete decoder;
+>>> +
+>>> +    return status == 0 ? -1 : 4;
+>>> +}
+>>> +
+>>> +int Fields32RdRsRt::getRd()
+>>> +{
+>>> +    return this->rd;
+>>> +}
+>>> +
+>>> +int Fields32RdRsRt::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32RdRsRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32ImmRsRt::getImm()
+>>> +{
+>>> +    return this->imm;
+>>> +}
+>>> +
+>>> +int Fields32ImmRsRt::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32ImmRsRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32RdRs::getRd()
+>>> +{
+>>> +    return this->rd;
+>>> +}
+>>> +
+>>> +int Fields32RdRs::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32Rs::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32BaseOffsetRt::getBase()
+>>> +{
+>>> +    return this->base;
+>>> +}
+>>> +
+>>> +int Fields32BaseOffsetRt::getOffset()
+>>> +{
+>>> +    return this->offset;
+>>> +}
+>>> +
+>>> +int Fields32BaseOffsetRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32ImmRt::getImm()
+>>> +{
+>>> +    return this->imm;
+>>> +}
+>>> +
+>>> +int Fields32ImmRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32Rd::getRd()
+>>> +{
+>>> +    return this->rd;
+>>> +}
+>>> +
+>>> +int Fields32Stype::getStype()
+>>> +{
+>>> +    return this->stype;
+>>> +}
+>>> +
+>>> +int Fields32CodeRsRt::getCode()
+>>> +{
+>>> +    return this->code;
+>>> +}
+>>> +
+>>> +int Fields32CodeRsRt::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32CodeRsRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32ImmRs::getImm()
+>>> +{
+>>> +    return this->imm;
+>>> +}
+>>> +
+>>> +int Fields32ImmRs::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32FdFs::getFd()
+>>> +{
+>>> +    return this->fd;
+>>> +}
+>>> +
+>>> +int Fields32FdFs::getFs()
+>>> +{
+>>> +    return this->fs;
+>>> +}
+>>> +
+>>> +int Fields32FdFsFt::getFd()
+>>> +{
+>>> +    return this->fd;
+>>> +}
+>>> +
+>>> +int Fields32FdFsFt::getFs()
+>>> +{
+>>> +    return this->fs;
+>>> +}
+>>> +
+>>> +int Fields32FdFsFt::getFt()
+>>> +{
+>>> +    return this->ft;
+>>> +}
+>>> +
+>>> +int Fields32Offset::getOffset()
+>>> +{
+>>> +    return this->offset;
+>>> +}
+>>> +
+>>> +int Fields32FsFt::getFs()
+>>> +{
+>>> +    return this->fs;
+>>> +}
+>>> +
+>>> +int Fields32FsFt::getFt()
+>>> +{
+>>> +    return this->ft;
+>>> +}
+>>> +
+>>> +int Fields32FsRt::getFs()
+>>> +{
+>>> +    return this->fs;
+>>> +}
+>>> +
+>>> +int Fields32FsRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32BaseFtOffset::getBase()
+>>> +{
+>>> +    return this->base;
+>>> +}
+>>> +
+>>> +int Fields32BaseFtOffset::getFt()
+>>> +{
+>>> +    return this->ft;
+>>> +}
+>>> +
+>>> +int Fields32BaseFtOffset::getOffset()
+>>> +{
+>>> +    return this->offset;
+>>> +}
+>>> +
+>>> +int Fields32OffsetRsRt::getOffset()
+>>> +{
+>>> +    return this->offset;
+>>> +}
+>>> +
+>>> +int Fields32OffsetRsRt::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32OffsetRsRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32OffsetRs::getOffset()
+>>> +{
+>>> +    return this->offset;
+>>> +}
+>>> +
+>>> +int Fields32OffsetRs::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32Code::getCode()
+>>> +{
+>>> +    return this->code;
+>>> +}
+>>> +
+>>> +int Fields32Cop_fun::getCop_fun()
+>>> +{
+>>> +    return this->cop_fun;
+>>> +}
+>>> +
+>>> +int Fields32RsRt::getRs()
+>>> +{
+>>> +    return this->rs;
+>>> +}
+>>> +
+>>> +int Fields32RsRt::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32RdRtSa::getRd()
+>>> +{
+>>> +    return this->rd;
+>>> +}
+>>> +
+>>> +int Fields32RdRtSa::getRt()
+>>> +{
+>>> +    return this->rt;
+>>> +}
+>>> +
+>>> +int Fields32RdRtSa::getSa()
+>>> +{
+>>> +    return this->sa;
+>>> +}
+>>> +
+>>> +int Fields32Instr_index::getInstr_index()
+>>> +{
+>>> +    return this->instr_index;
+>>> +}
+>>> +
+>>> +void Fields32RdRsRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->rd = extract32(insn, 11, 5);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32ImmRsRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->imm = sextract32(insn, 0, 16);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32RdRsD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rd = extract32(insn, 11, 5);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32RsD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32BaseOffsetRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->base = extract32(insn, 21, 5);
+>>> +    this->offset = sextract32(insn, 0, 16);
+>>> +}
+>>> +
+>>> +void Fields32ImmRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->imm = extract32(insn, 0, 16);
+>>> +}
+>>> +
+>>> +void Fields32RdD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rd = extract32(insn, 11, 5);
+>>> +}
+>>> +
+>>> +void Fields32StypeD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->stype = extract32(insn, 6, 5);
+>>> +}
+>>> +
+>>> +void Fields32CodeRsRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->code = extract32(insn, 6, 10);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32ImmRsD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->imm = sextract32(insn, 0, 16);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32FdFsD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->fs = extract32(insn, 11, 5);
+>>> +    this->fd = extract32(insn, 6, 5);
+>>> +}
+>>> +
+>>> +void Fields32FdFsFtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->ft = extract32(insn, 16, 5);
+>>> +    this->fs = extract32(insn, 11, 5);
+>>> +    this->fd = extract32(insn, 6, 5);
+>>> +}
+>>> +
+>>> +void Fields32ImmRsRtD1::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->imm = extract32(insn, 0, 16);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32OffsetD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->offset = sextract32(insn, 0, 16);
+>>> +}
+>>> +
+>>> +void Fields32FsFtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->fs = extract32(insn, 11, 5);
+>>> +    this->ft = extract32(insn, 16, 5);
+>>> +}
+>>> +
+>>> +void Fields32FsRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->fs = extract32(insn, 11, 5);
+>>> +}
+>>> +
+>>> +void Fields32BaseFtOffsetD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->base = extract32(insn, 21, 5);
+>>> +    this->ft = extract32(insn, 16, 5);
+>>> +    this->offset = sextract32(insn, 0, 16);
+>>> +}
+>>> +
+>>> +void Fields32OffsetRsRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +    this->offset = sextract32(insn, 0, 16);
+>>> +}
+>>> +
+>>> +void Fields32OffsetRsD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +    this->offset = sextract32(insn, 0, 16);
+>>> +}
+>>> +
+>>> +void Fields32CodeD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->code = extract32(insn, 6, 20);
+>>> +}
+>>> +
+>>> +void Fields32Cop_funD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->cop_fun = extract32(insn, 0, 26);
+>>> +}
+>>> +
+>>> +void Fields32RsRtD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->rs = extract32(insn, 21, 5);
+>>> +}
+>>> +
+>>> +void Fields32RdRtSaD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->rt = extract32(insn, 16, 5);
+>>> +    this->rd = extract32(insn, 11, 5);
+>>> +    this->sa = extract32(insn, 6, 5);
+>>> +}
+>>> +
+>>> +void Fields32Instr_indexD0::decode_fields32(uint32_t insn)
+>>> +{
+>>> +    this->instr_index = extract32(insn, 0, 26);
+>>> +}
+>>> +
+>>> +void Instruction32::getAlias(char *buffer, int regNo)
+>>> +{
+>>> +    switch (regNo) {
+>>> +    case 0:
+>>> +        strncpy(buffer, "zero", 5);
+>>> +        break;
+>>> +    case 1:
+>>> +        strncpy(buffer, "at", 5);
+>>> +        break;
+>>> +    case 2:
+>>> +    case 3:
+>>> +        sprintf(buffer, "v%d", regNo - 2);
+>>> +        break;
+>>> +    case 4:
+>>> +    case 5:
+>>> +    case 6:
+>>> +    case 7:
+>>> +    case 8:
+>>> +    case 9:
+>>> +    case 10:
+>>> +    case 11:
+>>> +        sprintf(buffer, "a%d", regNo - 4);
+>>> +        break;
+>>> +    case 12:
+>>> +    case 13:
+>>> +    case 14:
+>>> +    case 15:
+>>> +        sprintf(buffer, "t%d", regNo - 12);
+>>> +        break;
+>>> +    case 16:
+>>> +    case 17:
+>>> +    case 18:
+>>> +    case 19:
+>>> +    case 20:
+>>> +    case 21:
+>>> +    case 22:
+>>> +    case 23:
+>>> +        sprintf(buffer, "s%d", regNo - 16);
+>>> +        break;
+>>> +    case 24:
+>>> +    case 25:
+>>> +        sprintf(buffer, "t%d", regNo - 16);
+>>> +        break;
+>>> +    case 28:
+>>> +        strncpy(buffer, "gp", 5);
+>>> +        break;
+>>> +    case 29:
+>>> +        strncpy(buffer, "sp", 5);
+>>> +        break;
+>>> +    case 30:
+>>> +        strncpy(buffer, "s8", 5);
+>>> +        break;
+>>> +    case 31:
+>>> +        strncpy(buffer, "ra", 5);
+>>> +        break;
+>>> +    default:
+>>> +        sprintf(buffer, "r%d", regNo);
+>>> +        break;
+>>> +    }
+>>> +}
+>>> +
+>>> +Instruction32::~Instruction32() {}
+>>> +
+>>> +ADD::ADD(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool ADD::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "ADD",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +ADDI::ADDI(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32ImmRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool ADDI::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ADDI",
+>>> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +ADDIU::ADDIU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32ImmRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool ADDIU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ADDIU",
+>>> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +ADDU::ADDU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool ADDU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "ADDU",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +AND::AND(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool AND::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "AND",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +ANDI::ANDI(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32ImmRsRtD1();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool ANDI::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ANDI",
+>>> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BEQ::BEQ(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BEQ::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BEQ",
+>>> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
+>>> ));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BEQL::BEQL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BEQL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BEQL",
+>>> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
+>>> ));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BGEZ::BGEZ(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BGEZ::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZ",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BGEZAL::BGEZAL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BGEZAL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZAL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BGEZALL::BGEZALL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BGEZALL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZALL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BGEZL::BGEZL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BGEZL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGEZL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BGTZ::BGTZ(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BGTZ::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGTZ",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BGTZL::BGTZL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BGTZL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BGTZL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BLEZ::BLEZ(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BLEZ::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLEZ",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BLEZL::BLEZL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BLEZL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLEZL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BLTZ::BLTZ(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BLTZ::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZ",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BLTZAL::BLTZAL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BLTZAL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZAL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BLTZALL::BLTZALL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BLTZALL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZALL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BLTZL::BLTZL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BLTZL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "BLTZL",
+>>> +     alias1, ((Fields32OffsetRs *)this->fields32)->getOffset()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BNE::BNE(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BNE::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BNE",
+>>> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
+>>> ));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BNEL::BNEL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32OffsetRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BNEL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32OffsetRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32OffsetRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "BNEL",
+>>> +     alias1, alias2, ((Fields32OffsetRsRt *)this->fields32)->getOffset()
+>>> ));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +BREAK::BREAK(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32CodeD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool BREAK::disas_output(disassemble_info *info)
+>>> +{
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "BREAK",
+>>> +     ((Fields32Code *)this->fields32)->getCode()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +COP0::COP0(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32Cop_funD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool COP0::disas_output(disassemble_info *info)
+>>> +{
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "COP0",
+>>> +     ((Fields32Cop_fun *)this->fields32)->getCop_fun()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +COP3::COP3(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32Cop_funD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool COP3::disas_output(disassemble_info *info)
+>>> +{
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "COP3",
+>>> +     ((Fields32Cop_fun *)this->fields32)->getCop_fun()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DADD::DADD(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DADD::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DADD",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DADDI::DADDI(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32ImmRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DADDI::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DADDI",
+>>> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DADDIU::DADDIU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32ImmRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DADDIU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", ""
+>>> "DADDIU",
+>>> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DADDU::DADDU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DADDU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DADDU",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DDIV::DDIV(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DDIV::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DDIV",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DDIVU::DDIVU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DDIVU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DDIVU",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DIV::DIV(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DIV::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DIV",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DIVU::DIVU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DIVU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DIVU",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DMULT::DMULT(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DMULT::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DMULT",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DMULTU::DMULTU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DMULTU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "DMULTU",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSLL::DSLL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRtSaD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSLL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSLL",
+>>> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSLL32::DSLL32(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRtSaD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSLL32::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", ""
+>>> "DSLL32",
+>>> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSLLV::DSLLV(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSLLV::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSLLV",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSRA::DSRA(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRtSaD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSRA::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSRA",
+>>> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSRA32::DSRA32(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRtSaD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSRA32::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", ""
+>>> "DSRA32",
+>>> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSRAV::DSRAV(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSRAV::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSRAV",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSRL::DSRL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRtSaD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSRL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "DSRL",
+>>> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSRL32::DSRL32(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRtSaD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSRL32::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RdRtSa *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRtSa *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", ""
+>>> "DSRL32",
+>>> +     alias1, alias2, ((Fields32RdRtSa *)this->fields32)->getSa()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSRLV::DSRLV(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSRLV::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSRLV",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSUB::DSUB(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSUB::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSUB",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +DSUBU::DSUBU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool DSUBU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "DSUBU",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +J::J(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32Instr_indexD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool J::disas_output(disassemble_info *info)
+>>> +{
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "J",
+>>> +     ((Fields32Instr_index *)this->fields32)->getInstr_index()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +JAL::JAL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32Instr_indexD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool JAL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %d", "" "JAL",
+>>> +     ((Fields32Instr_index *)this->fields32)->getInstr_index()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +JALR::JALR(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool JALR::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RdRs *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "JALR",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +JR::JR(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool JR::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32Rs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "JR",
+>>> +     alias1));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LB::LB(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LB::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LB",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LBU::LBU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LBU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LBU",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LD::LD(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LD::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LD",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LDC2::LDC2(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LDC2::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LDC2",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LDL::LDL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LDL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LDL",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LDR::LDR(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LDR::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LDR",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LH::LH(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LH::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LH",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LHU::LHU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LHU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LHU",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LL::LL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LL",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LLD::LLD(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LLD::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LLD",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LUI::LUI(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32ImmRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LUI::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32ImmRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d", "" "LUI",
+>>> +     alias1, ((Fields32ImmRt *)this->fields32)->getImm()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LW::LW(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LW::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LW",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LWC2::LWC2(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LWC2::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWC2",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LWC3::LWC3(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LWC3::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWC3",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LWL::LWL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LWL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWL",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LWR::LWR(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LWR::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWR",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +LWU::LWU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool LWU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "LWU",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +MFHI::MFHI(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool MFHI::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32Rd *)this->fields32)->getRd());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MFHI",
+>>> +     alias1));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +MFLO::MFLO(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool MFLO::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32Rd *)this->fields32)->getRd());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MFLO",
+>>> +     alias1));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +MTHI::MTHI(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool MTHI::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32Rs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MTHI",
+>>> +     alias1));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +MTLO::MTLO(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool MTLO::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    getAlias(alias1, ((Fields32Rs *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s", "" "MTLO",
+>>> +     alias1));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +MULT::MULT(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool MULT::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "MULT",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +MULTU::MULTU(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool MULTU::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32RsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias2, ((Fields32RsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s", "" "MULTU",
+>>> +     alias1, alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +NOR::NOR(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool NOR::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "NOR",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +OR::OR(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32RdRsRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool OR::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    char alias3[5];
+>>> +    getAlias(alias1, ((Fields32RdRsRt *)this->fields32)->getRd());
+>>> +    getAlias(alias2, ((Fields32RdRsRt *)this->fields32)->getRs());
+>>> +    getAlias(alias3, ((Fields32RdRsRt *)this->fields32)->getRt());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %s", "" "OR",
+>>> +     alias1, alias2, alias3));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +ORI::ORI(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32ImmRsRtD1();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool ORI::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32ImmRsRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32ImmRsRt *)this->fields32)->getRs());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %s, %d", "" "ORI",
+>>> +     alias1, alias2, ((Fields32ImmRsRt *)this->fields32)->getImm()));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +SB::SB(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool SB::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SB",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +SC::SC(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool SC::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SC",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +SCD::SCD(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool SCD::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SCD",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +SD::SD(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool SD::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SD",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +SDC2::SDC2(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool SDC2::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s" " %s, %d(%s)", "" "SDC2",
+>>> +     alias1, ((Fields32BaseOffsetRt *)this->fields32)->getOffset(),
+>>> alias2));
+>>> +    return true;
+>>> +}
+>>> +
+>>> +SDL::SDL(uint32_t insn)
+>>> +{
+>>> +    this->fields32 = new Fields32BaseOffsetRtD0();
+>>> +    this->fields32->decode_fields32(insn);
+>>> +}
+>>> +
+>>> +bool SDL::disas_output(disassemble_info *info)
+>>> +{
+>>> +    char alias1[5];
+>>> +    char alias2[5];
+>>> +    getAlias(alias1, ((Fields32BaseOffsetRt *)this->fields32)->getRt());
+>>> +    getAlias(alias2, ((Fields32BaseOffsetRt
+>>> *)this->fields32)->getBase());
+>>> +    (info->fprintf_func(info->stream, "%-9s"
+>>
+>>
+
+--000000000000f1c82a05a9b480be
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Saturday, July 4, 2020, Aleksandar Markovic &lt;<a href=3D"mailt=
-o:aleksandar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&gt; =
-wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
-er-left:1px #ccc solid;padding-left:1ex"><br><br>On Friday, July 3, 2020, S=
-tefan Brankovic &lt;<a href=3D"mailto:stefanbrankovic96@gmail.com" target=
-=3D"_blank">stefanbrankovic96@gmail.com</a>&gt; wrote:<br><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">Add disassembler for Loongson 2F instruction set.<br>
+<br><br>On Sunday, July 5, 2020, Aleksandar Markovic &lt;<a href=3D"mailto:=
+aleksandar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&gt; wr=
+ote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border=
+-left:1px #ccc solid;padding-left:1ex"><br><br>On Saturday, July 4, 2020, A=
+leksandar Markovic &lt;<a href=3D"mailto:aleksandar.qemu.devel@gmail.com" t=
+arget=3D"_blank">aleksandar.qemu.devel@gmail.<wbr>com</a>&gt; wrote:<br><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
+ccc solid;padding-left:1ex"><br><br>On Friday, July 3, 2020, Stefan Brankov=
+ic &lt;<a href=3D"mailto:stefanbrankovic96@gmail.com" target=3D"_blank">ste=
+fanbrankovic96@gmail.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote=
+" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">A=
+dd disassembler for Loongson 2F instruction set.<br>
 <br>
 Testing is done by comparing qemu disassembly output, obtained by<br>
 using -d in_asm command line option, with appropriate objdump output.<br>
@@ -2157,24 +2176,27 @@ basic tests, and the output matches objdump&#39;s.</div><div><br></div><div=
  function invocation that should be under &quot;ifdef&quot;, similar to the=
  nanomips counterpart case.</div><div><br></div><div>Otherwise:</div><div><=
 br></div><div>Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksa=
-ndar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&gt;</div><di=
-v><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div>Thank you,=
- Stefan!</div><div><br></div><div>I am going to dor some independant testin=
-g in next few days, including building on systems without g++ (build should=
- be successful, and the disassembler should fallback on the current one).</=
-div><div><br></div><div>I noticed some cosmetic improvements may still be d=
-one, like, for example, using [ALIAS_MAX_LEN] instead of [5] in numerous pl=
-aces. But, there is no need to respin (send a new version) just for this. O=
-verall, the code looks well-organized and clean.</div><div><br></div><div>A=
-n interesting topic for future work would be the automation of QEMU disasse=
-mbler testing. Not only for this dissasembler, but for any supported disass=
-embler in QEMU. I don&#39;t say you should do it, this is just a brainstorm=
-ing idea, somebody may hopefully pick it up.</div><div><br></div><div>Congr=
-atulations on this interesting work!</div><div><br></div><div>Aleksandar</d=
-iv><div><br></div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmai=
-l_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left=
-:1ex">
+ndar.qemu.devel@gmail.com" target=3D"_blank">aleksandar.qemu.devel@gmail.<w=
+br>com</a>&gt;</div><div><br></div></blockquote><div><br></div><div>I plan =
+to select this patch for the next MIPS + TCG Continuous Benchmarking pull r=
+equest.</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div>=C2=A0</d=
+iv><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
+:1px #ccc solid;padding-left:1ex"><div>Thank you, Stefan!</div><div><br></d=
+iv><div>I am going to dor some independant testing in next few days, includ=
+ing building on systems without g++ (build should be successful, and the di=
+sassembler should fallback on the current one).</div><div><br></div><div>I =
+noticed some cosmetic improvements may still be done, like, for example, us=
+ing [ALIAS_MAX_LEN] instead of [5] in numerous places. But, there is no nee=
+d to respin (send a new version) just for this. Overall, the code looks wel=
+l-organized and clean.</div><div><br></div><div>An interesting topic for fu=
+ture work would be the automation of QEMU disassembler testing. Not only fo=
+r this dissasembler, but for any supported disassembler in QEMU. I don&#39;=
+t say you should do it, this is just a brainstorming idea, somebody may hop=
+efully pick it up.</div><div><br></div><div>Congratulations on this interes=
+ting work!</div><div><br></div><div>Aleksandar</div><div><br></div><div><br=
+></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0=
+ 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
 =C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =
 =C2=A0 1 +<br>
 =C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
@@ -2199,8 +2221,8 @@ index 3abe3faa4e..913ed2a6d3 100644<br>
 =C2=A0F: default-configs/*mips*<br>
 =C2=A0F: disas/*mips*<br>
 +F: disas/loongson*<br>
-=C2=A0F: docs/system/<a href=3D"http://cpu-models-mips.rs">cpu-models-mips.=
-rs</a><wbr>t.inc<br>
+=C2=A0F: docs/system/<a href=3D"http://cpu-models-mips.rs" target=3D"_blank=
+">cpu-models-mips.rs</a><wbr>t.inc<br>
 =C2=A0F: hw/intc/mips_gic.c<br>
 =C2=A0F: hw/mips/<br>
 diff --git a/configure b/configure<br>
@@ -4392,6 +4414,7 @@ t;getOffset()<wbr>, alias2));<br>
 +=C2=A0 =C2=A0 (info-&gt;fprintf_func(info-&gt;stre<wbr>am, &quot;%-9s&quot=
 ; </blockquote>
 </blockquote>
+</blockquote>
 
---000000000000b7611305a9b35e3a--
+--000000000000f1c82a05a9b480be--
 
