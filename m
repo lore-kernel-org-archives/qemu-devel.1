@@ -2,81 +2,68 @@ Return-Path: <SRS0=SLMP=AQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC73C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 06:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B90EDC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 07:10:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16C1C207CD
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 06:32:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C1C207CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7D89D207CD
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 07:10:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dGkXUBfT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D89D207CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jryCA-0007SZ-AC
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 02:32:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48590)
+	id 1jrymt-0007sL-Pz
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 03:10:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>)
- id 1jryBD-0006oB-Nq; Sun, 05 Jul 2020 02:31:11 -0400
-Received: from mail-ej1-f68.google.com ([209.85.218.68]:38612)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>)
- id 1jryB9-0007r8-A0; Sun, 05 Jul 2020 02:31:10 -0400
-Received: by mail-ej1-f68.google.com with SMTP id w16so39185042ejj.5;
- Sat, 04 Jul 2020 23:31:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=AC0bKtFkufkyNwdJUNbQrXinwDiu3+IvdQQi3k0ExBk=;
- b=QPvPgAWMdZVws2Kp5/L9ptW0zp+5ro97UW9GZu+7aPRQTElCI0FpL+qD5pYA9Q1sTf
- IWeIy5rxIPjFzjC4/aDDVSSCcCdRw72YeZzzmDf+6K9ATN4iDmOwsZkqGhvmIjAz1KDk
- Tw5ntoRc9nVI1yAFhAGeon/KyrrKbliL5MM6Bh6qhmj//gE3PCFpV9KWVsuo+JKAxR5J
- 1OpD2EYRjIlD/D4J1tN8N6hyVxmszp7HsYRBmPaptcsH7d3IxAQ+0wbQZ7GfQC3imOnO
- 2f5YcLc8rCYjF8Gi2BXWVZTUhm8V641j253RLLNPz5QLPf+UMfKx+Nt4jZ9C9w6MdV+u
- td6Q==
-X-Gm-Message-State: AOAM532BjjrlBLTqHEftg6ht14PL6Us7wBTiM5LMAFARMuKKa39hXYW4
- pJiT3HepUby1nDNySM/Xebw=
-X-Google-Smtp-Source: ABdhPJyArN3Df+uaJN/4OlyiwvauV0WFeBmtrHxUe4PEdiMCltn1oIUMe8ewC47UMB1fL0rez67gmQ==
-X-Received: by 2002:a17:906:1751:: with SMTP id
- d17mr22130319eje.140.1593930664580; 
- Sat, 04 Jul 2020 23:31:04 -0700 (PDT)
-Received: from thl530.multi.box (pd9e83654.dip0.t-ipconnect.de.
- [217.232.54.84])
- by smtp.gmail.com with ESMTPSA id by20sm14519161ejc.119.2020.07.04.23.31.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 04 Jul 2020 23:31:04 -0700 (PDT)
-Date: Sun, 5 Jul 2020 08:31:00 +0200
-From: Thomas Huth <huth@tuxfamily.org>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [RFC PATCH v2 15/23] hw/m68k/mcf520x: Emit warning when old
- code is used
-Message-ID: <20200705083100.19e74e4a@thl530.multi.box>
-In-Reply-To: <20200704153908.12118-16-philmd@redhat.com>
-References: <20200704153908.12118-1-philmd@redhat.com>
- <20200704153908.12118-16-philmd@redhat.com>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jrym1-00078h-Au; Sun, 05 Jul 2020 03:09:13 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51421 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jrylx-0005xZ-Jz; Sun, 05 Jul 2020 03:09:13 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4B00DP1Qk5z9sSJ; Sun,  5 Jul 2020 17:08:53 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1593932933;
+ bh=ywo6b+L+5gcEpl2+eSCOs43OV+chUDGZ62wu+OU3o6k=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=dGkXUBfTm6RXDtJnVowC+IE88Ig0MKFkg8I/GHBUiErx6atEpyTBuwEkpb6qOW+1e
+ jcyJYgJ7hs5/7YpN8CadKXGzFm2zFSLVTadyvwaK30CN5ed7gTzfxO3JIshfVG0f5N
+ HocfpoP85Q9lpS1dqt0a7DhD4CVWfk/ieic6UPgo=
+Date: Sun, 5 Jul 2020 15:34:13 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 2/2] hw/ppc: Use TYPE_SYSBUS_OHCI instead of hardcoded
+ string
+Message-ID: <20200705053413.GA6626@umbus.fritz.box>
+References: <20200703184952.4918-1-f4bug@amsat.org>
+ <20200703184952.4918-3-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.218.68; envelope-from=th.huth@gmail.com;
- helo=mail-ej1-f68.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 02:31:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 1
-X-Spam_score: 0.1
-X-Spam_bar: /
-X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lrZ03NoBR/3+SXJZ"
+Content-Disposition: inline
+In-Reply-To: <20200703184952.4918-3-f4bug@amsat.org>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,38 +76,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Gerd Hoffmann <kraxel@redhat.com>, "Edgar E.
- Iglesias" <edgar.iglesias@gmail.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Magnus Damm <magnus.damm@gmail.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>,
- qemu-riscv@nongnu.org, Stafford Horne <shorne@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>, "Daniel
- P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am Sat,  4 Jul 2020 17:39:00 +0200
-schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
 
-> This code hasn't been QOM'ified yet. Warn the user.
+--lrZ03NoBR/3+SXJZ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jul 03, 2020 at 08:49:52PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> By using the TYPE_* definitions for devices, we can:
+> - quickly find where devices are used with 'git-grep'
+> - easily rename a non-user-creatable device (one-line change).
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> v2: Add comment (thuth)
-> ---
->  hw/m68k/mcf5206.c | 5 +++++
->  hw/m68k/mcf5208.c | 3 +++
->  2 files changed, 8 insertions(+)
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-Acked-by: Thomas Huth <huth@tuxfamily.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/display/sm501.c | 3 ++-
+>  hw/ppc/sam460ex.c  | 3 ++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> index 9cccc68c35..c122a4eca5 100644
+> --- a/hw/display/sm501.c
+> +++ b/hw/display/sm501.c
+> @@ -36,6 +36,7 @@
+>  #include "hw/qdev-properties.h"
+>  #include "hw/i2c/i2c.h"
+>  #include "hw/display/i2c-ddc.h"
+> +#include "hw/usb/hcd-ohci.h"
+>  #include "qemu/range.h"
+>  #include "ui/pixel_ops.h"
+>  #include "qemu/bswap.h"
+> @@ -1961,7 +1962,7 @@ static void sm501_realize_sysbus(DeviceState *dev, =
+Error **errp)
+>      sysbus_init_mmio(sbd, &s->state.mmio_region);
+> =20
+>      /* bridge to usb host emulation module */
+> -    usb_dev =3D qdev_new("sysbus-ohci");
+> +    usb_dev =3D qdev_new(TYPE_SYSBUS_OHCI);
+>      qdev_prop_set_uint32(usb_dev, "num-ports", 2);
+>      qdev_prop_set_uint64(usb_dev, "dma-offset", s->base);
+>      sysbus_realize_and_unref(SYS_BUS_DEVICE(usb_dev), &error_fatal);
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 1a106a68de..593436937a 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -35,6 +35,7 @@
+>  #include "hw/char/serial.h"
+>  #include "hw/i2c/ppc4xx_i2c.h"
+>  #include "hw/i2c/smbus_eeprom.h"
+> +#include "hw/usb/hcd-ohci.h"
+>  #include "hw/usb/hcd-ehci.h"
+>  #include "hw/ppc/fdt.h"
+>  #include "hw/qdev-properties.h"
+> @@ -370,7 +371,7 @@ static void sam460ex_init(MachineState *machine)
+> =20
+>      /* USB */
+>      sysbus_create_simple(TYPE_PPC4xx_EHCI, 0x4bffd0400, uic[2][29]);
+> -    dev =3D qdev_new("sysbus-ohci");
+> +    dev =3D qdev_new(TYPE_SYSBUS_OHCI);
+>      qdev_prop_set_string(dev, "masterbus", "usb-bus.0");
+>      qdev_prop_set_uint32(dev, "num-ports", 6);
+>      sbdev =3D SYS_BUS_DEVICE(dev);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--lrZ03NoBR/3+SXJZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8BZlIACgkQbDjKyiDZ
+s5KS4Q/+JirVTbyghqt28vjm/cQzO7HW040SKRBB9iVctieCN4laJvYA3VvUxERH
+pujjHh2xnKbDyduzQlKfxO7EPENysPkvMbPxLidKgS/CeD0xNy7+2PWHDmrx2Zm8
+36whg9WlJw0BCleIIzBPpztKLB44owOZzpoKkEymGoFQeANE3ExRt8/TUzsIXCp1
+Q6lo5h6sr7FvFRnJnJpLupOGlzUn0t1ZeE9Wip/xgivmeTnWU405lfXugKZsblRt
+tk0pAYYbI4C8t/xTn3rckQ1ouiuJVYJaI+FAw0cb6RtFaj4L+/20NmAc/CgBSfXK
+NQVzAuKIqqjc4UjeCMsEyjGq1i3fmRDewOKJgh9iNMEeP9sZIHTYvgc5Ma1FuYOG
+/vNmhzCRxRasLarSO5s7AQNZsO/P1Yw+5pkSUHkHYPazafT8nsOqogH95HKiufRG
+eTw6RrwhZTq2QgUgtM/hWfCselfK3Bedg6kWaYkYLcNyQXVlZTzTJhkXEO9wzmg7
+YuIbJZuUAnHuW2NwogYwGUi200nhZ3VhdHRJNXl/kY+yHSrIx7ZlJmuS8M+iYbT0
+Svlp6AwtJGJJ0S/qrvPJlj71+5/GL5VGUlSLOOPig5qMfSxVFb14CcHp+cYTXclO
+yLmzCiVMcsjB5RrhZ8JPq1H0U5Cx9rnOiJVjmFnlqVt2DXdtXr4=
+=ah6p
+-----END PGP SIGNATURE-----
+
+--lrZ03NoBR/3+SXJZ--
 
