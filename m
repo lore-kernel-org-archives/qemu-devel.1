@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0ECC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA80C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41C7720739
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A72F2074F
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 21:13:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vq2D07LX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41C7720739
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQyhI/5Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A72F2074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsBve-000187-GS
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 17:12:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54832)
+	id 1jsBx0-0003KI-RZ
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 17:13:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsBu9-0007Gt-HH
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:29 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42294)
+ id 1jsBu3-0007Bs-D8
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:24 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41301)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsBu6-0004s6-E7
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:29 -0400
-Received: by mail-wr1-x442.google.com with SMTP id o11so38807276wrv.9
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 14:10:24 -0700 (PDT)
+ id 1jsBu1-0004qZ-QZ
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 17:10:23 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z15so27494932wrl.8
+ for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 14:10:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZL9T7KFWD7HCyn+1/9Rr0VvAdk4V+i9LaitRKQS9OF0=;
- b=Vq2D07LXep6KOqympd9raTJTXOvxd5ZhxsgXeWtQpiGYbwju0n72B2VWJtpg3Lns5Z
- Q2c+t/WDDT0HW7H1goR0p8RcdSkrigFj3TS/G+XfV7p7sbK1ZrceXPpvNIiY/XRj5phg
- BKH+LOvfhne4vp6xXx4PFpN5Y8/jJHRwSwem0iA3t1lx/4OD51TP+aPJsZ3DwC/k7Ubz
- k+wupdOyRQr3i3wqij4SUnD/HZveQGKSxkNW9vPjxxHPO1ZE0IyvxQiBU0qtkuayxj3E
- 5syPd4YPZWSqsDVHY6cXQ5Mp4VWvc2hSHmHbEgw7h8ROW7fM7mEvd64abAm9Fyb/wFa4
- RGMg==
+ bh=0uVc1RwrLMQTCvhtTK0p0uUR1koiTD8RW3TLjeqwhns=;
+ b=jQyhI/5YYDXiS/6oRlHxKFZRz39HKRwaJryKzojw8cFnKCp5SscGDOawLoQfQSv7gn
+ CQdxjB7M2RyEn1PxeK/OohUpFOhjYFL8uT0RbJK+tTnSy/gSWukidzwU9e2bmPZwlljf
+ vtTOq9yUvGMZHbyGahEKB84Zg2SrKmOViw7Wonwx5N8SiCecThtfbaCVTKF0DrtvGa3l
+ G1+IRUNdLgUCFpHwrCnYElB1lzZYpkAIotHx/eA93zFEz3V+h2S6nmLFt/A2qSIp5I3P
+ xERr/sLzTp0lvedmFR9Be9TlLRCwg3n4MJzIXqsfOfw+sRUBHY4COv/Ih2rWFycxRcgQ
+ GcSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ZL9T7KFWD7HCyn+1/9Rr0VvAdk4V+i9LaitRKQS9OF0=;
- b=Uh+zN2BTU+KeY2NTZddy2UMckOcxC+3im3PztP2gEsXWrT4mxBK2QNc/6m8eQ8zIAz
- JRPkwJMZFrEvcLmAI+UO08Yi2Tqn2QpjVluhhub6PGTYk0GKnBzErSfYx5gtrwTtSr+s
- M9be3uL/jnTsks2SJkiRpXaXcb0fAJgsMvoYtOdP4aIDhxUDqz3AP0+P+sXugwhFjLWl
- 4Q3WEXWfr1z7t+bBOU4WlJMmnYGu3jjPAyyaFQ8E257HkHQ8YrTQD/XrJ1tpji+ATgxg
- a3zSXd28XxgKkyGInEG84w7I9D1ChY/46Sm85PocROsiUQ2+towt0CoOSOc+t10E8OZk
- NycQ==
-X-Gm-Message-State: AOAM531o8zqlhgJVYqs3l6+IE2WMtcAjwXOJ42c6qcT9R+X5V+fL1JuW
- otkdQH+kjpit/Anjmr0BQ/aMF9+sRIA=
-X-Google-Smtp-Source: ABdhPJwsP8/I0Urr8xV58BPuY19kIhiQaPrtNXjBwNF0213Hs6A7XFrEgFBZm7f+3jBKFDiGpMyRjA==
-X-Received: by 2002:a5d:504b:: with SMTP id h11mr44724670wrt.160.1593983423231; 
- Sun, 05 Jul 2020 14:10:23 -0700 (PDT)
+ bh=0uVc1RwrLMQTCvhtTK0p0uUR1koiTD8RW3TLjeqwhns=;
+ b=NbjDcACoRXuOQAZ+tewMj+fdg/bQWgcoOqktQBUBDJ6jor3XXxl9TVhNRQ7UYRqQbU
+ TW06dCoVmR+1EtI23S6odG+o0Y4RrnHzmS9NtsB86Hevg6Hb7RgQkDQcuPLRO0p6d4Q7
+ qHCYIVj8Gua8CObd/C0ykbM+f852GmBT6QtgZfwUC+y53iorXuSW1Ek+flwPyBCDUhS3
+ v/b9iFcFIKquuZBdnN8UfHMZr7IWSO7/BUQLPAWGvHs07vEGRKGFF9H7nPvTXsua0NhY
+ bGmGH0rgsEuruKey1Pb4m7sWJ4ttPV/QsZl1IWPWZGNf6AG5E6nP7yCgaogUNqwPORKO
+ n4ww==
+X-Gm-Message-State: AOAM532rrqsHEEcJUN6XqxssKbliS+d8fF7Yv9NA8NWVsWrxN9tSaKfe
+ gnXZi0yiJncYfbOqygMjh6EXE9k63+Y=
+X-Google-Smtp-Source: ABdhPJwGaPdNiouywgbyHEMo19745phH81vXpdYVh82rIUV6Z7/+4yvJoR6lFcyqy9bcuMR7WOLYxQ==
+X-Received: by 2002:adf:ed4f:: with SMTP id u15mr44625398wro.318.1593983420004; 
+ Sun, 05 Jul 2020 14:10:20 -0700 (PDT)
 Received: from localhost.localdomain (1.red-83-51-162.dynamicip.rima-tde.net.
  [83.51.162.1])
- by smtp.gmail.com with ESMTPSA id r8sm21102004wrp.40.2020.07.05.14.10.22
+ by smtp.gmail.com with ESMTPSA id r8sm21102004wrp.40.2020.07.05.14.10.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jul 2020 14:10:22 -0700 (PDT)
+ Sun, 05 Jul 2020 14:10:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] hw/sd/milkymist: Do not create SD card within the SDHCI
- controller
-Date: Sun,  5 Jul 2020 23:10:16 +0200
-Message-Id: <20200705211016.15241-5-f4bug@amsat.org>
+Subject: [PATCH 1/4] hw/lm32/milkymist: Un-inline milkymist_memcard_create()
+Date: Sun,  5 Jul 2020 23:10:13 +0200
+Message-Id: <20200705211016.15241-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200705211016.15241-1-f4bug@amsat.org>
 References: <20200705211016.15241-1-f4bug@amsat.org>
@@ -80,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -110,152 +109,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SDHCI controllers provide a SD Bus to plug SD cards, but don't
-come with SD card plugged in :) Let the machine/board object
-create and plug the SD cards when required.
+As we will modify milkymist_memcard_create(), move it first
+to the source file where it is used.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/lm32/milkymist.c       | 13 +++++++++
- hw/sd/milkymist-memcard.c | 55 +++++++++++++++++++++++----------------
- 2 files changed, 45 insertions(+), 23 deletions(-)
+ hw/lm32/milkymist-hw.h | 11 -----------
+ hw/lm32/milkymist.c    | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index 117973c967..8e2c68da5a 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -34,6 +34,7 @@
- #include "elf.h"
- #include "milkymist-hw.h"
- #include "hw/display/milkymist_tmu2.h"
-+#include "hw/sd/sd.h"
- #include "lm32.h"
- #include "exec/address-spaces.h"
- #include "qemu/cutils.h"
-@@ -83,12 +84,24 @@ static void main_cpu_reset(void *opaque)
- static DeviceState *milkymist_memcard_create(hwaddr base)
- {
-     DeviceState *dev;
-+    DriveInfo *dinfo;
- 
-     dev = qdev_new("milkymist-memcard");
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-     /* FIXME wire 'card is readonly' and 'card inserted' IRQs? */
- 
-+    dinfo = drive_get_next(IF_SD);
-+    if (dinfo) {
-+        DeviceState *card;
-+
-+        card = qdev_new(TYPE_SD_CARD);
-+        qdev_prop_set_drive_err(card, "drive", blk_by_legacy_dinfo(dinfo),
-+                                &error_fatal);
-+        qdev_realize_and_unref(card, qdev_get_child_bus(dev, "sd-bus"),
-+                               &error_fatal);
-+    }
-+
+diff --git a/hw/lm32/milkymist-hw.h b/hw/lm32/milkymist-hw.h
+index 05e2c2a5a7..5dca5d52f5 100644
+--- a/hw/lm32/milkymist-hw.h
++++ b/hw/lm32/milkymist-hw.h
+@@ -31,17 +31,6 @@ static inline DeviceState *milkymist_hpdmc_create(hwaddr base)
      return dev;
  }
  
-diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-index fb02309f07..e9f5db5e22 100644
---- a/hw/sd/milkymist-memcard.c
-+++ b/hw/sd/milkymist-memcard.c
-@@ -66,6 +66,8 @@ enum {
- #define MILKYMIST_MEMCARD(obj) \
-     OBJECT_CHECK(MilkymistMemcardState, (obj), TYPE_MILKYMIST_MEMCARD)
- 
-+#define TYPE_MILKYMIST_SDBUS "milkymist-sdbus"
-+
- struct MilkymistMemcardState {
-     SysBusDevice parent_obj;
- 
-@@ -253,6 +255,19 @@ static void milkymist_memcard_reset(DeviceState *d)
-     }
- }
- 
-+static void milkymist_memcard_set_readonly(DeviceState *dev, bool level)
-+{
-+    qemu_log_mask(LOG_UNIMP,
-+                  "milkymist_memcard: read-only mode not supported\n");
-+}
-+
-+static void milkymist_memcard_set_inserted(DeviceState *dev, bool level)
-+{
-+    MilkymistMemcardState *s = MILKYMIST_MEMCARD(dev);
-+
-+    s->enabled = !!level;
-+}
-+
- static void milkymist_memcard_init(Object *obj)
- {
-     MilkymistMemcardState *s = MILKYMIST_MEMCARD(obj);
-@@ -266,27 +281,6 @@ static void milkymist_memcard_init(Object *obj)
-                         DEVICE(obj), "sd-bus");
- }
- 
--static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+-static inline DeviceState *milkymist_memcard_create(hwaddr base)
 -{
--    MilkymistMemcardState *s = MILKYMIST_MEMCARD(dev);
--    DeviceState *carddev;
--    BlockBackend *blk;
--    DriveInfo *dinfo;
--    Error *err = NULL;
+-    DeviceState *dev;
 -
--    /* Create and plug in the sd card */
--    /* FIXME use a qdev drive property instead of drive_get_next() */
--    dinfo = drive_get_next(IF_SD);
--    blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
--    carddev = qdev_new(TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk);
--    if (!qdev_realize_and_unref(carddev, BUS(&s->sdbus), &err)) {
--        error_propagate_prepend(errp, err, "failed to init SD card: %s");
--        return;
--    }
--    s->enabled = blk && blk_is_inserted(blk);
+-    dev = qdev_new("milkymist-memcard");
+-    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-
+-    return dev;
 -}
 -
- static const VMStateDescription vmstate_milkymist_memcard = {
-     .name = "milkymist-memcard",
-     .version_id = 1,
-@@ -308,10 +302,9 @@ static void milkymist_memcard_class_init(ObjectClass *klass, void *data)
+ static inline DeviceState *milkymist_vgafb_create(hwaddr base,
+         uint32_t fb_offset, uint32_t fb_mask)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    dc->realize = milkymist_memcard_realize;
-     dc->reset = milkymist_memcard_reset;
-     dc->vmsd = &vmstate_milkymist_memcard;
--    /* Reason: init() method uses drive_get_next() */
-+    /* Reason: output IRQs should be wired up */
-     dc->user_creatable = false;
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index 85913bb68b..469e3c4322 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -80,6 +80,17 @@ static void main_cpu_reset(void *opaque)
+     env->deba = reset_info->flash_base;
  }
  
-@@ -323,9 +316,25 @@ static const TypeInfo milkymist_memcard_info = {
-     .class_init    = milkymist_memcard_class_init,
- };
- 
-+static void milkymist_sdbus_class_init(ObjectClass *klass, void *data)
++static DeviceState *milkymist_memcard_create(hwaddr base)
 +{
-+    SDBusClass *sbc = SD_BUS_CLASS(klass);
++    DeviceState *dev;
 +
-+    sbc->set_inserted = milkymist_memcard_set_inserted;
-+    sbc->set_readonly = milkymist_memcard_set_readonly;
++    dev = qdev_new("milkymist-memcard");
++    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
++
++    return dev;
 +}
 +
-+static const TypeInfo milkymist_sdbus_info = {
-+    .name = TYPE_MILKYMIST_SDBUS,
-+    .parent = TYPE_SD_BUS,
-+    .instance_size = sizeof(SDBus),
-+    .class_init = milkymist_sdbus_class_init,
-+};
-+
- static void milkymist_memcard_register_types(void)
+ static void
+ milkymist_init(MachineState *machine)
  {
-     type_register_static(&milkymist_memcard_info);
-+    type_register_static(&milkymist_sdbus_info);
- }
- 
- type_init(milkymist_memcard_register_types)
 -- 
 2.21.3
 
