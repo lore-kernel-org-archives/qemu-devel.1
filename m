@@ -2,87 +2,125 @@ Return-Path: <SRS0=SLMP=AQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7578AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 17:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38448C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 17:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EFFF2068F
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 17:11:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04BE020715
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 17:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cHa8D6B9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EFFF2068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qi+1t43r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04BE020715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1js8AY-0001cC-Ir
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 13:11:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35022)
+	id 1js8X3-0000vo-B2
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 13:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1js89l-00012O-L0
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 13:10:21 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42090)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1js8WO-0000Kz-RK; Sun, 05 Jul 2020 13:33:44 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52499)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1js89i-00072s-Qb
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 13:10:21 -0400
-Received: by mail-ot1-x344.google.com with SMTP id g37so6284184otb.9
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 10:10:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5ZQRbT758TX2gxOlkJidQdi2GmVVmVYR4ms97Buz708=;
- b=cHa8D6B9W/dAZ1YoX4vO0Kw5a4hl9+Lnm5gBG7egJDeOp1gq666D7Byz4fgjIdHv/e
- nJHuJY7gKle0I+cSq3oBAymVvSQrXdUrwsmNCfrJ4jaUcbzrEWV2sXJsQzyKOtvs2/Ok
- 02wqs9r4B+86yIgHfdz775BCi8QP0049oGcfQyPzY/U1d8vFFCygiiQxYpXOMT6bk3eA
- 34absVQNOJaUkhTZGoKlKVo86zx5mzxxab3ObmIuh9AGrzR6E6toHfFpibdBLuYQEFKr
- uQzW1Ex7y+LR0IHALbBC3P0lGzd2Od+X7f5mH0v+oO6t5dDAmVRfka91gWYiSjA1AD3g
- v4aw==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1js8WN-0003K2-4A; Sun, 05 Jul 2020 13:33:44 -0400
+Received: by mail-wm1-x342.google.com with SMTP id q15so36738377wmj.2;
+ Sun, 05 Jul 2020 10:33:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/77a0ybO+Kw7RMWAdeOvm0+LhAnrrdaO610FUUTjGq8=;
+ b=Qi+1t43rikViELY32wR8eWRL5cPRFLOBoL+3jNV/eKCLPqrkXcPzHZIA2FMVFHVxx0
+ bTTMWyonFamUylOUQru+fy0BYias7An+xiww5DNO6EHzw93n3aN0S1hADjtteubRhP0K
+ PechcqEGWVmqbRaaJy653fJuSwNtiBvi4dRswIeOcMIAJdR7/ektWJYgTgKD5vahpHjg
+ sGjOGFeaXiBZQF7sShD7XkUWoBViEz1gSjtksyvybFSfTP2aExvFEWafsWCfcwRaFAKl
+ F2jBztgH4B8vbIvWAdAvV1oIl7SkPMIfwgaR8QaxPcH+Jk1kfoB4gZnIJeTfJUO2c19H
+ Fvkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5ZQRbT758TX2gxOlkJidQdi2GmVVmVYR4ms97Buz708=;
- b=MdlxlTChFU1H88XxYnd4W+u6WYFW1Pjv/J+COpYfu18llOc5mhctJk5jZwWyQO35Ph
- Pu0Mp99fgXShWPotO2zjCP11EXgerssJYIqpPdHtlKsuVvZlsH+bmssWp9ff0+Tiyxsc
- 2uiD8piCVW1l4GPBoOkQaZ2hY16i2LBhX6laGT+RIwFSTUKHWDaPDp/F/q0vdWZyf6gB
- maqjGXF/RQnj0lus7jIKur0rM4tH48J/QA85Eju7mJ8lCsjx3XZhmyDE4kpMiJByeZ8G
- Nf18RhfBtqeiW9611F3PhBEtBb3gDMUAGfbIazFIHRHVyo1JbCszt6Br8W2MfZnbKNu7
- QqIg==
-X-Gm-Message-State: AOAM5305BVTW/ijNuYQ1td1S2ht48a4d2iz+oFUIqYxNqkHL5HUyb4j/
- l8N9Yw1S375vSFLJv2byHCTnpPBhDVtD93xuIDikvQ==
-X-Google-Smtp-Source: ABdhPJzrJODtJsCWs6wfu+Re0oghWaghNIS+jPK4C5pft8NSsjBesGkl020U2jaHFmy0gKEPLQiv2TBqoHEtFXJbSSU=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr30932395oto.135.1593969017498; 
- Sun, 05 Jul 2020 10:10:17 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=/77a0ybO+Kw7RMWAdeOvm0+LhAnrrdaO610FUUTjGq8=;
+ b=YhU7ZpRrQ5AoaqTlRsonNr7MmqiyMHA2t9eAtbPMife/aoYqzuRl8H2iz+6lOjrU9j
+ RAFJs6IAz/FWo/tDmpK7aGWDkQ3Thxf4Go5q12xTezrabXeKh/+UhhzxDNkWsK7N8az6
+ unU4Rqktk+ZrBkLwPloLoFcQR7ON7b4pQdR4TawfirNg+QqYVoXTuY7NkvlsYxSTkaWl
+ fo4iweQc3r+hrRMQ2Xyi5HlBcF1+ducH5tREjx0fFoHDA7UxFxtlIenP32ETKPUGZCuX
+ lWnPeUH4gxzxYCLWsV0Uv9jvNjiVb0djQyF8oWiHUbftNjVQfeHLdlJ9jJvVEanJ02La
+ 203g==
+X-Gm-Message-State: AOAM532Amj0iqwNA1jpbThlS9b3ctkEy4ASASMuXcOcelUt6PNIQUVT/
+ U+KUt88Y3n3jXwIM5PqO3rg=
+X-Google-Smtp-Source: ABdhPJxPQt9Bdz8VRttbU47P72KDSqlvFNtg+5Pmo67kibc6XOvPNhZftC3ZowiUym1ydxaNB2Lk9A==
+X-Received: by 2002:a05:600c:2182:: with SMTP id
+ e2mr44981916wme.186.1593970420848; 
+ Sun, 05 Jul 2020 10:33:40 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net.
+ [83.51.162.1])
+ by smtp.gmail.com with ESMTPSA id u8sm20107243wrt.28.2020.07.05.10.33.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 05 Jul 2020 10:33:39 -0700 (PDT)
+Subject: Re: [PATCH v7 09/17] hw/sd/sdcard: Special case the -ENOMEDIUM error
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200630133912.9428-1-f4bug@amsat.org>
+ <20200630133912.9428-10-f4bug@amsat.org>
+ <CAFEAcA_dhbr6cjK40H0=e39sD2r8ERTZYrY5nhJtx81Rk+RmUg@mail.gmail.com>
+ <2c77e134-4762-89b2-b60d-aabde740f25f@amsat.org>
+ <2a6b8801-038e-d67c-6d96-a3df526c44a0@amsat.org>
+ <c016b643-3f5b-9064-3d86-639ec1497e88@amsat.org>
+ <7ef59cd7-c137-9d0d-135f-c8a9ae3d8d0a@amsat.org>
+ <96e9104a-fdca-332e-1f77-3fc82d93129f@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <d30ddf09-2dee-4364-ec7d-6d3191ba225d@amsat.org>
+Date: Sun, 5 Jul 2020 19:33:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200629160535.3910-1-wentong.wu@intel.com>
- <20200629160535.3910-3-wentong.wu@intel.com>
-In-Reply-To: <20200629160535.3910-3-wentong.wu@intel.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 5 Jul 2020 18:10:06 +0100
-Message-ID: <CAFEAcA-1eFyMNkqg-c3dTZv7HjVRUPbwcbZht5HV1mwgzrMcBQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] target/nios2: Use gen_io_start around wrctl
- instruction
-To: Wentong Wu <wentong.wu@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+In-Reply-To: <96e9104a-fdca-332e-1f77-3fc82d93129f@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,56 +133,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Marek Vasut <marex@denx.de>,
- Chris Wulff <crwulff@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eddie James <eajames@linux.vnet.ibm.com>, Cedric Le Goater <clg@fr.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 29 Jun 2020 at 09:17, Wentong Wu <wentong.wu@intel.com> wrote:
->
-> wrctl instruction on nios2 target will cause checking cpu
-> interrupt but tcg_handle_interrupt() will call cpu_abort()
-> if the CPU gets an interrupt while it's not in 'can do IO'
-> state, so add gen_io_start around wrctl instruction. Also
-> at the same time, end the onging TB with DISAS_UPDATE.
->
-> Signed-off-by: Wentong Wu <wentong.wu@intel.com>
-> ---
->  target/nios2/translate.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-> index 83c10eb2..51347ada 100644
-> --- a/target/nios2/translate.c
-> +++ b/target/nios2/translate.c
-> @@ -32,6 +32,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "exec/translator.h"
->  #include "qemu/qemu-print.h"
-> +#include "exec/gen-icount.h"
->
->  /* is_jmp field values */
->  #define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
-> @@ -518,7 +519,11 @@ static void wrctl(DisasContext *dc, uint32_t code, uint32_t flags)
->      /* If interrupts were enabled using WRCTL, trigger them. */
->  #if !defined(CONFIG_USER_ONLY)
->      if ((instr.imm5 + CR_BASE) == CR_STATUS) {
-> +        if (tb_cflags(dc->tb) & CF_USE_ICOUNT) {
-> +            gen_io_start();
-> +        }
->          gen_helper_check_interrupts(dc->cpu_env);
-> +        dc->is_jmp = DISAS_UPDATE;
->      }
->  #endif
->  }
+On 7/5/20 12:26 AM, Philippe Mathieu-Daudé wrote:
+> On 7/5/20 12:18 AM, Philippe Mathieu-Daudé wrote:
+>> On 7/5/20 12:10 AM, Philippe Mathieu-Daudé wrote:
+>>> On 7/4/20 1:42 AM, Philippe Mathieu-Daudé wrote:
+>>>> On 7/3/20 5:16 PM, Philippe Mathieu-Daudé wrote:
+>>>>> On 7/3/20 3:23 PM, Peter Maydell wrote:
+>>>>>> On Tue, 30 Jun 2020 at 14:39, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>>>>>
+>>>>>>> As we have no interest in the underlying block geometry,
+>>>>>>> directly call blk_getlength(). We have to care about machines
+>>>>>>> creating SD card with not drive attached (probably incorrect
+>>>>>>> API use). Simply emit a warning when such Frankenstein cards
+>>>>>>> of zero size are reset.
+>>>>>>
+>>>>>> Which machines create SD cards without a backing block device?
+>>>>>
+>>>>> The Aspeed machines:
+>>>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg718116.html
+>>>
+>>> Also all boards using:
+>>>
+>>> hw/sd/milkymist-memcard.c:278:    /* FIXME use a qdev drive property
+>>> instead of drive_get_next() */
+>>> hw/sd/pl181.c:506:    /* FIXME use a qdev drive property instead of
+>>> drive_get_next() */
+>>> hw/sd/ssi-sd.c:253:    /* FIXME use a qdev drive property instead of
+>>> drive_get_next() */
+>>>
+>>> I.e.:
+>>>
+>>> static void pl181_realize(DeviceState *dev, Error **errp)
+>>> {
+>>>     PL181State *s = PL181(dev);
+>>>     DriveInfo *dinfo;
+>>>
+>>>     /* FIXME use a qdev drive property instead of drive_get_next() */
+>>>     dinfo = drive_get_next(IF_SD);
+>>>     s->card = sd_init(dinfo ? blk_by_legacy_dinfo(dinfo) : NULL, false);
+>>>     if (s->card == NULL) {
+>>>         error_setg(errp, "sd_init failed");
+>>>     }
+>>> }
+>>
+>> Doh I was pretty sure this series was merged:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg514645.html
+>>
+>> Time to respin I guess, addressing your comment...
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg515866.html
+> 
+> Not straight forward at first glance, so probably too late for soft
+> freeze.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+I looked in backups of my previous computer and found the branch with
+your comment addressed... Not sure why I never send the series, but
+this explains why I was sure it was already fixed.
 
-though as Richard notes ideally the interrupt handling code here should
-be rewritten because the check_interrupts helper is a very weird way
-to implement things.
-
-thanks
--- PMM
+> 
+> Meanwhile patches 1-8 are reviewed and sufficient to fix
+> CVE-2020-13253. The problematic patch is #9, your "Check address is
+> in range" suggestion. Patches 11-14 are also reviewed and can go in.
+> 
+> Peter, can you consider taking them via your ARM queue? If you prefer
+> I can prepare a pull request.
+> 
+> I'll keep working on this during the next dev window.
+> 
+> Thanks,
+> 
+> Phil.
+> 
+>>
+>>>
+>>>>>
+>>>>>> I have a feeling that also the monitor "change" and "eject"
+>>>>>> commands can remove the backing block device from the SD card
+>>>>>> object.
+>>>>>
+>>>>> This is what I wanted to talk about on IRC. This seems wrong to me,
+>>>>> we should eject the card and destroy it, and recreate a new card
+>>>>> when plugging in another backing block device.
+>>>>>
+>>>>> Keep the reparenting on the bus layer, not on the card.
+>>>>
+>>>> I was wrong, the current code is correct:
+>>>>
+>>>> void sdbus_reparent_card(SDBus *from, SDBus *to)
+>>>> {
+>>>>     SDState *card = get_card(from);
+>>>>     SDCardClass *sc;
+>>>>     bool readonly;
+>>>>
+>>>>     /* We directly reparent the card object rather than implementing this
+>>>>      * as a hotpluggable connection because we don't want to expose SD cards
+>>>>      * to users as being hotpluggable, and we can get away with it in this
+>>>>      * limited use case. This could perhaps be implemented more cleanly in
+>>>>      * future by adding support to the hotplug infrastructure for "device
+>>>>      * can be hotplugged only via code, not by user".
+>>>>      */
+>>>>
+>>>>     if (!card) {
+>>>>         return;
+>>>>     }
+>>>>
+>>>>     sc = SD_CARD_GET_CLASS(card);
+>>>>     readonly = sc->get_readonly(card);
+>>>>
+>>>>     sdbus_set_inserted(from, false);
+>>>>     qdev_set_parent_bus(DEVICE(card), &to->qbus);
+>>>>     sdbus_set_inserted(to, true);
+>>>>     sdbus_set_readonly(to, readonly);
+>>>> }
+>>>>
+>>>> What I don't understand is why create a sdcard with no block backend.
+>>>>
+>>>> Maybe this is old code before the null-co block backend existed? I
+>>>> haven't checked the git history yet.
+>>>>
+>>>> I'll try to restrict sdcard with only block backend and see if
+>>>> something break (I doubt) at least it simplifies the code.
+>>>> But I need to update the Aspeed machines first.
+>>>>
+>>>> The problem when not using block backend, is the size is 0,
+>>>> so the next patch abort in sd_reset() due to:
+>>>>
+>>>>   static uint64_t sd_addr_to_wpnum(SDState *sd, uint64_t addr)
+>>>>   {
+>>>>       assert(addr < sd->size);
+>>>>
+>>>
+>>>
+>>
+> 
 
