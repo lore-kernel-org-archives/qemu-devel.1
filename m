@@ -6,77 +6,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B03EC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDEFC433DF
 	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:06:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D37FF20724
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:06:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D37FF20724
+	by mail.kernel.org (Postfix) with ESMTPS id 28E2520724
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:06:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E2520724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1js5HW-0004Ai-4g
+	id 1js5HW-0004An-6h
 	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 10:06:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54030)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5F1-00078M-K2
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5F1-00077z-3E
  for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:35 -0400
-Received: from mail-ej1-f51.google.com ([209.85.218.51]:38328)
+Received: from mail-ej1-f48.google.com ([209.85.218.48]:46610)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5Ez-0008IA-Rj
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:35 -0400
-Received: by mail-ej1-f51.google.com with SMTP id w16so39667693ejj.5
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 07:03:33 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5Ey-0008I1-IC
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:34 -0400
+Received: by mail-ej1-f48.google.com with SMTP id p20so39621476ejd.13
+ for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 07:03:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=jkC0aolhlj6RcBhlvFE2t0bB5Yx6UH76eFCh011rLYA=;
- b=GBHJTy2djowMvBrxecy2w64DCX+z/pvo/jO+/UPcL6moSloMj6ZlRqMnPQ8IoPUrCX
- ibxEg0ofgVA3IIi3F/pSCt9HE3X902gbHqoVhQO1YguecvJOYqkDhzj4nkLEs64NxDK0
- bng3xuPlYCaEd5W1kx4AG2270Q1FaSW9JSWo7RWfJMlsSSr0hCb8dwOyguKz8g05iWSj
- gCotcl7atlUBhVqY6uTnp5JxizAKX+YLWcWzPJijd5IMHOSkhNzsIG5tLh8hBicfjGhq
- 6vOsn4/zpoFtEEYWcuAGkXmFJUp3RG7lSpnbgqWrwi+b95iOakRXLFUNzkTJYk6x5DZ5
- +BJA==
-X-Gm-Message-State: AOAM531Q6IYxQqb7/bukwNDMGXsWN3l9ZBjdDixUJ3yp1IuLn+vBbuLr
- hA00rGdUR+yNyrobrb+X4eGKtWtP
-X-Google-Smtp-Source: ABdhPJwiH7tkO/RIWTy2nMophv9qlKkACO37EyOVyxU86bFk0rwm8Ea+xaLRz/s+LKvvtN8VMmggyw==
-X-Received: by 2002:a17:906:f202:: with SMTP id
- gt2mr39443768ejb.70.1593957812297; 
- Sun, 05 Jul 2020 07:03:32 -0700 (PDT)
+ bh=1CySjLgGRRVRRw0BBDjUZQRjIzzmMdiS8rvXA+PsrzM=;
+ b=luC3rwO0KBINnhCwDTzv3qqmHPp/6aKZsfil6JS4xnDHBUX7IPLMJXltZ+yuEtt5jF
+ LkDkGxThhNwiMzKijHlqSei/Fp5ilixsrAImKCX6Yegul/vEgqHRj/wWSHWWDDVYPabG
+ Mz1Jvmo7n24D++sWnGlj5n8xs/Ug4K5bRX0YTWjF9Ot3UXVEfOf+Ty6H4EEhFagAOTCH
+ UFwrRaLdafqSIcTs3Q4xfx6Dp5IO8ViIPzx/E8YOd7s46V4NOm9OX1LnRvSZAf4ovI+4
+ Uy+lUT8BRwiLyeXotvBT+niwcRraQ99qnE2j5v+MediU7qkWSJcy1WrudwvK+siYoyVc
+ ezxg==
+X-Gm-Message-State: AOAM532pvlZL2G4HWwDJ7BM7Fw0mYtiN4PZXPFralzYWxHt+mQ7F7T9D
+ 4NvBRsBF6R9xlN5HhpYvtRAw7uOe
+X-Google-Smtp-Source: ABdhPJxJldG3/UIGmJsjiYlDq4aei619IxfZhqx5itmpheD17ojc181bV+CUpWtO4FLPItYHtCbrvw==
+X-Received: by 2002:a17:906:6d56:: with SMTP id
+ a22mr41137488ejt.440.1593957810975; 
+ Sun, 05 Jul 2020 07:03:30 -0700 (PDT)
 Received: from thl530.multi.box (pd9e83654.dip0.t-ipconnect.de.
  [217.232.54.84])
- by smtp.gmail.com with ESMTPSA id bq8sm10941776ejb.103.2020.07.05.07.03.31
+ by smtp.gmail.com with ESMTPSA id bq8sm10941776ejb.103.2020.07.05.07.03.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jul 2020 07:03:31 -0700 (PDT)
+ Sun, 05 Jul 2020 07:03:30 -0700 (PDT)
 From: Thomas Huth <huth@tuxfamily.org>
 To: qemu-devel@nongnu.org, Michael Rolnik <mrolnik@gmail.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Richard Henderson <rth@twiddle.net>
-Subject: [PATCH rc6 05/30] target/avr: CPU class: Add migration support
-Date: Sun,  5 Jul 2020 16:02:50 +0200
-Message-Id: <20200705140315.260514-6-huth@tuxfamily.org>
+Subject: [PATCH rc6 03/30] target/avr: CPU class: Add interrupt handling
+ support
+Date: Sun,  5 Jul 2020 16:02:48 +0200
+Message-Id: <20200705140315.260514-4-huth@tuxfamily.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200705140315.260514-1-huth@tuxfamily.org>
 References: <20200705140315.260514-1-huth@tuxfamily.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.218.51; envelope-from=th.huth@gmail.com;
- helo=mail-ej1-f51.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 10:03:32
+Received-SPF: pass client-ip=209.85.218.48; envelope-from=th.huth@gmail.com;
+ helo=mail-ej1-f48.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 10:03:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 1
-X-Spam_score: 0.1
+X-Spam_score_int: -8
+X-Spam_score: -0.9
 X-Spam_bar: /
-X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
  FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,7 +97,8 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Add migration-related functions of AVR CPU class object.
+This patch introduces functions avr_cpu_do_interrupt() and
+avr_cpu_exec_interrupt() that are part of AVR CPU class object.
 
 [AM: Split a larger AVR introduction patch into logical units]
 Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
@@ -110,43 +112,30 @@ Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
 ---
- target/avr/cpu.c     |   1 +
- target/avr/cpu.h     |   2 +
- target/avr/machine.c | 121 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 124 insertions(+)
- create mode 100644 target/avr/machine.c
+ target/avr/cpu.c    |  2 +
+ target/avr/helper.c | 89 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+)
+ create mode 100644 target/avr/helper.c
 
 diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index a1d5f3c1eb..ced1107824 100644
+index 1e9b099263..8305a3a85d 100644
 --- a/target/avr/cpu.c
 +++ b/target/avr/cpu.c
-@@ -206,6 +206,7 @@ static void avr_cpu_class_init(ObjectClass *oc, void *data)
-     cc->memory_rw_debug = avr_cpu_memory_rw_debug;
-     cc->get_phys_page_debug = avr_cpu_get_phys_page_debug;
-     cc->tlb_fill = avr_cpu_tlb_fill;
-+    cc->vmsd = &vms_avr_cpu;
-     cc->disas_set_info = avr_cpu_disas_set_info;
-     cc->tcg_initialize = avr_cpu_tcg_init;
-     cc->synchronize_from_tb = avr_cpu_synchronize_from_tb;
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index ac14e642bf..d3003f8e25 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -118,6 +118,8 @@ typedef struct AVRCPU {
-     CPUAVRState env;
- } AVRCPU;
+@@ -199,6 +199,8 @@ static void avr_cpu_class_init(ObjectClass *oc, void *data)
+     cc->class_by_name = avr_cpu_class_by_name;
  
-+extern const struct VMStateDescription vms_avr_cpu;
-+
- void avr_cpu_do_interrupt(CPUState *cpu);
- bool avr_cpu_exec_interrupt(CPUState *cpu, int int_req);
- hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-diff --git a/target/avr/machine.c b/target/avr/machine.c
+     cc->has_work = avr_cpu_has_work;
++    cc->do_interrupt = avr_cpu_do_interrupt;
++    cc->cpu_exec_interrupt = avr_cpu_exec_interrupt;
+     cc->dump_state = avr_cpu_dump_state;
+     cc->set_pc = avr_cpu_set_pc;
+     cc->disas_set_info = avr_cpu_disas_set_info;
+diff --git a/target/avr/helper.c b/target/avr/helper.c
 new file mode 100644
-index 0000000000..ba44bd042b
+index 0000000000..731a9ee27f
 --- /dev/null
-+++ b/target/avr/machine.c
-@@ -0,0 +1,121 @@
++++ b/target/avr/helper.c
+@@ -0,0 +1,89 @@
 +/*
 + * QEMU AVR CPU
 + *
@@ -169,105 +158,73 @@ index 0000000000..ba44bd042b
 +
 +#include "qemu/osdep.h"
 +#include "cpu.h"
-+#include "migration/cpu.h"
++#include "exec/exec-all.h"
++#include "exec/helper-proto.h"
 +
-+static int get_sreg(QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field)
++bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 +{
-+    CPUAVRState *env = opaque;
-+    uint8_t sreg;
++    bool ret = false;
++    CPUClass *cc = CPU_GET_CLASS(cs);
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
 +
-+    sreg = qemu_get_byte(f);
-+    cpu_set_sreg(env, sreg);
-+    return 0;
-+}
++    if (interrupt_request & CPU_INTERRUPT_RESET) {
++        if (cpu_interrupts_enabled(env)) {
++            cs->exception_index = EXCP_RESET;
++            cc->do_interrupt(cs);
 +
-+static int put_sreg(
-+    QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field, QJSON *vmdesc)
-+{
-+    CPUAVRState *env = opaque;
-+    uint8_t sreg = cpu_get_sreg(env);
++            cs->interrupt_request &= ~CPU_INTERRUPT_RESET;
 +
-+    qemu_put_byte(f, sreg);
-+    return 0;
-+}
-+
-+static const VMStateInfo vms_sreg = {
-+    .name = "sreg",
-+    .get = get_sreg,
-+    .put = put_sreg,
-+};
-+
-+static int get_segment(
-+    QEMUFile *f, void *opaque, size_t size, const VMStateField *field)
-+{
-+    uint32_t *ramp = opaque;
-+    uint8_t temp;
-+
-+    temp = qemu_get_byte(f);
-+    *ramp = ((uint32_t)temp) << 16;
-+    return 0;
-+}
-+
-+static int put_segment(
-+    QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field, QJSON *vmdesc)
-+{
-+    uint32_t *ramp = opaque;
-+    uint8_t temp = *ramp >> 16;
-+
-+    qemu_put_byte(f, temp);
-+    return 0;
-+}
-+
-+static const VMStateInfo vms_rampD = {
-+    .name = "rampD",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_rampX = {
-+    .name = "rampX",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_rampY = {
-+    .name = "rampY",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_rampZ = {
-+    .name = "rampZ",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_eind = {
-+    .name = "eind",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+
-+const VMStateDescription vms_avr_cpu = {
-+    .name = "cpu",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.pc_w, AVRCPU),
-+        VMSTATE_UINT32(env.sp, AVRCPU),
-+        VMSTATE_UINT32(env.skip, AVRCPU),
-+
-+        VMSTATE_UINT32_ARRAY(env.r, AVRCPU, NUMBER_OF_CPU_REGISTERS),
-+
-+        VMSTATE_SINGLE(env, AVRCPU, 0, vms_sreg, CPUAVRState),
-+        VMSTATE_SINGLE(env.rampD, AVRCPU, 0, vms_rampD, uint32_t),
-+        VMSTATE_SINGLE(env.rampX, AVRCPU, 0, vms_rampX, uint32_t),
-+        VMSTATE_SINGLE(env.rampY, AVRCPU, 0, vms_rampY, uint32_t),
-+        VMSTATE_SINGLE(env.rampZ, AVRCPU, 0, vms_rampZ, uint32_t),
-+        VMSTATE_SINGLE(env.eind, AVRCPU, 0, vms_eind, uint32_t),
-+
-+        VMSTATE_END_OF_LIST()
++            ret = true;
++        }
 +    }
-+};
++    if (interrupt_request & CPU_INTERRUPT_HARD) {
++        if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
++            int index = ctz32(env->intsrc);
++            cs->exception_index = EXCP_INT(index);
++            cc->do_interrupt(cs);
++
++            env->intsrc &= env->intsrc - 1; /* clear the interrupt */
++            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
++
++            ret = true;
++        }
++    }
++    return ret;
++}
++
++void avr_cpu_do_interrupt(CPUState *cs)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    uint32_t ret = env->pc_w;
++    int vector = 0;
++    int size = avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
++    int base = 0;
++
++    if (cs->exception_index == EXCP_RESET) {
++        vector = 0;
++    } else if (env->intsrc != 0) {
++        vector = ctz32(env->intsrc) + 1;
++    }
++
++    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
++    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++    } else {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++    }
++
++    env->pc_w = base + vector * size;
++    env->sregI = 0; /* clear Global Interrupt Flag */
++
++    cs->exception_index = -1;
++}
 -- 
 2.26.2
 
