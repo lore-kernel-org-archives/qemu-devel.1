@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7FE9C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:10:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0808EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:10:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D7F820724
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:10:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D7F820724
+	by mail.kernel.org (Postfix) with ESMTPS id D14402073E
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jul 2020 14:10:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D14402073E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1js5LL-0002p1-M2
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 10:10:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54048)
+	id 1js5LR-00031k-2a
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 10:10:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5F2-0007AV-KD
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:36 -0400
-Received: from mail-ej1-f48.google.com ([209.85.218.48]:34084)
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5FG-0007ki-8l
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:50 -0400
+Received: from mail-ej1-f66.google.com ([209.85.218.66]:33058)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5F1-0008IS-3h
- for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:36 -0400
-Received: by mail-ej1-f48.google.com with SMTP id y10so39638414eje.1
- for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 07:03:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1js5FE-0008MP-DA
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 10:03:49 -0400
+Received: by mail-ej1-f66.google.com with SMTP id n26so25730319ejx.0
+ for <qemu-devel@nongnu.org>; Sun, 05 Jul 2020 07:03:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=elitw4ERbB57ECB4QKN3YQAYhtjGS+Rt1eJrbmY8dJg=;
- b=FKW+Dk4KmaKmgrKHhaBzw7x4/8jW94H+Uv7FMMpRFmYrZ6dVuUeuDRgo0RV/CTR8oH
- yU84jVL62cQac88ceUrvfIPNZupBzyazjRmajHZX2JeNlTotMUNhkpO2uMHm9N2KMwIN
- fhhRcCrspS/Zw97JwBQV+Y8NbdbT1QtVOksaJfExIZSGTc9KMaSY/tSq17KzbKb8RFI/
- Zy6Jg94EyWxxwrG+5bzCfRyQ0SrNxxBbXh/sAZ0PBM3HrMQh1IY5eEj0pvqcEb78lLTb
- qkm9N2MCOc4MTCy7WlAaHrl4F4gBcHhpSlIoHUXNxYorDTihDHoLZjzDjghduZ6LzD+4
- R6qQ==
-X-Gm-Message-State: AOAM533n8BLaUzy6swZn0thqKPwSaA69qifbs+ITMZq1WnposiB7Pv0R
- sXoNGPpiXH4jF1lPobxUmgl+0jJV
-X-Google-Smtp-Source: ABdhPJxQfsG0OYAMKNAnQrELPZvWaaM7+v7AsF/sjasAX36sDvB+0E08MiHijT/YfN0eJSdK8FbXQw==
-X-Received: by 2002:a17:906:fcba:: with SMTP id
- qw26mr39149203ejb.112.1593957813727; 
- Sun, 05 Jul 2020 07:03:33 -0700 (PDT)
+ bh=alRof7ar/BTTXnwLbfaomf4uRXUzHWbfcKrpaeApAxA=;
+ b=NmLg+EfxF8XMKR5OGUPYtvpGVj5YpxfnuYnhmIeEclbh6jUkyRrBsaSOCaMK03b+Ht
+ n2ondc+HbsszFHABPoVngcZgVA/EiGmW32UzggsCQCBjaWOCDCAIyKzN3ZRAIDDbxmnP
+ 65gSL2a5jLw5OO9iflbCfv+RloInUsE16ms2JrPDbowUGI4eNtbPvvIEJgwCyKRQlvzB
+ 5zOWDI6akDgXi7HqJ3WRV4MuqZiLhHEo+BiXSbhco1nuBuedKBHuTcKvVlJO4bk12ARn
+ NrdcKeiAp1SbXSl/IFrDrtvXDc/JTwOtF8lMWF3JHKB1Eyyq6WLh6ghYTH3dM7H41Uz0
+ SO/A==
+X-Gm-Message-State: AOAM532BCaDhMUCSzkKvQaovNEBQvaZk7yQTewyZeq0ZqTz9A9sXa7K7
+ Vv53Fsleh6KJ2VaBNrv9h4Jd738S
+X-Google-Smtp-Source: ABdhPJzpNCuVjQCQ3Nej1GIUyJr+QumPJqoGIRTD/FINHdTiG+A1lML+sOflnnmHSYndnXUv71Gf3A==
+X-Received: by 2002:a17:906:cc13:: with SMTP id
+ ml19mr39300967ejb.288.1593957826889; 
+ Sun, 05 Jul 2020 07:03:46 -0700 (PDT)
 Received: from thl530.multi.box (pd9e83654.dip0.t-ipconnect.de.
  [217.232.54.84])
- by smtp.gmail.com with ESMTPSA id bq8sm10941776ejb.103.2020.07.05.07.03.33
+ by smtp.gmail.com with ESMTPSA id bq8sm10941776ejb.103.2020.07.05.07.03.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jul 2020 07:03:33 -0700 (PDT)
+ Sun, 05 Jul 2020 07:03:46 -0700 (PDT)
 From: Thomas Huth <huth@tuxfamily.org>
 To: qemu-devel@nongnu.org, Michael Rolnik <mrolnik@gmail.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Richard Henderson <rth@twiddle.net>
-Subject: [PATCH rc6 07/30] target/avr: Introduce enumeration AVRFeature
-Date: Sun,  5 Jul 2020 16:02:52 +0200
-Message-Id: <20200705140315.260514-8-huth@tuxfamily.org>
+Subject: [PATCH rc6 26/30] target/avr: Update build system
+Date: Sun,  5 Jul 2020 16:03:11 +0200
+Message-Id: <20200705140315.260514-27-huth@tuxfamily.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200705140315.260514-1-huth@tuxfamily.org>
 References: <20200705140315.260514-1-huth@tuxfamily.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.218.48; envelope-from=th.huth@gmail.com;
- helo=mail-ej1-f48.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 10:03:31
+Received-SPF: pass client-ip=209.85.218.66; envelope-from=th.huth@gmail.com;
+ helo=mail-ej1-f66.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 10:03:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
+X-Spam_score_int: 1
+X-Spam_score: 0.1
 X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
+X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
  FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,88 +96,113 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-This patch introduces enumeration "AVRFeature" that will be
-used for defining various AVR core types.
+Make AVR support buildable.
 
-[AM: Split a larger AVR introduction patch into logical units]
+[AM: Remove word 'Atmel' from filenames and all elements of code]
 Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
 ---
- target/avr/cpu.h | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ MAINTAINERS                     |  1 +
+ configure                       |  7 +++++++
+ default-configs/avr-softmmu.mak |  5 +++++
+ target/avr/Makefile.objs        | 34 +++++++++++++++++++++++++++++++++
+ 4 files changed, 47 insertions(+)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 target/avr/Makefile.objs
 
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index 675a33d17a..a7318632c5 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -72,6 +72,42 @@
-  */
- #define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)
- 
-+typedef enum AVRFeature {
-+    AVR_FEATURE_SRAM,
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0ab0a0e40b..79e7470f5c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -982,6 +982,7 @@ AVR MCUs
+ M: Michael Rolnik <mrolnik@gmail.com>
+ R: Sarah Harris <S.E.Harris@kent.ac.uk>
+ S: Maintained
++F: default-configs/avr-softmmu.mak
+ F: hw/avr/
+ F: include/hw/char/avr_usart.h
+ F: hw/char/avr_usart.c
+diff --git a/configure b/configure
+index 8a65240d4a..e84b532bf5 100755
+--- a/configure
++++ b/configure
+@@ -8105,6 +8105,10 @@ case "$target_name" in
+     mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml arm-m-profile.xml"
+   ;;
++  avr)
++    gdb_xml_files="avr-cpu.xml"
++    target_compiler=$cross_cc_avr
++  ;;
+   cris)
+   ;;
+   hppa)
+@@ -8349,6 +8353,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+       disas_config "ARM_A64"
+     fi
+   ;;
++  avr)
++    disas_config "AVR"
++  ;;
+   cris)
+     disas_config "CRIS"
+   ;;
+diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
+new file mode 100644
+index 0000000000..80218add98
+--- /dev/null
++++ b/default-configs/avr-softmmu.mak
+@@ -0,0 +1,5 @@
++# Default configuration for avr-softmmu
 +
-+    AVR_FEATURE_1_BYTE_PC,
-+    AVR_FEATURE_2_BYTE_PC,
-+    AVR_FEATURE_3_BYTE_PC,
++# Boards:
++#
++CONFIG_ARDUINO=y
+diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
+new file mode 100644
+index 0000000000..7523e0c6e2
+--- /dev/null
++++ b/target/avr/Makefile.objs
+@@ -0,0 +1,34 @@
++#
++#  QEMU AVR CPU
++#
++#  Copyright (c) 2019 Michael Rolnik
++#
++#  This library is free software; you can redistribute it and/or
++#  modify it under the terms of the GNU Lesser General Public
++#  License as published by the Free Software Foundation; either
++#  version 2.1 of the License, or (at your option) any later version.
++#
++#  This library is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++#  Lesser General Public License for more details.
++#
++#  You should have received a copy of the GNU Lesser General Public
++#  License along with this library; if not, see
++#  <http://www.gnu.org/licenses/lgpl-2.1.html>
++#
 +
-+    AVR_FEATURE_1_BYTE_SP,
-+    AVR_FEATURE_2_BYTE_SP,
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++decode-y = $(SRC_PATH)/target/avr/insn.decode
 +
-+    AVR_FEATURE_BREAK,
-+    AVR_FEATURE_DES,
-+    AVR_FEATURE_RMW, /* Read Modify Write - XCH LAC LAS LAT */
++target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
++	$(call quiet-command, \
++	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
++	  "GEN", $(TARGET_DIR)$@)
 +
-+    AVR_FEATURE_EIJMP_EICALL,
-+    AVR_FEATURE_IJMP_ICALL,
-+    AVR_FEATURE_JMP_CALL,
++target/avr/translate.o: target/avr/decode_insn.inc.c
 +
-+    AVR_FEATURE_ADIW_SBIW,
-+
-+    AVR_FEATURE_SPM,
-+    AVR_FEATURE_SPMX,
-+
-+    AVR_FEATURE_ELPMX,
-+    AVR_FEATURE_ELPM,
-+    AVR_FEATURE_LPMX,
-+    AVR_FEATURE_LPM,
-+
-+    AVR_FEATURE_MOVW,
-+    AVR_FEATURE_MUL,
-+    AVR_FEATURE_RAMPD,
-+    AVR_FEATURE_RAMPX,
-+    AVR_FEATURE_RAMPY,
-+    AVR_FEATURE_RAMPZ,
-+} AVRFeature;
-+
- typedef struct CPUAVRState CPUAVRState;
- 
- struct CPUAVRState {
-@@ -126,6 +162,16 @@ hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- int avr_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
- int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- 
-+static inline int avr_feature(CPUAVRState *env, AVRFeature feature)
-+{
-+    return (env->features & (1U << feature)) != 0;
-+}
-+
-+static inline void set_avr_feature(CPUAVRState *env, int feature)
-+{
-+    env->features |= (1U << feature);
-+}
-+
- #define cpu_list avr_cpu_list
- #define cpu_signal_handler cpu_avr_signal_handler
- #define cpu_mmu_index avr_cpu_mmu_index
++obj-y += translate.o cpu.o helper.o
++obj-y += gdbstub.o
++obj-y += disas.o
++obj-$(CONFIG_SOFTMMU) += machine.o
 -- 
 2.26.2
 
