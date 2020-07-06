@@ -2,82 +2,79 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5014FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:56:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 054D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 09:16:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10521206DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:56:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4343206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 09:16:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LBzm+oYa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10521206DF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B14VMuES"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4343206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMvR-0004uZ-9k
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:56:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39740)
+	id 1jsNEZ-0002wY-1B
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 05:16:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jsMud-0003p1-FL
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:55:43 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43647)
+ id 1jsNDn-0002Jb-Ou
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 05:15:31 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34780)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jsMub-0002Io-PH
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:55:43 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 95so20466407otw.10
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 01:55:41 -0700 (PDT)
+ id 1jsNDk-000598-Uk
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 05:15:31 -0400
+Received: by mail-oi1-x242.google.com with SMTP id e4so23339578oib.1
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 02:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5Mc6QkVGztUHRVv7JVFrwV2ydiuq16uYtp70AA4SOLI=;
- b=LBzm+oYaap+xrpETICMJOA2s5usV9WEZWaxDwWheQb9/XkPZi7C88FNeugw6qoMdX2
- XuyPxKvwFZirSB5xl+LYgcpXzjMdR8PE7FbN6o9yVntXRVAkDiHCBDlQ7Bc2C4G9p+Ve
- /dwebyYgatu7uYl4BKuysevjnSolHzEP2mDflBY9uFoxASLMvDHc3FAzV3AZmrQWu/jT
- CtoJrcnSVUbBQy1JEl8TsGFXv4FYBODUG8/4G1o5KcHXMEdgzuoWkSUW9a+rybfA7Gt6
- eCU3cGkTfEirZXuaNldKV/y/Xzjkm5lD80gtrgGqI2lza6owWPAuo8n3dEe045b7wJe5
- ysbA==
+ :cc; bh=IQxUob2o23ZqEkZs3vrA3d3Sv/fOSzdbaUJUy1IfpZI=;
+ b=B14VMuESIe8OKeWrIVTH4vzbydXR2NfPWFj/Lohrl3qcaYqbSr6N70CZXmlSG+oiYf
+ o1SK7sd0K6vDG8T6mj21ckw5+ZwEWJFFwEDr8ePJTExGQG7Hw4S8SbV+I8plQOq59zCS
+ onnR5pdaNaEgbTKQ3lSeQey8VIxOnU0WmUn9jyU1YtU0VApH3P1UJKkZLAW44+K4fW4c
+ T9TNGmkQcpazkj8KrBiNQvKiRcRaHXvMzCTFNS7OBNY+b0MYz5+jUv7rzgh7WuJ/P5T4
+ cgKr28t1q4ZgnIKjD5/5ADUzdm2lO2sUuOeiroRfhDBjAb6a3nyL/EEtqNu/nR/FnLo5
+ AcQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=5Mc6QkVGztUHRVv7JVFrwV2ydiuq16uYtp70AA4SOLI=;
- b=ex2gYiCzZyueDy7Hb+GTR9reyQMiNziP4fiA4uILkcPB6LIp5qA3KFplx7gFgAroLL
- szA9RNmVKhOrj4PLZvEOVEK0psuREXztDvWE5mfQOeZO6sgvifvQQYLhAEnzxmMyB8lQ
- FGnc6rBuaHZ9HmGekNGGoUobkjmnGkmLf2zy36c7wZnYDuOYGxs8Q5baMZfK1oPBvE7G
- 1YScS2/M5Ms1TjjCnGc6bDgk8ehvkxmsP/2mm8WOIwI366FyaYKMiK8dOpEwddVNAox+
- QLi/GgRmptg+NNq8g3Tn1bLMaIKJ/WMuawb3ro4bFwHXAUtHMOYeJ+OKVKqEk7+gkT8Y
- xLHQ==
-X-Gm-Message-State: AOAM530BbApGNmIr/wn1AgDAa7ygpgPxyp7xe3mkOrTG1bVYyMVg2iS4
- 7/oiOIYbfhHczsGn6OUsuiEVCxCvXviV75DueG482Q==
-X-Google-Smtp-Source: ABdhPJxJdxNdMWiihVU6OjTkg6NmcLtQAEo4p4odUyPUQ22VkN7YW41/aPGBnIMJsUFTsujhIGK8PAs+81jTOwjkIXA=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr37933392ota.91.1594025740325; 
- Mon, 06 Jul 2020 01:55:40 -0700 (PDT)
+ bh=IQxUob2o23ZqEkZs3vrA3d3Sv/fOSzdbaUJUy1IfpZI=;
+ b=HUwSlf44kb70P6GJH+9Aqzbooyvs4CRFEQy+knyOalXzgJA+CgMldFajYQsg83xY3k
+ MwHgb+yusKGOZnooGQ3RfWFcqwQUm6TjPfvDyRmimwLU7ySlF3NUqS/R8aL5VuBtYvGu
+ Z+E2WYC0OczLyr5khE8NLg7n0lvAquW+8VHjnvtEBTGsQQ4BDjo0+2tgP24auYunORRX
+ 9jtCI/TQkzypc0csIyO0NzIpmmbk2xtK9gPqZtSxInjVuA8k0im1tx7fR8g7TfCWOfqU
+ Z3IIbFxwjrN5EDvmzFM9wXHr8bRlJOhcq3Kv/zURRATbGbsuulfvG1QqXB/lE2Lm3EwJ
+ rZzA==
+X-Gm-Message-State: AOAM532c5U3WjQhVM4FC/qWZUlFd4M3hn5rLzu2bk4Dh6vdcXj8d4zFp
+ E0Un0EjoqszGzp/4NsaboS+aUnRbtNuyWnAw5O/oAg==
+X-Google-Smtp-Source: ABdhPJwf1k1LKWnll6hNdXNzRCoYV3Iy9tVTrVZuC49ixh01D36vzs+itf2t8+oV+LuuNBEI00DDQZL8zCzAWPAK8Cg=
+X-Received: by 2002:aca:54c9:: with SMTP id
+ i192mr29343349oib.163.1594026927571; 
+ Mon, 06 Jul 2020 02:15:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200629160535.3910-1-wentong.wu@intel.com>
- <20200629160535.3910-3-wentong.wu@intel.com>
- <3260735e-05ab-2d42-f7e4-914ad804f543@linaro.org>
- <CAFEAcA_+e7hrA5GRGb=gv3GxJRL77ARP34vyudRbiqhdsNVKwg@mail.gmail.com>
- <CAMo8BfLVDEFCXWNffVJaRb31UOTPO1iXNz5StexoKvWqQYzg6g@mail.gmail.com>
- <CAMo8Bf+Fk32dYH6GV6Z6OWLsnpJy4Sw_ny+8yviQc6MjGD+mRw@mail.gmail.com>
-In-Reply-To: <CAMo8Bf+Fk32dYH6GV6Z6OWLsnpJy4Sw_ny+8yviQc6MjGD+mRw@mail.gmail.com>
+References: <20200630133912.9428-1-f4bug@amsat.org>
+ <20200630133912.9428-10-f4bug@amsat.org>
+ <CAFEAcA_dhbr6cjK40H0=e39sD2r8ERTZYrY5nhJtx81Rk+RmUg@mail.gmail.com>
+ <875zb1i40r.fsf@dusky.pond.sub.org>
+In-Reply-To: <875zb1i40r.fsf@dusky.pond.sub.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Jul 2020 09:55:29 +0100
-Message-ID: <CAFEAcA_nLDvPs-X-3krwC183f8hwm5kYYpxgz4f2r-Z4BKByQQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] target/nios2: Use gen_io_start around wrctl
- instruction
-To: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon, 6 Jul 2020 10:15:16 +0100
+Message-ID: <CAFEAcA-0H+LKWs8gjEEn8mf93sJE+L514gnHMA+vUBDnjb5-Ag@mail.gmail.com>
+Subject: Re: [PATCH v7 09/17] hw/sd/sdcard: Special case the -ENOMEDIUM error
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,39 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>, Wentong Wu <wentong.wu@intel.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 5 Jul 2020 at 21:54, Max Filippov <jcmvbkbc@gmail.com> wrote:
->
-> On Sun, Jul 5, 2020 at 11:16 AM Max Filippov <jcmvbkbc@gmail.com> wrote:
-> > On Sun, Jul 5, 2020 at 10:09 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > On Thu, 2 Jul 2020 at 19:53, Richard Henderson
-> > > <richard.henderson@linaro.org> wrote:
-> > > > This isn't right.  Not so much the gen_io_start portion, but the entire
-> > > > existence of helper_check_interrupt.
-> > > I agree that it looks bogus (xtensa has a similar helper as well, incidentally),
-> > I think there was a reason for it.
->
-> ...and the reason is that this helper calls cpu_[re]set_interrupt
-> to update CPU_INTERRUPT_HARD, which makes exit to the
-> main CPU loop do something to handle IRQ.
-> Maybe 'check_interrupt' is not a good name for that, but the
-> action taken there seems right to me.
+On Mon, 6 Jul 2020 at 06:52, Markus Armbruster <armbru@redhat.com> wrote:
+> This is TYPE_SD_CARD's ("sd-card").  What exactly does that device
+> model?
 
-Usually I would expect that CPU_INTERRUPT_HARD would be
-set by whatever was setting the interrupt (often a handler
-for an inbound qemu_irq line to the CPU). Then the
-cpu_exec_interrupt hook only actually does something if
-both the INTERRUPT_HARD bit is set and the CPU register
-says "and interrupts are unmasked". If you have a design
-like that then "unmasking interrupts just means going out
-to the main loop" will work.
+It is I think supposed to be an SD card. The modelling
+may well be odd -- it's a qomification of a pre-existing
+abstraction layer that predates QOM and qbus.
+
+> If it's the sd-card, then the modelling is odd.  A physical SD card gets
+> plugged and unplugged as a whole.  This model can't.  Instead, you
+> change "media".  Isn't the SD card the medium?
+
+I suspect this is because the requirement to change SD
+card contents existed and was implemented via changing
+the block backend before the concept of a hot-pluggable
+QOM object even existed. So now we have something we
+wish to maintain back-compat for (in terms of monitor
+commands to change/eject doing what they've always done),
+some SD controllers which haven't been entirely QOMified
+(I see Philippe just posted a series to do that cleanup,
+which is great), and some parts of the code which have been
+updated but by people (ie me) who understand the QOM parts
+of things but don't have any understanding of the operations
+the block layer provides and so converted the device/SD code's
+API to the rest of QEMU but left its interaction with the block
+layer using the same APIs that the pre-QOM code used.
+
+> The other device models with removable media (IDE & SCSI CD drives,
+> floppy drives) model the receptacle for media.  On media change, the
+> drive stays put, and only the medium changes, both in the physical world
+> and in our virtual world.
+>
+> Our "sd-card" seems to be an "SD card drive".  But then I wonder what
+> the thing at the other end of TYPE_SD_BUS ("sd-bus") actually models.
+> Any ideas?
+
+The thing at the other end of the TYPE_SD_BUS is the SD controller
+(ie the bit of hardware which presents a registers-and-interrupts
+interface to the system on one end and has an SD card slot on the
+other end). The link between them has operations like "do command",
+"read data", "write data", "get readonly status", which are abstractions
+of the h/w operations on the pins between an SD controller
+and the SD card. It also has an operation for "tell the controller
+I'm actually an inserted card". So the "sd-card" device implements
+the logic that in real h/w really is inside the microcontroller
+on the SD card (and so is identical for all SD cards regardless
+of machine type), and the sd controller device implements the logic
+that's in the sd controller chip in the machine proper (which
+can vary a lot between machines, from very-simple "software
+does all the work and the controller just waves the wires up and
+down" to much more sophisticated setups).
 
 thanks
 -- PMM
