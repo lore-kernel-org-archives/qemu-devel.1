@@ -6,85 +6,85 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E0CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4D6C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:18:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D138520739
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:18:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69DD920739
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:18:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MWYzzcv7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D138520739
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ah23GCoK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69DD920739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMKW-0001cx-31
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:18:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56946)
+	id 1jsMKd-0001tE-Je
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:18:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCY-0001t7-Pb
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:10 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55568
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCy-0002kI-GH
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37360
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCO-0003CM-D5
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:10 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCS-0003Hf-2G
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594022998;
+ s=mimecast20190719; t=1594023002;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ka0Bl6KaonGt2VTVzxk7TviRf5c0bxEvNQCkAhpSfmM=;
- b=MWYzzcv7r6DpDmq5QGizeu4Xcvex6DZcvG82IgsqD2RX+Nch3iRZBzjvRwzd+uwmuS7xcQ
- +Usp5hKPu5oTBLQ0wHQ6myILm27kVOYPXoHYl7SvcQFpruSIBiwehkSO9Vg2m4irzUWqat
- Xp8FxX9FnKTHfjWknwEt13CWNClRepY=
+ bh=WjH6u2neeF6V9LZ/KREOUckiZbXFB+nVE57Q8KWQk5U=;
+ b=ah23GCoKcAEg34sAjG6g6yWxQ0dnww2GdJgctaSTJmIeILZgd6AEltRVExsmUe5PlofjVT
+ BYXteBu9YF9wmoyjjge0rhGPRuWsa8VUr4n1u2Vtwui2me47C1E0Z4SL201VoQ1/ckfXSr
+ cjQS7/jidCZ62FcWnP2b9Fiowb8MatA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-5kazJt84PNCCa4__mK9_OA-1; Mon, 06 Jul 2020 04:09:57 -0400
-X-MC-Unique: 5kazJt84PNCCa4__mK9_OA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-337-YxovzKjsO2qUSxLhYZEzWA-1; Mon, 06 Jul 2020 04:10:00 -0400
+X-MC-Unique: YxovzKjsO2qUSxLhYZEzWA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5457800D5C;
- Mon,  6 Jul 2020 08:09:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1F56188361A;
+ Mon,  6 Jul 2020 08:09:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F67519C71;
- Mon,  6 Jul 2020 08:09:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E45DC6E6E4;
+ Mon,  6 Jul 2020 08:09:57 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1AFA311358DF; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
+ id 88A971133023; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 22/44] qom: Crash more nicely on object_property_get_link()
- failure
-Date: Mon,  6 Jul 2020 10:09:28 +0200
-Message-Id: <20200706080950.403087-23-armbru@redhat.com>
+Subject: [PATCH v3 41/44] error: Avoid error_propagate() after
+ migrate_add_blocker()
+Date: Mon,  6 Jul 2020 10:09:47 +0200
+Message-Id: <20200706080950.403087-42-armbru@redhat.com>
 In-Reply-To: <20200706080950.403087-1-armbru@redhat.com>
 References: <20200706080950.403087-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,99 +104,307 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pass &error_abort instead of NULL where the returned value is
-dereferenced or asserted to be non-null.  Drop a now redundant
-assertion.
+When migrate_add_blocker(blocker, &errp) is followed by
+error_propagate(errp, err), we can often just as well do
+migrate_add_blocker(..., errp).
+
+Do that with this Coccinelle script:
+
+    @@
+    expression blocker, err, errp;
+    expression ret;
+    @@
+    -    ret = migrate_add_blocker(blocker, &err);
+    -    if (err) {
+    +    ret = migrate_add_blocker(blocker, errp);
+    +    if (ret < 0) {
+             ... when != err;
+    -        error_propagate(errp, err);
+             ...
+         }
+
+    @@
+    expression blocker, err, errp;
+    @@
+    -    migrate_add_blocker(blocker, &err);
+    -    if (err) {
+    +    if (migrate_add_blocker(blocker, errp) < 0) {
+             ... when != err;
+    -        error_propagate(errp, err);
+             ...
+         }
+
+Double-check @err is not used afterwards.  Dereferencing it would be
+use after free, but checking whether it's null would be legitimate.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/core/platform-bus.c     | 6 +++---
- hw/ppc/spapr_drc.c         | 3 ++-
- hw/ppc/spapr_hcall.c       | 3 ++-
- hw/ppc/spapr_pci_nvlink2.c | 3 ++-
- ui/vnc.c                   | 2 +-
- 5 files changed, 10 insertions(+), 7 deletions(-)
+ block/parallels.c            | 5 ++---
+ block/qcow.c                 | 6 ++----
+ block/vdi.c                  | 6 ++----
+ block/vhdx.c                 | 5 ++---
+ block/vmdk.c                 | 6 ++----
+ block/vpc.c                  | 5 ++---
+ block/vvfat.c                | 6 ++----
+ hw/display/virtio-gpu-base.c | 5 +----
+ hw/intc/arm_gic_kvm.c        | 4 +---
+ hw/intc/arm_gicv3_its_kvm.c  | 5 +----
+ hw/intc/arm_gicv3_kvm.c      | 4 +---
+ hw/misc/ivshmem.c            | 4 +---
+ hw/scsi/vhost-scsi.c         | 4 +---
+ 13 files changed, 20 insertions(+), 45 deletions(-)
 
-diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-index d494e5cec1..5037ca265e 100644
---- a/hw/core/platform-bus.c
-+++ b/hw/core/platform-bus.c
-@@ -22,6 +22,7 @@
- #include "qemu/osdep.h"
- #include "hw/platform-bus.h"
- #include "hw/qdev-properties.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- 
-@@ -63,9 +64,8 @@ hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-         return -1;
+diff --git a/block/parallels.c b/block/parallels.c
+index f489c0d4ba..3c22dfdc9d 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -859,9 +859,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The Parallels format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (ret < 0) {
+         error_free(s->migration_blocker);
+         goto fail;
      }
+diff --git a/block/qcow.c b/block/qcow.c
+index c22d1bf6b8..1e134f3445 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -121,7 +121,6 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+     unsigned int len, i, shift;
+     int ret;
+     QCowHeader header;
+-    Error *local_err = NULL;
+     QCryptoBlockOpenOptions *crypto_opts = NULL;
+     unsigned int cflags = 0;
+     QDict *encryptopts = NULL;
+@@ -314,9 +313,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The qcow format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (ret < 0) {
+         error_free(s->migration_blocker);
+         goto fail;
+     }
+diff --git a/block/vdi.c b/block/vdi.c
+index 0a60be773e..3a3df45f84 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -375,7 +375,6 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     VdiHeader header;
+     size_t bmap_size;
+     int ret;
+-    Error *local_err = NULL;
+     QemuUUID uuid_link, uuid_parent;
  
--    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container", NULL);
--
--    assert(parent_mr);
-+    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container",
-+                                         &error_abort);
-     if (parent_mr != pbus_mr_obj) {
-         /* MMIO region is not mapped on platform bus */
-         return -1;
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index d10193f39e..1f18b79348 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -870,7 +870,8 @@ int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type_mask)
-             continue;
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
+@@ -496,9 +495,8 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The vdi format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (ret < 0) {
+         error_free(s->migration_blocker);
+         goto fail_free_bmap;
+     }
+diff --git a/block/vhdx.c b/block/vhdx.c
+index eed9c3b860..1f9fca837d 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1089,9 +1089,8 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The vhdx format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (ret < 0) {
+         error_free(s->migration_blocker);
+         goto fail;
+     }
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 9a09193f3b..28cec50f38 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1263,7 +1263,6 @@ static int vmdk_open(BlockDriverState *bs, QDict *options, int flags,
+     int ret;
+     BDRVVmdkState *s = bs->opaque;
+     uint32_t magic;
+-    Error *local_err = NULL;
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
+                                BDRV_CHILD_IMAGE, false, errp);
+@@ -1317,9 +1316,8 @@ static int vmdk_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The vmdk format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (ret < 0) {
+         error_free(s->migration_blocker);
+         goto fail;
+     }
+diff --git a/block/vpc.c b/block/vpc.c
+index 77043c2424..259d0ad2fe 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -446,9 +446,8 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The vpc format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (ret < 0) {
+         error_free(s->migration_blocker);
+         goto fail;
+     }
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 24d36220d3..36b53c8757 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1141,7 +1141,6 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+     bool floppy;
+     const char *dirname, *label;
+     QemuOpts *opts;
+-    Error *local_err = NULL;
+     int ret;
+ 
+ #ifdef DEBUG
+@@ -1267,9 +1266,8 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+                    "The vvfat (rw) format used by node '%s' "
+                    "does not support live migration",
+                    bdrv_get_device_or_node_name(bs));
+-        ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        ret = migrate_add_blocker(s->migration_blocker, errp);
++        if (ret < 0) {
+             error_free(s->migration_blocker);
+             goto fail;
          }
+diff --git a/hw/display/virtio-gpu-base.c b/hw/display/virtio-gpu-base.c
+index c159351be3..7961308606 100644
+--- a/hw/display/virtio-gpu-base.c
++++ b/hw/display/virtio-gpu-base.c
+@@ -128,7 +128,6 @@ virtio_gpu_base_device_realize(DeviceState *qdev,
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(qdev);
+     VirtIOGPUBase *g = VIRTIO_GPU_BASE(qdev);
+-    Error *local_err = NULL;
+     int i;
  
--        obj = object_property_get_link(root_container, prop->name, NULL);
-+        obj = object_property_get_link(root_container, prop->name,
-+                                       &error_abort);
-         drc = SPAPR_DR_CONNECTOR(obj);
-         drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
- 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 0f54988f2e..c1d01228c6 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1655,7 +1655,8 @@ static void spapr_handle_transient_dev_before_cas(SpaprMachineState *spapr)
-             continue;
+     if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
+@@ -139,9 +138,7 @@ virtio_gpu_base_device_realize(DeviceState *qdev,
+     g->use_virgl_renderer = false;
+     if (virtio_gpu_virgl_enabled(g->conf)) {
+         error_setg(&g->migration_blocker, "virgl is not yet migratable");
+-        migrate_add_blocker(g->migration_blocker, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (migrate_add_blocker(g->migration_blocker, errp) < 0) {
+             error_free(g->migration_blocker);
+             return false;
          }
-         drc = SPAPR_DR_CONNECTOR(object_property_get_link(drc_container,
--                                                          prop->name, NULL));
-+                                                          prop->name,
-+                                                          &error_abort));
+diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+index d7df423a7a..07b95143c9 100644
+--- a/hw/intc/arm_gic_kvm.c
++++ b/hw/intc/arm_gic_kvm.c
+@@ -517,9 +517,7 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
+     if (!kvm_arm_gic_can_save_restore(s)) {
+         error_setg(&s->migration_blocker, "This operating system kernel does "
+                                           "not support vGICv2 migration");
+-        migrate_add_blocker(s->migration_blocker, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (migrate_add_blocker(s->migration_blocker, errp) < 0) {
+             error_free(s->migration_blocker);
+             return;
+         }
+diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+index ad0ebabc87..46835ed085 100644
+--- a/hw/intc/arm_gicv3_its_kvm.c
++++ b/hw/intc/arm_gicv3_its_kvm.c
+@@ -91,7 +91,6 @@ static void vm_change_state_handler(void *opaque, int running,
+ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+ {
+     GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
+-    Error *local_err = NULL;
  
-         if (spapr_drc_transient(drc)) {
-             spapr_drc_reset(drc);
-diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
-index 8332d5694e..dd8cd6db96 100644
---- a/hw/ppc/spapr_pci_nvlink2.c
-+++ b/hw/ppc/spapr_pci_nvlink2.c
-@@ -358,7 +358,8 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
-     for (i = 0; i < sphb->nvgpus->num; ++i) {
-         SpaprPhbPciNvGpuSlot *nvslot = &sphb->nvgpus->slots[i];
-         Object *nv_mrobj = object_property_get_link(OBJECT(nvslot->gpdev),
--                                                    "nvlink2-mr[0]", NULL);
-+                                                    "nvlink2-mr[0]",
-+                                                    &error_abort);
-         uint32_t associativity[] = {
-             cpu_to_be32(0x4),
-             SPAPR_GPU_NUMA_ID,
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 527ad25124..f006aa1afd 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -568,7 +568,7 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
-                        &info->vencrypt, &info->has_vencrypt);
-         if (vd->dcl.con) {
-             dev = DEVICE(object_property_get_link(OBJECT(vd->dcl.con),
--                                                  "device", NULL));
-+                                                  "device", &error_abort));
-             info->has_display = true;
-             info->display = g_strdup(dev->id);
+     s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
+     if (s->dev_fd < 0) {
+@@ -113,9 +112,7 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+         GITS_CTLR)) {
+         error_setg(&s->migration_blocker, "This operating system kernel "
+                    "does not support vITS migration");
+-        migrate_add_blocker(s->migration_blocker, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (migrate_add_blocker(s->migration_blocker, errp) < 0) {
+             error_free(s->migration_blocker);
+             return;
+         }
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index ca43bf87ca..eddd07c743 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -858,9 +858,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+                                GICD_CTLR)) {
+         error_setg(&s->migration_blocker, "This operating system kernel does "
+                                           "not support vGICv3 migration");
+-        migrate_add_blocker(s->migration_blocker, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (migrate_add_blocker(s->migration_blocker, errp) < 0) {
+             error_free(s->migration_blocker);
+             return;
+         }
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index a8dc9b377d..fc128b25e2 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -898,9 +898,7 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
+     if (!ivshmem_is_master(s)) {
+         error_setg(&s->migration_blocker,
+                    "Migration is disabled when using feature 'peer mode' in device 'ivshmem'");
+-        migrate_add_blocker(s->migration_blocker, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        if (migrate_add_blocker(s->migration_blocker, errp) < 0) {
+             error_free(s->migration_blocker);
+             return;
+         }
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index c1b012aea4..13b05af29b 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -207,9 +207,7 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
+                 "When external environment supports it (Orchestrator migrates "
+                 "target SCSI device state or use shared storage over network), "
+                 "set 'migratable' property to true to enable migration.");
+-        migrate_add_blocker(vsc->migration_blocker, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        if (migrate_add_blocker(vsc->migration_blocker, errp) < 0) {
+             error_free(vsc->migration_blocker);
+             goto free_virtio;
          }
 -- 
 2.26.2
