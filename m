@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7ADC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FAECC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:22:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 371752075B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:22:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 371752075B
+	by mail.kernel.org (Postfix) with ESMTPS id 12D6B2075B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:22:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12D6B2075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsKVy-0007h7-Ga
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 02:22:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60844)
+	id 1jsKWm-0000Ng-Da
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 02:22:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jsKNx-0001t9-Jz; Mon, 06 Jul 2020 02:13:49 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:58140)
+ id 1jsKNa-0000mu-39; Mon, 06 Jul 2020 02:13:26 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:58128)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jsKNt-0000xB-OP; Mon, 06 Jul 2020 02:13:49 -0400
+ id 1jsKNW-0000wR-Uk; Mon, 06 Jul 2020 02:13:25 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 9982EBF86A;
- Mon,  6 Jul 2020 06:13:18 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id DFD82BF853;
+ Mon,  6 Jul 2020 06:13:15 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 15/18] hw/block/nvme: reject invalid nsid values in active
- namespace id list
-Date: Mon,  6 Jul 2020 08:13:00 +0200
-Message-Id: <20200706061303.246057-16-its@irrelevant.dk>
+Subject: [PATCH v3 09/18] hw/block/nvme: move NvmeFeatureVal into
+ hw/block/nvme.h
+Date: Mon,  6 Jul 2020 08:12:54 +0200
+Message-Id: <20200706061303.246057-10-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200706061303.246057-1-its@irrelevant.dk>
 References: <20200706061303.246057-1-its@irrelevant.dk>
@@ -65,7 +65,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
  Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
  Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
  Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
@@ -77,35 +77,67 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Reject the nsid broadcast value (0xffffffff) and 0xfffffffe in the
-Active Namespace ID list.
+The NvmeFeatureVal does not belong with the spec-related data structures
+in include/block/nvme.h that is shared between the block-level nvme
+driver and the emulated nvme device.
+
+Move it into the nvme device specific header file as it is the only
+user of the structure. Also, remove the unused members.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/nvme.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/block/nvme.h      |  8 ++++++++
+ include/block/nvme.h | 17 -----------------
+ 2 files changed, 8 insertions(+), 17 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index fc58f3d76530..af39126cd8d1 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -992,6 +992,16 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 1837233617bb..b93067c9e4a1 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -79,6 +79,14 @@ static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
+ #define NVME(obj) \
+         OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
  
-     trace_pci_nvme_identify_nslist(min_nsid);
- 
-+    /*
-+     * Both 0xffffffff (NVME_NSID_BROADCAST) and 0xfffffffe are invalid values
-+     * since the Active Namespace ID List should return namespaces with ids
-+     * *higher* than the NSID specified in the command. This is also specified
-+     * in the spec (NVM Express v1.3d, Section 5.15.4).
-+     */
-+    if (min_nsid >= NVME_NSID_BROADCAST - 1) {
-+        return NVME_INVALID_NSID | NVME_DNR;
-+    }
++typedef struct NvmeFeatureVal {
++    struct {
++        uint16_t temp_thresh_hi;
++        uint16_t temp_thresh_low;
++    };
++    uint32_t    async_config;
++} NvmeFeatureVal;
 +
-     list = g_malloc0(data_len);
-     for (i = 0; i < n->num_namespaces; i++) {
-         if (i < min_nsid) {
+ typedef struct NvmeCtrl {
+     PCIDevice    parent_obj;
+     MemoryRegion iomem;
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 2101292ed5e8..0dce15af6bcf 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -865,23 +865,6 @@ enum NvmeIdCtrlLpa {
+ #define NVME_CTRL_SGLS_MPTR_SGL            (0x1 << 19)
+ #define NVME_CTRL_SGLS_ADDR_OFFSET         (0x1 << 20)
+ 
+-typedef struct NvmeFeatureVal {
+-    uint32_t    arbitration;
+-    uint32_t    power_mgmt;
+-    struct {
+-        uint16_t temp_thresh_hi;
+-        uint16_t temp_thresh_low;
+-    };
+-    uint32_t    err_rec;
+-    uint32_t    volatile_wc;
+-    uint32_t    num_queues;
+-    uint32_t    int_coalescing;
+-    uint32_t    *int_vector_config;
+-    uint32_t    write_atomicity;
+-    uint32_t    async_config;
+-    uint32_t    sw_prog_marker;
+-} NvmeFeatureVal;
+-
+ #define NVME_ARB_AB(arb)    (arb & 0x7)
+ #define NVME_ARB_LPW(arb)   ((arb >> 8) & 0xff)
+ #define NVME_ARB_MPW(arb)   ((arb >> 16) & 0xff)
 -- 
 2.27.0
 
