@@ -2,88 +2,95 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F06FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C16F4C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:17:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0A71206DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:16:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91E55206DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:17:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gcllo2/b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A71206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXiliWdW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91E55206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUix-0007c2-19
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:16:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58780)
+	id 1jsUkJ-0001er-ST
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:17:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUHr-0006KS-4k; Mon, 06 Jul 2020 12:48:11 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:35067)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUHp-0004JD-9Q; Mon, 06 Jul 2020 12:48:10 -0400
-Received: by mail-il1-x144.google.com with SMTP id t18so13554820ilh.2;
- Mon, 06 Jul 2020 09:48:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ghXchj3um6Pn/VL2e/vxVCYYlGV97OajaQt+uKewb7Q=;
- b=gcllo2/bIIMmAXuudNSj/PMzTP1HUPloYdRIVK+mcAhySnXw45KBiFuA3Y1grIYAJE
- rMHuj1fgmzh4Ej9REPUkeUTZZ3DFHA2HpQen3WKBZ2J2q13IuHDQEs9Fl5zAv9yyQ8Up
- RwFYDomabB3S/Xi1x9uLQ/7qsFKQe6Pt6N2PlnDo3PXVHK4d3yIp/OJcbJYedyhVPxue
- g4wpaj/eBjsZDIHttEngYaY4qlI7vRQ4F0fsgZ5AdNzLgpgmmc6eHiNoVbAkDfF1vJuq
- pPGyrOUtthisNk4v/IXeAPxxhwbJXZPnleIyd5oRA7G1+3mYDAn4FyHdV6Ki6enR1HlR
- aglg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ghXchj3um6Pn/VL2e/vxVCYYlGV97OajaQt+uKewb7Q=;
- b=iBY23yiMXOMZA7L7alKRSFkt6BCVXp3FrJEHTsIoGU7Tdq0Jg+/z6qDusZIebppfck
- QZoRSWvEekavk4nlpPiu/67kNxQPQabcgAeqJuI36Mz1aHn7KLjYyR7FKJxOFe3nmgkn
- raC+A2AI3Zp2yNaP5NVysY+S8SnKr0JapBU6HaoF+PucOQHOZyrfQGCtKTvK2SNSWDr0
- wAO7Jez0KAjdidzCkcqRmT5h5iF0Sck0ZWT6dzmqrQrhLqNlnwzEgd54N2wURfjKTT0x
- /UHbgLcV2ekx5dDLCiyhObS1XFLYEk9HbkAywwTzSxoS+SRanWqB3cChlCot414OYV/L
- riaw==
-X-Gm-Message-State: AOAM531FpQk89DkY0yhrfTtmqjZSujSaEgYiJ/ciiFJXsoY6Cgk+RItS
- rpC5F8rwhjs2639/ORxPPbZ5l2PN3U2u4IQv0Lo=
-X-Google-Smtp-Source: ABdhPJwhf6MfrtxMqnGGVYqOOKMzBe890IGO9UHj0D56J/Bjj3ApFISX/lDUOr+QWiBHN9QHzpk2p0z1db2+5s6qHuk=
-X-Received: by 2002:a92:c213:: with SMTP id j19mr31544813ilo.40.1594054087802; 
- Mon, 06 Jul 2020 09:48:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jsUIG-0007Zy-PJ
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:48:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52638
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jsUIE-0004Jp-1l
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:48:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594054113;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=moO3+lGkJ2sBGKmNWn7n87wS9tUDIgtnaNaBNy+qKy8=;
+ b=ZXiliWdWpfbfryFVzo5PMzijwCMOhu/CG0B444JwNwzNRlkWBlIK5qLr2Cl6WqOe3NpGsT
+ ZwxgTf208QtPpgYACRbBtuI7pocxw1cxpTJeAQo52mpzGJq6uDss8QXf8wBqL9kESh4pRf
+ MvhW4eVbNQBsRxAVAwWWGg3srQqQmuY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-53-iTRLvVAZPM6FyUykgXLYyw-1; Mon, 06 Jul 2020 12:48:31 -0400
+X-MC-Unique: iTRLvVAZPM6FyUykgXLYyw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0298100A8E7;
+ Mon,  6 Jul 2020 16:48:29 +0000 (UTC)
+Received: from [10.36.113.241] (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D9B660C84;
+ Mon,  6 Jul 2020 16:48:21 +0000 (UTC)
+Subject: Re: [PATCH v2 9/9] hw/arm/smmuv3: Advertise SMMUv3.2 range
+ invalidation
+To: Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ peterx@redhat.com
+References: <20200702152659.8522-1-eric.auger@redhat.com>
+ <20200702152659.8522-10-eric.auger@redhat.com>
+ <10bafac8-a230-c545-662c-bcbd9f3902dc@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3f4dce7c-14e9-f97f-1de5-d39a501bd229@redhat.com>
+Date: Mon, 6 Jul 2020 18:48:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200705213350.24725-1-f4bug@amsat.org>
- <20200705213350.24725-2-f4bug@amsat.org>
-In-Reply-To: <20200705213350.24725-2-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 6 Jul 2020 09:38:20 -0700
-Message-ID: <CAKmqyKNZ13Kjax9jU+sk6eWxMm7W8UCOXuRMcioT2JiK9KA_7Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] hw/sd/pxa2xx_mmci: Do not create SD card within the
- SDHCI controller
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <10bafac8-a230-c545-662c-bcbd9f3902dc@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,159 +104,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>
+Cc: jean-philippe@linaro.org, mst@redhat.com, zhangfei.gao@foxmail.com,
+ shameerali.kolothum.thodi@huawei.com, will@kernel.org, robh@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jul 5, 2020 at 2:34 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> SDHCI controllers provide a SD Bus to plug SD cards, but don't
-> come with SD card plugged in :) Let the machine/board object
-> create and plug the SD cards when required.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Hi Robin,
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+On 7/6/20 6:18 PM, Robin Murphy wrote:
+> On 2020-07-02 16:26, Eric Auger wrote:
+>> Expose the RIL bit so that the guest driver uses range
+>> invalidation.
+> 
+> Hmm, this is a v3.2 feature... so strictly, in order to advertise it you
+> would need to claim at least v3.1 in SMMU_AIDR and implement all the
+> mandatory v3.1 behaviour ;)
 
-Alistair
+AIDR is not modeled at the moment in this emulation code.
+I do not see it used in the linux smmuv3 driver either. I can initialize
+it to 0x2 for the sake of completeness.
 
-> ---
->  include/hw/arm/pxa.h |  3 +--
->  hw/arm/pxa2xx.c      | 39 +++++++++++++++++++++++++++++----------
->  hw/sd/pxa2xx_mmci.c  | 11 ++---------
->  3 files changed, 32 insertions(+), 21 deletions(-)
->
-> diff --git a/include/hw/arm/pxa.h b/include/hw/arm/pxa.h
-> index 8843e5f910..d99b6192da 100644
-> --- a/include/hw/arm/pxa.h
-> +++ b/include/hw/arm/pxa.h
-> @@ -89,8 +89,7 @@ void pxa2xx_lcd_vsync_notifier(PXA2xxLCDState *s, qemu_=
-irq handler);
->  typedef struct PXA2xxMMCIState PXA2xxMMCIState;
->  PXA2xxMMCIState *pxa2xx_mmci_init(MemoryRegion *sysmem,
->                  hwaddr base,
-> -                BlockBackend *blk, qemu_irq irq,
-> -                qemu_irq rx_dma, qemu_irq tx_dma);
-> +                qemu_irq irq, qemu_irq rx_dma, qemu_irq tx_dma);
->  void pxa2xx_mmci_handlers(PXA2xxMMCIState *s, qemu_irq readonly,
->                  qemu_irq coverswitch);
->
-> diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-> index f104a33463..78f6e69f63 100644
-> --- a/hw/arm/pxa2xx.c
-> +++ b/hw/arm/pxa2xx.c
-> @@ -22,6 +22,7 @@
->  #include "hw/irq.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/ssi/ssi.h"
-> +#include "hw/sd/sd.h"
->  #include "chardev/char-fe.h"
->  #include "sysemu/blockdev.h"
->  #include "sysemu/qtest.h"
-> @@ -2135,15 +2136,24 @@ PXA2xxState *pxa270_init(MemoryRegion *address_sp=
-ace,
->
->      s->gpio =3D pxa2xx_gpio_init(0x40e00000, s->cpu, s->pic, 121);
->
-> -    dinfo =3D drive_get(IF_SD, 0, 0);
-> -    if (!dinfo && !qtest_enabled()) {
-> -        warn_report("missing SecureDigital device");
-> -    }
->      s->mmc =3D pxa2xx_mmci_init(address_space, 0x41100000,
-> -                    dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                      qdev_get_gpio_in(s->pic, PXA2XX_PIC_MMC),
->                      qdev_get_gpio_in(s->dma, PXA2XX_RX_RQ_MMCI),
->                      qdev_get_gpio_in(s->dma, PXA2XX_TX_RQ_MMCI));
-> +    dinfo =3D drive_get(IF_SD, 0, 0);
-> +    if (dinfo) {
-> +        DeviceState *carddev;
-> +
-> +        /* Create and plug in the sd card */
-> +        carddev =3D qdev_new(TYPE_SD_CARD);
-> +        qdev_prop_set_drive_err(carddev, "drive",
-> +                                blk_by_legacy_dinfo(dinfo), &error_fatal=
-);
-> +        qdev_realize_and_unref(carddev, qdev_get_child_bus(DEVICE(s->mmc=
-),
-> +                                                           "sd-bus"),
-> +                               &error_fatal);
-> +    } else if (!qtest_enabled()) {
-> +        warn_report("missing SecureDigital device");
-> +    }
->
->      for (i =3D 0; pxa270_serial[i].io_base; i++) {
->          if (serial_hd(i)) {
-> @@ -2259,15 +2269,24 @@ PXA2xxState *pxa255_init(MemoryRegion *address_sp=
-ace, unsigned int sdram_size)
->
->      s->gpio =3D pxa2xx_gpio_init(0x40e00000, s->cpu, s->pic, 85);
->
-> -    dinfo =3D drive_get(IF_SD, 0, 0);
-> -    if (!dinfo && !qtest_enabled()) {
-> -        warn_report("missing SecureDigital device");
-> -    }
->      s->mmc =3D pxa2xx_mmci_init(address_space, 0x41100000,
-> -                    dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                      qdev_get_gpio_in(s->pic, PXA2XX_PIC_MMC),
->                      qdev_get_gpio_in(s->dma, PXA2XX_RX_RQ_MMCI),
->                      qdev_get_gpio_in(s->dma, PXA2XX_TX_RQ_MMCI));
-> +    dinfo =3D drive_get(IF_SD, 0, 0);
-> +    if (dinfo) {
-> +        DeviceState *carddev;
-> +
-> +        /* Create and plug in the sd card */
-> +        carddev =3D qdev_new(TYPE_SD_CARD);
-> +        qdev_prop_set_drive_err(carddev, "drive",
-> +                                blk_by_legacy_dinfo(dinfo), &error_fatal=
-);
-> +        qdev_realize_and_unref(carddev, qdev_get_child_bus(DEVICE(s->mmc=
-),
-> +                                                           "sd-bus"),
-> +                               &error_fatal);
-> +    } else if (!qtest_enabled()) {
-> +        warn_report("missing SecureDigital device");
-> +    }
->
->      for (i =3D 0; pxa255_serial[i].io_base; i++) {
->          if (serial_hd(i)) {
-> diff --git a/hw/sd/pxa2xx_mmci.c b/hw/sd/pxa2xx_mmci.c
-> index 68bed24480..9482b9212d 100644
-> --- a/hw/sd/pxa2xx_mmci.c
-> +++ b/hw/sd/pxa2xx_mmci.c
-> @@ -476,10 +476,9 @@ static const MemoryRegionOps pxa2xx_mmci_ops =3D {
->
->  PXA2xxMMCIState *pxa2xx_mmci_init(MemoryRegion *sysmem,
->                  hwaddr base,
-> -                BlockBackend *blk, qemu_irq irq,
-> -                qemu_irq rx_dma, qemu_irq tx_dma)
-> +                qemu_irq irq, qemu_irq rx_dma, qemu_irq tx_dma)
->  {
-> -    DeviceState *dev, *carddev;
-> +    DeviceState *dev;
->      SysBusDevice *sbd;
->      PXA2xxMMCIState *s;
->
-> @@ -492,12 +491,6 @@ PXA2xxMMCIState *pxa2xx_mmci_init(MemoryRegion *sysm=
-em,
->      qdev_connect_gpio_out_named(dev, "tx-dma", 0, tx_dma);
->      sysbus_realize_and_unref(sbd, &error_fatal);
->
-> -    /* Create and plug in the sd card */
-> -    carddev =3D qdev_new(TYPE_SD_CARD);
-> -    qdev_prop_set_drive_err(carddev, "drive", blk, &error_fatal);
-> -    qdev_realize_and_unref(carddev, qdev_get_child_bus(dev, "sd-bus"),
-> -                           &error_fatal);
-> -
->      return s;
->  }
->
-> --
-> 2.21.3
->
->
+With respect to the 'mandatory features', could you please help me
+determining what are they. Most of the features that would impact this
+emulation code look optional to me (52bit support, PBHA, MPAM).
+
+This emulation code is tested against the latest linux kernel.
+
+Thanks
+
+Eric
+
+> Robin.
+> 
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>   hw/arm/smmuv3-internal.h | 1 +
+>>   hw/arm/smmuv3.c          | 2 ++
+>>   2 files changed, 3 insertions(+)
+>>
+>> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+>> index 5babf72f7d..4e7ec252ed 100644
+>> --- a/hw/arm/smmuv3-internal.h
+>> +++ b/hw/arm/smmuv3-internal.h
+>> @@ -54,6 +54,7 @@ REG32(IDR1,                0x4)
+>>     REG32(IDR2,                0x8)
+>>   REG32(IDR3,                0xc)
+>> +    FIELD(IDR3, RIL,          10, 1);
+>>   REG32(IDR4,                0x10)
+>>   REG32(IDR5,                0x14)
+>>        FIELD(IDR5, OAS,         0, 3);
+>> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+>> index 89ab11fc36..add4ba4543 100644
+>> --- a/hw/arm/smmuv3.c
+>> +++ b/hw/arm/smmuv3.c
+>> @@ -254,6 +254,8 @@ static void smmuv3_init_regs(SMMUv3State *s)
+>>       s->idr[1] = FIELD_DP32(s->idr[1], IDR1, EVENTQS, SMMU_EVENTQS);
+>>       s->idr[1] = FIELD_DP32(s->idr[1], IDR1, CMDQS,   SMMU_CMDQS);
+>>   +    s->idr[3] = FIELD_DP32(s->idr[3], IDR3, RIL, 1);
+>> +
+>>      /* 4K and 64K granule support */
+>>       s->idr[5] = FIELD_DP32(s->idr[5], IDR5, GRAN4K, 1);
+>>       s->idr[5] = FIELD_DP32(s->idr[5], IDR5, GRAN64K, 1);
+>>
+> 
+
 
