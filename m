@@ -2,65 +2,89 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A64C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE98C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:35:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B9942070B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:31:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B9942070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 1501E206CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:35:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCpgJgJf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1501E206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsS9B-0000sy-MM
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 10:31:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53304)
+	id 1jsSDN-0002bs-BD
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 10:35:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jsS8Z-0000Ek-H0
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:30:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40222)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jsS8X-00039d-G4
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:30:27 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 3F69EAD89;
- Mon,  6 Jul 2020 14:30:23 +0000 (UTC)
-Subject: Re: [PULL 00/10] Modules 20200702 patches
-To: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200702122048.27798-1-kraxel@redhat.com>
- <CAFEAcA9PVnKo8S7=bSggS2FpS5YoBexZD7nM54XFHto333_OhQ@mail.gmail.com>
- <20200703103949.7vz3dmy4br55rh4b@sirius.home.kraxel.org>
- <d9e28e08-e8d3-edd4-dcf0-af207a5ad3b8@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <b6d38863-1427-8721-5743-cd73e743bf40@suse.de>
-Date: Mon, 6 Jul 2020 16:30:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsSCe-0001sf-9O
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:34:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45298
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsSCc-0003jc-Pu
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:34:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594046078;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=sy82O70eh7lmpMogxX4Wig8ko74faHSoOvBCIgJ2Ptk=;
+ b=aCpgJgJfvykEPpxM1gKUCVJKOM/YLwuy/Y+8DL4H6KygPBZTiE0AJfDLhg+V0lzHIwuv+N
+ qRFyuxAVnkgnNpLMiBPoIPwWD7bsrYR4lxjIfXaAdm/jBNHXu+GGYpt6UN7QD7kHPFpKIk
+ z279dd5JvJfFZjt0NLjpqo+7DRxgW9c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-_sF_CQ2dNJeFDnj5XmgwzA-1; Mon, 06 Jul 2020 10:34:34 -0400
+X-MC-Unique: _sF_CQ2dNJeFDnj5XmgwzA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41B7E8DFFD9;
+ Mon,  6 Jul 2020 14:33:51 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E742D19D61;
+ Mon,  6 Jul 2020 14:33:50 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 746051132FD2; Mon,  6 Jul 2020 16:33:49 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v3 01/44] error: Improve examples in error.h's big comment
+References: <20200706080950.403087-1-armbru@redhat.com>
+ <20200706080950.403087-2-armbru@redhat.com>
+Date: Mon, 06 Jul 2020 16:33:49 +0200
+In-Reply-To: <20200706080950.403087-2-armbru@redhat.com> (Markus Armbruster's
+ message of "Mon, 6 Jul 2020 10:09:07 +0200")
+Message-ID: <87imf090he.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <d9e28e08-e8d3-edd4-dcf0-af207a5ad3b8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 21:32:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,95 +97,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, groug@kaod.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/3/20 2:05 PM, Paolo Bonzini wrote:
-> On 03/07/20 12:39, Gerd Hoffmann wrote:
->> On Fri, Jul 03, 2020 at 09:54:13AM +0100, Peter Maydell wrote:
->>> On Thu, 2 Jul 2020 at 13:23, Gerd Hoffmann <kraxel@redhat.com> wrote:
->>>>
->>>> The following changes since commit fc1bff958998910ec8d25db86cd2f53ff125f7ab:
->>>>
->>>>   hw/misc/pca9552: Add missing TypeInfo::class_size field (2020-06-29 21:16:10 +0100)
->>>>
->>>> are available in the Git repository at:
->>>>
->>>>   git://git.kraxel.org/qemu tags/modules-20200702-pull-request
->>>>
->>>> for you to fetch changes up to 474a5d66036d18ee5ccaa88364660d05bf32127b:
->>>>
->>>>   chardev: enable modules, use for braille (2020-07-01 21:08:11 +0200)
->>>>
->>>> ----------------------------------------------------------------
->>>> qom: add support for qom objects in modules.
->>>> build some devices (qxl, virtio-gpu, ccid, usb-redir) as modules.
->>>> build braille chardev as module.
->>>>
->>>> note: qemu doesn't rebuild objects on cflags changes (specifically
->>>>       -fPIC being added when code is switched from builtin to module).
->>>>       Workaround for resulting build errors: "make clean", rebuild.
->>>>
->>>> ----------------------------------------------------------------
->>>>
->>>> Gerd Hoffmann (10):
->>>>   module: qom module support
->>>>   object: qom module support
->>>>   qdev: device module support
->>>>   build: fix device module builds
->>>>   ccid: build smartcard as module
->>>>   usb: build usb-redir as module
->>>>   vga: build qxl as module
->>>>   vga: build virtio-gpu only once
->>>>   vga: build virtio-gpu as module
->>>>   chardev: enable modules, use for braille
->>>
->>> No code review at all? :-(
->>
->> Well, there have been 5 revisions on the list, partly due to bugs being
->> fixed, partly with changes as response to review comments.  So it got
->> some review (not much though) even though the v5 series (posted on June
->> 22th, so there was more than a week time) didn't got any acks so far.
->>
->>> In particular the "build: fix device module
->>> builds" commit (as you note in your commit message) does not look at
->>> all right.
->>
->> I think this stop-gap will do fine as long as we don't have any
->> target-specific modules.
-> 
-> Yeah, it's hackish but target-specific modules would be a huge
-> complication so I don't think we'd be having them anytime soon.  With
-> Meson removing the unnest-vars logic, the hack would also go away on its
-> own.  So I guess it's okay.
-> 
-> Paolo
-> 
-> 
+Markus Armbruster <armbru@redhat.com> writes:
 
-Hi Paolo,
+> Show errp instead of &err where &err is actually unusual.  Add a
+> missing declaration.  Add a second error pileup example.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> ---
+>  include/qapi/error.h | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index ad5b6e896d..3e64324b7a 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -16,15 +16,15 @@
+>   * Error reporting system loosely patterned after Glib's GError.
+>   *
+>   * Create an error:
+> - *     error_setg(&err, "situation normal, all fouled up");
+> + *     error_setg(errp, "situation normal, all fouled up");
+>   *
+>   * Create an error and add additional explanation:
+> - *     error_setg(&err, "invalid quark");
+> - *     error_append_hint(&err, "Valid quarks are up, down, strange, "
+> + *     error_setg(errp, "invalid quark");
+> + *     error_append_hint(errp, "Valid quarks are up, down, strange, "
+>   *                       "charm, top, bottom.\n");
+>   *
+>   * Do *not* contract this to
+> - *     error_setg(&err, "invalid quark\n"
+> + *     error_setg(errp, "invalid quark\n" // WRONG!
+>   *                "Valid quarks are up, down, strange, charm, top, bottom.");
+>   *
+>   * Report an error to the current monitor if we have one, else stderr:
 
-well, since it is one of my main objectives behind lots of the refactoring work I have in progress,
-and have been announcing this to the list since May:
+I intend to drop the change from &err to errp, and update the commit
+message accordingly.
 
-https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg04628.html
+error_setg(&err, ...) is indeed unusual, and I cleaned up several unwise
+uses in PATCH 32+35+39.  However, error_append_hint(errp, ...) is bad
+advice until Vladimir's ERRP_AUTO_PROPAGATE() makes it work.  No need to
+get ahead of his work here.
 
-I would disagree with the fact that target-specific modules are a huge complication in by themselves, as I got some initial promising results in building them.
-
-Will work on the series and contribute it as soon as the basic requisite initial refactoring series are in,
-so that the usefulness of target-specific modules can be demonstrated.
-
-In my view modules could have been implemented differently, instead of the current design, in a way that would have made them easier to extend.
-
-Probably meson is an interesting tool, I think however that good build designs will still be necessary,
-and that bad ones will still result in difficult to extend build features.
-
-Thanks & ciao,
-
-Claudio
+[...]
 
 
