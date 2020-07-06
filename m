@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33922C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93323C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0141E20723
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:58:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C05520702
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:59:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2bddHJM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0141E20723
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VwTVCfXd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C05520702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUS3-0004bV-6n
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:58:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57450)
+	id 1jsUSp-0005cm-Jq
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:59:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUCX-00047S-Ox
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42899
- helo=us-smtp-1.mimecast.com)
+ id 1jsUCI-0003Y4-Tf
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31897
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUCV-0003CO-B6
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:41 -0400
+ id 1jsUCF-00036q-5t
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594053758;
+ s=mimecast20190719; t=1594053740;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=b8v8CsIIGbx7AeWvcP2w0/O8hC9DtAN6upPuQEETrtc=;
- b=Q2bddHJMq9GzEA62VGAzlR6TT4RBfeHuD38tFeqIuULm85ap1cseBVkIbHcmsgE04QJSjN
- MkCA8+uCn0/kqCXKKsyGVo3yqd4VK886trHkAFZzeJXl0JdIPyszLnrDYJgLEdjaVwvOIQ
- T0Txh+nJ5jVKvRqU5MfdW+tebiDafEU=
+ bh=sbm4dlmKzlJfS+PAYK5L34O3rkpwzn8YdKzds1qva5g=;
+ b=VwTVCfXdNuzTuI8pkrlcSl8XTDJuheHZhoxOjdr3vKuN3UuRRio6IB8M2i35oPNGoCD9Mi
+ 9JYrjuq93bqflfSQ/EeFE4xcoZDB9rrylfhw6E+AfB7HucCO//mYHvOnmobekJ5O/4JeQW
+ K55xlLxKm+j12Spb5MPGlHPxVLHJKJE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-hHsgTRCoMLy0lTkANkBkyA-1; Mon, 06 Jul 2020 12:42:37 -0400
-X-MC-Unique: hHsgTRCoMLy0lTkANkBkyA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-206-7TfVLgn8M3yrRVem0GEUHw-1; Mon, 06 Jul 2020 12:42:14 -0400
+X-MC-Unique: 7TfVLgn8M3yrRVem0GEUHw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 240AB1937FE1
- for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 16:42:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05728EC1A2;
+ Mon,  6 Jul 2020 16:42:13 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C79681002380;
- Mon,  6 Jul 2020 16:42:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A4D495BACD;
+ Mon,  6 Jul 2020 16:42:12 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 53/53] scripts: improve message when TAP based tests fail
-Date: Mon,  6 Jul 2020 12:41:55 -0400
-Message-Id: <20200706164155.24696-54-pbonzini@redhat.com>
+Subject: [PULL 19/53] MAINTAINERS: Add Cameron as HVF co-maintainer
+Date: Mon,  6 Jul 2020 12:41:21 -0400
+Message-Id: <20200706164155.24696-20-pbonzini@redhat.com>
 In-Reply-To: <20200706164155.24696-1-pbonzini@redhat.com>
 References: <20200706164155.24696-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:59:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,44 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>, Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+From: Roman Bolshakov <r.bolshakov@yadro.com>
 
-If one of the qtests fails, the TAP driver prints out a message like:
+Similar patch was sent a while ago but got lost.
+While at it, add a status wiki page.
 
-  ERROR - too few tests run (expected 3, got 1)
-
-which fails to tell you which test program failed. This is a critical
-ommission when many tests are running in parallel as their output is
-interleaved. The improved message is:
-
-  ERROR endianness-test - too few tests run (expected 3, got 1)
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200706125054.2619012-1-berrange@redhat.com>
+Cc: Cameron Esfahani <dirty@apple.com>
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-Id: <20200624225850.16982-9-r.bolshakov@yadro.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/tap-driver.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
-index 6621a5cd67..b1d3880c50 100755
---- a/scripts/tap-driver.pl
-+++ b/scripts/tap-driver.pl
-@@ -217,7 +217,7 @@ sub report ($;$)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index dec252f38b..b6d4f62ba2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -417,7 +417,9 @@ F: target/i386/kvm.c
+ F: scripts/kvm/vmxcap
  
- sub testsuite_error ($)
- {
--  report "ERROR", "- $_[0]";
-+  report "ERROR", "$test_name - $_[0]";
- }
- 
- sub handle_tap_result ($)
+ X86 HVF CPUs
++M: Cameron Esfahani <dirty@apple.com>
+ M: Roman Bolshakov <r.bolshakov@yadro.com>
++W: https://wiki.qemu.org/Features/HVF
+ S: Maintained
+ F: accel/stubs/hvf-stub.c
+ F: target/i386/hvf/
 -- 
 2.26.2
+
 
 
