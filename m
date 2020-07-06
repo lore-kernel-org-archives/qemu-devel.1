@@ -2,73 +2,96 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3553FC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B3CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:48:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12ECB20723
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:45:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12ECB20723
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 490BA2053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:48:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MeeCjkui"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 490BA2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsVB5-0003rs-7B
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:45:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43982)
+	id 1jsVDt-00057T-I0
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:48:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jsVAP-0003Pt-1p
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 13:44:33 -0400
-Resent-Date: Mon, 06 Jul 2020 13:44:33 -0400
-Resent-Message-Id: <E1jsVAP-0003Pt-1p@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21746)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jsVAM-00063W-KP
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 13:44:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594057464; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=bZJO/R3hr8pH5XpXjWUz2o+cHyM0+/+FVpWyYt1IQvuciQTHTxm1uTVjiLCBGjmpZSaAdHLsoMjLJ7VIvQYDwjH9iC9AeC4MIvVjwZGxkDDTrT/dXf6k1NwCmQ7e5Jy59zds2IJhvyaNW8ZbXMomOAIC99e4QWu0ost3dqUwC50=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594057464;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=37hWl3l5jvASc7bAVb1yHg1Egnmrj3/UuEhNTf/hpoo=; 
- b=j9+wIyTH0wV+Hn1aGHEfYPGszCkP5ziaT4C6Gk/ovd1S9o7kfrm5SrJmq/SXl1sEuEpJ2PFRIXTTbGGjfXertVZxdO4w9lZcxVTB1vkeWbBOMTKMn0MdlCp68Tt+BznxxlW45Ta3gkAX02R6nY19kZGSuYzh51nq7NemT4hkVAA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1594057462713733.2240573743182;
- Mon, 6 Jul 2020 10:44:22 -0700 (PDT)
-Message-ID: <159405746133.7847.6146784276688587643@d1fd068a5071>
-Subject: Re: [PATCH v3 0/2] trace: Add a trace backend for the recorder library
-In-Reply-To: <20200706170255.1165105-1-dinechin@redhat.com>
+ (Exim 4.90_1) (envelope-from <leobras.c@gmail.com>)
+ id 1jsVDF-0004bj-QO; Mon, 06 Jul 2020 13:47:29 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37994)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <leobras.c@gmail.com>)
+ id 1jsVDE-0006XL-7b; Mon, 06 Jul 2020 13:47:29 -0400
+Received: by mail-qk1-x741.google.com with SMTP id e13so35619348qkg.5;
+ Mon, 06 Jul 2020 10:47:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=message-id:subject:from:to:cc:in-reply-to:references:organization
+ :mime-version:date:user-agent:content-transfer-encoding;
+ bh=QqyagR0cCLEnmduIUcuxSmnmTikYnG6rB5q0IMBXseI=;
+ b=MeeCjkuiWYTVUMY9AgU3mCo9gUKQ2tsowGVaqrgB+N9MuFCRrzAYVWlilau08lcIC4
+ +16h2QtfTWiNN5n5FbHTszeAUdi7x07kiF5+ddtsZuAF80fV/sPSlcMt/w2VOJuBJo6p
+ wq4Su/pQ31HMNbrmtV8BdXpdD1XTlv6BvapEFi/df34YrcHgAE1pIRt9vrRYiMA87SOq
+ JucLPgrrVbh8JrGWp6zbNBJdCnc5uOEqU51pmdk0H3rplBY0Czw5XEKezjkZPrrWT4Rq
+ GN1hTE7WKcBUJwEjkPLcskyG8grJpgVgPUWqxhUTqbgidCdYokdB5a3stXB5RknN/LuE
+ yyrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:message-id:subject:from:to:cc:in-reply-to
+ :references:organization:mime-version:date:user-agent
+ :content-transfer-encoding;
+ bh=QqyagR0cCLEnmduIUcuxSmnmTikYnG6rB5q0IMBXseI=;
+ b=EM5i755aR3/3V4gumJS8ah4TqWg3G5QyXVbOQZ0BuJiWZsbAzbzkc65f2cEZB6WN76
+ wBqwv3tzjQv6c4rnNCK93YSPX4aUuU9ZJ4zWBMbKEQpIBPOhliUIsH6/kJJgfBX7u7R+
+ MkWCZ+giV3rmBDA3xUojwmF6vCXriPCgwarZ46pzYHqPKpyqgefJZ4JiQM6ZOsC7g2rA
+ 5c2Rp2ddzNzDm/8kqtDVc3kmksPpL5tjQNrE4wHlNdDQ2ZZnYFZBIqdsvrrf1XppXxhI
+ iXZ+R/ls/kkKmZv6A0VCDydhZOl6+bict0Lezf1mABNlD7HunbbKzJsTAG6bmI4h4lue
+ oLGw==
+X-Gm-Message-State: AOAM531leioN7AQ71HRqYj7Bz7mKrMY0c+esCB3YgtHelNjFJxST0fb4
+ 1+VEjwUbvYMwg+MB7dwFnM0=
+X-Google-Smtp-Source: ABdhPJxMeWhn+ZA8Ws4seyby5qITkiTtf/4EMU9+6idJG26GJ0wHAEdlJSYhgND2SXevMZYos1AG9g==
+X-Received: by 2002:a05:620a:205e:: with SMTP id
+ d30mr49532395qka.450.1594057646125; 
+ Mon, 06 Jul 2020 10:47:26 -0700 (PDT)
+Received: from LeoBras (179-125-148-98.dynamic.desktop.com.br.
+ [179.125.148.98])
+ by smtp.gmail.com with ESMTPSA id d135sm19443874qkg.117.2020.07.06.10.47.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Jul 2020 10:47:25 -0700 (PDT)
+Message-ID: <29a2bce461f47a52beb0377640216b3362f8026e.camel@gmail.com>
+Subject: Re: [RESEND PATCH v3 1/1] ppc/spapr: Add hotremovable flag on DIMM
+ LMBs on drmem_v2
+From: Leonardo Bras <leobras.c@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao
+ <bharata.rao@in.ibm.com>
+In-Reply-To: <20200511200201.58537-1-leobras.c@gmail.com>
+References: <20200511200201.58537-1-leobras.c@gmail.com>
+Organization: IBM
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dinechin@redhat.com
-Date: Mon, 6 Jul 2020 10:44:22 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 12:33:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Date: Mon, 06 Jul 2020 14:45:55 -0300
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
+ envelope-from=leobras.c@gmail.com; helo=mail-qk1-x741.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,52 +104,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, mjt@tls.msk.ru, laurent@vivier.eu, armbru@redhat.com,
- stefanha@redhat.com, dgilbert@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Bharata B Rao <bharata@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwNjE3MDI1NS4xMTY1
-MTA1LTEtZGluZWNoaW5AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYzIDAvMl0gdHJhY2U6IEFkZCBhIHRyYWNl
-IGJhY2tlbmQgZm9yIHRoZSByZWNvcmRlciBsaWJyYXJ5ClR5cGU6IHNlcmllcwpNZXNzYWdlLWlk
-OiAyMDIwMDcwNjE3MDI1NS4xMTY1MTA1LTEtZGluZWNoaW5AcmVkaGF0LmNvbQoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251
-bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNl
-Li4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNmVm
-MzNiIHRyYWNlOiBFeGFtcGxlIG9mIG5vbi10cmFjaW5nIHJlY29yZGVyIHVzZQo2NGVlMjBiIHRy
-YWNlOiBBZGQgc3VwcG9ydCBmb3IgcmVjb3JkZXIgYmFjay1lbmQKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CjEvMiBDaGVja2luZyBjb21taXQgNjRlZTIwYjMwNGFiICh0cmFjZTogQWRkIHN1cHBvcnQg
-Zm9yIHJlY29yZGVyIGJhY2stZW5kKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNDg6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
-IHNlcGFyYXRlIGxpbmUKIzI2NzogRklMRTogdHJhY2UvcmVjb3JkZXIuYzoyMDoKKyAgICAvKiBB
-bGxvdyBhIGR1bXAgaW4gY2FzZSB3ZSByZWNlaXZlIHNvbWUgdW5oYW5kbGVkIHNpZ25hbAoKV0FS
-TklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2VxdWVudCBsaW5lcwojMjY4OiBGSUxF
-OiB0cmFjZS9yZWNvcmRlci5jOjIxOgorICAgIC8qIEFsbG93IGEgZHVtcCBpbiBjYXNlIHdlIHJl
-Y2VpdmUgc29tZSB1bmhhbmRsZWQgc2lnbmFsCisgICAgICAgRm9yIGV4YW1wbGUsIHNlbmQgVVNS
-MiB0byBhIGh1bmcgcHJvY2VzcyB0byBnZXQgYSBkdW1wICovCgpXQVJOSU5HOiBCbG9jayBjb21t
-ZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzI2ODogRklMRTogdHJh
-Y2UvcmVjb3JkZXIuYzoyMToKKyAgICAgICBGb3IgZXhhbXBsZSwgc2VuZCBVU1IyIHRvIGEgaHVu
-ZyBwcm9jZXNzIHRvIGdldCBhIGR1bXAgKi8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21t
-ZW50cwojMzEwOiBGSUxFOiB0cmFjZS9yZWNvcmRlci5oOjMyOgorI2VuZGlmIC8vIFRSQUNFX1JF
-Q09SREVSX0gKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMzMxOiBGSUxFOiB1
-dGlsL21vZHVsZS5jOjE1ODoKKyAgICAgICAgLy8gTmV3IHJlY29yZGVycyBtYXkgaGF2ZSBiZWVu
-IHB1bGxlZCBpbiwgYWN0aXZhdGUgdGhlbSBpZiBuZWNlc3NhcnkKCnRvdGFsOiAyIGVycm9ycywg
-NCB3YXJuaW5ncywgMjQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMiBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKMi8yIENoZWNraW5nIGNvbW1pdCAyNmVmMzNiM2Y5ZTEgKHRyYWNlOiBFeGFt
-cGxlIG9mIG5vbi10cmFjaW5nIHJlY29yZGVyIHVzZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3MDYxNzAyNTUuMTE2NTEwNS0xLWRpbmVj
-aGluQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Mon, 2020-05-11 at 17:02 -0300, Leonardo Bras wrote:
+> The new SPAPR_LMB_FLAGS_HOTREMOVABLE flag helps Linux to put this memory in
+> the correct memory zone, so no unmovable allocations are made there,
+> allowing the object to be easily hot-removed by device_del and
+> object_del.
+> 
+> This new flag was accepted in Power Architecture documentation.
+
+
+FYI: LoPAR released for public review. 
+https://openpowerfoundation.org/?resource_lib=linux-on-power-architecture-reference-a-papr-linux-subset-review-draft
+
+It contains the new flag implemented by this patch.
+
 
