@@ -2,89 +2,131 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB11FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 12:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9D8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 12:31:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4E3E206E9
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 12:05:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A83CC206E6
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 12:31:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LX6FquHB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E3E206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KNSJHR8e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A83CC206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsPsc-0006Yc-VM
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 08:05:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51294)
+	id 1jsQH8-0006IQ-Tj
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 08:31:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jsPrr-00060R-Ij
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 08:05:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39105
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsQGK-0005TG-Ha
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 08:30:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24624
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jsPrp-0006lu-QM
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 08:05:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsQGG-0002Hn-BI
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 08:30:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594037100;
+ s=mimecast20190719; t=1594038614;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Cjvw2gz/ks0M8X/sdpwjhdnM4lcXvyssuPZR5wcUK5M=;
- b=LX6FquHBylYFrbHHECaTSL2oWabKj316LZo+0Eo9zpHPqV+D+zrJUcsboGYOzy7znpCDyU
- yZriCzNDmHxpahjmdpUAxG8uinQDHUHFlY6IB9gi/L3rc4IpVadx7KkXkAzanrwlMVE9mT
- 6GfZRNh8g9wMQyPQmpkTStxnd51tZlw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-t6-g2H3OM1aIWfTg2UzXmA-1; Mon, 06 Jul 2020 08:04:58 -0400
-X-MC-Unique: t6-g2H3OM1aIWfTg2UzXmA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D46D018FF67B;
- Mon,  6 Jul 2020 12:04:56 +0000 (UTC)
-Received: from localhost (ovpn-114-217.ams2.redhat.com [10.36.114.217])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 60526106F74C;
- Mon,  6 Jul 2020 12:04:54 +0000 (UTC)
-Date: Mon, 6 Jul 2020 13:04:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=6yOqG5hefrKTG5oiSu+re5PjeBcHmm8gnKoetysJypM=;
+ b=KNSJHR8enghvrAD6t4hvpbE+GVAxcX9Ro5QY9u975+FPCxz6sOujcv4SsNSrGZ03AEGIxf
+ 3+A33pi8/NeOuUzb/x2Fzf4pjcChAjzvdEQADngH3Yc6dJVmfBpTJBbPr/3OPa8qLRlSv7
+ Z4Ppx6tb8og45FfhZU4XH64B4iTBPao=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-iYMb-kJXM8aThPt1w2QUXw-1; Mon, 06 Jul 2020 08:30:13 -0400
+X-MC-Unique: iYMb-kJXM8aThPt1w2QUXw-1
+Received: by mail-wm1-f71.google.com with SMTP id s134so46126146wme.6
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 05:30:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=4RSq671o+WrE4kqJ6/tfWcuHNkkGSxSeucb6UhdCG90=;
+ b=dtEsBQVq1jT9RaGKSzL/UpLgO3WkQnCoJePuyp2lDE9oRMUBqYE/VbY6YLSlfMdqFf
+ L6+yla8OwtO2B9E03KCMqHmvMdcceGRT0fh3ls+CQfFkVLC7a5DwkGgpwf1MPmb9/C9f
+ wHlJccRIZOhNA+cMzjQ9YtueuNZtu5NQkfaIakR6cT0ci1LsO3jMaa5MyuUXtoThgBY2
+ 0BLJ1Oo4LFc2S3wOyHNdXYX6zIv1BGRq81k8emtc8NZwnVjIKsC2KN76UUqAn+eEk9lI
+ ZZq2U0vqOIs+/gcT9JS+g9QJnrMCBZFPbEOQysaRjy0BitWhjys7ZZY7hjvXCmDF710Z
+ gKEg==
+X-Gm-Message-State: AOAM531PwIUyweD6tw2oj+TbhZP/Jba/nq9DR58yeTe1Tqk4MtT+oKjv
+ QaCSGLE6WhdCag/CCBUt4ENJcF79nbtkaT1kQGPmM9z+yS/qL8glskybr9X4n70AJPtkwCYGpcb
+ LfkimfgWLA3dUB6c=
+X-Received: by 2002:adf:de8d:: with SMTP id w13mr47699725wrl.129.1594038612168; 
+ Mon, 06 Jul 2020 05:30:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxwsDsTAMujsi3i2JucHs2puK/2XXWJyR/ntqjTUDnmlljTmpKPEEzJBHUXMonUChwqMPfiDg==
+X-Received: by 2002:adf:de8d:: with SMTP id w13mr47699690wrl.129.1594038611884; 
+ Mon, 06 Jul 2020 05:30:11 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id k18sm15166635wrx.34.2020.07.06.05.30.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jul 2020 05:30:11 -0700 (PDT)
 Subject: Re: [PATCH v3 16/16] block/nvme: Use per-queuepair IRQ notifier and
  AIO context
-Message-ID: <20200706120453.GE342708@stefanha-x1.localdomain>
+To: Stefan Hajnoczi <stefanha@redhat.com>
 References: <20200704213051.19749-1-philmd@redhat.com>
  <20200704213051.19749-17-philmd@redhat.com>
+ <20200706120453.GE342708@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <f7804215-f9dd-39ba-1708-94373aa3f72c@redhat.com>
+Date: Mon, 6 Jul 2020 14:30:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200704213051.19749-17-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200706120453.GE342708@stefanha-x1.localdomain>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="uCPdOCrL+PnN2Vxy"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,75 +140,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>, Max Reitz <mreitz@redhat.com>
+ qemu-block@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---uCPdOCrL+PnN2Vxy
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 7/6/20 2:04 PM, Stefan Hajnoczi wrote:
+> On Sat, Jul 04, 2020 at 11:30:51PM +0200, Philippe Mathieu-Daudé wrote:
+>> @@ -683,6 +676,17 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
+>>      s->queues = g_renew(NVMeQueuePair *, s->queues, n + 1);
+>>      s->queues[n] = q;
+>>      s->nr_queues++;
+>> +
+>> +    ret = qemu_vfio_pci_init_irq(s->vfio,
+>> +                                 &s->queues[n]->irq_notifier,
+>> +                                 VFIO_PCI_MSIX_IRQ_INDEX, errp);
+>> +    if (ret) {
+>> +        goto out_error;
+>> +    }
+>> +    aio_set_event_notifier(aio_context,
+>> +                           &s->queues[n]->irq_notifier,
+>> +                           false, nvme_handle_event, nvme_poll_cb);
+> 
+> s->queues[n] can be replaced with q to make the code easier to read.
 
-On Sat, Jul 04, 2020 at 11:30:51PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> @@ -683,6 +676,17 @@ static bool nvme_add_io_queue(BlockDriverState *bs, =
-Error **errp)
->      s->queues =3D g_renew(NVMeQueuePair *, s->queues, n + 1);
->      s->queues[n] =3D q;
->      s->nr_queues++;
-> +
-> +    ret =3D qemu_vfio_pci_init_irq(s->vfio,
-> +                                 &s->queues[n]->irq_notifier,
-> +                                 VFIO_PCI_MSIX_IRQ_INDEX, errp);
-> +    if (ret) {
-> +        goto out_error;
-> +    }
-> +    aio_set_event_notifier(aio_context,
-> +                           &s->queues[n]->irq_notifier,
-> +                           false, nvme_handle_event, nvme_poll_cb);
+Indeed.
 
-s->queues[n] can be replaced with q to make the code easier to read.
+> 
+>> @@ -784,12 +782,14 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>>          }
+>>      }
+>>  
+>> -    ret = qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
+>> +    ret = qemu_vfio_pci_init_irq(s->vfio,
+>> +                                 &s->queues[QUEUE_INDEX_ADMIN]->irq_notifier,
+>>                                   VFIO_PCI_MSIX_IRQ_INDEX, errp);
+> 
+> QEMU is setting up only 1 MSI-X vector that is shared by the admin and
+> all io queues?
+> 
+> I'm not very familiar with the VFIO ioctls but I guess this call
+> replaces the admin queue's irq_notifier registration with VFIO. So now
+> the queue's irq_notifier is signalled on admin cq events. The admin
+> irq_notifier is no longer signalled. This seems broken.
 
-> @@ -784,12 +782,14 @@ static int nvme_init(BlockDriverState *bs, const ch=
-ar *device, int namespace,
->          }
->      }
-> =20
-> -    ret =3D qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
-> +    ret =3D qemu_vfio_pci_init_irq(s->vfio,
-> +                                 &s->queues[QUEUE_INDEX_ADMIN]->irq_noti=
-fier,
->                                   VFIO_PCI_MSIX_IRQ_INDEX, errp);
+I'll look into that. Cc'ing VFIO experts meanwhile...
 
-QEMU is setting up only 1 MSI-X vector that is shared by the admin and
-all io queues?
-
-I'm not very familiar with the VFIO ioctls but I guess this call
-replaces the admin queue's irq_notifier registration with VFIO. So now
-the queue's irq_notifier is signalled on admin cq events. The admin
-irq_notifier is no longer signalled. This seems broken.
-
-If there are multiple irq_notifiers then multiple MSI-X vectors are
-needed.
-
-Stefan
-
---uCPdOCrL+PnN2Vxy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8DE2UACgkQnKSrs4Gr
-c8hq7gf/UaRxkOYkqtm21zr6M1kWkH3foOTnNNv4+KNp13bIYOURbi82r868UG+v
-ZpE/1hhflhlhrkM/dM8ldlR4zTMUi2hxSn22cnPhOU49rkCVsvsjXVT+4C21l8m0
-dJ/Tc70XmY5CQMd3uF1G0eA6T1TG2vzS3x1SOExiN21hgobu5rHPabC3sE9uwC+j
-uCbE9D+ilE0XGHp8+pRATaz3PIrFKynJIRUx7FPI2w82XwzQuST5+PfzRwYdXPRP
-zGICPjivFYEU7GC1ODkgQCG4Z+YNK0F9OwRyLtJ+q7vDk+dnbdT0UfOfF7x7x9qr
-+niiTtnJDCEY5W4lEBmOWDPt+xPG0A==
-=wOH2
------END PGP SIGNATURE-----
-
---uCPdOCrL+PnN2Vxy--
+> 
+> If there are multiple irq_notifiers then multiple MSI-X vectors are
+> needed.
+> 
+> Stefan
+> 
 
 
