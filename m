@@ -7,38 +7,39 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F93CC433E5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C53C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDE4620708
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:19:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE4620708
+	by mail.kernel.org (Postfix) with ESMTPS id A468F20739
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 06:20:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A468F20739
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsKTh-00041t-4k
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 02:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60544)
+	id 1jsKUE-0004jB-UB
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 02:20:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jsKNY-0000jU-Qd; Mon, 06 Jul 2020 02:13:24 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:57964)
+ id 1jsKNv-0001mC-Cx; Mon, 06 Jul 2020 02:13:47 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:58136)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jsKNQ-0000uW-9s; Mon, 06 Jul 2020 02:13:24 -0400
+ id 1jsKNt-0000x3-DY; Mon, 06 Jul 2020 02:13:47 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 7A220BF7A1;
- Mon,  6 Jul 2020 06:13:11 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 31A72BF867;
+ Mon,  6 Jul 2020 06:13:18 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 01/18] hw/block/nvme: bump spec data structures to v1.3
-Date: Mon,  6 Jul 2020 08:12:46 +0200
-Message-Id: <20200706061303.246057-2-its@irrelevant.dk>
+Subject: [PATCH v3 14/18] hw/block/nvme: support identify namespace descriptor
+ list
+Date: Mon,  6 Jul 2020 08:12:59 +0200
+Message-Id: <20200706061303.246057-15-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200706061303.246057-1-its@irrelevant.dk>
 References: <20200706061303.246057-1-its@irrelevant.dk>
@@ -65,11 +66,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
  Maxim Levitsky <mlevitsk@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -78,379 +78,88 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Add missing fields in the Identify Controller and Identify Namespace
-data structures to bring them in line with NVMe v1.3.
-
-This also adds data structures and defines for SGL support which
-requires a couple of trivial changes to the nvme block driver as well.
+Since we are not providing the NGUID or EUI64 fields, we must support
+the Namespace UUID. We do not have any way of storing a persistent
+unique identifier, so conjure up a UUID that is just the namespace id.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Fam Zheng <fam@euphon.net>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- block/nvme.c         |  18 ++---
- hw/block/nvme.c      |  12 ++--
- include/block/nvme.h | 156 ++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 154 insertions(+), 32 deletions(-)
+ hw/block/nvme.c       | 41 +++++++++++++++++++++++++++++++++++++++++
+ hw/block/trace-events |  1 +
+ 2 files changed, 42 insertions(+)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 374e26891573..c1c4c07ac6cc 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -518,7 +518,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-         error_setg(errp, "Cannot map buffer for DMA");
-         goto out;
-     }
--    cmd.prp1 = cpu_to_le64(iova);
-+    cmd.dptr.prp1 = cpu_to_le64(iova);
- 
-     if (nvme_cmd_sync(bs, s->queues[0], &cmd)) {
-         error_setg(errp, "Failed to identify controller");
-@@ -629,7 +629,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-     }
-     cmd = (NvmeCmd) {
-         .opcode = NVME_ADM_CMD_CREATE_CQ,
--        .prp1 = cpu_to_le64(q->cq.iova),
-+        .dptr.prp1 = cpu_to_le64(q->cq.iova),
-         .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | (n & 0xFFFF)),
-         .cdw11 = cpu_to_le32(0x3),
-     };
-@@ -640,7 +640,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-     }
-     cmd = (NvmeCmd) {
-         .opcode = NVME_ADM_CMD_CREATE_SQ,
--        .prp1 = cpu_to_le64(q->sq.iova),
-+        .dptr.prp1 = cpu_to_le64(q->sq.iova),
-         .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | (n & 0xFFFF)),
-         .cdw11 = cpu_to_le32(0x1 | (n << 16)),
-     };
-@@ -988,16 +988,16 @@ try_map:
-     case 0:
-         abort();
-     case 1:
--        cmd->prp1 = pagelist[0];
--        cmd->prp2 = 0;
-+        cmd->dptr.prp1 = pagelist[0];
-+        cmd->dptr.prp2 = 0;
-         break;
-     case 2:
--        cmd->prp1 = pagelist[0];
--        cmd->prp2 = pagelist[1];
-+        cmd->dptr.prp1 = pagelist[0];
-+        cmd->dptr.prp2 = pagelist[1];
-         break;
-     default:
--        cmd->prp1 = pagelist[0];
--        cmd->prp2 = cpu_to_le64(req->prp_list_iova + sizeof(uint64_t));
-+        cmd->dptr.prp1 = pagelist[0];
-+        cmd->dptr.prp2 = cpu_to_le64(req->prp_list_iova + sizeof(uint64_t));
-         break;
-     }
-     trace_nvme_cmd_map_qiov(s, cmd, req, qiov, entries);
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 1aee042d4cb2..71b388aa0e20 100644
+index 37e4fd8dfce1..fc58f3d76530 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -397,8 +397,8 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
-     uint32_t nlb  = le32_to_cpu(rw->nlb) + 1;
-     uint64_t slba = le64_to_cpu(rw->slba);
--    uint64_t prp1 = le64_to_cpu(rw->prp1);
--    uint64_t prp2 = le64_to_cpu(rw->prp2);
-+    uint64_t prp1 = le64_to_cpu(rw->dptr.prp1);
-+    uint64_t prp2 = le64_to_cpu(rw->dptr.prp2);
+@@ -1007,6 +1007,45 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+     return ret;
+ }
  
-     uint8_t lba_index  = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
-     uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
-@@ -795,8 +795,8 @@ static inline uint64_t nvme_get_timestamp(const NvmeCtrl *n)
- 
- static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
- {
--    uint64_t prp1 = le64_to_cpu(cmd->prp1);
--    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-+    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
-+    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
- 
-     uint64_t timestamp = nvme_get_timestamp(n);
- 
-@@ -834,8 +834,8 @@ static uint16_t nvme_set_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
- {
-     uint16_t ret;
-     uint64_t timestamp;
--    uint64_t prp1 = le64_to_cpu(cmd->prp1);
--    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-+    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
-+    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
- 
-     ret = nvme_dma_write_prp(n, (uint8_t *)&timestamp,
-                                 sizeof(timestamp), prp1, prp2);
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 1720ee1d5158..2a80d2a7ed89 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -377,15 +377,53 @@ enum NvmePmrmscMask {
- #define NVME_PMRMSC_SET_CBA(pmrmsc, val)   \
-     (pmrmsc |= (uint64_t)(val & PMRMSC_CBA_MASK) << PMRMSC_CBA_SHIFT)
- 
-+enum NvmeSglDescriptorType {
-+    NVME_SGL_DESCR_TYPE_DATA_BLOCK          = 0x0,
-+    NVME_SGL_DESCR_TYPE_BIT_BUCKET          = 0x1,
-+    NVME_SGL_DESCR_TYPE_SEGMENT             = 0x2,
-+    NVME_SGL_DESCR_TYPE_LAST_SEGMENT        = 0x3,
-+    NVME_SGL_DESCR_TYPE_KEYED_DATA_BLOCK    = 0x4,
++static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeIdentify *c)
++{
++    uint32_t nsid = le32_to_cpu(c->nsid);
++    uint64_t prp1 = le64_to_cpu(c->prp1);
++    uint64_t prp2 = le64_to_cpu(c->prp2);
 +
-+    NVME_SGL_DESCR_TYPE_VENDOR_SPECIFIC     = 0xf,
-+};
++    uint8_t list[NVME_IDENTIFY_DATA_SIZE];
 +
-+enum NvmeSglDescriptorSubtype {
-+    NVME_SGL_DESCR_SUBTYPE_ADDRESS = 0x0,
-+};
-+
-+typedef struct NvmeSglDescriptor {
-+    uint64_t addr;
-+    uint32_t len;
-+    uint8_t  rsvd[3];
-+    uint8_t  type;
-+} NvmeSglDescriptor;
-+
-+#define NVME_SGL_TYPE(type)     ((type >> 4) & 0xf)
-+#define NVME_SGL_SUBTYPE(type)  (type & 0xf)
-+
-+typedef union NvmeCmdDptr {
-+    struct {
-+        uint64_t    prp1;
-+        uint64_t    prp2;
++    struct data {
++        struct {
++            NvmeIdNsDescr hdr;
++            uint8_t v[16];
++        } uuid;
 +    };
 +
-+    NvmeSglDescriptor sgl;
-+} NvmeCmdDptr;
++    struct data *ns_descrs = (struct data *)list;
 +
-+enum NvmePsdt {
-+    PSDT_PRP                 = 0x0,
-+    PSDT_SGL_MPTR_CONTIGUOUS = 0x1,
-+    PSDT_SGL_MPTR_SGL        = 0x2,
-+};
++    trace_pci_nvme_identify_ns_descr_list(nsid);
 +
- typedef struct NvmeCmd {
-     uint8_t     opcode;
--    uint8_t     fuse;
-+    uint8_t     flags;
-     uint16_t    cid;
-     uint32_t    nsid;
-     uint64_t    res1;
-     uint64_t    mptr;
--    uint64_t    prp1;
--    uint64_t    prp2;
-+    NvmeCmdDptr dptr;
-     uint32_t    cdw10;
-     uint32_t    cdw11;
-     uint32_t    cdw12;
-@@ -394,6 +432,9 @@ typedef struct NvmeCmd {
-     uint32_t    cdw15;
- } NvmeCmd;
- 
-+#define NVME_CMD_FLAGS_FUSE(flags) (flags & 0x3)
-+#define NVME_CMD_FLAGS_PSDT(flags) ((flags >> 6) & 0x3)
++    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
++        trace_pci_nvme_err_invalid_ns(nsid, n->num_namespaces);
++        return NVME_INVALID_NSID | NVME_DNR;
++    }
 +
- enum NvmeAdminCommands {
-     NVME_ADM_CMD_DELETE_SQ      = 0x00,
-     NVME_ADM_CMD_CREATE_SQ      = 0x01,
-@@ -493,8 +534,7 @@ typedef struct NvmeRwCmd {
-     uint32_t    nsid;
-     uint64_t    rsvd2;
-     uint64_t    mptr;
--    uint64_t    prp1;
--    uint64_t    prp2;
-+    NvmeCmdDptr dptr;
-     uint64_t    slba;
-     uint16_t    nlb;
-     uint16_t    control;
-@@ -534,8 +574,7 @@ typedef struct NvmeDsmCmd {
-     uint16_t    cid;
-     uint32_t    nsid;
-     uint64_t    rsvd2[2];
--    uint64_t    prp1;
--    uint64_t    prp2;
-+    NvmeCmdDptr dptr;
-     uint32_t    nr;
-     uint32_t    attributes;
-     uint32_t    rsvd12[4];
-@@ -599,6 +638,12 @@ enum NvmeStatusCodes {
-     NVME_CMD_ABORT_MISSING_FUSE = 0x000a,
-     NVME_INVALID_NSID           = 0x000b,
-     NVME_CMD_SEQ_ERROR          = 0x000c,
-+    NVME_INVALID_SGL_SEG_DESCR  = 0x000d,
-+    NVME_INVALID_NUM_SGL_DESCRS = 0x000e,
-+    NVME_DATA_SGL_LEN_INVALID   = 0x000f,
-+    NVME_MD_SGL_LEN_INVALID     = 0x0010,
-+    NVME_SGL_DESCR_TYPE_INVALID = 0x0011,
-+    NVME_INVALID_USE_OF_CMB     = 0x0012,
-     NVME_LBA_RANGE              = 0x0080,
-     NVME_CAP_EXCEEDED           = 0x0081,
-     NVME_NS_NOT_READY           = 0x0082,
-@@ -687,7 +732,7 @@ enum NvmeSmartWarn {
-     NVME_SMART_FAILED_VOLATILE_MEDIA  = 1 << 4,
- };
- 
--enum LogIdentifier {
-+enum NvmeLogIdentifier {
-     NVME_LOG_ERROR_INFO     = 0x01,
-     NVME_LOG_SMART_INFO     = 0x02,
-     NVME_LOG_FW_SLOT_INFO   = 0x03,
-@@ -711,6 +756,7 @@ enum {
-     NVME_ID_CNS_NS             = 0x0,
-     NVME_ID_CNS_CTRL           = 0x1,
-     NVME_ID_CNS_NS_ACTIVE_LIST = 0x2,
-+    NVME_ID_CNS_NS_DESCR_LIST  = 0x3,
- };
- 
- typedef struct NvmeIdCtrl {
-@@ -723,7 +769,15 @@ typedef struct NvmeIdCtrl {
-     uint8_t     ieee[3];
-     uint8_t     cmic;
-     uint8_t     mdts;
--    uint8_t     rsvd255[178];
-+    uint16_t    cntlid;
-+    uint32_t    ver;
-+    uint32_t    rtd3r;
-+    uint32_t    rtd3e;
-+    uint32_t    oaes;
-+    uint32_t    ctratt;
-+    uint8_t     rsvd100[12];
-+    uint8_t     fguid[16];
-+    uint8_t     rsvd128[128];
-     uint16_t    oacs;
-     uint8_t     acl;
-     uint8_t     aerl;
-@@ -731,10 +785,28 @@ typedef struct NvmeIdCtrl {
-     uint8_t     lpa;
-     uint8_t     elpe;
-     uint8_t     npss;
--    uint8_t     rsvd511[248];
-+    uint8_t     avscc;
-+    uint8_t     apsta;
-+    uint16_t    wctemp;
-+    uint16_t    cctemp;
-+    uint16_t    mtfa;
-+    uint32_t    hmpre;
-+    uint32_t    hmmin;
-+    uint8_t     tnvmcap[16];
-+    uint8_t     unvmcap[16];
-+    uint32_t    rpmbs;
-+    uint16_t    edstt;
-+    uint8_t     dsto;
-+    uint8_t     fwug;
-+    uint16_t    kas;
-+    uint16_t    hctma;
-+    uint16_t    mntmt;
-+    uint16_t    mxtmt;
-+    uint32_t    sanicap;
-+    uint8_t     rsvd332[180];
-     uint8_t     sqes;
-     uint8_t     cqes;
--    uint16_t    rsvd515;
-+    uint16_t    maxcmd;
-     uint32_t    nn;
-     uint16_t    oncs;
-     uint16_t    fuses;
-@@ -742,8 +814,14 @@ typedef struct NvmeIdCtrl {
-     uint8_t     vwc;
-     uint16_t    awun;
-     uint16_t    awupf;
--    uint8_t     rsvd703[174];
--    uint8_t     rsvd2047[1344];
-+    uint8_t     nvscc;
-+    uint8_t     rsvd531;
-+    uint16_t    acwu;
-+    uint8_t     rsvd534[2];
-+    uint32_t    sgls;
-+    uint8_t     rsvd540[228];
-+    uint8_t     subnqn[256];
-+    uint8_t     rsvd1024[1024];
-     NvmePSD     psd[32];
-     uint8_t     vs[1024];
- } NvmeIdCtrl;
-@@ -769,6 +847,16 @@ enum NvmeIdCtrlOncs {
- #define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
- #define NVME_CTRL_CQES_MAX(cqes) (((cqes) >> 4) & 0xf)
- 
-+#define NVME_CTRL_SGLS_SUPPORT_MASK        (0x3 <<  0)
-+#define NVME_CTRL_SGLS_SUPPORT_NO_ALIGN    (0x1 <<  0)
-+#define NVME_CTRL_SGLS_SUPPORT_DWORD_ALIGN (0x1 <<  1)
-+#define NVME_CTRL_SGLS_KEYED               (0x1 <<  2)
-+#define NVME_CTRL_SGLS_BITBUCKET           (0x1 << 16)
-+#define NVME_CTRL_SGLS_MPTR_CONTIGUOUS     (0x1 << 17)
-+#define NVME_CTRL_SGLS_EXCESS_LENGTH       (0x1 << 18)
-+#define NVME_CTRL_SGLS_MPTR_SGL            (0x1 << 19)
-+#define NVME_CTRL_SGLS_ADDR_OFFSET         (0x1 << 20)
++    memset(list, 0x0, sizeof(list));
 +
- typedef struct NvmeFeatureVal {
-     uint32_t    arbitration;
-     uint32_t    power_mgmt;
-@@ -791,6 +879,15 @@ typedef struct NvmeFeatureVal {
- #define NVME_INTC_THR(intc)     (intc & 0xff)
- #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
- 
-+#define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
-+#define NVME_TEMP_THSEL_OVER   0x0
-+#define NVME_TEMP_THSEL_UNDER  0x1
++    /*
++     * Because the NGUID and EUI64 fields are 0 in the Identify Namespace data
++     * structure, a Namespace UUID (nidt = 0x3) must be reported in the
++     * Namespace Identification Descriptor. Add a very basic Namespace UUID
++     * here.
++     */
++    ns_descrs->uuid.hdr.nidt = NVME_NIDT_UUID;
++    ns_descrs->uuid.hdr.nidl = NVME_NIDT_UUID_LEN;
++    stl_be_p(&ns_descrs->uuid.v, nsid);
 +
-+#define NVME_TEMP_TMPSEL(temp)     ((temp >> 16) & 0xf)
-+#define NVME_TEMP_TMPSEL_COMPOSITE 0x0
++    return nvme_dma_read_prp(n, list, NVME_IDENTIFY_DATA_SIZE, prp1, prp2);
++}
 +
-+#define NVME_TEMP_TMPTH(temp) ((temp >>  0) & 0xffff)
-+
- enum NvmeFeatureIds {
-     NVME_ARBITRATION                = 0x1,
-     NVME_POWER_MANAGEMENT           = 0x2,
-@@ -833,18 +930,43 @@ typedef struct NvmeIdNs {
-     uint8_t     mc;
-     uint8_t     dpc;
-     uint8_t     dps;
--
-     uint8_t     nmic;
-     uint8_t     rescap;
-     uint8_t     fpi;
-     uint8_t     dlfeat;
--
--    uint8_t     res34[94];
-+    uint16_t    nawun;
-+    uint16_t    nawupf;
-+    uint16_t    nacwu;
-+    uint16_t    nabsn;
-+    uint16_t    nabo;
-+    uint16_t    nabspf;
-+    uint16_t    noiob;
-+    uint8_t     nvmcap[16];
-+    uint8_t     rsvd64[40];
-+    uint8_t     nguid[16];
-+    uint64_t    eui64;
-     NvmeLBAF    lbaf[16];
--    uint8_t     res192[192];
-+    uint8_t     rsvd192[192];
-     uint8_t     vs[3712];
- } NvmeIdNs;
- 
-+typedef struct NvmeIdNsDescr {
-+    uint8_t nidt;
-+    uint8_t nidl;
-+    uint8_t rsvd2[2];
-+} NvmeIdNsDescr;
-+
-+enum {
-+    NVME_NIDT_EUI64_LEN =  8,
-+    NVME_NIDT_NGUID_LEN = 16,
-+    NVME_NIDT_UUID_LEN  = 16,
-+};
-+
-+enum NvmeNsIdentifierType {
-+    NVME_NIDT_EUI64 = 0x1,
-+    NVME_NIDT_NGUID = 0x2,
-+    NVME_NIDT_UUID  = 0x3,
-+};
- 
- /*Deallocate Logical Block Features*/
- #define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
+ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+ {
+     NvmeIdentify *c = (NvmeIdentify *)cmd;
+@@ -1018,6 +1057,8 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+         return nvme_identify_ctrl(n, c);
+     case NVME_ID_CNS_NS_ACTIVE_LIST:
+         return nvme_identify_nslist(n, c);
++    case NVME_ID_CNS_NS_DESCR_LIST:
++        return nvme_identify_ns_descr_list(n, c);
+     default:
+         trace_pci_nvme_err_invalid_identify_cns(le32_to_cpu(c->cns));
+         return NVME_INVALID_FIELD | NVME_DNR;
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 4a4ef34071df..7b7303cab1dd 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -45,6 +45,7 @@ pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
+ pci_nvme_identify_ctrl(void) "identify controller"
+ pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
+ pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
++pci_nvme_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
+ pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+ pci_nvme_getfeat(uint16_t cid, uint8_t fid, uint8_t sel, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" sel 0x%"PRIx8" cdw11 0x%"PRIx32""
+ pci_nvme_setfeat(uint16_t cid, uint8_t fid, uint8_t save, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" save 0x%"PRIx8" cdw11 0x%"PRIx32""
 -- 
 2.27.0
 
