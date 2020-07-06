@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF9BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4FEC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77C1520724
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:21:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8611620724
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:21:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PMeJBhpz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77C1520724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O4q8A2CZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8611620724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMNb-0008RC-Nu
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:21:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57266)
+	id 1jsMNg-0000Di-Q2
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:21:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCn-0002Sh-I1
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41535
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCd-00022M-CZ
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34641
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCR-0003FN-17
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:25 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCO-0003CZ-LJ
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594023001;
+ s=mimecast20190719; t=1594022998;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aPSjfpMQtZWneGEzkcOWD6r6rJl1GajXieU/Zc5gfnc=;
- b=PMeJBhpzY8v8wtfoLyx2F13oLtEjd6gQKTT0kE7MZTmluxGzwAnv/Y7pdXFw6P2Q+tiRFI
- bA+uqETr8yVV+qhKNlXu5T32w90/RjlXlbqEwv6Pze0fIz3SrWW+hPy57wNERJf4gPEl20
- kQGIG4CCmm63C7dw82pWU6Xf1lSOTkA=
+ bh=ViA3UYCJ7XimOivy2yqRED7EAoPtDOYWvVLb874EOME=;
+ b=O4q8A2CZ/ewPnbhrgTxKHR7hXp8qWvKgG8VlzIZzbhYVeZbWMnYy3W8xc93Hdsiezv8I7d
+ 0jINbJJzi/4njVOHmIGc8mo2Q/E+CdVI+Bo5YGaDkhE6zNYPji/jllK9LLwBJANKiFX8kD
+ s4yKWz64XKQ5khUSA5bqtBU1NrSoQNo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-qpBX9yvPNVukvQSYKlsHkQ-1; Mon, 06 Jul 2020 04:09:59 -0400
-X-MC-Unique: qpBX9yvPNVukvQSYKlsHkQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-274-qXjRhF6mMRGxxqzUQfa_tw-1; Mon, 06 Jul 2020 04:09:57 -0400
+X-MC-Unique: qXjRhF6mMRGxxqzUQfa_tw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2A64800409;
- Mon,  6 Jul 2020 08:09:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 078D61883614;
+ Mon,  6 Jul 2020 08:09:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ECEF5C1D4;
- Mon,  6 Jul 2020 08:09:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 847211001268;
+ Mon,  6 Jul 2020 08:09:55 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 37C181135228; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
+ id 04E1011358D1; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 27/44] qom: Use returned bool to check for failure,
- Coccinelle part
-Date: Mon,  6 Jul 2020 10:09:33 +0200
-Message-Id: <20200706080950.403087-28-armbru@redhat.com>
+Subject: [PATCH v3 18/44] qapi: Use returned bool to check for failure,
+ manual part
+Date: Mon,  6 Jul 2020 10:09:24 +0200
+Message-Id: <20200706080950.403087-19-armbru@redhat.com>
 In-Reply-To: <20200706080950.403087-1-armbru@redhat.com>
 References: <20200706080950.403087-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -104,813 +104,260 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The previous commit enables conversion of
-
-    foo(..., &err);
-    if (err) {
-        ...
-    }
-
-to
-
-    if (!foo(..., errp)) {
-        ...
-    }
-
-for QOM functions that now return true / false on success / error.
-Coccinelle script:
-
-    @@
-    identifier fun = {
-        object_apply_global_props, object_initialize_child_with_props,
-        object_initialize_child_with_propsv, object_property_get,
-        object_property_get_bool, object_property_parse, object_property_set,
-        object_property_set_bool, object_property_set_int,
-        object_property_set_link, object_property_set_qobject,
-        object_property_set_str, object_property_set_uint, object_set_props,
-        object_set_propv, user_creatable_add_dict,
-        user_creatable_complete, user_creatable_del
-    };
-    expression list args, args2;
-    typedef Error;
-    Error *err;
-    @@
-    -    fun(args, &err, args2);
-    -    if (err)
-    +    if (!fun(args, &err, args2))
-         {
-             ...
-         }
-
-Fails to convert hw/arm/armsse.c, because Coccinelle gets confused by
-ARMSSE being used both as typedef and function-like macro there.
-Convert manually.
-
-Line breaks tidied up manually.
+The previous commit used Coccinelle to convert from checking the Error
+object to checking the return value.  Convert a few more manually.
+Also tweak control flow in places to conform to the conventional "if
+error bail out" pattern.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/arm/armsse.c              | 52 +++++++++++++++---------------------
- hw/arm/armv7m.c              | 20 ++++++--------
- hw/arm/aspeed_ast2600.c      |  5 ++--
- hw/arm/aspeed_soc.c          |  5 ++--
- hw/arm/bcm2835_peripherals.c |  5 ++--
- hw/arm/bcm2836.c             | 12 ++++-----
- hw/arm/cubieboard.c          | 11 ++++----
- hw/arm/digic.c               |  4 +--
- hw/arm/nrf51_soc.c           |  8 +++---
- hw/arm/stm32f405_soc.c       |  7 +++--
- hw/arm/xlnx-zynqmp.c         | 14 +++++-----
- hw/block/xen-block.c         | 15 +++++------
- hw/core/qdev.c               |  3 +--
- hw/i386/x86.c                |  3 +--
- hw/ppc/pnv_psi.c             |  4 +--
- hw/s390x/s390-pci-bus.c      |  3 +--
- hw/s390x/s390-virtio-ccw.c   |  3 +--
- hw/scsi/scsi-bus.c           |  3 +--
- hw/sd/aspeed_sdhci.c         |  8 +++---
- hw/sd/ssi-sd.c               |  3 +--
- hw/virtio/virtio-rng.c       |  5 ++--
- qdev-monitor.c               |  3 +--
- qom/object.c                 | 15 ++++-------
- qom/object_interfaces.c      |  6 ++---
- softmmu/vl.c                 |  4 +--
- target/arm/monitor.c         |  3 +--
- target/i386/cpu.c            | 11 +++-----
- target/s390x/cpu_models.c    |  3 +--
- 28 files changed, 96 insertions(+), 142 deletions(-)
+ accel/kvm/kvm-all.c       | 50 ++++++++++++++++++---------------------
+ block/throttle-groups.c   |  5 ++--
+ bootdevice.c              |  4 ++--
+ hw/core/qdev-properties.c | 12 +++++-----
+ hw/ide/qdev.c             |  4 ++--
+ hw/mem/nvdimm.c           |  9 +++----
+ hw/net/ne2000-isa.c       |  4 ++--
+ hw/usb/dev-storage.c      |  4 ++--
+ net/net.c                 |  8 ++-----
+ 9 files changed, 44 insertions(+), 56 deletions(-)
 
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index f8822f9cbd..e8d489a7e7 100644
---- a/hw/arm/armsse.c
-+++ b/hw/arm/armsse.c
-@@ -535,22 +535,20 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-          * later if necessary.
-          */
-         if (extract32(info->cpuwait_rst, i, 1)) {
--            object_property_set_bool(cpuobj, "start-powered-off", true, &err);
--            if (err) {
-+            if (!object_property_set_bool(cpuobj, "start-powered-off", true,
-+                                          &err)) {
-                 error_propagate(errp, err);
-                 return;
-             }
-         }
-         if (!s->cpu_fpu[i]) {
--            object_property_set_bool(cpuobj, "vfp", false, &err);
--            if (err) {
-+            if (!object_property_set_bool(cpuobj, "vfp", false, &err)) {
-                 error_propagate(errp, err);
-                 return;
-             }
-         }
-         if (!s->cpu_dsp[i]) {
--            object_property_set_bool(cpuobj, "dsp", false, &err);
--            if (err) {
-+            if (!object_property_set_bool(cpuobj, "dsp", false, &err)) {
-                 error_propagate(errp, err);
-                 return;
-             }
-@@ -605,9 +603,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-                 DeviceState *devs = DEVICE(splitter);
-                 int cpunum;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 397669231d..83f03b2018 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3128,37 +3128,33 @@ static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
+                                    const char *name, void *opaque,
+                                    Error **errp)
+ {
+-    Error *err = NULL;
+     KVMState *s = KVM_STATE(obj);
+     OnOffSplit mode;
  
--                object_property_set_int(splitter, "num-lines", info->num_cpus,
--                                        &err);
--                if (err) {
-+                if (!object_property_set_int(splitter, "num-lines",
-+                                             info->num_cpus, &err)) {
-                     error_propagate(errp, err);
-                     return;
-                 }
-@@ -659,9 +656,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-      * multiple lines, one for each of the PPCs within the ARMSSE and one
-      * that will be an output from the ARMSSE to the system.
-      */
--    object_property_set_int(OBJECT(&s->sec_resp_splitter), "num-lines", 3,
--                            &err);
+-    visit_type_OnOffSplit(v, name, &mode, &err);
 -    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->sec_resp_splitter),
-+                                 "num-lines", 3, &err)) {
-         error_propagate(errp, err);
+-        error_propagate(errp, err);
++    if (!visit_type_OnOffSplit(v, name, &mode, errp)) {
          return;
+-    } else {
+-        switch (mode) {
+-        case ON_OFF_SPLIT_ON:
+-            s->kernel_irqchip_allowed = true;
+-            s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+-            break;
+-        case ON_OFF_SPLIT_OFF:
+-            s->kernel_irqchip_allowed = false;
+-            s->kernel_irqchip_required = false;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+-            break;
+-        case ON_OFF_SPLIT_SPLIT:
+-            s->kernel_irqchip_allowed = true;
+-            s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_ON;
+-            break;
+-        default:
+-            /* The value was checked in visit_type_OnOffSplit() above. If
+-             * we get here, then something is wrong in QEMU.
+-             */
+-            abort();
+-        }
++    }
++    switch (mode) {
++    case ON_OFF_SPLIT_ON:
++        s->kernel_irqchip_allowed = true;
++        s->kernel_irqchip_required = true;
++        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
++        break;
++    case ON_OFF_SPLIT_OFF:
++        s->kernel_irqchip_allowed = false;
++        s->kernel_irqchip_required = false;
++        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
++        break;
++    case ON_OFF_SPLIT_SPLIT:
++        s->kernel_irqchip_allowed = true;
++        s->kernel_irqchip_required = true;
++        s->kernel_irqchip_split = ON_OFF_AUTO_ON;
++        break;
++    default:
++        /* The value was checked in visit_type_OnOffSplit() above. If
++         * we get here, then something is wrong in QEMU.
++         */
++        abort();
      }
-@@ -703,9 +699,9 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     }
+ }
  
-     /* We must OR together lines from the MPC splitters to go to the NVIC */
--    object_property_set_int(OBJECT(&s->mpc_irq_orgate), "num-lines",
--                            IOTS_NUM_EXP_MPC + info->sram_banks, &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->mpc_irq_orgate), "num-lines",
-+                                 IOTS_NUM_EXP_MPC + info->sram_banks,
-+                                 &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-@@ -842,9 +838,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-      * ones) are sent individually to the security controller, and also
-      * ORed together to give a single combined PPC interrupt to the NVIC.
-      */
--    object_property_set_int(OBJECT(&s->ppc_irq_orgate), "num-lines", NUM_PPCS,
--                            &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->ppc_irq_orgate),
-+                                 "num-lines", NUM_PPCS, &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-@@ -950,15 +945,13 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-                           qdev_get_gpio_in_named(dev_apb_ppc1,
-                                                  "cfg_sec_resp", 0));
- 
--    object_property_set_int(OBJECT(&s->sysinfo), "SYS_VERSION",
--                            info->sys_version, &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->sysinfo), "SYS_VERSION",
-+                                 info->sys_version, &err)) {
-         error_propagate(errp, err);
-         return;
-     }
--    object_property_set_int(OBJECT(&s->sysinfo), "SYS_CONFIG",
--                            armsse_sys_config_value(s, info), &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->sysinfo), "SYS_CONFIG",
-+                                 armsse_sys_config_value(s, info), &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-@@ -1006,8 +999,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* This OR gate wires together outputs from the secure watchdogs to NMI */
--    object_property_set_int(OBJECT(&s->nmi_orgate), "num-lines", 2, &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->nmi_orgate), "num-lines", 2,
-+                                 &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-@@ -1050,8 +1043,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     for (i = 0; i < ARRAY_SIZE(s->ppc_irq_splitter); i++) {
-         Object *splitter = OBJECT(&s->ppc_irq_splitter[i]);
- 
--        object_property_set_int(splitter, "num-lines", 2, &err);
--        if (err) {
-+        if (!object_property_set_int(splitter, "num-lines", 2, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-@@ -1096,8 +1088,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
-         DeviceState *dev_splitter = DEVICE(splitter);
- 
--        object_property_set_int(OBJECT(splitter), "num-lines", 2, &err);
--        if (err) {
-+        if (!object_property_set_int(OBJECT(splitter), "num-lines", 2,
-+                                     &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 923f7fad40..2e6dabbbaf 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -174,31 +174,27 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-                                  &error_abort);
-     }
-     if (object_property_find(OBJECT(s->cpu), "init-svtor", NULL)) {
--        object_property_set_uint(OBJECT(s->cpu), "init-svtor", s->init_svtor,
--                                 &err);
--        if (err != NULL) {
-+        if (!object_property_set_uint(OBJECT(s->cpu), "init-svtor",
-+                                      s->init_svtor, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-     }
-     if (object_property_find(OBJECT(s->cpu), "start-powered-off", NULL)) {
--        object_property_set_bool(OBJECT(s->cpu), "start-powered-off",
--                                 s->start_powered_off, &err);
--        if (err != NULL) {
-+        if (!object_property_set_bool(OBJECT(s->cpu), "start-powered-off",
-+                                      s->start_powered_off, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-     }
-     if (object_property_find(OBJECT(s->cpu), "vfp", NULL)) {
--        object_property_set_bool(OBJECT(s->cpu), "vfp", s->vfp, &err);
--        if (err != NULL) {
-+        if (!object_property_set_bool(OBJECT(s->cpu), "vfp", s->vfp, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-     }
-     if (object_property_find(OBJECT(s->cpu), "dsp", NULL)) {
--        object_property_set_bool(OBJECT(s->cpu), "dsp", s->dsp, &err);
--        if (err != NULL) {
-+        if (!object_property_set_bool(OBJECT(s->cpu), "dsp", s->dsp, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-@@ -243,8 +239,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-             Object *obj = OBJECT(&s->bitband[i]);
-             SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
- 
--            object_property_set_int(obj, "base", bitband_input_addr[i], &err);
--            if (err != NULL) {
-+            if (!object_property_set_int(obj, "base",
-+                                         bitband_input_addr[i], &err)) {
-                 error_propagate(errp, err);
-                 return;
-             }
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index e6e2cf0737..22cbe68449 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -356,9 +356,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     /* FMC, The number of CS is set at the board level */
-     object_property_set_link(OBJECT(&s->fmc), "dram", OBJECT(s->dram_mr),
-                              &error_abort);
--    object_property_set_int(OBJECT(&s->fmc), "sdram-base",
--                            sc->memmap[ASPEED_SDRAM], &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->fmc), "sdram-base",
-+                                 sc->memmap[ASPEED_SDRAM], &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 27704d87ea..ff5f4d6a52 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -308,9 +308,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     /* FMC, The number of CS is set at the board level */
-     object_property_set_link(OBJECT(&s->fmc), "dram", OBJECT(s->dram_mr),
-                              &error_abort);
--    object_property_set_int(OBJECT(&s->fmc), "sdram-base",
--                            sc->memmap[ASPEED_SDRAM], &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(&s->fmc), "sdram-base",
-+                                 sc->memmap[ASPEED_SDRAM], &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index a6ccf3b368..cb724c18e8 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -222,9 +222,8 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    object_property_set_uint(OBJECT(&s->fb), "vcram-base",
--                             ram_size - vcram_size, &err);
--    if (err) {
-+    if (!object_property_set_uint(OBJECT(&s->fb), "vcram-base",
-+                                  ram_size - vcram_size, &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 91d31a5cb7..0d373af1a1 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -110,17 +110,17 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
-         s->cpu[n].core.mp_affinity = (info->clusterid << 8) | n;
- 
-         /* set periphbase/CBAR value for CPU-local registers */
--        object_property_set_int(OBJECT(&s->cpu[n].core), "reset-cbar",
--                                info->peri_base, &err);
--        if (err) {
-+        if (!object_property_set_int(OBJECT(&s->cpu[n].core), "reset-cbar",
-+                                     info->peri_base, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
- 
-         /* start powered off if not enabled */
--        object_property_set_bool(OBJECT(&s->cpu[n].core), "start-powered-off",
--                                 n >= s->enabled_cpus, &err);
--        if (err) {
-+        if (!object_property_set_bool(OBJECT(&s->cpu[n].core),
-+                                      "start-powered-off",
-+                                      n >= s->enabled_cpus,
-+                                      &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-index 302919246b..1c6c792eb6 100644
---- a/hw/arm/cubieboard.c
-+++ b/hw/arm/cubieboard.c
-@@ -62,20 +62,19 @@ static void cubieboard_init(MachineState *machine)
-     object_property_add_child(OBJECT(machine), "soc", OBJECT(a10));
-     object_unref(OBJECT(a10));
- 
--    object_property_set_int(OBJECT(&a10->emac), "phy-addr", 1, &err);
--    if (err != NULL) {
-+    if (!object_property_set_int(OBJECT(&a10->emac), "phy-addr", 1, &err)) {
-         error_reportf_err(err, "Couldn't set phy address: ");
-         exit(1);
-     }
- 
--    object_property_set_int(OBJECT(&a10->timer), "clk0-freq", 32768, &err);
--    if (err != NULL) {
-+    if (!object_property_set_int(OBJECT(&a10->timer), "clk0-freq", 32768,
-+                                 &err)) {
-         error_reportf_err(err, "Couldn't set clk0 frequency: ");
-         exit(1);
-     }
- 
--    object_property_set_int(OBJECT(&a10->timer), "clk1-freq", 24000000, &err);
--    if (err != NULL) {
-+    if (!object_property_set_int(OBJECT(&a10->timer), "clk1-freq", 24000000,
-+                                 &err)) {
-         error_reportf_err(err, "Couldn't set clk1 frequency: ");
-         exit(1);
-     }
-diff --git a/hw/arm/digic.c b/hw/arm/digic.c
-index ffc89d86b8..2306034840 100644
---- a/hw/arm/digic.c
-+++ b/hw/arm/digic.c
-@@ -56,8 +56,8 @@ static void digic_realize(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd;
-     int i;
- 
--    object_property_set_bool(OBJECT(&s->cpu), "reset-hivecs", true, &err);
--    if (err != NULL) {
-+    if (!object_property_set_bool(OBJECT(&s->cpu), "reset-hivecs", true,
-+                                  &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index c440cd11e9..7877d2bf60 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -106,9 +106,8 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-                        BASE_TO_IRQ(NRF51_RNG_BASE)));
- 
-     /* UICR, FICR, NVMC, FLASH */
--    object_property_set_uint(OBJECT(&s->nvm), "flash-size", s->flash_size,
--                             &err);
--    if (err) {
-+    if (!object_property_set_uint(OBJECT(&s->nvm), "flash-size",
-+                                  s->flash_size, &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-@@ -141,8 +140,7 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
- 
-     /* TIMER */
-     for (i = 0; i < NRF51_NUM_TIMERS; i++) {
--        object_property_set_uint(OBJECT(&s->timer[i]), "id", i, &err);
--        if (err) {
-+        if (!object_property_set_uint(OBJECT(&s->timer[i]), "id", i, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
-index 07ce323a64..ddc680bfe0 100644
---- a/hw/arm/stm32f405_soc.c
-+++ b/hw/arm/stm32f405_soc.c
-@@ -160,10 +160,9 @@ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
-     }
- 
-     /* ADC device, the IRQs are ORed together */
--    object_initialize_child_with_props(OBJECT(s), "adc-orirq", &s->adc_irqs,
--                                       sizeof(s->adc_irqs), TYPE_OR_IRQ, &err,
--                                       NULL);
--    if (err != NULL) {
-+    if (!object_initialize_child_with_props(OBJECT(s), "adc-orirq",
-+                                            &s->adc_irqs, sizeof(s->adc_irqs),
-+                                            TYPE_OR_IRQ, &err, NULL)) {
-         error_propagate(errp, err);
-         return;
-     }
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index e7fe85f1d8..055b778d11 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -507,18 +507,16 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-          * - SDIO Specification Version 3.0
-          * - eMMC Specification Version 4.51
-          */
--        object_property_set_uint(sdhci, "sd-spec-version", 3, &err);
--        if (err) {
-+        if (!object_property_set_uint(sdhci, "sd-spec-version", 3, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
--        object_property_set_uint(sdhci, "capareg", SDHCI_CAPABILITIES, &err);
--        if (err) {
-+        if (!object_property_set_uint(sdhci, "capareg", SDHCI_CAPABILITIES,
-+                                      &err)) {
-             error_propagate(errp, err);
-             return;
-         }
--        object_property_set_uint(sdhci, "uhs", UHS_I, &err);
--        if (err) {
-+        if (!object_property_set_uint(sdhci, "uhs", UHS_I, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-@@ -606,8 +604,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0, gic_spi[RTC_IRQ]);
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_GDMA_CH; i++) {
--        object_property_set_uint(OBJECT(&s->gdma[i]), "bus-width", 128, &err);
--        if (err) {
-+        if (!object_property_set_uint(OBJECT(&s->gdma[i]), "bus-width", 128,
-+                                      &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 0e6e6df5fa..89a4d02a1b 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -935,22 +935,21 @@ static void xen_block_device_create(XenBackendInstance *backend,
-     xendev = XEN_DEVICE(qdev_new(type));
-     blockdev = XEN_BLOCK_DEVICE(xendev);
- 
--    object_property_set_str(OBJECT(xendev), "vdev", vdev, &local_err);
--    if (local_err) {
-+    if (!object_property_set_str(OBJECT(xendev), "vdev", vdev,
-+                                 &local_err)) {
-         error_propagate_prepend(errp, local_err, "failed to set 'vdev': ");
-         goto fail;
-     }
- 
--    object_property_set_str(OBJECT(xendev), "drive",
--                            xen_block_drive_get_node_name(drive), &local_err);
--    if (local_err) {
-+    if (!object_property_set_str(OBJECT(xendev), "drive",
-+                                 xen_block_drive_get_node_name(drive),
-+                                 &local_err)) {
-         error_propagate_prepend(errp, local_err, "failed to set 'drive': ");
-         goto fail;
-     }
- 
--    object_property_set_str(OBJECT(xendev), "iothread", iothread->id,
--                            &local_err);
--    if (local_err) {
-+    if (!object_property_set_str(OBJECT(xendev), "iothread", iothread->id,
-+                                 &local_err)) {
-         error_propagate_prepend(errp, local_err,
-                                 "failed to set 'iothread': ");
-         goto fail;
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 8de99f6ba5..d6416fb894 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -396,8 +396,7 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
-         assert(!DEVICE_GET_CLASS(dev)->bus_type);
-     }
- 
--    object_property_set_bool(OBJECT(dev), "realized", true, &err);
--    if (err) {
-+    if (!object_property_set_bool(OBJECT(dev), "realized", true, &err)) {
-         error_propagate(errp, err);
-     }
-     return !err;
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 54760197cf..22b524e0ab 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -121,8 +121,7 @@ void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
-     Error *local_err = NULL;
-     Object *cpu = object_new(MACHINE(x86ms)->cpu_type);
- 
--    object_property_set_uint(cpu, "apic-id", apic_id, &local_err);
--    if (local_err) {
-+    if (!object_property_set_uint(cpu, "apic-id", apic_id, &local_err)) {
-         goto out;
-     }
-     qdev_realize(DEVICE(cpu), NULL, &local_err);
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index e23276983f..604788a8eb 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -505,8 +505,8 @@ static void pnv_psi_power8_realize(DeviceState *dev, Error **errp)
-     unsigned int i;
- 
-     /* Create PSI interrupt control source */
--    object_property_set_int(OBJECT(ics), "nr-irqs", PSI_NUM_INTERRUPTS, &err);
--    if (err) {
-+    if (!object_property_set_int(OBJECT(ics), "nr-irqs", PSI_NUM_INTERRUPTS,
-+                                 &err)) {
-         error_propagate(errp, err);
-         return;
-     }
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 04c93472d2..c3b2a1eeda 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -822,8 +822,7 @@ static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
-         return NULL;
-     }
- 
--    object_property_set_str(OBJECT(dev), "target", target, &local_err);
--    if (local_err) {
-+    if (!object_property_set_str(OBJECT(dev), "target", target, &local_err)) {
-         object_unparent(OBJECT(dev));
-         error_propagate_prepend(errp, local_err,
-                                 "zPCI device could not be created: ");
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index be4859fa49..62af349c31 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -71,8 +71,7 @@ static S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id,
-     S390CPU *cpu = S390_CPU(object_new(typename));
-     Error *err = NULL;
- 
--    object_property_set_int(OBJECT(cpu), "core-id", core_id, &err);
--    if (err != NULL) {
-+    if (!object_property_set_int(OBJECT(cpu), "core-id", core_id, &err)) {
-         goto out;
-     }
-     qdev_realize(DEVICE(cpu), NULL, &err);
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 4860863f1d..a83939f7d0 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -283,8 +283,7 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
-         object_unparent(OBJECT(dev));
-         return NULL;
-     }
--    object_property_set_bool(OBJECT(dev), "share-rw", share_rw, &err);
--    if (err != NULL) {
-+    if (!object_property_set_bool(OBJECT(dev), "share-rw", share_rw, &err)) {
-         error_propagate(errp, err);
-         object_unparent(OBJECT(dev));
-         return NULL;
-diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
-index 29aa11df66..687b300773 100644
---- a/hw/sd/aspeed_sdhci.c
-+++ b/hw/sd/aspeed_sdhci.c
-@@ -132,15 +132,13 @@ static void aspeed_sdhci_realize(DeviceState *dev, Error **errp)
-         Object *sdhci_slot = OBJECT(&sdhci->slots[i]);
-         SysBusDevice *sbd_slot = SYS_BUS_DEVICE(&sdhci->slots[i]);
- 
--        object_property_set_int(sdhci_slot, "sd-spec-version", 2, &err);
--        if (err) {
-+        if (!object_property_set_int(sdhci_slot, "sd-spec-version", 2, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
- 
--        object_property_set_uint(sdhci_slot, "capareg",
--                                 ASPEED_SDHCI_CAPABILITIES, &err);
--        if (err) {
-+        if (!object_property_set_uint(sdhci_slot, "capareg",
-+                                      ASPEED_SDHCI_CAPABILITIES, &err)) {
-             error_propagate(errp, err);
-             return;
-         }
-diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-index cf17568f76..4d91f603fa 100644
---- a/hw/sd/ssi-sd.c
-+++ b/hw/sd/ssi-sd.c
-@@ -261,8 +261,7 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
-         }
-     }
- 
--    object_property_set_bool(OBJECT(carddev), "spi", true, &err);
--    if (err) {
-+    if (!object_property_set_bool(OBJECT(carddev), "spi", true, &err)) {
-         goto fail;
-     }
- 
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 85f7163e2d..8d052fbeed 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -194,9 +194,8 @@ static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
-     if (vrng->conf.rng == NULL) {
-         Object *default_backend = object_new(TYPE_RNG_BUILTIN);
- 
--        user_creatable_complete(USER_CREATABLE(default_backend),
--                                &local_err);
--        if (local_err) {
-+        if (!user_creatable_complete(USER_CREATABLE(default_backend),
-+                                     &local_err)) {
-             error_propagate(errp, local_err);
-             object_unref(default_backend);
-             return;
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 8d2de6a147..cd46157bcf 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -183,8 +183,7 @@ static int set_property(void *opaque, const char *name, const char *value,
-     if (strcmp(name, "bus") == 0)
-         return 0;
- 
--    object_property_parse(obj, name, value, &err);
--    if (err != NULL) {
-+    if (!object_property_parse(obj, name, value, &err)) {
-         error_propagate(errp, err);
-         return -1;
-     }
-diff --git a/qom/object.c b/qom/object.c
-index c4b915a484..25c5ddb78f 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -405,8 +405,7 @@ bool object_apply_global_props(Object *obj, const GPtrArray *props,
-             continue;
-         }
-         p->used = true;
--        object_property_parse(obj, p->property, p->value, &err);
--        if (err != NULL) {
-+        if (!object_property_parse(obj, p->property, p->value, &err)) {
-             error_prepend(&err, "can't apply global %s.%s=%s: ",
-                           p->driver, p->property, p->value);
-             /*
-@@ -566,8 +565,7 @@ bool object_initialize_child_with_propsv(Object *parentobj,
- 
-     uc = (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
-     if (uc) {
--        user_creatable_complete(uc, &local_err);
--        if (local_err) {
-+        if (!user_creatable_complete(uc, &local_err)) {
-             object_unparent(obj);
-             goto out;
-         }
-@@ -764,8 +762,7 @@ Object *object_new_with_propv(const char *typename,
- 
-     uc = (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
-     if (uc) {
--        user_creatable_complete(uc, &local_err);
--        if (local_err) {
-+        if (!user_creatable_complete(uc, &local_err)) {
-             if (id != NULL) {
-                 object_unparent(obj);
-             }
-@@ -810,8 +807,7 @@ int object_set_propv(Object *obj,
-         const char *value = va_arg(vargs, char *);
- 
-         g_assert(value != NULL);
--        object_property_parse(obj, propname, value, &local_err);
--        if (local_err) {
-+        if (!object_property_parse(obj, propname, value, &local_err)) {
-             error_propagate(errp, local_err);
-             return -1;
-         }
-@@ -1594,8 +1590,7 @@ char *object_property_print(Object *obj, const char *name, bool human,
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index bb242fde1a..e411051160 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -895,8 +895,8 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+     ThrottleLimits *argp;
      Error *local_err = NULL;
  
-     v = string_output_visitor_new(human, &string);
--    object_property_get(obj, name, v, &local_err);
--    if (local_err) {
-+    if (!object_property_get(obj, name, v, &local_err)) {
-         error_propagate(errp, local_err);
-         goto out;
+-    if (!visit_type_ThrottleLimits(v, name, &argp, &local_err)) {
+-        goto ret;
++    if (!visit_type_ThrottleLimits(v, name, &argp, errp)) {
++        return;
      }
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 382198504c..15fff66c3c 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -70,8 +70,7 @@ Object *user_creatable_add_type(const char *type, const char *id,
-         goto out;
+     qemu_mutex_lock(&tg->lock);
+     throttle_get_config(&tg->ts, &cfg);
+@@ -908,7 +908,6 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+ 
+ unlock:
+     qemu_mutex_unlock(&tg->lock);
+-ret:
+     qapi_free_ThrottleLimits(argp);
+     error_propagate(errp, local_err);
+     return;
+diff --git a/bootdevice.c b/bootdevice.c
+index fb09d3c668..769f40c77d 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -297,8 +297,8 @@ static void device_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
      }
-     for (e = qdict_first(qdict); e; e = qdict_next(qdict, e)) {
--        object_property_set(obj, e->key, v, &local_err);
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index c1a0f910d8..e4dd9ff6b2 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -672,15 +672,15 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+     if (!visit_type_str(v, name, &str, &local_err)) {
+         error_free(local_err);
+         local_err = NULL;
+-        visit_type_int32(v, name, &value, &local_err);
 -        if (local_err) {
-+        if (!object_property_set(obj, e->key, v, &local_err)) {
-             break;
+-            error_propagate(errp, local_err);
+-        } else if (value < -1 || value > 255) {
++        if (!visit_type_int32(v, name, &value, errp)) {
++            return;
++        }
++        if (value < -1 || value > 255) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                        name ? name : "null", "pci_devfn");
+-        } else {
+-            *ptr = value;
++            return;
          }
-     }
-@@ -88,8 +87,7 @@ Object *user_creatable_add_type(const char *type, const char *id,
-                                   id, obj);
++        *ptr = value;
+         return;
      }
  
--    user_creatable_complete(USER_CREATABLE(obj), &local_err);
--    if (local_err) {
-+    if (!user_creatable_complete(USER_CREATABLE(obj), &local_err)) {
-         if (id != NULL) {
-             object_property_del(object_get_objects_root(), id);
-         }
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 4903129867..aa79d3e79f 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -2450,9 +2450,7 @@ static int object_parse_property_opt(Object *obj,
-         return 0;
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 358f10a92e..ba8b0d7f02 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -245,8 +245,8 @@ static void ide_dev_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index ec92ffd415..1fa976c56c 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -85,21 +85,18 @@ static void nvdimm_set_uuid(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
+ {
+     NVDIMMDevice *nvdimm = NVDIMM(obj);
+-    Error *local_err = NULL;
+     char *value;
+ 
+-    if (!visit_type_str(v, name, &value, &local_err)) {
+-        goto out;
++    if (!visit_type_str(v, name, &value, errp)) {
++        return;
      }
  
--    object_property_parse(obj, name, value, &local_err);
+     if (qemu_uuid_parse(value, &nvdimm->uuid) != 0) {
+         error_setg(errp, "Property '%s.%s' has invalid value",
+                    object_get_typename(obj), name);
+     }
+-    g_free(value);
+ 
+-out:
+-    error_propagate(errp, local_err);
++    g_free(value);
+ }
+ 
+ 
+diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
+index 765bcd1f0b..0594abd93a 100644
+--- a/hw/net/ne2000-isa.c
++++ b/hw/net/ne2000-isa.c
+@@ -113,8 +113,8 @@ static void isa_ne2000_set_bootindex(Object *obj, Visitor *v,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index 1c3bd2578c..721665191e 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -736,8 +736,8 @@ static void usb_msd_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/net/net.c b/net/net.c
+index d1130296e1..e1f45d3b36 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1052,7 +1052,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+ {
+     gchar **substrings = NULL;
+     Netdev *object = NULL;
+-    Error *err = NULL;
+     int ret = -1;
+     Visitor *v = opts_visitor_new(opts);
+ 
+@@ -1100,16 +1099,13 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+         qemu_opts_set_id(opts, g_strdup_printf("__org.qemu.net%i", idx++));
+     }
+ 
+-    visit_type_Netdev(v, NULL, &object, &err);
 -
--    if (local_err) {
-+    if (!object_property_parse(obj, name, value, &local_err)) {
-         error_propagate(errp, local_err);
-         return -1;
-     }
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index 087726a394..c162c5fb68 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -184,8 +184,7 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-         i = 0;
-         while ((name = cpu_model_advertised_features[i++]) != NULL) {
-             if (qdict_get(qdict_in, name)) {
--                object_property_set(obj, name, visitor, &err);
--                if (err) {
-+                if (!object_property_set(obj, name, visitor, &err)) {
-                     break;
-                 }
-             }
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index dd83cb7f72..2b60b61ced 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5271,9 +5271,8 @@ static void object_apply_props(Object *obj, QDict *props, Error **errp)
-     Error *err = NULL;
- 
-     for (prop = qdict_first(props); prop; prop = qdict_next(props, prop)) {
--        object_property_set_qobject(obj, qdict_entry_key(prop),
--                                    qdict_entry_value(prop), &err);
--        if (err) {
-+        if (!object_property_set_qobject(obj, qdict_entry_key(prop),
-+                                         qdict_entry_value(prop), &err)) {
-             break;
-         }
-     }
-@@ -6340,16 +6339,14 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
- 
-     for (l = plus_features; l; l = l->next) {
-         const char *prop = l->data;
--        object_property_set_bool(OBJECT(cpu), prop, true, &local_err);
--        if (local_err) {
-+        if (!object_property_set_bool(OBJECT(cpu), prop, true, &local_err)) {
-             goto out;
-         }
+-    if (!err) {
+-        ret = net_client_init1(object, is_netdev, &err);
++    if (visit_type_Netdev(v, NULL, &object, errp)) {
++        ret = net_client_init1(object, is_netdev, errp);
      }
  
-     for (l = minus_features; l; l = l->next) {
-         const char *prop = l->data;
--        object_property_set_bool(OBJECT(cpu), prop, false, &local_err);
--        if (local_err) {
-+        if (!object_property_set_bool(OBJECT(cpu), prop, false, &local_err)) {
-             goto out;
-         }
-     }
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 8ab206186b..f3ba30e93e 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -517,8 +517,7 @@ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
-             return;
-         }
-         for (e = qdict_first(qdict); e; e = qdict_next(qdict, e)) {
--            object_property_set(obj, e->key, visitor, &err);
--            if (err) {
-+            if (!object_property_set(obj, e->key, visitor, &err)) {
-                 break;
-             }
-         }
+     qapi_free_Netdev(object);
+ 
+ out:
+-    error_propagate(errp, err);
+     g_strfreev(substrings);
+     visit_free(v);
+     return ret;
 -- 
 2.26.2
 
