@@ -2,86 +2,86 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 052FAC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:25:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97349C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:26:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C883A206B6
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:25:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6556920E65
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:26:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ROVHa8k/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C883A206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t+L89Nig"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6556920E65
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUrt-0007aV-2e
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:25:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33550)
+	id 1jsUsV-0008WF-JK
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:26:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jsUWU-0004Iv-HF
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 13:03:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40895
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jsUWS-0006fA-Pb
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 13:03:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594054995;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3X7RJpzUMPF8J+wdkMnhsqm3/0vtWeM8YRC6/Q+/O3E=;
- b=ROVHa8k/9sUt8sXMEkHLNctvQnQybsdWlmcqUpWoc54xqktx+6W0p30LpJtbKk6NgGB1lZ
- afe1Cs09frHoQfVo6on4XcJ6hV+oeiqe/X5aK9QPlTP4WzrQ4XoL5mBZm8APlbPCCuHf7r
- 81ak9kRVMHxFMzOIMDZBvf4FIvGQ3+Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349--bm3n0sWPCmh5AtkpasTGQ-1; Mon, 06 Jul 2020 13:03:14 -0400
-X-MC-Unique: -bm3n0sWPCmh5AtkpasTGQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15428185B3B7;
- Mon,  6 Jul 2020 17:03:13 +0000 (UTC)
-Received: from turbo.com (ovpn-114-213.ams2.redhat.com [10.36.114.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 244BB5BACD;
- Mon,  6 Jul 2020 17:03:10 +0000 (UTC)
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] trace: Example of non-tracing recorder use
-Date: Mon,  6 Jul 2020 19:02:55 +0200
-Message-Id: <20200706170255.1165105-3-dinechin@redhat.com>
-In-Reply-To: <20200706170255.1165105-1-dinechin@redhat.com>
-References: <20200706170255.1165105-1-dinechin@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsUTH-0006xk-EZ; Mon, 06 Jul 2020 12:59:59 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:39326)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsUTF-0005vQ-F9; Mon, 06 Jul 2020 12:59:59 -0400
+Received: by mail-il1-x141.google.com with SMTP id k6so33497267ili.6;
+ Mon, 06 Jul 2020 09:59:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=9/leO9q/0J5ZJH/Ka9OiHxF4rkOPGYi23nLotDw5+po=;
+ b=t+L89NigImBrMi5A+L/vayp2Ek2Z1xRrRswlKbUWeD6I7FIa+voJRjlBIqb0sMzDec
+ lqkQijLEMiyv2fVJODfnOo9v77QgO6cdGwJYO8vhoClltQxpALdDRs8ENXpnUTqPC8qf
+ cTqrxHmxfkx4pm++FONued1iM/PgnDbs7eHuq38xcfAZlmcjn7mbBAeb9JBvYwXLMk1x
+ fkmZUkSQLJ52R1fsCbmaL3rpzt43x9FH+XrveDmr0sQHoPrYO1DZaIY+DO5ZZzWlqj8M
+ WZZMs8mMEJb1bdpZBZrqRgqogw2cqAXAXg5S3fLxb9M/1IpPh6xuhL4Lmki4tyc8gx5S
+ /BcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=9/leO9q/0J5ZJH/Ka9OiHxF4rkOPGYi23nLotDw5+po=;
+ b=jktVYO3B9SHAm4OEA3P1v5xV2UFlxyfd8ZjvSyPvv2pN9IxK8eqJYfm/PAUsVefeVD
+ B82S0VIP0Xokqtm/v1w3cqh0yaFyuz9r1A+2bSChgxo/NQSF9p/17iUXm2Xkyq2gcO1w
+ yuL3liAHRutEkQgoNGEcsDdHdEZMiBH964Wh4Dp1YcIXjz3Orh2cs81K70odzse6DutJ
+ vEFC5E5uFD53jNPrHRNNCrblWP6/R2Pp5p8e07bLTr1/3nasXMxrxTCqPmuw5OCN7lN9
+ r7ozSbOCSG+R2hp8qbegYi1j0DuyubAOys3FeoQnCXwZQszJXrYkBZHoUGKN1hb5UF8q
+ S/DQ==
+X-Gm-Message-State: AOAM533Rd8rSdsOWlwHpfgoJIqOQ/MuCzpO2ayQsKEQ1pewlhRgOdyiL
+ KB8MO6Iq0fJRCYJo1zt9Wtj8afjzQFM+z9vX3Tg=
+X-Google-Smtp-Source: ABdhPJw/HaHEsm0ulaS03PTv+Iez2OAy3BXjXkZdtFUms+Csyj/gKycDAQBhYI+0mtg7FDmV0+SOu7NjIzp7EDuPP3Q=
+X-Received: by 2002:a92:c213:: with SMTP id j19mr31588925ilo.40.1594054795800; 
+ Mon, 06 Jul 2020 09:59:55 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dinechin@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dinechin@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200704144943.18292-1-f4bug@amsat.org>
+ <20200704144943.18292-3-f4bug@amsat.org>
+In-Reply-To: <20200704144943.18292-3-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 6 Jul 2020 09:50:09 -0700
+Message-ID: <CAKmqyKNB3fQCBNZ29cRuj5LW14duowkP6+k+6V0fhHhZU+GtsQ@mail.gmail.com>
+Subject: Re: [PATCH 02/26] hw/ppc/sam460ex: Add missing 'hw/pci/pci.h' header
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,84 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, Paul Durrant <paul@xen.org>,
+ Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "open list:X86" <xen-devel@lists.xenproject.org>,
+ Leif Lindholm <leif@nuviainc.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Richard Henderson <rth@twiddle.net>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, Paul Zimmerman <pauldzim@gmail.com>,
+ "open list:New World" <qemu-ppc@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch is a simple example showing how the recorder can be used to
-have one "topic" covering multiple entries. Here, the topic is "lock",
-the idea being to have the latest lock changes for instance in case of
-a crash or hang.
+On Sat, Jul 4, 2020 at 7:50 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>
+> This file uses pci_create_simple() and PCI_DEVFN() which are both
+> declared in "hw/pci/pci.h". This include is indirectly included
+> by an USB header. As we want to reduce the USB header inclusions
+> later, include the PCI header now, to avoid later:
+>
+>   hw/ppc/sam460ex.c:397:5: error: implicit declaration of function =E2=80=
+=98pci_create_simple=E2=80=99; did you mean =E2=80=98sysbus_create_simple=
+=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+>     397 |     pci_create_simple(pci_bus, PCI_DEVFN(6, 0), "sm501");
+>         |     ^~~~~~~~~~~~~~~~~
+>         |     sysbus_create_simple
+>   hw/ppc/sam460ex.c:397:5: error: nested extern declaration of =E2=80=98p=
+ci_create_simple=E2=80=99 [-Werror=3Dnested-externs]
+>   hw/ppc/sam460ex.c:397:32: error: implicit declaration of function =E2=
+=80=98PCI_DEVFN=E2=80=99 [-Werror=3Dimplicit-function-declaration]
+>     397 |     pci_create_simple(pci_bus, PCI_DEVFN(6, 0), "sm501");
+>         |                                ^~~~~~~~~
+>   hw/ppc/sam460ex.c:397:32: error: nested extern declaration of =E2=80=98=
+PCI_DEVFN=E2=80=99 [-Werror=3Dnested-externs]
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Here are a few use cases:
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-* Tracing  lock updates:
-    RECORDER_TRACES=lock qemu
-* Showing lock changes prior to a hang
-    RECORDER_TRACES=lock qemu &
-    # Wait until hang
-    killall -USR2 qemu  # This will trigger a dump
-* Graphic visualization of lock states:
-    RECORDER_TRACES="lock=state,id" qemu &
-    recorder_scope state
-    # Hit the 't' key to toggle timing display
-    # Hit the 'c' key to dump the screen data as CSV
-    cat recorder_scope_data-1.csv
+Alistair
 
-Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
----
- util/qemu-thread-common.h | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/util/qemu-thread-common.h b/util/qemu-thread-common.h
-index 2af6b12085..0de07a471f 100644
---- a/util/qemu-thread-common.h
-+++ b/util/qemu-thread-common.h
-@@ -15,6 +15,9 @@
- 
- #include "qemu/thread.h"
- #include "trace.h"
-+#include "trace/recorder.h"
-+
-+RECORDER_DEFINE(lock, 16, "Lock state");
- 
- static inline void qemu_mutex_post_init(QemuMutex *mutex)
- {
-@@ -23,12 +26,14 @@ static inline void qemu_mutex_post_init(QemuMutex *mutex)
-     mutex->line = 0;
- #endif
-     mutex->initialized = true;
-+    record(lock, "Init state %d for %p", -1, mutex);
- }
- 
- static inline void qemu_mutex_pre_lock(QemuMutex *mutex,
-                                        const char *file, int line)
- {
-     trace_qemu_mutex_lock(mutex, file, line);
-+    record(lock, "Locking state %d for %p", 1, mutex);
- }
- 
- static inline void qemu_mutex_post_lock(QemuMutex *mutex,
-@@ -39,6 +44,7 @@ static inline void qemu_mutex_post_lock(QemuMutex *mutex,
-     mutex->line = line;
- #endif
-     trace_qemu_mutex_locked(mutex, file, line);
-+    record(lock, "Locked state %d for %p", 2, mutex);
- }
- 
- static inline void qemu_mutex_pre_unlock(QemuMutex *mutex,
-@@ -49,6 +55,7 @@ static inline void qemu_mutex_pre_unlock(QemuMutex *mutex,
-     mutex->line = 0;
- #endif
-     trace_qemu_mutex_unlock(mutex, file, line);
-+    record(lock, "Unkocked state %d for %p", 0, mutex);
- }
- 
- #endif
--- 
-2.26.2
-
+> ---
+>  hw/ppc/sam460ex.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 1a106a68de..fae970b142 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -38,6 +38,7 @@
+>  #include "hw/usb/hcd-ehci.h"
+>  #include "hw/ppc/fdt.h"
+>  #include "hw/qdev-properties.h"
+> +#include "hw/pci/pci.h"
+>
+>  #include <libfdt.h>
+>
+> --
+> 2.21.3
+>
+>
 
