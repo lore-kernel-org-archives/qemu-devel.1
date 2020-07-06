@@ -2,87 +2,69 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577CFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 15:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC12CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20A1B20715
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 15:59:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jZZQB2mP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20A1B20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D8E9206DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:02:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D8E9206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsTX3-0000KN-Ep
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 11:59:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45042)
+	id 1jsTZX-0002SC-9l
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:02:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsTW5-00088P-Bx; Mon, 06 Jul 2020 11:58:49 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:33886)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsTW3-0001iY-KT; Mon, 06 Jul 2020 11:58:49 -0400
-Received: by mail-io1-xd43.google.com with SMTP id q74so16303929iod.1;
- Mon, 06 Jul 2020 08:58:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mKKcigg475g4N5X0X8xo5+Vll3KSlqiH6YNr9EZUX1A=;
- b=jZZQB2mPthZPH0EYjofNRF9+BASAe23g47XL+reBmorK3DCgWUwcyBUBN/PYSsN47T
- 5VKVRucvO0R6wAm2e0FiN3aar1PvDDrepdBseVBVlahU8Mk9UlW45FzfVoVS8jEfeoKa
- 7a7XUMuW0yqw7p5t4mQAjFOYmryCAZAPpw0IdgtAz76OZ+MrWL4lgJiVwhi/pGDByOEs
- hMXp9xEzgAvmCQ5JuDSKx0vsd1fadkgpYvXIzdJUzOnI8xtkNtM0DHmrrr5OZSkz6CuT
- v4RGhDZJkAFkTrzIDsm7mthYyiFCfKSd73+NBJvcfj6LW5XV1ZXqV1R5R7U7AXUuU5a3
- v31A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mKKcigg475g4N5X0X8xo5+Vll3KSlqiH6YNr9EZUX1A=;
- b=XBLra60FQi/ez9oJcnXCbsdFyAtHFdeoImk8dUE93mwBGWscJFELxAeGBWkqa6urZO
- YUUIeeQIrJYxP3oVQ8nTaZT+qrFoGyO1skZNSciwZ3kZ3TCmHNp+Pn11iBO4cYZ3Ruky
- YUpYLcs70vSRMe6SkFpn3EXIyQ9kDsWCSb4bXB9bd0Bf0LAcxnkEUAryEQfz3dMdowAI
- avYCKjkuqHsMItYfUSbc3Vmq3vb8MFN3fzTA6ibdLgNwkuGyvQdL0C3TdJON1hL+KBpd
- rp+wuSLAEq8HoJ01TgYUTdd7ZePIrk1/itcrDIruU2L+ZdYzf/4JGfuj4Hdw0ga3ccgW
- gEWQ==
-X-Gm-Message-State: AOAM533JAVqFaav4G5jfGf41rkpQ8kIR3uwWPAQ+ads8XFS+CQKo64q5
- Dizvh+QU5D8Y3CbIjEAKpcxhXR0lM2kBIuYWqYo=
-X-Google-Smtp-Source: ABdhPJxceGx4gftcAXtx8Omlhn25tRNGqkrB2VxMkDSh14kMcayuyMK18fsaQah2hfvevOUVVzfbDhTaaFCq/wxBps8=
-X-Received: by 2002:a05:6638:dd3:: with SMTP id
- m19mr55462185jaj.106.1594051126113; 
- Mon, 06 Jul 2020 08:58:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsTWm-0000LS-TY
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 11:59:32 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:36113)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsTWk-0001pD-Od
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 11:59:32 -0400
+Received: from player761.ha.ovh.net (unknown [10.110.208.131])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id B32F51E0748
+ for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 17:59:27 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player761.ha.ovh.net (Postfix) with ESMTPSA id BBC9C141A034E;
+ Mon,  6 Jul 2020 15:59:18 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-105G006bb76730e-bc5c-40da-8ae8-3b1db8a46564,
+ C4ABCEF356A601883B7DEB1AA4190402CFF29AFD) smtp.auth=groug@kaod.org
+Date: Mon, 6 Jul 2020 17:59:17 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v3 06/44] qemu-option: Check return value instead of
+ @err where convenient
+Message-ID: <20200706175917.460e4817@bahia.lan>
+In-Reply-To: <20200706080950.403087-7-armbru@redhat.com>
+References: <20200706080950.403087-1-armbru@redhat.com>
+ <20200706080950.403087-7-armbru@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200705204630.4133-1-f4bug@amsat.org>
- <20200705204630.4133-6-f4bug@amsat.org>
-In-Reply-To: <20200705204630.4133-6-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 6 Jul 2020 08:48:58 -0700
-Message-ID: <CAKmqyKP2_y5vfrP+EMjOxv+Xkqx2SLKvwoWyX2Qnw1VigjGUJQ@mail.gmail.com>
-Subject: Re: [PATCH v4 05/10] hw/sd/pl181: Use named GPIOs
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 5359002082299517326
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefgdelkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeiuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=188.165.48.182; envelope-from=groug@kaod.org;
+ helo=7.mo2.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 11:59:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,129 +78,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jul 5, 2020 at 1:50 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> To make the code easier to manage/review/use, rename the
-> cardstatus[0] variable as 'card_readonly' and name the GPIO
-> "card-read-only".
-> Similarly with cardstatus[1], renamed as 'card_inserted' and
-> name its GPIO "card-inserted".
->
-> Adapt the users accordingly by using the qdev_init_gpio_out_named()
-> function.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Mon,  6 Jul 2020 10:09:12 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Convert uses like
+> 
+>     opts = qemu_opts_create(..., &err);
+>     if (err) {
+>         ...
+>     }
+> 
+> to
+> 
+>     opts = qemu_opts_create(..., &err);
 
-Alistair
+The patch doesn't strictly do that since it also converts &err to errp.
+This is okay because most of the changes also drop the associated
+error_propagate(), with the exception of block/parallels.c for which
+I had to check how local_err is used. As already noted by Vladimir
+earlier this generates an harmless "no-op error_propagate", but it
+could be worth mentioning that in the changelog for future reviews :)
 
+>     if (!opts) {
+>         ...
+>     }
+> 
+> Eliminate error_propagate() that are now unnecessary.  Delete @err
+> that are now unused.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  hw/arm/integratorcp.c | 4 ++--
->  hw/arm/realview.c     | 4 ++--
->  hw/arm/vexpress.c     | 4 ++--
->  hw/sd/pl181.c         | 8 +++++---
->  4 files changed, 11 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
-> index b11a846355..2595e4d052 100644
-> --- a/hw/arm/integratorcp.c
-> +++ b/hw/arm/integratorcp.c
-> @@ -645,9 +645,9 @@ static void integratorcp_init(MachineState *machine)
->      sysbus_create_simple(TYPE_INTEGRATOR_DEBUG, 0x1a000000, 0);
->
->      dev =3D sysbus_create_varargs("pl181", 0x1c000000, pic[23], pic[24],=
- NULL);
-> -    qdev_connect_gpio_out(dev, 0,
-> +    qdev_connect_gpio_out_named(dev, "card-read-only", 0,
->                            qdev_get_gpio_in_named(icp, ICP_GPIO_MMC_WPROT=
-, 0));
-> -    qdev_connect_gpio_out(dev, 1,
-> +    qdev_connect_gpio_out_named(dev, "card-inserted", 0,
->                            qdev_get_gpio_in_named(icp, ICP_GPIO_MMC_CARDI=
-N, 0));
->      sysbus_create_varargs("pl041", 0x1d000000, pic[25], NULL);
->
-> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-> index b6c0a1adb9..8dc5f77139 100644
-> --- a/hw/arm/realview.c
-> +++ b/hw/arm/realview.c
-> @@ -234,8 +234,8 @@ static void realview_init(MachineState *machine,
->      mmc_irq[1] =3D qemu_irq_split(
->          qdev_get_gpio_in(sysctl, ARM_SYSCTL_GPIO_MMC_CARDIN),
->          qemu_irq_invert(qdev_get_gpio_in(gpio2, 0)));
-> -    qdev_connect_gpio_out(dev, 0, mmc_irq[0]);
-> -    qdev_connect_gpio_out(dev, 1, mmc_irq[1]);
-> +    qdev_connect_gpio_out_named(dev, "card-read-only", 0, mmc_irq[0]);
-> +    qdev_connect_gpio_out_named(dev, "card-inserted", 0, mmc_irq[1]);
->
->      sysbus_create_simple("pl031", 0x10017000, pic[10]);
->
-> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-> index 5bf9cff8a8..16629d6599 100644
-> --- a/hw/arm/vexpress.c
-> +++ b/hw/arm/vexpress.c
-> @@ -624,9 +624,9 @@ static void vexpress_common_init(MachineState *machin=
-e)
->
->      dev =3D sysbus_create_varargs("pl181", map[VE_MMCI], pic[9], pic[10]=
-, NULL);
->      /* Wire up MMC card detect and read-only signals */
-> -    qdev_connect_gpio_out(dev, 0,
-> +    qdev_connect_gpio_out_named(dev, "card-read-only", 0,
->                            qdev_get_gpio_in(sysctl, ARM_SYSCTL_GPIO_MMC_W=
-PROT));
-> -    qdev_connect_gpio_out(dev, 1,
-> +    qdev_connect_gpio_out_named(dev, "card-inserted", 0,
->                            qdev_get_gpio_in(sysctl, ARM_SYSCTL_GPIO_MMC_C=
-ARDIN));
->
->      sysbus_create_simple("pl050_keyboard", map[VE_KMI0], pic[12]);
-> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-> index 86219c851d..ab4cd733a4 100644
-> --- a/hw/sd/pl181.c
-> +++ b/hw/sd/pl181.c
-> @@ -60,7 +60,8 @@ typedef struct PL181State {
->      uint32_t fifo[PL181_FIFO_LEN]; /* TODO use Fifo32 */
->      qemu_irq irq[2];
->      /* GPIO outputs for 'card is readonly' and 'card inserted' */
-> -    qemu_irq cardstatus[2];
-> +    qemu_irq card_readonly;
-> +    qemu_irq card_inserted;
->  } PL181State;
->
->  static const VMStateDescription vmstate_pl181 =3D {
-> @@ -479,7 +480,7 @@ static void pl181_reset(DeviceState *d)
->      s->mask[1] =3D 0;
->
->      /* We can assume our GPIO outputs have been wired up now */
-> -    sd_set_cb(s->card, s->cardstatus[0], s->cardstatus[1]);
-> +    sd_set_cb(s->card, s->card_readonly, s->card_inserted);
->      /* Since we're still using the legacy SD API the card is not plugged
->       * into any bus, and we must reset it manually.
->       */
-> @@ -496,7 +497,8 @@ static void pl181_init(Object *obj)
->      sysbus_init_mmio(sbd, &s->iomem);
->      sysbus_init_irq(sbd, &s->irq[0]);
->      sysbus_init_irq(sbd, &s->irq[1]);
-> -    qdev_init_gpio_out(dev, s->cardstatus, 2);
-> +    qdev_init_gpio_out_named(dev, &s->card_readonly, "card-read-only", 1=
-);
-> +    qdev_init_gpio_out_named(dev, &s->card_inserted, "card-inserted", 1)=
-;
->  }
->
->  static void pl181_realize(DeviceState *dev, Error **errp)
-> --
-> 2.21.3
->
->
+>  block/parallels.c  |  4 ++--
+>  blockdev.c         |  5 ++---
+>  qdev-monitor.c     |  5 ++---
+>  util/qemu-config.c | 10 ++++------
+>  util/qemu-option.c | 12 ++++--------
+
+Maybe some other potential candidates ?
+
+chardev/char.c:
+
+   opts = qemu_opts_create(qemu_find_opts("chardev"), label, 1, &local_err);
+    if (local_err) {
+        error_report_err(local_err);
+        return NULL;
+    }
+
+monitor/hmp-cmds.c:
+
+    opts = qemu_opts_from_qdict(qemu_find_opts("netdev"), qdict, &err);
+    if (err) {
+        goto out;
+    }
+
+
+    opts = qemu_opts_from_qdict(qemu_find_opts("object"), qdict, &err);
+    if (err) {
+        goto end;
+    }
+
+With or without the extra changes:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  5 files changed, 14 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/parallels.c b/block/parallels.c
+> index 63a1cde8af..f26f03c926 100644
+> --- a/block/parallels.c
+> +++ b/block/parallels.c
+> @@ -824,8 +824,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+>          }
+>      }
+>  
+> -    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, &local_err);
+> -    if (local_err != NULL) {
+> +    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, errp);
+> +    if (!opts) {
+>          goto fail_options;
+>      }
+>  
+> diff --git a/blockdev.c b/blockdev.c
+> index 31d5eaf6bf..b52ed9de86 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -504,9 +504,8 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+>      /* Check common options by copying from bs_opts to opts, all other options
+>       * stay in bs_opts for processing by bdrv_open(). */
+>      id = qdict_get_try_str(bs_opts, "id");
+> -    opts = qemu_opts_create(&qemu_common_drive_opts, id, 1, &error);
+> -    if (error) {
+> -        error_propagate(errp, error);
+> +    opts = qemu_opts_create(&qemu_common_drive_opts, id, 1, errp);
+> +    if (!opts) {
+>          goto err_no_opts;
+>      }
+>  
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index 13a13a811a..079cb6001e 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -799,9 +799,8 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
+>      QemuOpts *opts;
+>      DeviceState *dev;
+>  
+> -    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, errp);
+> +    if (!opts) {
+>          return;
+>      }
+>      if (!monitor_cur_is_qmp() && qdev_device_help(opts)) {
+> diff --git a/util/qemu-config.c b/util/qemu-config.c
+> index 772f5a219e..c0d0e9b8ef 100644
+> --- a/util/qemu-config.c
+> +++ b/util/qemu-config.c
+> @@ -493,9 +493,8 @@ static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
+>          goto out;
+>      }
+>  
+> -    subopts = qemu_opts_create(opts, NULL, 0, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    subopts = qemu_opts_create(opts, NULL, 0, errp);
+> +    if (!subopts) {
+>          goto out;
+>      }
+>  
+> @@ -538,10 +537,9 @@ static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
+>              }
+>  
+>              opt_name = g_strdup_printf("%s.%u", opts->name, i++);
+> -            subopts = qemu_opts_create(opts, opt_name, 1, &local_err);
+> +            subopts = qemu_opts_create(opts, opt_name, 1, errp);
+>              g_free(opt_name);
+> -            if (local_err) {
+> -                error_propagate(errp, local_err);
+> +            if (!subopts) {
+>                  goto out;
+>              }
+>  
+> diff --git a/util/qemu-option.c b/util/qemu-option.c
+> index 0ebfd97a98..fd1fd23521 100644
+> --- a/util/qemu-option.c
+> +++ b/util/qemu-option.c
+> @@ -670,11 +670,9 @@ void qemu_opts_set(QemuOptsList *list, const char *id,
+>                     const char *name, const char *value, Error **errp)
+>  {
+>      QemuOpts *opts;
+> -    Error *local_err = NULL;
+>  
+> -    opts = qemu_opts_create(list, id, 1, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    opts = qemu_opts_create(list, id, 1, errp);
+> +    if (!opts) {
+>          return;
+>      }
+>      qemu_opt_set(opts, name, value, errp);
+> @@ -1012,10 +1010,8 @@ QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, const QDict *qdict,
+>      QemuOpts *opts;
+>      const QDictEntry *entry;
+>  
+> -    opts = qemu_opts_create(list, qdict_get_try_str(qdict, "id"), 1,
+> -                            &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    opts = qemu_opts_create(list, qdict_get_try_str(qdict, "id"), 1, errp);
+> +    if (!opts) {
+>          return NULL;
+>      }
+>  
+
 
