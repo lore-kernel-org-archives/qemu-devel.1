@@ -4,39 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CD6C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C63C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:44:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE75820675
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:43:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE75820675
+	by mail.kernel.org (Postfix) with ESMTPS id 2DDF820675
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:44:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DDF820675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsX1G-0003Xg-5H
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 15:43:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39772)
+	id 1jsX2C-0004t9-Gc
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 15:44:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsWzF-0000cE-Ak
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 15:41:09 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:46171)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jsWok-000712-8c; Mon, 06 Jul 2020 15:30:18 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:57833)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsWzD-0000Vg-HV
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 15:41:09 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jsWoh-0006x7-TT; Mon, 06 Jul 2020 15:30:17 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MYLqs-1kMelE01tS-00VOfu; Mon, 06 Jul 2020 21:41:06 +0200
-Subject: Re: [PATCH v4 2/2] target/m68k: consolidate physical translation
- offset into get_physical_address()
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-References: <20200701201531.13828-1-mark.cave-ayland@ilande.co.uk>
- <20200701201531.13828-3-mark.cave-ayland@ilande.co.uk>
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N3sZs-1ks9sM1yjI-00znST; Mon, 06 Jul 2020 21:30:06 +0200
+Subject: Re: [PATCH] net/tap-solaris.c: Include qemu-common.h for TFR macro
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200704092317.12943-1-peter.maydell@linaro.org>
+ <c247fc94-f8f7-efe1-017f-fc1c03fee811@redhat.com>
+ <5F00C6D6.8010001@mindspring.com>
+ <239dfc36-404f-3439-3f1e-5d8750d31f5b@vivier.eu>
+ <CAP+75-XTzoS7DWAt3QfuyXUw07ohrotKy71-KXGnFkxnxO0SuA@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,41 +82,42 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <a66d9fb0-6ef1-db59-7ddf-c74d4498904a@vivier.eu>
-Date: Mon, 6 Jul 2020 21:41:05 +0200
+Message-ID: <3c734379-5990-d683-3b32-0b369633347e@vivier.eu>
+Date: Mon, 6 Jul 2020 21:30:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200701201531.13828-3-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <CAP+75-XTzoS7DWAt3QfuyXUw07ohrotKy71-KXGnFkxnxO0SuA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:PrR/d2xmI5XF0ZgpI0uQGfq5pFzxvjG3Sfk+83tUdbL1YNszsLx
- FqZmtGZgYuD/3bcChfWxF8UiDLEMcf6RIEDelUIZSuWNMVXsCMx2j4P7jIHpk3NAFUBAk7P
- CXyamF7AL+maEuf885v7btuxsUDnxWutX4NPOYdbdlOU8s7f4Bh9Y4xRInOLPhpTmW8Nb38
- CxxKaIQvrDJPmp55ll5Ag==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Ec0rnP9UJBo=:EacTbezcnE+DmDzYQXtS9H
- n6Qzx6VDBSbZltzwbo/qPgiVglccc+KrfwDRZHK2+da+DYd8bqDek81IuhtkivD0PXEQfYE0O
- Q1LxifO3I+aaqcW7P+Y6/B7YGHf8AI2VBbObNWmbiXfGzgmoeyL7UKyj+2fqPWrB/c0HTQ/lw
- /aXuQzlyFfAFi5JA8FT5M/2CRJVKJ6Yn/DSSEFi1UStvRPQEWDHi/BJZMOdmY5Be9fSmdaO3k
- vsY0W38THG6u1ekdtqsxSysYSuZtGvjsIXZcoSSApdszWnXBpkGe+eCTBJEp8eyfQouZbSEjf
- RdoxdsgOQwGg/GOzm0ZPjarM+kEsAf4wurH9ngpE7xfiAV2frffuK5rOz9usMI5OLpwQBzfUO
- CDUagm5v3t1diQJm7py9ijfo3EvP8yce4jEMGRpVAJkZgKD9jIbTPbbUiM0MVpF0xIZqxUwOY
- tnvi6G75b1m7WPkSgszhTmwMO86RiThf9g+f7exCn3yvv8nhSshufVgaDGT/PNh7qGLRwzDBv
- T8imoOyb5U22rnHKkEtaQeO7wo/nwGXeXiQWdtqJYlDJW5VwZ3MbcPaniiQ8Ornfdh3T2ncMc
- IZX7pKW7qa31GOvYyAUXfR3lVnhBDkDhXoVRAgR9E6XJzeV/PjsVGKPo+ufWC/joLk964/DRM
- V9odzo+HmpQq7CT/QZKyu42Wv38zDuTOU9qtJSMSXc4sA1UoKnnA7pLP7a3aCaKwQystF+/by
- Zz5w4PfexN/xdrMdHlAcCaDpkcCTILbNvNVwR1RVIIIjmWHdsCXHkYYt0r+tGKBNG0k1ci0wW
- /TuzEq8N/Ue9JPG4IYdvSGAn7YuXDoDmV5yIGLdI8IV6UjrkyjdhKtiOS4pemdnLQimh6oj
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:URa6jAJOj1BhBMeSY8MKHStAOf55RjPcse4NzZPJ9Lmcxtnj2iL
+ syBSA/0NwEyHZjUrOD9QBoKiB4NknLsbGpF0hH16oDmCJoyYTf+sPRehdtpYlFkFhp4NmRO
+ q+ZDXpAtTNzuYcUfINOcyauxTLbhjk3edcEJZ4iYhUQiwe0l7h98+j/wVCRKVCy3yLrSXLa
+ aNOJ52uRsTyxdcRBhHoGA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nPG5AVV5NLk=:tUVuf9V1YYiWhMU6ll6+jN
+ 8TlH8sIrHiBfhsySuQbUoev7hHJ9G8/a+GQQcX6qp0a6+fru1Rru6GRe96/JxqTDjO5RNQUiQ
+ NxTJ9nZFew1Bg76gA07npPl6rGdEkVrj/sBLnIhMhro1xounl9cxpxd0nDnVqdAv4R9QcUIET
+ v6uNDX0rAUfI3vjbLN/B1+lzkyRGnVQFWRuiPoJe7nzHs1uqodzfeLEu5vGMJ4Ad+oVySUdgE
+ ZNyb5RWWllT6JEJwH1oBZ7ak1uBuxgZrnzRqaNi794HkBOaTgpM7D09JnFZRUYkkHtB2JuPLL
+ BfQ8Tys7LhUs3ZEM8ZdbYFWHxxPkYPapGBlJcMdFQYz3e/+qZgtPbP6ikFHxw4ExvxRTHLImS
+ UtzgAHZqzNc88uQKUmnyBQ0KLX96b79Wq9QOofN/y55P7r88xDc14ABVEyoZEwOHtJnpjRiSf
+ 2kAQr2r26G4wcdwDwurr7Mz4oljdO0qde2o0b9O7TNmnDcAY3Wyf84O/LfBRaOAyipLSnweDM
+ ZDiinktKakS9Zqv6kkF8Y8XNf1pnpG6OvMpDi0jpPxssNo/D0C2NvOpm7PXv0miPk97aMdbbQ
+ 1XFiWxPz8syzZZckdVSMJVf5I5XiS8aljoWtQgGm5PD8ESzdU8r/r1UxpxNtwnpQY8iVOZjD5
+ umot68ABhz/8mKrnSHHWzCgpfYgWzsVmlt9e59+a+rVb4hqrFi5lzWXKKCNfyy0QtlwzwSo6M
+ Onm1rBYoMyJLr+UPHkiN27QkreoZqgJT45FrMnpp/0ZUdpVuwIVz0Ha94DNKGgpLLpfpYYza6
+ aoqpUAPZNQzLpTarJXG7rw6Z0FjPEu3h+2RMa4mJq/1OSsJttPWErES6JaKZIq+e86w4SPX
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 15:41:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 15:30:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
 X-Spam_bar: --
 X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,81 +130,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Michele Denber <denber@mindspring.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 01/07/2020 à 22:15, Mark Cave-Ayland a écrit :
-> Since all callers to get_physical_address() now apply the same page offset to
-> the translation result, move the logic into get_physical_address() itself to
-> avoid duplication.
+Le 06/07/2020 à 19:56, Philippe Mathieu-Daudé a écrit :
+> On Mon, Jul 6, 2020 at 7:30 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>> Le 04/07/2020 à 20:13, Michele Denber a écrit :
+>>> On 07/04/20 13:11, Thomas Huth wrote:
+>>>> On 04/07/2020 11.23, Peter Maydell wrote:
+>>>>> In commit a8d2532645cf5ce4 we cleaned up usage of the qemu-common.h header
+>>>>> so that it was always included from .c files and never from other .h files.
+>>>>> We missed adding it to net/tap-solaris.c (which previously was pulling it
+>>>>> in via tap-int.h), which broke building on Solaris hosts.
+>>>>>
+>>>>> Fixes: a8d2532645cf5ce4
+>>>>> Reported-by: Michele Denber <denber@mindspring.com>
+>>>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>>>> ---
+>>>>> Untested: Michele, could you give this a try?
+>>>>> ---
+>>>>>  net/tap-solaris.c | 1 +
+>>>>>  1 file changed, 1 insertion(+)
+>>>>>
+>>>>> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+>>>>> index 4725d2314ee..d03165c57c9 100644
+>>>>> --- a/net/tap-solaris.c
+>>>>> +++ b/net/tap-solaris.c
+>>>>> @@ -27,6 +27,7 @@
+>>>>>  #include "tap_int.h"
+>>>>>  #include "qemu/ctype.h"
+>>>>>  #include "qemu/cutils.h"
+>>>>> +#include "qemu-common.h"
+>>>>>
+>>>>>  #include <sys/ethernet.h>
+>>>>>  #include <sys/sockio.h>
+>>>>>
+>>> I can confirm that this works in Solaris 11.4:
+>>>
+>>> root@hemlock:~/qemu-5.0.0# gpatch -p1 < tap-solaris.patch.diff
+>>> patching file net/tap-solaris.c
+>>> root@hemlock:~/qemu-5.0.0#
+>>
+>> Do you mean building on Solaris hosts works well now?
 > 
-> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  target/m68k/helper.c | 17 ++++++-----------
->  1 file changed, 6 insertions(+), 11 deletions(-)
+> This only shows the patch applies properly, but ...
 > 
-> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-> index 631eab7774..3ff5765795 100644
-> --- a/target/m68k/helper.c
-> +++ b/target/m68k/helper.c
-> @@ -643,7 +643,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->                  /* Transparent Translation Register bit */
->                  env->mmu.mmusr = M68K_MMU_T_040 | M68K_MMU_R_040;
->              }
-> -            *physical = address & TARGET_PAGE_MASK;
-> +            *physical = address;
->              *page_size = TARGET_PAGE_SIZE;
->              return 0;
->          }
-> @@ -771,7 +771,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->      }
->      *page_size = 1 << page_bits;
->      page_mask = ~(*page_size - 1);
-> -    *physical = next & page_mask;
-> +    *physical = (next & page_mask) + (address & (*page_size - 1));
->  
->      if (access_type & ACCESS_PTEST) {
->          env->mmu.mmusr |= next & M68K_MMU_SR_MASK_040;
-> @@ -826,8 +826,6 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
->          return -1;
->      }
->  
-> -    addr &= TARGET_PAGE_MASK;
-> -    phys_addr += addr & (page_size - 1);
->      return phys_addr;
->  }
->  
-> @@ -891,10 +889,8 @@ bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->      ret = get_physical_address(&cpu->env, &physical, &prot,
->                                 address, access_type, &page_size);
->      if (likely(ret == 0)) {
-> -        address &= TARGET_PAGE_MASK;
-> -        physical += address & (page_size - 1);
-> -        tlb_set_page(cs, address, physical,
-> -                     prot, mmu_idx, TARGET_PAGE_SIZE);
-> +        tlb_set_page(cs, address & TARGET_PAGE_MASK,
-> +                     physical & TARGET_PAGE_MASK, prot, mmu_idx, page_size);
->          return true;
->      }
->  
-> @@ -1383,9 +1379,8 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
->      ret = get_physical_address(env, &physical, &prot, addr,
->                                 access_type, &page_size);
->      if (ret == 0) {
-> -        addr &= TARGET_PAGE_MASK;
-> -        physical += addr & (page_size - 1);
-> -        tlb_set_page(env_cpu(env), addr, physical,
-> +        tlb_set_page(env_cpu(env), addr & TARGET_PAGE_MASK,
-> +                     physical & TARGET_PAGE_MASK,
->                       prot, access_type & ACCESS_SUPER ?
->                       MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
->      }
+>>
+>> In this case, you can add a "Tested-by:" tag.
+> 
+> Here after you have the confirmation the patch worked:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg720033.html
+> So IMO this is worth a:
+> Tested-by: Michele Denber <denber@mindspring.com>
 > 
 
-Applied to my m68k branch.
+Thank you.
+
+Applied to my trivial-patches-for-5.1 branch.
 
 Thanks,
 Laurent
+
 
