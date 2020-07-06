@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C591C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121A6C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:56:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4495520823
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA25420823
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:56:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bw+MC68E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4495520823
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NCr6wx2+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA25420823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsaxQ-0006oM-JL
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 19:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35484)
+	id 1jsaym-0008U0-46
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 19:56:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jsaqG-0001JQ-FA
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:08 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36846)
+ id 1jsaqH-0001MM-EX
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:09 -0400
+Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:40961)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jsaqE-00011A-Sc
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:08 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 207so17433787pfu.3
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 16:48:06 -0700 (PDT)
+ id 1jsaqF-00011K-Ow
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:09 -0400
+Received: by mail-pf1-x42d.google.com with SMTP id q17so17609618pfu.8
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 16:48:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=R+lITptw5fn9ER442LKhdifOCNEK9wzAb+CMXJ6Z8J0=;
- b=bw+MC68E/oyzn+hOQ6j2EtWp9H7OF2kl/o9S+N0CqCxzk12rGm4AYqKNxPjyX6rXWM
- HQxI/PDQ5xMvAl0nAr707ToLRHX+VGROV0l2Yt9TGwktJ7NunZJ4kGZ/4nRR5h92fWjN
- m9zP6m+pl7hDKtWJ1xCpwtt8YhCU4kmOpW93RuIii7Y/zpnqnhy6CtINgoem2OMAVbC+
- xvA66Wy6uct6NGH4n5qB9h6nts0eVZgl4kffF6uJreQe+ujy4vUNiPntN1Qs2pnz/+Z6
- zrCwegNJ+kN8IxSUIvlh+xm6UGOLX60Oitx3laHs76GT0u4+kO9RMtUeF/QR7hHoyuEQ
- kJ4A==
+ bh=wa+AHpqfEWhhgAfAEPD77aSGzH6coLYk43PBINkaick=;
+ b=NCr6wx2+R5cntPEhAq0STlGg8ebdf4qqtR6oD8e+wXTeSun91ayztURJkUNGRhkylv
+ kNJmPV5zBOn6vuNV/kcFjOBPL1jZNhdOXKqEe1teB/4WZlASagxgPeSjb8iZMf/qX44M
+ ScwLdfXaTSxuKWho40ttvFV6yMhaaMM8EvCniWgdMeDl5+eFXvTSoKLzVnBaRjXNCPIl
+ wVsPeyjRjcVU7XpTg6ZfX7gYNxeeU7cnF0+68Obbx0fkW20v/uand31AjYQICWPjIn6N
+ utxAuTwsJeNOVgcTP5Vf0XmCP0CwjdFU2wRFjg62avY7QLcY3iFP/x8WJNdwHACEfxKO
+ 3+jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=R+lITptw5fn9ER442LKhdifOCNEK9wzAb+CMXJ6Z8J0=;
- b=aFH7ubi5J23aRotu5L8adF2b0X9lAmf6HWHg9FCyR6pVezNekp0p9/l6IwqhkCnwDy
- Kqj/Y/9031lzYljSsWSoy4Jq0e1zfzJBRT3107PWOS3QcHh2K0OnwV8kwRLZHbUDNVio
- 8RQjGwyh/yiD0H9pS402+JpAXv10jLzfF2aSQRE0BhGM9SIsgDouzlI3kQst7QL7GOxv
- eNxh3OTpuJ+5+w5x2ol+CYL7cXO7Wf26A5u13DGhtG2mda7oPvzz+AZmnxoyQy906fa8
- g0ZUx9IFL6iozu3Ni2I5o2GNO2J72JOfBR/o/Cf1iEfcWjzjhoD/1KUB0HPF3D/M/Zd2
- vBBA==
-X-Gm-Message-State: AOAM530kPXZj4/jg9kWusUdj+5AkPbGtE1cXqF+6GYJiqMaBsYnf0Kks
- FVueW5mFkLCN4aitSaHkX65HibHa
-X-Google-Smtp-Source: ABdhPJxh+Nt4P5HaDczifSCnNRMb/wQpETBy2t6lexxcYYVbS2PbswD/oFTl8qfNEaesk3ZjX+5f5g==
-X-Received: by 2002:a62:3587:: with SMTP id c129mr6840515pfa.212.1594079285500; 
- Mon, 06 Jul 2020 16:48:05 -0700 (PDT)
+ bh=wa+AHpqfEWhhgAfAEPD77aSGzH6coLYk43PBINkaick=;
+ b=leQLr8tGxeEyeyW6JuYMpqlb38aa2VEDXT94BLvBLHiPmcr350QEEZyRNvgSTTEbWf
+ co3feF6u8lrEKLB7+Lv/0pmRDKGqOdl/2YTm1BJlDWLTSF8sIZxhGdIsFbmmYCQgcUz5
+ begxVXWlVNy/EkRitL/7uHofPXf5n7WJTygAhBSQOIU7vgRUQiOl/2ZVQKz/hgT81qiY
+ aveITL53OhXtdVXHBUReYbVu1yG6Bb8ww+oIpmuPPZlEM4nC/D9WBlRLPEgKV3pJh/fS
+ /wVpWXzLNx870Y3SgcjfgllJefTDHYY/dettBHL0QLhdza6rb52nutjCyPsikKA1pnKt
+ 0V/w==
+X-Gm-Message-State: AOAM533IZ4XLWmZIcKiIO4F07NBpinEkIVitii5Y+zo0NlZMw6XSDf0/
+ IAdyDMg2nNuqeZVRyjrL10/z0LWA
+X-Google-Smtp-Source: ABdhPJxTMbbENNZyx3VK3rgUpe6cEh+AYBXAZt1YPM3RYFBjfLyffxBu1i9ImD/tfa3LLIeUpwnXwg==
+X-Received: by 2002:aa7:9638:: with SMTP id r24mr4130757pfg.297.1594079286312; 
+ Mon, 06 Jul 2020 16:48:06 -0700 (PDT)
 Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id e15sm19647649pgt.17.2020.07.06.16.48.04
+ by smtp.gmail.com with ESMTPSA id e15sm19647649pgt.17.2020.07.06.16.48.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jul 2020 16:48:04 -0700 (PDT)
+ Mon, 06 Jul 2020 16:48:05 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 16/21] tests/tcg/xtensa: update test_lsc for DFPU
-Date: Mon,  6 Jul 2020 16:47:32 -0700
-Message-Id: <20200706234737.32378-17-jcmvbkbc@gmail.com>
+Subject: [PATCH 17/21] tests/tcg/xtensa: add fp0 div and sqrt tests
+Date: Mon,  6 Jul 2020 16:47:33 -0700
+Message-Id: <20200706234737.32378-18-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200706234737.32378-1-jcmvbkbc@gmail.com>
 References: <20200706234737.32378-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42d;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -5
@@ -106,113 +106,186 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DFPU doesn't have pre-increment FP load/store opcodes, it has
-post-increment opcodes instead. Test increment opcodes present in the
-current config.
+Test exact division/sqrt DFPU sequences.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/test_lsc.S | 47 +++++++++++++++++++++++++++----------
- 1 file changed, 34 insertions(+), 13 deletions(-)
+ tests/tcg/xtensa/test_fp0_div.S  | 82 ++++++++++++++++++++++++++++++++
+ tests/tcg/xtensa/test_fp0_sqrt.S | 76 +++++++++++++++++++++++++++++
+ 2 files changed, 158 insertions(+)
+ create mode 100644 tests/tcg/xtensa/test_fp0_div.S
+ create mode 100644 tests/tcg/xtensa/test_fp0_sqrt.S
 
-diff --git a/tests/tcg/xtensa/test_lsc.S b/tests/tcg/xtensa/test_lsc.S
-index 0578bf19e72e..9d59c1815a9e 100644
---- a/tests/tcg/xtensa/test_lsc.S
-+++ b/tests/tcg/xtensa/test_lsc.S
-@@ -1,4 +1,5 @@
- #include "macros.inc"
+diff --git a/tests/tcg/xtensa/test_fp0_div.S b/tests/tcg/xtensa/test_fp0_div.S
+new file mode 100644
+index 000000000000..c3e7ad7bb5b3
+--- /dev/null
++++ b/tests/tcg/xtensa/test_fp0_div.S
+@@ -0,0 +1,82 @@
++#include "macros.inc"
 +#include "fpu.h"
- 
- test_suite lsc
- 
-@@ -9,9 +10,14 @@ test lsi
-     wsr     a2, cpenable
- 
-     movi    a2, 1f
--    lsi     f0, a2, 0
-     lsi     f1, a2, 4
-+#if DFPU
-+    lsi     f2, a2, 8
-+    lsip    f0, a2, 8
-+#else
-+    lsi     f0, a2, 0
-     lsiu    f2, a2, 8
++
++test_suite fp0_div
++
++#if XCHAL_HAVE_FP_DIV
++
++.macro  divs_seq q, a, b, r, y, y0, an, bn, e, ex
++    div0.s      \y0, \b
++    nexp01.s    \bn, \b
++    const.s     \e, 1
++    maddn.s     \e, \bn, \y0
++    mov.s       \y, \y0
++    mov.s       \ex, \b
++    nexp01.s    \an, \a
++    maddn.s     \y, \e, \y0
++    const.s     \e, 1
++    const.s     \q, 0
++    neg.s       \r, \an
++    maddn.s     \e, \bn, \y
++    maddn.s     \q, \r, \y0
++    mkdadj.s    \ex, \a
++    maddn.s     \y, \e, \y
++    maddn.s     \r, \bn, \q
++    const.s     \e, 1
++    maddn.s     \e, \bn, \y
++    maddn.s     \q, \r, \y
++    neg.s       \r, \an
++    maddn.s     \y, \e, \y
++    maddn.s     \r, \bn, \q
++    addexpm.s   \q, \ex
++    addexp.s    \y, \ex
++    divn.s      \q, \r, \y
++.endm
++
++.macro div_s fr0, fr1, fr2
++    divs_seq    \fr0, \fr1, \fr2, f9, f10, f11, f12, f13, f14, f15
++.endm
++
++.macro movfp fr, v
++    movi        a2, \v
++    wfr         \fr, a2
++.endm
++
++.macro check_res fr, r, sr
++    rfr         a2, \fr
++    dump        a2
++    movi        a3, \r
++    assert      eq, a2, a3
++    rur         a2, fsr
++    movi        a3, \sr
++    assert      eq, a2, a3
++.endm
++
++test div_s
++    movi        a2, 1
++    wsr         a2, cpenable
++
++    test_op2    div_s, f0, f1, f2, 0x40000000, 0x40400000, \
++        0x3f2aaaab, 0x3f2aaaaa, 0x3f2aaaab, 0x3f2aaaaa, \
++             FSR_I,      FSR_I,      FSR_I,      FSR_I
++    test_op2    div_s, f3, f4, f5, F32_1, F32_0, \
++        F32_PINF, F32_PINF, F32_PINF, F32_PINF, \
++           FSR_Z,    FSR_Z,    FSR_Z,    FSR_Z
++    test_op2    div_s, f6, f7, f8, F32_0, F32_0, \
++        F32_DNAN, F32_DNAN, F32_DNAN, F32_DNAN, \
++           FSR_V,    FSR_V,    FSR_V,    FSR_V
++
++    /* MAX_FLOAT / 0.5 = +inf/MAX_FLOAT  */
++    test_op2    div_s, f0, f1, f2, F32_MAX, F32_0_5, \
++        F32_PINF, F32_MAX, F32_PINF, F32_MAX, \
++          FSR_OI,  FSR_OI,   FSR_OI,  FSR_OI
++
++    /* 0.5 / MAX_FLOAT = denorm  */
++    test_op2    div_s, f0, f1, f2, F32_0_5, F32_MAX, \
++        0x00100000, 0x00100000, 0x00100001, 0x00100000, \
++            FSR_UI,     FSR_UI,     FSR_UI,     FSR_UI
++test_end
++
 +#endif
-     movi    a3, 1f + 8
-     assert  eq, a2, a3
-     rfr     a2, f0
-@@ -34,13 +40,18 @@ test ssi
-     movi    a2, 1f
-     movi    a3, 0x40800000
-     wfr     f3, a3
--    ssi     f3, a2, 0
-     movi    a3, 0x40a00000
-     wfr     f4, a3
--    ssi     f4, a2, 4
-     movi    a3, 0x40c00000
-     wfr     f5, a3
-+    ssi     f4, a2, 4
-+#if DFPU
-+    ssi     f5, a2, 8
-+    ssip    f3, a2, 8
-+#else
-+    ssi     f3, a2, 0
-     ssiu    f5, a2, 8
++
++test_suite_end
+diff --git a/tests/tcg/xtensa/test_fp0_sqrt.S b/tests/tcg/xtensa/test_fp0_sqrt.S
+new file mode 100644
+index 000000000000..585973dce6bc
+--- /dev/null
++++ b/tests/tcg/xtensa/test_fp0_sqrt.S
+@@ -0,0 +1,76 @@
++#include "macros.inc"
++#include "fpu.h"
++
++test_suite fp0_sqrt
++
++#if XCHAL_HAVE_FP_SQRT
++
++.macro  sqrt_seq r, a, y, t1, hn, h2, t5, h
++    sqrt0.s     \y, \a
++    const.s     \t1, 0
++    maddn.s     \t1, \y, \y
++    nexp01.s    \hn, \a
++    const.s     \r, 3
++    addexp.s    \hn, \r
++    maddn.s     \r, \t1, \hn
++    nexp01.s    \t1, \a
++    neg.s       \h2, \t1
++    maddn.s     \y, \r, \y
++    const.s     \r, 0
++    const.s     \t5, 0
++    const.s     \h, 0
++    maddn.s     \r, \h2, \y
++    maddn.s     \t5, \y, \hn
++    const.s     \hn, 3
++    maddn.s     \h, \hn, \y
++    maddn.s     \t1, \r, \r
++    maddn.s     \hn, \t5, \y
++    neg.s       \y, \h
++    maddn.s     \r, \t1, \y
++    maddn.s     \h, \hn, \h
++    mksadj.s    \y, \a
++    nexp01.s    \a, \a
++    maddn.s     \a, \r, \r
++    neg.s       \t1, \h
++    addexpm.s   \r, \y
++    addexp.s    \t1, \y
++    divn.s      \r, \a, \t1
++.endm
++
++.macro sqrt_s fr0, fr1
++    sqrt_seq    \fr0, \fr1, f10, f11, f12, f13, f14, f15
++.endm
++
++.macro movfp fr, v
++    movi        a2, \v
++    wfr         \fr, a2
++.endm
++
++.macro check_res fr, r, sr
++    rfr         a2, \fr
++    dump        a2
++    movi        a3, \r
++    assert      eq, a2, a3
++    rur         a2, fsr
++    movi        a3, \sr
++    assert      eq, a2, a3
++.endm
++
++test sqrt_s
++    movi        a2, 1
++    wsr         a2, cpenable
++
++    test_op1    sqrt_s, f0, f1, 0x40000000, \
++        0x3fb504f3, 0x3fb504f3, 0x3fb504f4, 0x3fb504f3, \
++             FSR_I,      FSR_I,      FSR_I,      FSR_I
++    test_op1    sqrt_s, f3, f4, F32_1, \
++        F32_1, F32_1, F32_1, F32_1, \
++        FSR__, FSR__, FSR__, FSR__
++    test_op1    sqrt_s, f6, f7, F32_MINUS | F32_1, \
++        F32_DNAN, F32_DNAN, F32_DNAN, F32_DNAN, \
++           FSR_V,    FSR_V,    FSR_V,    FSR_V
++test_end
++
 +#endif
-     movi    a3, 1f + 8
-     assert  eq, a2, a3
-     l32i    a4, a2, -8
-@@ -62,11 +73,16 @@ test_end
- test lsx
-     movi    a2, 1f
-     movi    a3, 0
-+    movi    a4, 4
-+    movi    a5, 8
-+    lsx     f7, a2, a4
-+#if DFPU
-+    lsx     f8, a2, a5
-+    lsxp    f6, a2, a5
-+#else
-     lsx     f6, a2, a3
--    movi    a3, 4
--    lsx     f7, a2, a3
--    movi    a3, 8
--    lsxu    f8, a2, a3
-+    lsxu    f8, a2, a5
-+#endif
-     movi    a3, 1f + 8
-     assert  eq, a2, a3
-     rfr     a2, f6
-@@ -87,18 +103,23 @@ test_end
- 
- test ssx
-     movi    a2, 1f
--    movi    a3, 0
-     movi    a4, 0x41200000
-     wfr     f9, a4
--    ssx     f9, a2, a3
--    movi    a3, 4
-     movi    a4, 0x41300000
-     wfr     f10, a4
--    ssx     f10, a2, a3
--    movi    a3, 8
-     movi    a4, 0x41400000
-     wfr     f11, a4
--    ssxu    f11, a2, a3
-+    movi    a3, 0
-+    movi    a4, 4
-+    movi    a5, 8
-+    ssx     f10, a2, a4
-+#if DFPU
-+    ssx     f11, a2, a5
-+    ssxp    f9, a2, a5
-+#else
-+    ssx     f9, a2, a3
-+    ssxu    f11, a2, a5
-+#endif
-     movi    a3, 1f + 8
-     assert  eq, a2, a3
-     l32i    a4, a2, -8
++
++test_suite_end
 -- 
 2.20.1
 
