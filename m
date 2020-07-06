@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2D0C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D320C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:30:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B65C52070C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF74E206CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:30:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MioVaGq1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65C52070C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/1aoElj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF74E206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUvb-00044X-22
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:29:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33384)
+	id 1jsUwr-0006Fr-66
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:30:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUVb-0002EQ-O7; Mon, 06 Jul 2020 13:02:23 -0400
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:44779)
+ id 1jsUdj-0004D5-Sz; Mon, 06 Jul 2020 13:10:47 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:34930)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUVZ-0006a2-UJ; Mon, 06 Jul 2020 13:02:23 -0400
-Received: by mail-il1-x141.google.com with SMTP id h16so10189564ilj.11;
- Mon, 06 Jul 2020 10:02:20 -0700 (PDT)
+ id 1jsUdh-0007rx-Em; Mon, 06 Jul 2020 13:10:47 -0400
+Received: by mail-io1-xd41.google.com with SMTP id v8so40052002iox.2;
+ Mon, 06 Jul 2020 10:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=SURriqbHZVXTTwsvXZaGt8gxbHhNclYTbkHoMvIQmpM=;
- b=MioVaGq1jCalxgWYpPdotTkyVsAMeK/bshk85fNYAhYubO4nVFHSOeCUz0kSho8p9p
- 6Y83qIJELSpr9VN9VFzq+lTIUscnBNyLwqUC24IyYDjx/4cG7EfaP2YEZc6BAomYyDpg
- 4WJqsPVXOVt3XY2x1ZsaQLbg24wvg5Vy/7YqNFE+T3a7KXvhOx34JOs9fSXv1n/wrIC6
- 8CzhLDbRxujPAE056QBW2Z/dWImCVitmNebYDtS6btqpo7FzR6vkHFi2ue676ojVEt9W
- vkRi2J6vudadAMoruzF52cpovO1cMqBkDNoVdP47mEGcUSBlNOyPMoeOEOsRimXSU/ZU
- vZxg==
+ bh=wZPcNnfJm5MPTasltoq/pBa3iV0LcdhND5nIpKUJi/8=;
+ b=k/1aoEljxB0uBEqfqH0Zn4KhFaSEHuRC7puZspsg00ZQnuYbG361wHg3SacgFJDj5D
+ tsj3n5BFbxJduCK35tjRhuF2/a9NzvStraAOtyCnDhA1x3ZIDzvxsj0SeVn96GcH66cQ
+ +fOPAx/5lIiJ6CUyYV8ORDaUEU0GMk/TmxFz2lsMqQ1ZPLYRTUaOZTHWIAoFD6WwT2w9
+ dE0VZxLY1HVMcUMAVCCqzToMHhxxVykCFBb3WPUEtZ8T5PdUIBDhJKXxk1Spjm8NLNHs
+ uMj6b4Ox5j2PchTgKufiol5/oFIvZYBrDFwPFhjtdYp+E3sHNnFizOD1mX/9Z5ZYBI8v
+ cucQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=SURriqbHZVXTTwsvXZaGt8gxbHhNclYTbkHoMvIQmpM=;
- b=rU5wTaR/pZA9HUFdWbrwkwEN+hURz1bQPM5qUChxwkMWGvuJyvUNWugiOu1oFWO55Y
- /G5uW1VoRTDpuzdkzcsbzLR4eW1hWHUuhOcxb5Ws1wkwPRGP/tEEqyqrtPthogP9Yd6a
- t95DT8NQFgChR7Ev+/BTcRGqQD3NmzuOH00PH/Dm1sHNyFiG59uEcNW2br5LA1ogUxmv
- gtji8PCpaekWSBsQUTqg8J6rpobs+zGjTyL9gi/KtwP/UCBlVC5aRgqZu7JNJ1jNchrQ
- BRkqy6ktQ1BxJv21myCFWVJU6CzmlwIE00ei/luVq7/dFXFrWJRsqWyt9XrVib/TVej3
- x06g==
-X-Gm-Message-State: AOAM533SVmsIgQ4JllIU0rX7ViKHnrgJLj7WToaN6ez7g+oT7pCIbcXi
- HVF8Md/sRNjN/cVLnOKHohlVmw+YTVPsCKSUmRA=
-X-Google-Smtp-Source: ABdhPJw3irY14ekgg5HFZwY3uijUbo8j99jRr5i12obU9BK983EmEFW1tqXdt4MQ3PGmM1qTVFVUGr89GwGbxSSoFdg=
-X-Received: by 2002:a92:d186:: with SMTP id z6mr33254547ilz.227.1594054940213; 
- Mon, 06 Jul 2020 10:02:20 -0700 (PDT)
+ bh=wZPcNnfJm5MPTasltoq/pBa3iV0LcdhND5nIpKUJi/8=;
+ b=MskhW81joZ+3jmobz2zIHp+l3yRAanBxR6fKnIPM9VHB9dxf2+8kExoS0L4YSlFL81
+ AxN9y0BV9zP7WUkbDu6PAckQdMo8/HP4KEG3ZRbEtZ0a41foBEogpSSfHeVLJv4xgpex
+ Ha0pcia8Vrd7nTQVL5jktNSKUxwfJldI1Fnapyho8Rh3DG7vEWNeVcCro1aUClFiaSso
+ yqIzyHXV+meM+aT0KsMA9uFLXfISZZRihbkDKx/8DpsGJOhxrahSG4baM4yuXhYYJf0N
+ CH8ingrMv2Xx7pRWGqFbKme8oHe8fRKx5ZSEreMu/AtCfoj8mVz4vdkhGBKo+K5wvwjK
+ Sksg==
+X-Gm-Message-State: AOAM530dQANcaIXBqppbdGqW46KLTXHkenWB4GUrE4uU9hKJfR91b7qR
+ wrB78K5UwntIslSZ5gnZDb+K46qNOfiMIe+VpQE=
+X-Google-Smtp-Source: ABdhPJx4Y0GqgQR2J49zdJrF6Wimg0enF5qkXxsI0KvUd7/3ziu/gL8IcMOHx3OKEzWPz3QhdGIRQSrp8CAFUbt1qmc=
+X-Received: by 2002:a02:6c4c:: with SMTP id w73mr55529406jab.26.1594055443540; 
+ Mon, 06 Jul 2020 10:10:43 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200704144943.18292-1-f4bug@amsat.org>
- <20200704144943.18292-5-f4bug@amsat.org>
-In-Reply-To: <20200704144943.18292-5-f4bug@amsat.org>
+ <20200704144943.18292-14-f4bug@amsat.org>
+In-Reply-To: <20200704144943.18292-14-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 6 Jul 2020 09:52:26 -0700
-Message-ID: <CAKmqyKMm2xhgxSqX5mHAkELfBnWhzqw-ruf3oATFvB8sohnw2w@mail.gmail.com>
-Subject: Re: [PATCH 04/26] hw/usb: Reduce 'exec/memory.h' inclusion
+Date: Mon, 6 Jul 2020 10:00:56 -0700
+Message-ID: <CAKmqyKOcdG_Wv8yectwwHaxmryB9uBKK+GX1ZGtrq7ZCRcRsAw@mail.gmail.com>
+Subject: Re: [PATCH 13/26] hw/usb/desc: Reduce some declarations scope
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -127,11 +127,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 4, 2020 at 7:52 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+On Sat, Jul 4, 2020 at 7:59 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 > wrote:
 >
-> "exec/memory.h" is only required by "hw/usb/hcd-musb.h".
-> Include it there directly.
+> USBDescString is forward-declared. Only bus.c uses the
+> usb_device_get_product_desc() and usb_device_get_usb_desc()
+> function. Move all that to the "desc.h" header to reduce
+> the big "hw/usb.h" header a bit.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -140,35 +142,75 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  include/hw/usb.h          | 1 -
->  include/hw/usb/hcd-musb.h | 2 ++
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  hw/usb/desc.h    | 10 ++++++++++
+>  include/hw/usb.h | 10 ----------
+>  hw/usb/bus.c     |  1 +
+>  3 files changed, 11 insertions(+), 10 deletions(-)
 >
+> diff --git a/hw/usb/desc.h b/hw/usb/desc.h
+> index 92594fbe29..4bf6966c4b 100644
+> --- a/hw/usb/desc.h
+> +++ b/hw/usb/desc.h
+> @@ -242,4 +242,14 @@ int usb_desc_get_descriptor(USBDevice *dev, USBPacke=
+t *p,
+>  int usb_desc_handle_control(USBDevice *dev, USBPacket *p,
+>          int request, int value, int index, int length, uint8_t *data);
+>
+> +const char *usb_device_get_product_desc(USBDevice *dev);
+> +
+> +const USBDesc *usb_device_get_usb_desc(USBDevice *dev);
+> +
+> +struct USBDescString {
+> +    uint8_t index;
+> +    char *str;
+> +    QLIST_ENTRY(USBDescString) next;
+> +};
+> +
+>  #endif /* QEMU_HW_USB_DESC_H */
 > diff --git a/include/hw/usb.h b/include/hw/usb.h
-> index 4f04a1a879..15b2ef300a 100644
+> index 15b2ef300a..18f1349bdc 100644
 > --- a/include/hw/usb.h
 > +++ b/include/hw/usb.h
-> @@ -25,7 +25,6 @@
->   * THE SOFTWARE.
->   */
+> @@ -192,12 +192,6 @@ typedef struct USBDescOther USBDescOther;
+>  typedef struct USBDescString USBDescString;
+>  typedef struct USBDescMSOS USBDescMSOS;
 >
-> -#include "exec/memory.h"
->  #include "hw/qdev-core.h"
->  #include "qemu/iov.h"
->  #include "qemu/queue.h"
-> diff --git a/include/hw/usb/hcd-musb.h b/include/hw/usb/hcd-musb.h
-> index c874b9f292..ec3ee5c4b0 100644
-> --- a/include/hw/usb/hcd-musb.h
-> +++ b/include/hw/usb/hcd-musb.h
-> @@ -13,6 +13,8 @@
->  #ifndef HW_USB_MUSB_H
->  #define HW_USB_MUSB_H
+> -struct USBDescString {
+> -    uint8_t index;
+> -    char *str;
+> -    QLIST_ENTRY(USBDescString) next;
+> -};
+> -
+>  #define USB_MAX_ENDPOINTS  15
+>  #define USB_MAX_INTERFACES 16
 >
-> +#include "exec/memory.h"
-> +
->  enum musb_irq_source_e {
->      musb_irq_suspend =3D 0,
->      musb_irq_resume,
+> @@ -555,10 +549,6 @@ int usb_device_alloc_streams(USBDevice *dev, USBEndp=
+oint **eps, int nr_eps,
+>                               int streams);
+>  void usb_device_free_streams(USBDevice *dev, USBEndpoint **eps, int nr_e=
+ps);
+>
+> -const char *usb_device_get_product_desc(USBDevice *dev);
+> -
+> -const USBDesc *usb_device_get_usb_desc(USBDevice *dev);
+> -
+>  /* quirks.c */
+>
+>  /* In bulk endpoints are streaming data sources (iow behave like isoc ep=
+s) */
+> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+> index 957559b18d..111c3af7c1 100644
+> --- a/hw/usb/bus.c
+> +++ b/hw/usb/bus.c
+> @@ -9,6 +9,7 @@
+>  #include "monitor/monitor.h"
+>  #include "trace.h"
+>  #include "qemu/cutils.h"
+> +#include "desc.h"
+>
+>  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int inden=
+t);
+>
 > --
 > 2.21.3
 >
