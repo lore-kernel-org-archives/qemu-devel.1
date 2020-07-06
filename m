@@ -2,91 +2,85 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C01C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5A6C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72E532074F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD64F2067D
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3BUhDeh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72E532074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GwK48Ghm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD64F2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMsS-0001Yv-ME
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:53:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39108)
+	id 1jsMuY-0003TY-4c
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:55:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jsMrl-0000iF-35
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:52:45 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21777
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jsMrj-0001su-9i
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:52:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594025562;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5cOjdTzke3DujLoZaEeZXGBWGKLs6nfl9J4st40VDEg=;
- b=H3BUhDehcTcQxoy6BOvaxgp2MgC/6v0sky8wa2OEIRB2tGOhz7Bf5aJdkyYfUFIwhiSTvp
- mQbn/AMfv38sRzwsW8i0E98oOdvwM9FJLknKnBmFYjykVFpVKHke+J1Mwg5gYhIvbn6HmV
- bCHEKqXYQN3hwHCAJ5ciYkYGedXNRp8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-5tECdmnHPECHLc7E69FQXA-1; Mon, 06 Jul 2020 04:52:33 -0400
-X-MC-Unique: 5tECdmnHPECHLc7E69FQXA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B712A800403
- for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 08:52:32 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E9517AC9F;
- Mon,  6 Jul 2020 08:52:24 +0000 (UTC)
-Date: Mon, 6 Jul 2020 09:52:21 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2] MAINTAINERS: Cover the firmware JSON schema
-Message-ID: <20200706085221.GB2603839@redhat.com>
-References: <20200703183450.32398-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <linus.walleij@linaro.org>)
+ id 1jsMtx-0002qf-8c
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:55:01 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:36670)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <linus.walleij@linaro.org>)
+ id 1jsMtu-00024B-Pb
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:55:00 -0400
+Received: by mail-lj1-x244.google.com with SMTP id d17so29622192ljl.3
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 01:54:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=cNNvIPbyRDyhu5ZgEEiWbAIxYQhb/2gTkX3OL9Va+WQ=;
+ b=GwK48GhmFmirpg3fdswa9lBUePOmYDIUGRR8hdVDdkSej4xaxCeCZAFSNgxfHMX6Yy
+ w9Kla9Zz94g96jzu2SdkDHlz3/g7x+cSsfL0CLrYgCZP6J19zRAdLsZs87JfMO7sIJE6
+ hD8DhDJnDAm0DcZzdnRoijixEc6U2wSUxDKr/PyrnIZ6sDA3NJltPdTHsLduPer5Awad
+ NUwH5K/XHmbz5gpeAqR5kYWsh2PSuS+J5l9UTHxPSnjzSl1GyAg/pMTCqSfzmJ/+quNd
+ zVd7EeWl6Jy5ia0GEmuuMG516H4zo1kh4cHrXJacH0rZz+cmV3uWqvNIF5fVl3UCZoOV
+ qcKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=cNNvIPbyRDyhu5ZgEEiWbAIxYQhb/2gTkX3OL9Va+WQ=;
+ b=msfv5J8m7ys0Wxta0E5xgjKZK1GtpSA3/gU9WLXAfgpjzCDTBeuVN1WJlKRicRAU9S
+ Lb9nD2NNLEesnZ76pwmA3+47Z7GfusxeErBmClrf+5hj/h9zS8sRtcd+k6rIk8byWt5P
+ 3d+aLmZLj8rbzCTJUuDWhS7mYCf+gNHcExJMFWtnudJ4EI/ECPAB6OrT8OtT0eOQDkv8
+ EZ61VmhI+o1ytLz5k+cPImZrIJMwAYxObNC2LuK+qj2HCwLGPVBFA8AZ/ibM4i37jWMa
+ auGipafOUuHN84QeF7RD5IUMeYtGmljcJ4MDaX+upjriC65iM6Kb5lGHhKTWbAvkmiJS
+ +alA==
+X-Gm-Message-State: AOAM533sLrjdK8ujQ1AgVdM93rfhIcxpOwDa+Fc9qHAQM2daNQoDiljR
+ aqIQ3+cVshTtsjp8F7+PyKPYT2QHn33LM4Oh2lpUEw==
+X-Google-Smtp-Source: ABdhPJylBq/GlipYoQiOaeWdyv7Nd1mhikRAHRzoHcrBYF2Tgt2xn3B345Rezd2yDNMo2CkzdbSQ8juxx+Oe1fm99VA=
+X-Received: by 2002:a2e:7a1a:: with SMTP id v26mr10720535ljc.104.1594025696518; 
+ Mon, 06 Jul 2020 01:54:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200703183450.32398-1-philmd@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200529072017.2906-1-linus.walleij@linaro.org>
+ <CAFEAcA-x0y6ufRXebckRdGSLOBzbdBsk=uw+foK4p+HDeVrA9A@mail.gmail.com>
+In-Reply-To: <CAFEAcA-x0y6ufRXebckRdGSLOBzbdBsk=uw+foK4p+HDeVrA9A@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 6 Jul 2020 10:54:45 +0200
+Message-ID: <CACRpkdZk-Pv49PyhtrW7ZQo+iebOapVb7L2T_cxh0SpYtcv5Xw@mail.gmail.com>
+Subject: Re: [PATCH v2] fcntl: Add 32bit filesystem mode
+To: "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=linus.walleij@linaro.org; helo=mail-lj1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,39 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- qemu-devel@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Linux API <linux-api@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Florian Weimer <fw@deneb.enyo.de>, Andreas Dilger <adilger.kernel@dilger.ca>,
+ Andy Lutomirski <luto@kernel.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Ext4 Developers List <linux-ext4@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 03, 2020 at 08:34:50PM +0200, Philippe Mathieu-Daudé wrote:
-> Add an entry to cover firmware.json (see commit 3a0adfc9bf:
-> schema that describes the different uses and properties of
-> virtual machine firmware).
-> 
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Kashyap Chamarthy <kchamart@redhat.com>
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> Since RFC v1:
-> - Added Daniel & Kashyap as reviewer
-> - Added myself as co-maintainer with Laszlo
+On Tue, Jun 23, 2020 at 12:08 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> On Fri, 29 May 2020 at 08:22, Linus Walleij <linus.walleij@linaro.org> wrote:
+> >
+> > It was brought to my attention that this bug from 2018 was
+> > still unresolved: 32 bit emulators like QEMU were given
+> > 64 bit hashes when running 32 bit emulation on 64 bit systems.
+> >
+> > This adds a flag to the fcntl() F_GETFD and F_SETFD operations
+> > to set the underlying filesystem into 32bit mode even if the
+> > file handle was opened using 64bit mode without the compat
+> > syscalls.
+>
+> I somewhat belatedly got round to updating my QEMU patch
+> that uses this new fcntl() flag to fix the bug. Sorry for
+> the delay getting round to this. You can find the QEMU patch here:
+> https://patchew.org/QEMU/20200623100101.6041-1-peter.maydell@linaro.org/
+> (it's an RFC because obviously we won't put it into QEMU until
+> the kernel side has gone upstream and the API is final.)
+>
+> What's the next step for moving this forward?
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Ted, can you merge this patch?
 
+It seems QEMU is happy and AFICT it uses the approach you want :)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Yours,
+Linus Walleij
 
