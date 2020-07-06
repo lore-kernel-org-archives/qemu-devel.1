@@ -2,85 +2,84 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB29C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE884C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE1F820739
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A84E720739
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Znf+B9u8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE1F820739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="QwLS5Mh8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A84E720739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=cl.cam.ac.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsOIb-0005B3-6p
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:24:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54106)
+	id 1jsOJ8-0005UY-LC
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:25:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsO0V-0004pe-MT
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32818
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsO0T-0004Mu-SP
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594029949;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UrKoebiL2UfqTB2RJFDxEt9GUE2N/cuYD81ybQUoEMc=;
- b=Znf+B9u8iwC4FTmuMKnKCiZBMIRzv0nHNSpVdj59s4BX+XNwl2isMjskXy6JXxfY2l8xs5
- G+i3y5Uf8fK5df0JVy6SwF0jhZ/VgavFz6hfsRkX+qCJuTFWLkSJP6VaYGnxgZLiVluKPU
- VPVVggmElXD+D4U6iiX9Yqxa5ACohAo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-Z8mfu8oMO0SayqObcMufeA-1; Mon, 06 Jul 2020 06:05:47 -0400
-X-MC-Unique: Z8mfu8oMO0SayqObcMufeA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C6FB80183C;
- Mon,  6 Jul 2020 10:05:46 +0000 (UTC)
-Received: from localhost (ovpn-112-176.ams2.redhat.com [10.36.112.176])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DB48275E3B;
- Mon,  6 Jul 2020 10:05:45 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 30/31] block: drop unallocated_blocks_are_zero
-Date: Mon,  6 Jul 2020 12:04:31 +0200
-Message-Id: <20200706100432.2301919-31-mreitz@redhat.com>
-In-Reply-To: <20200706100432.2301919-1-mreitz@redhat.com>
-References: <20200706100432.2301919-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
+ id 1jsOHN-0003O5-Qe; Mon, 06 Jul 2020 06:23:17 -0400
+Received: from ppsw-32.csi.cam.ac.uk ([131.111.8.132]:37740)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
+ id 1jsOHL-00073c-26; Mon, 06 Jul 2020 06:23:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
+ s=20180806.ppsw;
+ h=Sender:Content-Transfer-Encoding:Content-Type:Cc:To:
+ Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Reply-To:
+ Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+ Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+ List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=CV14eKLNAeAzlJkwjnWkbyhiRKz8m9XvLDvFxgC1l98=; b=QwLS5Mh87UKJ7BAEKqcLgPxKyM
+ O0YUcZVSFtkAU+wvikQrL2WEUHwU+KcTIkmFQr2DuUKSLNDDQOjbim4FJK5RHIpRzBw6f8Eb48aTr
+ ywH1+JvcqH+GoOKqMAY7Dlqqnky+mIT1P0IM60j2t+Sa2If02QzJlmPIyf4uorHZJFR4=;
+X-Cam-AntiVirus: no malware found
+X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
+Received: from mail-io1-f41.google.com ([209.85.166.41]:36110)
+ by ppsw-32.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.156]:587)
+ with esmtpsa (PLAIN:alr48) (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+ id 1jsOHF-000F7J-35 (Exim 4.94)
+ (return-path <alr48@hermes.cam.ac.uk>); Mon, 06 Jul 2020 11:23:10 +0100
+Received: by mail-io1-f41.google.com with SMTP id y2so38749522ioy.3;
+ Mon, 06 Jul 2020 03:23:09 -0700 (PDT)
+X-Gm-Message-State: AOAM530Dr4jtze/PORklJOEh3+olUSMGiPrpnyM/xHE0JRI70YUbg++I
+ JdV3Oy/GVa73mJ7GUgfJYNjEPNJoGGma0M6InPk=
+X-Google-Smtp-Source: ABdhPJwiCTOCipz0b/eeOxADDgjJiu37q8JnZVwmCTdKGpiauFCW9uDp+r1ODGUiBE8Yl1Hp/oNiYxv6tVHJybP5D9I=
+X-Received: by 2002:a5e:cb42:: with SMTP id h2mr24283572iok.43.1594030988870; 
+ Mon, 06 Jul 2020 03:23:08 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200703161515.25966-1-Alexander.Richardson@cl.cam.ac.uk>
+ <013da4b5-be9e-aeae-5e88-82188a26d4bf@amsat.org>
+In-Reply-To: <013da4b5-be9e-aeae-5e88-82188a26d4bf@amsat.org>
+From: Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>
+Date: Mon, 6 Jul 2020 11:22:51 +0100
+X-Gmail-Original-Message-ID: <CAEeofcjJjAffMTg+cj5Y+HUZ9+bfkKMtKQRXMdk6FQgm-45KWQ@mail.gmail.com>
+Message-ID: <CAEeofcjJjAffMTg+cj5Y+HUZ9+bfkKMtKQRXMdk6FQgm-45KWQ@mail.gmail.com>
+Subject: Re: [PATCH] Fix MIPS add.s after
+ 1ace099f2acb952eaaef0ba7725879949a7e4406
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=131.111.8.132;
+ envelope-from=alr48@hermes.cam.ac.uk; helo=ppsw-32.csi.cam.ac.uk
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 06:23:10
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,125 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-trivial@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Hi Philippe,
 
-Currently this field only set by qed and qcow2. But in fact, all
-backing-supporting formats (parallels, qcow, qcow2, qed, vmdk) share
-these semantics: on unallocated blocks, if there is no backing file they
-just memset the buffer with zeroes.
+On Fri, 3 Jul 2020 at 19:40, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> Hi Alex,
+>
+> On 7/3/20 6:15 PM, Alex Richardson wrote:
+> > After merging latest QEMU upstream into our CHERI fork, I noticed that
+> > some of the FPU tests in our MIPS baremetal testsuite
+>
+> I understand by baremetal your soft core implementation running on
+> a FPGA, right?
+>
+By baremetal I mean small test binaries running without a host OS.
+The test suite was originally written for the CHERI FPGAs, but it also
+supports various MIPS simulators, our executable formal model written
+in sail and our fork of QEMU (https://github.com/CTSRD-CHERI/qemu).
+Unfortunately it cannot be run with upstream QEMU as it requires a
+special MTC0 instruction to dump register values in a textual format
+to the logfile.
 
-So, document this behavior for .supports_backing and drop
-.unallocated_blocks_are_zero
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200528094405.145708-10-vsementsov@virtuozzo.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- include/block/block.h     |  5 -----
- include/block/block_int.h | 12 +++++++++++-
- block/io.c                |  9 ++-------
- block/qcow2.c             |  1 -
- block/qed.c               |  1 -
- 5 files changed, 13 insertions(+), 15 deletions(-)
-
-diff --git a/include/block/block.h b/include/block/block.h
-index e7934e07f2..bca3bb831c 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -21,11 +21,6 @@ typedef struct BlockDriverInfo {
-     /* offset at which the VM state can be saved (0 if not possible) */
-     int64_t vm_state_offset;
-     bool is_dirty;
--    /*
--     * True if unallocated blocks read back as zeroes. This is equivalent
--     * to the LBPRZ flag in the SCSI logical block provisioning page.
--     */
--    bool unallocated_blocks_are_zero;
-     /*
-      * True if this block driver only supports compressed writes
-      */
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 1b86b59af1..3d6cf88592 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -123,7 +123,17 @@ struct BlockDriver {
-      */
-     bool bdrv_needs_filename;
- 
--    /* Set if a driver can support backing files */
-+    /*
-+     * Set if a driver can support backing files. This also implies the
-+     * following semantics:
-+     *
-+     *  - Return status 0 of .bdrv_co_block_status means that corresponding
-+     *    blocks are not allocated in this layer of backing-chain
-+     *  - For such (unallocated) blocks, read will:
-+     *    - fill buffer with zeros if there is no backing file
-+     *    - read from the backing file otherwise, where the block layer
-+     *      takes care of reading zeros beyond EOF if backing file is short
-+     */
-     bool supports_backing;
- 
-     /* For handling image reopen for split or non-split files */
-diff --git a/block/io.c b/block/io.c
-index 36d4d562a6..b6564e34c5 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2406,7 +2406,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
- 
-     if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
-         ret |= BDRV_BLOCK_ALLOCATED;
--    } else if (want_zero) {
-+    } else if (want_zero && bs->drv->supports_backing) {
-         if (bs->backing) {
-             BlockDriverState *bs2 = bs->backing->bs;
-             int64_t size2 = bdrv_getlength(bs2);
-@@ -2415,12 +2415,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-                 ret |= BDRV_BLOCK_ZERO;
-             }
-         } else {
--            BlockDriverInfo bdi;
--            int ret2 = bdrv_get_info(bs, &bdi);
--
--            if (ret2 == 0 && bdi.unallocated_blocks_are_zero) {
--                ret |= BDRV_BLOCK_ZERO;
--            }
-+            ret |= BDRV_BLOCK_ZERO;
-         }
-     }
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 30f073cf2a..38198b4e75 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4987,7 +4987,6 @@ err:
- static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
- {
-     BDRVQcow2State *s = bs->opaque;
--    bdi->unallocated_blocks_are_zero = true;
-     bdi->cluster_size = s->cluster_size;
-     bdi->vm_state_offset = qcow2_vm_state_offset(s);
-     return 0;
-diff --git a/block/qed.c b/block/qed.c
-index c0c65015c7..a2dd952699 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1514,7 +1514,6 @@ static int bdrv_qed_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-     memset(bdi, 0, sizeof(*bdi));
-     bdi->cluster_size = s->header.cluster_size;
-     bdi->is_dirty = s->header.features & QED_F_NEED_CHECK;
--    bdi->unallocated_blocks_are_zero = true;
-     return 0;
- }
- 
--- 
-2.26.2
-
+> > (https://github.com/CTSRD-CHERI/cheritest) started failing. It turns ou=
+t
+> > this commit accidentally changed add.s into a subtract.
+>
+> Fixes: 1ace099f2a ("target/mips: fpu: Demacro ADD.<D|S|PS>")
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> Thanks for your quick fix!
+>
+> Phil.
+>
+> > Signed-off-by: Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
+> > ---
+> >  target/mips/fpu_helper.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+> > index 7a3a61cab3..56beda49d8 100644
+> > --- a/target/mips/fpu_helper.c
+> > +++ b/target/mips/fpu_helper.c
+> > @@ -1221,7 +1221,7 @@ uint32_t helper_float_add_s(CPUMIPSState *env,
+> >  {
+> >      uint32_t wt2;
+> >
+> > -    wt2 =3D float32_sub(fst0, fst1, &env->active_fpu.fp_status);
+> > +    wt2 =3D float32_add(fst0, fst1, &env->active_fpu.fp_status);
+> >      update_fcr31(env, GETPC());
+> >      return wt2;
+> >  }
+> >
+>
 
