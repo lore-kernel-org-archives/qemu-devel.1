@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD3CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B871C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB5B9206E6
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:14:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB180206E6
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:15:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7tap1DQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB5B9206E6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpZk7Bcd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB180206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMGv-0002Nz-6V
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:14:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56760)
+	id 1jsMHT-000331-1u
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:15:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCS-0001eF-6E
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47780
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCU-0001i6-1C
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33083
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCL-0003BU-T5
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:03 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCN-0003CP-Ns
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594022997;
+ s=mimecast20190719; t=1594022998;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KHMn5I1RFKg3+jBpgffrwvUDe1QNVNMfFvqwt1B/NqU=;
- b=Y7tap1DQR+GyLUBLwJk66amZUElHNCDhjZbfjQJqldqPezswYN7njsqyk40F5Ru8Ja7RJP
- qntj2U6XcPQEppcJZGxaJe9Fuq8lo+ZZ0yryk9EcQBcYEuqnwjptkDI+r+MRJLplJqQZV5
- DbV3TAaGX5H8pU+Rh+v+tG1T2ps1IHs=
+ bh=RX9KpUqi+DRHMsEMRMZrviyEuy56377uUdBz0RHTTDM=;
+ b=OpZk7BcdVQmr7/FoBf39NfBYo3zDMtHOUovFgFBDIOws/Ap2CdBZcfMGd38tUFmDE+GFiN
+ YqGAo+1w2PZdvj1glbVV2lHUEERzkByV4J13ROnVMxz5w2I+yJcIfYxnbWWiqOkXPHLbLs
+ +woqrLUgValuNI/LgWaiyXV03LjP6QE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-ZMQ_boWNOL21JWvcYv2BEA-1; Mon, 06 Jul 2020 04:09:55 -0400
-X-MC-Unique: ZMQ_boWNOL21JWvcYv2BEA-1
+ us-mta-42-VodtojEyPEqyEYwr6oZgfg-1; Mon, 06 Jul 2020 04:09:57 -0400
+X-MC-Unique: VodtojEyPEqyEYwr6oZgfg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 300018014D7;
- Mon,  6 Jul 2020 08:09:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05C93420FE;
+ Mon,  6 Jul 2020 08:09:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EE28171669;
- Mon,  6 Jul 2020 08:09:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ACDA5275E3A;
+ Mon,  6 Jul 2020 08:09:55 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BE5221138536; Mon,  6 Jul 2020 10:09:50 +0200 (CEST)
+ id 25C6F1135223; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/44] qemu-option: Simplify around find_default_by_name()
-Date: Mon,  6 Jul 2020 10:09:15 +0200
-Message-Id: <20200706080950.403087-10-armbru@redhat.com>
+Subject: [PATCH v3 24/44] qom: Use return values to check for error where
+ that's simpler
+Date: Mon,  6 Jul 2020 10:09:30 +0200
+Message-Id: <20200706080950.403087-25-armbru@redhat.com>
 In-Reply-To: <20200706080950.403087-1-armbru@redhat.com>
 References: <20200706080950.403087-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +74,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,64 +104,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When using the Error object to check for error, we need to receive it
+into a local variable, then propagate() it to @errp.
+
+Using the return value permits allows receiving it straight to @errp.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- util/qemu-option.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+ qom/object.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 14e211ddd8..e7b540a21b 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -277,7 +277,6 @@ static void qemu_opt_del_all(QemuOpts *opts, const char *name)
- const char *qemu_opt_get(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
--    const char *def_val;
+diff --git a/qom/object.c b/qom/object.c
+index 0808da2767..3a7c062f8e 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -549,8 +549,7 @@ void object_initialize_child_with_propsv(Object *parentobj,
+     object_initialize(childobj, size, type);
+     obj = OBJECT(childobj);
  
-     if (opts == NULL) {
-         return NULL;
-@@ -285,12 +284,10 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
- 
-     opt = qemu_opt_find(opts, name);
-     if (!opt) {
--        def_val = find_default_by_name(opts, name);
--        if (def_val) {
--            return def_val;
--        }
-+        return find_default_by_name(opts, name);
+-    object_set_propv(obj, &local_err, vargs);
+-    if (local_err) {
++    if (object_set_propv(obj, errp, vargs) < 0) {
+         goto out;
      }
--    return opt ? opt->str : NULL;
-+
-+    return opt->str;
- }
  
- void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts, const char *name)
-@@ -319,8 +316,7 @@ const char *qemu_opt_iter_next(QemuOptsIter *iter)
- char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
--    const char *def_val;
--    char *str = NULL;
-+    char *str;
- 
-     if (opts == NULL) {
-         return NULL;
-@@ -328,11 +324,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- 
-     opt = qemu_opt_find(opts, name);
-     if (!opt) {
--        def_val = find_default_by_name(opts, name);
--        if (def_val) {
--            str = g_strdup(def_val);
--        }
--        return str;
-+        return g_strdup(find_default_by_name(opts, name));
+@@ -743,7 +742,7 @@ Object *object_new_with_propv(const char *typename,
      }
-     str = opt->str;
-     opt->str = NULL;
+     obj = object_new_with_type(klass->type);
+ 
+-    if (object_set_propv(obj, &local_err, vargs) < 0) {
++    if (object_set_propv(obj, errp, vargs) < 0) {
+         goto error;
+     }
+ 
+@@ -1763,20 +1762,24 @@ static void object_set_link_property(Object *obj, Visitor *v,
+     LinkProperty *prop = opaque;
+     Object **targetp = object_link_get_targetp(obj, prop);
+     Object *old_target = *targetp;
+-    Object *new_target = NULL;
++    Object *new_target;
+     char *path = NULL;
+ 
+-    visit_type_str(v, name, &path, &local_err);
++    if (!visit_type_str(v, name, &path, errp)) {
++        return;
++    }
+ 
+-    if (!local_err && strcmp(path, "") != 0) {
+-        new_target = object_resolve_link(obj, name, path, &local_err);
++    if (*path) {
++        new_target = object_resolve_link(obj, name, path, errp);
++        if (!new_target) {
++            g_free(path);
++            return;
++        }
++    } else {
++        new_target = NULL;
+     }
+ 
+     g_free(path);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+ 
+     prop->check(obj, name, new_target, &local_err);
+     if (local_err) {
 -- 
 2.26.2
 
