@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED4F6C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C08AFC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:25:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB05320724
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:25:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F70920724
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:25:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eRmnXNOC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB05320724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdO1BALA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F70920724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMRe-0007JS-Vs
+	id 1jsMRf-0007L2-Qg
 	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:25:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57388)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCt-0002fI-Ct
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40177
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCf-00027V-Le
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41912
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCR-0003GV-UY
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:31 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCP-0003Dw-9D
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594023001;
+ s=mimecast20190719; t=1594023000;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PHPrf4CoEIah77RobW83ZCh8oZf0jzMGgZFjhqN1hME=;
- b=eRmnXNOCnH/QiT0sAl9MvoXgVb65b071SIc1Mxre0Wva7TnqrPCPTJLrtpWmCuK8GTyg4U
- OPxRwpnoQ6na8wOuo8TLq4agyec7cvXfo+sBhl2e4kb+L24cWa6jgcFOEyzkLjQLgCwrw1
- zQWBtnE24dqfDvKJQul4heGUs1+7vF4=
+ bh=XoxaS8HCvhbtSj+AnfqvqebShw8EsKZihvgQYUOkUtk=;
+ b=TdO1BALAp1gNw6cL13ksb9cUetOS0y8+pKJZ8ss5gSR5nCFmcLTZLbnQtGhCDuQ4m8wu69
+ dRFKjK5jK/kIHAz1mywj11cpMs1OtYQDS6av1dfOniTaFzGkmHYtWjr4U/pCMRA8GTV0kl
+ nU1CZmnqYJ4JyvgpQoAtvl7G82p+9+Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-87aB-DpQNdmpwQ7ZvL5s2g-1; Mon, 06 Jul 2020 04:09:57 -0400
-X-MC-Unique: 87aB-DpQNdmpwQ7ZvL5s2g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-472-u6Dp-a0uNcu8nzHqsYq7Uw-1; Mon, 06 Jul 2020 04:09:58 -0400
+X-MC-Unique: u6Dp-a0uNcu8nzHqsYq7Uw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10A4E2D0;
- Mon,  6 Jul 2020 08:09:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C0221883622;
+ Mon,  6 Jul 2020 08:09:57 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 97DC16E6E4;
- Mon,  6 Jul 2020 08:09:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 256BA7B40A;
+ Mon,  6 Jul 2020 08:09:57 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0A41A11358D7; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
+ id 4286E1135236; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 19/44] s390x/pci: Fix harmless mistake in zpci's property
- fid's setter
-Date: Mon,  6 Jul 2020 10:09:25 +0200
-Message-Id: <20200706080950.403087-20-armbru@redhat.com>
+Subject: [PATCH v3 30/44] qdev: Make functions taking Error ** return bool,
+ not void
+Date: Mon,  6 Jul 2020 10:09:36 +0200
+Message-Id: <20200706080950.403087-31-armbru@redhat.com>
 In-Reply-To: <20200706080950.403087-1-armbru@redhat.com>
 References: <20200706080950.403087-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -98,41 +98,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- groug@kaod.org, pbonzini@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>
+ ehabkost@redhat.com, qemu-block@nongnu.org, groug@kaod.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-s390_pci_set_fid() sets zpci->fid_defined to true even when
-visit_type_uint32() failed.  Reproducer: "-device zpci,fid=junk".
-Harmless in practice, because qdev_device_add() then fails, throwing
-away @zpci.  Fix it anyway.
+See recent commit "error: Document Error API usage rules" for
+rationale.
 
-Cc: Matthew Rosato <mjrosato@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/hw/qdev-properties.h     | 4 ++--
+ hw/core/qdev-properties-system.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 0517901024..07e1e4d7a3 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -1267,7 +1267,9 @@ static void s390_pci_set_fid(Object *obj, Visitor *v, const char *name,
-         return;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 49c6cd2460..f12ab9e6bc 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -236,8 +236,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+ /*
+  * Set properties between creation and realization.
+  */
+-void qdev_prop_set_drive_err(DeviceState *dev, const char *name,
+-                         BlockBackend *value, Error **errp);
++bool qdev_prop_set_drive_err(DeviceState *dev, const char *name,
++                             BlockBackend *value, Error **errp);
+ 
+ /*
+  * Set properties between creation and realization.
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index 810831b1df..7d2387f22c 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -421,7 +421,7 @@ const PropertyInfo qdev_prop_audiodev = {
+     .set = set_audiodev,
+ };
+ 
+-void qdev_prop_set_drive_err(DeviceState *dev, const char *name,
++bool qdev_prop_set_drive_err(DeviceState *dev, const char *name,
+                              BlockBackend *value, Error **errp)
+ {
+     const char *ref = "";
+@@ -436,7 +436,7 @@ void qdev_prop_set_drive_err(DeviceState *dev, const char *name,
+         }
      }
  
--    visit_type_uint32(v, name, ptr, errp);
-+    if (!visit_type_uint32(v, name, ptr, errp)) {
-+        return;
-+    }
-     zpci->fid_defined = true;
+-    object_property_set_str(OBJECT(dev), name, ref, errp);
++    return object_property_set_str(OBJECT(dev), name, ref, errp);
  }
  
+ void qdev_prop_set_drive(DeviceState *dev, const char *name,
 -- 
 2.26.2
 
