@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C165C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32770C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:30:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25EBC20702
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:30:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F067E206CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:30:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EU+1Fgxm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25EBC20702
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6106WMl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F067E206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsU0O-0005Bm-Es
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:30:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53582)
+	id 1jsU0j-0005mx-8t
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:30:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsTzU-0003mQ-43
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:29:12 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:43603)
+ id 1jsTzw-0004Lv-K2
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:29:40 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:34906)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsTzS-0000Ix-Hv
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:29:11 -0400
-Received: by mail-il1-x142.google.com with SMTP id i18so33436698ilk.10
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 09:29:10 -0700 (PDT)
+ id 1jsTzv-0000Ld-35
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:29:40 -0400
+Received: by mail-il1-x143.google.com with SMTP id t18so13501477ilh.2
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 09:29:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=txw3S/6j5UEIlp9BnD/o01vmpv0rgKoTKJs0lDslMEE=;
- b=EU+1FgxmK4fdLTdPSgiWteMJBLUKis7+vKn0APloEX2v5AGoVOF49GVUpl9mCfOWYM
- x7KlS2QUQnLcc+pcgK90jCOXsRwDjepbH71zQ6kaGnbHQeMMn5cp44sE2VVZQuifkv0T
- C5Ag8s8E5H+Cd+F0KnAqWCa52V22jMEOssRufv06XRjgInEaOsrZPk+hEVJadFMyZJQk
- iNNWB0Ftb8C0xNBhRTzjDApgOze9vxvn1BCWGW5pWetFy4Tu5BqOy2OtFttLv+m2URwC
- 38HNuUiQYpk23uBfNWIycQIQKtHm/yVl7WW7206hDj2VflKEo9UHgFDqxpc039li22wS
- sNuQ==
+ bh=FkOrzPJRfCEkl/rxaCiZ45H0g+MGuLDY7Pi17f7zR30=;
+ b=A6106WMltit+3BoFkLaXAsvhrfQAuV9U/+xoUenQYCWAJoVHQ99X/fwZFtDOUYgccM
+ htKc7QFhYrWHM+c+4aHBrkaXZFW8zR9vh+p+E6h8eu2tYb8Zq7+bR1KO+SyMWJM4h146
+ nvRPp1W7HQQFKT6xyxkcNGXNjgy0I+Mj1xLx3Mom9OBz63H1zlwkOJb9f8swVDpdSPh2
+ 3Vyo4pAq+okPeYsjPC4Cz4LjHalXr7jw+kxAfHEUjm4FpwzpjyrpF3qWX3RKGhdegm8O
+ pglt36svVBOEaw293GXEQBU3QPLqWvqIb/daDGh0OxlsLEX5tv6L8H0FpGYaSNLWCHgs
+ /AvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=txw3S/6j5UEIlp9BnD/o01vmpv0rgKoTKJs0lDslMEE=;
- b=RZdO9KRUqao7wjzbFsARKTl0snYfGR5tX/2DHuBqVqTwFUtoQEKUSjB89PiJ66pljt
- +BeiL+DoIcZr8Sr1ygjWlbkYSkmGGW7GDLnLAX8KQfSUDWOQlMqFPJWFGiHNg4M8wRV3
- 5AJkHETqjrWn8Erk628XP1qK2tDT1Ux7luQRC+tRMsVia0Js9Mjyp6wZStSfmtDq53VN
- DRc38CweZVSvGDMMSHOfo0qFK65K1oR2O8OnSEQMONC7nBp9lZoiZ4do8ue1I7OrjzYj
- tVESWVgDUfu85woVfTakCXO+ApzNa4RJIz7kyvj7ba/Y6WGfgDzwp+IzWsLXYahD3gGa
- VSfA==
-X-Gm-Message-State: AOAM5325h1ZajwAJqP8V83/vdgjeHVkzznuXo9m9XCFxXaS3s8b790r5
- mnw6S20TP52P6W3ZprE2SkibYGn0DFkBOZPaXZI=
-X-Google-Smtp-Source: ABdhPJxm+C3ts2EuXC3Aq44x6Vgl463r69L8+iBTLmcOa8MHgIPCPg/ORdpuXHXZJvxUowFOpkR9CJN43VxxWMBsfM4=
-X-Received: by 2002:a92:bb84:: with SMTP id x4mr32062004ilk.177.1594052949425; 
- Mon, 06 Jul 2020 09:29:09 -0700 (PDT)
+ bh=FkOrzPJRfCEkl/rxaCiZ45H0g+MGuLDY7Pi17f7zR30=;
+ b=TLPtz72ogsy6vpSZ1YQB+gpl66J+ChSQQuAPlsbxZos3ovvCai8wu4QTvhGbODMsjU
+ CTXVXXcJXUF/1ErnzxxcRrkfgBGMfu7pWAtW2HgUngkTRjB9s7Hg158bUievB6aNRZ21
+ ukFVsl2V1nXBCMANTsXlp/qiyD+c4vnaS3vfG4lxiMo3QDtr7jXa6ygfXMM2ARFFhZe+
+ Vys/wEqBHVkm/0BaGJ5JkdPZopXZWrQGHL4/UGb+PNhcVk+wsAQwjzUihiiqrRzlPckk
+ JV2QMtqtIuSfthwPtEIeKhlDne/zI9uddVrvnMn4lFg2iIoKaGpl24j7B+XF2y9yuLFC
+ reSA==
+X-Gm-Message-State: AOAM532gT0w2fh7o8cN/zxUrFhlmuV2zT90F4JuEZFhrpdZXeQiTg7W/
+ uC2Jy/n947Ndmg3bHHfmlBgFZiZc+AIntzH6iIycdVre
+X-Google-Smtp-Source: ABdhPJziXjidVi/5sH1BIP6BcoG3L/phziEOJYmnTMlZgOiqy6YTNcF+1NGriSgPWxVtVEX3XPS4R89ShukZes4/J70=
+X-Received: by 2002:a05:6e02:d51:: with SMTP id
+ h17mr31615207ilj.131.1594052977979; 
+ Mon, 06 Jul 2020 09:29:37 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200705211016.15241-1-f4bug@amsat.org>
- <20200705211016.15241-3-f4bug@amsat.org>
-In-Reply-To: <20200705211016.15241-3-f4bug@amsat.org>
+ <20200705211016.15241-4-f4bug@amsat.org>
+In-Reply-To: <20200705211016.15241-4-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 6 Jul 2020 09:19:23 -0700
-Message-ID: <CAKmqyKOcc=recN5dpsMUZRq9FkU2Kj0-AbmxGTOSpY=yxOEF-Q@mail.gmail.com>
-Subject: Re: [PATCH 2/4] hw/lm32/milkymist: Comment to remember some IRQs
- lines are left unwired
+Date: Mon, 6 Jul 2020 09:19:51 -0700
+Message-ID: <CAKmqyKMrUYJ6sSP8SMj+HXaSHdkvB3oxGQS8kxhyq7YPHmscLw@mail.gmail.com>
+Subject: Re: [PATCH 3/4] hw/sd/milkymist: Create the SDBus at init()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -108,34 +108,45 @@ Sender: "Qemu-devel"
 On Sun, Jul 5, 2020 at 2:10 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 > wrote:
 >
-> The 'card is readonly' and 'card inserted' IRQs are not wired.
-> Add a comment in case someone know where to wire them.
+> We don't need to wait until realize() to create the SDBus,
+> create it in init() directly.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-I'm not convinced adding fixmes or todos in the code is the right
-direction. It would be better to file bugs or use some other more
-official tracking mechanism.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  hw/lm32/milkymist.c | 1 +
->  1 file changed, 1 insertion(+)
+>  hw/sd/milkymist-memcard.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-> index 469e3c4322..117973c967 100644
-> --- a/hw/lm32/milkymist.c
-> +++ b/hw/lm32/milkymist.c
-> @@ -87,6 +87,7 @@ static DeviceState *milkymist_memcard_create(hwaddr bas=
-e)
->      dev =3D qdev_new("milkymist-memcard");
->      sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
->      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> +    /* FIXME wire 'card is readonly' and 'card inserted' IRQs? */
->
->      return dev;
+> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+> index afdb8aa0c0..fb02309f07 100644
+> --- a/hw/sd/milkymist-memcard.c
+> +++ b/hw/sd/milkymist-memcard.c
+> @@ -261,6 +261,9 @@ static void milkymist_memcard_init(Object *obj)
+>      memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops,=
+ s,
+>              "milkymist-memcard", R_MAX * 4);
+>      sysbus_init_mmio(dev, &s->regs_region);
+> +
+> +    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+> +                        DEVICE(obj), "sd-bus");
 >  }
+>
+>  static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+> @@ -271,9 +274,6 @@ static void milkymist_memcard_realize(DeviceState *de=
+v, Error **errp)
+>      DriveInfo *dinfo;
+>      Error *err =3D NULL;
+>
+> -    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+> -                        dev, "sd-bus");
+> -
+>      /* Create and plug in the sd card */
+>      /* FIXME use a qdev drive property instead of drive_get_next() */
+>      dinfo =3D drive_get_next(IF_SD);
 > --
 > 2.21.3
 >
