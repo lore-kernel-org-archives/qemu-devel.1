@@ -2,87 +2,85 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36686C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A35C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:40:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 020BC2073E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:39:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63FD5206E9
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:40:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GIFXgIk8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020BC2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IOp7Q2zc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63FD5206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsPTT-00005Q-94
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 07:39:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45538)
+	id 1jsPTh-0000RZ-4H
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 07:40:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jsPSD-0006rN-17
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 07:38:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33638
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jsPSB-0002KO-Bw
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 07:38:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594035510;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BxyY8fHQuGh0O6z39NVMHrhqOWF9Si8qwwucYQTaMaM=;
- b=GIFXgIk8lMGx3/DAe3iy82+Ie6M/pci+WC8AR7SLGAIArdxDmUrdDr77w4YOgGaomAsyMu
- vLy8hOFflf0AuA33u2ne5oLi120ziAjMVXxO33mu0g+V/jViOZHI5wiheqGjL/sOqyrUmJ
- rw32JAMgoEHd5cYSmQGS/IYXmuAEEvM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-qJJTae2uMve_Jzp6pJTcWw-1; Mon, 06 Jul 2020 07:38:28 -0400
-X-MC-Unique: qJJTae2uMve_Jzp6pJTcWw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56C71107ACCD;
- Mon,  6 Jul 2020 11:38:27 +0000 (UTC)
-Received: from gondolin (ovpn-112-234.ams2.redhat.com [10.36.112.234])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E887260BF3;
- Mon,  6 Jul 2020 11:38:25 +0000 (UTC)
-Date: Mon, 6 Jul 2020 13:38:23 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PULL 13/14] virtio-ccw: fix virtio_set_ind_atomic
-Message-ID: <20200706133823.64f6945a.cohuck@redhat.com>
-In-Reply-To: <20200706132311.2add044f.pasic@linux.ibm.com>
-References: <20200703100650.621212-1-cohuck@redhat.com>
- <20200703100650.621212-14-cohuck@redhat.com>
- <20200706132311.2add044f.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jsPST-00076o-HB
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 07:38:49 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39460)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jsPSR-0002O7-2c
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 07:38:49 -0400
+Received: by mail-il1-x143.google.com with SMTP id k6so32557166ili.6
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 04:38:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=kAjOy405mdzvOiXwIbBWwCtYghiu1SkzlY2tU/CuGr8=;
+ b=IOp7Q2zcU2UXTXBkKne9A6A3vCCTT4/calpX1l6rd/MeiT6WbpxL1D2B4ohKyAwiV2
+ XYDWwgNnxeQR43FLRxt7ukDiPKNwwyikW6spovqdw7CFIeoLuoz0mh1sU7uT4HhF7faI
+ agwFqoww9dCj1rpuK8AZNgeBfLvBYurkWOYdR88L2322Nt5PHlxZNhg8JeKqOhmhaZyk
+ aBe0Bt0Mp4qdsqGHOueOPeT6joGQTeyNDeT3blu6zBzP6MoE5Nxet1NiRY8RDcCVEdWs
+ /D8NKwnAoeEcPKK3OcPabRi5FNvKdZlZLA4i4Kp4u46CR/o/F3XFYUvnh0WobFcfoMgG
+ lKDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=kAjOy405mdzvOiXwIbBWwCtYghiu1SkzlY2tU/CuGr8=;
+ b=Y8NF2M9WIdXukXLub/xz0dqwS6iDr+5To4rZPhBttkZEDgl/QBRCNHktV/uUhfZkf5
+ VuQIhgtTE5cdqfmrjKgf3en0uj6Tv152R5VfBlU8pHjX7WUXg8Lwxe7/HYubzAtOgYRB
+ ZDH/25fzvbUT2T4zRTmU5kHCDq7vjNLatleayf4dGrpoavh08Ca0WwIBtwSqRaWL5R9b
+ vBOXTds7/jec0KQoY6WslJJVYqLssTApDOBIWxjSf5vyTOB1ewGVOm6EOhCwZCoseXYA
+ KimqRUKfM0Dfp1y9Wh1Sye9/H4207IZR2E3gcAXqtsfa9wRxjxY2dGfyiIsDNMQ1h+/5
+ KAgg==
+X-Gm-Message-State: AOAM5318hvHxUrc1YQME7uPek1xX3t7pNUw6ysCYlXxtYaFbcHqi1u3J
+ xqrdgZvM2b+/++KBGi9KSjQcbTsaUW5j6f8L4xflcg==
+X-Google-Smtp-Source: ABdhPJxKtoT4aeLs8U6JypVPenfh4gH1Nfbf7qBR+ljZ743fY/bBeLrVg04lhyox593+8yjpBQmSHyuuf8HUy1QDSMM=
+X-Received: by 2002:a92:d3c7:: with SMTP id c7mr30315954ilh.292.1594035525479; 
+ Mon, 06 Jul 2020 04:38:45 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200703200459.23294-1-f4bug@amsat.org>
+In-Reply-To: <20200703200459.23294-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Jul 2020 12:38:34 +0100
+Message-ID: <CAFEAcA93Ak+OBuUJ_tmevFB+-rsfQTxdXqSKNmvt_Wbg6Hr2fw@mail.gmail.com>
+Subject: Re: [PATCH] hw/arm/bcm2836: Remove unused 'cpu_type' field
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=peter.maydell@linaro.org; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,41 +94,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org,
- Andre Wild <Andre.Wild1@ibm.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Jul 2020 13:23:11 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On Fri, 3 Jul 2020 at 21:05, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> The 'cpu_type' has been moved from BCM283XState to BCM283XClass
+> in commit 210f47840d, but we forgot to remove the old variable.
+> Do it now.
+>
+> Fixes: 210f47840d ("hw/arm/bcm2836: Hardcode correct CPU type")
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/hw/arm/bcm2836.h | 1 -
+>  1 file changed, 1 deletion(-)
+>
 
-> On Fri,  3 Jul 2020 12:06:49 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > From: Halil Pasic <pasic@linux.ibm.com>
-> > 
-> > The atomic_cmpxchg() loop is broken because we occasionally end up with
-> > old and _old having different values (a legit compiler can generate code
-> > that accessed *ind_addr again to pick up a value for _old instead of
-> > using the value of old that was already fetched according to the
-> > rules of the abstract machine). This means the underlying CS instruction
-> > may use a different old (_old) than the one we intended to use if
-> > atomic_cmpxchg() performed the xchg part.
-> > 
-> > Let us use volatile to force the rules of the abstract machine for
-> > accesses to *ind_addr. Let us also rewrite the loop so, we that the  
-> 
-> Michael T. Has pointed out that this sentence is ungrammatical. 
-> 
-> s/we// would IMHO solve the problem. Can we fix this before it gets
-> merged?
 
-Unfortunately, it's already too late :(
 
-> 
-> > new old is used to compute the new desired value if the xchg part
-> > is not performed.
+Applied to target-arm.next, thanks.
 
+-- PMM
 
