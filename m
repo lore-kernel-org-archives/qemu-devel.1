@@ -2,104 +2,84 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7699C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FCEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:27:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CD9B2073E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:25:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CD9B2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B6B02073E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:27:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qy007EeT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B6B02073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsPFc-0008F5-Ok
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 07:25:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42460)
+	id 1jsPH9-000100-Lh
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 07:27:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jsPEJ-0006sb-2i; Mon, 06 Jul 2020 07:24:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24696)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jsPEH-0008KM-5k; Mon, 06 Jul 2020 07:24:10 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 066B2usl079464; Mon, 6 Jul 2020 07:24:07 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3237cfxrap-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Jul 2020 07:24:07 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 066B2vZC079496;
- Mon, 6 Jul 2020 07:24:07 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.102])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3237cfxra4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Jul 2020 07:24:06 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
- by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 066BKnX2011294;
- Mon, 6 Jul 2020 11:24:05 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com
- (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
- by ppma06ams.nl.ibm.com with ESMTP id 322h1h27ce-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Jul 2020 11:24:05 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 066BO2Cc28246042
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 6 Jul 2020 11:24:03 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E05CDA4040;
- Mon,  6 Jul 2020 11:24:02 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 81110A4059;
- Mon,  6 Jul 2020 11:24:02 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.6.129])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  6 Jul 2020 11:24:02 +0000 (GMT)
-Date: Mon, 6 Jul 2020 13:23:41 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PULL 14/14] s390x/pci: fix set_ind_atomic
-Message-ID: <20200706132341.2eb7255e.pasic@linux.ibm.com>
-In-Reply-To: <20200703100650.621212-15-cohuck@redhat.com>
-References: <20200703100650.621212-1-cohuck@redhat.com>
- <20200703100650.621212-15-cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jsPGb-0000W1-D9
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 07:26:33 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40895)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jsPGZ-0000MQ-Hn
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 07:26:32 -0400
+Received: by mail-io1-xd44.google.com with SMTP id q8so38905952iow.7
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 04:26:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=626m2y7v45xA66SSQKynyXH6OAAoP3SjQ+sZ16r1KOw=;
+ b=Qy007EeT+pldu9Aas2FlxIL0c4vUXWX0hiw7/icHFBl3fVKh/ApnSueAAy+d2mvcQK
+ JV7b1iqV3zRINMNbuwlubpk0z9yfBr8T8P/0+mkbKaULnap/Jqsl3ZF7RLZFtC9AnGIw
+ kI3Sa8RjpZBeBGOr1/qOQ1CZJ55rx+01OY4BUPzlAWirdyOHEDtPe6PiUmCdQxRRCuwO
+ ycCxWfoDKR+wNDVkgtWK2DdINgA2yxAXSmOc+w7bWSdy8NlqsN5Cryzwq2sYRUYtGw0Z
+ g+nczpMJpjDBNW/7L6UJZwu6+XdBIT7DfPwrVTWicgU0xX3+2Wgzdek120D+Ftkuzkx8
+ VD8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=626m2y7v45xA66SSQKynyXH6OAAoP3SjQ+sZ16r1KOw=;
+ b=n/NLUmKBQgPhKjE0tZZmW9xEY89D1sG0OfAE5yt07oPdgNjhUl+/VFRxODKJ9UZ3Fr
+ 7/gd+t+ygeUnrS8aVpf4MxaT/zmyY1MxZITl1vQT/MJxh8JinuqJ1oMY2fBLFJG4Admj
+ cmgox5mRlxv6Ia26OTaKFVN6zcY1X5h5DGkXERuWE5lkhOvr4GWodtWNwAyuvImiGDCp
+ KlmK7knZJcS4SYFKqX54Sk07iMvcxrHVIBJkd6b1Pjy7e8lfq3vIzvgV3xymKjLxi5QN
+ 1fkJJTQsogCIJClEX7X6C4NOTRCbGOpF/6DZqNCO/uW4YEshowTUMCcYaqGjGrNy74/K
+ L6LA==
+X-Gm-Message-State: AOAM532LMPYbpuCQ1/umfyB4I/YIK10IIzu7RQ8C6tpun21eB9jsL86X
+ 4Bd/yL8TYylHM5MjLly58XFIvPAPbsaWs64M4tBmYQ==
+X-Google-Smtp-Source: ABdhPJxCvkuRV6KcuKbfxBTcTvkb+8dzznwpRPQe8tp+qL5hw5lmkEkWUqjZtbPiB2m/cM7OMkl9HlzPRgowZv/0+ZI=
+X-Received: by 2002:a6b:9042:: with SMTP id s63mr25467264iod.195.1594034790342; 
+ Mon, 06 Jul 2020 04:26:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-06_08:2020-07-06,
- 2020-07-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- suspectscore=0 bulkscore=0 priorityscore=1501 phishscore=0 impostorscore=0
- spamscore=0 adultscore=0 mlxlogscore=999 clxscore=1015
- cotscore=-2147483648 malwarescore=0 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007060086
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 07:24:08
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200520172800.8499-1-richard.henderson@linaro.org>
+ <20200520172800.8499-5-richard.henderson@linaro.org>
+In-Reply-To: <20200520172800.8499-5-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Jul 2020 12:26:19 +0100
+Message-ID: <CAFEAcA-fqaXRd7-hD0Wh2c+SLshg_7eN-YJp+vyORBLmE_wKLQ@mail.gmail.com>
+Subject: Re: [PATCH v9 4/5] linux-user: Parse NT_GNU_PROPERTY_TYPE_0 notes
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=peter.maydell@linaro.org; helo=mail-io1-xd44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,81 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  3 Jul 2020 12:06:50 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> From: Halil Pasic <pasic@linux.ibm.com>
-> 
-> The atomic_cmpxchg() loop is broken because we occasionally end up with
-> old and _old having different values (a legit compiler can generate code
-> that accessed *ind_addr again to pick up a value for _old instead of
-> using the value of old that was already fetched according to the
-> rules of the abstract machine). This means the underlying CS instruction
-> may use a different old (_old) than the one we intended to use if
-> atomic_cmpxchg() performed the xchg part.
-> 
-> Let us use volatile to force the rules of the abstract machine for
-> accesses to *ind_addr. Let us also rewrite the loop so, we that the
-
-Michael T. Has pointed out that this sentence is ungrammatical. 
-
-s/we// would IMHO solve the problem. Can we fix this before it gets
-merged?
-
-> new old is used to compute the new desired value if the xchg part
-> is not performed.
-> 
-> Fixes: 8cba80c3a0 ("s390: Add PCI bus support")
-> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Message-Id: <20200616045035.51641-3-pasic@linux.ibm.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+On Wed, 20 May 2020 at 18:28, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> For aarch64, this includes the GNU_PROPERTY_AARCH64_FEATURE_1_BTI bit,
+> which indicates that the image should be mapped with guarded pages.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/s390x/s390-pci-bus.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 142e52a8ffdd..736965c9287f 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -637,22 +637,24 @@ static AddressSpace *s390_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
->  
->  static uint8_t set_ind_atomic(uint64_t ind_loc, uint8_t to_be_set)
->  {
-> -    uint8_t ind_old, ind_new;
-> +    uint8_t expected, actual;
->      hwaddr len = 1;
-> -    uint8_t *ind_addr;
-> +    /* avoid  multiple fetches */
-> +    uint8_t volatile *ind_addr;
->  
->      ind_addr = cpu_physical_memory_map(ind_loc, &len, true);
->      if (!ind_addr) {
->          s390_pci_generate_error_event(ERR_EVENT_AIRERR, 0, 0, 0, 0);
->          return -1;
->      }
-> +    actual = *ind_addr;
->      do {
-> -        ind_old = *ind_addr;
-> -        ind_new = ind_old | to_be_set;
-> -    } while (atomic_cmpxchg(ind_addr, ind_old, ind_new) != ind_old);
-> -    cpu_physical_memory_unmap(ind_addr, len, 1, len);
-> +        expected = actual;
-> +        actual = atomic_cmpxchg(ind_addr, expected, expected | to_be_set);
-> +    } while (actual != expected);
-> +    cpu_physical_memory_unmap((void *)ind_addr, len, 1, len);
->  
-> -    return ind_old;
-> +    return actual;
->  }
->  
->  static void s390_msi_ctrl_write(void *opaque, hwaddr addr, uint64_t data,
+> v9: Only map the startup executable with BTI; anything else must be
+>     handled by the interpreter.
+> ---
+>  linux-user/qemu.h    |   4 ++
+>  linux-user/elfload.c | 143 ++++++++++++++++++++++++++++++++-----------
+>  2 files changed, 112 insertions(+), 35 deletions(-)
 
+Hi; this patch has some changes which seem to be just code motion
+(moving the PT_INTERP handling higher up in the function), some
+changes which are coding style fixes (braces), some which are
+no-behaviour-change changes (using eppnt->foo instead of phdr[i].foo)
+and also the actual BTI related functional change. Could you
+split them out, please? I think it would make this easier to review.
+
+thanks
+-- PMM
 
