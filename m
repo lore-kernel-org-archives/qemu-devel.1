@@ -2,89 +2,97 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 813BFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B842C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 402F120724
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:31:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A0BF20724
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:32:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIWzLx0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402F120724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqAhUZoH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A0BF20724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMXT-0000KN-G6
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:31:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57352)
+	id 1jsMYE-0001R9-B1
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCr-0002dt-Ts
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41563
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsMCR-0003GN-It
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:10:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594023001;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fF1Tucf7UaPBiq9hbDh7qt6xTfeK4tykAPibQb7geLk=;
- b=OIWzLx0GbZc7JM6FfX8AsmNhsCWT+VDogP8IrnSu7Q5qX9nqpLXXso7Hd9FIMSpxp/DRA5
- OdIeOJCMHoP9p5szBiQ0iu+7xrRTrMGDn0ODegAwipceuGbCWHUzpHHP7V/zf2iKGWjj1m
- OasN799VNpZakqbNfNg7qov+pLVCzk0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-mH4PMuJsMaaS4d0r8bQOAA-1; Mon, 06 Jul 2020 04:09:57 -0400
-X-MC-Unique: mH4PMuJsMaaS4d0r8bQOAA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F4F010059A5;
- Mon,  6 Jul 2020 08:09:56 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1991760BF3;
- Mon,  6 Jul 2020 08:09:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 338841135227; Mon,  6 Jul 2020 10:09:51 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 26/44] qom: Make functions taking Error ** return bool,
- not void
-Date: Mon,  6 Jul 2020 10:09:32 +0200
-Message-Id: <20200706080950.403087-27-armbru@redhat.com>
-In-Reply-To: <20200706080950.403087-1-armbru@redhat.com>
-References: <20200706080950.403087-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsMML-000662-3S
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:20:17 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42799)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsMMJ-000545-Bw
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:20:16 -0400
+Received: by mail-wr1-x444.google.com with SMTP id o11so39835202wrv.9
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 01:20:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=oPviQ+LIWGrd/yJvMZKPPFt1O+v7N7YSCrqZW1qvupw=;
+ b=nqAhUZoHKtcH8+JTjMw9DvyU2KCcMBXr33sTsYlgoLsYRchsNhWlobHPjN6xacxBdR
+ /7nO90UQ+1LY6nFoGK7uOCbZJv/tIvadGVicDMReuxy3hhyRBuSsXm4DJ/QbOJQ+vwau
+ UpC38BTvLIhzFZeoLZjsvva1yMmrV6Fpkwo30Uzy2XGClZ9lN5mglAfhTIxmT+1S6Op6
+ gTfByH6T5ZilI6aOuGQflWhGp24qRD1MwQUrjY/GnBz4yOqswU94hA8nOkyaa5ymS3cU
+ O/x0UwRTN2nVLomayA9WeBuGdN4z5szSBDMxXRZIjbrj264Ms5F/cten2BtOEp7j1TRh
+ fHJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=oPviQ+LIWGrd/yJvMZKPPFt1O+v7N7YSCrqZW1qvupw=;
+ b=uM1m9rs4xS5ag7PUJhNmL3y4XBsbH0ZxcJ2LwCD5BPcT9YiHkPUnBEBJLBF+ZmjxV5
+ 1fkxWXFwK+N/N7kAwbA34jKxGpXp/bIcb+9Un5yYcVV6LkBKXjVQSA5kkXE7R7f6pa4R
+ dCPyHPBUP9sPl7Elj6ZIs5S6djusRARO2FpThl0P6xToW+1gZgVaoNrpOItGpWjC4/mA
+ 54P7SGWs9UPnQZGAe9hZxvH+rYbXdjKAcc4p9DakJVsimbcHjdc+u0pTn508wnHThHxg
+ EJIBQzUqtuz8o+tvpdQU1urfAf0sMrPIytO8tul30BVcRtDJnuDcfIn4irqBbbZlf21p
+ R0ZA==
+X-Gm-Message-State: AOAM530XoEVRjMeHMHqG9pCZ8WstD2/AW6dSnt6efQaD08nQ6txikTKY
+ kQst+qnYP+wS/b15/CG2k1w=
+X-Google-Smtp-Source: ABdhPJxqlqkFu3NaAPX4oF/vhN+9Gr5aDnHDCX2/Pm6tPo1voU+ZpCcbMUBOquGIdgGovtafLshPow==
+X-Received: by 2002:adf:f2c5:: with SMTP id d5mr48542327wrp.96.1594023613840; 
+ Mon, 06 Jul 2020 01:20:13 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id t141sm2643612wmt.26.2020.07.06.01.20.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jul 2020 01:20:13 -0700 (PDT)
+Subject: Re: [PATCH v2] hw/core/qdev: Increase qdev_realize() kindness
+To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200705221430.30207-1-f4bug@amsat.org>
+ <87fta5glw8.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f9e07dfc-868d-b5d6-ff62-24bdb882ccc4@amsat.org>
+Date: Mon, 6 Jul 2020 10:20:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <87fta5glw8.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,585 +105,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, groug@kaod.org,
- pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-See recent commit "error: Document Error API usage rules" for
-rationale.
+On 7/6/20 9:09 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> Since commit 510ef98dca5, qdev_realize() aborts if bus-less
+>> device is realized on a bus. Be kind with the developer by
+>> displaying a hint about what is wrong.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> v2: Use errp (bonzini suggestion)
+>>
+>> Paolo, I was tempted to check errp is really &error_abort else
+>> it is an error! :P
+>>
+>>     } else if (DEVICE_GET_CLASS(dev)->bus_type) {
+>>         error_setg(errp, "%s: Unexpected bus '%s' for bus-less device '%s'",
+>>                    __func__, DEVICE_GET_CLASS(dev)->bus_type,
+>>                    object_get_typename(OBJECT(dev)));
+>>         assert(errp == &error_abort); // <--------------
+> 
+> Don't!
+> 
+> Functions taking an Error **errp parameter to report errors should never
+> examine the argument.
+> 
+> The Error API is for separating concerns.  The callee's concern is
+> detecting errors and failing cleanly.  *Handling* the errors is the
+> caller's concern.
+> 
+> To simplify common handling patterns, we provide convenience arguments
+> &error_abort, &error_fatal, and NULL.  Their use is exclusively the
+> caller's concern.
+> 
+> Examining the argument undermines the separation of concerns.
+> 
+>>         return false;
+>>     }
+>> ---
+>>  hw/core/qdev.c | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+>> index 2131c7f951..9d1530c39d 100644
+>> --- a/hw/core/qdev.c
+>> +++ b/hw/core/qdev.c
+>> @@ -392,8 +392,11 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
+>>  
+>>      if (bus) {
+>>          qdev_set_parent_bus(dev, bus);
+>> -    } else {
+>> -        assert(!DEVICE_GET_CLASS(dev)->bus_type);
+>> +    } else if (DEVICE_GET_CLASS(dev)->bus_type) {
+>> +        error_setg(errp, "%s: Unexpected bus '%s' for bus-less device '%s'",
+>> +                   __func__, DEVICE_GET_CLASS(dev)->bus_type,
+>> +                   object_get_typename(OBJECT(dev)));
+>> +        return false;
+>>      }
+>>  
+>>      object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> 
+> Scratch __func__.  error_setg() records __FILE__, __LINE__ and __func__,
+> and error_handle_fatal() prints them.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- include/qom/object.h            | 42 ++++++++++----
- include/qom/object_interfaces.h | 12 +++-
- include/qom/qom-qobject.h       |  4 +-
- qom/object.c                    | 99 +++++++++++++++++++++------------
- qom/object_interfaces.c         | 21 ++++---
- qom/qom-qobject.c               |  6 +-
- 6 files changed, 122 insertions(+), 62 deletions(-)
+Correct :/
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index e60aa8dd5c..189f8ecbf6 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -703,7 +703,7 @@ Object *object_new_with_propv(const char *typename,
-                               Error **errp,
-                               va_list vargs);
- 
--void object_apply_global_props(Object *obj, const GPtrArray *props,
-+bool object_apply_global_props(Object *obj, const GPtrArray *props,
-                                Error **errp);
- void object_set_machine_compat_props(GPtrArray *compat_props);
- void object_set_accelerator_compat_props(GPtrArray *compat_props);
-@@ -798,8 +798,10 @@ void object_initialize(void *obj, size_t size, const char *typename);
-  * strings. The propname of %NULL indicates the end of the property list.
-  * If the object implements the user creatable interface, the object will
-  * be marked complete once all the properties have been processed.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_initialize_child_with_props(Object *parentobj,
-+bool object_initialize_child_with_props(Object *parentobj,
-                              const char *propname,
-                              void *childobj, size_t size, const char *type,
-                              Error **errp, ...) QEMU_SENTINEL;
-@@ -815,8 +817,10 @@ void object_initialize_child_with_props(Object *parentobj,
-  * @vargs: list of property names and values
-  *
-  * See object_initialize_child() for documentation.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_initialize_child_with_propsv(Object *parentobj,
-+bool object_initialize_child_with_propsv(Object *parentobj,
-                               const char *propname,
-                               void *childobj, size_t size, const char *type,
-                               Error **errp, va_list vargs);
-@@ -1197,8 +1201,10 @@ void object_unparent(Object *obj);
-  * @errp: returns an error if this function fails
-  *
-  * Reads a property from a object.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_get(Object *obj, const char *name, Visitor *v,
-+bool object_property_get(Object *obj, const char *name, Visitor *v,
-                          Error **errp);
- 
- /**
-@@ -1208,8 +1214,10 @@ void object_property_get(Object *obj, const char *name, Visitor *v,
-  * @errp: returns an error if this function fails
-  *
-  * Writes a string value to a property.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_set_str(Object *obj, const char *name,
-+bool object_property_set_str(Object *obj, const char *name,
-                              const char *value, Error **errp);
- 
- /**
-@@ -1237,8 +1245,9 @@ char *object_property_get_str(Object *obj, const char *name,
-  * <code>OBJ_PROP_LINK_STRONG</code> bit, the old target object is
-  * unreferenced, and a reference is added to the new target object.
-  *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_set_link(Object *obj, const char *name,
-+bool object_property_set_link(Object *obj, const char *name,
-                               Object *value, Error **errp);
- 
- /**
-@@ -1261,8 +1270,10 @@ Object *object_property_get_link(Object *obj, const char *name,
-  * @errp: returns an error if this function fails
-  *
-  * Writes a bool value to a property.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_set_bool(Object *obj, const char *name,
-+bool object_property_set_bool(Object *obj, const char *name,
-                               bool value, Error **errp);
- 
- /**
-@@ -1284,8 +1295,10 @@ bool object_property_get_bool(Object *obj, const char *name,
-  * @errp: returns an error if this function fails
-  *
-  * Writes an integer value to a property.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_set_int(Object *obj, const char *name,
-+bool object_property_set_int(Object *obj, const char *name,
-                              int64_t value, Error **errp);
- 
- /**
-@@ -1307,8 +1320,10 @@ int64_t object_property_get_int(Object *obj, const char *name,
-  * @errp: returns an error if this function fails
-  *
-  * Writes an unsigned integer value to a property.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_set_uint(Object *obj, const char *name,
-+bool object_property_set_uint(Object *obj, const char *name,
-                               uint64_t value, Error **errp);
- 
- /**
-@@ -1347,8 +1362,10 @@ int object_property_get_enum(Object *obj, const char *name,
-  * @errp: returns an error if this function fails
-  *
-  * Writes a property to a object.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_set(Object *obj, const char *name, Visitor *v,
-+bool object_property_set(Object *obj, const char *name, Visitor *v,
-                          Error **errp);
- 
- /**
-@@ -1359,8 +1376,10 @@ void object_property_set(Object *obj, const char *name, Visitor *v,
-  * @errp: returns an error if this function fails
-  *
-  * Parses a string and writes the result into a property of an object.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_parse(Object *obj, const char *name,
-+bool object_property_parse(Object *obj, const char *name,
-                            const char *string, Error **errp);
- 
- /**
-@@ -1803,6 +1822,7 @@ ObjectProperty *object_property_add_const_link(Object *obj, const char *name,
-  *
-  * Set an object property's description.
-  *
-+ * Returns: %true on success, %false on failure.
-  */
- void object_property_set_description(Object *obj, const char *name,
-                                      const char *description);
-diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfaces.h
-index 65172120fa..7035829337 100644
---- a/include/qom/object_interfaces.h
-+++ b/include/qom/object_interfaces.h
-@@ -57,8 +57,10 @@ typedef struct UserCreatableClass {
-  * Wrapper to call complete() method if one of types it's inherited
-  * from implements USER_CREATABLE interface, otherwise the call does
-  * nothing.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void user_creatable_complete(UserCreatable *uc, Error **errp);
-+bool user_creatable_complete(UserCreatable *uc, Error **errp);
- 
- /**
-  * user_creatable_can_be_deleted:
-@@ -100,8 +102,10 @@ Object *user_creatable_add_type(const char *type, const char *id,
-  * @qdict.  The object type is taken from the QDict key 'qom-type', its
-  * ID from the key 'id'. The remaining entries in @qdict are used to
-  * initialize the object properties.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp);
-+bool user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp);
- 
- /**
-  * user_creatable_add_opts:
-@@ -167,8 +171,10 @@ bool user_creatable_print_help(const char *type, QemuOpts *opts);
-  *
-  * Delete an instance of the user creatable object identified
-  * by @id.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void user_creatable_del(const char *id, Error **errp);
-+bool user_creatable_del(const char *id, Error **errp);
- 
- /**
-  * user_creatable_cleanup:
-diff --git a/include/qom/qom-qobject.h b/include/qom/qom-qobject.h
-index ad9a98dd62..73e4e0e474 100644
---- a/include/qom/qom-qobject.h
-+++ b/include/qom/qom-qobject.h
-@@ -33,8 +33,10 @@ struct QObject *object_property_get_qobject(Object *obj, const char *name,
-  * @errp: returns an error if this function fails
-  *
-  * Writes a property to a object.
-+ *
-+ * Returns: %true on success, %false on failure.
-  */
--void object_property_set_qobject(Object *obj,
-+bool object_property_set_qobject(Object *obj,
-                                  const char *name, struct QObject *value,
-                                  struct Error **errp);
- 
-diff --git a/qom/object.c b/qom/object.c
-index b34bac4874..c4b915a484 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -385,12 +385,13 @@ static void object_post_init_with_type(Object *obj, TypeImpl *ti)
-     }
- }
- 
--void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp)
-+bool object_apply_global_props(Object *obj, const GPtrArray *props,
-+                               Error **errp)
- {
-     int i;
- 
-     if (!props) {
--        return;
-+        return true;
-     }
- 
-     for (i = 0; i < props->len; i++) {
-@@ -415,12 +416,14 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
-              */
-             if (errp) {
-                 error_propagate(errp, err);
--                return;
-+                return false;
-             } else {
-                 warn_report_err(err);
-             }
-         }
-     }
-+
-+    return true;
- }
- 
- /*
-@@ -524,25 +527,31 @@ void object_initialize(void *data, size_t size, const char *typename)
-     object_initialize_with_type(data, size, type);
- }
- 
--void object_initialize_child_with_props(Object *parentobj,
--                             const char *propname,
--                             void *childobj, size_t size, const char *type,
--                             Error **errp, ...)
-+bool object_initialize_child_with_props(Object *parentobj,
-+                                        const char *propname,
-+                                        void *childobj, size_t size,
-+                                        const char *type,
-+                                        Error **errp, ...)
- {
-     va_list vargs;
-+    bool ok;
- 
-     va_start(vargs, errp);
--    object_initialize_child_with_propsv(parentobj, propname,
--                                        childobj, size, type, errp, vargs);
-+    ok = object_initialize_child_with_propsv(parentobj, propname,
-+                                             childobj, size, type, errp,
-+                                             vargs);
-     va_end(vargs);
-+    return ok;
- }
- 
--void object_initialize_child_with_propsv(Object *parentobj,
--                              const char *propname,
--                              void *childobj, size_t size, const char *type,
--                              Error **errp, va_list vargs)
-+bool object_initialize_child_with_propsv(Object *parentobj,
-+                                         const char *propname,
-+                                         void *childobj, size_t size,
-+                                         const char *type,
-+                                         Error **errp, va_list vargs)
- {
-     Error *local_err = NULL;
-+    bool ok = false;
-     Object *obj;
-     UserCreatable *uc;
- 
-@@ -564,6 +573,8 @@ void object_initialize_child_with_propsv(Object *parentobj,
-         }
-     }
- 
-+    ok = true;
-+
- out:
-     /*
-      * We want @obj's reference to be 1 on success, 0 on failure.
-@@ -576,6 +587,7 @@ out:
-     object_unref(obj);
- 
-     error_propagate(errp, local_err);
-+    return ok;
- }
- 
- void object_initialize_child_internal(Object *parent,
-@@ -1298,43 +1310,52 @@ void object_property_del(Object *obj, const char *name)
-     g_hash_table_remove(obj->properties, name);
- }
- 
--void object_property_get(Object *obj, const char *name, Visitor *v,
-+bool object_property_get(Object *obj, const char *name, Visitor *v,
-                          Error **errp)
- {
-+    Error *err = NULL;
-     ObjectProperty *prop = object_property_find(obj, name, errp);
-+
-     if (prop == NULL) {
--        return;
-+        return false;
-     }
- 
-     if (!prop->get) {
-         error_setg(errp, QERR_PERMISSION_DENIED);
--    } else {
--        prop->get(obj, v, name, prop->opaque, errp);
-+        return false;
-     }
-+    prop->get(obj, v, name, prop->opaque, &err);
-+    error_propagate(errp, err);
-+    return !err;
- }
- 
--void object_property_set(Object *obj, const char *name, Visitor *v,
-+bool object_property_set(Object *obj, const char *name, Visitor *v,
-                          Error **errp)
- {
-+    Error *err = NULL;
-     ObjectProperty *prop = object_property_find(obj, name, errp);
-+
-     if (prop == NULL) {
--        return;
-+        return false;
-     }
- 
-     if (!prop->set) {
-         error_setg(errp, QERR_PERMISSION_DENIED);
--    } else {
--        prop->set(obj, v, name, prop->opaque, errp);
-+        return false;
-     }
-+    prop->set(obj, v, name, prop->opaque, &err);
-+    error_propagate(errp, err);
-+    return !err;
- }
- 
--void object_property_set_str(Object *obj, const char *name,
-+bool object_property_set_str(Object *obj, const char *name,
-                              const char *value, Error **errp)
- {
-     QString *qstr = qstring_from_str(value);
--    object_property_set_qobject(obj, name, QOBJECT(qstr), errp);
-+    bool ok = object_property_set_qobject(obj, name, QOBJECT(qstr), errp);
- 
-     qobject_unref(qstr);
-+    return ok;
- }
- 
- char *object_property_get_str(Object *obj, const char *name,
-@@ -1356,16 +1377,15 @@ char *object_property_get_str(Object *obj, const char *name,
-     return retval;
- }
- 
--void object_property_set_link(Object *obj, const char *name,
-+bool object_property_set_link(Object *obj, const char *name,
-                               Object *value, Error **errp)
- {
-+    g_autofree char *path = NULL;
-+
-     if (value) {
--        char *path = object_get_canonical_path(value);
--        object_property_set_str(obj, name, path, errp);
--        g_free(path);
--    } else {
--        object_property_set_str(obj, name, "", errp);
-+        path = object_get_canonical_path(value);
-     }
-+    return object_property_set_str(obj, name, path ?: "", errp);
- }
- 
- Object *object_property_get_link(Object *obj, const char *name,
-@@ -1386,13 +1406,14 @@ Object *object_property_get_link(Object *obj, const char *name,
-     return target;
- }
- 
--void object_property_set_bool(Object *obj, const char *name,
-+bool object_property_set_bool(Object *obj, const char *name,
-                               bool value, Error **errp)
- {
-     QBool *qbool = qbool_from_bool(value);
--    object_property_set_qobject(obj, name, QOBJECT(qbool), errp);
-+    bool ok = object_property_set_qobject(obj, name, QOBJECT(qbool), errp);
- 
-     qobject_unref(qbool);
-+    return ok;
- }
- 
- bool object_property_get_bool(Object *obj, const char *name,
-@@ -1417,13 +1438,14 @@ bool object_property_get_bool(Object *obj, const char *name,
-     return retval;
- }
- 
--void object_property_set_int(Object *obj, const char *name,
-+bool object_property_set_int(Object *obj, const char *name,
-                              int64_t value, Error **errp)
- {
-     QNum *qnum = qnum_from_int(value);
--    object_property_set_qobject(obj, name, QOBJECT(qnum), errp);
-+    bool ok = object_property_set_qobject(obj, name, QOBJECT(qnum), errp);
- 
-     qobject_unref(qnum);
-+    return ok;
- }
- 
- int64_t object_property_get_int(Object *obj, const char *name,
-@@ -1486,13 +1508,14 @@ void object_property_set_default_uint(ObjectProperty *prop, uint64_t value)
-     object_property_set_default(prop, QOBJECT(qnum_from_uint(value)));
- }
- 
--void object_property_set_uint(Object *obj, const char *name,
-+bool object_property_set_uint(Object *obj, const char *name,
-                               uint64_t value, Error **errp)
- {
-     QNum *qnum = qnum_from_uint(value);
-+    bool ok = object_property_set_qobject(obj, name, QOBJECT(qnum), errp);
- 
--    object_property_set_qobject(obj, name, QOBJECT(qnum), errp);
-     qobject_unref(qnum);
-+    return ok;
- }
- 
- uint64_t object_property_get_uint(Object *obj, const char *name,
-@@ -1553,12 +1576,14 @@ int object_property_get_enum(Object *obj, const char *name,
-     return ret;
- }
- 
--void object_property_parse(Object *obj, const char *name,
-+bool object_property_parse(Object *obj, const char *name,
-                            const char *string, Error **errp)
- {
-     Visitor *v = string_input_visitor_new(string);
--    object_property_set(obj, name, v, errp);
-+    bool ok = object_property_set(obj, name, v, errp);
-+
-     visit_free(v);
-+    return ok;
- }
- 
- char *object_property_print(Object *obj, const char *name, bool human,
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 4c59ee56d5..382198504c 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -14,13 +14,16 @@
- #include "qapi/opts-visitor.h"
- #include "qemu/config-file.h"
- 
--void user_creatable_complete(UserCreatable *uc, Error **errp)
-+bool user_creatable_complete(UserCreatable *uc, Error **errp)
- {
-     UserCreatableClass *ucc = USER_CREATABLE_GET_CLASS(uc);
-+    Error *err = NULL;
- 
-     if (ucc->complete) {
--        ucc->complete(uc, errp);
-+        ucc->complete(uc, &err);
-+        error_propagate(errp, err);
-     }
-+    return !err;
- }
- 
- bool user_creatable_can_be_deleted(UserCreatable *uc)
-@@ -101,7 +104,7 @@ out:
-     return obj;
- }
- 
--void user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp)
-+bool user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp)
- {
-     Visitor *v;
-     Object *obj;
-@@ -111,14 +114,14 @@ void user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp)
-     type = g_strdup(qdict_get_try_str(qdict, "qom-type"));
-     if (!type) {
-         error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
--        return;
-+        return false;
-     }
-     qdict_del(qdict, "qom-type");
- 
-     id = g_strdup(qdict_get_try_str(qdict, "id"));
-     if (!id) {
-         error_setg(errp, QERR_MISSING_PARAMETER, "id");
--        return;
-+        return false;
-     }
-     qdict_del(qdict, "id");
- 
-@@ -130,6 +133,7 @@ void user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp)
-     obj = user_creatable_add_type(type, id, qdict, v, errp);
-     visit_free(v);
-     object_unref(obj);
-+    return !!obj;
- }
- 
- Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
-@@ -260,7 +264,7 @@ bool user_creatable_print_help(const char *type, QemuOpts *opts)
-     return false;
- }
- 
--void user_creatable_del(const char *id, Error **errp)
-+bool user_creatable_del(const char *id, Error **errp)
- {
-     Object *container;
-     Object *obj;
-@@ -269,12 +273,12 @@ void user_creatable_del(const char *id, Error **errp)
-     obj = object_resolve_path_component(container, id);
-     if (!obj) {
-         error_setg(errp, "object '%s' not found", id);
--        return;
-+        return false;
-     }
- 
-     if (!user_creatable_can_be_deleted(USER_CREATABLE(obj))) {
-         error_setg(errp, "object '%s' is in use, can not be deleted", id);
--        return;
-+        return false;
-     }
- 
-     /*
-@@ -285,6 +289,7 @@ void user_creatable_del(const char *id, Error **errp)
-                                  id));
- 
-     object_unparent(obj);
-+    return true;
- }
- 
- void user_creatable_cleanup(void)
-diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
-index f949572d8a..62ac5e07ac 100644
---- a/qom/qom-qobject.c
-+++ b/qom/qom-qobject.c
-@@ -17,15 +17,17 @@
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/qobject-output-visitor.h"
- 
--void object_property_set_qobject(Object *obj,
-+bool object_property_set_qobject(Object *obj,
-                                  const char *name, QObject *value,
-                                  Error **errp)
- {
-     Visitor *v;
-+    bool ok;
- 
-     v = qobject_input_visitor_new(value);
--    object_property_set(obj, name, v, errp);
-+    ok = object_property_set(obj, name, v, errp);
-     visit_free(v);
-+    return ok;
- }
- 
- QObject *object_property_get_qobject(Object *obj, const char *name,
--- 
-2.26.2
+> 
+> Always, always, always test your error messages.  If they are impossible
+> to test, mock up the error.  If mocking up is too much trouble, then
+> reporting the error nicely is, too.
+> 
+> That said, this one matters to me only insofar as it sets a bad example.
+> I don't actually care how impossible error messages come out :)
 
+It might seems "impossible" to you because you only work with mainstream
+QEMU.
+There are plenty of forks trying to keep up with mainstream. Their code
+is not mergeable in mainstream for various reasons (usually code not in
+good shape, using deprecated APIs). These are mostly hobbyist trying
+different boards / hardware / whatever.
+
+You cleaned mainstream incorrect qdev/qom bus/parenting code before
+merging your qdev/qom cleanup in commit 6675a653d2 ("Merge
+remotes/armbru/tags/pull-qom-2020-06-15") but you didn't clean all the
+forks. Now various forks simply abort, and it seems quite hard for a
+developer not following mainstream activity on a daily basis to figure
+out which change broke is fork.
+
+As of today:
+$ git log --oneline --since="3 weeks ago"|wc -l
+776
+And in 2 days we'll probably pass the 1k.
+
+I hope you now understand the motivation of this patch. I failed at
+properly describing it, mostly because I have a limited hobbyist time
+where I try to address as much issues as I can.
+
+I'll respin with improved commit description, and __func__ removed.
+
+Regards,
+
+Phil.
 
