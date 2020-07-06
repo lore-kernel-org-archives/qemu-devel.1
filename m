@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 108A3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A2BC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:49:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFF5B206CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:49:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F0C1206CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:49:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="byNtjv8k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFF5B206CD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BvgQXldk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F0C1206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUJA-0000Kh-UA
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:49:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56900)
+	id 1jsUJZ-0001p2-Jv
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:49:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUCB-0003R0-NN
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:19 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55057
+ id 1jsUCK-0003Zb-BA
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:28 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38980
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUC7-00035i-Ua
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:17 -0400
+ id 1jsUC9-000364-8s
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594053735;
+ s=mimecast20190719; t=1594053736;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=l5fXLBze59nPDEkEuVrpthSN+Z5ri2IdAgGJVsMcbG4=;
- b=byNtjv8kQSEK69jkBd6CrjyDol5lq7oSA8sWnjkfmAY4TfQnYvvaUN+1YeiH2vA1AcCw2d
- 8EujLWXwS7iOayLf/W4RjX8gkAmNfQszWceSjHNEcG13t+5f30xcktGiKlTXeD2YHUr6zL
- tuX+3A4SyZjzmkDX/q8FcTa0k9ShiDI=
+ bh=hEWTZdll5mwD2SxvOrMYy2zK3cjMHJ9TOZNLiKmN/XU=;
+ b=BvgQXldk9oMULOp+8/DdretrxzC3m67cYvLgCIe1ojzGZLfIHMzGTjATmGU21FshQ1dLYU
+ msDb6L9ip4stHh2BI+k5bERXDg4VE76Jj+Iy6S4cFq2polXXrf1TiHVink9jS8TczZKtwt
+ rKhmbf1Tn7kzf0yc2hAgcBVroebUGdA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-JaypAMh-MTmhO4iIi3K69A-1; Mon, 06 Jul 2020 12:42:13 -0400
-X-MC-Unique: JaypAMh-MTmhO4iIi3K69A-1
+ us-mta-304-jRLCNvYYOHaVXnKpfkiCgA-1; Mon, 06 Jul 2020 12:42:12 -0400
+X-MC-Unique: jRLCNvYYOHaVXnKpfkiCgA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 160571052502;
- Mon,  6 Jul 2020 16:42:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9769A107ACCD;
+ Mon,  6 Jul 2020 16:42:11 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B4DAD5BACD;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 42AE55BACD;
  Mon,  6 Jul 2020 16:42:11 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/53] i386: hvf: Don't duplicate register reset
-Date: Mon,  6 Jul 2020 12:41:19 -0400
-Message-Id: <20200706164155.24696-18-pbonzini@redhat.com>
+Subject: [PULL 16/53] i386: hvf: Move Guest LMA reset to macvm_set_cr0()
+Date: Mon,  6 Jul 2020 12:41:18 -0400
+Message-Id: <20200706164155.24696-17-pbonzini@redhat.com>
 In-Reply-To: <20200706164155.24696-1-pbonzini@redhat.com>
 References: <20200706164155.24696-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -104,168 +104,58 @@ Sender: "Qemu-devel"
 
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 
-hvf_reset_vcpu() duplicates actions performed by x86_cpu_reset(). The
-difference is that hvf_reset_vcpu() stores initial values directly to
-VMCS while x86_cpu_reset() stores it in CPUX86State and then
-cpu_synchronize_all_post_init() or cpu_synchronize_all_post_reset()
-flushes CPUX86State into VMCS. That makes hvf_reset_vcpu() a kind of
-no-op.
+The only useful purpose of hvf_reset_vcpu() is to clear "IA-32e mode
+guest" (LMA) VM-Entry control. But it can be moved to macvm_set_cr0()
+which is indirectly used by post-init and post-reset to flush emulator
+state. That enables clean removal of hvf_reset_vcpu().
 
-Here's the trace of CPU state modifications during VM start:
-  hvf_reset_vcpu (resets VMCS)
-  cpu_synchronize_all_post_init (overwrites VMCS fields written by
-                                 hvf_reset_vcpu())
-  cpu_synchronize_all_states
-  hvf_reset_vcpu (resets VMCS)
-  cpu_synchronize_all_post_reset (overwrites VMCS fields written by
-                                  hvf_reset_vcpu())
-
-General purpose registers, system registers, segment descriptors, flags
-and IP are set by hvf_put_segments() in post-init and post-reset,
-therefore it's safe to remove them from hvf_reset_vcpu().
-
-PDPTE initialization can be dropped because Intel SDM (26.3.1.6 Checks
-on Guest Page-Directory-Pointer-Table Entries) doesn't require PDPTE to
-be clear unless PAE is used: "A VM entry to a guest that does not use
-PAE paging does not check the validity of any PDPTEs."
-And if PAE is used, PDPTE's are initialized from CR3 in macvm_set_cr0().
+LMA is set only if IA32_EFER.LME = 1, according to Intel SDM "9.8.5
+Initializing IA-32e Mode" and "9.8.5.4 Switching Out of IA-32e Mode
+Operation", otherwise the entry control can be safely cleared.
 
 Cc: Cameron Esfahani <dirty@apple.com>
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-Id: <20200630102824.77604-8-r.bolshakov@yadro.com>
+Message-Id: <20200630102824.77604-7-r.bolshakov@yadro.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/sysemu/hvf.h  |  1 -
- target/i386/cpu.c     |  3 --
- target/i386/hvf/hvf.c | 89 -------------------------------------------
- 3 files changed, 93 deletions(-)
+ target/i386/hvf/hvf.c | 1 -
+ target/i386/hvf/vmx.h | 4 ++++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-index 1d40a8ec01..6d3ee4fdb7 100644
---- a/include/sysemu/hvf.h
-+++ b/include/sysemu/hvf.h
-@@ -30,7 +30,6 @@ void hvf_cpu_synchronize_post_reset(CPUState *);
- void hvf_cpu_synchronize_post_init(CPUState *);
- void hvf_cpu_synchronize_pre_loadvm(CPUState *);
- void hvf_vcpu_destroy(CPUState *);
--void hvf_reset_vcpu(CPUState *);
- 
- #define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
- 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f1cbac2fb5..c44cc510e1 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6099,9 +6099,6 @@ static void x86_cpu_reset(DeviceState *dev)
-     if (kvm_enabled()) {
-         kvm_arch_reset_vcpu(cpu);
-     }
--    else if (hvf_enabled()) {
--        hvf_reset_vcpu(s);
--    }
- #endif
- }
- 
 diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 31980f9076..2a12867ef0 100644
+index efe9802962..31980f9076 100644
 --- a/target/i386/hvf/hvf.c
 +++ b/target/i386/hvf/hvf.c
-@@ -452,95 +452,6 @@ static MemoryListener hvf_memory_listener = {
-     .log_sync = hvf_log_sync,
- };
+@@ -459,7 +459,6 @@ void hvf_reset_vcpu(CPUState *cpu) {
+     /* TODO: this shouldn't be needed; there is already a call to
+      * cpu_synchronize_all_post_reset in vl.c
+      */
+-    wvmcs(cpu->hvf_fd, VMCS_ENTRY_CTLS, 0);
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_IA32_EFER, 0);
  
--void hvf_reset_vcpu(CPUState *cpu) {
--    uint64_t pdpte[4] = {0, 0, 0, 0};
--    int i;
--
--    /* TODO: this shouldn't be needed; there is already a call to
--     * cpu_synchronize_all_post_reset in vl.c
--     */
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_IA32_EFER, 0);
--
--    /* Initialize PDPTE */
--    for (i = 0; i < 4; i++) {
--        wvmcs(cpu->hvf_fd, VMCS_GUEST_PDPTE0 + i * 2, pdpte[i]);
--    }
--
--    macvm_set_cr0(cpu->hvf_fd, 0x60000010);
--
--    wvmcs(cpu->hvf_fd, VMCS_CR4_MASK, CR4_VMXE_MASK);
--    wvmcs(cpu->hvf_fd, VMCS_CR4_SHADOW, 0x0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_CR4, CR4_VMXE_MASK);
--
--    /* set VMCS guest state fields */
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_CS_SELECTOR, 0xf000);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_CS_LIMIT, 0xffff);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_CS_ACCESS_RIGHTS, 0x9b);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_CS_BASE, 0xffff0000);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_DS_SELECTOR, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_DS_LIMIT, 0xffff);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_DS_ACCESS_RIGHTS, 0x93);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_DS_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_ES_SELECTOR, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_ES_LIMIT, 0xffff);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_ES_ACCESS_RIGHTS, 0x93);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_ES_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_FS_SELECTOR, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_FS_LIMIT, 0xffff);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_FS_ACCESS_RIGHTS, 0x93);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_FS_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_GS_SELECTOR, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_GS_LIMIT, 0xffff);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_GS_ACCESS_RIGHTS, 0x93);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_GS_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_SS_SELECTOR, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_SS_LIMIT, 0xffff);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_SS_ACCESS_RIGHTS, 0x93);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_SS_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_LDTR_SELECTOR, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_LDTR_LIMIT, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_LDTR_ACCESS_RIGHTS, 0x10000);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_LDTR_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_TR_SELECTOR, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_TR_LIMIT, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_TR_ACCESS_RIGHTS, 0x83);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_TR_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_GDTR_LIMIT, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_GDTR_BASE, 0);
--
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_IDTR_LIMIT, 0);
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_IDTR_BASE, 0);
--
--    /*wvmcs(cpu->hvf_fd, VMCS_GUEST_CR2, 0x0);*/
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_CR3, 0x0);
--
--    wreg(cpu->hvf_fd, HV_X86_RIP, 0xfff0);
--    wreg(cpu->hvf_fd, HV_X86_RDX, 0x623);
--    wreg(cpu->hvf_fd, HV_X86_RFLAGS, 0x2);
--    wreg(cpu->hvf_fd, HV_X86_RSP, 0x0);
--    wreg(cpu->hvf_fd, HV_X86_RAX, 0x0);
--    wreg(cpu->hvf_fd, HV_X86_RBX, 0x0);
--    wreg(cpu->hvf_fd, HV_X86_RCX, 0x0);
--    wreg(cpu->hvf_fd, HV_X86_RSI, 0x0);
--    wreg(cpu->hvf_fd, HV_X86_RDI, 0x0);
--    wreg(cpu->hvf_fd, HV_X86_RBP, 0x0);
--
--    for (int i = 0; i < 8; i++) {
--        wreg(cpu->hvf_fd, HV_X86_R8 + i, 0x0);
--    }
--
--    hv_vcpu_invalidate_tlb(cpu->hvf_fd);
--    hv_vcpu_flush(cpu->hvf_fd);
--}
--
- void hvf_vcpu_destroy(CPUState *cpu)
- {
-     X86CPU *x86_cpu = X86_CPU(cpu);
+     /* Initialize PDPTE */
+diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
+index 437238f11d..75ba1e2a5f 100644
+--- a/target/i386/hvf/vmx.h
++++ b/target/i386/hvf/vmx.h
+@@ -123,6 +123,7 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
+     uint64_t old_cr0 = rvmcs(vcpu, VMCS_GUEST_CR0);
+     uint64_t changed_cr0 = old_cr0 ^ cr0;
+     uint64_t mask = CR0_PG | CR0_CD | CR0_NW | CR0_NE | CR0_ET;
++    uint64_t entry_ctls;
+ 
+     if ((cr0 & CR0_PG) && (rvmcs(vcpu, VMCS_GUEST_CR4) & CR4_PAE) &&
+         !(efer & MSR_EFER_LME)) {
+@@ -146,6 +147,9 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
+                 exit_long_mode(vcpu, cr0, efer);
+             }
+         }
++    } else {
++        entry_ctls = rvmcs(vcpu, VMCS_ENTRY_CTLS);
++        wvmcs(vcpu, VMCS_ENTRY_CTLS, entry_ctls & ~VM_ENTRY_GUEST_LMA);
+     }
+ 
+     /* Filter new CR0 after we are finished examining it above. */
 -- 
 2.26.2
 
