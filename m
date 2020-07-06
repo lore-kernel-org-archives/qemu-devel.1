@@ -2,81 +2,81 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3275FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE09C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:01:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0FB5205CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:01:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4E3B205CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:01:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpDUuuz7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0FB5205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Or9cLG7o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E3B205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUUX-0008Fk-1i
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:01:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57530)
+	id 1jsUV2-0000or-Qk
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:01:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUCa-0004FF-UT
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32065
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jsUCO-0003j4-9K
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45782
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUCY-0003EL-3e
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:44 -0400
+ id 1jsUCJ-00038G-Ve
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594053761;
+ s=mimecast20190719; t=1594053746;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3GxL6btt/Ogdx87xX8H9KeDltY/mkqzmXGn7AWxglbs=;
- b=dpDUuuz7ERnySaAkY7N0pjBVyc2XlrHbneekxHe9KNPa+j5VyjqpGGLkW1ld6j0mdvav77
- hH3qnSGZlC++2alUwwJA1wMpNC6i8KVBnc2aSKI2ROEFAkkzJ9lG+OPzBUXrTXpo+WTXV2
- k10r7utAwnlFNMJ8Jo25OGTQ3B9IBm8=
+ bh=VjzbHJB011P4JrSJGu5RW392psBXRe2s43oXx8KYWow=;
+ b=Or9cLG7oYY7MZdnYOSeZAVTPRZfwH/w9Mn+lsQ8SeF6F4LnSQXdM72G5ISnA8zWre8QgiH
+ rT1ainOZCPz1PLXSaoxxh2CCTfl8cqjnmD85+EvKKYGiLeBMMU9v6ntFLUB7uPP+dgT92J
+ u0N5gDzeLlPg5isxo75ZUQT0KrCfl7g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-gpSolqQkOEq0tUUfhUAQkw-1; Mon, 06 Jul 2020 12:42:36 -0400
-X-MC-Unique: gpSolqQkOEq0tUUfhUAQkw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-266-jGM_f0jxPFGYplIyAsNk6w-1; Mon, 06 Jul 2020 12:42:24 -0400
+X-MC-Unique: jGM_f0jxPFGYplIyAsNk6w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33EE0EC1A0;
- Mon,  6 Jul 2020 16:42:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD9851005510
+ for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 16:42:23 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7974100238C;
- Mon,  6 Jul 2020 16:42:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8C9047B40D;
+ Mon,  6 Jul 2020 16:42:23 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 51/53] target/i386: Add SERIALIZE cpu feature
-Date: Mon,  6 Jul 2020 12:41:53 -0400
-Message-Id: <20200706164155.24696-52-pbonzini@redhat.com>
+Subject: [PULL 32/53] target/i386: sev: provide proper error reporting for
+ query-sev-capabilities
+Date: Mon,  6 Jul 2020 12:41:34 -0400
+Message-Id: <20200706164155.24696-33-pbonzini@redhat.com>
 In-Reply-To: <20200706164155.24696-1-pbonzini@redhat.com>
 References: <20200706164155.24696-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:59:39
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,58 +97,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cathy Zhang <cathy.zhang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cathy Zhang <cathy.zhang@intel.com>
+The query-sev-capabilities was reporting errors through error_report;
+change it to use Error** so that the cause of the failure is clearer.
 
-The availability of the SERIALIZATION instruction is indicated
-by the presence of the CPUID feature flag SERIALIZE, which is
-defined as CPUID.(EAX=7,ECX=0):ECX[bit 14].
-
-The release spec link is as follows:
-https://software.intel.com/content/dam/develop/public/us/en/documents/\
-architecture-instruction-set-extensions-programming-reference.pdf
-
-The associated kvm patch link is as follows:
-https://lore.kernel.org/patchwork/patch/1268025/
-
-Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
-Message-Id: <1593991036-12183-2-git-send-email-cathy.zhang@intel.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 2 +-
- target/i386/cpu.h | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ target/i386/monitor.c  | 10 +---------
+ target/i386/sev-stub.c |  3 ++-
+ target/i386/sev.c      | 18 +++++++++---------
+ target/i386/sev_i386.h |  2 +-
+ 4 files changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index be9a0aa76d..fa9353dfba 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -986,7 +986,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, "avx512-4vnniw", "avx512-4fmaps",
-             NULL, NULL, NULL, NULL,
-             "avx512-vp2intersect", NULL, "md-clear", NULL,
--            NULL, NULL, NULL, NULL,
-+            NULL, NULL, "serialize", NULL,
-             NULL, NULL, NULL /* pconfig */, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "spec-ctrl", "stibp",
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 9284f96896..bd71fe3ef2 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -777,6 +777,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_AVX512_4FMAPS     (1U << 3)
- /* AVX512 Vector Pair Intersection to a Pair of Mask Registers */
- #define CPUID_7_0_EDX_AVX512_VP2INTERSECT (1U << 8)
-+/* SERIALIZE instruction */
-+#define CPUID_7_0_EDX_SERIALIZE         (1U << 14)
- /* Speculation Control */
- #define CPUID_7_0_EDX_SPEC_CTRL         (1U << 26)
- /* Single Thread Indirect Branch Predictors */
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 27ebfa3ad2..7abae3c8df 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -726,13 +726,5 @@ SevLaunchMeasureInfo *qmp_query_sev_launch_measure(Error **errp)
+ 
+ SevCapability *qmp_query_sev_capabilities(Error **errp)
+ {
+-    SevCapability *data;
+-
+-    data = sev_get_capabilities();
+-    if (!data) {
+-        error_setg(errp, "SEV feature is not available");
+-        return NULL;
+-    }
+-
+-    return data;
++    return sev_get_capabilities(errp);
+ }
+diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+index e5ee13309c..88e3f39a1e 100644
+--- a/target/i386/sev-stub.c
++++ b/target/i386/sev-stub.c
+@@ -44,7 +44,8 @@ char *sev_get_launch_measurement(void)
+     return NULL;
+ }
+ 
+-SevCapability *sev_get_capabilities(void)
++SevCapability *sev_get_capabilities(Error **errp)
+ {
++    error_setg(errp, "SEV is not available in this QEMU");
+     return NULL;
+ }
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index d273174ad3..70f9ee026f 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -399,7 +399,7 @@ sev_get_info(void)
+ 
+ static int
+ sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
+-                 size_t *cert_chain_len)
++                 size_t *cert_chain_len, Error **errp)
+ {
+     guchar *pdh_data = NULL;
+     guchar *cert_chain_data = NULL;
+@@ -410,8 +410,8 @@ sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
+     r = sev_platform_ioctl(fd, SEV_PDH_CERT_EXPORT, &export, &err);
+     if (r < 0) {
+         if (err != SEV_RET_INVALID_LEN) {
+-            error_report("failed to export PDH cert ret=%d fw_err=%d (%s)",
+-                         r, err, fw_error_to_str(err));
++            error_setg(errp, "failed to export PDH cert ret=%d fw_err=%d (%s)",
++                       r, err, fw_error_to_str(err));
+             return 1;
+         }
+     }
+@@ -423,8 +423,8 @@ sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
+ 
+     r = sev_platform_ioctl(fd, SEV_PDH_CERT_EXPORT, &export, &err);
+     if (r < 0) {
+-        error_report("failed to export PDH cert ret=%d fw_err=%d (%s)",
+-                     r, err, fw_error_to_str(err));
++        error_setg(errp, "failed to export PDH cert ret=%d fw_err=%d (%s)",
++                   r, err, fw_error_to_str(err));
+         goto e_free;
+     }
+ 
+@@ -441,7 +441,7 @@ e_free:
+ }
+ 
+ SevCapability *
+-sev_get_capabilities(void)
++sev_get_capabilities(Error **errp)
+ {
+     SevCapability *cap = NULL;
+     guchar *pdh_data = NULL;
+@@ -452,13 +452,13 @@ sev_get_capabilities(void)
+ 
+     fd = open(DEFAULT_SEV_DEVICE, O_RDWR);
+     if (fd < 0) {
+-        error_report("%s: Failed to open %s '%s'", __func__,
+-                     DEFAULT_SEV_DEVICE, strerror(errno));
++        error_setg_errno(errp, errno, "Failed to open %s",
++                         DEFAULT_SEV_DEVICE);
+         return NULL;
+     }
+ 
+     if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
+-                         &cert_chain_data, &cert_chain_len)) {
++                         &cert_chain_data, &cert_chain_len, errp)) {
+         goto out;
+     }
+ 
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index 8eb7de1bef..4db6960f60 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -34,6 +34,6 @@ extern SevInfo *sev_get_info(void);
+ extern uint32_t sev_get_cbit_position(void);
+ extern uint32_t sev_get_reduced_phys_bits(void);
+ extern char *sev_get_launch_measurement(void);
+-extern SevCapability *sev_get_capabilities(void);
++extern SevCapability *sev_get_capabilities(Error **errp);
+ 
+ #endif
 -- 
 2.26.2
 
