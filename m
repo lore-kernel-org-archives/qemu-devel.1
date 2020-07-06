@@ -2,80 +2,96 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F28C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 05:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 420C1C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 05:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CF8E2074F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 05:51:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CF8E2074F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 09BD82074F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 05:53:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gqcDnUPT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09BD82074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsK28-0008AF-FE
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 01:51:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56792)
+	id 1jsK4f-0000nf-9j
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 01:53:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jsK1V-0007OV-Dr
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 01:50:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42882)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jsK1S-00065I-VE
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 01:50:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jsK1Q-0004rL-R7
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 05:50:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CAF1C2E8023
- for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 05:50:32 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsK3Y-0000FL-I9
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 01:52:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24751
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsK3W-0006Uv-Lo
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 01:52:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594014761;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dkw2M+agDsyb6+Imx8Z9V0Lev8fU61znU7uYOtQ6zS4=;
+ b=gqcDnUPTJSU280VaawtFwL6EwiVrdw5vDZQZzUgeJvBS9OczjNBAl7LmvK/nbV8xh6SkpC
+ 3/46DzePbZkL/dmGukb3+XAw3aaYJe5/vAaJcDvISnxoW3wF2rqOr4n/fL6hriVGBd1GlC
+ wxaVfFDfh2CFNva49Rxfu85P+SZVoNs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-VQjCbYqGM6-GQo0RjsDnhQ-1; Mon, 06 Jul 2020 01:52:39 -0400
+X-MC-Unique: VQjCbYqGM6-GQo0RjsDnhQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1187B8F50B;
+ Mon,  6 Jul 2020 05:52:38 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A54AB1A888;
+ Mon,  6 Jul 2020 05:52:37 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2F5051138648; Mon,  6 Jul 2020 07:52:36 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v7 09/17] hw/sd/sdcard: Special case the -ENOMEDIUM error
+References: <20200630133912.9428-1-f4bug@amsat.org>
+ <20200630133912.9428-10-f4bug@amsat.org>
+ <CAFEAcA_dhbr6cjK40H0=e39sD2r8ERTZYrY5nhJtx81Rk+RmUg@mail.gmail.com>
+Date: Mon, 06 Jul 2020 07:52:36 +0200
+In-Reply-To: <CAFEAcA_dhbr6cjK40H0=e39sD2r8ERTZYrY5nhJtx81Rk+RmUg@mail.gmail.com>
+ (Peter Maydell's message of "Fri, 3 Jul 2020 14:23:10 +0100")
+Message-ID: <875zb1i40r.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jul 2020 05:44:37 -0000
-From: Xiaolei <1885827@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: plugins windows
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee casmac cota
-X-Launchpad-Bug-Reporter: Xiaolei (casmac)
-X-Launchpad-Bug-Modifier: Xiaolei (casmac)
-References: <159357217483.1717.4076077243388027502.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159401427737.17066.12397088076400752163.malone@soybean.canonical.com>
-Subject: [Bug 1885827] Re: building plugin failed on Windows with mingw
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ba579a406004b034293fa1e4659558be93431d01
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:50:33
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,250 +100,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885827 <1885827@bugs.launchpad.net>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-  I patched configure file and makefile. The output is listed below.
-  The project is configured as :
-  #../configure --target-list=3Ddsp-softmmu --cross-prefix=3Dx86_64-w64-min=
-gw32- --enable-gtk --enable-sdl --enable-debug --enable-plugins --extra-cfl=
-ags=3D"-DBUILDING_DLL"
-  =
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-  But running make yeilds error:
-  CC      dsp-softmmu/trace/generated-helpers.o
-  CC      dsp-softmmu/trace/control-target.o
-  LINK    dsp-softmmu/qemu-system-dspw.exe
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: cannot find -lfdt
-collect2.exe: error: ld returned 1 exit status
-make[1]: *** [Makefile:208: qemu-system-dspw.exe] Error 1
-make: *** [Makefile:491: dsp-softmmu/all] Error 2
-  =
+> On Tue, 30 Jun 2020 at 14:39, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>>
+>> As we have no interest in the underlying block geometry,
+>> directly call blk_getlength(). We have to care about machines
+>> creating SD card with not drive attached (probably incorrect
+>> API use). Simply emit a warning when such Frankenstein cards
+>> of zero size are reset.
+>
+> Which machines create SD cards without a backing block device?
+>
+> I have a feeling that also the monitor "change" and "eject"
+> commands can remove the backing block device from the SD card
+> object.
 
-  We then reconfigured by disable the -fdt :
-  ../configure --target-list=3Ddsp-softmmu --cross-prefix=3Dx86_64-w64-ming=
-w32- --enable-gtk --enable-sdl --enable-debug --enable-plugins --disable-fd=
-t --extra-cflags=3D"-DBUILDING_DLL"
-  Build finished and running  "make -C tests/plugin" gets similar linking e=
-rrors:
-  =
+Correct:
 
-  x86_64-w64-mingw32-gcc -shared -Wl,-soname,libbb.so -o libbb.so bb.o
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: bb.o: in function `g_autoptr_cleanup_generic_gfre=
-e':
-C:/msys64/mingw64/include/glib-2.0/glib/glib-autocleanups.h:28: undefined r=
-eference to `g_free'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: bb.o: in function `plugin_exit':
-C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.c:27: undefined reference =
-to `g_strdup_printf'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.=
-c:29: undefined reference to `qemu_plugin_outs'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.=
-c:30: undefined reference to `__stack_chk_fail'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: bb.o: in function `vcpu_tb_trans':
-C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.c:42: undefined reference =
-to `qemu_plugin_tb_n_insns'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.=
-c:45: undefined reference to `qemu_plugin_register_vcpu_tb_exec_inline'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.=
-c:47: undefined reference to `qemu_plugin_register_vcpu_tb_exec_inline'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.=
-c:50: undefined reference to `qemu_plugin_register_vcpu_tb_exec_cb'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: bb.o: in function `qemu_plugin_install':
-C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.c:64: undefined reference =
-to `qemu_plugin_register_vcpu_tb_trans_cb'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: C:/QRS_Project/simdsp/qemu-4.2.0/tests/plugin/bb.=
-c:65: undefined reference to `qemu_plugin_register_atexit_cb'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86_6=
-4-w64-mingw32/bin/ld.exe: bb.o:bb.c:(.rdata$.refptr.__stack_chk_guard[.refp=
-tr.__stack_chk_guard]+0x0): undefined reference to `__stack_chk_guard'
-collect2.exe: error: ld returned 1 exit status
+    static const BlockDevOps sd_block_ops =3D {
+        .change_media_cb =3D sd_cardchange,
+    };
 
----------makefile -----------
-BUILD_DIR :=3D $(CURDIR)/../..
+This is TYPE_SD_CARD's ("sd-card").  What exactly does that device
+model?
 
-include $(BUILD_DIR)/config-host.mak
-include $(SRC_PATH)/rules.mak
+If it's the sd-card, then the modelling is odd.  A physical SD card gets
+plugged and unplugged as a whole.  This model can't.  Instead, you
+change "media".  Isn't the SD card the medium?
 
-$(call set-vpath, $(SRC_PATH)/tests/plugin)
-#out =
+The other device models with removable media (IDE & SCSI CD drives,
+floppy drives) model the receptacle for media.  On media change, the
+drive stays put, and only the medium changes, both in the physical world
+and in our virtual world.
 
-NAMES :=3D
-NAMES +=3D bb
-NAMES +=3D empty
-NAMES +=3D insn
-NAMES +=3D mem
-NAMES +=3D hotblocks
-NAMES +=3D howvec
-NAMES +=3D hotpages
+Our "sd-card" seems to be an "SD card drive".  But then I wonder what
+the thing at the other end of TYPE_SD_BUS ("sd-bus") actually models.
+Any ideas?
 
-SONAMES :=3D $(addsuffix .so,$(addprefix lib,$(NAMES)))
-
-QEMU_CFLAGS +=3D -fPIC -DBUILDING_DLL
-QEMU_CFLAGS +=3D -I$(SRC_PATH)/include/qemu
-
-all: $(SONAMES)
-
-lib%.so: %.o
-	$(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
-
-clean:
-	rm -f *.o *.so *.d
-	rm -Rf .libs
-
-.PHONY: all clean
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885827
-
-Title:
-  building plugin failed on Windows with mingw
-
-Status in QEMU:
-  New
-
-Bug description:
-  I want to build QEMU 4.2.0's plugin module on Windows 7/10 with Mingw, bu=
-t the building process faild.
-   =
-
-  The step I follow is listed below:
-  1. create "dsp_build" diretory under source file folder
-
-  2.  change directory to dsp_build , and run ../configure --target-list=3D=
-dsp-softmmu --cross-prefix=3Dx86_64-w64-mingw32- --enable-gtk --enable-sdl =
---enable-debug --enable-plugins
-  3. build qemu project
-  4. switch dir to /dsp_build, make -C tests/plugin, yeilds error: =
-
-     CC      bb.o
-   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:17:2=
-4: error: variable 'qemu_plugin_version' definition is marked dllimport
-     17 | QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSIO=
-N;
-        |                        ^~~~~~~~~~~~~~~~~~~
-   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:17:2=
-4: warning: 'qemu_plugin_version' redeclared without dllimport attribute: p=
-revious dllimport ignored [-Wattributes]
-   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c: In =
-function 'vcpu_tb_exec':
-   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:33:2=
-9: warning: cast from pointer to integer of different size [-Wpointer-to-in=
-t-cast]
-     33 |     unsigned long n_insns =3D (unsigned long)udata;
-        |                             ^
-   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c: In =
-function 'vcpu_tb_trans':
-   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:51:4=
-6: warning: cast to pointer from integer of different size [-Wint-to-pointe=
-r-cast]
-     51 |                                              (void *)n_insns);
-
-  5.  Then , I modified the QEMU_flags and the compilation command
-  arguments($(CC) ..) in  the  makefile :
-
-                  BUILD_DIR :=3D $(CURDIR)/../..
-
-  		include $(BUILD_DIR)/config-host.mak
-  		include $(SRC_PATH)/rules.mak
-
-                  $(call set-vpath, $(SRC_PATH)/tests/plugin)
-
-  		NAMES :=3D
-  		NAMES +=3D bb
-  		NAMES +=3D empty
-  		NAMES +=3D insn
-  		NAMES +=3D mem
-  		NAMES +=3D hotblocks
-  		NAMES +=3D howvec
-  		NAMES +=3D hotpages
-
-                  SONAMES :=3D $(addsuffix .so,$(addprefix lib,$(NAMES)))
-
-  		QEMU_CFLAGS +=3D -fPIC	-DBUILDING_DLL  		#added  -DBUILDING_DLL
-  		QEMU_CFLAGS +=3D -I$(SRC_PATH)/include/qemu
-
-                  all: $(SONAMES)
-
-  		lib%.so: %.o
-  			$(CC) -fPIC -shared -o $@ $^ $(LDLIBS) -L /c/msys64/mingw64/lib/ -lgli=
-b-2.0
-  			# original cmd: $(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
-
-  		clean:
-  			rm -f *.o *.so *.d
-  			rm -Rf .libs
-
-                  .PHONY: all clean
-
-  6.  Executing make yeilds:
-
-  make: enter   =E2=80=9C/d/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/=
-build_dsp/tests/plugin=E2=80=9D
-    CC      bb.o
-  x86_64-w64-mingw32-gcc -fPIC -shared -o libbb.so bb.o  -L /c/msys64/mingw=
-64/lib/ -lglib-2.0
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: bb.o: in function `plugin_exit':
-  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:28: u=
-ndefined reference to `qemu_plugin_outs'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
-c3x/tests/plugin/bb.c:29: undefined reference to `__stack_chk_fail'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: bb.o: in function `vcpu_tb_trans':
-  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:41: u=
-ndefined reference to `qemu_plugin_tb_n_insns'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
-c3x/tests/plugin/bb.c:44: undefined reference to `qemu_plugin_register_vcpu=
-_tb_exec_inline'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
-c3x/tests/plugin/bb.c:46: undefined reference to `qemu_plugin_register_vcpu=
-_tb_exec_inline'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
-c3x/tests/plugin/bb.c:49: undefined reference to `qemu_plugin_register_vcpu=
-_tb_exec_cb'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: bb.o: in function `qemu_plugin_install':
-  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:63: u=
-ndefined reference to `qemu_plugin_register_vcpu_tb_trans_cb'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
-c3x/tests/plugin/bb.c:64: undefined reference to `qemu_plugin_register_atex=
-it_cb'
-  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
-6_64-w64-mingw32/bin/ld.exe: bb.o:bb.c:(.rdata$.refptr.__stack_chk_guard[.r=
-efptr.__stack_chk_guard]+0x0): undefined reference to `__stack_chk_guard'
-  collect2.exe: error: ld returned 1 exit status
-
-     It looks like linking problem(fail to link functions defined in api.c,=
- core.c...), but I have no idea what goes wrong. If I mannualy add api.o, c=
-ore.o in the compilation command, still get error like undefined reference =
-to '__stack_chk_guard'. =
-
-     My collegue can build 4.2.0  plugins on Ubuntu Linux without any probl=
-em.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885827/+subscriptions
 
