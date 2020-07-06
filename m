@@ -6,38 +6,36 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63620C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F9CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:27:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B54120720
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:26:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B54120720
+	by mail.kernel.org (Postfix) with ESMTPS id 5685120702
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:27:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5685120702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsTxH-0001aF-C8
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52972)
+	id 1jsTyF-0002gw-MD
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:27:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jsTvI-0007oe-I2; Mon, 06 Jul 2020 12:24:52 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:43831)
+ id 1jsTxB-0001hD-J0; Mon, 06 Jul 2020 12:26:49 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:59629)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jsTvG-0007u9-G5; Mon, 06 Jul 2020 12:24:52 -0400
+ id 1jsTx9-0008Ka-BZ; Mon, 06 Jul 2020 12:26:49 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Md6dH-1kQzn61j7b-00aBCH; Mon, 06 Jul 2020 18:24:43 +0200
-Subject: Re: [PATCH] hw/core/null-machine: Do not initialize unused chardev
- backends
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, qemu-devel@nongnu.org
-References: <20200624105611.1049-1-f4bug@amsat.org>
- <bd458cb8-e005-0ea9-bbaf-bcb541bfdc89@redhat.com>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M7ehh-1jzu4211wL-00835C; Mon, 06 Jul 2020 18:26:39 +0200
+Subject: Re: [PATCH] intel_iommu: "aw-bits" error message still refers to
+ "x-aw-bits"
+To: Menno Lageman <menno.lageman@oracle.com>, qemu-devel@nongnu.org
+References: <20200625155258.1452425-1-menno.lageman@oracle.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2631a1b9-a501-8633-6dbd-37fce4b116bd@vivier.eu>
-Date: Mon, 6 Jul 2020 18:24:42 +0200
+Message-ID: <b28ad290-0f91-de6c-26a7-c154a57e8526@vivier.eu>
+Date: Mon, 6 Jul 2020 18:26:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <bd458cb8-e005-0ea9-bbaf-bcb541bfdc89@redhat.com>
+In-Reply-To: <20200625155258.1452425-1-menno.lageman@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OpM+q4/0SCEHVreyrf+kopuTEgUKAQGvzgh9IrbSBpphFKTmE8+
- 2fmtpdCqY4IgldPuFlxpiIX0CnELGOIG9hfo4yH9GKiGtbmGy1NWOJWhFhTIIxtBhWgvTtw
- Fq0YRrCdFT5JalctiiCDaHbcnoABeINquG0xKnmCf3ZIaBkoBON5+0wBOgGTj5h+9PdGsA/
- RYkGPyt12c3FKpythRANg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:v4SQdEc30ZM=:5WrZDB4R0ZsVwHwoKF/sRC
- iEs7TPYo86rYt7rU3mHuUoUiXtqlZsj8UU8sp7zBglqbmtUkvzDmaEHwlWBjgq5i44GGr2zm5
- Jayyqnwa/71Ldf+h44oi+Ld5CNydaervkxVF4xrTQoA6bgVYJ2uKbpgeMLxJl5UtO0yWLQnfs
- 77jOYe+FMkdV9ju7fYHGfDcs0p0q79vVs+seBVgX5is8j9zTFI5JFOg+Ej/E64wdebcntKiKG
- PxMml6YnPsum3qIlmHZdEfbhidB+MUMifYMrjAxnrX48isgDw5fQXr0N88ZcU6kWqTgbqqTKo
- rOPUq4iRen5wuuxiZ6LjlIFFQ8hGAuUtrA1GZGce67arGaDzfvp0qLYxWuLOgu6id07UO2F9+
- vGdTobD9ZLBwTbf2PFUr89M9VjN32mOeH6oBfS2n+zGbtK2tWZMjsrFU4WiE6oA2uSoEtw7H+
- Sw3cgvkzPUIL4TozxyMqtKC4QEgbGUBxTzq4oqvcLNGK7TccIE9fgn0rJ8M0Y8/D/KKGKsWOX
- EBNWWYui+WXsquT0+9nrOJ3dmkdA12YmO5y0wrZxX2CznZvURz/mABHaiEVuMqolR1M8EWvdi
- +d4ciYFE8Y4PkVfW2a3rxd/53j8WoPyiqvpMUbp4fCeeobKoN6tDRYkKfnnnlfPay7km642up
- UmeQcQYS/Q9QW5+5oFiDVSn2oeaf9kr7xv42/6jgRdkbo/SorOFdqDmy0lDRpPIklktlK3Kw5
- Gk0FO9FZsBMLnYx4M6wSzVNgGsTAKO16vLUAZONv75+U3digOUu6KTXss1ZqT92C79J5UMo6w
- HPqqmU2iWInTKrNYrkiK+T62aRnniV+nh7+1uvKnLZ4nOMz9kx5AFgUmJ2Zce8INA0IBMJL
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:uYNoQ4oJOYsErGj8PeJG5dm+w7Dht4NOYp+mAEE8f4GC9E79rWG
+ hyVB21vPkvd1Nkk+lEVdGULdM8MQH46jz6tC2RoOFkL7zIf3XLYcTQLudZOq7utFGu2kTGy
+ x5wiUClpukW/dX1PIY/0txfzIj1iEzlg0Aihpj/uAC9g5769l53J+5Y0+duElJ5/KQmYEPn
+ t/RJf1vlz7ce0hTTIgjZA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:fmuhg6S8+iE=:9FtF97G82U1d3bpltxBMcz
+ IZjKu8EPMjmsjqtx/hCaQuGUyuxmjt/0F1tRirompLPBLMIHZTqAetrR5LcGbXpRgryp/Jx27
+ hYhGZ5w12DdgZ9j1PsLuoAg1YUcG5Pgke60WKUv/B1OJFS/u3piEH7PJWpAOaeLXtn/iatD1s
+ s5f2VzOB7l6uWJnhm58YxwJwQ8Y2xiRGh+TkiDCoeeAjZDTuK6b/MEhId5sc7FHZ1BBE0Al8r
+ ZJynp/CH6TPHdZnxDgNUwR6ZDlv+3U0kB2KasP3/AWhs9a+0RbfSj+s4lpap56prHTznvEviV
+ NVhWpVfgXF1o9YHnyA+uzRNCV54w6MKDI2Xl42Fz+CAQaFotW4/aMLSXQ7gZ3APxcu8mugs/R
+ VXBKGaW0yx1vk2VCzGtFBv1WwJE8t7V2UlNRlcEZz+jz7RXhLDEGNaJI11yBc2D0CmYWNm9rK
+ xC2EtRJa6Ix6MDNnsb8iGYCIp+wFW5h+/5fgfQ6FA+HAq5l0TNudrGwm9eyrVQ2Me9ZRlkrZG
+ +4PHMhDbE7X/7n+g3xq95agjUbcgmJi+YUvEpI1QVHS9Vw2oXh5E5oMCse5IASVFZdxDilWpC
+ 93z12jkPCjpRliQU6hRlPqiMYe7knXVJFAv+wDMRnpv3LJXOYFWZ3JBiItFyqP/Kt0mOw2V/b
+ L8B/aLj1enRa0A9TbDAHVX8XLWEd213hgeH+AVDM/E2zQ3B/aMlLgRW8SobR8+28DzdyDAojR
+ TFinOgJ58liuW1C974L5AlvsMrQbHo2c0E/EMDW4dbOd0CPiBYeaoujgJgplLdjVDaAXy0rPO
+ yHfjiCD95DAr21WTnmWHuDczpA+ON0tOTh+pDVCpuj6IVEwL4VML26kpUDQUm24/2LTOR2A
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 12:24:48
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 11:54:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -128,55 +126,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 24/06/2020 à 13:01, Thomas Huth a écrit :
-> On 24/06/2020 12.56, Philippe Mathieu-Daudé wrote:
->> The MachineClass uses an inverted logic (inherited from the
->> PC machines [*]) to create the chardev backends for the default
->> devices (see commits 998bbd74b9d..aa40fc9c964 and ac33f8fad14).
->>
->> As the none-machine doesn't have any hardware device, it is
->> pointless to initialize chardev backends. Fix by setting the
->> 'no_defaults' bits in its MachineClass.
->>
->> Suggested-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   hw/core/null-machine.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
->> index cb47d9d4f8..7e693523d7 100644
->> --- a/hw/core/null-machine.c
->> +++ b/hw/core/null-machine.c
->> @@ -50,6 +50,11 @@ static void machine_none_machine_init(MachineClass
->> *mc)
->>       mc->max_cpus = 1;
->>       mc->default_ram_size = 0;
->>       mc->default_ram_id = "ram";
->> +    mc->no_serial = 1;
->> +    mc->no_parallel = 1;
->> +    mc->no_floppy = 1;
->> +    mc->no_cdrom = 1;
->> +    mc->no_sdcard = 1;
->>   }
->>     DEFINE_MACHINE("none", machine_none_machine_init)
->>
+Le 25/06/2020 à 17:52, Menno Lageman a écrit :
+> Commit 4b49b586c4 ('intel_iommu: remove "x-" prefix for "aw-bits"')
+> removed the "x-" prefix but but didn't update the error message
+> accordingly.
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Menno Lageman <menno.lageman@oracle.com>
+> ---
+>  hw/i386/intel_iommu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index df7ad254ac15..c56398e99177 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3758,7 +3758,7 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+>      /* Currently only address widths supported are 39 and 48 bits */
+>      if ((s->aw_bits != VTD_HOST_AW_39BIT) &&
+>          (s->aw_bits != VTD_HOST_AW_48BIT)) {
+> -        error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
+> +        error_setg(errp, "Supported values for aw-bits are: %d, %d",
+>                     VTD_HOST_AW_39BIT, VTD_HOST_AW_48BIT);
+>          return false;
+>      }
 > 
 
-Applied to my trivial-patches-for-5.1 branch.
-
-Thanks,
-Laurent
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
