@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 093CDC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F8D3C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:12:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8C6020739
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:11:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A74120772
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:12:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z4/eKqHQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8C6020739
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BeiwvVWI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A74120772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsO5X-0005SH-0l
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:11:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53448)
+	id 1jsO6m-0007hN-CE
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:12:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsNzf-0003Aa-QI
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:04:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34000
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsNzg-0003Ca-Ij
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57236
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsNzb-00042W-NZ
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:04:59 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsNze-00043F-Ko
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594029895;
+ s=mimecast20190719; t=1594029897;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Vq6TsUIGnDXBhPCJ0YcNJc3kNtoo5pcVkJs1OhIv2GQ=;
- b=Z4/eKqHQOZe9Ac04ldSq5iiZlJTm2xfhATnfm/Ijpc7M+qse15iL81817jWP3fmxGYVOOY
- wcOaTd/84IbJg18UaPFdr8QB4Uc3aHF/QZv59a3/d94PetbjUAhmyAP6hiiMX2YfHejGRN
- qqDIFVaqGeH7VtKJqTv9FFci3498DxI=
+ bh=vZsdfrZa9AABbOcAVi25FTFLZq4GcjtpS1hXB4cDpkc=;
+ b=BeiwvVWI9CkABFSGE7q0rePYmi9A/UcOuGyI00QI5E0mda7kxuji/ncSnqi3V5vpaW4t95
+ cB03Z4soicUSstV2+2icpfN8TywOSG7NINDZQ8Qm7Lfp1nqleHxkDVStjE3TBWldfNIvEB
+ 1VUhTTIwi+lq8wk52G7up/570fOGaGA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-0wd9y_Z7NtmhKwYHI1besw-1; Mon, 06 Jul 2020 06:04:49 -0400
-X-MC-Unique: 0wd9y_Z7NtmhKwYHI1besw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-270-_F4pauEwPl-9_a9Wh_Lu_A-1; Mon, 06 Jul 2020 06:04:56 -0400
+X-MC-Unique: _F4pauEwPl-9_a9Wh_Lu_A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E791800D5C;
- Mon,  6 Jul 2020 10:04:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0454B18A8224;
+ Mon,  6 Jul 2020 10:04:55 +0000 (UTC)
 Received: from localhost (ovpn-112-176.ams2.redhat.com [10.36.112.176])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BD7210013D9;
- Mon,  6 Jul 2020 10:04:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 995682DE81;
+ Mon,  6 Jul 2020 10:04:54 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 06/31] iotests.py: Add qemu_img_pipe_and_status()
-Date: Mon,  6 Jul 2020 12:04:07 +0200
-Message-Id: <20200706100432.2301919-7-mreitz@redhat.com>
+Subject: [PULL 09/31] qcrypto/core: add generic infrastructure for crypto
+ options amendment
+Date: Mon,  6 Jul 2020 12:04:10 +0200
+Message-Id: <20200706100432.2301919-10-mreitz@redhat.com>
 In-Reply-To: <20200706100432.2301919-1-mreitz@redhat.com>
 References: <20200706100432.2301919-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:59:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -80,7 +81,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,85 +100,184 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function will be used by the next patch, which intends to check
-both the exit code and qemu-img's output.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200625125548.870061-5-mreitz@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-[mreitz: Rebased on 49438972b8c2e]
+This will be used first to implement luks keyslot management.
+
+block_crypto_amend_opts_init will be used to convert
+qemu-img cmdline to QCryptoBlockAmendOptions
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200608094030.670121-2-mlevitsk@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 40 +++++++++++++++++------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ qapi/crypto.json       | 16 ++++++++++++++++
+ block/crypto.h         |  3 +++
+ crypto/blockpriv.h     |  8 ++++++++
+ include/crypto/block.h | 22 ++++++++++++++++++++++
+ block/crypto.c         | 17 +++++++++++++++++
+ crypto/block.c         | 29 +++++++++++++++++++++++++++++
+ 6 files changed, 95 insertions(+)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index ef739dd1e3..423974d3f6 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -29,7 +29,7 @@ import struct
- import subprocess
- import sys
- from typing import (Any, Callable, Dict, Iterable,
--                    List, Optional, Sequence, TypeVar)
-+                    List, Optional, Sequence, Tuple, TypeVar)
- import unittest
- 
- # pylint: disable=import-error, wrong-import-position
-@@ -90,15 +90,24 @@ luks_default_secret_object = 'secret,id=keysec0,data=' + \
- luks_default_key_secret_opt = 'key-secret=keysec0'
- 
- 
--def qemu_img(*args):
--    '''Run qemu-img and return the exit code'''
--    devnull = open('/dev/null', 'r+')
--    exitcode = subprocess.call(qemu_img_args + list(args),
--                               stdin=devnull, stdout=devnull)
--    if exitcode < 0:
-+def qemu_img_pipe_and_status(*args: str) -> Tuple[str, int]:
-+    """
-+    Run qemu-img and return both its output and its exit code
-+    """
-+    subp = subprocess.Popen(qemu_img_args + list(args),
-+                            stdout=subprocess.PIPE,
-+                            stderr=subprocess.STDOUT,
-+                            universal_newlines=True)
-+    output = subp.communicate()[0]
-+    if subp.returncode < 0:
-         sys.stderr.write('qemu-img received signal %i: %s\n'
--                         % (-exitcode, ' '.join(qemu_img_args + list(args))))
--    return exitcode
-+                         % (-subp.returncode,
-+                            ' '.join(qemu_img_args + list(args))))
-+    return (output, subp.returncode)
+diff --git a/qapi/crypto.json b/qapi/crypto.json
+index b2a4cff683..aeb6c7ef7b 100644
+--- a/qapi/crypto.json
++++ b/qapi/crypto.json
+@@ -309,3 +309,19 @@
+   'base': 'QCryptoBlockInfoBase',
+   'discriminator': 'format',
+   'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
 +
-+def qemu_img(*args: str) -> int:
-+    '''Run qemu-img and return the exit code'''
-+    return qemu_img_pipe_and_status(*args)[1]
++
++
++##
++# @QCryptoBlockAmendOptions:
++#
++# The options that are available for all encryption formats
++# when amending encryption settings
++#
++# Since: 5.1
++##
++{ 'union': 'QCryptoBlockAmendOptions',
++  'base': 'QCryptoBlockOptionsBase',
++  'discriminator': 'format',
++  'data': {
++            } }
+diff --git a/block/crypto.h b/block/crypto.h
+index b935695e79..06e044c9be 100644
+--- a/block/crypto.h
++++ b/block/crypto.h
+@@ -91,6 +91,9 @@
+ QCryptoBlockCreateOptions *
+ block_crypto_create_opts_init(QDict *opts, Error **errp);
  
- def ordered_qmp(qmsg, conv_keys=True):
-     # Dictionaries are not ordered prior to 3.6, therefore:
-@@ -140,18 +149,9 @@ def qemu_img_verbose(*args):
-                          % (-exitcode, ' '.join(qemu_img_args + list(args))))
-     return exitcode
++QCryptoBlockAmendOptions *
++block_crypto_amend_opts_init(QDict *opts, Error **errp);
++
+ QCryptoBlockOpenOptions *
+ block_crypto_open_opts_init(QDict *opts, Error **errp);
  
--def qemu_img_pipe(*args):
-+def qemu_img_pipe(*args: str) -> str:
-     '''Run qemu-img and return its output'''
--    subp = subprocess.Popen(qemu_img_args + list(args),
--                            stdout=subprocess.PIPE,
--                            stderr=subprocess.STDOUT,
--                            universal_newlines=True)
--    output = subp.communicate()[0]
--    if subp.returncode < 0:
--        sys.stderr.write('qemu-img received signal %i: %s\n'
--                         % (-subp.returncode,
--                            ' '.join(qemu_img_args + list(args))))
--    return output
-+    return qemu_img_pipe_and_status(*args)[0]
+diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
+index 71c59cb542..3c7ccea504 100644
+--- a/crypto/blockpriv.h
++++ b/crypto/blockpriv.h
+@@ -62,6 +62,14 @@ struct QCryptoBlockDriver {
+                   void *opaque,
+                   Error **errp);
  
- def qemu_img_log(*args):
-     result = qemu_img_pipe(*args)
++    int (*amend)(QCryptoBlock *block,
++                 QCryptoBlockReadFunc readfunc,
++                 QCryptoBlockWriteFunc writefunc,
++                 void *opaque,
++                 QCryptoBlockAmendOptions *options,
++                 bool force,
++                 Error **errp);
++
+     int (*get_info)(QCryptoBlock *block,
+                     QCryptoBlockInfo *info,
+                     Error **errp);
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index c77ccaf9c0..d274819791 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -144,6 +144,28 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
+                                    void *opaque,
+                                    Error **errp);
+ 
++/**
++ * qcrypto_block_amend_options:
++ * @block: the block encryption object
++ *
++ * @readfunc: callback for reading data from the volume header
++ * @writefunc: callback for writing data to the volume header
++ * @opaque: data to pass to @readfunc and @writefunc
++ * @options: the new/amended encryption options
++ * @force: hint for the driver to allow unsafe operation
++ * @errp: error pointer
++ *
++ * Changes the crypto options of the encryption format
++ *
++ */
++int qcrypto_block_amend_options(QCryptoBlock *block,
++                                QCryptoBlockReadFunc readfunc,
++                                QCryptoBlockWriteFunc writefunc,
++                                void *opaque,
++                                QCryptoBlockAmendOptions *options,
++                                bool force,
++                                Error **errp);
++
+ 
+ /**
+  * qcrypto_block_calculate_payload_offset:
+diff --git a/block/crypto.c b/block/crypto.c
+index 973b57b3eb..dcf8b42bb2 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -202,6 +202,23 @@ block_crypto_create_opts_init(QDict *opts, Error **errp)
+     return ret;
+ }
+ 
++QCryptoBlockAmendOptions *
++block_crypto_amend_opts_init(QDict *opts, Error **errp)
++{
++    Visitor *v;
++    QCryptoBlockAmendOptions *ret;
++
++    v = qobject_input_visitor_new_flat_confused(opts, errp);
++    if (!v) {
++        return NULL;
++    }
++
++    visit_type_QCryptoBlockAmendOptions(v, NULL, &ret, errp);
++
++    visit_free(v);
++    return ret;
++}
++
+ 
+ static int block_crypto_open_generic(QCryptoBlockFormat format,
+                                      QemuOptsList *opts_spec,
+diff --git a/crypto/block.c b/crypto/block.c
+index 6f42b32f1e..eb057948b5 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -150,6 +150,35 @@ qcrypto_block_calculate_payload_offset(QCryptoBlockCreateOptions *create_opts,
+     return crypto != NULL;
+ }
+ 
++int qcrypto_block_amend_options(QCryptoBlock *block,
++                                QCryptoBlockReadFunc readfunc,
++                                QCryptoBlockWriteFunc writefunc,
++                                void *opaque,
++                                QCryptoBlockAmendOptions *options,
++                                bool force,
++                                Error **errp)
++{
++    if (options->format != block->format) {
++        error_setg(errp,
++                   "Cannot amend encryption format");
++        return -1;
++    }
++
++    if (!block->driver->amend) {
++        error_setg(errp,
++                   "Crypto format %s doesn't support format options amendment",
++                   QCryptoBlockFormat_str(block->format));
++        return -1;
++    }
++
++    return block->driver->amend(block,
++                                readfunc,
++                                writefunc,
++                                opaque,
++                                options,
++                                force,
++                                errp);
++}
+ 
+ QCryptoBlockInfo *qcrypto_block_get_info(QCryptoBlock *block,
+                                          Error **errp)
 -- 
 2.26.2
 
