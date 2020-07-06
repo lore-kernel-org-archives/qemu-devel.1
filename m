@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A65D9C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46275C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:23:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7047420739
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:21:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DD6220739
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:23:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="By9w9xOi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7047420739
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EXmMHhFM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD6220739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsOFj-0001LF-NI
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:21:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53810)
+	id 1jsOHL-00038m-Bc
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:23:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsO05-00042h-Br
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48028
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsO0T-0004kS-J8
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:49 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32609
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsO02-00048N-3V
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:25 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jsO0R-0004Kt-Si
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:05:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594029921;
+ s=mimecast20190719; t=1594029947;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=izuy53HpCfbY4Wj31Xz6HKjJGdWIlXO7S22gmtfVZB4=;
- b=By9w9xOiI3VC5VM+OPQrxb+r7O87ghOaDZxvHooLPAxa5EcGlMt9xN0UcnkwpGM4Wkg/Ti
- TiDfplqEFyMdtM61fBa2DIDZH0T4Y1ypRmY6bX4B58bE+djrnYvaUgcFhcV99Z0BOw+HKk
- sXTASFHA1X27+QGVWn3xuQDTh7DiwpQ=
+ bh=InPfZquPBgwPbYSZszfQvUPWmQe0ZZ6lz3elx4Kj37Y=;
+ b=EXmMHhFMfaaC7GK+zS74mVoURIvt7Bd3Q2AzhHV77oLBvCVWB2qU1jsBdF64H+X959XJmZ
+ lcdZoFYfD/Tfwd/iu6ON6NvouoM6r1wHbPMuu71DE399JorDVPH+irZmzRkfnI+S8QyN5k
+ lA91hhz9/MTRPjwDtmI8C25r1gMYMZM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-Yfq1RYflNymMCTLAHrBkiA-1; Mon, 06 Jul 2020 06:05:19 -0400
-X-MC-Unique: Yfq1RYflNymMCTLAHrBkiA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-502-ddY4hHx0MoO1botEup4g1g-1; Mon, 06 Jul 2020 06:05:44 -0400
+X-MC-Unique: ddY4hHx0MoO1botEup4g1g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5621107B267;
- Mon,  6 Jul 2020 10:05:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0290107B265;
+ Mon,  6 Jul 2020 10:05:43 +0000 (UTC)
 Received: from localhost (ovpn-112-176.ams2.redhat.com [10.36.112.176])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3193D71662;
- Mon,  6 Jul 2020 10:05:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E35D87B419;
+ Mon,  6 Jul 2020 10:05:42 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 18/31] block/core: add generic infrastructure for
- x-blockdev-amend qmp command
-Date: Mon,  6 Jul 2020 12:04:19 +0200
-Message-Id: <20200706100432.2301919-19-mreitz@redhat.com>
+Subject: [PULL 29/31] block/vhdx: drop unallocated_blocks_are_zero
+Date: Mon,  6 Jul 2020 12:04:30 +0200
+Message-Id: <20200706100432.2301919-30-mreitz@redhat.com>
 In-Reply-To: <20200706100432.2301919-1-mreitz@redhat.com>
 References: <20200706100432.2301919-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:59:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,274 +99,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-blockdev-amend will be used similiar to blockdev-create
-to allow on the fly changes of the structure of the format based block devices.
+vhdx doesn't have .bdrv_co_block_status handler, so DATA|ALLOCATED is
+always assumed for it in bdrv_co_block_status().
+unallocated_blocks_are_zero is useless (it doesn't affect the only user
+of the field: bdrv_co_block_status()), drop it.
 
-Current plan is to first support encryption keyslot management for luks
-based formats (raw and embedded in qcow2)
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200608094030.670121-12-mlevitsk@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200528094405.145708-9-vsementsov@virtuozzo.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json      |  42 ++++++++++++++
- qapi/job.json             |   4 +-
- include/block/block_int.h |  21 +++++--
- block/amend.c             | 113 ++++++++++++++++++++++++++++++++++++++
- block/Makefile.objs       |   2 +-
- 5 files changed, 174 insertions(+), 8 deletions(-)
- create mode 100644 block/amend.c
+ block/vhdx.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0e1c6a59f2..c22996282f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4674,6 +4674,48 @@
-   'data': { 'job-id': 'str',
-             'options': 'BlockdevCreateOptions' } }
+diff --git a/block/vhdx.c b/block/vhdx.c
+index fa9e544a5e..645dc4b4f4 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1164,9 +1164,6 @@ static int vhdx_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
  
-+##
-+# @BlockdevAmendOptions:
-+#
-+# Options for amending an image format
-+#
-+# @driver:          Block driver of the node to amend.
-+#
-+# Since: 5.1
-+##
-+{ 'union': 'BlockdevAmendOptions',
-+  'base': {
-+      'driver':         'BlockdevDriver' },
-+  'discriminator': 'driver',
-+  'data': {
-+  } }
-+
-+##
-+# @x-blockdev-amend:
-+#
-+# Starts a job to amend format specific options of an existing open block device
-+# The job is automatically finalized, but a manual job-dismiss is required.
-+#
-+# @job-id:          Identifier for the newly created job.
-+#
-+# @node-name:       Name of the block node to work on
-+#
-+# @options:         Options (driver specific)
-+#
-+# @force:           Allow unsafe operations, format specific
-+#                   For luks that allows erase of the last active keyslot
-+#                   (permanent loss of data),
-+#                   and replacement of an active keyslot
-+#                   (possible loss of data if IO error happens)
-+#
-+# Since: 5.1
-+##
-+{ 'command': 'x-blockdev-amend',
-+  'data': { 'job-id': 'str',
-+            'node-name': 'str',
-+            'options': 'BlockdevAmendOptions',
-+            '*force': 'bool' } }
-+
- ##
- # @BlockErrorAction:
- #
-diff --git a/qapi/job.json b/qapi/job.json
-index 5e658281f5..c48a0c3e34 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -19,10 +19,12 @@
- #
- # @create: image creation job type, see "blockdev-create" (since 3.0)
- #
-+# @amend: image options amend job type, see "x-blockdev-amend" (since 5.1)
-+#
- # Since: 1.7
- ##
- { 'enum': 'JobType',
--  'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
-+  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] }
+     bdi->cluster_size = s->block_size;
  
- ##
- # @JobStatus:
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ed335519cc..1b86b59af1 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -141,12 +141,27 @@ struct BlockDriver {
-     int (*bdrv_file_open)(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp);
-     void (*bdrv_close)(BlockDriverState *bs);
-+
-+
-     int coroutine_fn (*bdrv_co_create)(BlockdevCreateOptions *opts,
-                                        Error **errp);
-     int coroutine_fn (*bdrv_co_create_opts)(BlockDriver *drv,
-                                             const char *filename,
-                                             QemuOpts *opts,
-                                             Error **errp);
-+
-+    int coroutine_fn (*bdrv_co_amend)(BlockDriverState *bs,
-+                                      BlockdevAmendOptions *opts,
-+                                      bool force,
-+                                      Error **errp);
-+
-+    int (*bdrv_amend_options)(BlockDriverState *bs,
-+                              QemuOpts *opts,
-+                              BlockDriverAmendStatusCB *status_cb,
-+                              void *cb_opaque,
-+                              bool force,
-+                              Error **errp);
-+
-     int (*bdrv_make_empty)(BlockDriverState *bs);
- 
-     /*
-@@ -441,12 +456,6 @@ struct BlockDriver {
-                                       BdrvCheckResult *result,
-                                       BdrvCheckMode fix);
- 
--    int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
--                              BlockDriverAmendStatusCB *status_cb,
--                              void *cb_opaque,
--                              bool force,
--                              Error **errp);
+-    bdi->unallocated_blocks_are_zero =
+-        (s->params.data_bits & VHDX_PARAMS_HAS_PARENT) == 0;
 -
-     void (*bdrv_debug_event)(BlockDriverState *bs, BlkdebugEvent event);
- 
-     /* TODO Better pass a option string/QDict/QemuOpts to add any rule? */
-diff --git a/block/amend.c b/block/amend.c
-new file mode 100644
-index 0000000000..f4612dcf08
---- /dev/null
-+++ b/block/amend.c
-@@ -0,0 +1,113 @@
-+/*
-+ * Block layer code related to image options amend
-+ *
-+ * Copyright (c) 2018 Kevin Wolf <kwolf@redhat.com>
-+ * Copyright (c) 2020 Red Hat. Inc
-+ *
-+ * Heavily based on create.c
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/block_int.h"
-+#include "qemu/job.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/qapi-commands-block-core.h"
-+#include "qapi/qapi-visit-block-core.h"
-+#include "qapi/clone-visitor.h"
-+#include "qapi/error.h"
-+
-+typedef struct BlockdevAmendJob {
-+    Job common;
-+    BlockdevAmendOptions *opts;
-+    BlockDriverState *bs;
-+    bool force;
-+} BlockdevAmendJob;
-+
-+static int coroutine_fn blockdev_amend_run(Job *job, Error **errp)
-+{
-+    BlockdevAmendJob *s = container_of(job, BlockdevAmendJob, common);
-+    int ret;
-+
-+    job_progress_set_remaining(&s->common, 1);
-+    ret = s->bs->drv->bdrv_co_amend(s->bs, s->opts, s->force, errp);
-+    job_progress_update(&s->common, 1);
-+    qapi_free_BlockdevAmendOptions(s->opts);
-+    return ret;
-+}
-+
-+static const JobDriver blockdev_amend_job_driver = {
-+    .instance_size = sizeof(BlockdevAmendJob),
-+    .job_type      = JOB_TYPE_AMEND,
-+    .run           = blockdev_amend_run,
-+};
-+
-+void qmp_x_blockdev_amend(const char *job_id,
-+                          const char *node_name,
-+                          BlockdevAmendOptions *options,
-+                          bool has_force,
-+                          bool force,
-+                          Error **errp)
-+{
-+    BlockdevAmendJob *s;
-+    const char *fmt = BlockdevDriver_str(options->driver);
-+    BlockDriver *drv = bdrv_find_format(fmt);
-+    BlockDriverState *bs = bdrv_find_node(node_name);
-+
-+
-+    if (!drv) {
-+        error_setg(errp, "Block driver '%s' not found or not supported", fmt);
-+        return;
-+    }
-+
-+    /*
-+     * If the driver is in the schema, we know that it exists. But it may not
-+     * be whitelisted.
-+     */
-+    if (bdrv_uses_whitelist() && !bdrv_is_whitelisted(drv, false)) {
-+        error_setg(errp, "Driver is not whitelisted");
-+        return;
-+    }
-+
-+    if (bs->drv != drv) {
-+        error_setg(errp,
-+                   "x-blockdev-amend doesn't support changing the block driver");
-+        return;
-+    }
-+
-+    /* Error out if the driver doesn't support .bdrv_co_amend */
-+    if (!drv->bdrv_co_amend) {
-+        error_setg(errp, "Driver does not support x-blockdev-amend");
-+        return;
-+    }
-+
-+    /* Create the block job */
-+    s = job_create(job_id, &blockdev_amend_job_driver, NULL,
-+                   bdrv_get_aio_context(bs), JOB_DEFAULT | JOB_MANUAL_DISMISS,
-+                   NULL, NULL, errp);
-+    if (!s) {
-+        return;
-+    }
-+
-+    s->bs = bs,
-+    s->opts = QAPI_CLONE(BlockdevAmendOptions, options),
-+    s->force = has_force ? force : false;
-+    job_start(&s->common);
-+}
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 96028eedce..577e578bc2 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -19,7 +19,7 @@ block-obj-$(CONFIG_WIN32) += file-win32.o win32-aio.o
- block-obj-$(CONFIG_POSIX) += file-posix.o
- block-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- block-obj-$(CONFIG_LINUX_IO_URING) += io_uring.o
--block-obj-y += null.o mirror.o commit.o io.o create.o
-+block-obj-y += null.o mirror.o commit.o io.o create.o amend.o
- block-obj-y += throttle-groups.o
- block-obj-$(CONFIG_LINUX) += nvme.o
+     return 0;
+ }
  
 -- 
 2.26.2
