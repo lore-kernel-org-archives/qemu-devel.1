@@ -2,95 +2,86 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C16F4C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7636AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91E55206DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:17:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43004206DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:18:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXiliWdW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91E55206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VlAqpNrK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43004206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUkJ-0001er-ST
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:17:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58846)
+	id 1jsUkl-00032I-HT
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:18:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jsUIG-0007Zy-PJ
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:48:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52638
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jsUIE-0004Jp-1l
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:48:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594054113;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=moO3+lGkJ2sBGKmNWn7n87wS9tUDIgtnaNaBNy+qKy8=;
- b=ZXiliWdWpfbfryFVzo5PMzijwCMOhu/CG0B444JwNwzNRlkWBlIK5qLr2Cl6WqOe3NpGsT
- ZwxgTf208QtPpgYACRbBtuI7pocxw1cxpTJeAQo52mpzGJq6uDss8QXf8wBqL9kESh4pRf
- MvhW4eVbNQBsRxAVAwWWGg3srQqQmuY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-iTRLvVAZPM6FyUykgXLYyw-1; Mon, 06 Jul 2020 12:48:31 -0400
-X-MC-Unique: iTRLvVAZPM6FyUykgXLYyw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0298100A8E7;
- Mon,  6 Jul 2020 16:48:29 +0000 (UTC)
-Received: from [10.36.113.241] (ovpn-113-241.ams2.redhat.com [10.36.113.241])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D9B660C84;
- Mon,  6 Jul 2020 16:48:21 +0000 (UTC)
-Subject: Re: [PATCH v2 9/9] hw/arm/smmuv3: Advertise SMMUv3.2 range
- invalidation
-To: Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- peterx@redhat.com
-References: <20200702152659.8522-1-eric.auger@redhat.com>
- <20200702152659.8522-10-eric.auger@redhat.com>
- <10bafac8-a230-c545-662c-bcbd9f3902dc@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3f4dce7c-14e9-f97f-1de5-d39a501bd229@redhat.com>
-Date: Mon, 6 Jul 2020 18:48:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsUIz-0000wH-El; Mon, 06 Jul 2020 12:49:21 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:40080)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsUIx-0004Pa-5U; Mon, 06 Jul 2020 12:49:21 -0400
+Received: by mail-il1-x141.google.com with SMTP id e18so22772008ilr.7;
+ Mon, 06 Jul 2020 09:49:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Nbx9IfByicVhiGofOcBwvynyHEZt9D8sbVE/rksuBKQ=;
+ b=VlAqpNrKxCPkyItSx5oheqbtPIm7Un993nTRk23s0wL2NGLawIMQzVHROozLKBVDd5
+ LHl0zYjP+OtF6o5KCM2TWF3D0trQbqJllGxBp/wF+wAPypXHEobmGRqxoL3/0xh7rWkx
+ j8jaHHPy4a3YnQNaORJvKpS9ppo1SeXplNNrhFolASokM8S9gInT9SKRXoF2QgD1Bqwf
+ G86D9t4nLxd8UmlSyxQKfE3ljgAnll5zJQsGFXoPMQCHU4wy1XSfk8jrIjyh0LqkA3be
+ yuS9Ls/ayZyVBKoKQ/zfRkyO0KCCrzz2lnyozUyBx9gJU0kF+xCHjyT8aIU9ckdbqsrY
+ /WrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Nbx9IfByicVhiGofOcBwvynyHEZt9D8sbVE/rksuBKQ=;
+ b=NDdfFxXHNxI4w2ZJkSE2AvbHuJmSicrfxbPndy1TT0nDUzDl7KtTG4bMoPYOUDXq1y
+ 3K/bZEMQaPpH6I/jNlNAgmMMnKdSDtWZhpYYGRxdcskfd3C7SoSXq8HNnCl6mKE0EUTq
+ pR4YXpVYF0bR7koZyvrU+UqDtRhm1vW90HhAzcmmV3FVX32laqtiwf/hl2hqjxnZUGbz
+ Koue6oMwUZUQyTyT/ZIOcFdEJQ1AxLhcyCKIatdYFag6YYJmQnYqXJRZaZs/COYq5ltT
+ Cx1FIy41KQSIkoqucMutCdzRnFIMbdeXX+SX2UIh/N9WWKFSEjM9CLJFWQ7sek/D+er9
+ lvBA==
+X-Gm-Message-State: AOAM530tQQsuCBPPU5sFSCCwKllEtvVu4SOncZVaIf1DbOiYt5RuN6fR
+ Wqcp75h63k5aDxdGeGoUxk+cP3NkwuIw1ZGAmm4=
+X-Google-Smtp-Source: ABdhPJypGlcxLt+/3A86jvbCmBdwPrEotQsvQy+ykkvFqxTLUIHFUaSlyTkUU3qqKxSjMlyvMcc7jR24Tfa5V1UmX+s=
+X-Received: by 2002:a92:5f12:: with SMTP id t18mr31642216ilb.267.1594054157141; 
+ Mon, 06 Jul 2020 09:49:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <10bafac8-a230-c545-662c-bcbd9f3902dc@arm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200705213350.24725-1-f4bug@amsat.org>
+ <20200705213350.24725-3-f4bug@amsat.org>
+In-Reply-To: <20200705213350.24725-3-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 6 Jul 2020 09:39:25 -0700
+Message-ID: <CAKmqyKO_1HhM4WVejpEBcqNW9W6Ept9Vks0E75uF2CJAxHH0HQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/sd/pxa2xx_mmci: Trivial simplification
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,70 +95,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, mst@redhat.com, zhangfei.gao@foxmail.com,
- shameerali.kolothum.thodi@huawei.com, will@kernel.org, robh@kernel.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:Trivial patches" <qemu-trivial@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>, Michael Tokarev <mjt@tls.msk.ru>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Robin,
+On Sun, Jul 5, 2020 at 2:35 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>
+> Avoid declaring PXA2xxMMCIState local variable, return it directly.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-On 7/6/20 6:18 PM, Robin Murphy wrote:
-> On 2020-07-02 16:26, Eric Auger wrote:
->> Expose the RIL bit so that the guest driver uses range
->> invalidation.
-> 
-> Hmm, this is a v3.2 feature... so strictly, in order to advertise it you
-> would need to claim at least v3.1 in SMMU_AIDR and implement all the
-> mandatory v3.1 behaviour ;)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-AIDR is not modeled at the moment in this emulation code.
-I do not see it used in the linux smmuv3 driver either. I can initialize
-it to 0x2 for the sake of completeness.
+Alistair
 
-With respect to the 'mandatory features', could you please help me
-determining what are they. Most of the features that would impact this
-emulation code look optional to me (52bit support, PBHA, MPAM).
-
-This emulation code is tested against the latest linux kernel.
-
-Thanks
-
-Eric
-
-> Robin.
-> 
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>   hw/arm/smmuv3-internal.h | 1 +
->>   hw/arm/smmuv3.c          | 2 ++
->>   2 files changed, 3 insertions(+)
->>
->> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
->> index 5babf72f7d..4e7ec252ed 100644
->> --- a/hw/arm/smmuv3-internal.h
->> +++ b/hw/arm/smmuv3-internal.h
->> @@ -54,6 +54,7 @@ REG32(IDR1,                0x4)
->>     REG32(IDR2,                0x8)
->>   REG32(IDR3,                0xc)
->> +    FIELD(IDR3, RIL,          10, 1);
->>   REG32(IDR4,                0x10)
->>   REG32(IDR5,                0x14)
->>        FIELD(IDR5, OAS,         0, 3);
->> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
->> index 89ab11fc36..add4ba4543 100644
->> --- a/hw/arm/smmuv3.c
->> +++ b/hw/arm/smmuv3.c
->> @@ -254,6 +254,8 @@ static void smmuv3_init_regs(SMMUv3State *s)
->>       s->idr[1] = FIELD_DP32(s->idr[1], IDR1, EVENTQS, SMMU_EVENTQS);
->>       s->idr[1] = FIELD_DP32(s->idr[1], IDR1, CMDQS,   SMMU_CMDQS);
->>   +    s->idr[3] = FIELD_DP32(s->idr[3], IDR3, RIL, 1);
->> +
->>      /* 4K and 64K granule support */
->>       s->idr[5] = FIELD_DP32(s->idr[5], IDR5, GRAN4K, 1);
->>       s->idr[5] = FIELD_DP32(s->idr[5], IDR5, GRAN64K, 1);
->>
-> 
-
+> ---
+>  hw/sd/pxa2xx_mmci.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/hw/sd/pxa2xx_mmci.c b/hw/sd/pxa2xx_mmci.c
+> index 9482b9212d..2996a2ef17 100644
+> --- a/hw/sd/pxa2xx_mmci.c
+> +++ b/hw/sd/pxa2xx_mmci.c
+> @@ -480,10 +480,8 @@ PXA2xxMMCIState *pxa2xx_mmci_init(MemoryRegion *sysm=
+em,
+>  {
+>      DeviceState *dev;
+>      SysBusDevice *sbd;
+> -    PXA2xxMMCIState *s;
+>
+>      dev =3D qdev_new(TYPE_PXA2XX_MMCI);
+> -    s =3D PXA2XX_MMCI(dev);
+>      sbd =3D SYS_BUS_DEVICE(dev);
+>      sysbus_mmio_map(sbd, 0, base);
+>      sysbus_connect_irq(sbd, 0, irq);
+> @@ -491,7 +489,7 @@ PXA2xxMMCIState *pxa2xx_mmci_init(MemoryRegion *sysme=
+m,
+>      qdev_connect_gpio_out_named(dev, "tx-dma", 0, tx_dma);
+>      sysbus_realize_and_unref(sbd, &error_fatal);
+>
+> -    return s;
+> +    return PXA2XX_MMCI(dev);
+>  }
+>
+>  static void pxa2xx_mmci_set_inserted(DeviceState *dev, bool inserted)
+> --
+> 2.21.3
+>
+>
 
