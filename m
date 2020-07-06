@@ -2,88 +2,88 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C570C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 15:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA3C4C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 15:58:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37ED420715
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 15:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A17BE20715
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 15:58:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VlYMmh+k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37ED420715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elhJ1w5+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A17BE20715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsTUk-0005y5-HK
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 11:57:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44352)
+	id 1jsTVH-0007MV-UT
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 11:57:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsTU7-0005K3-11; Mon, 06 Jul 2020 11:56:47 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:35611)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsTU5-0001LV-Ha; Mon, 06 Jul 2020 11:56:46 -0400
-Received: by mail-il1-x144.google.com with SMTP id t18so13402418ilh.2;
- Mon, 06 Jul 2020 08:56:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=+amaCydGXFD7tOxIoaW5Ws/ffZUNsk3k3gWx+ubwDDo=;
- b=VlYMmh+kk6mVwx2SUxdCskvaFIue5WpAq4U45IzeMfwD4LK/Fim3v/pM553Z5TYeV6
- CBQBpFRhSsEAlXIVXNfwdm4ep4RZ1T1Q+H8og5vinWtpHmpFT96fp2BNqESpXTI/1tAi
- 2PK3L1FbKX/RV5YCezx66fLbdqwnaw2ZZB0JAE7UQlF1n7bPNtClHzommue4G4GCXMC9
- REZc6TmnNDsCQbA11QkSioinNjiel8zGLHQ3MrjnlS2PURrH+stAbwidgrmVpV8hbM9u
- mKGUUx0F4ltG14jFTxJURGndiue07iIM+kkmuY5YdD7mI1Iojqz+BTA618q1jjNLU4dA
- mM/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=+amaCydGXFD7tOxIoaW5Ws/ffZUNsk3k3gWx+ubwDDo=;
- b=s8eCXR2SdBd3fRAh0JHubMjTsDMoznvXRHTRjLxM/MyhThYBAio/wu25/t9/DTyVuj
- wT9N2UQA7Ui537UzAFaaJSuYK0NscfDS2HpCTPUcYm5a0ik7svQ/tNlwbPu4lqV2WVRt
- dmilSeKZw8QhFnDq4R9KBkqa3wWhA6nh1dOtNXK+a/lJrQuxk0G9+h66634HGszteOSy
- VeEcXJDZL6u9Ub1Pfczotu4P0jnn7/IONoq/4AZEQnyU3huZYgOkn3gNhDjoPKVh+WeV
- YuZvRAYcg4fCdSFvv55meyD7zYz+i0MsWdbkH+zx6BG7Rru2iGt5aS/RFaJ0G4FDEpSu
- 94Tg==
-X-Gm-Message-State: AOAM533Yd7P9H24cGVo19rS70rZP5ryYUyvv/vm0DFykPaK8+he33/qS
- OT5yeDDdwSPj6VuzN0uEp1Prn9LP5jvk9oAc0t8=
-X-Google-Smtp-Source: ABdhPJxENutLmFHTUAymf2xcqLqi2GgT/CGMqEx2tTYZEWkp+V83PgR1PoNT7aLR7QLvByHlPdObLxFL2NIxY/Vp0qY=
-X-Received: by 2002:a92:d186:: with SMTP id z6mr32968267ilz.227.1594051003999; 
- Mon, 06 Jul 2020 08:56:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsTUb-00060S-SK
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 11:57:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49889
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsTUZ-0001Wc-VQ
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 11:57:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594051034;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bII9UDEAv4g70Q1ciDU10DC8QgdfDH4XOjobdsEBjaU=;
+ b=elhJ1w5+WLIZISfY5sRaCNHExfJkyvE0wBxHbCFMjIOBrbdbBZGKDx7HSZxqhDfMr+ARec
+ Yzd0k7T4/+UTvJ+9UKPR23Vfr9Rrp0252GBLj//1B2FU3OCiPywTF4LhJn5Zn8JzsfgZuA
+ TrGFyhYfafCu1xuo+CYxZBM+HlQsMuY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-57-N8Ds-uVOMDSv-cIDbFEF4A-1; Mon, 06 Jul 2020 11:57:13 -0400
+X-MC-Unique: N8Ds-uVOMDSv-cIDbFEF4A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D05DEC1A0;
+ Mon,  6 Jul 2020 15:57:12 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-203.ams2.redhat.com [10.36.114.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1342619D7C;
+ Mon,  6 Jul 2020 15:57:09 +0000 (UTC)
+Date: Mon, 6 Jul 2020 17:57:08 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 5/6] migration: support excluding block devs in QMP
+ snapshot commands
+Message-ID: <20200706155708.GD5052@linux.fritz.box>
+References: <20200702175754.2211821-1-berrange@redhat.com>
+ <20200702175754.2211821-6-berrange@redhat.com>
 MIME-Version: 1.0
-References: <20200705204630.4133-1-f4bug@amsat.org>
- <20200705204630.4133-3-f4bug@amsat.org>
-In-Reply-To: <20200705204630.4133-3-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 6 Jul 2020 08:46:57 -0700
-Message-ID: <CAKmqyKMQ9-JqZmNnVm9ibw-doiSd=vUhO3_bGCq2U7=rK1KO1A@mail.gmail.com>
-Subject: Re: [PATCH v4 02/10] hw/sd/pl181: Rename pl181_send_command() as
- pl181_do_command()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200702175754.2211821-6-berrange@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,54 +96,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>
+Cc: Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jul 5, 2020 at 1:46 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> pl181_send_command() do a bus transaction (send or receive),
-> rename it as pl181_do_command().
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Am 02.07.2020 um 19:57 hat Daniel P. Berrangé geschrieben:
+> This wires up support for a new "exclude" parameter to the QMP commands
+> for snapshots (savevm, loadvm, delvm). This parameter accepts a list of
+> block driver state node names.
+> 
+> One use case for this would be a VM using OVMF firmware where the
+> variables store is a raw disk image. Ideally the variable store would be
+> qcow2, allowing its contents to be included in the snapshot, but
+> typically today the variable store is raw. It is still useful to be able
+> to snapshot VMs using OVMF, even if the varstore is excluded, as the
+> main OS disk content is usually the stuff the user cares about.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Wouldn't it be better to take an optional list of nodes to _include_
+that just defaults to our current set of nodes?
 
-Alistair
+The problem with excluding is that we already don't snapshot many nodes,
+and the criteria to choose the right ones weren't entirely obvious, so
+we just went with something that seemed to make the most sense. But the
+management application may actually want to snapshot more nodes than we
+cover by default.
 
-> ---
->  hw/sd/pl181.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-> index 649386ec3d..3fc2cdd71a 100644
-> --- a/hw/sd/pl181.c
-> +++ b/hw/sd/pl181.c
-> @@ -173,7 +173,7 @@ static uint32_t pl181_fifo_pop(PL181State *s)
->      return value;
->  }
->
-> -static void pl181_send_command(PL181State *s)
-> +static void pl181_do_command(PL181State *s)
->  {
->      SDRequest request;
->      uint8_t response[16];
-> @@ -402,7 +402,7 @@ static void pl181_write(void *opaque, hwaddr offset,
->                  qemu_log_mask(LOG_UNIMP,
->                                "pl181: Pending commands not implemented\n=
-");
->              } else {
-> -                pl181_send_command(s);
-> +                pl181_do_command(s);
->                  pl181_fifo_run(s);
->              }
->              /* The command has completed one way or the other.  */
-> --
-> 2.21.3
->
->
+I feel things become clearer and less surprising if the client just
+tells us explicitly which images are supposed to be snapshotted instead
+of adding exceptions on top of a default selection that we're already
+not really sure about.
+
+Kevin
+
 
