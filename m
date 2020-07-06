@@ -2,131 +2,125 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4ABC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89525C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:40:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8B9A20675
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:40:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5070120675
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:40:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGZyNj8e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B9A20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="PLhjXekK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5070120675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUAX-0000aX-Sd
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:40:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56148)
+	id 1jsUAg-0000m3-G6
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:40:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jsU9Z-0007f6-Pt
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:39:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35020
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jsU9W-0002SB-Q5
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:39:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594053573;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KnnK9w/FmABu+AyRsR4MHv+ZnxgnRM5gsJpk2U4XmK0=;
- b=XGZyNj8ewPtI8rTQsFSEwpkZyFARwHvFvTYABYnApcWqzvyjZm97R3EASisBvITmNnCOyC
- TTXQj8OBJ9eWsS5+xAWFaF3L+XCAkqeHXO1NnRYfC/hPwug0qOXh8sqS78ORSM74zEjt64
- JNh9Oqm21cPCNK2Gbu6bwF7pY9suoeE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-thMX8ENvM0iA3qNe60Fk9A-1; Mon, 06 Jul 2020 12:39:29 -0400
-X-MC-Unique: thMX8ENvM0iA3qNe60Fk9A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05DA7805EE6;
- Mon,  6 Jul 2020 16:39:28 +0000 (UTC)
-Received: from [10.36.112.179] (ovpn-112-179.ams2.redhat.com [10.36.112.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A7B895D9CD;
- Mon,  6 Jul 2020 16:39:22 +0000 (UTC)
-Subject: Re: [PATCH v5 11/21] virtio-pci: Proxy for virtio-mem
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200626072248.78761-1-david@redhat.com>
- <20200626072248.78761-12-david@redhat.com>
- <20200706172851.2d3062d9.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <f376a26a-c032-9f51-6ca1-e828afeada21@redhat.com>
-Date: Mon, 6 Jul 2020 18:39:21 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jsU9c-0007j5-MR; Mon, 06 Jul 2020 12:39:40 -0400
+Received: from mail-db8eur05on2119.outbound.protection.outlook.com
+ ([40.107.20.119]:1760 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jsU9a-0002SM-5Y; Mon, 06 Jul 2020 12:39:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UPo5vaxUdXlxjhFet1z59crY8bV6/ao9LFdsyfTh9qrmJLsXvLYSXysaqn203+TuwiHWpAENVmtRbwZ5HaDfTYRMO4yNdo7Yl/rYhWRsxM3ncRyTNN6o/1nQMs8FSdEk4iSvQk6rY3L/IQYtlFCfBnUQL4X3SUofEWK74fFsknXqjWrp3CluXnPVzyvggiL5Kfkh1dPwiyUNYqvzekpqfMcSGEbMdNzc+/kEODKGT7BIQZpu8sbwNx5c4gL9NSi7l6OHU+AMXPDziPrwRDizu3sB6MEsRBpGvZVzgVlj+mN9bq4m5TROIfvlREUqPEJowKvMxdg3N4WS/P+yYBh0Lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TwL/nTizRe7Txe8uTaBLpZPrJubcOCcLBKQkAK9U44E=;
+ b=SShgRlu0o11GrkF3t6XEmemjSR0/FPJWy4DMEE1yQPW8ZuKPLp8Jw2IWWr9qLQHUe6rg7dN6eqLKEohWN4+YF9R7bI65W1EwR1cIVYdhsTx6/3GbCjAyAr62UQCxESnOWUtWN0JympcofkT5AwavivxmV6tJegbg59PfkOuq+iP7O5bAlWPimPpGSYJ9gUMcFpXy3joSA3p6Ge2FZWY9rFlTMMSQUUl4u499TEfgPqd5QMXhxAsrv5H01l9sfJbEn5qqfgw7pNVIPYojwpJ9dAXhnVZXjlit4Sd2r8cVArJ/1p9u3r6LvLjd+tJ6UcaeClkvEzIBfwO6zCOOMlTFfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TwL/nTizRe7Txe8uTaBLpZPrJubcOCcLBKQkAK9U44E=;
+ b=PLhjXekKQFfXG4acrw+y/Txqkz3WK+CcvlKGnaJKnU07jeeiJMnpx7EyedwhfvBL5YAO669TjXphdUbeqtMhJJ4s52VxiTV1K+BbvVx3nE22aTxg9ReVs3qg+5rbaXouUJefmsDEE4USAYUZZotLT9UXOB+gD4uZTK0sApSxTzY=
+Authentication-Results: kaod.org; dkim=none (message not signed)
+ header.d=none;kaod.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4788.eurprd08.prod.outlook.com (2603:10a6:20b:c4::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Mon, 6 Jul
+ 2020 16:39:35 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3153.029; Mon, 6 Jul 2020
+ 16:39:35 +0000
+Subject: Re: [PATCH v3 28/44] qom: Use returned bool to check for failure,
+ manual part
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200706080950.403087-1-armbru@redhat.com>
+ <20200706080950.403087-29-armbru@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <98f00963-0b32-ea46-fa92-72c7354b5a8b@virtuozzo.com>
+Date: Mon, 6 Jul 2020 19:39:33 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200706172851.2d3062d9.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ Thunderbird/68.7.0
+In-Reply-To: <20200706080950.403087-29-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-ClientProxiedBy: AM3PR07CA0131.eurprd07.prod.outlook.com
+ (2603:10a6:207:8::17) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.12] (185.215.60.58) by
+ AM3PR07CA0131.eurprd07.prod.outlook.com (2603:10a6:207:8::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3174.13 via Frontend Transport; Mon, 6 Jul 2020 16:39:34 +0000
+X-Originating-IP: [185.215.60.58]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cbbfa86a-9af6-44a4-9007-08d821cb2a89
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4788:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB478810777AAF183F4C075EF4C1690@AM6PR08MB4788.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:221;
+X-Forefront-PRVS: 04569283F9
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DN2gc0RGfKkFx7+KfV3/PXmCnIGh7/i85jhAbzD6Es5sX22Q2+rFCallKvK58QYpx5fDvZ7dCDSw69wz5GOpU7DOcoNtBwP3bcP1P84xGHkoxFh/7WDeEWCWqFDirUnUbb/wEkrRGWhvkNSSbwht/506/UyHE9a5zcQcUpFRahm/vEvmDxM8U2qMjPRLRs2ma5+L2wBlA2JFRgVBktFWPDKYx6wwQ8gWnrp1m2lNEGhbEM1TZozBLlUFD5uIqJByPqg0NRDNBv75cA7oK+JohD7ZtDzD+f94uEzseomLEYaGS8EK2L3WyqeQR8JF6wi9xRmgg2X3QMApTiC5VkdUu+9aOvC/+n4AZkvcbr6XhNXD84gdYwjQvEcHxTIH1rSR
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(136003)(366004)(396003)(376002)(39840400004)(478600001)(4744005)(66556008)(66946007)(66476007)(8676002)(5660300002)(956004)(36756003)(2906002)(2616005)(52116002)(31686004)(53546011)(31696002)(16576012)(86362001)(186003)(4326008)(16526019)(316002)(8936002)(26005)(6486002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: lcw5Uv/zHL+jTVfRmnWBh9mrjiwBQ9fJcq86lcNKV2dr7ge7eLcYWc4HveUSdeMSfpjgLyqgQZ1vGBaMl1EAVq28stKDLf+6EAayte5krfnB6da+AGE76JO8L7W3te0M6quNjkkWmxVlQkBo43ZcjFsaqPGOea6yfBFYrj9LmlNJ9uVP6nImKJMgsesm/2gZmAWoFcUOTpEuiwmuAySw99VXv1bmeUJiMIgoYdDiSSoRyrYsPwp2Fg25q90Fao+ACO7SLydNiWZqi9V+FrbRAnTkZXp3Tr1ykVaRE6ShjbsKzxVoHHexnC2iC/1YSD5CQicCSpUJN7Sd8fbl+mo4/DQoTCVn0VPdzul2alx8dyXuO90FSnNl1Q2cqXuql4bogdZzx2CniN80YcH5Jvv3aWJ5H6sOrUuvb7oNpzepdHGvFOKhEQqdGZy88oRlXBD+AA+n5/EcAhcXmqa8uTvqEt+PDDA+fYmPwetSb1hutYs=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbbfa86a-9af6-44a4-9007-08d821cb2a89
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2020 16:39:35.0523 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nefK55u+c11KTiSoYsofK5iUUBpUUMEkk+YaqI/PUeP8A7CrDhiTXDIfDz91AP4w4VK8IJMUDV9Z+9SO7atuTcPx5o98cmP3AzG6nGTdB24=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4788
+Received-SPF: pass client-ip=40.107.20.119;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 12:39:36
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,83 +133,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, groug@kaod.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06.07.20 17:28, Cornelia Huck wrote:
-> On Fri, 26 Jun 2020 09:22:38 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On 06.07.2020 11:09, Markus Armbruster wrote:
+> The previous commit used Coccinelle to convert from checking the Error
+> object to checking the return value.  Convert a few more manually.
 > 
->> Let's add a proxy for virtio-mem, make it a memory device, and
->> pass-through the properties.
->>
->> Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/virtio/Makefile.objs    |   1 +
->>  hw/virtio/virtio-mem-pci.c | 129 +++++++++++++++++++++++++++++++++++++
->>  hw/virtio/virtio-mem-pci.h |  33 ++++++++++
->>  include/hw/pci/pci.h       |   1 +
->>  4 files changed, 164 insertions(+)
->>  create mode 100644 hw/virtio/virtio-mem-pci.c
->>  create mode 100644 hw/virtio/virtio-mem-pci.h
-> 
-> (...)
-> 
->> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
->> new file mode 100644
->> index 0000000000..b325303b32
->> --- /dev/null
->> +++ b/hw/virtio/virtio-mem-pci.c
->> @@ -0,0 +1,129 @@
->> +/*
->> + * Virtio MEM PCI device
->> + *
->> + * Copyright (C) 2020 Red Hat, Inc.
->> + *
->> + * Authors:
->> + *  David Hildenbrand <david@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "virtio-mem-pci.h"
->> +#include "hw/mem/memory-device.h"
->> +#include "qapi/error.h"
->> +
->> +static void virtio_mem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->> +{
->> +    VirtIOMEMPCI *mem_pci = VIRTIO_MEM_PCI(vpci_dev);
->> +    DeviceState *vdev = DEVICE(&mem_pci->vdev);
->> +
-> 
-> As we were having that discussion for other devices recently: I think
-> you want to use 
-> 
->     virtio_pci_force_virtio_1(vpci_dev);
-> 
-> here. (Or do it via the names in the type, as virtio-fs does, but I
-> think I like forcing it better.)
+> Signed-off-by: Markus Armbruster<armbru@redhat.com>
+> Reviewed-by: Eric Blake<eblake@redhat.com>
 
-Interesting. There is a PULL request pending which includes virtio-mem,
-so I'll send that as an addon. Thanks!
-
--- 
-Thanks,
-
-David / dhildenb
-
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
