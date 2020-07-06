@@ -2,89 +2,72 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE98C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:35:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4237C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:44:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1501E206CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:35:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCpgJgJf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1501E206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 754112070C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 14:44:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 754112070C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsSDN-0002bs-BD
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 10:35:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54230)
+	id 1jsSLw-0005F5-Je
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 10:44:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsSCe-0001sf-9O
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:34:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45298
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsSCc-0003jc-Pu
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:34:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594046078;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=sy82O70eh7lmpMogxX4Wig8ko74faHSoOvBCIgJ2Ptk=;
- b=aCpgJgJfvykEPpxM1gKUCVJKOM/YLwuy/Y+8DL4H6KygPBZTiE0AJfDLhg+V0lzHIwuv+N
- qRFyuxAVnkgnNpLMiBPoIPwWD7bsrYR4lxjIfXaAdm/jBNHXu+GGYpt6UN7QD7kHPFpKIk
- z279dd5JvJfFZjt0NLjpqo+7DRxgW9c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-_sF_CQ2dNJeFDnj5XmgwzA-1; Mon, 06 Jul 2020 10:34:34 -0400
-X-MC-Unique: _sF_CQ2dNJeFDnj5XmgwzA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41B7E8DFFD9;
- Mon,  6 Jul 2020 14:33:51 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E742D19D61;
- Mon,  6 Jul 2020 14:33:50 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 746051132FD2; Mon,  6 Jul 2020 16:33:49 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v3 01/44] error: Improve examples in error.h's big comment
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsSLI-0004jn-2e
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:43:36 -0400
+Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:42702)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsSLF-0004wJ-EX
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 10:43:35 -0400
+Received: from player759.ha.ovh.net (unknown [10.110.115.29])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5F9889824B
+ for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 16:43:30 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id 51215141EE48E;
+ Mon,  6 Jul 2020 14:43:22 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R0069c9ae004-2bbc-44ed-b5ec-228a6e6c65cf,C4ABCEF356A601883B7DEB1AA4190402CFF29AFD)
+ smtp.auth=groug@kaod.org
+Date: Mon, 6 Jul 2020 16:43:21 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v3 03/44] qdev: Use returned bool to check for
+ qdev_realize() etc. failure
+Message-ID: <20200706164321.30de6339@bahia.lan>
+In-Reply-To: <87k0zganbc.fsf@dusky.pond.sub.org>
 References: <20200706080950.403087-1-armbru@redhat.com>
- <20200706080950.403087-2-armbru@redhat.com>
-Date: Mon, 06 Jul 2020 16:33:49 +0200
-In-Reply-To: <20200706080950.403087-2-armbru@redhat.com> (Markus Armbruster's
- message of "Mon, 6 Jul 2020 10:09:07 +0200")
-Message-ID: <87imf090he.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ <20200706080950.403087-4-armbru@redhat.com>
+ <20200706120718.70c37bc0@bahia.lan>
+ <87k0zganbc.fsf@dusky.pond.sub.org>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4076039139545815438
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefgdekvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=46.105.73.241; envelope-from=groug@kaod.org;
+ helo=10.mo69.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 10:43:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,58 +81,132 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, groug@kaod.org,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
  pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Mon, 06 Jul 2020 13:35:19 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-> Show errp instead of &err where &err is actually unusual.  Add a
-> missing declaration.  Add a second error pileup example.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> ---
->  include/qapi/error.h | 19 +++++++++++++++----
->  1 file changed, 15 insertions(+), 4 deletions(-)
->
-> diff --git a/include/qapi/error.h b/include/qapi/error.h
-> index ad5b6e896d..3e64324b7a 100644
-> --- a/include/qapi/error.h
-> +++ b/include/qapi/error.h
-> @@ -16,15 +16,15 @@
->   * Error reporting system loosely patterned after Glib's GError.
->   *
->   * Create an error:
-> - *     error_setg(&err, "situation normal, all fouled up");
-> + *     error_setg(errp, "situation normal, all fouled up");
->   *
->   * Create an error and add additional explanation:
-> - *     error_setg(&err, "invalid quark");
-> - *     error_append_hint(&err, "Valid quarks are up, down, strange, "
-> + *     error_setg(errp, "invalid quark");
-> + *     error_append_hint(errp, "Valid quarks are up, down, strange, "
->   *                       "charm, top, bottom.\n");
->   *
->   * Do *not* contract this to
-> - *     error_setg(&err, "invalid quark\n"
-> + *     error_setg(errp, "invalid quark\n" // WRONG!
->   *                "Valid quarks are up, down, strange, charm, top, bottom.");
->   *
->   * Report an error to the current monitor if we have one, else stderr:
+> Greg Kurz <groug@kaod.org> writes:
+> 
+> > On Mon,  6 Jul 2020 10:09:09 +0200
+> > Markus Armbruster <armbru@redhat.com> wrote:
+> >
+> >> Convert
+> >> 
+> >>     foo(..., &err);
+> >>     if (err) {
+> >>         ...
+> >>     }
+> >> 
+> >> to
+> >> 
+> >>     if (!foo(..., &err)) {
+> >>         ...
+> >>     }
+> >> 
+> >> for qdev_realize(), qdev_realize_and_unref(), qbus_realize() and their
+> >> wrappers isa_realize_and_unref(), pci_realize_and_unref(),
+> >> sysbus_realize(), sysbus_realize_and_unref(), usb_realize_and_unref().
+> >> Coccinelle script:
+> >> 
+> >>     @@
+> >>     identifier fun = {
+> >>         isa_realize_and_unref, pci_realize_and_unref, qbus_realize,
+> >>         qdev_realize, qdev_realize_and_unref, sysbus_realize,
+> >>         sysbus_realize_and_unref, usb_realize_and_unref
+> >>     };
+> >>     expression list args, args2;
+> >>     typedef Error;
+> >>     Error *err;
+> >>     @@
+> >>     -    fun(args, &err, args2);
+> >>     -    if (err)
+> >>     +    if (!fun(args, &err, args2))
+> >>          {
+> >>              ...
+> >>          }
+> >> 
+> >> Chokes on hw/arm/musicpal.c's lcd_refresh() with the unhelpful error
+> >> message "no position information".  Nothing to convert there; skipped.
+> >> 
+> >> Fails to convert hw/arm/armsse.c, because Coccinelle gets confused by
+> >> ARMSSE being used both as typedef and function-like macro there.
+> >> Converted manually.
+> >> 
+> >> A few line breaks tidied up manually.
+> >> 
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >> ---
+> >
+> > FWIW I had posted an R-b for this patch in v1 (20200629124037.2b9a269e@bahia.lan).
+> 
+> When I sliced and diced my patches for v2, I dropped R-bys for patches
+> substantially altered.  This one was borderline: the patch does strictly
+> less, and the work it no longer does us done by later patches.
+> 
+> Example: v1's first hunk
+> 
+>     diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
+>     index 52e0d83760..3e45aa4141 100644
+>     --- a/hw/arm/allwinner-a10.c
+>     +++ b/hw/arm/allwinner-a10.c
+>     @@ -72,17 +72,12 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+>      {
+>          AwA10State *s = AW_A10(dev);
+>          SysBusDevice *sysbusdev;
+>     -    Error *err = NULL;
+> 
+>     -    qdev_realize(DEVICE(&s->cpu), NULL, &err);
+>     -    if (err != NULL) {
+>     -        error_propagate(errp, err);
+>     +    if (!qdev_realize(DEVICE(&s->cpu), NULL, errp)) {
+>              return;
+>          }
+> 
+>     -    sysbus_realize(SYS_BUS_DEVICE(&s->intc), &err);
+>     -    if (err != NULL) {
+>     -        error_propagate(errp, err);
+>     +    if (!sysbus_realize(SYS_BUS_DEVICE(&s->intc), errp)) {
+>              return;
+>          }
+>          sysbusdev = SYS_BUS_DEVICE(&s->intc);
+> 
+> became
+> 
+>     diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
+>     index 52e0d83760..e1acffe5f6 100644
+>     --- a/hw/arm/allwinner-a10.c
+>     +++ b/hw/arm/allwinner-a10.c
+>     @@ -74,14 +74,12 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+>          SysBusDevice *sysbusdev;
+>          Error *err = NULL;
+> 
+>     -    qdev_realize(DEVICE(&s->cpu), NULL, &err);
+>     -    if (err != NULL) {
+>     +    if (!qdev_realize(DEVICE(&s->cpu), NULL, &err)) {
+>              error_propagate(errp, err);
+>              return;
+>          }
+> 
+>     -    sysbus_realize(SYS_BUS_DEVICE(&s->intc), &err);
+>     -    if (err != NULL) {
+>     +    if (!sysbus_realize(SYS_BUS_DEVICE(&s->intc), &err)) {
+>              error_propagate(errp, err);
+>              return;
+>          }
+> 
+> 
+> in v2 and v3.  The two error_propagate() and the local variable now go
+> away only in PATCH v3 33.
+> 
+> Would you like me to record your R-by for the patch's current version?
+> 
 
-I intend to drop the change from &err to errp, and update the commit
-message accordingly.
-
-error_setg(&err, ...) is indeed unusual, and I cleaned up several unwise
-uses in PATCH 32+35+39.  However, error_append_hint(errp, ...) is bad
-advice until Vladimir's ERRP_AUTO_PROPAGATE() makes it work.  No need to
-get ahead of his work here.
-
-[...]
-
+I've reviewed it again, so, yes, please do.
 
