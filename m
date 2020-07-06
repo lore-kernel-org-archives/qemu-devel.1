@@ -2,88 +2,133 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BCBFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F71EC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:55:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30F7920715
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:53:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AEC320715
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:55:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="HSNr36AQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F7920715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="RMENLqAG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AEC320715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsOk8-0003k0-Dp
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:53:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35560)
+	id 1jsOmt-0005K4-BO
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:55:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jsOjZ-0003KW-Ax
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:52:25 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43147)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jsOjX-0003PU-80
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:52:25 -0400
-Received: by mail-lj1-x244.google.com with SMTP id f5so28852345ljj.10
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 03:52:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=mfg3UXx+kQ8L82ftMFnvaicyP4lVZZK0W3m5aNci2oc=;
- b=HSNr36AQOJ9HhnMUrN67miV23jPkiQDIs34Hhcwe1CEadx/pnvFvzJYnbFo6PBjjnP
- lMedTMh6Q+S/NCno3laB6fCjqk9TE7/DmUj4S7sNjkBnrd5lnSX2lXaR3OE6RqFcYfO2
- /DY05UCu4zmbVBT5J6OvnYKBxUuvUdYVE5EjD6PPEpyLE353uQllOQySJ5TznBASFLwW
- MOElRm9uod+wb5mavZyOsfLJux5WdrEbTjrMJ488X/57mzCaNsHOWRdYH4Js+rLt9shr
- 0rrlieh4APYu4ha/UAQCSHSNlAGb+rdAolNCeEA4M5oZAMmv7oiymzBJPcIk2UpzXiYn
- OZKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=mfg3UXx+kQ8L82ftMFnvaicyP4lVZZK0W3m5aNci2oc=;
- b=PlFa49VFSHUxlQEfwpWdTSkyZ3WUiIeWM4JwUfGD3r4p28PuC0ZLkQPOBOIbmL9xC8
- veYNDMzr/mKmj8TECbEmrzuAujDPCbHOOIL9pSKCQQkVcGPKqv3NepyinMPtM6TJhoGl
- NBbmgfB3ubsSVm+7rD+FVS/aXgRYm1EdKiumyzUbsfuZlHHPQoCyssYMr+XYl0E/mp7/
- MryHwMcilD8JHLddhu5ktrM3xGNhX4MtzdZ4aQr/U7eRTft7SsDaNnbqlir+GtlVkS/J
- NqYwW+ysy993yxTDZGObb9bt3UEmRDPiyiOl6YCEp9lham7l/MqNKPnFUJfQxRS9vCEI
- T+Cg==
-X-Gm-Message-State: AOAM530r3lDpTM+PXJTK/YfuPoI1ZY+Up4O6E1h7hbnuXqIcEzpawhTy
- 4kV37AVTBXVxHLMlCZEUBtqjiU6xKXOJkg==
-X-Google-Smtp-Source: ABdhPJzCTXmBowDXATh3NsXUVzpmIHDTEg1kvh6OgNEz/p64z0ZLu8V0vOJcypgU7hTQjO83h73J4A==
-X-Received: by 2002:a2e:80da:: with SMTP id r26mr13930572ljg.179.1594032740559; 
- Mon, 06 Jul 2020 03:52:20 -0700 (PDT)
-Received: from navi.cosmonova.net.ua ([95.67.24.131])
- by smtp.gmail.com with ESMTPSA id h22sm7791940ljg.1.2020.07.06.03.52.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jul 2020 03:52:19 -0700 (PDT)
-From: andrew@daynix.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH] virtio-pci: Changed vdev to proxy for VirtIO PCI BAR
- callbacks.
-Date: Mon,  6 Jul 2020 14:21:23 +0300
-Message-Id: <20200706112123.971087-1-andrew@daynix.com>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
+ id 1jsOmF-0004kt-9P
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:55:11 -0400
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:29060)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
+ id 1jsOmC-0003cv-8P
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:55:11 -0400
+Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
+ by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 066Asgow023532; Mon, 6 Jul 2020 03:55:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=proofpoint20171006;
+ bh=aYCtOPg50lt6i64bB6BvmAjHPr4FDQkGCr4bcyeNEWA=;
+ b=RMENLqAGlWYKOx1VCjD38kqm+BssoUROtJK0E6v2dMHP7F9uZ88t815/sju8sIySxXbv
+ 9h4zxRf2oJ1NjQs5Jh8Lwt/9beAOLE7Q9XPkz4C1Nyykc+ncjhj7jQO2ghoAZMqDHvsC
+ FU5W6RzazsFwvWBJ5vA3yD4aLzlvqKjcUAnBWL56UaB2ipkSm9x+Vjmi7op61k1/9RWv
+ 4aN/B01kn8t/1i2bvwGkjV9FoWAgPX9lN1k7JYVUZaKbJjwfUwGPc6LL5RYbDjmEAiB4
+ uWE/WrYLmNj3umUQhIrU4WnCdrCrp776fDXuiUIwX0O591AO6ovNlE7K3O6pDXLiEIeq Uw== 
+Received: from nam10-bn7-obe.outbound.protection.outlook.com
+ (mail-bn7nam10lp2105.outbound.protection.outlook.com [104.47.70.105])
+ by mx0a-002c1b01.pphosted.com with ESMTP id 322ruhaxea-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 06 Jul 2020 03:55:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WqGrgncR4G9KYPmkitdxH8u+eqviOj0jamcJWyWRSv2+0o2UP4JyUoP2Ca6EKv4rRX45tQbXcFUL4ATX/fblcADhkikTQavFwNHPDgwvrji2Jp2zJ6+697/uNKf0C8u8h8G9QPpYViCizu9rSFesaU7bfqmejnmL0vRGGlvOrrBBIg/Wbtprxka9QpU7pJySo5B1phkKKjGF3um5jp+FcDoBZkVAOahRNQoiSQXD1e/H7I+Z8j84WoDPMH7BBrEdLe0sFNDQ+VfoxvfXGbGYtgVFRqXvobjaR+Ra1pXkvNYIV8ixoWKofxZOhbF3+NYtIgUBjf6rnqst+0Obh5lz4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aYCtOPg50lt6i64bB6BvmAjHPr4FDQkGCr4bcyeNEWA=;
+ b=V0mdoan6vezSqdAvE7NcLaK7PxcqQeTt5zGyWxMeZUOws8TPcyqQKwnymTR8hBqhujeBDwtutsm1jsTMUAa2x3nVYqD4KUYjQdHGs0h9P0WuOwrGVms6iiL7HmvFGL7xUjON826LbzwNoya//Q9T0KxR743XfWCe8K/c6t2mKfOMDM/kgPNwRurHQcMQYzvcwOVmNFQUCZxl81CleOBcppfoDlOCfqltAy4ChfSK3huOht3HUyr6MHSYBhycNrahsu8RWCZfpxD6oCLTKZcyi6KStgZqQ6Y3xfWHCRnGMB3+lDGUtvF+F3lYvsVy+qiQ5I0emDSwLrwITVLA/6vXww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MW2PR02MB3723.namprd02.prod.outlook.com (2603:10b6:907:2::32)
+ by MWHPR02MB3151.namprd02.prod.outlook.com (2603:10b6:301:65::30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.22; Mon, 6 Jul
+ 2020 10:55:00 +0000
+Received: from MW2PR02MB3723.namprd02.prod.outlook.com
+ ([fe80::accb:7583:c55c:acd2]) by MW2PR02MB3723.namprd02.prod.outlook.com
+ ([fe80::accb:7583:c55c:acd2%7]) with mapi id 15.20.3153.029; Mon, 6 Jul 2020
+ 10:55:00 +0000
+From: Thanos Makatos <thanos.makatos@nutanix.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: DMA region abruptly removed from PCI device
+Thread-Topic: DMA region abruptly removed from PCI device
+Thread-Index: AdZTg3uLE9L5RNQrTJ25kTkeyN20cw==
+Date: Mon, 6 Jul 2020 10:55:00 +0000
+Message-ID: <MW2PR02MB3723509CC4795066274C9D4C8B690@MW2PR02MB3723.namprd02.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
+x-originating-ip: [92.29.225.29]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 86a552c6-1703-42c7-df11-08d8219b07c3
+x-ms-traffictypediagnostic: MWHPR02MB3151:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR02MB3151A4C235040E4A80B9067C8B690@MWHPR02MB3151.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 04569283F9
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UZeL5okq8Hr2TVmTHdxNM8NjzMuL18A2HMhgMpw15Nh43Hz8qr8LYwYkfpLLI6pyYVn8lj42xJStki+0MZ3iEp91qEU5X3JbbUZ1BeX/DANrWfDGmNF4twAfeyg4jkKd0RZBQcGfaHPRGRQvYce3POqLHZ9PMeNWD80E2/QrgPfn86cpl4o3zM1iHelhfmFhAQm360dlsAUXLLdm5KoEuF0znyD4F+XOz5m18a7kcNLVw17iONlcew3hCM0usnjNGkF9oHUgg5t2U/FcR5HLps+RwYbM8bP82DampsQq/X/Cz5uVWARHaJrU4rhR6dbWcLKn86fBEa5bIFaVo0VTGiSpccGRTaYTh0EhVHeT7orWL/ozJP1MfvdyHdwFkpfeAO4aNOq2dw/YdIyhUiw45g==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MW2PR02MB3723.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(136003)(366004)(346002)(39860400002)(376002)(478600001)(4326008)(7696005)(83380400001)(6916009)(6506007)(66476007)(5660300002)(186003)(316002)(33656002)(9686003)(55016002)(66446008)(52536014)(44832011)(8676002)(66946007)(86362001)(64756008)(66556008)(54906003)(76116006)(8936002)(2906002)(71200400001)(26005);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: n9vBhDBB3nlzgPvWrzcg8aNCCEp2S3xbtKBArB+WsBGwNmeNAlbSBR6SkZ8XOM/iDWFMaMhDCsGwEzVMDrf/kExVs49O2NZK11Rj6w3VFbIndK4AOsorTuVqo8GzF2OHAq1HQXS7VYGAvLMJ0Bw+48KEzMA0HfgJJuBhX2UxmXpZFIPxiNXF8iAGNgUUuyk7UNIaxNXtqjQZS0H2a1mTVZROFx/Rrb1vkWfUJgoAYCvYyO/IksxRk+D6BV/rD1sIOt7tFBOZ/u5W9HF+Chech1n3t6bDIvdZhoT5BsWz3hAs36PDgnpGXNqC6nVno2WIWhiYFHeD/GUNTzq5+JZcyzq6TI/iyv3rBPkkl1k/MHqS957cr6pZWnj1QXeugLbh6isLyAEKq+o8WAkNpaIfQElVrZA+vZPeJtxk35rItBhECHf2Dw/LH9/KBSYU/xt6Yy5V6KcrkEPEtyOKAix6QHfGSb9zP6hye5+PG82Z4Rk=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=2a00:1450:4864:20::244;
- envelope-from=andrew@daynix.com; helo=mail-lj1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR02MB3723.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 86a552c6-1703-42c7-df11-08d8219b07c3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2020 10:55:00.6210 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Oyf9Tcaky6b092deydFp4l0TpQWGmLpHen0aJQryJqUYsYsco3SpZkHCo2rfh21dVoZ6G2VgEyzvH7Zqket4fl9o3YIEELM2AiWFYjEwpaA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB3151
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-06_08:2020-07-06,
+ 2020-07-06 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.151.68;
+ envelope-from=thanos.makatos@nutanix.com; helo=mx0a-002c1b01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 06:55:04
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,115 +141,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com
+Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
+ John G Johnson <john.g.johnson@oracle.com>,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Melnychenko <andrew@daynix.com>
+We have an issue when using the VFIO-over-socket libmuser PoC
+(https://www.mail-archive.com/qemu-devel@nongnu.org/msg692251.html) instead=
+ of
+the VFIO kernel module: we notice that DMA regions used by the emulated dev=
+ice
+can be abruptly removed while the device is still using them.
 
-There is an issue when callback may be called with invalid vdev.
-It happens on unplug when vdev already deleted and VirtIOPciProxy is not.
-So now, callbacks accept proxy device, and vdev retrieved from it.
-Technically memio callbacks should be removed during the flatview update,
-but memoryregions remain til PCI device(and it's address space) completely deleted.
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1716352
-
-Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
----
- hw/virtio/virtio-pci.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
-
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 7bc8c1c056..904010f1cc 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1321,11 +1321,12 @@ static uint64_t virtio_pci_notify_read(void *opaque, hwaddr addr,
- static void virtio_pci_notify_write(void *opaque, hwaddr addr,
-                                     uint64_t val, unsigned size)
- {
--    VirtIODevice *vdev = opaque;
--    VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
-+    VirtIOPCIProxy *proxy = opaque;
-+    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-+
-     unsigned queue = addr / virtio_pci_queue_mem_mult(proxy);
- 
--    if (queue < VIRTIO_QUEUE_MAX) {
-+    if (vdev != NULL && queue < VIRTIO_QUEUE_MAX) {
-         virtio_queue_notify(vdev, queue);
-     }
- }
-@@ -1333,10 +1334,12 @@ static void virtio_pci_notify_write(void *opaque, hwaddr addr,
- static void virtio_pci_notify_write_pio(void *opaque, hwaddr addr,
-                                         uint64_t val, unsigned size)
- {
--    VirtIODevice *vdev = opaque;
-+    VirtIOPCIProxy *proxy = opaque;
-+    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-+
-     unsigned queue = val;
- 
--    if (queue < VIRTIO_QUEUE_MAX) {
-+    if (vdev != NULL && queue < VIRTIO_QUEUE_MAX) {
-         virtio_queue_notify(vdev, queue);
-     }
- }
-@@ -1360,9 +1363,14 @@ static void virtio_pci_isr_write(void *opaque, hwaddr addr,
- static uint64_t virtio_pci_device_read(void *opaque, hwaddr addr,
-                                        unsigned size)
- {
--    VirtIODevice *vdev = opaque;
-+    VirtIOPCIProxy *proxy = opaque;
-+    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-     uint64_t val = 0;
- 
-+    if (vdev == NULL) {
-+        return val;
-+    }
-+
-     switch (size) {
-     case 1:
-         val = virtio_config_modern_readb(vdev, addr);
-@@ -1380,7 +1388,13 @@ static uint64_t virtio_pci_device_read(void *opaque, hwaddr addr,
- static void virtio_pci_device_write(void *opaque, hwaddr addr,
-                                     uint64_t val, unsigned size)
- {
--    VirtIODevice *vdev = opaque;
-+    VirtIOPCIProxy *proxy = opaque;
-+    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-+
-+    if (vdev == NULL) {
-+        return;
-+    }
-+
-     switch (size) {
-     case 1:
-         virtio_config_modern_writeb(vdev, addr, val);
-@@ -1457,19 +1471,19 @@ static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy)
- 
-     memory_region_init_io(&proxy->device.mr, OBJECT(proxy),
-                           &device_ops,
--                          virtio_bus_get_device(&proxy->bus),
-+                          proxy,
-                           "virtio-pci-device",
-                           proxy->device.size);
- 
-     memory_region_init_io(&proxy->notify.mr, OBJECT(proxy),
-                           &notify_ops,
--                          virtio_bus_get_device(&proxy->bus),
-+                          proxy,
-                           "virtio-pci-notify",
-                           proxy->notify.size);
- 
-     memory_region_init_io(&proxy->notify_pio.mr, OBJECT(proxy),
-                           &notify_pio_ops,
--                          virtio_bus_get_device(&proxy->bus),
-+                          proxy,
-                           "virtio-pci-notify-pio",
-                           proxy->notify_pio.size);
- }
--- 
-2.27.0
-
+The PCI device we've implemented is an NVMe controller using SPDK, so it po=
+lls
+the submission queues for new requests. We use the latest SeaBIOS where it =
+tries
+to boot from the NVMe controller. Several DMA regions are registered
+(VFIO_IOMMU_MAP_DMA) and then the admin and a submission queues are created=
+.
+From this point SPDK polls both queues. Then, the DMA region where the
+submission queue lies is removed (VFIO_IOMMU_UNMAP_DMA) and then re-added a=
+t the
+same IOVA but at a different offset. SPDK crashes soon after as it accesses
+invalid memory. There is no other event (e.g. some PCI config space or NVMe
+register write) happening between unmapping and mapping the DMA region. My =
+guess
+is that this behavior is legitimate and that this is solved in the VFIO ker=
+nel
+module by releasing the DMA region only after all references to it have bee=
+n
+released, which is handled by vfio_pin/unpin_pages, correct? If this is the=
+ case
+then I suppose we need to implement the same logic in libmuser, but I just =
+want
+to make sure I'm not missing anything as this is a substantial change.
 
