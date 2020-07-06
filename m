@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4947C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C591C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E24720786
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4495520823
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 23:55:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mGBB5ADW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E24720786
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bw+MC68E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4495520823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsaxD-0006QP-Sp
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 19:55:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35404)
+	id 1jsaxQ-0006oM-JL
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 19:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jsaqC-00019A-Te
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:04 -0400
-Received: from mail-pj1-x102d.google.com ([2607:f8b0:4864:20::102d]:34877)
+ id 1jsaqG-0001JQ-FA
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:08 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36846)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jsaqA-0000w6-Pp
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:04 -0400
-Received: by mail-pj1-x102d.google.com with SMTP id f16so7309692pjt.0
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 16:48:02 -0700 (PDT)
+ id 1jsaqE-00011A-Sc
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 19:48:08 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 207so17433787pfu.3
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 16:48:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ON8TlGBWP6j9tnyoD1Ob1PnTUOjdjsUaKfXxF5xWLoo=;
- b=mGBB5ADWjkw1K2wH++Ya1kMjmO9oW/mtQSBcKxb3Fb1lUBDOkiqN+4qdV2EEEfwSSg
- 1or8AO/uz0Lrzght15bNNC/6Udn+9vBA4rFsbfkpWFoBYZAoqUKIIDvzDRzPFQJWDKWi
- VI64Py4Tvey+Ts9frcfe/3JFnV0OZqLnnAKXnYyJ9AEIyzb3B2LuK0aMPssOZCtAp4Wr
- uQA1GdFi6b27Lfg1XR1fLHvp3SZRyXazITkXvXEU7cyFJl0onyINYaKjneyVTUyb59RW
- TCNej0SBmdY0i2BZqJeWclLsvvcHrwLycQi8zS/H8S9OiYnwfyD6E+ucu9Iff6gidcmT
- 3Rdw==
+ bh=R+lITptw5fn9ER442LKhdifOCNEK9wzAb+CMXJ6Z8J0=;
+ b=bw+MC68E/oyzn+hOQ6j2EtWp9H7OF2kl/o9S+N0CqCxzk12rGm4AYqKNxPjyX6rXWM
+ HQxI/PDQ5xMvAl0nAr707ToLRHX+VGROV0l2Yt9TGwktJ7NunZJ4kGZ/4nRR5h92fWjN
+ m9zP6m+pl7hDKtWJ1xCpwtt8YhCU4kmOpW93RuIii7Y/zpnqnhy6CtINgoem2OMAVbC+
+ xvA66Wy6uct6NGH4n5qB9h6nts0eVZgl4kffF6uJreQe+ujy4vUNiPntN1Qs2pnz/+Z6
+ zrCwegNJ+kN8IxSUIvlh+xm6UGOLX60Oitx3laHs76GT0u4+kO9RMtUeF/QR7hHoyuEQ
+ kJ4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ON8TlGBWP6j9tnyoD1Ob1PnTUOjdjsUaKfXxF5xWLoo=;
- b=AxOWzZL/RBwKEJ9wsHS3hHOYu7jIkkTd42em2wMYQ5eyN7Y+YDLOi4vQ4NCm8mJe7W
- CRViIiTyJIPN3ZkTFM5PLEqz6dMy8m29VWjqKG5ujisnDPzuc0rvWm1Oe/jaoKi5Cu9R
- bX99wD9ditfgj/eAYUhMAOX19jnxFTHjHz+XxF+VmEh83cJhLz1EcX4aaoMt7TgDjEHM
- 7oF3ZYBnir0tXC+a374Eme7LwSlsEf/MWT7TFuKFyq/AgDmKYsWjBkaGnv8+u4te2jg8
- oeL06Bbxhn03lfPbPLAlE4f3byBpyTpWEqehDnqHYEGNgKg2curMWU8SSCJIV9u/c62I
- cCnw==
-X-Gm-Message-State: AOAM530DKf6RI6EWBvINx38V+hDUFSI52EnEVsoLFHfchKluNVFoEZMA
- zHd+W3n7DAElAAJMtdx2HiCmUt9Y
-X-Google-Smtp-Source: ABdhPJyYoIBJaMcxfQ+mXAWmbtd1k2e+oH6ovoluwJqZRotaCH8DZR3TUkFUBDdjr4mzciNpq1Y/hQ==
-X-Received: by 2002:a17:90a:240a:: with SMTP id
- h10mr1532565pje.225.1594079281418; 
- Mon, 06 Jul 2020 16:48:01 -0700 (PDT)
+ bh=R+lITptw5fn9ER442LKhdifOCNEK9wzAb+CMXJ6Z8J0=;
+ b=aFH7ubi5J23aRotu5L8adF2b0X9lAmf6HWHg9FCyR6pVezNekp0p9/l6IwqhkCnwDy
+ Kqj/Y/9031lzYljSsWSoy4Jq0e1zfzJBRT3107PWOS3QcHh2K0OnwV8kwRLZHbUDNVio
+ 8RQjGwyh/yiD0H9pS402+JpAXv10jLzfF2aSQRE0BhGM9SIsgDouzlI3kQst7QL7GOxv
+ eNxh3OTpuJ+5+w5x2ol+CYL7cXO7Wf26A5u13DGhtG2mda7oPvzz+AZmnxoyQy906fa8
+ g0ZUx9IFL6iozu3Ni2I5o2GNO2J72JOfBR/o/Cf1iEfcWjzjhoD/1KUB0HPF3D/M/Zd2
+ vBBA==
+X-Gm-Message-State: AOAM530kPXZj4/jg9kWusUdj+5AkPbGtE1cXqF+6GYJiqMaBsYnf0Kks
+ FVueW5mFkLCN4aitSaHkX65HibHa
+X-Google-Smtp-Source: ABdhPJxh+Nt4P5HaDczifSCnNRMb/wQpETBy2t6lexxcYYVbS2PbswD/oFTl8qfNEaesk3ZjX+5f5g==
+X-Received: by 2002:a62:3587:: with SMTP id c129mr6840515pfa.212.1594079285500; 
+ Mon, 06 Jul 2020 16:48:05 -0700 (PDT)
 Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id e15sm19647649pgt.17.2020.07.06.16.48.00
+ by smtp.gmail.com with ESMTPSA id e15sm19647649pgt.17.2020.07.06.16.48.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jul 2020 16:48:00 -0700 (PDT)
+ Mon, 06 Jul 2020 16:48:04 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 11/21] tests/tcg/xtensa: fix test execution on ISS
-Date: Mon,  6 Jul 2020 16:47:27 -0700
-Message-Id: <20200706234737.32378-12-jcmvbkbc@gmail.com>
+Subject: [PATCH 16/21] tests/tcg/xtensa: update test_lsc for DFPU
+Date: Mon,  6 Jul 2020 16:47:32 -0700
+Message-Id: <20200706234737.32378-17-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200706234737.32378-1-jcmvbkbc@gmail.com>
 References: <20200706234737.32378-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102d;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pj1-x102d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -5
@@ -107,57 +106,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Space for test results may be allocated in IRAM which is only
-word-accessible. Use full 32-bit words to access test results.
+DFPU doesn't have pre-increment FP load/store opcodes, it has
+post-increment opcodes instead. Test increment opcodes present in the
+current config.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/macros.inc | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ tests/tcg/xtensa/test_lsc.S | 47 +++++++++++++++++++++++++++----------
+ 1 file changed, 34 insertions(+), 13 deletions(-)
 
-diff --git a/tests/tcg/xtensa/macros.inc b/tests/tcg/xtensa/macros.inc
-index aa8f95bce879..f88937c7bf82 100644
---- a/tests/tcg/xtensa/macros.inc
-+++ b/tests/tcg/xtensa/macros.inc
-@@ -3,7 +3,7 @@
- .macro test_suite name
- .data
- status: .word result
--result: .space 256
-+result: .space 1024
- .text
- .global main
- .align 4
-@@ -25,9 +25,9 @@ main:
-     movi    a3, 0
-     beqz    a2, 2f
- 1:
--    l8ui    a1, a0, 0
-+    l32i    a1, a0, 0
-     or      a3, a3, a1
--    addi    a0, a0, 1
-+    addi    a0, a0, 4
-     addi    a2, a2, -1
-     bnez    a2, 1b
- 2:
-@@ -65,7 +65,7 @@ test_\name:
-     reset_ps
-     movi    a2, status
-     l32i    a3, a2, 0
--    addi    a3, a3, 1
-+    addi    a3, a3, 4
-     s32i    a3, a2, 0
- .endm
+diff --git a/tests/tcg/xtensa/test_lsc.S b/tests/tcg/xtensa/test_lsc.S
+index 0578bf19e72e..9d59c1815a9e 100644
+--- a/tests/tcg/xtensa/test_lsc.S
++++ b/tests/tcg/xtensa/test_lsc.S
+@@ -1,4 +1,5 @@
+ #include "macros.inc"
++#include "fpu.h"
  
-@@ -78,7 +78,7 @@ test_\name:
-     movi    a2, status
-     l32i    a2, a2, 0
-     movi    a3, 1
--    s8i     a3, a2, 0
-+    s32i    a3, a2, 0
- #ifdef DEBUG
-     print   failed
- #endif
+ test_suite lsc
+ 
+@@ -9,9 +10,14 @@ test lsi
+     wsr     a2, cpenable
+ 
+     movi    a2, 1f
+-    lsi     f0, a2, 0
+     lsi     f1, a2, 4
++#if DFPU
++    lsi     f2, a2, 8
++    lsip    f0, a2, 8
++#else
++    lsi     f0, a2, 0
+     lsiu    f2, a2, 8
++#endif
+     movi    a3, 1f + 8
+     assert  eq, a2, a3
+     rfr     a2, f0
+@@ -34,13 +40,18 @@ test ssi
+     movi    a2, 1f
+     movi    a3, 0x40800000
+     wfr     f3, a3
+-    ssi     f3, a2, 0
+     movi    a3, 0x40a00000
+     wfr     f4, a3
+-    ssi     f4, a2, 4
+     movi    a3, 0x40c00000
+     wfr     f5, a3
++    ssi     f4, a2, 4
++#if DFPU
++    ssi     f5, a2, 8
++    ssip    f3, a2, 8
++#else
++    ssi     f3, a2, 0
+     ssiu    f5, a2, 8
++#endif
+     movi    a3, 1f + 8
+     assert  eq, a2, a3
+     l32i    a4, a2, -8
+@@ -62,11 +73,16 @@ test_end
+ test lsx
+     movi    a2, 1f
+     movi    a3, 0
++    movi    a4, 4
++    movi    a5, 8
++    lsx     f7, a2, a4
++#if DFPU
++    lsx     f8, a2, a5
++    lsxp    f6, a2, a5
++#else
+     lsx     f6, a2, a3
+-    movi    a3, 4
+-    lsx     f7, a2, a3
+-    movi    a3, 8
+-    lsxu    f8, a2, a3
++    lsxu    f8, a2, a5
++#endif
+     movi    a3, 1f + 8
+     assert  eq, a2, a3
+     rfr     a2, f6
+@@ -87,18 +103,23 @@ test_end
+ 
+ test ssx
+     movi    a2, 1f
+-    movi    a3, 0
+     movi    a4, 0x41200000
+     wfr     f9, a4
+-    ssx     f9, a2, a3
+-    movi    a3, 4
+     movi    a4, 0x41300000
+     wfr     f10, a4
+-    ssx     f10, a2, a3
+-    movi    a3, 8
+     movi    a4, 0x41400000
+     wfr     f11, a4
+-    ssxu    f11, a2, a3
++    movi    a3, 0
++    movi    a4, 4
++    movi    a5, 8
++    ssx     f10, a2, a4
++#if DFPU
++    ssx     f11, a2, a5
++    ssxp    f9, a2, a5
++#else
++    ssx     f9, a2, a3
++    ssxu    f11, a2, a5
++#endif
+     movi    a3, 1f + 8
+     assert  eq, a2, a3
+     l32i    a4, a2, -8
 -- 
 2.20.1
 
