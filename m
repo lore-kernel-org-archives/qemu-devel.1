@@ -2,74 +2,91 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52394C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0594C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B05D206B6
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:07:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B05D206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 8956D206B6
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:09:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J3cnyGFT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8956D206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsXP5-0004cA-Fs
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 16:07:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45690)
+	id 1jsXQK-0006Vw-R6
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 16:09:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsXNf-0001cV-Ge
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:06:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:44951)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsXNd-0004sz-Fy
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:06:23 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MirSu-1kX6vQ3PLo-00evKx; Mon, 06 Jul 2020 22:06:05 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/3] target/m68k: consolidate physical translation offset into
- get_physical_address()
-Date: Mon,  6 Jul 2020 22:05:58 +0200
-Message-Id: <20200706200559.160209-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200706200559.160209-1-laurent@vivier.eu>
-References: <20200706200559.160209-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsXPh-0005qC-Lz
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:08:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54663
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsXPf-0005MR-RS
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:08:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594066106;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=zFXtwG7HS+G1xidJA/diM3vo8Q7bef1yatvfa7UHzCs=;
+ b=J3cnyGFTOU+Zln0yAdNMx91dVhYPD9n9GeTpwCKrNgZ/1C28oV9ZAWw8m+CO9ylvaQU6Ry
+ XPJx7Ij3EYcL8yQwGiRvqeZCJ0qoC7aEbpqW0Jzc/yu6f1KoJpwhuvsZHq8hbqcWfvWKZk
+ EeGP8f80Sqixyyg2oWL+yxcaZC3rUyk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-adcrRh5vNKCfYhnp45xk9w-1; Mon, 06 Jul 2020 16:08:25 -0400
+X-MC-Unique: adcrRh5vNKCfYhnp45xk9w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DBA3107ACCA;
+ Mon,  6 Jul 2020 20:08:24 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CDA1160BEC;
+ Mon,  6 Jul 2020 20:08:23 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 583861132FD2; Mon,  6 Jul 2020 22:07:43 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v3 29/44] qom: Make functions taking Error ** return bool,
+ not 0/-1
+References: <20200706080950.403087-1-armbru@redhat.com>
+ <20200706080950.403087-30-armbru@redhat.com>
+ <26905451-4a8f-87af-4414-560ea0f3c735@virtuozzo.com>
+Date: Mon, 06 Jul 2020 22:07:43 +0200
+In-Reply-To: <26905451-4a8f-87af-4414-560ea0f3c735@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Mon, 6 Jul 2020 19:52:28 +0300")
+Message-ID: <87wo3gbe5s.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:6ByfCQdS36HnRHicBYjzL4lbMjnxZSZ4ub5HbgTD6hI+ZAOAReI
- A1EG33JFp3hN7BIzVZR5RqT3iiI+ZhzCQP1yZqcWi7OabOkb2yPXUQ71Jjbc5uGFP2ZvyJj
- ePwjlbBzxMJ88sXHzIMl+059ERuHVe9/AVOEkZCM6qGMd7E3idsSxao6M1yvo/044rXjPvk
- +pwmoNQRGU87NWww9T6vg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sspCEf3us1c=:RKzRNrR17UetWFa+R4STeM
- RZ2YVBe4ITGFzrQzjo+F3Kd63OtBoK7K5cbknfKvrWyYLrzJQSTDpB0UpSAD448rgV2CWPGJy
- kb593GwOrNLAS5AyrPlcdpoa1Pml83ZC5lMA2xr3I/r2IpVmnq+++JibGS1vWQyJCtLw6DQrx
- B9d0LmnVkSz0EP7pC0tVKwyJ23MI91hcrpGCD1FocRk7c0y7kFSIaInWI9NTkF+sP8OO7KqgJ
- 0+1TQlzCUqq9YDTWIzIbA+lxyrE9Gbpcz44HNOL6sKj7LZig8A9v0CC7d7sZucSWzUhskEyh6
- nBdpsMXN3aOWIrQunqxvnedCCphBDQ8TusBKAESKY6Yc50YRoDGP5mWbVa8C52Uc+WsCMiK3D
- iYn0uszYebyYxbpJjYOJsGFkRiCmZjQ8P/69P+DVGt1fI6ttmjH3VwRJwO0g/kyM8Ipfmevt+
- Delt5Z8rQ9nZS0ou0N5tmiUIzfKm6Z4tOrBWu4s/RroaoV1BoE3KC/dGzV92Mj4PRDZ9H2ojw
- gP5cqroNNTAbYWU/C4uuaLQuiFoYtoQgRqT+yS/ESpavXcn/Kc8nij4NNQmbGS5oz0CT8pp63
- nL7fG+kq20fWltupojZF6ZC/+qNeVY9p6Rytp1DNO+6LOMcNCU5lQIP3rUNga5jLLce8xaj0m
- IQVhOr74X4CLWLAcR09+yvR1+Ql+7Y03jJrTr1zYLiVzesgQ6ES2XV2CkMrAEn9UYb0NA+q3j
- T6R+56IaVBPKgH/ODAQTKduciLxz9BrsVMVxnEa4Lr4c/DM9ImQHfxZETozjSkNx5ksgfi1wz
- JTDpzU7Z5Fc8EoZ5g2Xgbp2juB2pM1ndXlEflKD2iTmh7SPamx/+4zZ0oZBrCe9peNbjKFq
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 16:06:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 15:29:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,88 +99,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, groug@kaod.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-Since all callers to get_physical_address() now apply the same page offset to
-the translation result, move the logic into get_physical_address() itself to
-avoid duplication.
+> On 06.07.2020 11:09, Markus Armbruster wrote:
+>> Just for consistency.  Also fix the example in object_set_props()'s
+>> documentation.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> Note, that object_set_props is unused and may be dropped.
 
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200701201531.13828-3-mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- target/m68k/helper.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+True.  It's never been used.  It was added together with
+object_set_propv(), probably out of habit to always have both a ... and
+the va_list function.
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 631eab777494..3ff57657958c 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -643,7 +643,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-                 /* Transparent Translation Register bit */
-                 env->mmu.mmusr = M68K_MMU_T_040 | M68K_MMU_R_040;
-             }
--            *physical = address & TARGET_PAGE_MASK;
-+            *physical = address;
-             *page_size = TARGET_PAGE_SIZE;
-             return 0;
-         }
-@@ -771,7 +771,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-     }
-     *page_size = 1 << page_bits;
-     page_mask = ~(*page_size - 1);
--    *physical = next & page_mask;
-+    *physical = (next & page_mask) + (address & (*page_size - 1));
- 
-     if (access_type & ACCESS_PTEST) {
-         env->mmu.mmusr |= next & M68K_MMU_SR_MASK_040;
-@@ -826,8 +826,6 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         return -1;
-     }
- 
--    addr &= TARGET_PAGE_MASK;
--    phys_addr += addr & (page_size - 1);
-     return phys_addr;
- }
- 
-@@ -891,10 +889,8 @@ bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     ret = get_physical_address(&cpu->env, &physical, &prot,
-                                address, access_type, &page_size);
-     if (likely(ret == 0)) {
--        address &= TARGET_PAGE_MASK;
--        physical += address & (page_size - 1);
--        tlb_set_page(cs, address, physical,
--                     prot, mmu_idx, TARGET_PAGE_SIZE);
-+        tlb_set_page(cs, address & TARGET_PAGE_MASK,
-+                     physical & TARGET_PAGE_MASK, prot, mmu_idx, page_size);
-         return true;
-     }
- 
-@@ -1383,9 +1379,8 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
-     ret = get_physical_address(env, &physical, &prot, addr,
-                                access_type, &page_size);
-     if (ret == 0) {
--        addr &= TARGET_PAGE_MASK;
--        physical += addr & (page_size - 1);
--        tlb_set_page(env_cpu(env), addr, physical,
-+        tlb_set_page(env_cpu(env), addr & TARGET_PAGE_MASK,
-+                     physical & TARGET_PAGE_MASK,
-                      prot, access_type & ACCESS_SUPER ?
-                      MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
-     }
--- 
-2.26.2
+Thanks!
 
 
