@@ -2,82 +2,83 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B722BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 18:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D281C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 18:55:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 874C4206B6
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 18:53:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4376D206B6
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 18:55:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OYPATk30"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 874C4206B6
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qfyWv7Rl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4376D206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsWFZ-0002W6-RV
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 14:53:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58488)
+	id 1jsWGn-0004Kf-Jh
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 14:55:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jsWEY-0000qr-B3
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 14:52:54 -0400
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:47042)
+ id 1jsWEc-00010W-0w
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 14:52:58 -0400
+Received: from mail-pj1-x1032.google.com ([2607:f8b0:4864:20::1032]:52065)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jsWEW-0000fC-Nc
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 14:52:54 -0400
-Received: by mail-pl1-x635.google.com with SMTP id j7so2332073plk.13
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 11:52:51 -0700 (PDT)
+ id 1jsWEa-0000fg-FS
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 14:52:57 -0400
+Received: by mail-pj1-x1032.google.com with SMTP id l6so14089819pjq.1
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 11:52:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=GVTDiY0ZsA/nF7FM/+lifohaf9ERBm26oBV/l0jEJ6o=;
- b=OYPATk30bDHCZ0Syi2yg+G7tKhzFdgzbG7soVynVqyMeATXYaKlub6u72RS10h3Ar/
- SsP9gK4y1Kex64z8x+thR4Ro1g7fovuOTXNDgwUvmjZjmMuZ4vtJX3ctfgjuFCjOWKKM
- G5c/YP6SS5zlVa9NCgwsfXO0G7MX9E8aapdN3u6oZJBNy5mMdVVezlu6azcsO3fgtEQH
- 43PRDTFrBN3K5IIoutu++g+RxC8V6eK6wKgSI9JRO9TUy9wV5JkPukDjzjj8Sql5kViP
- YeiOjI0T0VKp6TBVGkZ+I2lYC8nIVkHlxkWit9hxyF4uhWi6+4iVXyZZn51+iol/kH64
- CNoA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=hUkw5IV25PzdOpbKU56LvtYexDUOIKyrljMdyGHGiXE=;
+ b=qfyWv7RleJAdZTrZmwUL4ineINZT9SG9RU3WZbqZOU4XufGdslg9daes6nC1hcwZTb
+ s1mLxJRj6glIT103LtuoYoIXcCvT5GzUpiUREre6/zhGBsyMkLMAXMxW9guOYeM3jBEp
+ 8Dvel4Gu4mpsAHupPoZD+CJkw/u3wknsASa/tnMxpk+y8NxwSsWSQnMB7SYXOGRpgULD
+ qKzANq+7dBcEOwokg17gwIeU9v7yut0TejndXsc4wFJpxaojyt5TtGvCEzbWl5QaNB31
+ AhGmHfLhWQqrmChxJRr2oMJmVfFwSTUyzDIVe+srpeopzSb80hfBRJz8iuyRNR/hWIdF
+ 06Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=GVTDiY0ZsA/nF7FM/+lifohaf9ERBm26oBV/l0jEJ6o=;
- b=nmJpZkw4HgPrceYzCGqdbMwTZI+T0memR+ujO5X0txOm8HAD/eSR9e6Xmu86TXgzmn
- mfjdHmk0c6twwj/3yByPwouSOXmGDqvM7e0HNqZqA0o4DKPa/0rczcgDdACpjdWauJyn
- 21AUiMnsYGvfcjtp3K20i2/2/fjGS5JwaC9mCVh1LoIv2LnVDUMRZOa4wnvyRTuRaFbV
- c5k1oBqHhwHIp26avegzWw7IbFZ5yYSYVmh3CvlrhqhCUbSRTmkL6NeIxXw7qhH5hMxa
- qoYbxVVhBXAhHbo0LxxRA22We0IkSQkd8sav7IhxolH2MHt1GfTll7UX23QqqmSnbmvW
- Rwrw==
-X-Gm-Message-State: AOAM530s1r3940ftXAZ1yawMUy6kObuePesj/zle1X3gDTDID/vU7mti
- TBOd7AD/aLlCRoYGXrNUVLPZjXf8zSg=
-X-Google-Smtp-Source: ABdhPJxAApUR4Gah6kboMdUyJs8aC3Rcb7iiTz9SMkTFvMcVLsfl8/g4nqUADcZVl7fwM80iZl2SVQ==
-X-Received: by 2002:a17:90a:df0f:: with SMTP id
- gp15mr580205pjb.98.1594061570268; 
- Mon, 06 Jul 2020 11:52:50 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=hUkw5IV25PzdOpbKU56LvtYexDUOIKyrljMdyGHGiXE=;
+ b=kUhg3UsYmkijd3+W2E8RbcNitEXbbR2jBklg8L3FcgnozvbYHTg5O42BuNjbLVM3v1
+ /IS5YxLpU0rtt/AhHFLi3t5g8pYOnC/gBU1Xq++Q/pZqEr6p4IBa2AkIl5C+FavR0mft
+ sWc+PXbAvsrQrQy82kHV3umhLPwXd/D/l5DZfNqzqkQxmi4LntYKL5BXCmFaJZgxHgvo
+ xK90B1pme+3j1BKOsClUFyPIbPONDJtZL+w2yofD0jXnuUfyp8q7HXcjdKwwXss5oilR
+ u7QvpNEbLGSRWll3BQvMmy4/KgnFZxQdzVT01Fp6OuQ+OY40gTFeXXo7YAMNVX8WpueY
+ w5EA==
+X-Gm-Message-State: AOAM532uFuAVQ3zNW9fPxkYfLwooEQnItXFVRm0w43zpPtO0TWxtM87k
+ 5P/e515MXNDPr9OjV2OiGBogoCeN+n0=
+X-Google-Smtp-Source: ABdhPJzI+8AIZXU/YL6JBRHQvvJTxDK0I5U9+M7Wirawsc8p2YqvEX1EvPNv1Y4Bs7ZUrXNu4BT8dQ==
+X-Received: by 2002:a17:90a:a887:: with SMTP id h7mr615794pjq.0.1594061574641; 
+ Mon, 06 Jul 2020 11:52:54 -0700 (PDT)
 Received: from localhost.localdomain (097-090-106-114.biz.spectrum.com.
  [97.90.106.114])
- by smtp.gmail.com with ESMTPSA id q6sm19988179pfg.76.2020.07.06.11.52.49
+ by smtp.gmail.com with ESMTPSA id q6sm19988179pfg.76.2020.07.06.11.52.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jul 2020 11:52:49 -0700 (PDT)
+ Mon, 06 Jul 2020 11:52:53 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/2] tcg patch queue
-Date: Mon,  6 Jul 2020 11:52:45 -0700
-Message-Id: <20200706185248.118447-1-richard.henderson@linaro.org>
+Subject: [PULL 2/2] tcg: Fix do_nonatomic_op_* vs signed operations
+Date: Mon,  6 Jul 2020 11:52:48 -0700
+Message-Id: <20200706185248.118447-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200706185248.118447-1-richard.henderson@linaro.org>
+References: <20200706185248.118447-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::635;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x635.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1032;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1032.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,35 +100,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit eb6490f544388dd24c0d054a96dd304bc7284450:
+The smin/smax/umin/umax operations require the operands to be
+properly sign extended.  Do not drop the MO_SIGN bit from the
+load, and additionally extend the val input.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200703' into staging (2020-07-04 16:08:41 +0100)
+Reviewed-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reported-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200701165646.1901320-1-richard.henderson@linaro.org>
+---
+ tcg/tcg-op.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-are available in the Git repository at:
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index e60b74fb82..4b8a473fad 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -3189,8 +3189,9 @@ static void do_nonatomic_op_i32(TCGv_i32 ret, TCGv addr, TCGv_i32 val,
+ 
+     memop = tcg_canonicalize_memop(memop, 0, 0);
+ 
+-    tcg_gen_qemu_ld_i32(t1, addr, idx, memop & ~MO_SIGN);
+-    gen(t2, t1, val);
++    tcg_gen_qemu_ld_i32(t1, addr, idx, memop);
++    tcg_gen_ext_i32(t2, val, memop);
++    gen(t2, t1, t2);
+     tcg_gen_qemu_st_i32(t2, addr, idx, memop);
+ 
+     tcg_gen_ext_i32(ret, (new_val ? t2 : t1), memop);
+@@ -3232,8 +3233,9 @@ static void do_nonatomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
+ 
+     memop = tcg_canonicalize_memop(memop, 1, 0);
+ 
+-    tcg_gen_qemu_ld_i64(t1, addr, idx, memop & ~MO_SIGN);
+-    gen(t2, t1, val);
++    tcg_gen_qemu_ld_i64(t1, addr, idx, memop);
++    tcg_gen_ext_i64(t2, val, memop);
++    gen(t2, t1, t2);
+     tcg_gen_qemu_st_i64(t2, addr, idx, memop);
+ 
+     tcg_gen_ext_i64(ret, (new_val ? t2 : t1), memop);
+-- 
+2.25.1
 
-  https://github.com/rth7680/qemu.git tags/pull-tcg-20200706
-
-for you to fetch changes up to 852f933e482518797f7785a2e017a215b88df815:
-
-  tcg: Fix do_nonatomic_op_* vs signed operations (2020-07-06 10:58:19 -0700)
-
-----------------------------------------------------------------
-Fix for ppc shifts
-Fix for non-parallel atomic ops
-
-----------------------------------------------------------------
-Catherine A. Frederick (1):
-      tcg/ppc: Sanitize immediate shifts
-
-Richard Henderson (1):
-      tcg: Fix do_nonatomic_op_* vs signed operations
-
- tcg/ppc/tcg-target.inc.c | 15 ++++++++++-----
- tcg/tcg-op.c             | 10 ++++++----
- 2 files changed, 16 insertions(+), 9 deletions(-)
 
