@@ -2,93 +2,88 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020A8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7FCC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1A9D20720
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 088ED20720
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:24:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HuRaH0aP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1A9D20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SJswZLFv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 088ED20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsTtn-0004Yn-VM
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:23:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51726)
+	id 1jsTuw-0006ax-9M
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:24:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsTsg-00036k-Mi
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:22:10 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36556
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsTse-0007K1-Hl
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:22:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594052527;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6+bzPTygRTInhjOyIrjQySaXDZ2E7K1S/ISoLEVIWis=;
- b=HuRaH0aPe22qmRU1AlZGKZUReiWy6YSL8qnTqaVEItWU1cIg+6UMIvqwWR3DJvzCgFi6Nh
- DpOa0Jx4CbrV6snBaF103apkL8wgmoO9oq6JOCprIS11fkXVvfOcPi9OgSmBEacSS2hHeF
- I/unnaCzirxLdd8j8W7EvwHEy8IzkUc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-_c4OzSTBNSWePMPZhGLOjQ-1; Mon, 06 Jul 2020 12:22:02 -0400
-X-MC-Unique: _c4OzSTBNSWePMPZhGLOjQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9A12BFC0;
- Mon,  6 Jul 2020 16:22:01 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-203.ams2.redhat.com [10.36.114.203])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C6837890F;
- Mon,  6 Jul 2020 16:21:58 +0000 (UTC)
-Date: Mon, 6 Jul 2020 18:21:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH 0/6] migration: bring savevm/loadvm/delvm over to QMP
-Message-ID: <20200706162156.GF5052@linux.fritz.box>
-References: <20200702175754.2211821-1-berrange@redhat.com>
- <a747fcd4-d87e-8124-a988-f3ae678c856e@virtuozzo.com>
- <20200703172224.GT2213227@redhat.com>
- <a8015fd3-e73e-c70e-9ba7-fa1bc047a1c2@virtuozzo.com>
- <20200706152701.GB5052@linux.fritz.box>
- <20200706152902.GH2603839@redhat.com>
- <20200706155011.GC5052@linux.fritz.box>
- <20200706160318.GI2603839@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsTta-0004Yw-PZ; Mon, 06 Jul 2020 12:23:06 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43949)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsTtY-0007W6-L4; Mon, 06 Jul 2020 12:23:06 -0400
+Received: by mail-io1-xd41.google.com with SMTP id k23so39912206iom.10;
+ Mon, 06 Jul 2020 09:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ZCFsUgKWMHvjDffglxEwENbngV4NS85ssCNLB+uyOKU=;
+ b=SJswZLFvxKUNl19tgpP9pnlvN/y2gsQha2ge8zsRL4LRd9lwtCWSkt0+RF1hAxJlRZ
+ wvxy8wmDphGoq5KWwitWEDh5DN2Dyblo+9gqxtz4TFCXfRaNBH5BJ2q8WA7rFd8t2GSW
+ wkVwZVVkuCjFoF+W+um5hWmkJAWLN7DkVzpIWc4wqoKm1bYRquQSt+wOKHXHSwhuba1h
+ +fWv/8RPzK+nv5GiHl707mQ/IRX4ffMGOl46MDAtjiJ3sQ31lJ/BDxhWgigopIdDdkOl
+ I6bS882r/k+WVtZ/bU5i5wcB2OxEe85eNm7j9YCPyjy+k/QA8eBb+BwygpQdIcMDkzyn
+ N7YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ZCFsUgKWMHvjDffglxEwENbngV4NS85ssCNLB+uyOKU=;
+ b=QP2yLM9PlxGXDiQo2WKVvQGyZpPcC1V6RMoJ29SA4I3sN5KBAc27B2l8kyNvhFf/6A
+ K3H/uCJe888QNj8Gb3i5sCvcuR3G36Kg7mmT3w2Lv/V6GmnjRH4U7WzVOR24SGbxNtS8
+ GTFnXP4Z4qmF/Zrf81PrUlwGVE0aPGr2xKeWMCyDw9Yi0W/yKQMcG/Xtbi0MtIZt/b/o
+ 83obBOvh9B/0tbnl+w/x2baoKjWmqmtZUNv1ER1AQCAikkr/pcSClDEBiy9htTkj3L9M
+ l2fcAhGRYYHGOXfqYU9EIEttAT3EytjeVq0JGbBqtcjjPFxvHvazovnMlZ7pGDTNoKcM
+ lNXQ==
+X-Gm-Message-State: AOAM532l6f+bfvBM5OLfcGjpp0TUlXvzY+hN1QcoIl3aifeFF/AeV747
+ T/f+BfqAWOP2z6ZsN/KXAXvwQ6aFIVOELPAN89g=
+X-Google-Smtp-Source: ABdhPJyMxcEKWgHqyXGjQC7edshOzxWyXa5rwxXI9sZnrZzKqcjcqWXyX3XcfmTSFQVGUb6RdGBmn4EYeFrJKfH/NtA=
+X-Received: by 2002:a02:6c4c:: with SMTP id w73mr55307238jab.26.1594052582475; 
+ Mon, 06 Jul 2020 09:23:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200706160318.GI2603839@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:59:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200705204630.4133-1-f4bug@amsat.org>
+ <20200705204630.4133-9-f4bug@amsat.org>
+In-Reply-To: <20200705204630.4133-9-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 6 Jul 2020 09:13:15 -0700
+Message-ID: <CAKmqyKOu9Wpu-9pZLCxdMZUHW2Ku=8BazzuTSpUba8=rRqDUWQ@mail.gmail.com>
+Subject: Re: [PATCH v4 08/10] hw/sd/pl181: Replace disabled fprintf()s by
+ trace events
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,208 +96,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.07.2020 um 18:03 hat Daniel P. Berrangé geschrieben:
-> On Mon, Jul 06, 2020 at 05:50:11PM +0200, Kevin Wolf wrote:
-> > Am 06.07.2020 um 17:29 hat Daniel P. Berrangé geschrieben:
-> > > On Mon, Jul 06, 2020 at 05:27:01PM +0200, Kevin Wolf wrote:
-> > > > Am 03.07.2020 um 19:29 hat Denis V. Lunev geschrieben:
-> > > > > On 7/3/20 8:22 PM, Daniel P. BerrangÃƒÂ© wrote:
-> > > > > > On Fri, Jul 03, 2020 at 08:15:44PM +0300, Denis V. Lunev wrote:
-> > > > > >> On 7/2/20 8:57 PM, Daniel P. BerrangÃƒÂ© wrote:
-> > > > > >>> When QMP was first introduced some 10+ years ago now, the snapshot
-> > > > > >>> related commands (savevm/loadvm/delvm) were not converted. This was
-> > > > > >>> primarily because their implementation causes blocking of the thread
-> > > > > >>> running the monitor commands. This was (and still is) considered
-> > > > > >>> undesirable behaviour both in HMP and QMP.
-> > > > > >>>
-> > > > > >>> In theory someone was supposed to fix this flaw at some point in the
-> > > > > >>> past 10 years and bring them into the QMP world. Sadly, thus far it
-> > > > > >>> hasn't happened as people always had more important things to work
-> > > > > >>> on. Enterprise apps were much more interested in external snapshots
-> > > > > >>> than internal snapshots as they have many more features.
-> > > > > >>>
-> > > > > >>> Meanwhile users still want to use internal snapshots as there is
-> > > > > >>> a certainly simplicity in having everything self-contained in one
-> > > > > >>> image, even though it has limitations. Thus the apps that end up
-> > > > > >>> executing the savevm/loadvm/delvm via the "human-monitor-command"
-> > > > > >>> QMP command.
-> > > > > >>>
-> > > > > >>>
-> > > > > >>> IOW, the problematic blocking behaviour that was one of the reasons
-> > > > > >>> for not having savevm/loadvm/delvm in QMP is experienced by applications
-> > > > > >>> regardless. By not portting the commands to QMP due to one design flaw,
-> > > > > >>> we've forced apps and users to suffer from other design flaws of HMP (
-> > > > > >>> bad error reporting, strong type checking of args, no introspection) for
-> > > > > >>> an additional 10 years. This feels rather sub-optimal :-(
-> > > > > >>>
-> > > > > >>> In practice users don't appear to care strongly about the fact that these
-> > > > > >>> commands block the VM while they run. I might have seen one bug report
-> > > > > >>> about it, but it certainly isn't something that comes up as a frequent
-> > > > > >>> topic except among us QEMU maintainers. Users do care about having
-> > > > > >>> access to the snapshot feature.
-> > > > > >>>
-> > > > > >>> Where I am seeing frequent complaints is wrt the use of OVMF combined
-> > > > > >>> with snapshots which has some serious pain points. This is getting worse
-> > > > > >>> as the push to ditch legacy BIOS in favour of UEFI gain momentum both
-> > > > > >>> across OS vendors and mgmt apps. Solving it requires new parameters to
-> > > > > >>> the commands, but doing this in HMP is super unappealing.
-> > > > > >>>
-> > > > > >>>
-> > > > > >>>
-> > > > > >>> After 10 years, I think it is time for us to be a little pragmatic about
-> > > > > >>> our handling of snapshots commands. My desire is that libvirt should never
-> > > > > >>> use "human-monitor-command" under any circumstances, because of the
-> > > > > >>> inherant flaws in HMP as a protocol for machine consumption. If there
-> > > > > >>> are flaws in QMP commands that's fine. If we fix them in future, we can
-> > > > > >>> deprecate the current QMP commands and remove them not too long after,
-> > > > > >>> without being locked in forever.
-> > > > > >>>
-> > > > > >>>
-> > > > > >>> Thus in this series I'm proposing a direct 1-1 mapping of the existing
-> > > > > >>> HMP commands for savevm/loadvm/delvm into QMP as a first step. This does
-> > > > > >>> not solve the blocking thread problem, but it does eliminate the error
-> > > > > >>> reporting, type checking and introspection problems inherant to HMP.
-> > > > > >>> We're winning on 3 out of the 4 long term problems.
-> > > > > >>>
-> > > > > >>> If someone can suggest a easy way to fix the thread blocking problem
-> > > > > >>> too, I'd be interested to hear it. If it involves a major refactoring
-> > > > > >>> then I think user are better served by unlocking what look like easy
-> > > > > >>> wins today.
-> > > > > >>>
-> > > > > >>> With a QMP variant, we reasonably deal with the problems related to OVMF:
-> > > > > >>>
-> > > > > >>>  - The logic to pick which disk to store the vmstate in is not
-> > > > > >>>    satsifactory.
-> > > > > >>>
-> > > > > >>>    The first block driver state cannot be assumed to be the root disk
-> > > > > >>>    image, it might be OVMF varstore and we don't want to store vmstate
-> > > > > >>>    in there.
-> > > > > >>>
-> > > > > >>>  - The logic to decide which disks must be snapshotted is hardwired
-> > > > > >>>    to all disks which are writable
-> > > > > >>>
-> > > > > >>>    Again with OVMF there might be a writable varstore, but this can be
-> > > > > >>>    raw rather than qcow2 format, and thus unable to be snapshotted.
-> > > > > >>>    While users might wish to snapshot their varstore, in some/many/most
-> > > > > >>>    cases it is entirely uneccessary. Users are blocked from snapshotting
-> > > > > >>>    their VM though due to this varstore.
-> > > > > >>>
-> > > > > >>> These are solved by adding two parameters to the commands. The first is
-> > > > > >>> a block device node name that identifies the image to store vmstate in,
-> > > > > >>> and the second is a list of node names to exclude from snapshots.
-> > > > > >>>
-> > > > > >>> In the block code I've only dealt with node names for block devices, as
-> > > > > >>> IIUC, this is all that libvirt should need in the -blockdev world it now
-> > > > > >>> lives in. IOW, I've made not attempt to cope with people wanting to use
-> > > > > >>> these QMP commands in combination with -drive args.
-> > > > > >>>
-> > > > > >>> I've done some minimal work in libvirt to start to make use of the new
-> > > > > >>> commands to validate their functionality, but this isn't finished yet.
-> > > > > >>>
-> > > > > >>> My ultimate goal is to make the GNOME Boxes maintainer happy again by
-> > > > > >>> having internal snapshots work with OVMF:
-> > > > > >>>
-> > > > > >>>   https://gitlab.gnome.org/GNOME/gnome-boxes/-/commit/c486da262f6566326fbcb5e=
-> > > > > >>> f45c5f64048f16a6e
-> > > > > >>>
-> > > > > >>> Daniel P. Berrang=C3=A9 (6):
-> > > > > >>>   migration: improve error reporting of block driver state name
-> > > > > >>>   migration: introduce savevm, loadvm, delvm QMP commands
-> > > > > >>>   block: add ability to filter out blockdevs during snapshot
-> > > > > >>>   block: allow specifying name of block device for vmstate storage
-> > > > > >>>   migration: support excluding block devs in QMP snapshot commands
-> > > > > >>>   migration: support picking vmstate disk in QMP snapshot commands
-> > > > > >>>
-> > > > > >>>  block/monitor/block-hmp-cmds.c |  4 +-
-> > > > > >>>  block/snapshot.c               | 68 +++++++++++++++++++------
-> > > > > >>>  include/block/snapshot.h       | 21 +++++---
-> > > > > >>>  include/migration/snapshot.h   | 10 +++-
-> > > > > >>>  migration/savevm.c             | 71 +++++++++++++++++++-------
-> > > > > >>>  monitor/hmp-cmds.c             | 20 ++------
-> > > > > >>>  qapi/migration.json            | 91 ++++++++++++++++++++++++++++++++++
-> > > > > >>>  replay/replay-snapshot.c       |  4 +-
-> > > > > >>>  softmmu/vl.c                   |  2 +-
-> > > > > >>>  9 files changed, 228 insertions(+), 63 deletions(-)
-> > > > > >> I have tried to work in this interface in 2016. That time
-> > > > > >> we have struggled with the idea that this QMP interface should
-> > > > > >> be ready to work asynchronously.
-> > > > > >>
-> > > > > >> Write-protect userfaultfd was merged into vanilla Linux
-> > > > > >> thus it is time to async savevm interface, which will also
-> > > > > >> bring async loadvm and some rework for state storing.
-> > > > > >>
-> > > > > >> Thus I think that with the introduction of the QMP interface
-> > > > > >> we should at least run save VM not from the main
-> > > > > >> thread but from the background with the event at the end.
-> > > > > > spawning a thread in which to invoke save_snapshot() and load_snapshot()
-> > > > > > is easy enough.  I'm not at all clear on what we need in the way of
-> > > > > > mutex locking though, to make those methods safe to run in a thread
-> > > > > > that isn't the main event loop.
-> > > > > 
-> > > > > I am unsure that this is so easy. We need to be protected from other
-> > > > > operations
-> > > > > coming through QMP interface. Right now parallel operations are not allowed.
-> > > > > 
-> > > > > > Even with savevm/loadvm being blocking, we could introduce a QMP event
-> > > > > > straight away, and document that users shouldn't assume the operation
-> > > > > > is complete until they see the event. That would let us make the commands
-> > > > > > non-blocking later with same documented semantics.
-> > > > > OK. Let us assume that you have added QMP savevm as proposed. It is
-> > > > > sync now. Sooner or later (I hope sooner) we will have to re-implement
-> > > > > this command with async version of the command, which will bring
-> > > > > again event etc and thus you will have to add compat layers to the
-> > > > > libvirt.
-> > > > > 
-> > > > > I think that it would be cleaner to start with the interface suitable for
-> > > > > further (coming) features and not copy obsolete implementation.
-> > > > > Yes, unfortunately, this is much more complex :(
-> > > > 
-> > > > Should we make this a job (may or may not be a block job) that just
-> > > > happens to block the VM and return completion immediately with the
-> > > > simple implementation we can have today? Then moving it later to a
-> > > > truly async operation mode should become transparent to the QMP client.
-> > > 
-> > > What would making it a job / block job need from a QMP design POV ?
-> > 
-> > The actual QMP syntax for the command wouldn't look much different (I
-> > think just a new option 'job-id'), but the difference would be that it's
-> > not documented as performing the whole action, but just starting the
-> > job. The expectation would then be that it can be managed with the
-> > job-* commands and that it emits the job status events.
-> > 
-> > This may sound complicated, but most of it is actually covered by the
-> > generic job infrastructure.
-> > 
-> > The simplest job that we have is blockdev-create, which is implemented
-> > in block/create.c (99 lines including the license header). I think this
-> > would be a good model for our new case.
-> 
-> The QMP design and internal API looks simple enough, but I'm wondering
-> what implications come with the job infra wrt locking/thread safety. In
-> particular I see the "job_start" command runs the impl in a coroutine.
-> I can't tell if that's going to cause any interactions wrto the current
-> loadvm/savevm impl and its assumptions about blocking execution while
-> running.
+On Sun, Jul 5, 2020 at 1:51 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>
+> Convert disabled DPRINTF() to trace events and remove ifdef'ry.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Yes, the job infrastructure is build on coroutines and we'd need to
-check that this is safe. But both loadvm and savevm call both vm_stop()
-and bdrv_drain_all_begin/end(), so not much should be going on in
-parallel.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-If this doesn't easily work out, there is still a simple solution for
-our sync implementation with an async interface: Just leave coroutine
-context immediately again by scheduling a BH that does the actual work.
+Alistair
 
-Kevin
-
+> ---
+>  hw/sd/pl181.c      | 26 +++++++++-----------------
+>  hw/sd/trace-events | 10 ++++++++++
+>  2 files changed, 19 insertions(+), 17 deletions(-)
+>
+> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+> index f69488ebac..574500ce60 100644
+> --- a/hw/sd/pl181.c
+> +++ b/hw/sd/pl181.c
+> @@ -17,15 +17,7 @@
+>  #include "qemu/module.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> -
+> -//#define DEBUG_PL181 1
+> -
+> -#ifdef DEBUG_PL181
+> -#define DPRINTF(fmt, ...) \
+> -do { printf("pl181: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define DPRINTF(fmt, ...) do {} while(0)
+> -#endif
+> +#include "trace.h"
+>
+>  #define PL181_FIFO_LEN 16
+>
+> @@ -158,7 +150,7 @@ static void pl181_fifo_push(PL181State *s, uint32_t v=
+alue)
+>      n =3D (s->fifo_pos + s->fifo_len) & (PL181_FIFO_LEN - 1);
+>      s->fifo_len++;
+>      s->fifo[n] =3D value;
+> -    DPRINTF("FIFO push %08x\n", (int)value);
+> +    trace_pl181_fifo_push(value);
+>  }
+>
+>  static uint32_t pl181_fifo_pop(PL181State *s)
+> @@ -172,7 +164,7 @@ static uint32_t pl181_fifo_pop(PL181State *s)
+>      value =3D s->fifo[s->fifo_pos];
+>      s->fifo_len--;
+>      s->fifo_pos =3D (s->fifo_pos + 1) & (PL181_FIFO_LEN - 1);
+> -    DPRINTF("FIFO pop %08x\n", (int)value);
+> +    trace_pl181_fifo_pop(value);
+>      return value;
+>  }
+>
+> @@ -184,7 +176,7 @@ static void pl181_do_command(PL181State *s)
+>
+>      request.cmd =3D s->cmd & PL181_CMD_INDEX;
+>      request.arg =3D s->cmdarg;
+> -    DPRINTF("Command %d %08x\n", request.cmd, request.arg);
+> +    trace_pl181_command_send(request.cmd, request.arg);
+>      rlen =3D sdbus_do_command(&s->sdbus, &request, response);
+>      if (rlen < 0)
+>          goto error;
+> @@ -201,16 +193,16 @@ static void pl181_do_command(PL181State *s)
+>              s->response[2] =3D ldl_be_p(&response[8]);
+>              s->response[3] =3D ldl_be_p(&response[12]) & ~1;
+>          }
+> -        DPRINTF("Response received\n");
+> +        trace_pl181_command_response_pending();
+>          s->status |=3D PL181_STATUS_CMDRESPEND;
+>      } else {
+> -        DPRINTF("Command sent\n");
+> +        trace_pl181_command_sent();
+>          s->status |=3D PL181_STATUS_CMDSENT;
+>      }
+>      return;
+>
+>  error:
+> -    DPRINTF("Timeout\n");
+> +    trace_pl181_command_timeout();
+>      s->status |=3D PL181_STATUS_CMDTIMEOUT;
+>  }
+>
+> @@ -262,11 +254,11 @@ static void pl181_fifo_run(PL181State *s)
+>          s->status |=3D PL181_STATUS_DATAEND;
+>          /* HACK: */
+>          s->status |=3D PL181_STATUS_DATABLOCKEND;
+> -        DPRINTF("Transfer Complete\n");
+> +        trace_pl181_fifo_transfer_complete();
+>      }
+>      if (s->datacnt =3D=3D 0 && s->fifo_len =3D=3D 0) {
+>          s->datactrl &=3D ~PL181_DATA_ENABLE;
+> -        DPRINTF("Data engine idle\n");
+> +        trace_pl181_data_engine_idle();
+>      } else {
+>          /* Update FIFO bits.  */
+>          bits =3D PL181_STATUS_TXACTIVE | PL181_STATUS_RXACTIVE;
+> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+> index 5f09d32eb2..a87d7355fb 100644
+> --- a/hw/sd/trace-events
+> +++ b/hw/sd/trace-events
+> @@ -62,3 +62,13 @@ milkymist_memcard_memory_write(uint32_t addr, uint32_t=
+ value) "addr 0x%08x value
+>  # pxa2xx_mmci.c
+>  pxa2xx_mmci_read(uint8_t size, uint32_t addr, uint32_t value) "size %d a=
+ddr 0x%02x value 0x%08x"
+>  pxa2xx_mmci_write(uint8_t size, uint32_t addr, uint32_t value) "size %d =
+addr 0x%02x value 0x%08x"
+> +
+> +# pl181.c
+> +pl181_command_send(uint8_t cmd, uint32_t arg) "sending CMD%02d arg 0x%08=
+" PRIx32
+> +pl181_command_sent(void) "command sent"
+> +pl181_command_response_pending(void) "response received"
+> +pl181_command_timeout(void) "command timeouted"
+> +pl181_fifo_push(uint32_t data) "FIFO push 0x%08" PRIx32
+> +pl181_fifo_pop(uint32_t data) "FIFO pop 0x%08" PRIx32
+> +pl181_fifo_transfer_complete(void) "FIFO transfer complete"
+> +pl181_data_engine_idle(void) "data engine idle"
+> --
+> 2.21.3
+>
+>
 
