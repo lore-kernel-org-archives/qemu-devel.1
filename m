@@ -2,84 +2,100 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE884C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C57DAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:27:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A84E720739
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:25:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9095D20739
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:27:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="QwLS5Mh8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A84E720739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=cl.cam.ac.uk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSrgfnp+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9095D20739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsOJ8-0005UY-LC
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:25:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58272)
+	id 1jsOLk-000074-Qb
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:27:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
- id 1jsOHN-0003O5-Qe; Mon, 06 Jul 2020 06:23:17 -0400
-Received: from ppsw-32.csi.cam.ac.uk ([131.111.8.132]:37740)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
- id 1jsOHL-00073c-26; Mon, 06 Jul 2020 06:23:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
- s=20180806.ppsw;
- h=Sender:Content-Transfer-Encoding:Content-Type:Cc:To:
- Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Reply-To:
- Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
- Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
- List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=CV14eKLNAeAzlJkwjnWkbyhiRKz8m9XvLDvFxgC1l98=; b=QwLS5Mh87UKJ7BAEKqcLgPxKyM
- O0YUcZVSFtkAU+wvikQrL2WEUHwU+KcTIkmFQr2DuUKSLNDDQOjbim4FJK5RHIpRzBw6f8Eb48aTr
- ywH1+JvcqH+GoOKqMAY7Dlqqnky+mIT1P0IM60j2t+Sa2If02QzJlmPIyf4uorHZJFR4=;
-X-Cam-AntiVirus: no malware found
-X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
-Received: from mail-io1-f41.google.com ([209.85.166.41]:36110)
- by ppsw-32.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.156]:587)
- with esmtpsa (PLAIN:alr48) (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- id 1jsOHF-000F7J-35 (Exim 4.94)
- (return-path <alr48@hermes.cam.ac.uk>); Mon, 06 Jul 2020 11:23:10 +0100
-Received: by mail-io1-f41.google.com with SMTP id y2so38749522ioy.3;
- Mon, 06 Jul 2020 03:23:09 -0700 (PDT)
-X-Gm-Message-State: AOAM530Dr4jtze/PORklJOEh3+olUSMGiPrpnyM/xHE0JRI70YUbg++I
- JdV3Oy/GVa73mJ7GUgfJYNjEPNJoGGma0M6InPk=
-X-Google-Smtp-Source: ABdhPJwiCTOCipz0b/eeOxADDgjJiu37q8JnZVwmCTdKGpiauFCW9uDp+r1ODGUiBE8Yl1Hp/oNiYxv6tVHJybP5D9I=
-X-Received: by 2002:a5e:cb42:: with SMTP id h2mr24283572iok.43.1594030988870; 
- Mon, 06 Jul 2020 03:23:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsO8H-0002cZ-Lx
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:13:55 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54717)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsO8F-0005Xq-W9
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:13:53 -0400
+Received: by mail-wm1-x342.google.com with SMTP id o8so38604653wmh.4
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 03:13:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9SqWFVrzUfCxpWPdQsQSQdUU0ZuLBS9kb6eOSzr3lFg=;
+ b=JSrgfnp+MOSdnvNPllB6emVuPYsFiOMqlR+FHnrrv5rXT+bicgp/lEKab4p/v8sFmP
+ yGSrjG+9844nppaHxxfp7RboNYjiZglAPr3X7QKTa8FGlP5IJgGtBSvtjtxfSGMITqW7
+ 2eu9fjEpry9MFH/WCUla1DoPuUVCCt9lfBIrKkjAvzmPhKOuZLzK/I4ZHcfdy/LhiWh6
+ uuV4EOaHo0UqVldhSzcl15scZjcWn2pT0rYiKVWN6rCYT/GcRaBN2bvorDb1+L7ARFTa
+ BLyi0Fvp+GfSEZz9URQNG7lFDk1DoVKlkDaxxU1GAy+AmqNvzEzii5OdjkgU07nhHqdT
+ J2fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9SqWFVrzUfCxpWPdQsQSQdUU0ZuLBS9kb6eOSzr3lFg=;
+ b=Z8aoNp3qSCWk4gP3M9wAwYlAw095d/R3xjU4z4bpa4NE9qQm5EOBjGKN478C5QWKz8
+ M4zF9Srmjc4pIBn+GnO1Ypbn4Z4HOyfv/ygcYdgnNcjPfyiYsrNlz5dZj3f1la4EjYat
+ C229kfK03xEuaXMFiqyW117fCjv5XCv+JuO9/OjnEuyRhYuoC+2Z9cHg+X/Wr2s4jVIz
+ Vn0M+eXhYrQmvbtJ41jULEHlhzQ+5Senov07Zhk7Sr+QBdTj7Jc0Xzgt8n5MTbQ4V0dT
+ 90qtUAKi/DIThMAiRbRGLKbbfZ5rlw4sgNeik8PtEjtYwEq9ntireudFWJCMpfSGzSOm
+ 6KAg==
+X-Gm-Message-State: AOAM533Kc8CNRg6z/mUC1Tz20cMhlOUk3Dqswt+si/Rn3sIxLp0GRW8j
+ 2qvlign95bRFnkfdT5Xu7AI=
+X-Google-Smtp-Source: ABdhPJykzzHeJ2VnqBzYnU0XJnVZrHdQPaUOAEnqDOWE319ijS+hLqBFz0/FGnw6XO+xvqf8hpJySw==
+X-Received: by 2002:a7b:ca59:: with SMTP id m25mr51391509wml.151.1594030430053; 
+ Mon, 06 Jul 2020 03:13:50 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id v11sm60962418wmb.3.2020.07.06.03.13.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jul 2020 03:13:49 -0700 (PDT)
+Subject: Re: [PULL 36/37] qdev: remove QDEV_PROP_PTR
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>
+References: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
+ <20200107150442.1727958-37-marcandre.lureau@redhat.com>
+ <13c91f97-a7e6-adbd-9c23-2464f2b1b46e@amsat.org>
+ <CAMxuvaxx0bM5yhZcmc7LPmpMt-qvuB+zjhRR1mpUiNm=DyasoQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9b2cfb05-ce65-7356-fe78-718e39138093@amsat.org>
+Date: Mon, 6 Jul 2020 12:13:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200703161515.25966-1-Alexander.Richardson@cl.cam.ac.uk>
- <013da4b5-be9e-aeae-5e88-82188a26d4bf@amsat.org>
-In-Reply-To: <013da4b5-be9e-aeae-5e88-82188a26d4bf@amsat.org>
-From: Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>
-Date: Mon, 6 Jul 2020 11:22:51 +0100
-X-Gmail-Original-Message-ID: <CAEeofcjJjAffMTg+cj5Y+HUZ9+bfkKMtKQRXMdk6FQgm-45KWQ@mail.gmail.com>
-Message-ID: <CAEeofcjJjAffMTg+cj5Y+HUZ9+bfkKMtKQRXMdk6FQgm-45KWQ@mail.gmail.com>
-Subject: Re: [PATCH] Fix MIPS add.s after
- 1ace099f2acb952eaaef0ba7725879949a7e4406
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=131.111.8.132;
- envelope-from=alr48@hermes.cam.ac.uk; helo=ppsw-32.csi.cam.ac.uk
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 06:23:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAMxuvaxx0bM5yhZcmc7LPmpMt-qvuB+zjhRR1mpUiNm=DyasoQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,66 +108,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+On 7/6/20 12:01 PM, Marc-André Lureau wrote:
+> Hi
+> 
+> On Mon, Jul 6, 2020 at 12:44 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> On 1/7/20 4:04 PM, Marc-André Lureau wrote:
+>>> No longer used in the tree. The comment about user_creatable is still
+>>> quite relevant, but there is already a similar comment in qdev-core.h.
+>>>
+>>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  include/hw/qdev-properties.h | 22 ----------------------
+>>>  hw/core/qdev-properties.c    | 18 ------------------
+>>>  2 files changed, 40 deletions(-)
+>>>
+>>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+>>> index 16837ab5dd..a90a9cec80 100644
+>>> --- a/include/hw/qdev-properties.h
+>>> +++ b/include/hw/qdev-properties.h
+>>> @@ -18,7 +18,6 @@ extern const PropertyInfo qdev_prop_size;
+>>>  extern const PropertyInfo qdev_prop_string;
+>>>  extern const PropertyInfo qdev_prop_chr;
+>>>  extern const PropertyInfo qdev_prop_tpm;
+>>> -extern const PropertyInfo qdev_prop_ptr;
+>>>  extern const PropertyInfo qdev_prop_macaddr;
+>>>  extern const PropertyInfo qdev_prop_on_off_auto;
+>>>  extern const PropertyInfo qdev_prop_losttickpolicy;
+>>> @@ -171,25 +170,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+>>>  #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+>>>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
+>>>
+>>> -/*
+>>> - * Please avoid pointer properties.  If you must use them, you must
+>>> - * cover them in their device's class init function as follows:
+>>> - *
+>>> - * - If the property must be set, the device cannot be used with
+>>> - *   device_add, so add code like this:
+>>> - *   |* Reason: pointer property "NAME-OF-YOUR-PROP" *|
+>>> - *   DeviceClass *dc = DEVICE_CLASS(class);
+>>> - *   dc->user_creatable = false;
+>>> - *
+>>> - * - If the property may safely remain null, document it like this:
+>>> - *   |*
+>>> - *    * Note: pointer property "interrupt_vector" may remain null, thus
+>>> - *    * no need for dc->user_creatable = false;
+>>> - *    *|
+>>> - */
+>>> -#define DEFINE_PROP_PTR(_n, _s, _f)             \
+>>> -    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, void*)
+>>
+>> So the replacement is DEFINE_PROP_LINK()? It is not documented, but
+>> it takes a TYPENAME argument, so I assume we can only LINK QOM types.
+>> Can the documentation be improved?
+> 
+> Certainly, although we already have some documentation in
+> object_property_add_link(). It's annoying that we have several places
+> documenting similar/close API, or API docs in docs/ that quickly
+> becomes outdated, or more difficult to find. Root of the issue is that
+> there are at least 3 ways to add props: object_{,class}_property &
+> QDEV_PROPS ...
+> 
+>> Yet another sneaky way to force forks to either update to QOM or die...
+> 
+> You can't blame upstream from doing cleanups and modernization, or
+> stagnating. Forks are forks, with all the pain they carry. If they
+> want to avoid the maintenance cost, they have to do the extra effort
+> to get it upstream. This is also a "sneaky way" to remind them that
+> effort is better spent in this direction.
 
-On Fri, 3 Jul 2020 at 19:40, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->
-> Hi Alex,
->
-> On 7/3/20 6:15 PM, Alex Richardson wrote:
-> > After merging latest QEMU upstream into our CHERI fork, I noticed that
-> > some of the FPU tests in our MIPS baremetal testsuite
->
-> I understand by baremetal your soft core implementation running on
-> a FPGA, right?
->
-By baremetal I mean small test binaries running without a host OS.
-The test suite was originally written for the CHERI FPGAs, but it also
-supports various MIPS simulators, our executable formal model written
-in sail and our fork of QEMU (https://github.com/CTSRD-CHERI/qemu).
-Unfortunately it cannot be run with upstream QEMU as it requires a
-special MTC0 instruction to dump register values in a textual format
-to the logfile.
+I totally understand, but at the same time we are excluding hobbyist
+contributors with mainstream exigency.
 
-> > (https://github.com/CTSRD-CHERI/cheritest) started failing. It turns ou=
-t
-> > this commit accidentally changed add.s into a subtract.
->
-> Fixes: 1ace099f2a ("target/mips: fpu: Demacro ADD.<D|S|PS>")
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> Thanks for your quick fix!
->
-> Phil.
->
-> > Signed-off-by: Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
-> > ---
-> >  target/mips/fpu_helper.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-> > index 7a3a61cab3..56beda49d8 100644
-> > --- a/target/mips/fpu_helper.c
-> > +++ b/target/mips/fpu_helper.c
-> > @@ -1221,7 +1221,7 @@ uint32_t helper_float_add_s(CPUMIPSState *env,
-> >  {
-> >      uint32_t wt2;
-> >
-> > -    wt2 =3D float32_sub(fst0, fst1, &env->active_fpu.fp_status);
-> > +    wt2 =3D float32_add(fst0, fst1, &env->active_fpu.fp_status);
-> >      update_fcr31(env, GETPC());
-> >      return wt2;
-> >  }
-> >
->
+This is unfortunate. I'd like to suggest ideas how to keep the QEMU
+project open to non-corporate contributors, but I don't have any.
+
+Well, maybe this one: better document API changes, if possible with
+examples (example can be as simple as pointing to a particular commit
+sha1). At least for each release, because forks usually try to rebase
+after releases.
+
+> 
+>>> -
+>>>  #define DEFINE_PROP_CHR(_n, _s, _f)             \
+>>>      DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
+>>>  #define DEFINE_PROP_STRING(_n, _s, _f)             \
+>>> @@ -262,8 +242,6 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
+>>>  void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
+>>>                             const uint8_t *value);
+>>>  void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
+>>> -/* FIXME: Remove opaque pointer properties.  */
+>>> -void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
+>>>
+>>>  void qdev_prop_register_global(GlobalProperty *prop);
+>>>  int qdev_prop_check_globals(void);
+>>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>>> index ac28890e5a..6ca7697599 100644
+>>> --- a/hw/core/qdev-properties.c
+>>> +++ b/hw/core/qdev-properties.c
+>>> @@ -501,13 +501,6 @@ const PropertyInfo qdev_prop_string = {
+>>>      .set   = set_string,
+>>>  };
+>>>
+>>> -/* --- pointer --- */
+>>> -
+>>> -/* Not a proper property, just for dirty hacks.  TODO Remove it!  */
+>>> -const PropertyInfo qdev_prop_ptr = {
+>>> -    .name  = "ptr",
+>>> -};
+>>> -
+>>>  /* --- mac address --- */
+>>>
+>>>  /*
+>>> @@ -1165,17 +1158,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value)
+>>>                              name, &error_abort);
+>>>  }
+>>>
+>>> -void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
+>>> -{
+>>> -    Property *prop;
+>>> -    void **ptr;
+>>> -
+>>> -    prop = qdev_prop_find(dev, name);
+>>> -    assert(prop && prop->info == &qdev_prop_ptr);
+>>> -    ptr = qdev_get_prop_ptr(dev, prop);
+>>> -    *ptr = value;
+>>> -}
+>>> -
+>>>  static GPtrArray *global_props(void)
+>>>  {
+>>>      static GPtrArray *gp;
+>>>
+>>
+> 
+> 
 
