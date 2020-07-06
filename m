@@ -2,81 +2,88 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A2EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:37:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F929C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:38:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D453206CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:37:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E273D206CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 16:38:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="PpMqwGfn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D453206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=posteo.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNFMlh4/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E273D206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsU7f-0005X4-CS
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:37:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55602)
+	id 1jsU8Q-0006ZO-7d
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 12:38:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <th.huth@posteo.de>) id 1jsU6T-0003lt-MG
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:36:25 -0400
-Received: from mout01.posteo.de ([185.67.36.65]:60246)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <th.huth@posteo.de>) id 1jsU6R-00024f-Cw
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:36:25 -0400
-Received: from submission (posteo.de [89.146.220.130]) 
- by mout01.posteo.de (Postfix) with ESMTPS id 9896216005F
- for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 18:36:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.de; s=2017;
- t=1594053379; bh=s7Rg5HQ8oSF9KLtnOC2CgU2rXrXgIf3IGIs3WnXIoyw=;
- h=Subject:To:Cc:From:Date:From;
- b=PpMqwGfnS2xpBbgXKNo/gWHIahem5lSbxsKOjXq4zw2/AE/Q6ogsXYhS/c/W0+b9t
- j3R3wys55dGLiX6UHUGBaz8ciu2X9t+/Qno5XvSlqHkTmM7qN6ZnR9Vi99tE052/jo
- WeqrbDCckP/1D4mQfik0w/ml2GnZP8vTsmt2oU+AiKM246onlSYbjyM/wpg6MrYfSm
- 4hDOMzeXsylOQJAaXeAN1R8MYbSl0fAuwhLiL56YHFfoANtB3T38l7CYyhdeAzP4ws
- Z3aZ93oxhAECRvDatqNfOzUewzY9PWwvZmQPFLHRwlQNTsmDUuLLiEJ5S8XwidFjSb
- Q+6rrExkeQlIg==
-Received: from customer (localhost [127.0.0.1])
- by submission (posteo.de) with ESMTPSA id 4B0rmb52hzz6tmG;
- Mon,  6 Jul 2020 18:36:15 +0200 (CEST)
-Subject: Re: [PATCH rc6 22/30] target/avr: Register AVR support with the rest
- of QEMU
-To: Eric Blake <eblake@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
- qemu-devel@nongnu.org, Michael Rolnik <mrolnik@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Richard Henderson <rth@twiddle.net>
-References: <20200705140315.260514-1-huth@tuxfamily.org>
- <20200705140315.260514-23-huth@tuxfamily.org>
- <257c315e-687f-0c29-9f6a-eeb0702e64a1@redhat.com>
-From: Thomas Huth <th.huth@posteo.de>
-Message-ID: <8b9c8b19-b162-ed79-f795-e7d702b7f860@posteo.de>
-Date: Mon, 6 Jul 2020 18:36:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsU7V-0005X5-Bl; Mon, 06 Jul 2020 12:37:29 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39989)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsU7T-0002AR-NJ; Mon, 06 Jul 2020 12:37:29 -0400
+Received: by mail-il1-x143.google.com with SMTP id e18so22738885ilr.7;
+ Mon, 06 Jul 2020 09:37:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=gUa/JAequ5IOqanfZzjwe7iEx/8B4O6WJ7E2KVpYgKc=;
+ b=GNFMlh4/llPGqic0xnoM+u3q+H/vXIj80H2Lyck23QC2borcKGqxnQze4wwpxW0bv2
+ Jno8bRQsCim2lV8QgIrJ/KyA+7UdOEGZnUDt5TbMbENY7/JempE8lNA74CyQMOAH1+yU
+ xtZ/UcVGUCFvlJ1+QjD0Ztz0RHMkMa3/sW13+i0c/hdvuuRPCjvwhhUxQwDCHl4J1oN7
+ K+ahdUPvIHnEgfEEYw0tx2ek0itPAh4oSJQCXYYEjaJvoyjIdeOwX3ElYWl0OpD0LmDZ
+ aNUej1qzFnvvlBwlMjT8LImsVYK4I7x7oMGgEBp9S+Cf/MH4sr1IA+eStjS7OHJQVzrg
+ hlsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=gUa/JAequ5IOqanfZzjwe7iEx/8B4O6WJ7E2KVpYgKc=;
+ b=GGjU41DEI6HradF0QwIQ/Uj51hd+ab4cQi9lKH+Er52MBNz8stJmrTtcIfrQMqDMhC
+ Kxoy+p+8lxhyTga6imFgbk2mEdd9V0HoMkBx602t6ITNxp28j6yux8FtHShlxWOmBZ48
+ U9NhNfBi85z3j97aqnfA+05Lx2dEP8rjfonPlWeigAA/i7YJaumTQUkYOtJNIksVtBAn
+ G2WbN8m9UydlTKaM6H7wAx9x2jUdZ/rUZWD7gpEWjlvs7cJn5btUvr/rtcc5T8wU4C+b
+ GUQLbW2b7lmmMvl9zvTQR1NcJVmeDVaySBCbrGh3j/jy9G5ld9m6Wtn4wbCgwHPKIT+Q
+ ZMrA==
+X-Gm-Message-State: AOAM530C+dcxeZhYjfPgM2d7+KAFtR8rgVp/ATfm/LxOS0/0EjbFd1pS
+ AtnlOQ/H/21y3Cts7G8XyLPIabIeUy4B+usuHFPAgtNO
+X-Google-Smtp-Source: ABdhPJzCWYErNKhtLyQYqRHLcYxzZZg7PCRyk6WbfeM2A8lD/Mpyhxguk7UVN+YsUOsdEzSnhtvBTxI2ahx4PLseIX0=
+X-Received: by 2002:a92:bb84:: with SMTP id x4mr32098391ilk.177.1594053446396; 
+ Mon, 06 Jul 2020 09:37:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <257c315e-687f-0c29-9f6a-eeb0702e64a1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=185.67.36.65; envelope-from=th.huth@posteo.de;
- helo=mout01.posteo.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 12:36:20
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+References: <20200630133912.9428-1-f4bug@amsat.org>
+ <20200630133912.9428-7-f4bug@amsat.org>
+In-Reply-To: <20200630133912.9428-7-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 6 Jul 2020 09:27:36 -0700
+Message-ID: <CAKmqyKN6h1BWaD3kryxkAHDGwsiMbJoLWTckZ+borPbOCQeMyg@mail.gmail.com>
+Subject: Re: [PATCH v7 06/17] hw/sd/sdcard: Restrict Class 6 commands to SCSD
+ cards
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,42 +96,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/07/2020 16.56, Eric Blake wrote:
-> On 7/5/20 9:03 AM, Thomas Huth wrote:
->> From: Michael Rolnik <mrolnik@gmail.com>
->>
->> Add AVR related definitions into QEMU.
->>
->> [AM: Remove word 'Atmel' from filenames and all elements of code]
->> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
->> ---
-> 
->> +++ b/qapi/machine.json
->> @@ -25,7 +25,7 @@
->>   # Since: 3.0
->>   ##
-> 
-> Missing a line that resembles:
-> 
-> # @avr since 5.1
+On Tue, Jun 30, 2020 at 6:44 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> Only SCSD cards support Class 6 (Block Oriented Write Protection)
+> commands.
+>
+>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+>
+>   4.3.14 Command Functional Difference in Card Capacity Types
+>
+>   * Write Protected Group
+>
+>   SDHC and SDXC do not support write-protected groups. Issuing
+>   CMD28, CMD29 and CMD30 generates the ILLEGAL_COMMAND error.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-I thought that we stopped doing that ... but apparently, my memory was
-wrong and this was only about the "dropped" statements (see commit id
-bb5ccf225e81d2).
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Ok, I can add that again (though it's somewhat strange that we removed
-the "dropped" statements but still keep the "since" statements...?)
+Alistair
 
- Thomas
+> ---
+>  hw/sd/sd.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 7e0d684aca..871c30a67f 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -922,6 +922,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, =
+SDRequest req)
+>          sd->multi_blk_cnt =3D 0;
+>      }
+>
+> +    if (sd_cmd_class[req.cmd] =3D=3D 6 && FIELD_EX32(sd->ocr, OCR, CARD_=
+CAPACITY)) {
+> +        /* Only Standard Capacity cards support class 6 commands */
+> +        return sd_illegal;
+> +    }
+> +
+>      switch (req.cmd) {
+>      /* Basic commands (Class 0 and Class 1) */
+>      case 0:    /* CMD0:   GO_IDLE_STATE */
+> --
+> 2.21.3
+>
+>
 
