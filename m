@@ -2,70 +2,91 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 673E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D433C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:37:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39B422070B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:35:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B422070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4906F20724
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:37:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbtbYnSY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4906F20724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsLf6-0002k2-GN
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 03:35:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48680)
+	id 1jsLgt-0003p8-It
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 03:37:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsLe6-0001bf-1S
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 03:34:34 -0400
-Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:56595)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsLe3-0005Xx-U5
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 03:34:33 -0400
-Received: from player779.ha.ovh.net (unknown [10.110.103.112])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id D3949144ACB
- for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 09:34:21 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player779.ha.ovh.net (Postfix) with ESMTPSA id 78455140A9E7C;
- Mon,  6 Jul 2020 07:34:13 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-95G0014494c1af-d210-4b67-90d6-1f3790b67fed,C4ABCEF356A601883B7DEB1AA4190402CFF29AFD)
- smtp.auth=groug@kaod.org
-Date: Mon, 6 Jul 2020 09:34:12 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v4 00/11] Add several Power ISA 3.1 32/64-bit vector
- instructions
-Message-ID: <20200706093412.51d3e514@bahia.lan>
-In-Reply-To: <20200705091046.GE12576@umbus.fritz.box>
-References: <20200701234344.91843-1-ljp@linux.ibm.com>
- <20200705091046.GE12576@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsLgH-0003OX-OD
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 03:36:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32366
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsLgE-0006Az-OA
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 03:36:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594021005;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=N0niEkmlHZxu3AUFQIuBOHU5EczKvQ63r4BHscBfqK0=;
+ b=SbtbYnSYScHXedQ3CvmBtuR5kNGtOkK2uZZ07VmgnefWJaWfWQKdi3s9ZvpqYtcLOHk7KL
+ l6mkUuqU9ii7LEDfT5zOUoBa50avEg8+er7sD32s/ATbjpTECiPYMOsGqNutG1mVhpEUJ8
+ uxhLOODOsLfyDYgPzsqNtgJVW9SF8EU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-hZQwsm-9PK-vO7MlSjKeuA-1; Mon, 06 Jul 2020 03:36:43 -0400
+X-MC-Unique: hZQwsm-9PK-vO7MlSjKeuA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B48E800406;
+ Mon,  6 Jul 2020 07:36:42 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-144.ams2.redhat.com [10.36.112.144])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C459275E34;
+ Mon,  6 Jul 2020 07:36:41 +0000 (UTC)
+Subject: Re: [PULL 5/6] hw/m68k/mcf5206: Replace remaining hw_error()s by
+ qemu_log_mask()
+From: Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200706072835.23582-1-thuth@redhat.com>
+ <20200706072835.23582-6-thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9b84407f-cf8d-b733-6db1-0c50c9a0f33f@redhat.com>
+Date: Mon, 6 Jul 2020 09:36:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/X4wOqI4iMears9J0O04IOVW";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 15275365514807056870
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -51
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddvgdduvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegoufhushhpvggtthffohhmrghinhculdegledmnecujfgurhepfffhvffukfgjfhfogggtsehgtderreertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejjeffgfeitdegtdehudeuudeitedtlefguddugfeujeejleeufeektdehheetgfenucffohhmrghinhepihgsmhdrtghomhdpsghogidrtghomhenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=46.105.44.159; envelope-from=groug@kaod.org;
- helo=7.mo173.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 03:34:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200706072835.23582-6-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="xeNciyHMzf6BcDqjJhLV21D9RRlRg1qqr"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:52:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,83 +99,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, richard.henderson@linaro.org,
- Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/X4wOqI4iMears9J0O04IOVW
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xeNciyHMzf6BcDqjJhLV21D9RRlRg1qqr
+Content-Type: multipart/mixed; boundary="CEXXI7mmX1TAfLdm0muBnqZCSTPX4OzrZ";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
+Message-ID: <9b84407f-cf8d-b733-6db1-0c50c9a0f33f@redhat.com>
+Subject: Re: [PULL 5/6] hw/m68k/mcf5206: Replace remaining hw_error()s by
+ qemu_log_mask()
+References: <20200706072835.23582-1-thuth@redhat.com>
+ <20200706072835.23582-6-thuth@redhat.com>
+In-Reply-To: <20200706072835.23582-6-thuth@redhat.com>
+
+--CEXXI7mmX1TAfLdm0muBnqZCSTPX4OzrZ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, 5 Jul 2020 19:10:46 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Wed, Jul 01, 2020 at 06:43:35PM -0500, Lijun Pan wrote:
-> > This patch series add several newly introduced 32/64-bit vector
-> > instructions in Power ISA 3.1. Power ISA 3.1 flag is introduced in
-> > this version. In v4 version, coding style issues are fixed, community
-> > reviews/suggestions are taken into consideration.
+On 06/07/2020 09.28, Thomas Huth wrote:
+> From: Thomas Huth <huth@tuxfamily.org>
 >=20
-> So, is the ISA 3.1 document available somewhere?
+> hw_error() dumps the CPU state and exits QEMU. This is ok during initial
+> code development (to see where the guest code is currently executing),
+> but it is certainly not the desired behavior that we want to present to
+> normal users, and it can also cause trouble when e.g. fuzzing devices.
+> Thus let's replace these hw_error()s by qemu_log_mask()s instead.
 >=20
+> Message-Id: <20200611055807.15921-1-huth@tuxfamily.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Thomas Huth <thuth@tuxfamily.org>
 
-In https://www-355.ibm.com/systems/power/openpower/ there's a link to
-the PDF:
+I just noticed that I had a typo in my e-mail address here :-(
 
-https://ibm.ent.box.com/s/hhjfw0x0lrbtyzmiaffnbxh2fuo0fog0
+Peter, FYI, I fixed it and pushed the same tag (pull-request-2020-07-06)
+again, latest commit ID is now 8c4329214f1d4484205e6f7c48e98ff26969eb56.
 
-> >=20
-> > Lijun Pan (11):
-> >   target/ppc: Introduce Power ISA 3.1 flag
-> >   target/ppc: Enable Power ISA 3.1
-> >   target/ppc: add byte-reverse br[dwh] instructions
-> >   target/ppc: convert vmuluwm to tcg_gen_gvec_mul
-> >   target/ppc: add vmulld instruction
-> >   Update PowerPC AT_HWCAP2 definition
-> >   target/ppc: add vmulld to INDEX_op_mul_vec case
-> >   target/ppc: add vmulh{su}w instructions
-> >   fix the prototype of muls64/mulu64
-> >   target/ppc: add vmulh{su}d instructions
-> >   target/ppc: add vdiv{su}{wd} vmod{su}{wd} instructions
-> >=20
-> >  include/elf.h                       |  1 +
-> >  include/qemu/host-utils.h           |  4 +-
-> >  target/ppc/cpu.h                    |  4 +-
-> >  target/ppc/helper.h                 | 13 ++++-
-> >  target/ppc/int_helper.c             | 75 ++++++++++++++++++++++++-----
-> >  target/ppc/translate.c              | 43 +++++++++++++++++
-> >  target/ppc/translate/vmx-impl.inc.c | 26 +++++++++-
-> >  target/ppc/translate/vmx-ops.inc.c  | 27 +++++++++--
-> >  target/ppc/translate_init.inc.c     |  2 +-
-> >  tcg/ppc/tcg-target.h                |  2 +
-> >  tcg/ppc/tcg-target.inc.c            | 12 ++++-
-> >  11 files changed, 184 insertions(+), 25 deletions(-)
-> >=20
->=20
+Sorry for the inconvenience.
+
+ Thomas
 
 
---Sig_/X4wOqI4iMears9J0O04IOVW
-Content-Type: application/pgp-signature
+--CEXXI7mmX1TAfLdm0muBnqZCSTPX4OzrZ--
+
+--xeNciyHMzf6BcDqjJhLV21D9RRlRg1qqr
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl8C0/QACgkQcdTV5YIv
-c9ZhbQ//fHBDAO+rrYhMrlQw8jnr9n1zen7EPnwpQ17XmK3sNKrzs50Q2dNkCvPL
-YfDKjzvmgD0LeTuNvZmv8m2btoUOJBagQj8lTxH54RXtNlxVbrSHKyP+u/cO/HxK
-NZW8fUJIhMtTEtGSYGHn6OsugyTzlJjpi8AIK9sfJ4yQudkeLDkjvtWW23iGtMth
-y5FW56F3Do5lJ3fKrEVChnoM5wBxpiAD1+bGcN4aTs9snT/pqqQ3km7TKgPmyjWd
-o7cUcFnH+K8xuR9bAMDE2t+g0h89l89C/z4XG2CD8Y9DYWt9VDioLv5uEhLpawIT
-qm+vVp6x8lSv0cttl8xYXTR29aQYs9bmx8uZ5f91gy8v7GPtfg7sOSOx8IYQSfIE
-NIQe4fsgq/UO1bsg8yJ9SAy28jJyY/leGWxL5Ct3GyXGqyXVKpY8v1gN6IIlLKPv
-t2bjqFjvdQHhSKt9nWgtXznKK45dULit2jG2WsvbHtKtAbMNPs+zTfSW26sVEuWm
-S3/5YgVj6NCstOjymy2jEcRv3Y6FQkTySM7+B8S1PPD2njQ5W5nObcXFw72R4/Cw
-C0wssWKJ4LGJM0fs6vmuqr7smAACIBaR3H/3rh1fxXnia5SVM2jyQSSu4CqXGdvT
-48r6kwy5SRxdh/dCdbSZa+4kM2oEtDQdJFQNlxm7aZ14iPlV1Jk=
-=usUA
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl8C1IcACgkQLtnXdP5w
+LbUo3BAAlE46Gv4SO4L6YymKvQLRlSiJL4cUIRHN9FXGMOxJJEjetNTkm5BSVPU+
+V2wvYGViuP3tXP1i5tuJB2z4UlmWe0xgeUvG00Oxad/UQEKEVKurpMVD1F9HKj/a
+LbxbI0a8s+eTdoXQdz3Dfa6m0r6sbJXy0G5qbK/JO7QlEsIBPOR37sEB1J+c/GLQ
+cjJMXuhkL6rtF0XS8G4sn5thU6tjwTklD5zEBQlP9PCXprZCO4RzyfGom7HeybLG
+Su7jwT4sMzqFcIFWHZ+D2Y6jZF7O1rHpG9TuHrFBBPPFZZ1SXM4rcO+KSoM2bVrA
+eMsHuK6BwK8yggE6F5o6Ia0VLYn4KrwsgBRM73Ck0+nsZLygxi3xTh0hz5MB8jRF
+878L9X2VYfLg9v7Atn3YJf6T6Lc3ZQtJfK+ccTavc4c9duBNO4vqAbXTEGMLSs6r
+9UmdAa9w67DtNB13rDHyrbUszPAjiQdTT8TvqHGW64/F+ZBa0PGwJJjxJg2VlGIz
+vZXogRTIkPNJxmtYviFirhVf4U3XPuNviLfm3XjWtVAYtn9uR30pgAcsy1BcD1hM
+Yg+8ENmQwSNdDQWK6/FfF7oDDk7BoMRZPQZBqZ6srKhqLWexpN87CEzWbC6zUFMU
+fGaZ+t42UHp+dx0nmsaPV1cIsb9xxw0YYLHDlcCFBtaEAQR9TZI=
+=moEc
 -----END PGP SIGNATURE-----
 
---Sig_/X4wOqI4iMears9J0O04IOVW--
+--xeNciyHMzf6BcDqjJhLV21D9RRlRg1qqr--
+
 
