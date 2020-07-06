@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B23E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2D0C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:29:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 815FF2070C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:28:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B65C52070C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:29:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5emWhnv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 815FF2070C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MioVaGq1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65C52070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUuk-000385-RC
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:28:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33858)
+	id 1jsUvb-00044X-22
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:29:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUXt-0007qX-US; Mon, 06 Jul 2020 13:04:45 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38263)
+ id 1jsUVb-0002EQ-O7; Mon, 06 Jul 2020 13:02:23 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:44779)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUXs-0006wa-8f; Mon, 06 Jul 2020 13:04:45 -0400
-Received: by mail-io1-xd42.google.com with SMTP id f6so24558830ioj.5;
- Mon, 06 Jul 2020 10:04:43 -0700 (PDT)
+ id 1jsUVZ-0006a2-UJ; Mon, 06 Jul 2020 13:02:23 -0400
+Received: by mail-il1-x141.google.com with SMTP id h16so10189564ilj.11;
+ Mon, 06 Jul 2020 10:02:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=cTCiYJ1utsgT/OEA1JPToQ9e7sbkDVzau0vl+orbX5M=;
- b=Y5emWhnvg2wA6Hsc2mNKM91+PUECbIjNCVx4XijBRlwxhG9yPaVY4nCPuN66Pn/g4N
- jALw2uCbPtXPOhmyJkKBc45MnuJg6mxtGi3kWihcL0PytiWW/5DejqGp9pu1JW3N0B0L
- YJbqT9Ic/jycTAYWFiu+Rsh/qMuTBhTldv4DWUXGneSj8xYSSWACCuJie0v5fihIfGzM
- +FHYD1FVz9yVKlUzWPPpjP3O3le2SpOqqOzlb4GBTfB83H90A+bGP6q+3xoLfe4Nv+cq
- E6XH5NYuSvgxKJUs0XSM4FaA8Wd5kSisFNa8A9sD0zbO1Mx64e82B7/5rFnqrKTujNAu
- cLYg==
+ bh=SURriqbHZVXTTwsvXZaGt8gxbHhNclYTbkHoMvIQmpM=;
+ b=MioVaGq1jCalxgWYpPdotTkyVsAMeK/bshk85fNYAhYubO4nVFHSOeCUz0kSho8p9p
+ 6Y83qIJELSpr9VN9VFzq+lTIUscnBNyLwqUC24IyYDjx/4cG7EfaP2YEZc6BAomYyDpg
+ 4WJqsPVXOVt3XY2x1ZsaQLbg24wvg5Vy/7YqNFE+T3a7KXvhOx34JOs9fSXv1n/wrIC6
+ 8CzhLDbRxujPAE056QBW2Z/dWImCVitmNebYDtS6btqpo7FzR6vkHFi2ue676ojVEt9W
+ vkRi2J6vudadAMoruzF52cpovO1cMqBkDNoVdP47mEGcUSBlNOyPMoeOEOsRimXSU/ZU
+ vZxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=cTCiYJ1utsgT/OEA1JPToQ9e7sbkDVzau0vl+orbX5M=;
- b=nhrWnsYnbiVKzXw4zdFkvyjPTtZ5TjlyAjP8r1PpPVVMQvVP+60DkmITruvWJA1H44
- 9rrK5o7GVA0UXpjO0Kf//OlgyqwPm/mWE910pVy/ddgNBW3gs95ixMC+4Qv2vKGMCi0/
- sYJGSzfpIu6RArb9VlbXJFN7vOUV23xK6JMC/D5U0rIRdX1YbilaCBZJeOlJud2TPxNp
- 4vSLVPZXAquiGLXWOxqx8/XFDkDk0bqfT2HKGnFDmO3Q5FzXOJreKPmBPD0YF2ropRbR
- c79LGoag5zVQtDf9Onf9RffUN0MHC4HrEm9F6UaX61PA3i7fbJR71/NypTNuj+VUKBRi
- J6fA==
-X-Gm-Message-State: AOAM5315Jg7J6TnKzaAmXRniArtAV5bmDaqt6UQ47DniGAQZMFOaAFfV
- p3JxP35xn+7LYitGD38QqSf4j07pRU29kspmGqI=
-X-Google-Smtp-Source: ABdhPJwtinW+rIbee8onSzHAr9mGYnsnNGs22+9NC+YbC3w6hod1nvPLY3hYBjgn60PpMlBLwo7zj8UoDSitGwru4As=
-X-Received: by 2002:a5d:97d9:: with SMTP id k25mr26494073ios.42.1594055082487; 
- Mon, 06 Jul 2020 10:04:42 -0700 (PDT)
+ bh=SURriqbHZVXTTwsvXZaGt8gxbHhNclYTbkHoMvIQmpM=;
+ b=rU5wTaR/pZA9HUFdWbrwkwEN+hURz1bQPM5qUChxwkMWGvuJyvUNWugiOu1oFWO55Y
+ /G5uW1VoRTDpuzdkzcsbzLR4eW1hWHUuhOcxb5Ws1wkwPRGP/tEEqyqrtPthogP9Yd6a
+ t95DT8NQFgChR7Ev+/BTcRGqQD3NmzuOH00PH/Dm1sHNyFiG59uEcNW2br5LA1ogUxmv
+ gtji8PCpaekWSBsQUTqg8J6rpobs+zGjTyL9gi/KtwP/UCBlVC5aRgqZu7JNJ1jNchrQ
+ BRkqy6ktQ1BxJv21myCFWVJU6CzmlwIE00ei/luVq7/dFXFrWJRsqWyt9XrVib/TVej3
+ x06g==
+X-Gm-Message-State: AOAM533SVmsIgQ4JllIU0rX7ViKHnrgJLj7WToaN6ez7g+oT7pCIbcXi
+ HVF8Md/sRNjN/cVLnOKHohlVmw+YTVPsCKSUmRA=
+X-Google-Smtp-Source: ABdhPJw3irY14ekgg5HFZwY3uijUbo8j99jRr5i12obU9BK983EmEFW1tqXdt4MQ3PGmM1qTVFVUGr89GwGbxSSoFdg=
+X-Received: by 2002:a92:d186:: with SMTP id z6mr33254547ilz.227.1594054940213; 
+ Mon, 06 Jul 2020 10:02:20 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200704144943.18292-1-f4bug@amsat.org>
- <20200704144943.18292-8-f4bug@amsat.org>
-In-Reply-To: <20200704144943.18292-8-f4bug@amsat.org>
+ <20200704144943.18292-5-f4bug@amsat.org>
+In-Reply-To: <20200704144943.18292-5-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 6 Jul 2020 09:54:53 -0700
-Message-ID: <CAKmqyKMk272oxLgGJHQMmZk_7+Q7N=5uPxSUdEMq2-N8DbHrLg@mail.gmail.com>
-Subject: Re: [PATCH 07/26] hw/usb/hcd-dwc2: Restrict some headers to source
+Date: Mon, 6 Jul 2020 09:52:26 -0700
+Message-ID: <CAKmqyKMm2xhgxSqX5mHAkELfBnWhzqw-ruf3oATFvB8sohnw2w@mail.gmail.com>
+Subject: Re: [PATCH 04/26] hw/usb: Reduce 'exec/memory.h' inclusion
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -130,10 +130,8 @@ Sender: "Qemu-devel"
 On Sat, Jul 4, 2020 at 7:52 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 > wrote:
 >
-> The header "usb/hcd-dwc2.h" doesn't need to include "qemu/timer.h",
-> "sysemu/dma.h", "hw/irq.h" (the types required are forward declared).
-> Include them in the source file which is the only one requiring the
-> function declarations.
+> "exec/memory.h" is only required by "hw/usb/hcd-musb.h".
+> Include it there directly.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -142,42 +140,35 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/usb/hcd-dwc2.h | 3 ---
->  hw/usb/hcd-dwc2.c | 3 +++
->  2 files changed, 3 insertions(+), 3 deletions(-)
+>  include/hw/usb.h          | 1 -
+>  include/hw/usb/hcd-musb.h | 2 ++
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/usb/hcd-dwc2.h b/hw/usb/hcd-dwc2.h
-> index 4ba809a07b..2adf0f53c7 100644
-> --- a/hw/usb/hcd-dwc2.h
-> +++ b/hw/usb/hcd-dwc2.h
-> @@ -19,11 +19,8 @@
->  #ifndef HW_USB_DWC2_H
->  #define HW_USB_DWC2_H
+> diff --git a/include/hw/usb.h b/include/hw/usb.h
+> index 4f04a1a879..15b2ef300a 100644
+> --- a/include/hw/usb.h
+> +++ b/include/hw/usb.h
+> @@ -25,7 +25,6 @@
+>   * THE SOFTWARE.
+>   */
 >
-> -#include "qemu/timer.h"
-> -#include "hw/irq.h"
->  #include "hw/sysbus.h"
->  #include "hw/usb.h"
-> -#include "sysemu/dma.h"
+> -#include "exec/memory.h"
+>  #include "hw/qdev-core.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/queue.h"
+> diff --git a/include/hw/usb/hcd-musb.h b/include/hw/usb/hcd-musb.h
+> index c874b9f292..ec3ee5c4b0 100644
+> --- a/include/hw/usb/hcd-musb.h
+> +++ b/include/hw/usb/hcd-musb.h
+> @@ -13,6 +13,8 @@
+>  #ifndef HW_USB_MUSB_H
+>  #define HW_USB_MUSB_H
 >
->  #define DWC2_MMIO_SIZE      0x11000
->
-> diff --git a/hw/usb/hcd-dwc2.c b/hw/usb/hcd-dwc2.c
-> index 590e75b455..ccf05d0823 100644
-> --- a/hw/usb/hcd-dwc2.c
-> +++ b/hw/usb/hcd-dwc2.c
-> @@ -36,8 +36,11 @@
->  #include "qapi/error.h"
->  #include "hw/usb/dwc2-regs.h"
->  #include "hw/usb/hcd-dwc2.h"
-> +#include "hw/irq.h"
-> +#include "sysemu/dma.h"
->  #include "migration/vmstate.h"
->  #include "trace.h"
-> +#include "qemu/timer.h"
->  #include "qemu/log.h"
->  #include "hw/qdev-properties.h"
->
+> +#include "exec/memory.h"
+> +
+>  enum musb_irq_source_e {
+>      musb_irq_suspend =3D 0,
+>      musb_irq_resume,
 > --
 > 2.21.3
 >
