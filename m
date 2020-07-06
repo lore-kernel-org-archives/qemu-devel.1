@@ -2,103 +2,79 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66719C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 02:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E364C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 02:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 317C120724
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 02:00:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="isduqsbV";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="U/U3uzef"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 317C120724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 610A320737
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 02:51:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 610A320737
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsGQo-0007le-Cn
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 22:00:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46330)
+	id 1jsHEY-0003ys-KN
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jul 2020 22:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@aj.id.au>)
- id 1jsGQ9-0007Dv-A3; Sun, 05 Jul 2020 21:59:49 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51531)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@aj.id.au>)
- id 1jsGQ7-0004qS-Ij; Sun, 05 Jul 2020 21:59:49 -0400
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
- by mailout.nyi.internal (Postfix) with ESMTP id 1C8065C00CE;
- Sun,  5 Jul 2020 21:59:46 -0400 (EDT)
-Received: from imap2 ([10.202.2.52])
- by compute3.internal (MEProxy); Sun, 05 Jul 2020 21:59:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
- mime-version:message-id:in-reply-to:references:date:from:to:cc
- :subject:content-type; s=fm3; bh=rir9q1V4XSPi8pCPlUzHKUaVsOAm/gi
- h4cY+mHrLsao=; b=isduqsbVfFbh+Z0YLZL2+C9zPdRGGQU2MvWqOBRzm7vbgXE
- 0zG1ZyB7Xt5586K7pCBjgujrb7S20VKuwA1MLgT01KqGX1xeczyrooLEftWILC7S
- fM0BXEGTqRQ/fZiU6ejX9xVY/ifM1pwbbEGQcG9XduvRww9dFpzNtcRFzAA5i16s
- S3fCywCRR/3wZpZQm9r2qN9IIKfpkJ+2VfYAoSPxrK6yL0hqfBesw21QmA/Qnkvx
- dmOpzhtHUt3c19854Q2guGsf52/qmmy8h75AhWo6QLsa+C0WMiA6wk94fjtlzXVh
- +hD1Nd8yD+tg+mWgQp23J2RqxS/Bj5sYXsnjPHA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=rir9q1
- V4XSPi8pCPlUzHKUaVsOAm/gih4cY+mHrLsao=; b=U/U3uzefh+pL8+08CxZ/u/
- KAvNWp8Ani6KJDIq9si0noDsFP1OkviNhawfRWcH0g6orUnNQB4S2dAgIV9K2QgQ
- 19sSFLNEvLy2CNUgz2CYqSsErCRvHH/9Cq2iGBYXytr2jrmKrmG14tok4JNkGoGg
- fI21lxVbPe2KLnbcW6d7vopB2nIJGj5YxUKIXerEPLEjUL/APETVCG8w63ddaa6Q
- 9ba1IiSyrPL7WbNfbFIoQhxCm/um5uG0qhQtusb12rrs0//uWnrHlrauEkj+6SN1
- /OcZ9O56aa4pCrJfdpYLHlVDN35QIQca35M4NLdktS7DDa3tC1MXTYG9kIqkz5sg
- ==
-X-ME-Sender: <xms:kYUCX6fAxgiGrb_swiIarlXbhrc3ap0L1BkBX7niFpDILTLU_hYWXA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedruddvgdehtdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpedftehnughr
- vgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucggtffrrg
- htthgvrhhnpeehhfefkefgkeduveehffehieehudejfeejveejfedugfefuedtuedvhefh
- veeuffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
- grnhgurhgvfiesrghjrdhiugdrrghu
-X-ME-Proxy: <xmx:kYUCX0MtoAEeK7npK_jMDfN5s9dwCXJh1vKgdc2FBm55gjq8OtWyxg>
- <xmx:kYUCX7jPAWWnyu-sbFA4jiuvNPp67o0FoIfyZDH5HqIfULZTb-rIHw>
- <xmx:kYUCX38t6PT_kZIEruiz1pGwTVtmc1jXS_YKInGKZhTXooOGFFeScg>
- <xmx:koUCX6Kle_lxgrJIJwzE7J12Qe9mRmUp0gr4ZiTF-19U_8xaqYIlfw>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 0C925E00AA; Sun,  5 Jul 2020 21:59:45 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.3.0-dev0-576-gfe2cd66-fm-20200629.001-gfe2cd668
-Mime-Version: 1.0
-Message-Id: <df64d8de-9d7f-474b-8b72-5d2e6c7df1f4@www.fastmail.com>
-In-Reply-To: <20200628142658.29264-1-erik.lucas.smit@gmail.com>
-References: <20200628142658.29264-1-erik.lucas.smit@gmail.com>
-Date: Mon, 06 Jul 2020 11:29:24 +0930
-From: "Andrew Jeffery" <andrew@aj.id.au>
-To: erik-smit <erik.lucas.smit@gmail.com>
-Subject: Re: [PATCH v2] ftgmac100: fix dblac write test
-Content-Type: text/plain
-Received-SPF: pass client-ip=66.111.4.25; envelope-from=andrew@aj.id.au;
- helo=out1-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 21:59:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jsHDJ-00036h-5a
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 22:50:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54052)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jsHDG-0006RI-9k
+ for qemu-devel@nongnu.org; Sun, 05 Jul 2020 22:50:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jsHDE-0008W5-3i
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 02:50:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 173612E8072
+ for <qemu-devel@nongnu.org>; Mon,  6 Jul 2020 02:50:32 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Jul 2020 02:44:58 -0000
+From: Alexander Bulekov <1886362@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+Message-Id: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
+Subject: [Bug 1886362] [NEW] Heap use-after-free in lduw_he_p through
+ e1000e_write_to_rx_buffers
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a1c40782ceb40cbaf16cae6822f941c91f0d8619
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/05 22:50:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,34 +83,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Cameron Esfahani via <qemu-devel@nongnu.org>,
- "open list:ASPEED BMCs" <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Reply-To: Bug 1886362 <1886362@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
 
+Hello,
+This reproducer causes a heap-use-after free. QEMU Built with --enable-sani=
+tizers:
+cat << EOF | ./i386-softmmu/qemu-system-i386 -M q35,accel=3Dqtest \
+-qtest stdio -nographic -monitor none -serial none
+outl 0xcf8 0x80001010
+outl 0xcfc 0xe1020000
+outl 0xcf8 0x80001014
+outl 0xcf8 0x80001004
+outw 0xcfc 0x7
+outl 0xcf8 0x800010a2
+write 0xe102003b 0x1 0xff
+write 0xe1020103 0x1e 0xffffff055c5e5c30be4511d084fffffffffffffffffffffffff=
+fffffffff
+write 0xe1020420 0x4 0xffffffff
+write 0xe1020424 0x4 0xffffffff
+write 0xe102042b 0x1 0xff
+write 0xe1020430 0x4 0x055c5e5c
+write 0x5c041 0x1 0x04
+write 0x5c042 0x1 0x02
+write 0x5c043 0x1 0xe1
+write 0x5c048 0x1 0x8a
+write 0x5c04a 0x1 0x31
+write 0x5c04b 0x1 0xff
+write 0xe1020403 0x1 0xff
+EOF
 
-On Sun, 28 Jun 2020, at 23:56, erik-smit wrote:
-> The test of the write of the dblac register was testing the old value
-> instead of the new value. This would accept the write of an invalid value
-> but subsequently refuse any following valid writes.
-> 
-> Signed-off-by: erik-smit <erik.lucas.smit@gmail.com>
-> ---
-> Changes since v1:
-> 
-> Changed %ld to HWADDR_PRIx to fix building on mingw
+The Output:
+=3D=3D22689=3D=3DERROR: AddressSanitizer: heap-use-after-free on address 0x=
+62500026800e at pc 0x55b93bb18bfa bp 0x7fffdbe844f0 sp 0x7fffdbe83cb8
+READ of size 2 at 0x62500026800e thread T0
+    #0  in __asan_memcpy (/build/i386-softmmu/qemu-system-i386+)
+    #1  in lduw_he_p /include/qemu/bswap.h:332:5
+    #2  in ldn_he_p /include/qemu/bswap.h:550:1
+    #3  in flatview_write_continue /exec.c:3145:19
+    #4  in flatview_write /exec.c:3186:14
+    #5  in address_space_write /exec.c:3280:18
+    #6  in address_space_rw /exec.c:3290:16
+    #7  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+    #8  in dma_memory_rw /include/sysemu/dma.h:113:12
+    #9  in pci_dma_rw /include/hw/pci/pci.h:789:5
+    #10  in pci_dma_write /include/hw/pci/pci.h:802:12
+    #11  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+    #12  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+    #13  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+    #14  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+    #15  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+    #16  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+    #17  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+    #18  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+    #19  in e1000e_process_tx_desc /hw/net/e1000e_core.c:743:17
+    #20  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+    #21  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+    #22  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+    #23  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+    #24  in memory_region_write_accessor /memory.c:483:5
+    #25  in access_with_adjusted_size /memory.c:544:18
+    #26  in memory_region_dispatch_write /memory.c:1476:16
+    #27  in flatview_write_continue /exec.c:3146:23
+    #28  in flatview_write /exec.c:3186:14
+    #29  in address_space_write /exec.c:3280:18
+    #30  in qtest_process_command /qtest.c:567:9
+    #31  in qtest_process_inbuf /qtest.c:710:9
+    #32  in qtest_read /qtest.c:722:5
+    #33  in qemu_chr_be_write_impl /chardev/char.c:188:9
+    #34  in qemu_chr_be_write /chardev/char.c:200:9
+    #35  in fd_chr_read /chardev/char-fd.c:68:9
+    #36  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+    #37  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
+so.0+)
+    #38  in glib_pollfds_poll /util/main-loop.c:219:9
+    #39  in os_host_main_loop_wait /util/main-loop.c:242:5
+    #40  in main_loop_wait /util/main-loop.c:518:11
+    #41  in qemu_main_loop /softmmu/vl.c:1664:9
+    #42  in main /softmmu/main.c:52:5
+    #43  in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+)
+    #44  in _start (/build/i386-softmmu/qemu-system-i386+)
 
-Bit of a nitpick, but the type of the value argument is uint64_t, so shouldn't 
-the result of the expression captured by FTGMAC100_DBLAC_TXDES_SIZE() and 
-FTGMAC100_DBLAC_RXDES_SIZE() be printed with a straight PRIx64 rather than 
-HWADDR_PRIx?
+0x62500026800e is located 14 bytes inside of 138-byte region [0x62500026800=
+0,0x62500026808a)
+freed by thread T0 here:
+    #0  in free (/build/i386-softmmu/qemu-system-i386+)
+    #1  in qemu_vfree /util/oslib-posix.c:238:5
+    #2  in address_space_unmap /exec.c:3616:5
+    #3  in dma_memory_unmap /include/sysemu/dma.h:148:5
+    #4  in pci_dma_unmap /include/hw/pci/pci.h:839:5
+    #5  in net_tx_pkt_reset /hw/net/net_tx_pkt.c:453:9
+    #6  in e1000e_process_tx_desc /hw/net/e1000e_core.c:749:9
+    #7  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+    #8  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+    #9  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+    #10  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+    #11  in memory_region_write_accessor /memory.c:483:5
+    #12  in access_with_adjusted_size /memory.c:544:18
+    #13  in memory_region_dispatch_write /memory.c:1476:16
+    #14  in flatview_write_continue /exec.c:3146:23
+    #15  in flatview_write /exec.c:3186:14
+    #16  in address_space_write /exec.c:3280:18
+    #17  in address_space_rw /exec.c:3290:16
+    #18  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+    #19  in dma_memory_rw /include/sysemu/dma.h:113:12
+    #20  in pci_dma_rw /include/hw/pci/pci.h:789:5
+    #21  in pci_dma_write /include/hw/pci/pci.h:802:12
+    #22  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+    #23  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+    #24  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+    #25  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+    #26  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+    #27  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+    #28  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+    #29  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
 
-Otherwise the change seems sensible, so:
+previously allocated by thread T0 here:
+    #0  in posix_memalign (/build/i386-softmmu/qemu-system-i386+)
+    #1  in qemu_try_memalign /util/oslib-posix.c:198:11
+    #2  in qemu_memalign /util/oslib-posix.c:214:27
+    #3  in address_space_map /exec.c:3558:25
+    #4  in dma_memory_map /include/sysemu/dma.h:138:9
+    #5  in pci_dma_map /include/hw/pci/pci.h:832:11
+    #6  in net_tx_pkt_add_raw_fragment /hw/net/net_tx_pkt.c:391:24
+    #7  in e1000e_process_tx_desc /hw/net/e1000e_core.c:731:14
+    #8  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+    #9  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+    #10  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+    #11  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+    #12  in memory_region_write_accessor /memory.c:483:5
+    #13  in access_with_adjusted_size /memory.c:544:18
+    #14  in memory_region_dispatch_write /memory.c:1476:16
+    #15  in flatview_write_continue /exec.c:3146:23
+    #16  in flatview_write /exec.c:3186:14
+    #17  in address_space_write /exec.c:3280:18
+    #18  in qtest_process_command /qtest.c:567:9
+    #19  in qtest_process_inbuf /qtest.c:710:9
+    #20  in qtest_read /qtest.c:722:5
+    #21  in qemu_chr_be_write_impl /chardev/char.c:188:9
+    #22  in qemu_chr_be_write /chardev/char.c:200:9
+    #23  in fd_chr_read /chardev/char-fd.c:68:9
+    #24  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+    #25  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
+so.0+)
 
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+-Alex
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1886362
+
+Title:
+  Heap use-after-free in lduw_he_p through e1000e_write_to_rx_buffers
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  This reproducer causes a heap-use-after free. QEMU Built with --enable-sa=
+nitizers:
+  cat << EOF | ./i386-softmmu/qemu-system-i386 -M q35,accel=3Dqtest \
+  -qtest stdio -nographic -monitor none -serial none
+  outl 0xcf8 0x80001010
+  outl 0xcfc 0xe1020000
+  outl 0xcf8 0x80001014
+  outl 0xcf8 0x80001004
+  outw 0xcfc 0x7
+  outl 0xcf8 0x800010a2
+  write 0xe102003b 0x1 0xff
+  write 0xe1020103 0x1e 0xffffff055c5e5c30be4511d084fffffffffffffffffffffff=
+fffffffffff
+  write 0xe1020420 0x4 0xffffffff
+  write 0xe1020424 0x4 0xffffffff
+  write 0xe102042b 0x1 0xff
+  write 0xe1020430 0x4 0x055c5e5c
+  write 0x5c041 0x1 0x04
+  write 0x5c042 0x1 0x02
+  write 0x5c043 0x1 0xe1
+  write 0x5c048 0x1 0x8a
+  write 0x5c04a 0x1 0x31
+  write 0x5c04b 0x1 0xff
+  write 0xe1020403 0x1 0xff
+  EOF
+
+  The Output:
+  =3D=3D22689=3D=3DERROR: AddressSanitizer: heap-use-after-free on address =
+0x62500026800e at pc 0x55b93bb18bfa bp 0x7fffdbe844f0 sp 0x7fffdbe83cb8
+  READ of size 2 at 0x62500026800e thread T0
+      #0  in __asan_memcpy (/build/i386-softmmu/qemu-system-i386+)
+      #1  in lduw_he_p /include/qemu/bswap.h:332:5
+      #2  in ldn_he_p /include/qemu/bswap.h:550:1
+      #3  in flatview_write_continue /exec.c:3145:19
+      #4  in flatview_write /exec.c:3186:14
+      #5  in address_space_write /exec.c:3280:18
+      #6  in address_space_rw /exec.c:3290:16
+      #7  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+      #8  in dma_memory_rw /include/sysemu/dma.h:113:12
+      #9  in pci_dma_rw /include/hw/pci/pci.h:789:5
+      #10  in pci_dma_write /include/hw/pci/pci.h:802:12
+      #11  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+      #12  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+      #13  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+      #14  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+      #15  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+      #16  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+      #17  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+      #18  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+      #19  in e1000e_process_tx_desc /hw/net/e1000e_core.c:743:17
+      #20  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+      #21  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+      #22  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+      #23  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+      #24  in memory_region_write_accessor /memory.c:483:5
+      #25  in access_with_adjusted_size /memory.c:544:18
+      #26  in memory_region_dispatch_write /memory.c:1476:16
+      #27  in flatview_write_continue /exec.c:3146:23
+      #28  in flatview_write /exec.c:3186:14
+      #29  in address_space_write /exec.c:3280:18
+      #30  in qtest_process_command /qtest.c:567:9
+      #31  in qtest_process_inbuf /qtest.c:710:9
+      #32  in qtest_read /qtest.c:722:5
+      #33  in qemu_chr_be_write_impl /chardev/char.c:188:9
+      #34  in qemu_chr_be_write /chardev/char.c:200:9
+      #35  in fd_chr_read /chardev/char-fd.c:68:9
+      #36  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+      #37  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.=
+0.so.0+)
+      #38  in glib_pollfds_poll /util/main-loop.c:219:9
+      #39  in os_host_main_loop_wait /util/main-loop.c:242:5
+      #40  in main_loop_wait /util/main-loop.c:518:11
+      #41  in qemu_main_loop /softmmu/vl.c:1664:9
+      #42  in main /softmmu/main.c:52:5
+      #43  in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+)
+      #44  in _start (/build/i386-softmmu/qemu-system-i386+)
+
+  0x62500026800e is located 14 bytes inside of 138-byte region [0x625000268=
+000,0x62500026808a)
+  freed by thread T0 here:
+      #0  in free (/build/i386-softmmu/qemu-system-i386+)
+      #1  in qemu_vfree /util/oslib-posix.c:238:5
+      #2  in address_space_unmap /exec.c:3616:5
+      #3  in dma_memory_unmap /include/sysemu/dma.h:148:5
+      #4  in pci_dma_unmap /include/hw/pci/pci.h:839:5
+      #5  in net_tx_pkt_reset /hw/net/net_tx_pkt.c:453:9
+      #6  in e1000e_process_tx_desc /hw/net/e1000e_core.c:749:9
+      #7  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+      #8  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+      #9  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+      #10  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+      #11  in memory_region_write_accessor /memory.c:483:5
+      #12  in access_with_adjusted_size /memory.c:544:18
+      #13  in memory_region_dispatch_write /memory.c:1476:16
+      #14  in flatview_write_continue /exec.c:3146:23
+      #15  in flatview_write /exec.c:3186:14
+      #16  in address_space_write /exec.c:3280:18
+      #17  in address_space_rw /exec.c:3290:16
+      #18  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+      #19  in dma_memory_rw /include/sysemu/dma.h:113:12
+      #20  in pci_dma_rw /include/hw/pci/pci.h:789:5
+      #21  in pci_dma_write /include/hw/pci/pci.h:802:12
+      #22  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+      #23  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+      #24  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+      #25  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+      #26  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+      #27  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+      #28  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+      #29  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+
+  previously allocated by thread T0 here:
+      #0  in posix_memalign (/build/i386-softmmu/qemu-system-i386+)
+      #1  in qemu_try_memalign /util/oslib-posix.c:198:11
+      #2  in qemu_memalign /util/oslib-posix.c:214:27
+      #3  in address_space_map /exec.c:3558:25
+      #4  in dma_memory_map /include/sysemu/dma.h:138:9
+      #5  in pci_dma_map /include/hw/pci/pci.h:832:11
+      #6  in net_tx_pkt_add_raw_fragment /hw/net/net_tx_pkt.c:391:24
+      #7  in e1000e_process_tx_desc /hw/net/e1000e_core.c:731:14
+      #8  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+      #9  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+      #10  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+      #11  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+      #12  in memory_region_write_accessor /memory.c:483:5
+      #13  in access_with_adjusted_size /memory.c:544:18
+      #14  in memory_region_dispatch_write /memory.c:1476:16
+      #15  in flatview_write_continue /exec.c:3146:23
+      #16  in flatview_write /exec.c:3186:14
+      #17  in address_space_write /exec.c:3280:18
+      #18  in qtest_process_command /qtest.c:567:9
+      #19  in qtest_process_inbuf /qtest.c:710:9
+      #20  in qtest_read /qtest.c:722:5
+      #21  in qemu_chr_be_write_impl /chardev/char.c:188:9
+      #22  in qemu_chr_be_write /chardev/char.c:200:9
+      #23  in fd_chr_read /chardev/char-fd.c:68:9
+      #24  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+      #25  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.=
+0.so.0+)
+
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1886362/+subscriptions
 
