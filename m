@@ -6,80 +6,80 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29212C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60824C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5EDF20675
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:41:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FEAA20675
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 19:41:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ABzfkoJo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5EDF20675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3u0rXjx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FEAA20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsWzy-0001UA-7V
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 15:41:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37422)
+	id 1jsX02-0001au-Fj
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 15:41:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsWoJ-0006AX-7M
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 15:29:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52849
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsWoK-0006Dl-A7
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 15:29:52 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21672
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsWoF-0006qQ-LX
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 15:29:50 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsWoI-0006r9-3o
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 15:29:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594063786;
+ s=mimecast20190719; t=1594063789;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=2rOF0vIczdeD9fjALP1QYsU4NX3PjQQWiQ37J65TZUg=;
- b=ABzfkoJoRPTHxcLghEWyYgjLNws31liP0rdK38tqr7QrCXijSirI8gVacWj0mNxy8jTo2Y
- Ra0TKldHr6gSMKee9GSHa9QcUROnUbfcqWlplHAMP0Nc/79Gg19ygYD44IIhuoOh7idYhg
- i2hb1/yHqiqLf8Atn1IMU4YClKRnPdI=
+ references:references; bh=+AaAHjOZwno1drTqxZDNzFUh6XmfOWg6U6/LZUaOxeM=;
+ b=R3u0rXjxLtjHtxrga7ehJjCr2wRkgPQybpXNgINIYej+fqVHhOJ0WdEINbLXxBr3w2WiZ7
+ wgRyXtqG+rGh+UF8oITNx6EFYQRmcTc+2NXUGQTUiFAksQx3gUdd0IQBLM3gvB+Pe5We0n
+ LlP3ttsJBfNUBk09pH3UPpdPGEcaBfI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-FbIU1H2TNHOae6PqLfLhjw-1; Mon, 06 Jul 2020 15:29:42 -0400
-X-MC-Unique: FbIU1H2TNHOae6PqLfLhjw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-53-os4HIQPbPyGLNdMCyVycbw-1; Mon, 06 Jul 2020 15:29:43 -0400
+X-MC-Unique: os4HIQPbPyGLNdMCyVycbw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4279519057AD;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92402108BD0D;
  Mon,  6 Jul 2020 19:29:41 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com
  [10.36.112.200])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 00BCE5D9F5;
- Mon,  6 Jul 2020 19:29:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB2C360BF3;
+ Mon,  6 Jul 2020 19:29:32 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9F9EA31EE4; Mon,  6 Jul 2020 21:29:22 +0200 (CEST)
+ id 6356531E93; Mon,  6 Jul 2020 21:29:22 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/20] audio: create pcspk device early
-Date: Mon,  6 Jul 2020 21:29:17 +0200
-Message-Id: <20200706192921.1154-17-kraxel@redhat.com>
+Subject: [PULL 11/20] pc_basic_device_init: pass PCMachineState
+Date: Mon,  6 Jul 2020 21:29:12 +0200
+Message-Id: <20200706192921.1154-12-kraxel@redhat.com>
 In-Reply-To: <20200706192921.1154-1-kraxel@redhat.com>
 References: <20200706192921.1154-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 15:29:35
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,49 +104,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Create the pcspk device early, so it exists at
-machine type initialization time.
+Need access to pcms for pcspk initialization.
+Just preparation, no functional change.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20200702132525.6849-17-kraxel@redhat.com
+Message-id: 20200702132525.6849-12-kraxel@redhat.com
 ---
- include/hw/i386/pc.h | 1 +
+ include/hw/i386/pc.h | 3 ++-
  hw/i386/pc.c         | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ hw/i386/pc_piix.c    | 2 +-
+ hw/i386/pc_q35.c     | 2 +-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index d7690bf4290f..a802e699749a 100644
+index dce1273c7dad..3a601dbe71da 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -33,6 +33,7 @@ struct PCMachineState {
-     PCIBus *bus;
-     I2CBus *smbus;
-     PFlashCFI01 *flash[2];
-+    ISADevice *pcspk;
- 
-     /* Configuration options: */
-     uint64_t max_ram_below_4g;
+@@ -160,7 +160,8 @@ void pc_memory_init(PCMachineState *pcms,
+                     MemoryRegion **ram_memory);
+ uint64_t pc_pci_hole64_start(void);
+ DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
+-void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
++void pc_basic_device_init(struct PCMachineState *pcms,
++                          ISABus *isa_bus, qemu_irq *gsi,
+                           ISADevice **rtc_state,
+                           bool create_fdctrl,
+                           bool no_vmport,
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 4fc1b7048b28..88785f9dcc70 100644
+index 4af9679d039b..d89e577f6fa1 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -1219,7 +1219,7 @@ void pc_basic_device_init(struct PCMachineState *pcms,
-             /* connect PIT to output control line of the HPET */
-             qdev_connect_gpio_out(hpet, 0, qdev_get_gpio_in(DEVICE(pit), 0));
-         }
--        pcspk_init(isa_new(TYPE_PC_SPEAKER), isa_bus, pit);
-+        pcspk_init(pcms->pcspk, isa_bus, pit);
-     }
- 
-     i8257_dma_init(isa_bus, 0);
-@@ -1891,6 +1891,7 @@ static void pc_machine_initfn(Object *obj)
-     pcms->pit_enabled = true;
- 
-     pc_system_flash_create(pcms);
-+    pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
+@@ -1155,7 +1155,8 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
+     g_free(a20_line);
  }
  
- static void pc_machine_reset(MachineState *machine)
+-void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
++void pc_basic_device_init(struct PCMachineState *pcms,
++                          ISABus *isa_bus, qemu_irq *gsi,
+                           ISADevice **rtc_state,
+                           bool create_fdctrl,
+                           bool no_vmport,
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 1d832b2878b1..a3b416507286 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -235,7 +235,7 @@ static void pc_init1(MachineState *machine,
+     }
+ 
+     /* init basic PC hardware */
+-    pc_basic_device_init(isa_bus, x86ms->gsi, &rtc_state, true,
++    pc_basic_device_init(pcms, isa_bus, x86ms->gsi, &rtc_state, true,
+                          (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
+                          0x4);
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 047ea8db28ea..b16e22c6cccd 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -275,7 +275,7 @@ static void pc_q35_init(MachineState *machine)
+     }
+ 
+     /* init basic PC hardware */
+-    pc_basic_device_init(isa_bus, x86ms->gsi, &rtc_state, !mc->no_floppy,
++    pc_basic_device_init(pcms, isa_bus, x86ms->gsi, &rtc_state, !mc->no_floppy,
+                          (pcms->vmport != ON_OFF_AUTO_ON), pcms->pit_enabled,
+                          0xff0104);
+ 
 -- 
 2.18.4
 
