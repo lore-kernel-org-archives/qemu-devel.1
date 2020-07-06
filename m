@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72380C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5CBC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:32:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 407F8206E6
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:32:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F932206E6
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:32:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+NfzrMh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407F8206E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OwWaKMMM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F932206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUyX-0001Rc-EY
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:32:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35546)
+	id 1jsUyx-0002Mw-AS
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:32:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUf5-0006ah-Es; Mon, 06 Jul 2020 13:12:11 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:42803)
+ id 1jsUct-0002gN-Fs; Mon, 06 Jul 2020 13:09:55 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:38750)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsUf3-0008Fp-Cd; Mon, 06 Jul 2020 13:12:11 -0400
-Received: by mail-io1-xd42.google.com with SMTP id c16so40148349ioi.9;
- Mon, 06 Jul 2020 10:12:08 -0700 (PDT)
+ id 1jsUcr-0007ch-Mu; Mon, 06 Jul 2020 13:09:55 -0400
+Received: by mail-il1-x143.google.com with SMTP id s21so18390706ilk.5;
+ Mon, 06 Jul 2020 10:09:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=P0d8Iq06s1RxhBs4I7BZ5yRhluIYSvpMY7wkvFtI2Xg=;
- b=Y+NfzrMhVjazx3jBHloldv5qQ1eAAl6uiOiG7IwSb4NMG6+903IYIYU0tSMwa8mrC3
- cTQQBM94OvCgQ7efQJmM6schD+rLNB+ozc5/uJgypYi55rBKWT+NxRBPTgvuL6eWEhhE
- 7rUuX7OsT4URw2jWCniwP0L1yU131oOJcE/YnIXdhlnn6n4G1LcX+iI6fNOgQFNSh157
- m2EprNayyIy7Rbewu0VeNMbCXbX+6iCdEKOcr8WRTrTBw4Gh4m+fC7fmitA3XMXG66WL
- XqFVF5UEWj2WlfQevGi6yVpV9hZNiy39mq2dQqoo5OhqyH5Quk+sfoOIKSNr3g+956up
- gJjw==
+ bh=Qjmg6keciKQ+VOMeBpL/AW2YN1J1Kn6ACCJR6VlV+qI=;
+ b=OwWaKMMMP1QFjMhkzf7cgTSnKgDIc5+avykkBDKL5ShxrEZIh2B9WQ4e2zfIOytV/S
+ nT2xYaD/K/Vz5l0Ackv84a76Sz0UM/YC/GgxV/iqLEOpTvzEuxbqE411kHshEjoTjLro
+ D8tn/C0W0XdheqSqYAmla8lSsnywSVsKq0WHgzdFTlrA5qHkvSACL4/4KkAEjFI5VhYv
+ yu4z/Z1UQT1x3Xag1s1raH6NdSUSqtqIsUOrtWYSlMNZfedghH8nGN5g6ZLmqfd1X3fq
+ 1n5JPWWntS7W1kO4/RKlZkXlSU9pqI4NdubmRt+GADA2vNbCuw3/HfBUFwD2kp5Wgsvr
+ AJtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=P0d8Iq06s1RxhBs4I7BZ5yRhluIYSvpMY7wkvFtI2Xg=;
- b=o9kr4IPVkgZwGwhTRvh1Dg+4z3YgYEMtmUBL0sWZadUqvnpHLwWc1LjXgWwF31X5G/
- GJ3eG5rsMWkWrvxKfbXByasaNm2oKFbUoiEZ7q9YVn7lA6e3VZnc+ylsp2mZ14750nOc
- 4ag0OgDwcaGFRN4bs0kZZc3TN+Wsx2zk3tpgXCuhiwb2cFX5Q2wb72Ua3vp88RgutASg
- XywiOIg66/jJ/XttM8aZz2vu+9n8hL+K8v/g263f6UUrTJ6C8+op+7jZw5vHmCP99r6W
- gzl/4C9Ze/aCuVzx9LCl/NOwwAB2/3lxlTxNNljluynun+E0tAYtMODT3uKCA//PnjFg
- Md6Q==
-X-Gm-Message-State: AOAM532fnfOxkGZyGoYLqxq/wX07oCUO0QfAoWupwLarON+//1f5gukM
- cT2uJkvQkwxXkHZjemufnjgEaOoFZ0YvRrPTsGI=
-X-Google-Smtp-Source: ABdhPJwQ4Y5SU2PHxNBgM6arl9mZiS4VMzkN+WtIMsTLI4VHjyaJG6nzbQPzYC2Wzjh5CnPd7DP0E6zy1bY/U6O6MAw=
-X-Received: by 2002:a5d:9306:: with SMTP id l6mr26961459ion.105.1594055527579; 
- Mon, 06 Jul 2020 10:12:07 -0700 (PDT)
+ bh=Qjmg6keciKQ+VOMeBpL/AW2YN1J1Kn6ACCJR6VlV+qI=;
+ b=e7JvzPmQvBpxb8BkBEiozOCZgxY0Vpt8JFdOdhWp4x00Mdj6i5dL4Oe4Oas2q1gFlk
+ qdd6zdZV98lka2iZ21+SHVsECWX5gHe0DzMAF4Cy/z9I2tuHnuBYU+kEm1OWyTSc83O/
+ tk5ef74ygfzlSUEQk+9C76uHc/RLpuANqec0GZJoWXmyS+rGMmMzsmwQYbCI+TphIOPe
+ UgVNS9IHJsoepl/hEJJS1ujEDms+nk1zi6eJNftgl4wz5quMdHDAd8PNdT0GF2dhbqVo
+ eZ6UQx3SyhMllj2cSNEjBYtKMTRoqLp9le+Ix8WAKoD6DvRc66xDkQp9/X30cnmw2YTz
+ VTdg==
+X-Gm-Message-State: AOAM530OmGoE4gaVBWKq6bieSvoaqclp/GqZqTJsgCdWAWyviXiKxaCb
+ SX8T9LYCbAgFbK8eBh5JLxtJvx3bpX6qdRrCvPo=
+X-Google-Smtp-Source: ABdhPJyOwkiRiK+9nBFi1yzATBmoIi7mSBskR4fEEeJCsCiuqZAj+mTPEz50OG8NSilCy8YDtIqWGKoKN3C/V91lepU=
+X-Received: by 2002:a92:bb84:: with SMTP id x4mr32234878ilk.177.1594055392114; 
+ Mon, 06 Jul 2020 10:09:52 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200704144943.18292-1-f4bug@amsat.org>
- <20200704144943.18292-15-f4bug@amsat.org>
-In-Reply-To: <20200704144943.18292-15-f4bug@amsat.org>
+ <20200704144943.18292-11-f4bug@amsat.org>
+In-Reply-To: <20200704144943.18292-11-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 6 Jul 2020 10:02:20 -0700
-Message-ID: <CAKmqyKNYrB+BxS41KFWhYc2wXetJH4sJ_18kEDcaYPzu87r49A@mail.gmail.com>
-Subject: Re: [PATCH 14/26] hw/usb/quirks: Rename included source with '.inc.c'
- suffix
+Date: Mon, 6 Jul 2020 10:00:05 -0700
+Message-ID: <CAKmqyKMUWZ9BsEeZkiK4-_MAhFpZO66MKQNhoZ3q1FT+XZie3g@mail.gmail.com>
+Subject: Re: [PATCH 10/26] hw/usb/hcd-ehci: Move few definitions from header
+ to source
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -128,13 +128,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 4, 2020 at 7:58 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+On Sat, Jul 4, 2020 at 7:53 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 > wrote:
 >
-> This file is not a header, but contains source code which is
-> included and compiled once. We use the '.inc.c' suffix in few
-> other cases in the repository. Follow the same convention with
-> this file.
+> Move definitions only useful for hcd-ehci.c to this source file.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -143,48 +140,55 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/usb/quirks.c                   | 2 +-
->  hw/usb/{quirks.h =3D> quirks.inc.c} | 5 -----
->  2 files changed, 1 insertion(+), 6 deletions(-)
->  rename hw/usb/{quirks.h =3D> quirks.inc.c} (99%)
+>  hw/usb/hcd-ehci.h | 11 -----------
+>  hw/usb/hcd-ehci.c | 12 ++++++++++++
+>  2 files changed, 12 insertions(+), 11 deletions(-)
 >
-> diff --git a/hw/usb/quirks.c b/hw/usb/quirks.c
-> index 23ea7a23ea..655b36f2d5 100644
-> --- a/hw/usb/quirks.c
-> +++ b/hw/usb/quirks.c
-> @@ -13,7 +13,7 @@
->   */
+> diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+> index 57b38cfc05..4577f5e31d 100644
+> --- a/hw/usb/hcd-ehci.h
+> +++ b/hw/usb/hcd-ehci.h
+> @@ -24,17 +24,6 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/sysbus.h"
 >
->  #include "qemu/osdep.h"
-> -#include "quirks.h"
-> +#include "quirks.inc.c"
->  #include "hw/usb.h"
->
->  static bool usb_id_match(const struct usb_device_id *ids,
-> diff --git a/hw/usb/quirks.h b/hw/usb/quirks.inc.c
-> similarity index 99%
-> rename from hw/usb/quirks.h
-> rename to hw/usb/quirks.inc.c
-> index 50ef2f9c2e..004b228aba 100644
-> --- a/hw/usb/quirks.h
-> +++ b/hw/usb/quirks.inc.c
-> @@ -12,9 +12,6 @@
->   * (at your option) any later version.
->   */
->
-> -#ifndef HW_USB_QUIRKS_H
-> -#define HW_USB_QUIRKS_H
-> -
->  /* 1 on 1 copy of linux/drivers/usb/serial/ftdi_sio_ids.h */
->  #include "quirks-ftdi-ids.h"
->  /* 1 on 1 copy of linux/drivers/usb/serial/pl2303.h */
-> @@ -915,5 +912,3 @@ static const struct usb_device_id usbredir_ftdi_seria=
-l_ids[] =3D {
->
->  #undef USB_DEVICE
->  #undef USB_DEVICE_AND_INTERFACE_INFO
-> -
+> -#ifndef EHCI_DEBUG
+> -#define EHCI_DEBUG   0
 > -#endif
+> -
+> -#if EHCI_DEBUG
+> -#define DPRINTF printf
+> -#else
+> -#define DPRINTF(...)
+> -#endif
+> -
+> -#define MMIO_SIZE        0x1000
+>  #define CAPA_SIZE        0x10
+>
+>  #define NB_PORTS         6        /* Max. Number of downstream ports */
+> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+> index 256fb91e0c..a0beee527c 100644
+> --- a/hw/usb/hcd-ehci.c
+> +++ b/hw/usb/hcd-ehci.c
+> @@ -36,6 +36,18 @@
+>  #include "qemu/error-report.h"
+>  #include "sysemu/runstate.h"
+>
+> +#ifndef EHCI_DEBUG
+> +#define EHCI_DEBUG   0
+> +#endif
+> +
+> +#if EHCI_DEBUG
+> +#define DPRINTF printf
+> +#else
+> +#define DPRINTF(...)
+> +#endif
+> +
+> +#define MMIO_SIZE        0x1000
+> +
+>  #define FRAME_TIMER_FREQ 1000
+>  #define FRAME_TIMER_NS   (NANOSECONDS_PER_SECOND / FRAME_TIMER_FREQ)
+>  #define UFRAME_TIMER_NS  (FRAME_TIMER_NS / 8)
 > --
 > 2.21.3
 >
