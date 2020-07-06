@@ -2,88 +2,87 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63890C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BF0C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BB25206B6
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:11:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACD9C206B6
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 17:11:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKuVdECE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BB25206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eegBASf0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACD9C206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsUeM-0004wd-B9
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:11:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57506)
+	id 1jsUea-0005Ip-VU
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 13:11:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33972)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUCa-0004Cc-0A
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:44 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43871
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsUCX-0003Cz-93
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 12:42:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594053760;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lZYIuYhb+zYChQRuWbnOvJoxrja7P5iRG2waMsb5gLE=;
- b=ZKuVdECESUOsUkV4LuPbwvDaRw8CNXOFXIT3mao3/KoGqgo+AsDthHBvVYhrLpFC7AgKEJ
- fJnhEB3OseZs3HGQlOAiZ/lncaDyCBriO7IwAyF78HL9YJKrnERbctae5n8i/oR0hOhP8m
- cY6oBKkljMnUEAnD8DzeHx9VXjSZUKM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-sbWzbLK2PIiDU71WEHtHPQ-1; Mon, 06 Jul 2020 12:42:28 -0400
-X-MC-Unique: sbWzbLK2PIiDU71WEHtHPQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC2A81937FC4;
- Mon,  6 Jul 2020 16:42:27 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3577F5F7D8;
- Mon,  6 Jul 2020 16:42:27 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 39/53] cpus: Move CPU code from exec.c to cpus-common.c
-Date: Mon,  6 Jul 2020 12:41:41 -0400
-Message-Id: <20200706164155.24696-40-pbonzini@redhat.com>
-In-Reply-To: <20200706164155.24696-1-pbonzini@redhat.com>
-References: <20200706164155.24696-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsUYK-0000Xr-Pt; Mon, 06 Jul 2020 13:05:12 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:40516)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jsUYJ-00070N-3W; Mon, 06 Jul 2020 13:05:12 -0400
+Received: by mail-io1-xd41.google.com with SMTP id q8so40125815iow.7;
+ Mon, 06 Jul 2020 10:05:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=zN9P5ColTvlUfdn83p6hlM/q3HmA739CHt0AXxAEsKY=;
+ b=eegBASf0DJgvBsiQJhBbGe04hBG8gQlnhR0e1R/ASVwj2VHV9vGLfcRsCN4KCZZL7R
+ B83BaGMH/iF7mwFtkqNwrhcYBoLeuRgJhTM45CYuhyfzNTru1stzx/37r5EW7OhPb+Sh
+ LRtrqRylWajXgEByi9cOTijxoLbDMEMhICnRVbAOOwJLu9jPbF/Te8Qvau7kveunJewl
+ Db0lsTutmvoozzVPB+KFbn17OIYLS5FptsgdKB52Bz3rn1GjOosdN0j2cy5W6T6sYt0p
+ QdMaqFdSvbzvnq0BKJyMWcewvVfyBSesh4A14gyVGvYTOfgkCHZ+MscaMJTp0T9VOAKa
+ WAHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zN9P5ColTvlUfdn83p6hlM/q3HmA739CHt0AXxAEsKY=;
+ b=gSZPeOHoGAi+1J9hCYQUV+BQGojLm8PxynrAPnK2pmyGHO8Jun+E5AQEtLcV1rFO5g
+ gfPkOnCh3JbUo/syPFH9gq3oYwEJ1JhlKmK6Dri0M6w9wzJjAQAOE5/QNlZpfcYOQsrI
+ jO9jou+s/4O4lBx8c60dEzKbhqmIl0KIFtgiYsR0jT/qSlen+UMzfJS5GzetfxPyPdzv
+ a52tJyKD79zdfu/tzTVCKHzd8P14/I+T8+cg75SXZwj56dHunRCqlbe2EMjvQy3Ze8ly
+ sOW34UpzP6g/hjlWY3BU/sCOQutyAIUfMM+LzUIKqOJAzg4FNyE4BaqSKEx1vn+q2dKa
+ 6uag==
+X-Gm-Message-State: AOAM531pUTqRCWI3bMgebHOx3JPNlq0nEOb46qW/fp73KKhItMIlMqQQ
+ fLlVgais/l2c9bPuzZqT8idvP2uTP/OP/Q03tlk=
+X-Google-Smtp-Source: ABdhPJw8hZ3hkrezlrBZ0tGzIowHRnJHp8TQNjhIxHPipZ6z7o2IrpAbgPHKaESP7cYXHZCW69GaN6F/KxK5+BYwjZc=
+X-Received: by 2002:a5d:9ed0:: with SMTP id a16mr26251024ioe.176.1594055109583; 
+ Mon, 06 Jul 2020 10:05:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200704144943.18292-1-f4bug@amsat.org>
+ <20200704144943.18292-6-f4bug@amsat.org>
+In-Reply-To: <20200704144943.18292-6-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 6 Jul 2020 09:55:22 -0700
+Message-ID: <CAKmqyKMW3Db-bk1+MOtz461-iAy9Se4uq=2stNmgiELzVAd3NA@mail.gmail.com>
+Subject: Re: [PATCH 05/26] hw/usb/desc: Add missing header
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,107 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, Paul Durrant <paul@xen.org>,
+ Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "open list:X86" <xen-devel@lists.xenproject.org>,
+ Leif Lindholm <leif@nuviainc.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Richard Henderson <rth@twiddle.net>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, Paul Zimmerman <pauldzim@gmail.com>,
+ "open list:New World" <qemu-ppc@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Sat, Jul 4, 2020 at 7:52 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>
+> This header uses the USBPacket and USBDevice types which are
+> forward declared in "hw/usb.h".
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-This code was introduced with SMP support in commit 6a00d60127,
-later commit 267f685b8b moved CPU list management to common code
-but forgot this code. Move now and simplify ifdef'ry.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200702104017.14057-1-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- cpus-common.c | 18 ++++++++++++++++++
- exec.c        | 22 ----------------------
- 2 files changed, 18 insertions(+), 22 deletions(-)
+Alistair
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 8f5512b3d7..34044f4e4c 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -72,6 +72,8 @@ static int cpu_get_free_index(void)
-     return max_cpu_index;
- }
- 
-+CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
-+
- void cpu_list_add(CPUState *cpu)
- {
-     QEMU_LOCK_GUARD(&qemu_cpu_list_lock);
-@@ -96,6 +98,22 @@ void cpu_list_remove(CPUState *cpu)
-     cpu->cpu_index = UNASSIGNED_CPU_INDEX;
- }
- 
-+CPUState *qemu_get_cpu(int index)
-+{
-+    CPUState *cpu;
-+
-+    CPU_FOREACH(cpu) {
-+        if (cpu->cpu_index == index) {
-+            return cpu;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+/* current CPU in the current thread. It is only valid inside cpu_exec() */
-+__thread CPUState *current_cpu;
-+
- struct qemu_work_item {
-     QSIMPLEQ_ENTRY(qemu_work_item) node;
-     run_on_cpu_func func;
-diff --git a/exec.c b/exec.c
-index 21926dc9c7..997b7db15f 100644
---- a/exec.c
-+++ b/exec.c
-@@ -98,12 +98,6 @@ AddressSpace address_space_memory;
- static MemoryRegion io_mem_unassigned;
- #endif
- 
--CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
--
--/* current CPU in the current thread. It is only valid inside
--   cpu_exec() */
--__thread CPUState *current_cpu;
--
- uintptr_t qemu_host_page_size;
- intptr_t qemu_host_page_mask;
- 
-@@ -832,22 +826,6 @@ const VMStateDescription vmstate_cpu_common = {
-     }
- };
- 
--#endif
--
--CPUState *qemu_get_cpu(int index)
--{
--    CPUState *cpu;
--
--    CPU_FOREACH(cpu) {
--        if (cpu->cpu_index == index) {
--            return cpu;
--        }
--    }
--
--    return NULL;
--}
--
--#if !defined(CONFIG_USER_ONLY)
- void cpu_address_space_init(CPUState *cpu, int asidx,
-                             const char *prefix, MemoryRegion *mr)
- {
--- 
-2.26.2
-
-
+> ---
+>  hw/usb/desc.h | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/usb/desc.h b/hw/usb/desc.h
+> index 4d81c68e0e..92594fbe29 100644
+> --- a/hw/usb/desc.h
+> +++ b/hw/usb/desc.h
+> @@ -2,6 +2,7 @@
+>  #define QEMU_HW_USB_DESC_H
+>
+>  #include <wchar.h>
+> +#include "hw/usb.h"
+>
+>  /* binary representation */
+>  typedef struct USBDescriptor {
+> --
+> 2.21.3
+>
+>
 
