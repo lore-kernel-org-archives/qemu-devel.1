@@ -7,82 +7,79 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 107D4C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B2A4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:48:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE2832073E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:46:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42E2620724
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 08:48:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWYkxBm7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2832073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="glJ2BMQN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E2620724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsMlj-0005pK-3O
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:46:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37928)
+	id 1jsMnD-00078S-Hy
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 04:48:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsMkp-00059f-Cu
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:45:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47111
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsMmd-0006iO-21
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:47:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45477
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsMkm-0000k3-6N
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:45:34 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsMmb-000106-0S
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 04:47:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594025130;
+ s=mimecast20190719; t=1594025243;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=FX1XMYkNnYOKa5dcm+FKKhcROC+9LUk+T2SMyuLNjqk=;
- b=QWYkxBm712IgLWbqifbTq4NwGdvKWUVivK2E/9Mf6WU6clW+Jr94KFXH+j2ePEysewmLQx
- XrlzD4ZO+Ik7o4zNegbemri+aLsEa5uNGPCUxhVwDMYXXQkll1a0ScuJnhwiHXDfm0G88i
- VwxyqUB0WXsvj48WPJd+exY2vF9wlLg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-k4GoSqfnN2-ST0tUkp0hiA-1; Mon, 06 Jul 2020 04:45:29 -0400
-X-MC-Unique: k4GoSqfnN2-ST0tUkp0hiA-1
-Received: by mail-wm1-f69.google.com with SMTP id f68so21503494wmf.1
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 01:45:28 -0700 (PDT)
+ bh=P8h/HhrsmeetZ3WpwezM5OiaGGfhKuZoeymCllUho4Q=;
+ b=glJ2BMQN0EuuaNxtnfjZc5nHIh0R00Q6KwzfY0cc8Wtwk4iUOLj38UFFZC6RRYGDUsmvLy
+ KlGOtRCK5fjSgV0YLr2bCFAQjMhvpEM+S1VMVmlnzdrVSymyqr7pYU9eb/2gn74brBD5OV
+ 187eFqYMyUi8SLD21mTBQk8pqYTCo5k=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-455-y93b1kihPHOYxZIy5EQt5w-1; Mon, 06 Jul 2020 04:47:21 -0400
+X-MC-Unique: y93b1kihPHOYxZIy5EQt5w-1
+Received: by mail-wr1-f71.google.com with SMTP id c6so22219732wru.7
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 01:47:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:autocrypt
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=FX1XMYkNnYOKa5dcm+FKKhcROC+9LUk+T2SMyuLNjqk=;
- b=Gdj6myK/oFC3zAyI1YbmW8guB2dUlC04b1cLTVW4ZGIBWAyUCAQ8ZoPD68YfYH914e
- CznEtU7gQlBAJXtLfHLBVRBEliW5YIuvajnuqXNEeX6cJNL4jA+AiKcvxtpAgQo7Bje4
- oAYLHDNBdsx+57bc+IfP5d9GppJQZF4KWZmx5uxf+6joFHjPa145cqnubAidl7mXwZmc
- 4F/nWcQePYifV8L8c8EOWIO5opDqdhgPXsh5+uuooi3fQotcImf70KSnk9uIeOtFIdBk
- p1EoKjnRXuMw2h+/FkhqLNpoL8VMEri9QigjMwlDVbSKygz7O7xZOVBJgdxzVL8Y/9au
- 6hrQ==
-X-Gm-Message-State: AOAM533EJLCwCx94fFFviy49pktwOeSjeYabvuDqoHvkItL5Jy5FnDSx
- o0tQGO91S7JKCwzwBM3wFbT3PIMVmqp54SaPr0HRo9xMrGQyZ/Kh7IgqW2J8GYC23Hbp3wQaYVx
- /SyI0nxwZK4DD4Xs=
-X-Received: by 2002:adf:ff8d:: with SMTP id j13mr46247968wrr.11.1594025127793; 
- Mon, 06 Jul 2020 01:45:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxaEx4BXIQ24SRx8y2DGqv4LaVOF+vyOpdDcO8CDAP0VVEkYYnA7SSV/cBaFkVSlkg4v5MOSA==
-X-Received: by 2002:adf:ff8d:: with SMTP id j13mr46247947wrr.11.1594025127516; 
- Mon, 06 Jul 2020 01:45:27 -0700 (PDT)
+ bh=P8h/HhrsmeetZ3WpwezM5OiaGGfhKuZoeymCllUho4Q=;
+ b=ixcEk2kb/LnUuuUUh2LbRyoW3UiRRIHn7b+CL+4FbLc5p29qDPm4qf3XXR39jKN9KE
+ 9UXx1tF71UJrv457OJLN/9gUXpN6RdW4aqFsKRBf1ieqbkaisf/29+bjoB6LdNl1HdFt
+ MmYuRiFvwv2p4UavKz9g8olZaaOMNwfbZiDoGiqwVXs60BwpsSbwRyET/fiCoZFWMlTa
+ L7eLkJDcQZCUwNAtcRwORrT0/j8FR3D7GwV/6DM5pFBAXswznzCVF1wERlqW89imc0bt
+ esT8y4+II33HKYpfLOdKWi62U/0KeCHVdUnLHsaLCcTmr77kBIZ3cVwk2V5yhrQcAjyl
+ gDBg==
+X-Gm-Message-State: AOAM533kCeFzmMOhWpLKTXDt1TbHaoqcntHPKJtc3M1iiRaeAjStC4Lv
+ lBqH2/3pv/o42I9HdyFbiOznPSFmC1xoDWIvHSxrL5NXJkUGd1t4SC5IgaSQQT8T8rJaCBFMBsr
+ 1greFL1fsxXIY2r0=
+X-Received: by 2002:adf:ee0b:: with SMTP id y11mr25309015wrn.360.1594025240741; 
+ Mon, 06 Jul 2020 01:47:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxbwrw0SfccJvJqf/jKH7KBE2CP4qMFTFkqonDCinNSh7NRyEvGchiC1YMsnyISbM/q04nMqA==
+X-Received: by 2002:adf:ee0b:: with SMTP id y11mr25308994wrn.360.1594025240449; 
+ Mon, 06 Jul 2020 01:47:20 -0700 (PDT)
 Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id w12sm24421728wrm.79.2020.07.06.01.45.26
+ by smtp.gmail.com with ESMTPSA id g14sm23046579wrm.93.2020.07.06.01.47.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 06 Jul 2020 01:45:26 -0700 (PDT)
-Subject: Re: [PATCH v3 1/2] net: tap: check if the file descriptor is valid
- before using it
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+ Mon, 06 Jul 2020 01:47:19 -0700 (PDT)
+Subject: Re: [PATCH v3 2/2] net: detect errors from probing vnet hdr flag for
+ TAP devices
 To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
 References: <20200701193951.36248-1-lvivier@redhat.com>
- <20200701193951.36248-2-lvivier@redhat.com>
- <48ef599b-20b8-0cfa-4c73-548f1f9bebee@redhat.com>
- <339093a1-6937-85d0-7313-5cd9f55ac779@redhat.com>
- <31892cf3-b19c-9911-8fed-1dd5dcbec2c0@redhat.com>
+ <20200701193951.36248-3-lvivier@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
  bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
@@ -106,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <b97672d9-c0a2-bd27-3421-c6b276434a7f@redhat.com>
-Date: Mon, 6 Jul 2020 10:45:25 +0200
+Message-ID: <28315bc8-ee70-3fb0-8f19-4a02437258be@redhat.com>
+Date: Mon, 6 Jul 2020 10:47:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <31892cf3-b19c-9911-8fed-1dd5dcbec2c0@redhat.com>
+In-Reply-To: <20200701193951.36248-3-lvivier@redhat.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -119,9 +116,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:22:37
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -144,97 +141,209 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/2/20 10:18 AM, Philippe Mathieu-Daudé wrote:
-> On 7/2/20 10:17 AM, Laurent Vivier wrote:
->> On 02/07/2020 10:00, Philippe Mathieu-Daudé wrote:
->>> On 7/1/20 9:39 PM, Laurent Vivier wrote:
->>>> qemu_set_nonblock() checks that the file descriptor can be used and, if
->>>> not, crashes QEMU. An assert() is used for that. The use of assert() is
->>>> used to detect programming error and the coredump will allow to debug
->>>> the problem.
->>>>
->>>> But in the case of the tap device, this assert() can be triggered by
->>>> a misconfiguration by the user. At startup, it's not a real problem, but it
->>>> can also happen during the hot-plug of a new device, and here it's a
->>>> problem because we can crash a perfectly healthy system.
->>>>
->>>> For instance:
->>>>  # ip link add link virbr0 name macvtap0 type macvtap mode bridge
->>>>  # ip link set macvtap0 up
->>>>  # TAP=/dev/tap$(ip -o link show macvtap0 | cut -d: -f1)
->>>>  # qemu-system-x86_64 -machine q35 -device pcie-root-port,id=pcie-root-port-0 -monitor stdio 9<> $TAP
->>>>  (qemu) netdev_add type=tap,id=hostnet0,vhost=on,fd=9
->>>>  (qemu) device_add driver=virtio-net-pci,netdev=hostnet0,id=net0,bus=pcie-root-port-0
->>>>  (qemu) device_del net0
->>>>  (qemu) netdev_del hostnet0
->>>>  (qemu) netdev_add type=tap,id=hostnet1,vhost=on,fd=9
->>>>  qemu-system-x86_64: .../util/oslib-posix.c:247: qemu_set_nonblock: Assertion `f != -1' failed.
->>>>  Aborted (core dumped)
->>>>
->>>> To avoid that, add a function, qemu_try_set_nonblock(), that allows to report the
->>>> problem without crashing.
->>>>
->>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>> ---
->>>>  include/qemu/sockets.h |  1 +
->>>>  net/tap.c              | 16 +++++++++---
->>>>  util/oslib-posix.c     | 26 +++++++++++++------
->>>>  util/oslib-win32.c     | 57 ++++++++++++++++++++++++------------------
->>>>  4 files changed, 64 insertions(+), 36 deletions(-)
->>>>
->>>> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
->>>> index 57cd049d6edd..7d1f8135767d 100644
->>>> --- a/include/qemu/sockets.h
->>>> +++ b/include/qemu/sockets.h
->>>> @@ -18,6 +18,7 @@ int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
->>>>  int socket_set_cork(int fd, int v);
->>>>  int socket_set_nodelay(int fd);
->>>>  void qemu_set_block(int fd);
->>>> +int qemu_try_set_nonblock(int fd);
->>>>  void qemu_set_nonblock(int fd);
->>>>  int socket_set_fast_reuse(int fd);
->>>>  
->>>> diff --git a/net/tap.c b/net/tap.c
->>>> index 6207f61f84ab..fb04c9044ce2 100644
->>>> --- a/net/tap.c
->>>> +++ b/net/tap.c
->>>> @@ -766,6 +766,7 @@ int net_init_tap(const Netdev *netdev, const char *name,
->>>>      Error *err = NULL;
->>>>      const char *vhostfdname;
->>>>      char ifname[128];
->>>> +    int ret = 0;
->>>
->>> No need to zero-initialize.
->>>
->>> Otherwise:
->>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>
->>
->> I would agree with you but gcc doesn't:
->>
->> net/tap.c:769:9: error: ‘ret’ may be used uninitialized in this function
->> [-Werror=maybe-uninitialized]
->>   769 |     int ret;
->>       |         ^~~
+On 7/1/20 9:39 PM, Laurent Vivier wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
 > 
-> I tried to outsmart GCC by manual review :/
+> When QEMU sets up a tap based network device backend, it mostly ignores errors
+> reported from various ioctl() calls it makes, assuming the TAP file descriptor
+> is valid. This assumption can easily be violated when the user is passing in a
+> pre-opened file descriptor. At best, the ioctls may fail with a -EBADF, but if
+> the user passes in a bogus FD number that happens to clash with a FD number that
+> QEMU has opened internally for another reason, a wide variety of errnos may
+> result, as the TUNGETIFF ioctl number may map to a completely different command
+> on a different type of file.
+> 
+> By ignoring all these errors, QEMU sets up a zombie network backend that will
+> never pass any data. Even worse, when QEMU shuts down, or that network backend
+> is hot-removed, it will close this bogus file descriptor, which could belong to
+> another QEMU device backend.
+> 
+> There's no obvious guaranteed reliable way to detect that a FD genuinely is a
+> TAP device, as opposed to a UNIX socket, or pipe, or something else. Checking
+> the errno from probing vnet hdr flag though, does catch the big common cases.
+> ie calling TUNGETIFF will return EBADF for an invalid FD, and ENOTTY when FD is
+> a UNIX socket, or pipe which catches accidental collisions with FDs used for
+> stdio, or monitor socket.
+> 
+> Previously the example below where bogus fd 9 collides with the FD used for the
+> chardev saw:
+> 
+> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+>   -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+>   -monitor stdio -vnc :0
+> qemu-system-x86_64: -netdev tap,id=hostnet0,fd=9: TUNGETIFF ioctl() failed: Inappropriate ioctl for device
+> TUNSETOFFLOAD ioctl() failed: Bad address
+> QEMU 2.9.1 monitor - type 'help' for more information
+> (qemu) Warning: netdev hostnet0 has no peer
+> 
+> which gives a running QEMU with a zombie network backend.
+> 
+> With this change applied we get an error message and QEMU immediately exits
+> before carrying on and making a bigger disaster:
+> 
+> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+>   -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+>   -monitor stdio -vnc :0
+> qemu-system-x86_64: -netdev tap,id=hostnet0,vhost=on,fd=9: Unable to query TUNGETIFF on FD 9: Inappropriate ioctl for device
+> 
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Message-id: 20171027085548.3472-1-berrange@redhat.com
+> [lv: to simplify, don't check on EINVAL with TUNGETIFF as it exists since v2.6.27]
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  net/tap-bsd.c     |  2 +-
+>  net/tap-linux.c   |  8 +++++---
+>  net/tap-solaris.c |  2 +-
+>  net/tap-stub.c    |  2 +-
+>  net/tap.c         | 25 ++++++++++++++++++++-----
+>  net/tap_int.h     |  2 +-
+>  6 files changed, 29 insertions(+), 12 deletions(-)
+> 
+> diff --git a/net/tap-bsd.c b/net/tap-bsd.c
+> index a5c3707f806d..77aaf674b19d 100644
+> --- a/net/tap-bsd.c
+> +++ b/net/tap-bsd.c
+> @@ -211,7 +211,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>  {
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      return 0;
+>  }
+> diff --git a/net/tap-linux.c b/net/tap-linux.c
+> index e0dd442ee34f..b0635e9e32ce 100644
+> --- a/net/tap-linux.c
+> +++ b/net/tap-linux.c
+> @@ -147,13 +147,15 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>      }
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      struct ifreq ifr;
+>  
+>      if (ioctl(fd, TUNGETIFF, &ifr) != 0) {
+> -        error_report("TUNGETIFF ioctl() failed: %s", strerror(errno));
+> -        return 0;
+> +        /* TUNGETIFF is available since kernel v2.6.27 */
+> +        error_setg_errno(errp, errno,
+> +                         "Unable to query TUNGETIFF on FD %d", fd);
+> +        return -1;
+>      }
+>  
+>      return ifr.ifr_flags & IFF_VNET_HDR;
+> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+> index 4725d2314eef..ae2ba6828415 100644
+> --- a/net/tap-solaris.c
+> +++ b/net/tap-solaris.c
+> @@ -206,7 +206,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>  {
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      return 0;
+>  }
+> diff --git a/net/tap-stub.c b/net/tap-stub.c
+> index a9ab8f829362..de525a2e69d4 100644
+> --- a/net/tap-stub.c
+> +++ b/net/tap-stub.c
+> @@ -37,7 +37,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>  {
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      return 0;
+>  }
+> diff --git a/net/tap.c b/net/tap.c
+> index fb04c9044ce2..208d9c0f8d35 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -597,7 +597,11 @@ int net_init_bridge(const Netdev *netdev, const char *name,
+>      }
+>  
+>      qemu_set_nonblock(fd);
+> -    vnet_hdr = tap_probe_vnet_hdr(fd);
+> +    vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +    if (vnet_hdr < 0) {
+> +        close(fd);
+> +        return -1;
+> +    }
+>      s = net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
+>  
+>      snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=%s,br=%s", helper,
+> @@ -803,7 +807,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>              return -1;
+>          }
+>  
+> -        vnet_hdr = tap_probe_vnet_hdr(fd);
+> +        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +        if (vnet_hdr < 0) {
+> +            close(fd);
+> +            return -1;
+> +        }
+>  
+>          net_init_tap_one(tap, peer, "tap", name, NULL,
+>                           script, downscript,
+> @@ -856,8 +864,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>              }
+>  
+>              if (i == 0) {
+> -                vnet_hdr = tap_probe_vnet_hdr(fd);
+> -            } else if (vnet_hdr != tap_probe_vnet_hdr(fd)) {
+> +                vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +                if (vnet_hdr < 0) {
+> +                    goto free_fail;
+> +                }
+> +            } else if (vnet_hdr != tap_probe_vnet_hdr(fd, NULL)) {
+>                  error_setg(errp,
+>                             "vnet_hdr not consistent across given tap fds");
+>                  ret = -1;
+> @@ -902,7 +913,11 @@ free_fail:
+>          }
+>  
+>          qemu_set_nonblock(fd);
+> -        vnet_hdr = tap_probe_vnet_hdr(fd);
+> +        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +        if (vnet_hdr < 0) {
+> +            close(fd);
+> +            return -1;
+> +        }
+>  
+>          net_init_tap_one(tap, peer, "bridge", name, ifname,
+>                           script, downscript, vhostfdname,
+> diff --git a/net/tap_int.h b/net/tap_int.h
+> index e3194b23f47d..225a49ea4843 100644
+> --- a/net/tap_int.h
+> +++ b/net/tap_int.h
+> @@ -34,7 +34,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+>  ssize_t tap_read_packet(int tapfd, uint8_t *buf, int maxlen);
+>  
+>  void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp);
+> -int tap_probe_vnet_hdr(int fd);
+> +int tap_probe_vnet_hdr(int fd, Error **errp);
 
-IOW my R-b stands:
+Missing documentation (can be added on top), otherwise:
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> 
->>
->> if nfds == 0, we don't enter in the loop and ret is never set.
->>
->> Thanks,
->> Laurent
->>
+>  int tap_probe_vnet_hdr_len(int fd, int len);
+>  int tap_probe_has_ufo(int fd);
+>  void tap_fd_set_offload(int fd, int csum, int tso4, int tso6, int ecn, int ufo);
 > 
 
 
