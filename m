@@ -2,66 +2,68 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 524FCC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4877EC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:07:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25937206B6
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:07:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25937206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 22407206B6
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 20:07:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22407206B6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsXOb-0003BW-4P
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 16:07:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45660)
+	id 1jsXOc-0003Ga-Ac
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 16:07:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsXNd-0001bb-JE
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:06:21 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:59343)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsXNe-0001c3-OV
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:06:22 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:53427)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsXNb-0004sd-QL
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:06:21 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jsXNc-0004sq-Dy
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 16:06:22 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N5FxN-1ksvBm11OP-01192U; Mon, 06 Jul 2020 22:06:03 +0200
+ id 1MsI4Q-1kkvVm0EIs-00thKT; Mon, 06 Jul 2020 22:06:04 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/3] M68k next patches
-Date: Mon,  6 Jul 2020 22:05:56 +0200
-Message-Id: <20200706200559.160209-1-laurent@vivier.eu>
+Subject: [PULL 1/3] target/m68k: fix physical address translation in
+ m68k_cpu_get_phys_page_debug()
+Date: Mon,  6 Jul 2020 22:05:57 +0200
+Message-Id: <20200706200559.160209-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200706200559.160209-1-laurent@vivier.eu>
+References: <20200706200559.160209-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:QMb/K/vKy91cDn+6Q9gahUNR/YOyHsIleT5l0y3DcGKOHH5417s
- yThTFDtK4RKOX2Q44qHlfU+z0oygwTa/5OlRY4TJYpdZ42WHAX+83A/tKl9FWdlpatUI0pD
- qKXEah8rulEy1NMdqPlcB3TEWdavh1psLm6mnD/M+OGrpIuVlS7uaUrLY9gblBLITjHH6Ne
- oTnm5rAvAXxnFYuJN4gbA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:CiBS6l7P3fo=:e1RewxE+aCGOrNrr9JguUa
- RkI5sGIOeoNSj+/Pc4MK+4wFTfg2Yfr/E1G/OfQ3NZi+R+AG8vj4QoexfyuzQ+j3a1YcOQ7tF
- pGUA3eTvprSy4J3R3ZLdkPc81kkKNXYpSaWMpeVGtqIJgKjLz0DF4mNya3qww++JLXo7NoS1u
- Kr+B0BoOzmChEbnTkMIxb22eNfTshMja5nrkW0LMkOEjnqXnShpDBuR2IJ3teH+3pJEHdg9go
- GwfLm4QCWJf8WxbVSjFhUW40DjACFRCpK/66cJl3IL+qrfZl68IvL2tqN8F8M0odpYcwp011j
- JvydGvau1pC7EaV71R6OPJ6A4nb+hVHZmRQW7/r1RK39R6+srpiCfpfarjwj4+xxWRwmiEa9u
- lSXctTBJq6oWGkZFw/6Z/me7EcZyBMj3vUWhz50loeHx/PamvrixfMI6sTUBr0o3PnALwjlro
- VUY5U65Slwfko2iB3HV5gI2kmwunfZgnPEW+rrbt3OprRBXTYqmCXzx7jHsQv22oP63hpqKEF
- pP9QbY2ZnCD2IJh95qQHWZOQ5lgkTx4QchedZF1H3rZWlQPjcHEekbRvL7F5EVOjTzljQnP1n
- Lf40sG7bP/HKvPyOo8wTWKi/nSTMmrtTLgQgfswXeKC3r4/+7iTocb2oa1br0AKJgf34mjZ5L
- 64Lul3Ml48UQMzLF5kqaZBf430jc9YR9wcBbHEo3ARdVTDQIALAy56++RCBcqCWre4pJguQCn
- hLQmkNGD6wuNbL5Ex4xv9wJ56lxTjOrc7yN3/VbPgsjDHChHxHTBkgixppMANnX0o6TgMR/GX
- 8cnhWSqdF3flCbsy6kZXfpsi5pliyFXCqzm1BYPoFUVLtTiEbslQyphbFsEpbDScR9zlP8E
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:cKeJsdyi0MwlEnEzFBeJKdeh6bhOx7DNo8NUVe7tPVWhxaXPVAA
+ ZOpevYKNDAItU8uOSKc1+bJFv9Le75ay0Y8auuSja9+HWjBxEbNdGpEgFXRUO7Rcg7n4LNa
+ 5PswsWwcxFFYT00hf0cfPgJhmkQmW4HbnxQNKt6glGvkGxmZpiCIcMuC8XJbbaJXYBCuuVu
+ IPajnI6sTjsjEwlEU6PGQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:cNZt1kfyLoo=:JFZLyMm/iFn47s+QxZKSHw
+ BgFmGNZHgXUqQg4WEJ0T/ZE6ydeWlo+cAC4/vQcWGw6Cf5gu5ghTxoD2TJVjWyL53DrP/ikmJ
+ 0K0obObZE5uF2idT58f3bM1Q59WvWYcU3a2iB7UvChBWIEc5T/j6v70YVDRQ+5EEKN5tCsxmC
+ vGmZARYugVhDSrqdBWEF+CS4VHrNL5FehFhe9XEZQMLCPR6yyDzv5oQFAPNDn9xZqwdr9Dal4
+ 7g3ABCGb1zXrzk7vF3kz3ipIkaC0Y0Fkc6U8gIzel9UVptwOXZttqrdtfTZAgudDniQmsC7iG
+ Y+HmbB49XUV482y1DlUtgEuLXyKcc6YspMDQhAEVEq9ffQEme5AhctXt5Dv/aufygjSLuB3dP
+ OZoT81Pz+64ciyFf7GAdfyEPg+FQqaNfrOK7l2Bo8GKvn+1fVqZ8ttYr9KZKVcmCh8ZRXWAXB
+ wm5kcD32uMHDDP40D4YSDrQPAkwajd3VR6tJ23X0jpY2+jXWkMjuAer4Br2r/oGgHMzV1dkX4
+ lg+zuQxfkPLbiMKVhGwmE6O2Np1nekvRunnjOdc9ju9bk0tSONkDH3SksatX8Q20ZQxZaiWHP
+ 99/LItbrtHKiwy8U0pXhzzzrsnxLpmrD/EcvsMObW9P669pOacrQq+7dwd9iYZPSIOhMDRnWb
+ t6joT6kB0Gqv05IrkgH0EjsXMPKZzIWcV4/eLMGMh3M8blkpm5AhmdKk6fak2Bit674NEXOeb
+ 5ykwHYE/YVTuWPRr7WW8hMmnW1Wo4Siz0Rwmt8zh5+Xo2Pa5Ag0A8HjOM3+pI1QWUcJKO42Oe
+ JsOYio7jn+IyRMMtGqZCkLSyAnhMREkMZlIqgKxkGfMpKuzZNL8acBo9MtMB3FvP+Ao/c34
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 15:40:39
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 15:30:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -81,49 +83,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 64f0ad8ad8e13257e7c912df470d46784b55c3fd=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2020-07-02' =
-into staging (2020-07-02 15:54:09 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/vivier/qemu-m68k.git tags/m68k-next-pull-request=0D
-=0D
-for you to fetch changes up to d159dd058c7dc48a9291fde92eaae52a9f26a4d1:=0D
-=0D
-  softfloat,m68k: disable floatx80_invalid_encoding() for m68k (2020-07-06 =
-21:41:52 +0200)=0D
-=0D
-----------------------------------------------------------------=0D
-m68k pull-request 20200706=0D
-=0D
-disable floatx80_invalid_encoding() for m68k=0D
-fix m68k_cpu_get_phys_page_debug()=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Laurent Vivier (1):=0D
-  softfloat,m68k: disable floatx80_invalid_encoding() for m68k=0D
-=0D
-Mark Cave-Ayland (2):=0D
-  target/m68k: fix physical address translation in=0D
-    m68k_cpu_get_phys_page_debug()=0D
-  target/m68k: consolidate physical translation offset into=0D
-    get_physical_address()=0D
-=0D
- include/fpu/softfloat.h | 24 ++++++++++++++++++++++++=0D
- target/m68k/helper.c    | 17 ++++++++---------=0D
- 2 files changed, 32 insertions(+), 9 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+The result of the get_physical_address() function should be combined with the
+offset of the original page access before being returned. Otherwise the
+m68k_cpu_get_phys_page_debug() function can round to the wrong page causing
+incorrect lookups in gdbstub and various "Disassembler disagrees with
+translator over instruction decoding" warnings to appear at translation time.
+
+Fixes: 88b2fef6c3 ("target/m68k: add MC68040 MMU")
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200701201531.13828-2-mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index 79b0b10ea9bc..631eab777494 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -820,10 +820,14 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     if (env->sr & SR_S) {
+         access_type |= ACCESS_SUPER;
+     }
++
+     if (get_physical_address(env, &phys_addr, &prot,
+                              addr, access_type, &page_size) != 0) {
+         return -1;
+     }
++
++    addr &= TARGET_PAGE_MASK;
++    phys_addr += addr & (page_size - 1);
+     return phys_addr;
+ }
+ 
+-- 
+2.26.2
+
 
