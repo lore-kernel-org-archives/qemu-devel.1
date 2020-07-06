@@ -2,93 +2,67 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2AE1C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A834C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:54:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C85320724
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62CBB2070C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 07:54:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PgwueSQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C85320724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DogxOmM8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CBB2070C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsLm2-0006R0-Q2
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 03:42:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50622)
+	id 1jsLxm-0002Xk-MN
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 03:54:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsLlJ-0005mR-IM
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 03:42:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59603
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsLlH-00070Z-51
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 03:42:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594021317;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VPclBdxcEAnChhlbJZsDBWI14QCfYuM438hdr/HHVjs=;
- b=PgwueSQOuyP2kiygGxMkitsV5RaPqCtwbI3cu1AYwl8nb8MIvQ4vjxXg78QUAHrZgvhpiY
- r4wMS/v+oqWSoHqvlMTlpcL31CMRzeOYuePWb6t5H9op3ob9Q2G99/dfMec9MVTOvaidHb
- fauGQDs9W0K3ZKUiePuCHAqyUeqoGGo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-GXwXvf9pPU6o06QHFW7HIA-1; Mon, 06 Jul 2020 03:41:56 -0400
-X-MC-Unique: GXwXvf9pPU6o06QHFW7HIA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6529A801E6A;
- Mon,  6 Jul 2020 07:41:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 369D110013C2;
- Mon,  6 Jul 2020 07:41:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9139B1138648; Mon,  6 Jul 2020 09:41:49 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v11 8/8] xen: introduce ERRP_AUTO_PROPAGATE
-References: <20200703090816.3295-1-vsementsov@virtuozzo.com>
- <20200703090816.3295-9-vsementsov@virtuozzo.com>
- <e2b4f10a-162c-ebb8-3232-381c4d820f9f@redhat.com>
-Date: Mon, 06 Jul 2020 09:41:49 +0200
-In-Reply-To: <e2b4f10a-162c-ebb8-3232-381c4d820f9f@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Sat, 4 Jul 2020 18:36:07
- +0200")
-Message-ID: <878sfxgkea.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jsLxC-000288-5R; Mon, 06 Jul 2020 03:54:18 -0400
+Received: from ozlabs.org ([203.11.71.1]:59531)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jsLx8-0000bf-Cl; Mon, 06 Jul 2020 03:54:17 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4B0dB51dBJz9sSn; Mon,  6 Jul 2020 17:54:04 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1594022045;
+ bh=o0E0m4KhoJx8xJ6OOB8Azw4UzXHnZoSTfL0h8sn0atM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=DogxOmM801y5fE+3/le9aUI4TSmetmp5CR68m1jJrke19CvLWF50ncuZwilCpe3fp
+ lMgFZ2yjaFcw7hRiOwlyr+Ou4uR+DBEgdX5znmKB2qvHvrePFmE5v7CsCBK4qqvHnN
+ 0vIu+6AkFLRnoJDc3EM+Fyidmm4V6bXUPLuPqvkc=
+Date: Mon, 6 Jul 2020 17:53:20 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Lijun Pan <ljp@linux.ibm.com>
+Subject: Re: [PATCH v3] target/ppc: add vmsumudm vmsumcud instructions
+Message-ID: <20200706075320.GA5996@umbus.fritz.box>
+References: <20200623042501.47065-1-ljp@linux.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="yrj/dFKFPuw6o+aM"
+Content-Disposition: inline
+In-Reply-To: <20200623042501.47065-1-ljp@linux.ibm.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 03:54:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,94 +75,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org, groug@kaod.org,
- Stefano Stabellini <sstabellini@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On 7/3/20 11:08 AM, Vladimir Sementsov-Ogievskiy wrote:
->> If we want to add some info to errp (by error_prepend() or
->> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
->> Otherwise, this info will not be added when errp =3D=3D &error_fatal
->> (the program will exit prior to the error_append_hint() or
->> error_prepend() call).  Fix such cases.
->>=20
->> If we want to check error after errp-function call, we need to
->> introduce local_err and then propagate it to errp. Instead, use
->> ERRP_AUTO_PROPAGATE macro, benefits are:
->> 1. No need of explicit error_propagate call
->> 2. No need of explicit local_err variable: use errp directly
->> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
->>    &error_fatal, this means that we don't break error_abort
->>    (we'll abort on error_set, not on error_propagate)
->>=20
->> This commit is generated by command
->>=20
->>     sed -n '/^X86 Xen CPUs$/,/^$/{s/^F: //p}' MAINTAINERS | \
->>     xargs git ls-files | grep '\.[hc]$' | \
->>     xargs spatch \
->>         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->>         --macro-file scripts/cocci-macro-file.h \
->>         --in-place --no-show-diff --max-width 80
->>=20
->> Reported-by: Kevin Wolf <kwolf@redhat.com>
->> Reported-by: Greg Kurz <groug@kaod.org>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>  hw/block/dataplane/xen-block.c |  17 +++---
->>  hw/block/xen-block.c           | 102 ++++++++++++++-------------------
->>  hw/pci-host/xen_igd_pt.c       |   7 +--
->>  hw/xen/xen-backend.c           |   7 +--
->>  hw/xen/xen-bus.c               |  92 +++++++++++++----------------
->>  hw/xen/xen-host-pci-device.c   |  27 +++++----
->>  hw/xen/xen_pt.c                |  25 ++++----
->>  hw/xen/xen_pt_config_init.c    |  17 +++---
->>  8 files changed, 128 insertions(+), 166 deletions(-)
->
-> Without the description, this patch has 800 lines of diff...
-> It killed me, I don't have the energy to review patch #7 of this
-> series after that, sorry.
-> Consider splitting such mechanical patches next time. Here it
-> could have been hw/block, hw/pci-host, hw/xen.
+--yrj/dFKFPuw6o+aM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Probably my fault; I asked for less fine-grained splitting.
+On Mon, Jun 22, 2020 at 11:25:01PM -0500, Lijun Pan wrote:
+> vmsumudm (Power ISA 3.0) - Vector Multiply-Sum Unsigned Doubleword Modulo
+> VA-form.
+> vmsumcud (Power ISA 3.1) - Vector Multiply-Sum & write Carry-out Unsigned
+> Doubleword VA-form.
 
-Finding a split of a tree-wide transformation that pleases everyone is
-basically impossible.
+If this is only in ISA 3.1, shouldn't it be conditional on some
+instruction flag for that?
 
-The conversion to ERRP_AUTO_PROPAGATE() could be one patch per function,
-but that would be excessive.
+SHould this maybe be integrated into your other series of ISA 3.1
+instructions.
 
-Vladimir chose to split along maintenance boundaries, so he can cc: the
-right people on the right code.  I agree with the idea.  The difficulty
-is which boundaries.  Our code is not partitioned into maintenance
-domains.  Instead, we have overlapping sets.  Makes sense, because it
-mirrors how we actually maintain it.
+>=20
+> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+> ---
+> v3: implement vmsumudm/vmsumcud through int128 functions,
+>     suggested by Richard Henderson.
+>=20
+>  disas/ppc.c                         |  2 ++
+>  target/ppc/helper.h                 |  4 ++-
+>  target/ppc/int_helper.c             | 49 ++++++++++++++++++++++++++++-
+>  target/ppc/translate.c              |  1 -
+>  target/ppc/translate/vmx-impl.inc.c | 39 ++++++++++++-----------
+>  target/ppc/translate/vmx-ops.inc.c  |  2 ++
+>  6 files changed, 76 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/disas/ppc.c b/disas/ppc.c
+> index 63e97cfe1d..bd76fae4c4 100644
+> --- a/disas/ppc.c
+> +++ b/disas/ppc.c
+> @@ -2261,7 +2261,9 @@ const struct powerpc_opcode powerpc_opcodes[] =3D {
+>  { "vmsumshs",  VXA(4,  41), VXA_MASK,	PPCVEC,		{ VD, VA, VB, VC } },
+>  { "vmsumubm",  VXA(4,  36), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
+>  { "vmsumuhm",  VXA(4,  38), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
+> +{ "vmsumudm",  VXA(4,  35), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC=
+ } },
+>  { "vmsumuhs",  VXA(4,  39), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
+> +{ "vmsumcud",  VXA(4,  23), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC=
+ } },
+>  { "vmulesb",   VX(4,  776), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+>  { "vmulesh",   VX(4,  840), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+>  { "vmuleub",   VX(4,  520), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index 2dfa1c6942..d540e8f30b 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -263,10 +263,12 @@ DEF_HELPER_3(vpkpx, void, avr, avr, avr)
+>  DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
+> +DEF_HELPER_5(vmsumudm, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
+> -DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
+> +DEF_HELPER_5(vmsumcud, void, env, avr, avr, avr, avr)
+> +DEF_HELPER_5(vmladduhm, void, env, avr, avr, avr, avr)
+>  DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
+>  DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, env)
+>  DEF_HELPER_3(lvebx, void, env, avr, tl)
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index be53cd6f68..37ea343cb3 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -926,7 +926,8 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a,
+>      }
+>  }
+> =20
+> -void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_=
+t *c)
+> +void helper_vmladduhm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+> +                      ppc_avr_t *b, ppc_avr_t *c)
+>  {
+>      int i;
+> =20
+> @@ -1064,6 +1065,52 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *=
+r, ppc_avr_t *a,
+>      }
+>  }
+> =20
+> +void helper_vmsumudm(CPUPPCState *env, ppc_avr_t *r,
+> +                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+> +{
+> +    Int128 sum;
+> +    uint64_t lo, hi;
+> +
+> +    sum =3D int128_make128(c->VsrD(1), c->VsrD(0));
+> +
+> +    mulu64(&lo, &hi, a->VsrD(0), b->VsrD(0));
+> +    sum =3D int128_add(sum, int128_make128(lo, hi));
+> +
+> +    mulu64(&lo, &hi, a->VsrD(1), b->VsrD(1));
+> +    sum =3D int128_add(sum, int128_make128(lo, hi));
+> +
+> +    r->VsrD(0) =3D int128_gethi(sum);
+> +    r->VsrD(1) =3D int128_getlo(sum);
+> +}
+> +
+> +void helper_vmsumcud(CPUPPCState *env, ppc_avr_t *r,
+> +                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+> +{
+> +    Int128 sum;
+> +    uint64_t p1lo, p1hi, p2lo, p2hi;
+> +
+> +    mulu64(&p1lo, &p1hi, a->VsrD(0), b->VsrD(0));
+> +    mulu64(&p2lo, &p2hi, a->VsrD(1), b->VsrD(1));
+> +
+> +    /* Sum lowest 64-bit elements.  */
+> +    sum =3D int128_make128(c->VsrD(1), 0);
+> +    sum =3D int128_add(sum, int128_make128(p1lo, 0));
+> +    sum =3D int128_add(sum, int128_make128(p2lo, 0));
+> +
+> +    /*
+> +     * Discard low 64-bits, leaving the carry into bit 64.
+> +     * Then sum the higher 64-bit elements.
+> +     */
+> +    sum =3D int128_rshift(sum, 64);
+> +    sum =3D int128_add(sum, int128_make128(c->VsrD(0), 0));
+> +    sum =3D int128_add(sum, int128_make128(p1hi, 0));
+> +    sum =3D int128_add(sum, int128_make128(p2hi, 0));
+> +
+> +    /* The result is only the carry into bits 64 & 65. */
+> +    r->VsrD(1) =3D int128_gethi(sum);
+> +    r->VsrD(0) =3D 0;
+> +}
+> +
+>  #define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast)   \
+>      void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
+>      {                                                                   \
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 4ce3d664b5..35ff1aa77e 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -7281,7 +7281,6 @@ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC=
+_ALTIVEC),
+>  GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+>  GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+>  GEN_HANDLER(mtvscr, 0x04, 0x2, 0x19, 0x03ff0000, PPC_ALTIVEC),
+> -GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x00000000, PPC_ALTIVEC),
+>  #if defined(TARGET_PPC64)
+>  GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, PPC_NONE,
+>                PPC2_ISA300),
+> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+> index 403ed3a01c..520b49a773 100644
+> --- a/target/ppc/translate/vmx-impl.inc.c
+> +++ b/target/ppc/translate/vmx-impl.inc.c
+> @@ -1248,6 +1248,25 @@ static void gen_vsldoi(DisasContext *ctx)
+>      tcg_temp_free_i32(sh);
+>  }
+> =20
+> +#define GEN_VAFORM(name, opc2)                                          \
+> +static void glue(gen_, name)(DisasContext *ctx)                         \
+> +{                                                                       \
+> +    TCGv_ptr ra, rb, rc, rd;                                            \
+> +    if (unlikely(!ctx->altivec_enabled)) {                              \
+> +        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
+> +        return;                                                         \
+> +    }                                                                   \
+> +    ra =3D gen_avr_ptr(rA(ctx->opcode));                                =
+  \
+> +    rb =3D gen_avr_ptr(rB(ctx->opcode));                                =
+  \
+> +    rc =3D gen_avr_ptr(rC(ctx->opcode));                                =
+  \
+> +    rd =3D gen_avr_ptr(rD(ctx->opcode));                                =
+  \
+> +    gen_helper_##name(cpu_env, rd, ra, rb, rc);                         \
+> +    tcg_temp_free_ptr(ra);                                              \
+> +    tcg_temp_free_ptr(rb);                                              \
+> +    tcg_temp_free_ptr(rc);                                              \
+> +    tcg_temp_free_ptr(rd);                                              \
+> +}
+> +
+>  #define GEN_VAFORM_PAIRED(name0, name1, opc2)                           \
+>  static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
+>      {                                                                   \
+> @@ -1272,24 +1291,8 @@ static void glue(gen_, name0##_##name1)(DisasConte=
+xt *ctx)              \
+>      }
+> =20
+>  GEN_VAFORM_PAIRED(vmhaddshs, vmhraddshs, 16)
+> -
+> -static void gen_vmladduhm(DisasContext *ctx)
+> -{
+> -    TCGv_ptr ra, rb, rc, rd;
+> -    if (unlikely(!ctx->altivec_enabled)) {
+> -        gen_exception(ctx, POWERPC_EXCP_VPU);
+> -        return;
+> -    }
+> -    ra =3D gen_avr_ptr(rA(ctx->opcode));
+> -    rb =3D gen_avr_ptr(rB(ctx->opcode));
+> -    rc =3D gen_avr_ptr(rC(ctx->opcode));
+> -    rd =3D gen_avr_ptr(rD(ctx->opcode));
+> -    gen_helper_vmladduhm(rd, ra, rb, rc);
+> -    tcg_temp_free_ptr(ra);
+> -    tcg_temp_free_ptr(rb);
+> -    tcg_temp_free_ptr(rc);
+> -    tcg_temp_free_ptr(rd);
+> -}
+> +GEN_VAFORM(vmsumcud, 11)
+> +GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17)
+> =20
+>  static void gen_vpermr(DisasContext *ctx)
+>  {
+> diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vm=
+x-ops.inc.c
+> index 84e05fb827..aee23e31c6 100644
+> --- a/target/ppc/translate/vmx-ops.inc.c
+> +++ b/target/ppc/translate/vmx-ops.inc.c
+> @@ -276,6 +276,8 @@ GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),
+>  GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),
+>  GEN_VAFORM_PAIRED(vsel, vperm, 21),
+>  GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),
+> +GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, PPC_ALTIVEC),
+> +GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17),
+> =20
+>  GEN_VXFORM_DUAL(vclzb, vpopcntb, 1, 28, PPC_NONE, PPC2_ALTIVEC_207),
+>  GEN_VXFORM_DUAL(vclzh, vpopcnth, 1, 29, PPC_NONE, PPC2_ALTIVEC_207),
 
-Because of that, a blind split guided by MAINTAINERS won't work well.  A
-split that makes sense needs a bit of human judgement, too.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-This part makes perfect sense to me from the cc: point of view: it's
-Xen, the whole of Xen, and nothing but Xen.
+--yrj/dFKFPuw6o+aM
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I acknowledge that its size made it exhausting for you to review.  I
-didn't expect that, probably because after having spent hours on
-reviewing and improving the macro and the Coccinelle script, I know
-exactly what to look for, and also consider the script trustworthy[*].
+-----BEGIN PGP SIGNATURE-----
 
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8C2G0ACgkQbDjKyiDZ
+s5KJAg//RqchsaL3KvZV8akLG1G5YaDeNCNBHpMSVlv5t71gfhoj+/MPR5Tabcco
+YCLp+S5Ulk+ESjZk5VvgZJ1zf0q4h93VcOovVwU7LXwM8+tpVGLZVCa36hrgorei
+nh7YHacMCfVH8uGiCixjkrhElvFPi1Oiv7wFyHRijlXc87lmra0+itmEQ1A3DvLV
+EhjGZRS8usUq9XVyXO4+bDhJTVhVyBfeKRnvVdw27UXtijt+zEOT4iS5Ud9tSIqr
+KqIj9NYOrjrHF56wcgtB9nObbih/7EAv/x+IACkYkRpYEP/xI9Pz0m37qNdXtLwe
+2/IJG0Ou2Gjnq1DWe9tSTjCVAUBa0NRC5znbQalMsjvZeyOFcFGOAwQZXeqgIqFA
+V/RhK1VyBJJhGvIZs7wLJxhtF5biu8C0JXdNSIBGqwFz2ckzqKP3d6t4AiPnDnfR
+Auul/AV39oBusXJrQzjKy0k0OLx1CMLuu4LTmC1yEMkYR20VKQZD5DGqvpTap9x+
+TaiaLH3vZce3wBuZVBNFsEherGJ19ZgWcd8+QeHsSTIY44AVwApgQm3n98tb0REV
+kzzaL9rv+QKl3JPvXeEVjc8JJB5jKg1ff/NK/IBA7jRUaEmJD7Pou3HPgxVKe6Qg
+dCQ+Sj04hVICCZQKASXuEhQj2iD4bDOgPjTSEVBWAVzSb/ANZHU=
+=e9Tt
+-----END PGP SIGNATURE-----
 
-Thank you, much appreciated!
-
-
-[*] I've learned not to trust Coccinelle 100%, ever.
-
+--yrj/dFKFPuw6o+aM--
 
