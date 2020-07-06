@@ -2,104 +2,126 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 278DBC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E6FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3EC32074F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:24:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3EC32074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0FA232074F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 11:24:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="iC7Ut1CE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA232074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsPET-0006lM-5k
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 07:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42252)
+	id 1jsPEX-0006pb-8t
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 07:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jsPDX-0005vv-2z; Mon, 06 Jul 2020 07:23:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7418)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jsPDY-0005w8-Pj; Mon, 06 Jul 2020 07:23:25 -0400
+Received: from mail-eopbgr30125.outbound.protection.outlook.com
+ ([40.107.3.125]:38725 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jsPDU-00088N-HN; Mon, 06 Jul 2020 07:23:22 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 066B4eUj143761; Mon, 6 Jul 2020 07:23:18 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3236n98qjf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Jul 2020 07:23:18 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 066B6DWg005641;
- Mon, 6 Jul 2020 07:23:18 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.107])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3236n98qhw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Jul 2020 07:23:17 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
- by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 066BKO3O027186;
- Mon, 6 Jul 2020 11:23:15 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma03fra.de.ibm.com with ESMTP id 322hd7s4j3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Jul 2020 11:23:15 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 066BNDfq29950030
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 6 Jul 2020 11:23:13 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0D7E111C058;
- Mon,  6 Jul 2020 11:23:13 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9C0C111C052;
- Mon,  6 Jul 2020 11:23:12 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.6.129])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  6 Jul 2020 11:23:12 +0000 (GMT)
-Date: Mon, 6 Jul 2020 13:23:11 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PULL 13/14] virtio-ccw: fix virtio_set_ind_atomic
-Message-ID: <20200706132311.2add044f.pasic@linux.ibm.com>
-In-Reply-To: <20200703100650.621212-14-cohuck@redhat.com>
-References: <20200703100650.621212-1-cohuck@redhat.com>
- <20200703100650.621212-14-cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jsPDV-00088M-Dh; Mon, 06 Jul 2020 07:23:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rhrg/Aa4IgyBl2mBTDU0kYwqtznE3FlZzUAHM5y9AzXjSXm/O2X4LsPwVqBmnxY3Va5PpnLB6WqbEt7Y4GR33w8GqNgOmNn2oYpWPWwPUDsRKPkITQaRIgWxzzjAsha+LK3UwHaV/g6Cgs2PYJpmrmjNFhajsJKDvfeGfiCuGuGe9Gi1xa9IKHNO+7GkfTpKdeR2quo/VRUcvOKW/cKPhZFlFgNu40LqnYiLHNZ9s1ON9aFmZ5kkZchIAyrEMdYX5t3vYRE6ob3pMNgsQ06w9BAukwZbW3PJhM032A+gNFnkvVdBLuYexy8rJbfr3qdMEUsXQlR1GdSMIAvzo68c9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u8/EJgVLlm0LykqOhRRHa/ifoIbCkMRaBBygqGdlHpg=;
+ b=GygdRX1vDSr1S8ivTCUTdYQwWwgViY16TSVO3zLT5GFkux07A34nDs+p/cdQ8/EH58NyEdgAXOPx3FAP4aGm2Exiu6CpVNd7gUYMW6MGsX3YsrGJJxvBJIdTT8/xqrYMSDFN+q2jiyWh2i9qj0czPtWy86az9vIX0duRwaUfY+D1rcfwmVa3+ExiPcjhGghZB4KCn3xnpjiFM640LHLBlJ9YNOyK+/tSM4Yq0Lz3pfEMPOHgp4lLK1Ix/VJjtA6BWmHL9J/u/zfGWdv54tGZylyDfKX8SBoQWRhjvCPDGn3VDB7lkmp/sPrvMxQ2cTEplwrTigEnvUFxmPewmxN1nQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u8/EJgVLlm0LykqOhRRHa/ifoIbCkMRaBBygqGdlHpg=;
+ b=iC7Ut1CEQpwdg7nhR3ml4WhjPrxW2f48xjdXF+uAFIMrC8ha4imk7/YgLgDg750dshLkH4GBNSdPAADWM2VxVqvmfBRncKnOG1kU8/vllyQJCn5wzS+EKx/3TgpACTs7HwZc1sObdFs6L1spVX24pdFzhKFaoie9b7jODxcWsf8=
+Authentication-Results: kaod.org; dkim=none (message not signed)
+ header.d=none;kaod.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0801MB1907.eurprd08.prod.outlook.com (2603:10a6:203:4a::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.21; Mon, 6 Jul
+ 2020 11:23:18 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%4]) with mapi id 15.20.3153.029; Mon, 6 Jul 2020
+ 11:23:18 +0000
+Subject: Re: [PATCH v3 24/44] qom: Use return values to check for error where
+ that's simpler
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200706080950.403087-1-armbru@redhat.com>
+ <20200706080950.403087-25-armbru@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2f366245-8995-6446-898c-ced84d04b5b7@virtuozzo.com>
+Date: Mon, 6 Jul 2020 14:23:16 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200706080950.403087-25-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR04CA0004.eurprd04.prod.outlook.com
+ (2603:10a6:208:122::17) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-06_08:2020-07-06,
- 2020-07-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 adultscore=0
- lowpriorityscore=0 mlxlogscore=999 impostorscore=0 bulkscore=0
- priorityscore=1501 cotscore=-2147483648 malwarescore=0 suspectscore=0
- mlxscore=0 spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007060086
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 07:21:42
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.58) by
+ AM0PR04CA0004.eurprd04.prod.outlook.com (2603:10a6:208:122::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20 via Frontend
+ Transport; Mon, 6 Jul 2020 11:23:17 +0000
+X-Originating-IP: [185.215.60.58]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b880912a-f825-48c4-1f08-08d8219efb4e
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1907:
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB1907EB826BA65FD46C73F001C1690@AM5PR0801MB1907.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-Forefront-PRVS: 04569283F9
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TpZXFtHMFiVy36nA/KMRMtG96SsYDY6kHG458ZnVaW/2uk5DNSq6i9Rpuow4g7EwbA1Cge/2S/lUcpsQOfWjxaRHHfBfq8ySaSytFSEkZnmVIitthSIsSdAYUGfX+ZM9DHqh9cn6cwefBhUZi/F4KjJTtbjadQJa+eyxVvpDwYxMo159+pvbN/Pey4VJYZOnxWZ4Qr3NDyIBZ1aljjY7xJ5DT/w29TiFnSW1c4TW5SjB3FPWfU8KpRnN+DleJ9qzWuZwFHauHak9BhJscs1NbqYsreTtCwKll8sdlnRoClQcPXnnzbs3OHpwN743vhvK+B2Goe5LViU9lXiJu9E6ZYvcnQkRMntTyDwea2xS1QX9MpkSeM8JMvXV9Z4aG2OW
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(396003)(346002)(39840400004)(366004)(136003)(5660300002)(186003)(4744005)(2906002)(16526019)(316002)(16576012)(66946007)(31696002)(31686004)(86362001)(66556008)(66476007)(956004)(2616005)(6486002)(8936002)(4326008)(52116002)(8676002)(36756003)(478600001)(26005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 1pSapvEhUiFc/N8qUVOCNDETKf5Kvcwvfpzs6Qfhc8yaXj/N04iBF7FiGdtdxiTIaliR4t/58m3MxXcHvIqJrnnYp8WOsBkE2vQxeSG8DsWa5HC7+y5RRRkhAZHE3bxj2xPVxJFMj8lhj5DM8u6GKodlgpqV8Gs/OjWXSA469kyHdxrpxTVjlr5KqieUIMTp2i9E4rzPPKfwmvVpuRqAJlvBKbwfYUqi71DmxWZqo/WEsydzzaaI6VRwi/mqtzrzUsIWwc1DdKMYYMUvQOMK2ng3mmV1d60vhUIUTY+HYVe3WntIBG20y5o1TqtOl97EGBtRv0HHLDOW/HN19D2/eeXOuvt8Uq/ZvygdXG0JdPav9pKIbsOdJvQ4tvRaqirvBxQpsDoJaRFckOpfd8OX/q4yaB9pp1ox0LSlOgTjuxunHJXfN+79lXrYUu+xxQ5utUdslM+2jucBFTDYDjsYweAlGFshJqS1owZFCBk6Atk=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b880912a-f825-48c4-1f08-08d8219efb4e
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2020 11:23:17.9159 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iiYtFweetPixXwFUAmaisv3I+rjQfsYQMRafTdxmwVP36fSGPOc82p8Ahx9IwGSG8c4b190xWBWtxf6ZmJvBKnBac1WjCFXQiccIxJWj8E8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1907
+Received-SPF: pass client-ip=40.107.3.125;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 07:23:19
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,85 +134,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org,
- Andre Wild <Andre.Wild1@ibm.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, groug@kaod.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  3 Jul 2020 12:06:49 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> From: Halil Pasic <pasic@linux.ibm.com>
+06.07.2020 11:09, Markus Armbruster wrote:
+> When using the Error object to check for error, we need to receive it
+> into a local variable, then propagate() it to @errp.
 > 
-> The atomic_cmpxchg() loop is broken because we occasionally end up with
-> old and _old having different values (a legit compiler can generate code
-> that accessed *ind_addr again to pick up a value for _old instead of
-> using the value of old that was already fetched according to the
-> rules of the abstract machine). This means the underlying CS instruction
-> may use a different old (_old) than the one we intended to use if
-> atomic_cmpxchg() performed the xchg part.
+> Using the return value permits allows receiving it straight to @errp.
 > 
-> Let us use volatile to force the rules of the abstract machine for
-> accesses to *ind_addr. Let us also rewrite the loop so, we that the
+> Signed-off-by: Markus Armbruster<armbru@redhat.com>
+> Reviewed-by: Eric Blake<eblake@redhat.com>
 
-Michael T. Has pointed out that this sentence is ungrammatical. 
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-s/we// would IMHO solve the problem. Can we fix this before it gets
-merged?
-
-> new old is used to compute the new desired value if the xchg part
-> is not performed.
-> 
-> Fixes: 7e7494627f ("s390x/virtio-ccw: Adapter interrupt support.")
-> Reported-by: Andre Wild <Andre.Wild1@ibm.com>
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Message-Id: <20200616045035.51641-2-pasic@linux.ibm.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/s390x/virtio-ccw.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index c1f4bb1d331d..3c988a000b5b 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -786,9 +786,10 @@ static inline VirtioCcwDevice *to_virtio_ccw_dev_fast(DeviceState *d)
->  static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                                       uint8_t to_be_set)
->  {
-> -    uint8_t ind_old, ind_new;
-> +    uint8_t expected, actual;
->      hwaddr len = 1;
-> -    uint8_t *ind_addr;
-> +    /* avoid  multiple fetches */
-> +    uint8_t volatile *ind_addr;
->  
->      ind_addr = cpu_physical_memory_map(ind_loc, &len, true);
->      if (!ind_addr) {
-> @@ -796,14 +797,15 @@ static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                       __func__, sch->cssid, sch->ssid, sch->schid);
->          return -1;
->      }
-> +    actual = *ind_addr;
->      do {
-> -        ind_old = *ind_addr;
-> -        ind_new = ind_old | to_be_set;
-> -    } while (atomic_cmpxchg(ind_addr, ind_old, ind_new) != ind_old);
-> -    trace_virtio_ccw_set_ind(ind_loc, ind_old, ind_new);
-> -    cpu_physical_memory_unmap(ind_addr, len, 1, len);
-> +        expected = actual;
-> +        actual = atomic_cmpxchg(ind_addr, expected, expected | to_be_set);
-> +    } while (actual != expected);
-> +    trace_virtio_ccw_set_ind(ind_loc, actual, actual | to_be_set);
-> +    cpu_physical_memory_unmap((void *)ind_addr, len, 1, len);
->  
-> -    return ind_old;
-> +    return actual;
->  }
->  
->  static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-
+-- 
+Best regards,
+Vladimir
 
