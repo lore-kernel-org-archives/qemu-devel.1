@@ -2,99 +2,89 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C57DAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440CBC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9095D20739
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D99620739
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 10:29:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSrgfnp+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9095D20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HzL1It/+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D99620739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsOLk-000074-Qb
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:27:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56150)
+	id 1jsON7-0001nd-Bm
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 06:29:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsO8H-0002cZ-Lx
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:13:55 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54717)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsO8F-0005Xq-W9
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:13:53 -0400
-Received: by mail-wm1-x342.google.com with SMTP id o8so38604653wmh.4
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 03:13:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9SqWFVrzUfCxpWPdQsQSQdUU0ZuLBS9kb6eOSzr3lFg=;
- b=JSrgfnp+MOSdnvNPllB6emVuPYsFiOMqlR+FHnrrv5rXT+bicgp/lEKab4p/v8sFmP
- yGSrjG+9844nppaHxxfp7RboNYjiZglAPr3X7QKTa8FGlP5IJgGtBSvtjtxfSGMITqW7
- 2eu9fjEpry9MFH/WCUla1DoPuUVCCt9lfBIrKkjAvzmPhKOuZLzK/I4ZHcfdy/LhiWh6
- uuV4EOaHo0UqVldhSzcl15scZjcWn2pT0rYiKVWN6rCYT/GcRaBN2bvorDb1+L7ARFTa
- BLyi0Fvp+GfSEZz9URQNG7lFDk1DoVKlkDaxxU1GAy+AmqNvzEzii5OdjkgU07nhHqdT
- J2fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9SqWFVrzUfCxpWPdQsQSQdUU0ZuLBS9kb6eOSzr3lFg=;
- b=Z8aoNp3qSCWk4gP3M9wAwYlAw095d/R3xjU4z4bpa4NE9qQm5EOBjGKN478C5QWKz8
- M4zF9Srmjc4pIBn+GnO1Ypbn4Z4HOyfv/ygcYdgnNcjPfyiYsrNlz5dZj3f1la4EjYat
- C229kfK03xEuaXMFiqyW117fCjv5XCv+JuO9/OjnEuyRhYuoC+2Z9cHg+X/Wr2s4jVIz
- Vn0M+eXhYrQmvbtJ41jULEHlhzQ+5Senov07Zhk7Sr+QBdTj7Jc0Xzgt8n5MTbQ4V0dT
- 90qtUAKi/DIThMAiRbRGLKbbfZ5rlw4sgNeik8PtEjtYwEq9ntireudFWJCMpfSGzSOm
- 6KAg==
-X-Gm-Message-State: AOAM533Kc8CNRg6z/mUC1Tz20cMhlOUk3Dqswt+si/Rn3sIxLp0GRW8j
- 2qvlign95bRFnkfdT5Xu7AI=
-X-Google-Smtp-Source: ABdhPJykzzHeJ2VnqBzYnU0XJnVZrHdQPaUOAEnqDOWE319ijS+hLqBFz0/FGnw6XO+xvqf8hpJySw==
-X-Received: by 2002:a7b:ca59:: with SMTP id m25mr51391509wml.151.1594030430053; 
- Mon, 06 Jul 2020 03:13:50 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id v11sm60962418wmb.3.2020.07.06.03.13.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 06 Jul 2020 03:13:49 -0700 (PDT)
-Subject: Re: [PULL 36/37] qdev: remove QDEV_PROP_PTR
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>
-References: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
- <20200107150442.1727958-37-marcandre.lureau@redhat.com>
- <13c91f97-a7e6-adbd-9c23-2464f2b1b46e@amsat.org>
- <CAMxuvaxx0bM5yhZcmc7LPmpMt-qvuB+zjhRR1mpUiNm=DyasoQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9b2cfb05-ce65-7356-fe78-718e39138093@amsat.org>
-Date: Mon, 6 Jul 2020 12:13:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jsOHm-00045L-La
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:23:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43813
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jsOHk-000754-AF
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 06:23:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594031019;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=d7lEmMYN+o5ltYyBHvwWHyN3STBUY3oftm7QMnv6Gv4=;
+ b=HzL1It/+mbDMR6Zito3dDY0xvdHssNldGPkNxl0J136ZEtGxG/SveMp5j6sV+sp+0UR7Lk
+ ck0UX++cFrNufh5obJcqjCBY5HAl3s9w4N/YqqxFx1IzGtPYwSawEOtTJqdE7LP05UnHxf
+ lJWkIyfXO/BtCdcEg1VY/GMjpmQLMM8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-509-AnIZO5mePMSS7TDt3ka3zA-1; Mon, 06 Jul 2020 06:23:36 -0400
+X-MC-Unique: AnIZO5mePMSS7TDt3ka3zA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 336AC91164;
+ Mon,  6 Jul 2020 10:23:34 +0000 (UTC)
+Received: from localhost (ovpn-114-217.ams2.redhat.com [10.36.114.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 46C6C71662;
+ Mon,  6 Jul 2020 10:23:25 +0000 (UTC)
+Date: Mon, 6 Jul 2020 11:23:24 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v2 4/7] vhost: involve device backends in feature
+ negotiation
+Message-ID: <20200706102324.GB328186@stefanha-x1.localdomain>
+References: <20200609170218.246468-1-stefanha@redhat.com>
+ <20200609170218.246468-5-stefanha@redhat.com>
+ <20200609135007-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMxuvaxx0bM5yhZcmc7LPmpMt-qvuB+zjhRR1mpUiNm=DyasoQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <20200609135007-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="eJnRUKwClWJh1Khz"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 01:39:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,145 +98,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, Laurent Vivier <lvivier@redhat.com>,
+ jasowang@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/6/20 12:01 PM, Marc-André Lureau wrote:
-> Hi
-> 
-> On Mon, Jul 6, 2020 at 12:44 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> On 1/7/20 4:04 PM, Marc-André Lureau wrote:
->>> No longer used in the tree. The comment about user_creatable is still
->>> quite relevant, but there is already a similar comment in qdev-core.h.
->>>
->>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  include/hw/qdev-properties.h | 22 ----------------------
->>>  hw/core/qdev-properties.c    | 18 ------------------
->>>  2 files changed, 40 deletions(-)
->>>
->>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
->>> index 16837ab5dd..a90a9cec80 100644
->>> --- a/include/hw/qdev-properties.h
->>> +++ b/include/hw/qdev-properties.h
->>> @@ -18,7 +18,6 @@ extern const PropertyInfo qdev_prop_size;
->>>  extern const PropertyInfo qdev_prop_string;
->>>  extern const PropertyInfo qdev_prop_chr;
->>>  extern const PropertyInfo qdev_prop_tpm;
->>> -extern const PropertyInfo qdev_prop_ptr;
->>>  extern const PropertyInfo qdev_prop_macaddr;
->>>  extern const PropertyInfo qdev_prop_on_off_auto;
->>>  extern const PropertyInfo qdev_prop_losttickpolicy;
->>> @@ -171,25 +170,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
->>>  #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
->>>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
->>>
->>> -/*
->>> - * Please avoid pointer properties.  If you must use them, you must
->>> - * cover them in their device's class init function as follows:
->>> - *
->>> - * - If the property must be set, the device cannot be used with
->>> - *   device_add, so add code like this:
->>> - *   |* Reason: pointer property "NAME-OF-YOUR-PROP" *|
->>> - *   DeviceClass *dc = DEVICE_CLASS(class);
->>> - *   dc->user_creatable = false;
->>> - *
->>> - * - If the property may safely remain null, document it like this:
->>> - *   |*
->>> - *    * Note: pointer property "interrupt_vector" may remain null, thus
->>> - *    * no need for dc->user_creatable = false;
->>> - *    *|
->>> - */
->>> -#define DEFINE_PROP_PTR(_n, _s, _f)             \
->>> -    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, void*)
->>
->> So the replacement is DEFINE_PROP_LINK()? It is not documented, but
->> it takes a TYPENAME argument, so I assume we can only LINK QOM types.
->> Can the documentation be improved?
-> 
-> Certainly, although we already have some documentation in
-> object_property_add_link(). It's annoying that we have several places
-> documenting similar/close API, or API docs in docs/ that quickly
-> becomes outdated, or more difficult to find. Root of the issue is that
-> there are at least 3 ways to add props: object_{,class}_property &
-> QDEV_PROPS ...
-> 
->> Yet another sneaky way to force forks to either update to QOM or die...
-> 
-> You can't blame upstream from doing cleanups and modernization, or
-> stagnating. Forks are forks, with all the pain they carry. If they
-> want to avoid the maintenance cost, they have to do the extra effort
-> to get it upstream. This is also a "sneaky way" to remind them that
-> effort is better spent in this direction.
+--eJnRUKwClWJh1Khz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I totally understand, but at the same time we are excluding hobbyist
-contributors with mainstream exigency.
+On Tue, Jun 09, 2020 at 02:07:44PM -0400, Michael S. Tsirkin wrote:
+> On Tue, Jun 09, 2020 at 06:02:15PM +0100, Stefan Hajnoczi wrote:
+> > Many vhost devices in QEMU currently do not involve the device backend
+> > in feature negotiation. This seems fine at first glance when no
+> > device-specific feature bits are defined (virtio-net has many but some
+> > devices have none).
+> >=20
+> > Unfortunately this causes problems when QEMU's virtqueue implementation
+> > and the device backend's implementation support different features.
+> > QEMU must not report features to the guest that aren't supported by the
+> > device backend.
+> >=20
+> > For example, QEMU supports VIRTIO 1.1 packed virtqueues while many
+> > existing vhost device backends do not. The device backend breaks when
+> > the user sets packed=3Don. This should have been handled gracefully by
+> > feature negotiation instead of resulting in a cryptic failure when the
+> > device backend cannot parse the vring.
+> >=20
+> > Introduce the vhost_old_default_feature_bits[] array so existing
+> > devices can involve the device backend in feature negotiation.
+> > libvhost-user does not report VIRTIO_RING_F_INDIRECT_DESC and other cor=
+e
+> > feature bits even though it implements them. Therefore
+> > vhost_old_default_feature_bits[] only includes feature bits that can be
+> > explicitly negotiated without breaking existing libvhost-user device
+> > backends.
+>=20
+> libvhost-user is in contrib. Can't we just fix it as appropriate?
+> Work arounds have their cost ..
 
-This is unfortunate. I'd like to suggest ideas how to keep the QEMU
-project open to non-corporate contributors, but I don't have any.
+libvhost-user's behavior is unfortunate but the bigger problem is that
+QEMU does not include backends in feature negotiation. Existing backends
+for devices touched in this patch may have a broken
+VHOST_USER_GET_FEATURES implementations and changing QEMU's behavior
+will break them.
 
-Well, maybe this one: better document API changes, if possible with
-examples (example can be as simple as pointing to a particular commit
-sha1). At least for each release, because forks usually try to rebase
-after releases.
+If you feel confident that third-party vhost-user backends will work,
+then we can simplify this patch series. I think we should be very
+careful but it's up to you.
 
-> 
->>> -
->>>  #define DEFINE_PROP_CHR(_n, _s, _f)             \
->>>      DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
->>>  #define DEFINE_PROP_STRING(_n, _s, _f)             \
->>> @@ -262,8 +242,6 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
->>>  void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
->>>                             const uint8_t *value);
->>>  void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
->>> -/* FIXME: Remove opaque pointer properties.  */
->>> -void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
->>>
->>>  void qdev_prop_register_global(GlobalProperty *prop);
->>>  int qdev_prop_check_globals(void);
->>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
->>> index ac28890e5a..6ca7697599 100644
->>> --- a/hw/core/qdev-properties.c
->>> +++ b/hw/core/qdev-properties.c
->>> @@ -501,13 +501,6 @@ const PropertyInfo qdev_prop_string = {
->>>      .set   = set_string,
->>>  };
->>>
->>> -/* --- pointer --- */
->>> -
->>> -/* Not a proper property, just for dirty hacks.  TODO Remove it!  */
->>> -const PropertyInfo qdev_prop_ptr = {
->>> -    .name  = "ptr",
->>> -};
->>> -
->>>  /* --- mac address --- */
->>>
->>>  /*
->>> @@ -1165,17 +1158,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value)
->>>                              name, &error_abort);
->>>  }
->>>
->>> -void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
->>> -{
->>> -    Property *prop;
->>> -    void **ptr;
->>> -
->>> -    prop = qdev_prop_find(dev, name);
->>> -    assert(prop && prop->info == &qdev_prop_ptr);
->>> -    ptr = qdev_get_prop_ptr(dev, prop);
->>> -    *ptr = value;
->>> -}
->>> -
->>>  static GPtrArray *global_props(void)
->>>  {
->>>      static GPtrArray *gp;
->>>
->>
-> 
-> 
+Stefan
+
+--eJnRUKwClWJh1Khz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8C+5wACgkQnKSrs4Gr
+c8hjxAf+LPWcTIlC2XeAfMQ6jEJzgRIRSmpxooh6RkK3Tb6ezLiMn44/UcEKW6cv
+sp4ihxJEFrfsYwnsS82GORjMxd3MzX3+kkh9hUP24PVVLyBeCTKXTfENJ49rMBVo
+LT9rPtO4PQol9YNJMRZrbpsO6Ojh7axilLK+mPJtdjSgtBWbWXty2/szISoNv95B
+Jd9F7c363MTOEHAZLzFarZz5I0jE4U1GZouQfif9lVHAjE21l+DlapGBSOqnoF1k
+UjRfXQUJzjxdo4YNLcI/RP85XIUBKGRvIV3nBoqeclwfHcxiUqrkwIdi/xcOAEtu
+hTuOLh3CxkZYRHPl693J62IqMsMfsQ==
+=pMw8
+-----END PGP SIGNATURE-----
+
+--eJnRUKwClWJh1Khz--
+
 
