@@ -2,94 +2,99 @@ Return-Path: <SRS0=h+Ky=AR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C80C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 21:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B34CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 21:55:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B2B82064C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 21:16:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u3FcFbSl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B2B82064C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B63620674
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jul 2020 21:55:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B63620674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsYTY-0001Ft-Oo
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 17:16:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60536)
+	id 1jsZ5a-0003pN-FG
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 17:55:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jsYRP-000719-GM
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 17:14:19 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44276)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jsYRN-0000Hx-6g
- for qemu-devel@nongnu.org; Mon, 06 Jul 2020 17:14:19 -0400
-Received: by mail-pg1-x543.google.com with SMTP id j19so12095675pgm.11
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 14:14:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:cc:date:message-id:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=4o19OsDe9oFfHbhDQkXw6x1QFNSe+TGuSxA03xPCfOE=;
- b=u3FcFbSlcQQnZArg02xCOwy+LL1DZC8HOmQAmltihMRoJvo0dwUWOp2qfo18v9KClK
- kGP6Qws6WOOXokSo1EyXD4I1SA8MQRD05GUK8YkoQvao8Am2qJsdNv8bkrikJj7/lAQ6
- vzIRZywP0sCgbUXRxcVwA4NLxBeIJJwnm8YIpS6umyOiicG/OTBgLKhr1krNi25KJqkr
- Qrv0X/Ul8uLHFRWSTbwV5zUuZsfjGVYOAWnmUSSwrcLw3DM7w5+y75v+DMJhi6i6wbLH
- elJVJt+r99CG26erLZu3jtMuPEeSJLdJhzDvsrZF9agfvTwAkRkh5cb4LUKV8U91+2rJ
- +CEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=4o19OsDe9oFfHbhDQkXw6x1QFNSe+TGuSxA03xPCfOE=;
- b=QOJbvZBu9Nyzz25Baj4fA1sy6RzecO0sOhtFzBQuoyiOPoLo/iloku4+ycjycxp2Fm
- 23iKDXRc70rOtEzlu1mO7clmOfoGbIUmGTvjDaRUmAeNJBLsceRlrUJLDcfUlVzyN9pI
- BRG9fXtVVNfOTOQEilrkA+/FEi6uTZaG9B2TONiiFuMY/LiDW/LFxmgBqySvcHRLQe4z
- 3ryfy3J3/PxrXDt++9prY9Hg1l99CyDgqpD88240sHg9UzpzNTBdxGLZFT2/VDpP/kKd
- kk0Bcu+SkVoglIKaYvBd4DVlFywXT4LbvJr9MfAZoCerISsTmRHJh0xPHqNBtyBdMg+b
- UNZQ==
-X-Gm-Message-State: AOAM530fJ3Q9hkkfUWRNtJnUEnt5q3XUh6L9L8tAm6d19yB+fYVI73xa
- 1yUDRdToyN0ZfUw2zPkvb4s=
-X-Google-Smtp-Source: ABdhPJy1hFn/LIfoNhWMTkpno1bp3vqYyA0PoIlmSj+Hlu+T0DIQXgPety0IPybGCq9dyFrh0lubDA==
-X-Received: by 2002:a63:6744:: with SMTP id b65mr22083667pgc.42.1594070055646; 
- Mon, 06 Jul 2020 14:14:15 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
- by smtp.gmail.com with ESMTPSA id w18sm19966888pgj.31.2020.07.06.14.14.14
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 06 Jul 2020 14:14:14 -0700 (PDT)
-Subject: [PATCH v2 3/3] virtio-balloon: Replace free page hinting references
- to 'report' with 'hint'
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: david@redhat.com, mst@redhat.com
-Date: Mon, 06 Jul 2020 14:14:14 -0700
-Message-ID: <20200706211414.20018.89815.stgit@localhost.localdomain>
-In-Reply-To: <20200706211314.20018.89695.stgit@localhost.localdomain>
-References: <20200706211314.20018.89695.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
+ (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
+ id 1jsZ51-0003OA-Q9
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 17:55:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59650)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <tobin@linux.vnet.ibm.com>)
+ id 1jsZ4z-0006S8-3w
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 17:55:15 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 066Lb2eu178329; Mon, 6 Jul 2020 17:55:08 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32486c6v10-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 06 Jul 2020 17:55:08 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 066LbQGC179913;
+ Mon, 6 Jul 2020 17:55:07 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32486c6v0q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 06 Jul 2020 17:55:07 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 066LpDlW006255;
+ Mon, 6 Jul 2020 21:55:06 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma03dal.us.ibm.com with ESMTP id 324aej90j7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 06 Jul 2020 21:55:06 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
+ [9.57.199.107])
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 066Lt61i43844088
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 6 Jul 2020 21:55:06 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id ED772124052;
+ Mon,  6 Jul 2020 21:55:05 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B8AFD124064;
+ Mon,  6 Jul 2020 21:55:05 +0000 (GMT)
+Received: from Tobins-MBP-2.fios-router.home (unknown [9.80.216.39])
+ by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+ Mon,  6 Jul 2020 21:55:05 +0000 (GMT)
+From: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] SEV: QMP support for Inject-Launch-Secret
+Date: Mon,  6 Jul 2020 17:54:51 -0400
+Message-Id: <20200706215451.59179-1-tobin@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=alexander.duyck@gmail.com; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-06_20:2020-07-06,
+ 2020-07-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0
+ impostorscore=0 mlxscore=0 clxscore=1015 adultscore=0 priorityscore=1501
+ mlxlogscore=999 lowpriorityscore=0 suspectscore=4 bulkscore=0 phishscore=0
+ cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2007060146
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=tobin@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 17:55:09
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,281 +107,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: thomas.lendacky@amd.com, jejb@linux.ibm.com, tobin@ibm.com,
+ dgilbert@redhat.com, Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>,
+ pbonzini@redhat.com, brijesh.singh@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+AMD SEV allows a guest owner to inject a secret blob
+into the memory of a virtual machine. The secret is
+encrypted with the SEV Transport Encryption Key and
+integrity is guaranteed with the Transport Integrity
+Key. Although QEMU faciliates the injection of the
+launch secret, it cannot access the secret.
 
-Recently a feature named Free Page Reporting was added to the virtio
-balloon. In order to avoid any confusion we should drop the use of the word
-'report' when referring to Free Page Hinting. So what this patch does is go
-through and replace all instances of 'report' with 'hint" when we are
-referring to free page hinting.
-
-Acked-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio-balloon.c         |   74 ++++++++++++++++++------------------
- include/hw/virtio/virtio-balloon.h |   20 +++++-----
- 2 files changed, 47 insertions(+), 47 deletions(-)
+ include/monitor/monitor.h |  3 ++
+ include/sysemu/sev.h      |  2 ++
+ monitor/misc.c            |  8 ++---
+ qapi/misc-target.json     | 18 +++++++++++
+ target/i386/monitor.c     |  9 ++++++
+ target/i386/sev-stub.c    |  5 +++
+ target/i386/sev.c         | 66 +++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events  |  1 +
+ 8 files changed, 108 insertions(+), 4 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index b3e96a822b4d..a21e7c3db538 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -527,22 +527,22 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
-             ret = false;
-             goto out;
-         }
--        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED &&
--            id == dev->free_page_report_cmd_id) {
--            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
-+        if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED &&
-+            id == dev->free_page_hint_cmd_id) {
-+            dev->free_page_hint_status = FREE_PAGE_HINT_S_START;
-         } else {
-             /*
-              * Stop the optimization only when it has started. This
-              * avoids a stale stop sign for the previous command.
-              */
--            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
--                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-+            if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
-+                dev->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-             }
-         }
-     }
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 1018d754a6..bf049c5b00 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -4,6 +4,7 @@
+ #include "block/block.h"
+ #include "qapi/qapi-types-misc.h"
+ #include "qemu/readline.h"
++#include "include/exec/hwaddr.h"
  
-     if (elem->in_num) {
--        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-+        if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
-             qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
-                                       elem->in_sg[0].iov_len);
-         }
-@@ -568,11 +568,11 @@ static void virtio_ballloon_get_free_page_hints(void *opaque)
-         qemu_mutex_unlock(&dev->free_page_lock);
-         virtio_notify(vdev, vq);
-       /*
--       * Start to poll the vq once the reporting started. Otherwise, continue
-+       * Start to poll the vq once the hinting started. Otherwise, continue
-        * only when there are entries on the vq, which need to be given back.
-        */
-     } while (continue_to_get_hints ||
--             dev->free_page_report_status == FREE_PAGE_REPORT_S_START);
-+             dev->free_page_hint_status == FREE_PAGE_HINT_S_START);
-     virtio_queue_set_notification(vq, 1);
+ extern __thread Monitor *cur_mon;
+ typedef struct MonitorHMP MonitorHMP;
+@@ -36,6 +37,8 @@ void monitor_flush(Monitor *mon);
+ int monitor_set_cpu(int cpu_index);
+ int monitor_get_cpu_index(void);
+ 
++void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error **errp);
++
+ void monitor_read_command(MonitorHMP *mon, int show_prompt);
+ int monitor_read_password(MonitorHMP *mon, ReadLineFunc *readline_func,
+                           void *opaque);
+diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+index 98c1ec8d38..b279b293e8 100644
+--- a/include/sysemu/sev.h
++++ b/include/sysemu/sev.h
+@@ -18,4 +18,6 @@
+ 
+ void *sev_guest_init(const char *id);
+ int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
++int sev_inject_launch_secret(const char *hdr, const char *secret,
++                             uint64_t gpa);
+ #endif
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 89bb970b00..b9ec8ba410 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -674,10 +674,10 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
+     memory_dump(mon, count, format, size, addr, 1);
  }
  
-@@ -595,14 +595,14 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
- 
-     qemu_mutex_lock(&s->free_page_lock);
- 
--    if (s->free_page_report_cmd_id == UINT_MAX) {
--        s->free_page_report_cmd_id =
--                       VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-+    if (s->free_page_hint_cmd_id == UINT_MAX) {
-+        s->free_page_hint_cmd_id =
-+                       VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
-     } else {
--        s->free_page_report_cmd_id++;
-+        s->free_page_hint_cmd_id++;
-     }
- 
--    s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
-+    s->free_page_hint_status = FREE_PAGE_HINT_S_REQUESTED;
-     qemu_mutex_unlock(&s->free_page_lock);
- 
-     virtio_notify_config(vdev);
-@@ -612,18 +612,18 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
+-static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
++void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error **errp)
  {
-     VirtIODevice *vdev = VIRTIO_DEVICE(s);
+     MemoryRegionSection mrs = memory_region_find(get_system_memory(),
+-                                                 addr, 1);
++                                                 addr, size);
  
--    if (s->free_page_report_status != FREE_PAGE_REPORT_S_STOP) {
-+    if (s->free_page_hint_status != FREE_PAGE_HINT_S_STOP) {
-         /*
-          * The lock also guarantees us that the
-          * virtio_ballloon_get_free_page_hints exits after the
--         * free_page_report_status is set to S_STOP.
-+         * free_page_hint_status is set to S_STOP.
-          */
-         qemu_mutex_lock(&s->free_page_lock);
-         /*
--         * The guest hasn't done the reporting, so host sends a notification
--         * to the guest to actively stop the reporting.
-+         * The guest isn't done hinting, so send a notification
-+         * to the guest to actively stop the hinting.
-          */
--        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-+        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-         qemu_mutex_unlock(&s->free_page_lock);
-         virtio_notify_config(vdev);
-     }
-@@ -633,15 +633,15 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(s);
+     if (!mrs.mr) {
+         error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
+@@ -701,7 +701,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
+     MemoryRegion *mr = NULL;
+     void *ptr;
  
--    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
-+    s->free_page_hint_status = FREE_PAGE_HINT_S_DONE;
-     virtio_notify_config(vdev);
+-    ptr = gpa2hva(&mr, addr, &local_err);
++    ptr = gpa2hva(&mr, addr, 1, &local_err);
+     if (local_err) {
+         error_report_err(local_err);
+         return;
+@@ -777,7 +777,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
+     void *ptr;
+     uint64_t physaddr;
+ 
+-    ptr = gpa2hva(&mr, addr, &local_err);
++    ptr = gpa2hva(&mr, addr, 1, &local_err);
+     if (local_err) {
+         error_report_err(local_err);
+         return;
+diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+index dee3b45930..d145f916b3 100644
+--- a/qapi/misc-target.json
++++ b/qapi/misc-target.json
+@@ -200,6 +200,24 @@
+ { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+   'if': 'defined(TARGET_I386)' }
+ 
++##
++# @sev-inject-launch-secret:
++#
++# This command injects a secret blob into memory of SEV guest.
++#
++# @packet-header: the launch secret packet header encoded in base64
++#
++# @secret: the launch secret data to be injected encoded in base64
++#
++# @gpa: the guest physical address where secret will be injected.
++#
++# Since: 5.1
++#
++##
++{ 'command': 'sev-inject-launch-secret',
++  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa': 'uint64' },
++  'if': 'defined(TARGET_I386)' }
++
+ ##
+ # @dump-skeys:
+ #
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 27ebfa3ad2..42bcfe6dc0 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -736,3 +736,12 @@ SevCapability *qmp_query_sev_capabilities(Error **errp)
+ 
+     return data;
  }
- 
- static int
--virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
-+virtio_balloon_free_page_hint_notify(NotifierWithReturn *n, void *data)
++
++void qmp_sev_inject_launch_secret(const char *packet_hdr,
++                                  const char *secret, uint64_t gpa,
++                                  Error **errp)
++{
++    if (sev_inject_launch_secret(packet_hdr, secret, gpa) != 0) {
++        error_setg(errp, "SEV inject secret failed");
++    }
++}
+diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+index e5ee13309c..fed4588185 100644
+--- a/target/i386/sev-stub.c
++++ b/target/i386/sev-stub.c
+@@ -48,3 +48,8 @@ SevCapability *sev_get_capabilities(void)
  {
-     VirtIOBalloon *dev = container_of(n, VirtIOBalloon,
--                                      free_page_report_notify);
-+                                      free_page_hint_notify);
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     PrecopyNotifyData *pnd = data;
- 
-@@ -690,7 +690,7 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         return offsetof(struct virtio_balloon_config, poison_val);
-     }
--    return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-+    return offsetof(struct virtio_balloon_config, free_page_hint_cmd_id);
+     return NULL;
  }
++int sev_inject_launch_secret(const char *hdr, const char *secret,
++                             uint64_t gpa)
++{
++    return 1;
++}
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index d273174ad3..cbeb8f2e02 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -28,6 +28,8 @@
+ #include "sysemu/runstate.h"
+ #include "trace.h"
+ #include "migration/blocker.h"
++#include "exec/address-spaces.h"
++#include "monitor/monitor.h"
  
- static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-@@ -702,14 +702,14 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-     config.actual = cpu_to_le32(dev->actual);
-     config.poison_val = cpu_to_le32(dev->poison_val);
- 
--    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
--        config.free_page_report_cmd_id =
--                       cpu_to_le32(dev->free_page_report_cmd_id);
--    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
--        config.free_page_report_cmd_id =
-+    if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED) {
-+        config.free_page_hint_cmd_id =
-+                       cpu_to_le32(dev->free_page_hint_cmd_id);
-+    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_STOP) {
-+        config.free_page_hint_cmd_id =
-                        cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
--    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
--        config.free_page_report_cmd_id =
-+    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_DONE) {
-+        config.free_page_hint_cmd_id =
-                        cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
-     }
- 
-@@ -822,14 +822,14 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
+ #define TYPE_SEV_GUEST "sev-guest"
+ #define SEV_GUEST(obj)                                          \
+@@ -769,6 +771,70 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
      return 0;
  }
  
--static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
-+static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
-     .name = "virtio-balloon-device/free-page-report",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .needed = virtio_balloon_free_page_support,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
--        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
-+        VMSTATE_UINT32(free_page_hint_cmd_id, VirtIOBalloon),
-+        VMSTATE_UINT32(free_page_hint_status, VirtIOBalloon),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -856,7 +856,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
-         VMSTATE_END_OF_LIST()
-     },
-     .subsections = (const VMStateDescription * []) {
--        &vmstate_virtio_balloon_free_page_report,
-+        &vmstate_virtio_balloon_free_page_hint,
-         &vmstate_virtio_balloon_page_poison,
-         NULL
-     }
-@@ -895,7 +895,7 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-                                            virtio_balloon_handle_free_page_vq);
--        precopy_add_notifier(&s->free_page_report_notify);
-+        precopy_add_notifier(&s->free_page_hint_notify);
- 
-         object_ref(OBJECT(s->iothread));
-         s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
-@@ -919,7 +919,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev)
-         qemu_bh_delete(s->free_page_bh);
-         object_unref(OBJECT(s->iothread));
-         virtio_balloon_free_page_stop(s);
--        precopy_remove_notifier(&s->free_page_report_notify);
-+        precopy_remove_notifier(&s->free_page_hint_notify);
-     }
-     balloon_stats_destroy_timer(s);
-     qemu_remove_balloon_handler(s);
-@@ -991,8 +991,8 @@ static void virtio_balloon_instance_init(Object *obj)
- 
-     qemu_mutex_init(&s->free_page_lock);
-     qemu_cond_init(&s->free_page_cond);
--    s->free_page_report_cmd_id = VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
--    s->free_page_report_notify.notify = virtio_balloon_free_page_report_notify;
-+    s->free_page_hint_cmd_id = VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
-+    s->free_page_hint_notify.notify = virtio_balloon_free_page_hint_notify;
- 
-     object_property_add(obj, "guest-stats", "guest statistics",
-                         balloon_stats_get_all, NULL, NULL, s);
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index d49fef00cef2..28fd2b396087 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -23,7 +23,7 @@
- #define VIRTIO_BALLOON(obj) \
-         OBJECT_CHECK(VirtIOBalloon, (obj), TYPE_VIRTIO_BALLOON)
- 
--#define VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN 0x80000000
-+#define VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN 0x80000000
- 
- typedef struct virtio_balloon_stat VirtIOBalloonStat;
- 
-@@ -33,20 +33,20 @@ typedef struct virtio_balloon_stat_modern {
-        uint64_t val;
- } VirtIOBalloonStatModern;
- 
--enum virtio_balloon_free_page_report_status {
--    FREE_PAGE_REPORT_S_STOP = 0,
--    FREE_PAGE_REPORT_S_REQUESTED = 1,
--    FREE_PAGE_REPORT_S_START = 2,
--    FREE_PAGE_REPORT_S_DONE = 3,
-+enum virtio_balloon_free_page_hint_status {
-+    FREE_PAGE_HINT_S_STOP = 0,
-+    FREE_PAGE_HINT_S_REQUESTED = 1,
-+    FREE_PAGE_HINT_S_START = 2,
-+    FREE_PAGE_HINT_S_DONE = 3,
- };
- 
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
-     VirtQueue *ivq, *dvq, *svq, *free_page_vq, *reporting_vq;
--    uint32_t free_page_report_status;
-+    uint32_t free_page_hint_status;
-     uint32_t num_pages;
-     uint32_t actual;
--    uint32_t free_page_report_cmd_id;
-+    uint32_t free_page_hint_cmd_id;
-     uint64_t stats[VIRTIO_BALLOON_S_NR];
-     VirtQueueElement *stats_vq_elem;
-     size_t stats_vq_offset;
-@@ -55,7 +55,7 @@ typedef struct VirtIOBalloon {
-     QEMUBH *free_page_bh;
-     /*
-      * Lock to synchronize threads to access the free page reporting related
--     * fields (e.g. free_page_report_status).
-+     * fields (e.g. free_page_hint_status).
-      */
-     QemuMutex free_page_lock;
-     QemuCond  free_page_cond;
-@@ -64,7 +64,7 @@ typedef struct VirtIOBalloon {
-      * stopped.
-      */
-     bool block_iothread;
--    NotifierWithReturn free_page_report_notify;
-+    NotifierWithReturn free_page_hint_notify;
-     int64_t stats_last_update;
-     int64_t stats_poll_interval;
-     uint32_t host_features;
++int sev_inject_launch_secret(const char *packet_hdr,
++                             const char *secret, uint64_t gpa)
++{
++    struct kvm_sev_launch_secret input;
++    guchar *data = NULL, *hdr = NULL;
++    int error, ret = 1;
++    void *hva;
++    gsize hdr_sz = 0, data_sz = 0;
++    Error *local_err = NULL;
++    MemoryRegion *mr = NULL;
++
++    /* secret can be inject only in this state */
++    if (!sev_check_state(sev_guest, SEV_STATE_LAUNCH_SECRET)) {
++        error_report("SEV: Not in correct state. (LSECRET) %x",
++                     sev_guest->state);
++        return 1;
++    }
++
++    hdr = g_base64_decode(packet_hdr, &hdr_sz);
++    if (!hdr || !hdr_sz) {
++        error_report("SEV: Failed to decode sequence header");
++        return 1;
++    }
++
++    data = g_base64_decode(secret, &data_sz);
++    if (!data || !data_sz) {
++        error_report("SEV: Failed to decode data");
++        goto err;
++    }
++
++    hva = gpa2hva(&mr, gpa, data_sz, &local_err);
++    if (!hva) {
++        error_report("SEV: Failed to calculate guest address.");
++        goto err;
++    }
++
++    input.hdr_uaddr = (uint64_t)(unsigned long)hdr;
++    input.hdr_len = hdr_sz;
++
++    input.trans_uaddr = (uint64_t)(unsigned long)data;
++    input.trans_len = data_sz;
++
++    input.guest_uaddr = (uint64_t)(unsigned long)hva;
++    input.guest_len = data_sz;
++
++    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
++                                input.trans_uaddr, input.trans_len);
++
++    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET,
++                    &input, &error);
++    if (ret) {
++        error_report("SEV: failed to inject secret ret=%d fw_error=%d '%s'",
++                     ret, error, fw_error_to_str(error));
++        goto err;
++    }
++
++    ret = 0;
++
++err:
++    g_free(data);
++    g_free(hdr);
++    return ret;
++}
++
+ static void
+ sev_register_types(void)
+ {
+diff --git a/target/i386/trace-events b/target/i386/trace-events
+index 789c700d4a..9f299e94a2 100644
+--- a/target/i386/trace-events
++++ b/target/i386/trace-events
+@@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session
+ kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
+ kvm_sev_launch_measurement(const char *value) "data %s"
+ kvm_sev_launch_finish(void) ""
++kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
+-- 
+2.20.1 (Apple Git-117)
 
 
