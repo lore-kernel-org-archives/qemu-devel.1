@@ -2,91 +2,99 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BAFC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA0AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:17:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7707020720
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:12:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MMAt3Onj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7707020720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A3872158C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:17:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A3872158C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jstx4-0006jo-Ph
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 16:12:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60934)
+	id 1jsu24-0000iM-C1
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 16:17:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jstwO-0006Ex-32
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 16:11:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30906
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jstwL-0003WH-N0
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 16:11:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594152700;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=FA94CubuNsJD3dhRwMuG/cH+l9RtDN/Na7ZHN23jtV8=;
- b=MMAt3OnjEjJuRUNue7Ocn11rB53cy+ns0ldW28IZPhYmlI95n22CyT0sZ+dP0/15v6sr0D
- u1k0ySvklAd7K5txdn1GylKlZvNKSx1e3Xdj8Sg/gpYxPyGMqk2gwLNN6NfU53uGsk6fn1
- xDohjD5HLNb9KeXQhr2aMNvT13oNlL0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-lsdgI-V3MtukxB0PW3T76A-1; Tue, 07 Jul 2020 16:11:39 -0400
-X-MC-Unique: lsdgI-V3MtukxB0PW3T76A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D941107ACCA;
- Tue,  7 Jul 2020 20:11:37 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A7A1073FEA;
- Tue,  7 Jul 2020 20:11:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3451A1132FD2; Tue,  7 Jul 2020 22:11:28 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v12 2/8] scripts: Coccinelle script to use
- ERRP_AUTO_PROPAGATE()
-References: <20200707165037.1026246-1-armbru@redhat.com>
- <20200707165037.1026246-3-armbru@redhat.com>
- <764387d7-0d42-a291-d720-60df303c15e4@redhat.com>
-Date: Tue, 07 Jul 2020 22:11:28 +0200
-In-Reply-To: <764387d7-0d42-a291-d720-60df303c15e4@redhat.com> (Eric Blake's
- message of "Tue, 7 Jul 2020 14:36:02 -0500")
-Message-ID: <87y2nv5bm7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1jsu16-0007rF-8U; Tue, 07 Jul 2020 16:16:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15358
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1jsu14-0004JT-Eh; Tue, 07 Jul 2020 16:16:35 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 067K2fRR001404; Tue, 7 Jul 2020 16:16:29 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 324faqdks9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 07 Jul 2020 16:16:29 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 067K5eXZ011186;
+ Tue, 7 Jul 2020 16:16:28 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 324faqdks1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 07 Jul 2020 16:16:28 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 067K67Vp021539;
+ Tue, 7 Jul 2020 20:16:27 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma01dal.us.ibm.com with ESMTP id 322hd917qu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 07 Jul 2020 20:16:27 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
+ [9.57.199.108])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 067KGRMH52560350
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 7 Jul 2020 20:16:27 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 167D5B2065;
+ Tue,  7 Jul 2020 20:16:27 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DECB8B205F;
+ Tue,  7 Jul 2020 20:16:26 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue,  7 Jul 2020 20:16:26 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: qemu-ppc@nongnu.org, marcandre.lureau@redhat.com
+Subject: [PATCH v3 0/2] tpm: Some fixes
+Date: Tue,  7 Jul 2020 16:16:23 -0400
+Message-Id: <20200707201625.4177419-1-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:04:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-07_13:2020-07-07,
+ 2020-07-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ impostorscore=0 mlxlogscore=680 clxscore=1015 bulkscore=0 phishscore=0
+ spamscore=0 adultscore=0 mlxscore=0 suspectscore=0 malwarescore=0
+ lowpriorityscore=0 cotscore=-2147483648 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2007070134
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 16:16:33
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,112 +107,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
- Laszlo Ersek <lersek@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>, groug@kaod.org,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+This series of patches fixes the TPM SPAPR device model so that it reacts
+in the same way as the other device models do when the backend device did
+not start up properly. It now calls exit(1).
 
-> On 7/7/20 11:50 AM, Markus Armbruster wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Script adds ERRP_AUTO_PROPAGATE macro invocation where appropriate and
->> does corresponding changes in code (look for details in
->> include/qapi/error.h)
->>
->> Usage example:
->> spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->>   --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
->>   --max-width 80 FILES...
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   scripts/coccinelle/auto-propagated-errp.cocci | 337 ++++++++++++++++++
->>   include/qapi/error.h                          |   3 +
->>   MAINTAINERS                                   |   1 +
->>   3 files changed, 341 insertions(+)
->>   create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
->
-> Needs a tweak if we go with ERRP_GUARD.  But that's easy.
->
->> +
->> +// Convert special case with goto separately.
->> +// I tried merging this into the following rule the obvious way, but
->> +// it made Coccinelle hang on block.c
->> +//
->> +// Note interesting thing: if we don't do it here, and try to fixup
->> +// "out: }" things later after all transformations (the rule will be
->> +// the same, just without error_propagate() call), coccinelle fails to
->> +// match this "out: }".
->
-> "out: }" is not valid C; would referring to "out: ; }" fare any better?
+Due to a change in the TPM 2 code, the pcrUpdateCounter (14th byte) in the
+TPM2_Pcrread response now returns a different value than before. So it's
+better to skip the 14th byte when comparing expected against actual responses.
 
-We can try for the next batch.
+   Stefan
 
->> +@ disable optional_qualifier@
->> +identifier rule1.fn, rule1.local_err, out;
->> +symbol errp;
->> +@@
->> +
->> + fn(..., Error ** ____, ...)
->> + {
->> +     <...
->> +-    goto out;
->> ++    return;
->> +     ...>
->> +- out:
->> +-    error_propagate(errp, local_err);
->> + }
->> +
->> +// Convert most of local_err related stuff.
->> +//
->> +// Note, that we inherit rule1.fn and rule1.local_err names, not
->> +// objects themselves. We may match something not related to the
->> +// pattern matched by rule1. For example, local_err may be defined with
->> +// the same name in different blocks inside one function, and in one
->> +// block follow the propagation pattern and in other block doesn't.
->> +//
->> +// Note also that errp-cleaning functions
->> +//   error_free_errp
->> +//   error_report_errp
->> +//   error_reportf_errp
->> +//   warn_report_errp
->> +//   warn_reportf_errp
->> +// are not yet implemented. They must call corresponding Error* -
->> +// freeing function and then set *errp to NULL, to avoid further
->> +// propagation to original errp (consider ERRP_AUTO_PROPAGATE in use).
->> +// For example, error_free_errp may look like this:
->> +//
->> +//    void error_free_errp(Error **errp)
->> +//    {
->> +//        error_free(*errp);
->> +//        *errp = NULL;
->> +//    }
->
-> I guess we can still decide later if we want these additional
-> functions, or if they will even help after the number of places we
-> have already improved after applying this script as-is and with
-> Markus' cleanups in place.
+v2->v3:
+  - more elaborate commit messages
 
-Yes.
+v1->v2:
+  - simplified skipping of 14th byte in response
 
-> While I won't call myself a Coccinelle expert, it at least looks sane
-> enough that I'm comfortable if you add:
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Thanks!
+Stefan Berger (2):
+  tpm: tpm_spapr: Exit on TPM backend failures
+  tests: tpm: Skip over pcrUpdateCounter byte in result comparison
+
+ hw/tpm/tpm_spapr.c     | 5 ++++-
+ tests/qtest/tpm-util.c | 6 +++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+-- 
+2.24.1
 
 
