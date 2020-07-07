@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC1AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93918C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:18:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69AC7206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:17:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62B0E206F6
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:18:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e4GgYJSG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69AC7206E2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R9v8p9Ae"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B0E206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jshrU-0003iy-Ke
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:17:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42660)
+	id 1jshre-0004M4-Kg
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:18:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshjF-0004wn-Kl
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:21 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:40327)
+ id 1jshoH-0006hH-TP
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:33 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:36104)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshjD-00046L-Ku
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:21 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id f2so15988767wrp.7
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:09:19 -0700 (PDT)
+ id 1jshoG-0004rI-8b
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:33 -0400
+Received: by mail-wr1-x436.google.com with SMTP id k6so44006533wrn.3
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:14:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3f/VHOspddBHT4k11DZu6PifAAchG3ueuum87F8Ii4I=;
- b=e4GgYJSGSdUDdTvWp4DXuGcsoHDKKRQjBXo34oPgu/tD75FJETV0mNfIvfGa98zmK4
- EM+MSZWMyZaaMN5MGhTCfBd9s7VIaFD8W/NLpkX38ZlIOxnp4hMxzmL+Yt68lxboZ2Nl
- y8bCL151xoeOHjR9YvcDB7+j2CK7LUrVhMczcFUbk3Hdqazl12dUkF2C6EvhSe+tJLoJ
- /TnGxgwWRxt/mh3kFjuSUqiR0Zj4PKao9g8GbSeQNqVrki+X7zoxTQzOOYMLQjTSV+k/
- JEjqE7NFyjVJsPm6HGfEAx6vzgsVLsR+SHFirvh9QkQUdsSJkoiCqFor6yvME+8skBM4
- EEAg==
+ bh=fVpFU3Bn0gx8fweRN9XBf8loHnsbKZ9F1g1Uyun+Gsg=;
+ b=R9v8p9AeUq2v6ydPU9XeLm7KEUpSWIYFUsXmqGq/pcbaCLgExX3UzYb8WSY1ZVO7vS
+ R0N9dhWsat59BvoOOTpVaWsq+1k6+04KSYhwWYPOrSBpOMbJDz9mc+pN0Xi7yI33Pvvf
+ BaAmOlCK2xYKRpG4koFGnaHFQhjGnZrCnw1BWd8o2toAK71FS24ephW2oWZCE9orVsz4
+ PcDNLtKH18/L3PO470NtrWJh2FuzMVAbuDgM1jpeCfw/uXHf2EBhTjhxxrgEbAXJZ3bw
+ 75en7898w2I+hSoX/2ZPLXCmZdsQeWeE3LwHRXHvQEm81XLQVmlmdqOE0AESDX0S9mL8
+ ewPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3f/VHOspddBHT4k11DZu6PifAAchG3ueuum87F8Ii4I=;
- b=Uo0wYZu4cwpS1FvRr73DlL9zNTsuiZXlQaibDaPMyjSSqdEJJM0xrB01PJ9SBsjpEj
- tzZ1Hc7WcXTgP8T+mvukl9nSSuKC2zRQMvxZi7BSZDy5HZ+iH1vW5DbFAyt+Rbx+2HBM
- KXpbo09RqRwh/vRvM3SO4ijXXNNp9W/BZ0Fn+oWYktk+plHILTQOHc0WISMVYJtH6RTJ
- ihFLf3oblK30Xfeia5SGOCa/65grwmsd5zY8uozH/2LZVrBoEnDX1ufQvn3syJL4xMKR
- 5Umb2s7i0ys7jJf2jSI2O0eyst73lOvC62Rf5kCqMOUAO8BnrDP6lPcUt/gQiyBNT9q0
- o2hw==
-X-Gm-Message-State: AOAM5334Vzh/RJwthQA2E3o+qACUXooZGT4X3id0UZQ85g7cCrfdZBJR
- fzITa6nUJNcmKZR5ct1pt40Wlg==
-X-Google-Smtp-Source: ABdhPJx2q+ytLqyFTEQRXNYCgYRhzHkN/kQ++WfTs4CGLAQDf6vPFMT38XJKtqQKXP7oIBz7SjrU4Q==
-X-Received: by 2002:adf:f14e:: with SMTP id y14mr52429711wro.151.1594105758202; 
- Tue, 07 Jul 2020 00:09:18 -0700 (PDT)
+ bh=fVpFU3Bn0gx8fweRN9XBf8loHnsbKZ9F1g1Uyun+Gsg=;
+ b=bzvimRNmisSAHlk65IIVwkGZpREcyVja/94++UkT/ZuRnUBTSXCdfpmgKeSRLL36pS
+ y9tDo5MH/BVNrNZVI4kfGrK9f8H9wiKo2Ri6tZ00GoBURHWlhatvwUSBhPTEp2+MlCtG
+ t4/oqDUyBZ8Y5pTEzGAPnKJCXK+6zxCJPhitWFke3tupHxczoSSgtap8Co6KvwqGL2Lp
+ 4JvjGGrO4crCp7D16tUYQSpWqO/OULPVHRZipXMO6mDWoNYj+usVhwvLj0UFuSNJ/E3a
+ 0Osxuf7kOlU43wxfkU/wRVo5QDPY/SaQn2aJIBYAQt7zXKg6YRzhfVfCqBxc+cXR7xLb
+ +tBg==
+X-Gm-Message-State: AOAM533WchUaytXSomYHuTQSWdBi3jKWiw3cxaq3ZJHmWagux9JSx2Az
+ gM/TENOW9UzIzWjHOkSpfpsNbQ==
+X-Google-Smtp-Source: ABdhPJxmGtovh0WxrLk3sQG75lLyAVsh6Ydo/nY/kSLQ8+wgsSfpXm/1liGjffbk+W4UqRDoqXXIRA==
+X-Received: by 2002:adf:b1ca:: with SMTP id r10mr24403519wra.150.1594106070886; 
+ Tue, 07 Jul 2020 00:14:30 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u2sm2137896wml.16.2020.07.07.00.09.04
+ by smtp.gmail.com with ESMTPSA id c25sm2107501wml.46.2020.07.07.00.14.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 00:09:10 -0700 (PDT)
+ Tue, 07 Jul 2020 00:14:27 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 922191FF9A;
- Tue,  7 Jul 2020 08:08:59 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 3CCD21FFB3;
+ Tue,  7 Jul 2020 08:09:01 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 11/41] tests/vm: Add workaround to consume console
-Date: Tue,  7 Jul 2020 08:08:28 +0100
-Message-Id: <20200707070858.6622-12-alex.bennee@linaro.org>
+Subject: [PULL 27/41] tests/acceptance: skip LinuxInitrd 2gib with v4.16 on
+ GitLab
+Date: Tue,  7 Jul 2020 08:08:44 +0100
+Message-Id: <20200707070858.6622-28-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200707070858.6622-1-alex.bennee@linaro.org>
 References: <20200707070858.6622-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::436;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x436.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -89,8 +90,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,131 +104,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Robert Foley <robert.foley@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Peter Puhov <peter.puhov@linaro.org>,
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Cleber Rosa <crosa@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Robert Foley <robert.foley@linaro.org>
+This fails on GitLab but not when run locally on the same container
+image. It's very confusing.
 
-This adds support to basevm.py so that we always
-drain the console chars.  This makes use of
-support added in an earlier commit that allows
-QEMUMachine to use the ConsoleSocket.
-
-This is a workaround we found was needed since
-there is a known issue where QEMU will hang waiting
-for console characters to be consumed.
-
-We also added the option of logging the console to a file.
-LOG_CONSOLE=1 will now log the output to a file.
-
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200601211421.1277-10-robert.foley@linaro.org>
-Message-Id: <20200701135652.1366-14-alex.bennee@linaro.org>
+Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200701135652.1366-30-alex.bennee@linaro.org>
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 39f918a430a5..f21948c46a52 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -49,6 +49,7 @@ endif
- 	@echo '    EXTRA_CONFIGURE_OPTS="..."'
- 	@echo "    J=[0..9]*            	 - Override the -jN parameter for make commands"
- 	@echo "    DEBUG=1              	 - Enable verbose output on host and interactive debugging"
-+	@echo "    LOG_CONSOLE=1        	 - Log console to file in: ~/.cache/qemu-vm "
- 	@echo "    V=1				 - Enable verbose ouput on host and guest commands"
- 	@echo "    QEMU_LOCAL=1                 - Use QEMU binary local to this build."
- 	@echo "    QEMU=/path/to/qemu		 - Change path to QEMU binary"
-@@ -75,6 +76,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
- 		$(if $(GENISOIMAGE),--genisoimage $(GENISOIMAGE)) \
- 		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
- 		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
-+		$(if $(LOG_CONSOLE),--log-console) \
- 		--image "$@" \
- 		--force \
- 		--build-image $@, \
-@@ -91,6 +93,7 @@ vm-build-%: $(IMAGES_DIR)/%.img
- 		$(if $(V),--verbose) \
- 		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
- 		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
-+		$(if $(LOG_CONSOLE),--log-console) \
- 		--image "$<" \
- 		$(if $(BUILD_TARGET),--build-target $(BUILD_TARGET)) \
- 		--snapshot \
-@@ -114,6 +117,7 @@ vm-boot-ssh-%: $(IMAGES_DIR)/%.img
- 		$(if $(V)$(DEBUG), --debug) \
- 		$(if $(QEMU_LOCAL),--build-path $(BUILD_DIR)) \
- 		$(if $(EFI_AARCH64),--efi-aarch64 $(EFI_AARCH64)) \
-+		$(if $(LOG_CONSOLE),--log-console) \
- 		--image "$<" \
- 		--interactive \
- 		false, \
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index f716798b405e..04d083409a5f 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -117,6 +117,11 @@ class BaseVM(object):
-              "w").write(self._config['ssh_pub_key'])
+diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
+index a3e54d3fc915..a249e2f14a24 100644
+--- a/tests/acceptance/linux_initrd.py
++++ b/tests/acceptance/linux_initrd.py
+@@ -8,10 +8,12 @@
+ # This work is licensed under the terms of the GNU GPL, version 2 or
+ # later.  See the COPYING file in the top-level directory.
  
-         self.debug = args.debug
-+        self._console_log_path = None
-+        if args.log_console:
-+                self._console_log_path = \
-+                         os.path.join(os.path.expanduser("~/.cache/qemu-vm"),
-+                                      "{}.install.log".format(self.name))
-         self._stderr = sys.stderr
-         self._devnull = open(os.devnull, "w")
-         if self.debug:
-@@ -271,7 +276,13 @@ class BaseVM(object):
-         args += self._data_args + extra_args + self._config['extra_args']
-         logging.debug("QEMU args: %s", " ".join(args))
-         qemu_path = get_qemu_path(self.arch, self._build_path)
--        guest = QEMUMachine(binary=qemu_path, args=args)
-+
-+        # Since console_log_path is only set when the user provides the
-+        # log_console option, we will set drain_console=True so the
-+        # console is always drained.
-+        guest = QEMUMachine(binary=qemu_path, args=args,
-+                            console_log=self._console_log_path,
-+                            drain_console=True)
-         guest.set_machine(self._config['machine'])
-         guest.set_console()
-         try:
-@@ -285,6 +296,8 @@ class BaseVM(object):
-             raise
-         atexit.register(self.shutdown)
-         self._guest = guest
-+        # Init console so we can start consuming the chars.
-+        self.console_init()
-         usernet_info = guest.qmp("human-monitor-command",
-                                  command_line="info usernet")
-         self.ssh_port = None
-@@ -296,7 +309,9 @@ class BaseVM(object):
-             raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-                             usernet_info)
++import os
+ import logging
+ import tempfile
  
--    def console_init(self, timeout = 120):
-+    def console_init(self, timeout = None):
-+        if timeout == None:
-+            timeout = self.socket_timeout
-         vm = self._guest
-         vm.console_socket.settimeout(timeout)
-         self.console_raw_path = os.path.join(vm._temp_dir,
-@@ -578,6 +593,8 @@ def parse_args(vmcls):
-     parser.add_option("--efi-aarch64",
-                       default="/usr/share/qemu-efi-aarch64/QEMU_EFI.fd",
-                       help="Path to efi image for aarch64 VMs.")
-+    parser.add_option("--log-console", action="store_true",
-+                      help="Log console to file.")
-     parser.disable_interspersed_args()
-     return parser.parse_args()
+ from avocado_qemu import Test
++from avocado import skipIf
  
+ 
+ class LinuxInitrd(Test):
+@@ -51,6 +53,7 @@ class LinuxInitrd(Test):
+                 max_size + 1)
+             self.assertRegex(self.vm.get_log(), expected_msg)
+ 
++    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
+     def test_with_2gib_file_should_work_with_linux_v4_16(self):
+         """
+         QEMU has supported up to 4 GiB initrd for recent kernel
 -- 
 2.20.1
 
