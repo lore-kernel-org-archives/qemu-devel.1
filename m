@@ -2,91 +2,95 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8368CC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 05:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF54C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 05:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D46120772
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 05:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB68320772
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 05:34:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTQqoKy2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D46120772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrT6mMbf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB68320772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsgEk-0005m2-Jt
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 01:33:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55474)
+	id 1jsgFq-0006wG-3k
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 01:34:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsgE2-0004yI-0S
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 01:33:02 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55591
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsgEy-00069f-Lc
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 01:34:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28348
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsgDz-0006QH-MV
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 01:33:01 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsgEw-0006V5-TJ
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 01:34:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594099978;
+ s=mimecast20190719; t=1594100037;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=06T+kuWqJ3FHvRYdNLCjqmABGC3pzPSfu6BAy1hmaOw=;
- b=fTQqoKy20fFn29bUqHaCPfIOgPRDt5Yp1SlxuzozpEisaQVM0X1cI6dcScfn5/CIQYRXU8
- 4BHf6eApcH7XxL3CEKt4Jg0xQHlQV8XR7vxba0YzxkWgg3Vx28Ok2mHLfAdZLxxx1AJva6
- bBvQd8+zSv5kSHvzCyb3f8SkHmUrfsA=
+ in-reply-to:in-reply-to:references:references;
+ bh=KuMKDqtWd2NJ4rYtAvFF/mv5CXNgliZcbrJ0DkWkIDM=;
+ b=MrT6mMbf6pkSVWjKI27SNbxqTxLL80H0P4IBnV0Mf7vCp1ktsKLHS/0zCgtBvP5rHnLK4f
+ iHAJeURA4UTvcUag3Rw6JuOdCdv7c4MSX0aZJGnOAEgcgFYjsqzBtjNd6N4lh+2MPhgIQ7
+ a0pJcQjUIrJWAJRFrrcf8H8h8domwsE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-B9dIumXdNd2sHIRzHKwfWA-1; Tue, 07 Jul 2020 01:32:56 -0400
-X-MC-Unique: B9dIumXdNd2sHIRzHKwfWA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-234-S4Iuw8wOPlWvmDAsWeGNYw-1; Tue, 07 Jul 2020 01:33:53 -0400
+X-MC-Unique: S4Iuw8wOPlWvmDAsWeGNYw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C574818A8222;
- Tue,  7 Jul 2020 05:32:55 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-77.ams2.redhat.com [10.36.112.77])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 874E42DE6A;
- Tue,  7 Jul 2020 05:32:54 +0000 (UTC)
-Subject: Re: Test failure with Smartfusion2 emac block (msf2-emac)
-From: Thomas Huth <thuth@redhat.com>
-To: QEMU Developers <qemu-devel@nongnu.org>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>
-References: <e010da48-cfbe-9616-d750-a922cb463a94@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f457f5d9-2405-4456-4a26-b3a9784e2cd9@redhat.com>
-Date: Tue, 7 Jul 2020 07:32:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57DCF18A8220;
+ Tue,  7 Jul 2020 05:33:52 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E614E1002397;
+ Tue,  7 Jul 2020 05:33:51 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AD5341132FD2; Tue,  7 Jul 2020 07:33:49 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: Slow down with: 'Make "info qom-tree" show children sorted'
+References: <20200527084754.7531-1-armbru@redhat.com>
+ <20200527084754.7531-3-armbru@redhat.com>
+ <49bea110-0a3d-5a40-6647-67b116fb41b5@redhat.com>
+ <5e967e5f-8ae5-01cc-0dfe-f22e0f03b6b3@redhat.com>
+Date: Tue, 07 Jul 2020 07:33:49 +0200
+In-Reply-To: <5e967e5f-8ae5-01cc-0dfe-f22e0f03b6b3@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 7 Jul 2020 06:58:56
+ +0200")
+Message-ID: <87y2nvanya.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <e010da48-cfbe-9616-d750-a922cb463a94@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 23:10:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,45 +103,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ berrange@redhat.com, ehabkost@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ =?utf-8?Q?C?= =?utf-8?Q?=C3=A9dric?= Le Goater <clg@kaod.org>,
+ pbonzini@redhat.com, David Gibson <dgibson@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/07/2020 07.18, Thomas Huth wrote:
-> 
->  Hi Subbaraya,
-> 
-> today, I noticed that there is a test failure with msf2-emac when
-> running the device-introspect-test in slow mode. Either run:
-> 
->  make check-qtest-aarch64 SPEED=slow
-> 
-> or as a shortcut:
-> 
->  make tests/qtest/device-introspect-test
->  QTEST_QEMU_BINARY="aarch64-softmmu/qemu-system-aarch64" \
->   ./tests/qtest/device-introspect-test -m slow
-> 
-> Then the test fails with:
-> 
-> Unexpected error in error_set_from_qdev_prop_error() at
-> hw/core/qdev-properties.c:1251:
-> Property 'msf2-emac.netdev' can't take value 'hub0port0', it's in use
-> 
-> Could you please have a look?
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-The problem might be related to m2sxxx_soc_initfn() in msf2-soc.c. Looks
-like you are using nd_table in an instance_init function. This is almost
-always wrong, and should be done by the machine code instead (e.g. in
-msf2-som.c).
+> On 7/7/20 6:45 AM, Thomas Huth wrote:
+>> On 27/05/2020 10.47, Markus Armbruster wrote:
+>>> "info qom-tree" prints children in unstable order.  This is a pain
+>>> when diffing output for different versions to find change.  Print it
+>>> sorted.
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>  qom/qom-hmp-cmds.c | 24 ++++++++++++++++--------
+>>>  1 file changed, 16 insertions(+), 8 deletions(-)
+>>=20
+>>  Hi Markus,
+>>=20
+>> this patch causes a slow down of the qtests which becomes quite massive
+>> when e.g. using the ppc64 and thourough testing. When I'm running
+>>=20
+>> QTEST_QEMU_BINARY=3D"ppc64-softmmu/qemu-system-ppc64" time \
+>> ./tests/qtest/device-introspect-test -m slow | tail -n 10
+>>=20
+>> the test runs for ca. 6m40s here before the patch got applied, and for
+>> mor than 20 minutes after the patch got applied!
 
- Thomas
+That's surprising.
 
+> Argh, yesterday I reviewed again all the range except this patch... not
+> sure why as looking at it now it is obvious.
+>
+>> This causes our gitlab CI to constantly fail since the patch got merged,
+>> since the testing time now exceeds the 1h time limit:
+>>=20
+>>  https://gitlab.com/qemu-project/qemu/-/pipelines/156767175
+>>=20
+>> Sure, we can work around that problem in the CI (Alex has already a
+>> patch queued), but still, is there something you could do about this
+>> massive slowdown?
+>
+> Suggestion: add a '-u' option for unsorted mode, to use in qtests.
+>
+> Humans want the new behavior (default: sorted).
 
-PS: Maybe also have a look at this article, it might help to understand
-the idea behind instance_init a little bit:
-http://people.redhat.com/~thuth/blog/qemu/2018/09/10/instance-init-realize.html
+Last resort. =20
+
+I'll look into speeding up the sort first.
+
+Work-around: drop -m slow until we get this sorted (pardon the pun).
 
 
