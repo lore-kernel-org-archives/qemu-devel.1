@@ -4,78 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD1EC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B9ABC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:26:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3BF520786
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:24:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B4E220675
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:26:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CjvFc8xl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3BF520786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AfA7wJ+Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B4E220675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsqOZ-0002tk-6N
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:24:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60058)
+	id 1jsqQC-0005aR-90
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:26:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq7a-000390-Te
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:07:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33488
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq7J-0002MS-Ep
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:06:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55670
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq7D-0006te-J2
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:07:02 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq77-0006qH-Ea
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:06:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594137998;
+ s=mimecast20190719; t=1594137992;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=l+rLohLgZnTu2IlzcsMOXdC76WUa2zsCZUV0lG6faCw=;
- b=CjvFc8xlMhFO30D7zwJRmbRCJ8O4TTnVVFTCXCYtkxIeH8o+rxPsDPITIwP/IIkI9Q3ea+
- IleXfAl1SJx5h+Zm6WdLqOjqbUY/tVa8niwulyyAqyJ+TSi427ufadnzt9DQdttaHOa099
- jiynsuhtSSfb6PRRjx13wQV8IkxThEA=
+ bh=pn8Op5aLidJEdIe6QKFefuWqvnptlZK5/Nl4ar8/4Sc=;
+ b=AfA7wJ+Q/uyCyuaxcNdtDpZq5ADIVuMliXGg8/69UqNmDkajuy/TKyeBAX4nGZK8v0swQr
+ M9RAgKS2bh27iwDUNnMq48Z/sgl63wx2k+DC4PhfLPg0+54zTIwEvw1apEhF9K8gPuObaz
+ sQKdFT+bMC9frtA/I1LV11ZyWr5vc7Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-p5VSF-2HNuC-PJG0AoYFzA-1; Tue, 07 Jul 2020 12:06:33 -0400
-X-MC-Unique: p5VSF-2HNuC-PJG0AoYFzA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-411-MRDya2NwPdyPdc5i4g0IjA-1; Tue, 07 Jul 2020 12:06:28 -0400
+X-MC-Unique: MRDya2NwPdyPdc5i4g0IjA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D133EBFC2;
- Tue,  7 Jul 2020 16:06:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E682F107ACCD;
+ Tue,  7 Jul 2020 16:06:26 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F33477896;
- Tue,  7 Jul 2020 16:06:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6224E1A4D9;
+ Tue,  7 Jul 2020 16:06:26 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1FAD110C4AE2; Tue,  7 Jul 2020 18:06:14 +0200 (CEST)
+ id B85771144255; Tue,  7 Jul 2020 18:06:13 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 39/45] qapi: Smooth another visitor error checking pattern
-Date: Tue,  7 Jul 2020 18:06:07 +0200
-Message-Id: <20200707160613.848843-40-armbru@redhat.com>
+Subject: [PATCH v4 19/45] qapi: Use returned bool to check for failure,
+ manual part
+Date: Tue,  7 Jul 2020 18:05:47 +0200
+Message-Id: <20200707160613.848843-20-armbru@redhat.com>
 In-Reply-To: <20200707160613.848843-1-armbru@redhat.com>
 References: <20200707160613.848843-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:04:49
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -103,431 +105,260 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert
-
-    visit_type_FOO(v, ..., &ptr, &err);
-    ...
-    if (err) {
-        ...
-    }
-
-to
-
-    visit_type_FOO(v, ..., &ptr, errp);
-    ...
-    if (!ptr) {
-        ...
-    }
-
-for functions that set @ptr to non-null / null on success / error.
-
-Eliminate error_propagate() that are now unnecessary.  Delete @err
-that are now unused.
+The previous commit used Coccinelle to convert from checking the Error
+object to checking the return value.  Convert a few more manually.
+Also tweak control flow in places to conform to the conventional "if
+error bail out" pattern.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nfs.c          |  7 ++-----
- block/parallels.c    |  7 ++-----
- block/qcow.c         |  7 ++-----
- block/qcow2.c        |  7 ++-----
- block/qed.c          |  7 ++-----
- block/rbd.c          |  7 ++-----
- block/sheepdog.c     |  6 ++----
- block/ssh.c          |  7 ++-----
- block/vdi.c          |  7 ++-----
- block/vhdx.c         |  7 ++-----
- block/vpc.c          |  7 ++-----
- hw/acpi/core.c       |  5 ++---
- hw/block/xen-block.c |  6 ++----
- hw/core/numa.c       |  7 +++----
- monitor/monitor.c    | 21 +++++++--------------
- 15 files changed, 36 insertions(+), 79 deletions(-)
+ accel/kvm/kvm-all.c       | 50 ++++++++++++++++++---------------------
+ block/throttle-groups.c   |  5 ++--
+ bootdevice.c              |  4 ++--
+ hw/core/qdev-properties.c | 12 +++++-----
+ hw/ide/qdev.c             |  4 ++--
+ hw/mem/nvdimm.c           |  9 +++----
+ hw/net/ne2000-isa.c       |  4 ++--
+ hw/usb/dev-storage.c      |  4 ++--
+ net/net.c                 |  8 ++-----
+ 9 files changed, 44 insertions(+), 56 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index b1718d125a..61a249a9fc 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -563,18 +563,15 @@ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-     BlockdevOptionsNfs *opts = NULL;
-     Visitor *v;
-     const QDictEntry *e;
--    Error *local_err = NULL;
- 
-     v = qobject_input_visitor_new_flat_confused(options, errp);
-     if (!v) {
-         return NULL;
-     }
- 
--    visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
-+    visit_type_BlockdevOptionsNfs(v, NULL, &opts, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!opts) {
-         return NULL;
-     }
- 
-diff --git a/block/parallels.c b/block/parallels.c
-index cb5259ac44..f489c0d4ba 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -625,7 +625,6 @@ static int coroutine_fn parallels_co_create_opts(BlockDriver *drv,
-                                                  Error **errp)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 397669231d..83f03b2018 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3128,37 +3128,33 @@ static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
+                                    const char *name, void *opaque,
+                                    Error **errp)
  {
-     BlockdevCreateOptions *create_options = NULL;
--    Error *local_err = NULL;
-     BlockDriverState *bs = NULL;
-     QDict *qdict;
-     Visitor *v;
-@@ -668,11 +667,9 @@ static int coroutine_fn parallels_co_create_opts(BlockDriver *drv,
-         goto done;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto done;
-     }
-diff --git a/block/qcow.c b/block/qcow.c
-index dca2a1fe7d..c22d1bf6b8 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -943,7 +943,6 @@ static int coroutine_fn qcow_co_create_opts(BlockDriver *drv,
-     QDict *qdict;
-     Visitor *v;
-     const char *val;
--    Error *local_err = NULL;
-     int ret;
- 
-     static const QDictRenames opt_renames[] = {
-@@ -995,11 +994,9 @@ static int coroutine_fn qcow_co_create_opts(BlockDriver *drv,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto fail;
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a9137a535b..9ed2396c88 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3683,7 +3683,6 @@ static int coroutine_fn qcow2_co_create_opts(BlockDriver *drv,
-     Visitor *v;
-     BlockDriverState *bs = NULL;
-     BlockDriverState *data_bs = NULL;
--    Error *local_err = NULL;
-     const char *val;
-     int ret;
- 
-@@ -3779,11 +3778,9 @@ static int coroutine_fn qcow2_co_create_opts(BlockDriver *drv,
-         goto finish;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto finish;
-     }
-diff --git a/block/qed.c b/block/qed.c
-index e369fd360a..7fa7f880f6 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -729,7 +729,6 @@ static int coroutine_fn bdrv_qed_co_create_opts(BlockDriver *drv,
-     QDict *qdict;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
--    Error *local_err = NULL;
-     int ret;
- 
-     static const QDictRenames opt_renames[] = {
-@@ -771,11 +770,9 @@ static int coroutine_fn bdrv_qed_co_create_opts(BlockDriver *drv,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto fail;
-     }
-diff --git a/block/rbd.c b/block/rbd.c
-index 617553b022..688074c64b 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -681,7 +681,6 @@ static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
-                                     Error **errp)
- {
-     Visitor *v;
--    Error *local_err = NULL;
- 
-     /* Convert the remaining options into a QAPI object */
-     v = qobject_input_visitor_new_flat_confused(options, errp);
-@@ -689,11 +688,9 @@ static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
-         return -EINVAL;
-     }
- 
--    visit_type_BlockdevOptionsRbd(v, NULL, opts, &local_err);
-+    visit_type_BlockdevOptionsRbd(v, NULL, opts, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!opts) {
-         return -EINVAL;
-     }
- 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index a6a91442c9..6c487c8322 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -2193,11 +2193,9 @@ static int coroutine_fn sd_co_create_opts(BlockDriver *drv,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto fail;
-     }
-diff --git a/block/ssh.c b/block/ssh.c
-index f00b89684a..ebe3d8b631 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -616,7 +616,6 @@ static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
- {
-     BlockdevOptionsSsh *result = NULL;
-     QemuOpts *opts = NULL;
--    Error *local_err = NULL;
-     const QDictEntry *e;
-     Visitor *v;
- 
-@@ -636,11 +635,9 @@ static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
-         goto fail;
-     }
- 
--    visit_type_BlockdevOptionsSsh(v, NULL, &result, &local_err);
-+    visit_type_BlockdevOptionsSsh(v, NULL, &result, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!result) {
-         goto fail;
-     }
- 
-diff --git a/block/vdi.c b/block/vdi.c
-index 2f506a01ba..0a60be773e 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -907,7 +907,6 @@ static int coroutine_fn vdi_co_create_opts(BlockDriver *drv,
-     uint64_t block_size = DEFAULT_CLUSTER_SIZE;
-     bool is_static = false;
-     Visitor *v;
--    Error *local_err = NULL;
-     int ret;
- 
-     /* Parse options and convert legacy syntax.
-@@ -958,11 +957,9 @@ static int coroutine_fn vdi_co_create_opts(BlockDriver *drv,
-         ret = -EINVAL;
-         goto done;
-     }
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto done;
-     }
-diff --git a/block/vhdx.c b/block/vhdx.c
-index ac5a9094c4..eed9c3b860 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -2067,7 +2067,6 @@ static int coroutine_fn vhdx_co_create_opts(BlockDriver *drv,
-     QDict *qdict;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
--    Error *local_err = NULL;
-     int ret;
- 
-     static const QDictRenames opt_renames[] = {
-@@ -2108,11 +2107,9 @@ static int coroutine_fn vhdx_co_create_opts(BlockDriver *drv,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto fail;
-     }
-diff --git a/block/vpc.c b/block/vpc.c
-index c8cf3957bc..77043c2424 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -1096,7 +1096,6 @@ static int coroutine_fn vpc_co_create_opts(BlockDriver *drv,
-     QDict *qdict;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
--    Error *local_err = NULL;
-     int ret;
- 
-     static const QDictRenames opt_renames[] = {
-@@ -1135,11 +1134,9 @@ static int coroutine_fn vpc_co_create_opts(BlockDriver *drv,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!create_options) {
-         ret = -EINVAL;
-         goto fail;
-     }
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 8b240c3e09..f6d9ec4f13 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -239,7 +239,6 @@ static void acpi_table_install(const char unsigned *blob, size_t bloblen,
- void acpi_table_add(const QemuOpts *opts, Error **errp)
- {
-     AcpiTableOptions *hdrs = NULL;
 -    Error *err = NULL;
-     char **pathnames = NULL;
-     char **cur;
-     size_t bloblen = 0;
-@@ -249,11 +248,11 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-         Visitor *v;
+     KVMState *s = KVM_STATE(obj);
+     OnOffSplit mode;
  
-         v = opts_visitor_new(opts);
--        visit_type_AcpiTableOptions(v, NULL, &hdrs, &err);
-+        visit_type_AcpiTableOptions(v, NULL, &hdrs, errp);
-         visit_free(v);
-     }
- 
+-    visit_type_OnOffSplit(v, name, &mode, &err);
 -    if (err) {
-+    if (!hdrs) {
-         goto out;
+-        error_propagate(errp, err);
++    if (!visit_type_OnOffSplit(v, name, &mode, errp)) {
+         return;
+-    } else {
+-        switch (mode) {
+-        case ON_OFF_SPLIT_ON:
+-            s->kernel_irqchip_allowed = true;
+-            s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+-            break;
+-        case ON_OFF_SPLIT_OFF:
+-            s->kernel_irqchip_allowed = false;
+-            s->kernel_irqchip_required = false;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+-            break;
+-        case ON_OFF_SPLIT_SPLIT:
+-            s->kernel_irqchip_allowed = true;
+-            s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_ON;
+-            break;
+-        default:
+-            /* The value was checked in visit_type_OnOffSplit() above. If
+-             * we get here, then something is wrong in QEMU.
+-             */
+-            abort();
+-        }
++    }
++    switch (mode) {
++    case ON_OFF_SPLIT_ON:
++        s->kernel_irqchip_allowed = true;
++        s->kernel_irqchip_required = true;
++        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
++        break;
++    case ON_OFF_SPLIT_OFF:
++        s->kernel_irqchip_allowed = false;
++        s->kernel_irqchip_required = false;
++        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
++        break;
++    case ON_OFF_SPLIT_SPLIT:
++        s->kernel_irqchip_allowed = true;
++        s->kernel_irqchip_required = true;
++        s->kernel_irqchip_split = ON_OFF_AUTO_ON;
++        break;
++    default:
++        /* The value was checked in visit_type_OnOffSplit() above. If
++         * we get here, then something is wrong in QEMU.
++         */
++        abort();
      }
-     if (hdrs->has_file == hdrs->has_data) {
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 96c6c009c7..a775fba7c0 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -682,11 +682,9 @@ static char *xen_block_blockdev_add(const char *id, QDict *qdict,
-     trace_xen_block_blockdev_add(node_name);
- 
-     v = qobject_input_visitor_new(QOBJECT(qdict));
--    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-+    visit_type_BlockdevOptions(v, NULL, &options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!options) {
-         goto fail;
-     }
- 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index d208fd5008..c83f1f01c4 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -516,10 +516,10 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-     Error *err = NULL;
-     Visitor *v = opts_visitor_new(opts);
- 
--    visit_type_NumaOptions(v, NULL, &object, &err);
-+    visit_type_NumaOptions(v, NULL, &object, errp);
-     visit_free(v);
--    if (err) {
--        goto end;
-+    if (!object) {
-+        return -1;
-     }
- 
-     /* Fix up legacy suffix-less format */
-@@ -530,7 +530,6 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
- 
-     set_numa_options(ms, object, &err);
- 
--end:
-     qapi_free_NumaOptions(object);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/monitor/monitor.c b/monitor/monitor.c
-index 125494410a..47167ac2a3 100644
---- a/monitor/monitor.c
-+++ b/monitor/monitor.c
-@@ -656,25 +656,18 @@ int monitor_init_opts(QemuOpts *opts, Error **errp)
- {
-     Visitor *v;
-     MonitorOptions *options;
--    Error *local_err = NULL;
-+    int ret;
- 
-     v = opts_visitor_new(opts);
--    visit_type_MonitorOptions(v, NULL, &options, &local_err);
-+    visit_type_MonitorOptions(v, NULL, &options, errp);
-     visit_free(v);
--
--    if (local_err) {
--        goto out;
--    }
--
--    monitor_init(options, true, &local_err);
--    qapi_free_MonitorOptions(options);
--
--out:
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (!options) {
-         return -1;
-     }
--    return 0;
-+
-+    ret = monitor_init(options, true, errp);
-+    qapi_free_MonitorOptions(options);
-+    return ret;
  }
  
- QemuOptsList qemu_mon_opts = {
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index bb242fde1a..e411051160 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -895,8 +895,8 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+     ThrottleLimits *argp;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_ThrottleLimits(v, name, &argp, &local_err)) {
+-        goto ret;
++    if (!visit_type_ThrottleLimits(v, name, &argp, errp)) {
++        return;
+     }
+     qemu_mutex_lock(&tg->lock);
+     throttle_get_config(&tg->ts, &cfg);
+@@ -908,7 +908,6 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+ 
+ unlock:
+     qemu_mutex_unlock(&tg->lock);
+-ret:
+     qapi_free_ThrottleLimits(argp);
+     error_propagate(errp, local_err);
+     return;
+diff --git a/bootdevice.c b/bootdevice.c
+index fb09d3c668..769f40c77d 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -297,8 +297,8 @@ static void device_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 3cb6faa12b..4c7a8a05a5 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -761,15 +761,15 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+     if (!visit_type_str(v, name, &str, &local_err)) {
+         error_free(local_err);
+         local_err = NULL;
+-        visit_type_int32(v, name, &value, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-        } else if (value < -1 || value > 255) {
++        if (!visit_type_int32(v, name, &value, errp)) {
++            return;
++        }
++        if (value < -1 || value > 255) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                        name ? name : "null", "pci_devfn");
+-        } else {
+-            *ptr = value;
++            return;
+         }
++        *ptr = value;
+         return;
+     }
+ 
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 358f10a92e..ba8b0d7f02 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -245,8 +245,8 @@ static void ide_dev_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index ec92ffd415..1fa976c56c 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -85,21 +85,18 @@ static void nvdimm_set_uuid(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
+ {
+     NVDIMMDevice *nvdimm = NVDIMM(obj);
+-    Error *local_err = NULL;
+     char *value;
+ 
+-    if (!visit_type_str(v, name, &value, &local_err)) {
+-        goto out;
++    if (!visit_type_str(v, name, &value, errp)) {
++        return;
+     }
+ 
+     if (qemu_uuid_parse(value, &nvdimm->uuid) != 0) {
+         error_setg(errp, "Property '%s.%s' has invalid value",
+                    object_get_typename(obj), name);
+     }
+-    g_free(value);
+ 
+-out:
+-    error_propagate(errp, local_err);
++    g_free(value);
+ }
+ 
+ 
+diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
+index 765bcd1f0b..0594abd93a 100644
+--- a/hw/net/ne2000-isa.c
++++ b/hw/net/ne2000-isa.c
+@@ -113,8 +113,8 @@ static void isa_ne2000_set_bootindex(Object *obj, Visitor *v,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index 1c3bd2578c..721665191e 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -736,8 +736,8 @@ static void usb_msd_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/net/net.c b/net/net.c
+index d1130296e1..e1f45d3b36 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1052,7 +1052,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+ {
+     gchar **substrings = NULL;
+     Netdev *object = NULL;
+-    Error *err = NULL;
+     int ret = -1;
+     Visitor *v = opts_visitor_new(opts);
+ 
+@@ -1100,16 +1099,13 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+         qemu_opts_set_id(opts, g_strdup_printf("__org.qemu.net%i", idx++));
+     }
+ 
+-    visit_type_Netdev(v, NULL, &object, &err);
+-
+-    if (!err) {
+-        ret = net_client_init1(object, is_netdev, &err);
++    if (visit_type_Netdev(v, NULL, &object, errp)) {
++        ret = net_client_init1(object, is_netdev, errp);
+     }
+ 
+     qapi_free_Netdev(object);
+ 
+ out:
+-    error_propagate(errp, err);
+     g_strfreev(substrings);
+     visit_free(v);
+     return ret;
 -- 
 2.26.2
 
