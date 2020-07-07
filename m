@@ -2,85 +2,93 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C1DC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAA2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:32:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12E73206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:03:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9891A20702
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:32:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRof3WvZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E73206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jvbxd7Ma"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9891A20702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jslNV-0008ET-Br
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 07:03:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38638)
+	id 1jslpW-0000sk-PY
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 07:32:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jslMU-0007hB-0h
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:02:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57438
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jslMS-0001rX-GX
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:02:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594119723;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:openpgp:openpgp;
- bh=1MLm6o6Xg2RNS4OVfM+TbqKzm0RGJmRg9n5H+VfrDLg=;
- b=BRof3WvZ6kRquVnLQGkshm7aMOXh1focfm9dOK94/qs9iYWEJhqd2eT6DEYxbJfZOt3pzr
- A03CywYqbkGJ2JZ/4CZRo+kbWOTBOOpBOCYpIagMraefahaWOek0IbfhISO3FdQF7oNeyM
- 0X0OodtSqFydFZJBdTLpEU6HATjSB7k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-OmJj5fNHPXCnlbOWInBpwg-1; Tue, 07 Jul 2020 07:02:00 -0400
-X-MC-Unique: OmJj5fNHPXCnlbOWInBpwg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC95C801E6A;
- Tue,  7 Jul 2020 11:01:57 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-77.ams2.redhat.com [10.36.112.77])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 31CDA19D7B;
- Tue,  7 Jul 2020 11:01:56 +0000 (UTC)
-To: Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>
-From: Thomas Huth <thuth@redhat.com>
-Subject: hw/intc/xics.c:605: ics_realize: Assertion `ics->xics' failed
-Openpgp: preference=signencrypt
-Message-ID: <104a1848-4686-0b6f-fb0c-e09e2ffbd031@redhat.com>
-Date: Tue, 7 Jul 2020 13:01:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jslod-0008QR-5m
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:31:11 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43894)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jslob-0006bA-7c
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:31:10 -0400
+Received: by mail-wr1-x444.google.com with SMTP id j4so42348360wrp.10
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 04:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=zrBr7BIv8VPH7Obo1cm5vtYbYjigCd4X9fJbH0UvJmA=;
+ b=Jvbxd7Ma0lVoVavlmOEdfciuwmikPK1qR4a5mg6FsGwOj2B72rj6jKlKjuuiK/+hxP
+ cNhCZxB4DjUKO3EVD1eXjDB430d6Y/obqMTjjMCPf8+sAD8QAYdnGrrnPgiemCwEv29D
+ fEPrN23a5yAbQffXAxvkkTlaOpsxC8wAZz7ZIU2m26WppMb0mxOsJDjEME6CkQCI5p+z
+ qsCYbP7z4MN8Q32B1eoEfTSnwVJaPrvtq1ECz9G4l7F6HNkLbGVG9Q04aZSK8EJ2tWoD
+ QuJUvhgzOYn/9wwkaLTpqorIEpX2NFHIpXxHnTFbiRgpb433Y7tKFk6qGkH00X2G8ChB
+ zBLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=zrBr7BIv8VPH7Obo1cm5vtYbYjigCd4X9fJbH0UvJmA=;
+ b=E1FuD7PzIsAMWUbUoW1WppfbY2X0l1wwPnVy3tig5/CdqTYU/sK35qw0xhaC0Dplfx
+ 93D17PWUQ6JR8EdLAA9Gr/p3D1DqplV8gXr5MTM2nPBz+JbBf4a++IjiN0j4JpG9kQFF
+ /pFQpdeu7u+tqg/4adIMFtouzfIpacDPKON9hu4LnbFJG8Xm06WZoH1rJrPbeU4TZZd1
+ L9kRZ5tgmBasQPGnc2ByTopdL2biHvNaIGAMhyvM8GAsMlVxZh0IgpCKUSFHPKBSgXOF
+ G3XY26654V22pKBB8gqbRSlsOSzphEfFAarmmzCXccCM+qyPk25A11I0wgYl6jbCiz6U
+ pa/A==
+X-Gm-Message-State: AOAM532q4Aj+CKny2wGaoo4BxDLLkDj8ifQITs0ewksehgP3r9Gm4qA4
+ 1Za7w97oHDf3ITQIYbNxEyqeTQ==
+X-Google-Smtp-Source: ABdhPJxHkFc2V5EWKD6kBy9+gfvka5zWk2o+Sj0blSQLRPGSDgybVBE+RlV3+UOaGnF/+b2elhAmDw==
+X-Received: by 2002:adf:d842:: with SMTP id k2mr55090040wrl.239.1594121467482; 
+ Tue, 07 Jul 2020 04:31:07 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k126sm778383wmf.3.2020.07.07.04.31.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jul 2020 04:31:05 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2E8C11FF7E;
+ Tue,  7 Jul 2020 12:31:05 +0100 (BST)
+References: <20200706234737.32378-1-jcmvbkbc@gmail.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Subject: Re: [PATCH 00/21] target/xtensa: implement double precision FPU
+In-reply-to: <20200706234737.32378-1-jcmvbkbc@gmail.com>
+Date: Tue, 07 Jul 2020 12:31:05 +0100
+Message-ID: <87pn97o93a.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,29 +102,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
- Hi Greg,
+Max Filippov <jcmvbkbc@gmail.com> writes:
 
-I just ran  scripts/device-crash-test and it triggered the assert that
-you've added in commit b015a9809427c8 ("xics: Link ICS_PROP_XICS
-property to ICSState::xics pointer"):
+> Hello,
+>
+> this series implements double precision floating point unit option for
+> target/xtensa, updates FPU tests and adds two new CPU cores, one with
+> FPU2000 option and one with DFPU option.
+>
+> Max Filippov (21):
+>   softfloat: make NO_SIGNALING_NANS runtime property
+>   softfloat: pass float_status pointer to pickNaN
+>   softfloat: add xtensa specialization for pickNaNMulAdd
 
-$ qemu-system-ppc64 -S -M powernv9,accel=tcg -device pnv-psi-POWER8
-qemu-system-ppc64: hw/intc/xics.c:605: ics_realize: Assertion
-`ics->xics' failed.
-Aborted (core dumped)
+I've only looked at the softfloat bits as I'm not familiar with xtensa
+at all. However you can have a vague:
 
-That's ugly. Could you please have a look how this could be done in a
-nicer way? (Maybe set errp and return in that case?)
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
- Thanks,
-  Thomas
+for the series - congratulations you pass your own tests ;-)
 
+--=20
+Alex Benn=C3=A9e
 
