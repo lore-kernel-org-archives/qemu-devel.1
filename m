@@ -6,94 +6,89 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 831D7C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:06:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3BDC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:07:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51F6220674
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:06:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A3F820674
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:07:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tee1x5uY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51F6220674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVWKvOVa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3F820674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jspBK-0004aN-JG
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 11:06:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44028)
+	id 1jspBl-00051F-MV
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 11:07:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsp9Q-0001DM-Hm
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 11:04:52 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:37583)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsp9O-00030x-Qb
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 11:04:52 -0400
-Received: by mail-wr1-x436.google.com with SMTP id a6so45530859wrm.4
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 08:04:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=x+IoXirChmdp3zBiKN8Yfjj2AmyQMe6UmqiATS78ywk=;
- b=Tee1x5uY9Bk9qY5Gi45XGEwTyPRTaWGEKqh6WCxS9yG5ymmT/WVLPDPLoDU11jT0Gk
- 9810/oQVBchQgEwhLqb32r91FQCQIXz86TWUr6x/QUPtJvvbXvYjinQAC3G2up6Kjm+Y
- BXq9AX4YdT1CFKsMZCDamvvrl2uEQjvrChh1rICR7S79zPGhy+SLu7aOeEEgKMuz/1Oq
- qMch+5t1AQ8DVXD8jx9Iiqcy5wCCNVvxZp2g6g2lRyLnhh6ufz8QYX7uRtinHmx0vB8Z
- 340vubs9TbHzsC31zjAxDNZp5fhCyTeSUbtWmn2ACLm7GDkOqAzrwbFnB99PWs0qHmkA
- 4Ctg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=x+IoXirChmdp3zBiKN8Yfjj2AmyQMe6UmqiATS78ywk=;
- b=VSVZjARhGFz2NeJHrPLqBBIhy1ndni3ife0BkyUxBQFkj77I5rUMQmOPKOAfF2O8QJ
- md5eveXTuKd/HjGIhKet2jsKibqpiW/t3o75aY5MvG8ECNtM9JmytRMcqsf7qSfoj3Ec
- 2kdR209YbJJYFtdk5DRxBpYJBtRRF+6cnlS3TSTbCKZcH/dpate/LVTJ9XZr2gmiW5Ez
- 2lRN2oEFE/voxq9qTqRqd86cg5QELeSPkU+d61fUSvxOQUST+l9N/WCZCvlxAYdq/Wud
- GvSBwfaroixhPqLvswRaAr4jF68vGhXfjWgR9N4/egw3UDN0hWWOFRk0e1+ToWcH5Wjf
- Vuvw==
-X-Gm-Message-State: AOAM533GP+cf7ek4rhtsh2yh+8DNVY/FC4+eBLV1BxmXvA3E32/1mDuA
- hF4dpEhbFd1Vb/LjO9YuDEA=
-X-Google-Smtp-Source: ABdhPJy9nbbyk/O3LfcJWwEHNlYPVQNSzXnw51asw/r/GMcUEs0JuUqP3lhcGJsFTu2hb2TwuUFpog==
-X-Received: by 2002:adf:e811:: with SMTP id o17mr58016972wrm.53.1594134289399; 
- Tue, 07 Jul 2020 08:04:49 -0700 (PDT)
-Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id u23sm1466045wru.94.2020.07.07.08.04.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jul 2020 08:04:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jspAs-00049M-Q5
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 11:06:22 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38139
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jspAq-0003Ol-7c
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 11:06:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594134379;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=oCBnPQYmrn1xPn5ii2VUn3RGd47YLCZkPMr4koF4Qqw=;
+ b=GVWKvOVa4hnZtaabewcaY4jKi/hKhFvQsUKSjrIm7fzcqcJGG7+FCjtPWnV8H0c2rXEYXu
+ ZAyDw1nc3DpYg7jE1qlAod4BrxekIbrdIlgrXW6/el5ln0I6O5YxDX2JZPPzFDmYE6mZho
+ lzQwTkIZ9neRJ4tB0UQNmRQkPSrBaek=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-1x9KNCLbN12V6OE-e1qTWQ-1; Tue, 07 Jul 2020 11:06:17 -0400
+X-MC-Unique: 1x9KNCLbN12V6OE-e1qTWQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E66CA108BD09;
+ Tue,  7 Jul 2020 15:06:15 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-35.ams2.redhat.com [10.36.113.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C212C0061;
+ Tue,  7 Jul 2020 15:06:10 +0000 (UTC)
 Subject: Re: [PULL 07/15] hw/timer: RX62N 8-Bit timer (TMR)
-To: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Yoshinori Sato <ysato@users.sourceforge.jp>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 References: <20200621124807.17226-1-f4bug@amsat.org>
  <20200621124807.17226-8-f4bug@amsat.org>
  <CAFEAcA8c2dywr=Zxz1ExAV-48JwFU5vbBDDfA=_KE98XamnXiA@mail.gmail.com>
  <1448b050-4f78-2ae3-95db-6c47baad5909@amsat.org>
  <878sfv9xmi.wl-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1b6e18a8-6baf-7b37-b48c-9029bca88d6e@amsat.org>
-Date: Tue, 7 Jul 2020 17:04:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6e36f1f3-06e2-9635-960d-e2f7f75b2040@redhat.com>
+Date: Tue, 7 Jul 2020 17:06:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
 In-Reply-To: <878sfv9xmi.wl-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x436.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,16 +105,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Richard Henderson <richard.henderson@linaro.org>,
  Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/7/20 5:02 PM, Yoshinori Sato wrote:
+On 07/07/2020 17.02, Yoshinori Sato wrote:
 > On Mon, 29 Jun 2020 18:58:56 +0900,
 > Philippe Mathieu-Daudé wrote:
 >>
@@ -227,13 +222,11 @@ On 7/7/20 5:02 PM, Yoshinori Sato wrote:
 > high byte: channel 0 register.
 > low byte: channel 1 register
 
-Thanks, can you send a patch to fix the potential bug?
+So could you please provide a patch that either adds the missing
+"break;" statement between the cases here, or adds a "/* fallthrough */"
+comment between the cases?
 
-> 
->>>
->>> thanks
->>> -- PMM
->>>
->>
-> 
+ Thanks,
+  Thomas
+
 
