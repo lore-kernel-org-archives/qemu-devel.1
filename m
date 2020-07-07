@@ -2,84 +2,91 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D226EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6027CC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:09:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D22D206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17E59206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:09:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alezWaNp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D22D206DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O5iMJl9L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E59206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsjaZ-0000S2-Rp
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 05:08:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40330)
+	id 1jsjb4-0001d5-9u
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 05:09:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jsjZv-0008I3-5b
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:07:51 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34585
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jsjaH-0000Ji-Nj
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:08:13 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60566
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jsjZt-0007Ay-0h
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:07:50 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jsjaF-0007Ji-G9
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:08:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594112868;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1594112890;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PgzWXCDcq0X1/5R/vzl4Nmfh5IE+hZKdLjEcdyMpsZA=;
- b=alezWaNpGu5+2KVDxOGy0bacEYzFl8YELrPmcT7thvuivxICwKLc+G4fvsdoLMCk1dPbyQ
- l3PKsuz/ept+elRNGifH97jZ0S0my7xfhotO/nWvSAjTGH8zFNUx2Mk3nZZ0SO1tGSQ4sD
- LKaguU8AMq34tyRIkt5dq5jQF3q+4kk=
+ bh=1D80C1RMUGfeTmAnS58Y0HxDVLtUZQC5V1O8JzSIMkY=;
+ b=O5iMJl9LzweE1uBc33bpygC2C8rr0Wko7QwQmIvGEDYWExFAdfmKUBmA2cP6pBW9n+ltfy
+ R/Fbqss87JMOUBRY3T180Q+X++AZJclXLGecSL2xDUqOb/ThBIgWbscHMr5CC4EdHhEdJL
+ euBvTUn9878SlGR4myIans6kc86fByQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-JktbbitRNrSHnhvvphmUhA-1; Tue, 07 Jul 2020 05:07:46 -0400
-X-MC-Unique: JktbbitRNrSHnhvvphmUhA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-191-fJRxzwzoM2eJTJ_MLFNESA-1; Tue, 07 Jul 2020 05:08:03 -0400
+X-MC-Unique: fJRxzwzoM2eJTJ_MLFNESA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDF7A461;
- Tue,  7 Jul 2020 09:07:44 +0000 (UTC)
-Received: from [10.72.13.254] (ovpn-13-254.pek2.redhat.com [10.72.13.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 11DA919D7E;
- Tue,  7 Jul 2020 09:07:42 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] hw/net: Added basic IPv6 fragmentation
-To: andrew@daynix.com, qemu-devel@nongnu.org
-References: <20200629011800.374914-1-andrew@daynix.com>
- <20200629011800.374914-2-andrew@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <348f030e-ab3b-52e8-ae37-494fdb49b4eb@redhat.com>
-Date: Tue, 7 Jul 2020 17:07:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 851F5BFC1;
+ Tue,  7 Jul 2020 09:08:02 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 013917166C;
+ Tue,  7 Jul 2020 09:07:58 +0000 (UTC)
+Date: Tue, 7 Jul 2020 10:07:55 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 0/6] migration: bring savevm/loadvm/delvm over to QMP
+Message-ID: <20200707090755.GC2649462@redhat.com>
+References: <20200702175754.2211821-1-berrange@redhat.com>
+ <a747fcd4-d87e-8124-a988-f3ae678c856e@virtuozzo.com>
+ <20200703172224.GT2213227@redhat.com>
+ <a8015fd3-e73e-c70e-9ba7-fa1bc047a1c2@virtuozzo.com>
+ <20200706152701.GB5052@linux.fritz.box>
+ <20200706152902.GH2603839@redhat.com>
+ <20200706155011.GC5052@linux.fritz.box>
+ <20200706160318.GI2603839@redhat.com>
+ <20200706162156.GF5052@linux.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20200629011800.374914-2-andrew@daynix.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200706162156.GF5052@linux.fritz.box>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -87,7 +94,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,313 +107,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dmitry.fleytman@gmail.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Jul 06, 2020 at 06:21:56PM +0200, Kevin Wolf wrote:
+> Am 06.07.2020 um 18:03 hat Daniel P. BerrangÃÂ© geschrieben:
+> > On Mon, Jul 06, 2020 at 05:50:11PM +0200, Kevin Wolf wrote:
+> > > Am 06.07.2020 um 17:29 hat Daniel P. BerrangÃÂ© geschrieben:
+> > > > On Mon, Jul 06, 2020 at 05:27:01PM +0200, Kevin Wolf wrote:
+> > > > > Am 03.07.2020 um 19:29 hat Denis V. Lunev geschrieben:
+> > > > > > On 7/3/20 8:22 PM, Daniel P. BerrangÃÆÃâÃâÃÂ© wrote:
+> > > > > > > On Fri, Jul 03, 2020 at 08:15:44PM +0300, Denis V. Lunev wrote:
+> > > > > > >> On 7/2/20 8:57 PM, Daniel P. BerrangÃÆÃâÃâÃÂ© wrote:
+> > > > > > >>> When QMP was first introduced some 10+ years ago now, the snapshot
+> > > > > > >>> related commands (savevm/loadvm/delvm) were not converted. This was
+> > > > > > >>> primarily because their implementation causes blocking of the thread
+> > > > > > >>> running the monitor commands. This was (and still is) considered
+> > > > > > >>> undesirable behaviour both in HMP and QMP.
+> > > > > > >>>
+> > > > > > >>> In theory someone was supposed to fix this flaw at some point in the
+> > > > > > >>> past 10 years and bring them into the QMP world. Sadly, thus far it
+> > > > > > >>> hasn't happened as people always had more important things to work
+> > > > > > >>> on. Enterprise apps were much more interested in external snapshots
+> > > > > > >>> than internal snapshots as they have many more features.
+> > > > > > >>>
+> > > > > > >>> Meanwhile users still want to use internal snapshots as there is
+> > > > > > >>> a certainly simplicity in having everything self-contained in one
+> > > > > > >>> image, even though it has limitations. Thus the apps that end up
+> > > > > > >>> executing the savevm/loadvm/delvm via the "human-monitor-command"
+> > > > > > >>> QMP command.
+> > > > > > >>>
+> > > > > > >>>
+> > > > > > >>> IOW, the problematic blocking behaviour that was one of the reasons
+> > > > > > >>> for not having savevm/loadvm/delvm in QMP is experienced by applications
+> > > > > > >>> regardless. By not portting the commands to QMP due to one design flaw,
+> > > > > > >>> we've forced apps and users to suffer from other design flaws of HMP (
+> > > > > > >>> bad error reporting, strong type checking of args, no introspection) for
+> > > > > > >>> an additional 10 years. This feels rather sub-optimal :-(
+> > > > > > >>>
+> > > > > > >>> In practice users don't appear to care strongly about the fact that these
+> > > > > > >>> commands block the VM while they run. I might have seen one bug report
+> > > > > > >>> about it, but it certainly isn't something that comes up as a frequent
+> > > > > > >>> topic except among us QEMU maintainers. Users do care about having
+> > > > > > >>> access to the snapshot feature.
+> > > > > > >>>
+> > > > > > >>> Where I am seeing frequent complaints is wrt the use of OVMF combined
+> > > > > > >>> with snapshots which has some serious pain points. This is getting worse
+> > > > > > >>> as the push to ditch legacy BIOS in favour of UEFI gain momentum both
+> > > > > > >>> across OS vendors and mgmt apps. Solving it requires new parameters to
+> > > > > > >>> the commands, but doing this in HMP is super unappealing.
+> > > > > > >>>
+> > > > > > >>>
+> > > > > > >>>
+> > > > > > >>> After 10 years, I think it is time for us to be a little pragmatic about
+> > > > > > >>> our handling of snapshots commands. My desire is that libvirt should never
+> > > > > > >>> use "human-monitor-command" under any circumstances, because of the
+> > > > > > >>> inherant flaws in HMP as a protocol for machine consumption. If there
+> > > > > > >>> are flaws in QMP commands that's fine. If we fix them in future, we can
+> > > > > > >>> deprecate the current QMP commands and remove them not too long after,
+> > > > > > >>> without being locked in forever.
+> > > > > > >>>
+> > > > > > >>>
+> > > > > > >>> Thus in this series I'm proposing a direct 1-1 mapping of the existing
+> > > > > > >>> HMP commands for savevm/loadvm/delvm into QMP as a first step. This does
+> > > > > > >>> not solve the blocking thread problem, but it does eliminate the error
+> > > > > > >>> reporting, type checking and introspection problems inherant to HMP.
+> > > > > > >>> We're winning on 3 out of the 4 long term problems.
+> > > > > > >>>
+> > > > > > >>> If someone can suggest a easy way to fix the thread blocking problem
+> > > > > > >>> too, I'd be interested to hear it. If it involves a major refactoring
+> > > > > > >>> then I think user are better served by unlocking what look like easy
+> > > > > > >>> wins today.
+> > > > > > >>>
+> > > > > > >>> With a QMP variant, we reasonably deal with the problems related to OVMF:
+> > > > > > >>>
+> > > > > > >>>  - The logic to pick which disk to store the vmstate in is not
+> > > > > > >>>    satsifactory.
+> > > > > > >>>
+> > > > > > >>>    The first block driver state cannot be assumed to be the root disk
+> > > > > > >>>    image, it might be OVMF varstore and we don't want to store vmstate
+> > > > > > >>>    in there.
+> > > > > > >>>
+> > > > > > >>>  - The logic to decide which disks must be snapshotted is hardwired
+> > > > > > >>>    to all disks which are writable
+> > > > > > >>>
+> > > > > > >>>    Again with OVMF there might be a writable varstore, but this can be
+> > > > > > >>>    raw rather than qcow2 format, and thus unable to be snapshotted.
+> > > > > > >>>    While users might wish to snapshot their varstore, in some/many/most
+> > > > > > >>>    cases it is entirely uneccessary. Users are blocked from snapshotting
+> > > > > > >>>    their VM though due to this varstore.
+> > > > > > >>>
+> > > > > > >>> These are solved by adding two parameters to the commands. The first is
+> > > > > > >>> a block device node name that identifies the image to store vmstate in,
+> > > > > > >>> and the second is a list of node names to exclude from snapshots.
+> > > > > > >>>
+> > > > > > >>> In the block code I've only dealt with node names for block devices, as
+> > > > > > >>> IIUC, this is all that libvirt should need in the -blockdev world it now
+> > > > > > >>> lives in. IOW, I've made not attempt to cope with people wanting to use
+> > > > > > >>> these QMP commands in combination with -drive args.
+> > > > > > >>>
+> > > > > > >>> I've done some minimal work in libvirt to start to make use of the new
+> > > > > > >>> commands to validate their functionality, but this isn't finished yet.
+> > > > > > >>>
+> > > > > > >>> My ultimate goal is to make the GNOME Boxes maintainer happy again by
+> > > > > > >>> having internal snapshots work with OVMF:
+> > > > > > >>>
+> > > > > > >>>   https://gitlab.gnome.org/GNOME/gnome-boxes/-/commit/c486da262f6566326fbcb5e=
+> > > > > > >>> f45c5f64048f16a6e
+> > > > > > >>>
+> > > > > > >>> Daniel P. Berrang=C3=A9 (6):
+> > > > > > >>>   migration: improve error reporting of block driver state name
+> > > > > > >>>   migration: introduce savevm, loadvm, delvm QMP commands
+> > > > > > >>>   block: add ability to filter out blockdevs during snapshot
+> > > > > > >>>   block: allow specifying name of block device for vmstate storage
+> > > > > > >>>   migration: support excluding block devs in QMP snapshot commands
+> > > > > > >>>   migration: support picking vmstate disk in QMP snapshot commands
+> > > > > > >>>
+> > > > > > >>>  block/monitor/block-hmp-cmds.c |  4 +-
+> > > > > > >>>  block/snapshot.c               | 68 +++++++++++++++++++------
+> > > > > > >>>  include/block/snapshot.h       | 21 +++++---
+> > > > > > >>>  include/migration/snapshot.h   | 10 +++-
+> > > > > > >>>  migration/savevm.c             | 71 +++++++++++++++++++-------
+> > > > > > >>>  monitor/hmp-cmds.c             | 20 ++------
+> > > > > > >>>  qapi/migration.json            | 91 ++++++++++++++++++++++++++++++++++
+> > > > > > >>>  replay/replay-snapshot.c       |  4 +-
+> > > > > > >>>  softmmu/vl.c                   |  2 +-
+> > > > > > >>>  9 files changed, 228 insertions(+), 63 deletions(-)
+> > > > > > >> I have tried to work in this interface in 2016. That time
+> > > > > > >> we have struggled with the idea that this QMP interface should
+> > > > > > >> be ready to work asynchronously.
+> > > > > > >>
+> > > > > > >> Write-protect userfaultfd was merged into vanilla Linux
+> > > > > > >> thus it is time to async savevm interface, which will also
+> > > > > > >> bring async loadvm and some rework for state storing.
+> > > > > > >>
+> > > > > > >> Thus I think that with the introduction of the QMP interface
+> > > > > > >> we should at least run save VM not from the main
+> > > > > > >> thread but from the background with the event at the end.
+> > > > > > > spawning a thread in which to invoke save_snapshot() and load_snapshot()
+> > > > > > > is easy enough.  I'm not at all clear on what we need in the way of
+> > > > > > > mutex locking though, to make those methods safe to run in a thread
+> > > > > > > that isn't the main event loop.
+> > > > > > 
+> > > > > > I am unsure that this is so easy. We need to be protected from other
+> > > > > > operations
+> > > > > > coming through QMP interface. Right now parallel operations are not allowed.
+> > > > > > 
+> > > > > > > Even with savevm/loadvm being blocking, we could introduce a QMP event
+> > > > > > > straight away, and document that users shouldn't assume the operation
+> > > > > > > is complete until they see the event. That would let us make the commands
+> > > > > > > non-blocking later with same documented semantics.
+> > > > > > OK. Let us assume that you have added QMP savevm as proposed. It is
+> > > > > > sync now. Sooner or later (I hope sooner) we will have to re-implement
+> > > > > > this command with async version of the command, which will bring
+> > > > > > again event etc and thus you will have to add compat layers to the
+> > > > > > libvirt.
+> > > > > > 
+> > > > > > I think that it would be cleaner to start with the interface suitable for
+> > > > > > further (coming) features and not copy obsolete implementation.
+> > > > > > Yes, unfortunately, this is much more complex :(
+> > > > > 
+> > > > > Should we make this a job (may or may not be a block job) that just
+> > > > > happens to block the VM and return completion immediately with the
+> > > > > simple implementation we can have today? Then moving it later to a
+> > > > > truly async operation mode should become transparent to the QMP client.
+> > > > 
+> > > > What would making it a job / block job need from a QMP design POV ?
+> > > 
+> > > The actual QMP syntax for the command wouldn't look much different (I
+> > > think just a new option 'job-id'), but the difference would be that it's
+> > > not documented as performing the whole action, but just starting the
+> > > job. The expectation would then be that it can be managed with the
+> > > job-* commands and that it emits the job status events.
+> > > 
+> > > This may sound complicated, but most of it is actually covered by the
+> > > generic job infrastructure.
+> > > 
+> > > The simplest job that we have is blockdev-create, which is implemented
+> > > in block/create.c (99 lines including the license header). I think this
+> > > would be a good model for our new case.
+> > 
+> > The QMP design and internal API looks simple enough, but I'm wondering
+> > what implications come with the job infra wrt locking/thread safety. In
+> > particular I see the "job_start" command runs the impl in a coroutine.
+> > I can't tell if that's going to cause any interactions wrto the current
+> > loadvm/savevm impl and its assumptions about blocking execution while
+> > running.
+> 
+> Yes, the job infrastructure is build on coroutines and we'd need to
+> check that this is safe. But both loadvm and savevm call both vm_stop()
+> and bdrv_drain_all_begin/end(), so not much should be going on in
+> parallel.
+> 
+> If this doesn't easily work out, there is still a simple solution for
+> our sync implementation with an async interface: Just leave coroutine
+> context immediately again by scheduling a BH that does the actual work.
 
-On 2020/6/29 上午9:18, andrew@daynix.com wrote:
-> From: Andrew <andrew@daynix.com>
->
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1708065
-> Overall, there was an issue that big frames of IPv6 doesn't sent.
-> With network backend with 'virtual header' - there was an issue
-> in 'plen' field. Overall, during TSO, 'plen' would be changed,
-> but with 'vheader' this field should be set to the size of the
-> payload itself instead of '0'.
-> For software offload - there is added basic IPv6 fragmentation.
-> The basic IPv6 fragmentation - adding 'frag' extension to
-> the packet, overall shares some logic with IPv4. It works,
-> but there are still issues with a combination of
-> extensions - in the future, it would require refactoring
-> work to implement workflow with IPv6 and extension.
-> e1000e driver doesn't set the 'plen' field for IPv6 for big packets
-> if TSO is enabled. "Jumbo option" isn't added yet, until
-> qemu supports packets greater than 64K.
->
-> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+Ok, I'm going to try out use of the job framework and post a v2.
 
-
-Hi Andrew:
-
-Please split the patch into two part, one is for the plen issue with the 
-vnet header capable backend. Another is the software segmentation.
-
-And I will apply for plen issue fixing for 5.1.
-
-Thanks
-
-
-> ---
->   hw/net/net_tx_pkt.c | 30 ++++++++++++--
->   hw/net/net_tx_pkt.h | 14 +++++++
->   include/net/eth.h   | 15 +++++--
->   net/eth.c           | 99 ++++++++++++++++++++++++++++++++++++++++++---
->   4 files changed, 147 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
-> index 331c73cfc0..74044c6618 100644
-> --- a/hw/net/net_tx_pkt.c
-> +++ b/hw/net/net_tx_pkt.c
-> @@ -589,10 +589,11 @@ static bool net_tx_pkt_do_sw_fragmentation(struct NetTxPkt *pkt,
->   
->           more_frags = (fragment_offset + fragment_len < pkt->payload_len);
->   
-> -        eth_setup_ip4_fragmentation(l2_iov_base, l2_iov_len, l3_iov_base,
-> -            l3_iov_len, fragment_len, fragment_offset, more_frags);
-> +        eth_setup_ip_fragmentation(l2_iov_base, l2_iov_len, l3_iov_base,
-> +            &l3_iov_len, ETH_MAX_IP_DGRAM_LEN,
-> +            fragment_len, fragment_offset, more_frags);
->   
-> -        eth_fix_ip4_checksum(l3_iov_base, l3_iov_len);
-> +        fragment[NET_TX_PKT_FRAGMENT_L3_HDR_POS].iov_len = l3_iov_len;
->   
->           net_tx_pkt_sendv(pkt, nc, fragment, dst_idx);
->   
-> @@ -626,6 +627,7 @@ bool net_tx_pkt_send(struct NetTxPkt *pkt, NetClientState *nc)
->   
->       if (pkt->has_virt_hdr ||
->           pkt->virt_hdr.gso_type == VIRTIO_NET_HDR_GSO_NONE) {
-> +        net_tx_pkt_fix_ip6_payload_len(pkt);
->           net_tx_pkt_sendv(pkt, nc, pkt->vec,
->               pkt->payload_frags + NET_TX_PKT_PL_START_FRAG);
->           return true;
-> @@ -644,3 +646,25 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *pkt, NetClientState *nc)
->   
->       return res;
->   }
-> +
-> +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt)
-> +{
-> +    struct iovec *l2 = &pkt->vec[NET_TX_PKT_L2HDR_FRAG];
-> +    if (eth_get_l3_proto(l2, 1, l2->iov_len) == ETH_P_IPV6) {
-> +        struct ip6_header *ip6 = (struct ip6_header *) pkt->l3_hdr;
-> +        /*
-> +         * TODO: if qemu would support >64K packets - add jumbo option check
-> +         * something like that:
-
-
-This comment is duplicated with the one below?
-
-
-> +         * 'if (ip6->ip6_plen == 0 && !has_jumbo_option(ip6)) {'
-> +         */
-> +        if (ip6->ip6_plen == 0) {
-> +            if (pkt->payload_len <= ETH_MAX_IP_DGRAM_LEN) {
-> +                ip6->ip6_plen = htons(pkt->payload_len);
-> +            }
-> +            /*
-> +             * TODO: if qemu would support >64K packets
-> +             * add jumbo option for packets greater then 65,535 bytes
-> +             */
-
-
-Is this better to warn here?
-
-
-> +        }
-> +    }
-> +}
-> diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h
-> index 212ecc62fc..4ec8bbe9bd 100644
-> --- a/hw/net/net_tx_pkt.h
-> +++ b/hw/net/net_tx_pkt.h
-> @@ -187,4 +187,18 @@ bool net_tx_pkt_parse(struct NetTxPkt *pkt);
->   */
->   bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt);
->   
-> +/**
-> + * Fix IPv6 'plen' field.
-> + * If ipv6 payload length field is 0 - then there should be Hop-by-Hop
-> + * option for packets greater than 65,535.
-> + * For packets with a payload less than 65,535: fix 'plen' field.
-> + * For backends with vheader, we need just one packet with proper
-> + * payload size. For now, qemu drops every packet with size greater 64K
-> + * (see net_tx_pkt_send()) so, there is no reason to add jumbo option to ip6
-> + * hop-by-hop extension if it's missed
-> + *
-> + * @pkt            packet
-> + */
-> +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt);
-> +
->   #endif
-> diff --git a/include/net/eth.h b/include/net/eth.h
-> index 7f45c678e7..05c75ac9fc 100644
-> --- a/include/net/eth.h
-> +++ b/include/net/eth.h
-> @@ -139,6 +139,14 @@ struct ip6_ext_hdr_routing {
->       uint8_t     rsvd[4];
->   };
->   
-> +struct ip6_ext_hdr_fragment {
-> +    uint8_t     nxt;
-> +    uint8_t     res0;
-> +    uint16_t    off;
-> +    uint32_t    id;
-> +};
-> +
-> +
->   struct ip6_option_hdr {
->   #define IP6_OPT_PAD1   (0x00)
->   #define IP6_OPT_HOME   (0xC9)
-> @@ -186,6 +194,7 @@ struct tcp_hdr {
->   
->   #define ip6_nxt      ip6_ctlun.ip6_un1.ip6_un1_nxt
->   #define ip6_ecn_acc  ip6_ctlun.ip6_un3.ip6_un3_ecn
-> +#define ip6_plen     ip6_ctlun.ip6_un1.ip6_un1_plen
->   
->   #define PKT_GET_ETH_HDR(p)        \
->       ((struct eth_header *)(p))
-> @@ -398,9 +407,9 @@ void eth_get_protocols(const struct iovec *iov, int iovcnt,
->                          eth_ip4_hdr_info *ip4hdr_info,
->                          eth_l4_hdr_info  *l4hdr_info);
->   
-> -void eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
-> -                                 void *l3hdr, size_t l3hdr_len,
-> -                                 size_t l3payload_len,
-> +void eth_setup_ip_fragmentation(const void *l2hdr, size_t l2hdr_len,
-> +                                 void *l3hdr, size_t *l3hdr_len,
-> +                                 size_t l3hdr_max_len, size_t l3payload_len,
->                                    size_t frag_offset, bool more_frags);
->   
->   void
-> diff --git a/net/eth.c b/net/eth.c
-> index 0c1d413ee2..067111526d 100644
-> --- a/net/eth.c
-> +++ b/net/eth.c
-> @@ -314,10 +314,65 @@ eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
->       return 0;
->   }
->   
-> +static bool eth_is_ip6_extension_header_type(uint8_t hdr_type);
-> +
-> +static void *eth_ip6_find_ext(struct ip6_header *ip6, uint8_t ext_type)
-> +{
-> +    uint8_t curr_ext_hdr_type = ip6->ip6_nxt;
-> +    struct ip6_ext_hdr *ext_hdr = (struct ip6_ext_hdr *)(ip6 + 1);
-> +    for (; eth_is_ip6_extension_header_type(curr_ext_hdr_type);) {
-> +        if (curr_ext_hdr_type == ext_type) {
-> +            return ext_hdr;
-> +        }
-> +        curr_ext_hdr_type = ext_hdr->ip6r_nxt;
-> +        ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
-> +                + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
-> +    }
-> +
-> +    return NULL;
-> +}
-
-
-A separated patch please.
-
-
-> +
-> +/*
-> + * To add an extension - there is should be
-> + * enough memory 'behind' the ip6 header.
-> + */
-> +static void *eth_ip6_add_ext_nonsafe(struct ip6_header *ip6, uint8_t ext_type)
-> +{
-> +    uint8_t curr_ext_hdr_type = ip6->ip6_nxt;
-> +    struct ip6_ext_hdr *ext_hdr = (struct ip6_ext_hdr *)(ip6 + 1);
-> +    struct ip6_ext_hdr *ext_hdr_prev = NULL;
-> +
-> +    if (!eth_is_ip6_extension_header_type(curr_ext_hdr_type)) {
-> +        ext_hdr->ip6r_nxt = ip6->ip6_nxt;
-> +        ip6->ip6_nxt = ext_type;
-> +        return ext_hdr;
-> +    }
-> +
-> +    ext_hdr_prev = ext_hdr;
-> +    curr_ext_hdr_type = ext_hdr->ip6r_nxt;
-> +    ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
-> +            + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
-> +
-> +    for (; eth_is_ip6_extension_header_type(curr_ext_hdr_type);) {
-> +        ext_hdr_prev = ext_hdr;
-> +        curr_ext_hdr_type = ext_hdr->ip6r_nxt;
-> +        ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
-> +                + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
-> +    }
-> +
-> +    ext_hdr->ip6r_nxt = ext_hdr_prev->ip6r_nxt;
-> +    ext_hdr_prev->ip6r_nxt = ext_type;
-> +
-> +    return ext_hdr;
-> +}
-
-
-Another separate patch please.
-
-Thanks
-
-
-> +
-> +/* When IP6_FRAGMENT added, first 'id' would be 0x71656d75 */
-> +static const uint32_t s_first_fragment_identificator = 0x71656d75; /* 'qemu' */
-> +
->   void
-> -eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
-> -                            void *l3hdr, size_t l3hdr_len,
-> -                            size_t l3payload_len,
-> +eth_setup_ip_fragmentation(const void *l2hdr, size_t l2hdr_len,
-> +                            void *l3hdr, size_t *l3hdr_len,
-> +                            size_t l3hdr_max_len, size_t l3payload_len,
->                               size_t frag_offset, bool more_frags)
->   {
->       const struct iovec l2vec = {
-> @@ -325,7 +380,9 @@ eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
->           .iov_len = l2hdr_len
->       };
->   
-> -    if (eth_get_l3_proto(&l2vec, 1, l2hdr_len) == ETH_P_IP) {
-> +    uint16_t l3_proto = eth_get_l3_proto(&l2vec, 1, l2hdr_len);
-> +
-> +    if (l3_proto == ETH_P_IP) {
->           uint16_t orig_flags;
->           struct ip_header *iphdr = (struct ip_header *) l3hdr;
->           uint16_t frag_off_units = frag_offset / IP_FRAG_UNIT_SIZE;
-> @@ -337,7 +394,39 @@ eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
->           orig_flags = be16_to_cpu(iphdr->ip_off) & ~(IP_OFFMASK|IP_MF);
->           new_ip_off = frag_off_units | orig_flags  | (more_frags ? IP_MF : 0);
->           iphdr->ip_off = cpu_to_be16(new_ip_off);
-> -        iphdr->ip_len = cpu_to_be16(l3payload_len + l3hdr_len);
-> +        iphdr->ip_len = cpu_to_be16(l3payload_len + *l3hdr_len);
-> +
-> +        eth_fix_ip4_checksum(l3hdr, *l3hdr_len);
-> +    } else if (l3_proto == ETH_P_IPV6) {
-> +        struct ip6_header *ip6 = (struct ip6_header *) l3hdr;
-> +
-> +        struct ip6_ext_hdr_fragment *frag_ext = NULL;
-> +
-> +        /* Find frag extension */
-> +        frag_ext = eth_ip6_find_ext(ip6, IP6_FRAGMENT);
-> +        if (frag_ext == NULL) {
-> +            /* No frag extension? Add one */
-> +            if (*l3hdr_len + sizeof(*frag_ext) > l3hdr_max_len) {
-> +                /*
-> +                 * TODO:
-> +                 * For now, qemu's L3 buffer allocated with NetTxPkt
-> +                 * and have enough memory(buffer allocated with 65K bytes
-> +                 * ETH_MAX_IP_DGRAM_LEN = 0xFFFF)
-> +                 * for additional extensions.
-> +                 */
-> +                return; /* TODO: request to reallocate l3hdr */
-> +            }
-> +            frag_ext = eth_ip6_add_ext_nonsafe(ip6, IP6_FRAGMENT);
-> +            *l3hdr_len += sizeof(*frag_ext);
-> +            static uint32_t s_id = s_first_fragment_identificator;
-> +            frag_ext->id = cpu_to_be32(s_id);
-> +            ++s_id;
-> +        }
-> +
-> +        frag_ext->off = cpu_to_be16((frag_offset / IP_FRAG_UNIT_SIZE) << 3
-> +                | (uint16_t)!!more_frags);
-> +
-> +        ip6->ip6_plen = cpu_to_be16(l3payload_len + *l3hdr_len - sizeof(*ip6));
->       }
->   }
->   
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
