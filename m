@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE86AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECB5C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89CDC2065D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187082065D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:08:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C2G6/cra"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89CDC2065D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QKrFaSY8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187082065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsq8c-00055g-Ol
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:08:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59450)
+	id 1jsq8j-0005Os-Ud
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:08:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq79-0001wX-VM
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:06:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35076
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq6x-0001S3-Tp
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:06:24 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43887
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq72-0006nq-QO
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:06:35 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq6v-0006kY-1F
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:06:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594137988;
+ s=mimecast20190719; t=1594137979;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ka0Bl6KaonGt2VTVzxk7TviRf5c0bxEvNQCkAhpSfmM=;
- b=C2G6/cra9UO9cp6D9CGIxH0okeb2zvDbVvS1SERbFNQUSfZNOipXxw1tmIvrR6tshA08hU
- cdqlHf3QnATMF8AvJA+9a1sjHOxnQQHTH5ylZUqZZOJWbIczeEfecOBd3u1IyWhXrYxT6f
- 3qHV5CuLGjwL0Rbcn7Uo2iyB1UtIzS4=
+ bh=lHillwRyIGnhbM0EkLvMPuv4uHwYKgxl3/2VzxyAGK4=;
+ b=QKrFaSY8Ly3HrbkfQfq5Hu/tojbW6oW0z+QzYOWMMvv/Tao93SeslhVgihCxymYTiCxgP6
+ qS27DcnUdxE0IPMpER31bRX0GYxPAdhrex3SfOYGBXf7vSkyoxjzu8QZBmvCxK9SyBSt7O
+ T8LqnilIduP/ARCfVlaqGq1WfiRPIFg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-75-OXZE_gYaNAaXnzR0AzGn8A-1; Tue, 07 Jul 2020 12:06:26 -0400
-X-MC-Unique: OXZE_gYaNAaXnzR0AzGn8A-1
+ us-mta-247-iOJhbkrZNbGBxpTaSnhjIQ-1; Tue, 07 Jul 2020 12:06:17 -0400
+X-MC-Unique: iOJhbkrZNbGBxpTaSnhjIQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEE88107ACF2;
- Tue,  7 Jul 2020 16:06:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F69080183C;
+ Tue,  7 Jul 2020 16:06:16 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 77F4419D7B;
- Tue,  7 Jul 2020 16:06:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5BA219D7B;
+ Tue,  7 Jul 2020 16:06:14 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C6C3A1144259; Tue,  7 Jul 2020 18:06:13 +0200 (CEST)
+ id 6FBF41132921; Tue,  7 Jul 2020 18:06:13 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 23/45] qom: Crash more nicely on object_property_get_link()
- failure
-Date: Tue,  7 Jul 2020 18:05:51 +0200
-Message-Id: <20200707160613.848843-24-armbru@redhat.com>
+Subject: [PATCH v4 01/45] error: Fix examples in error.h's big comment
+Date: Tue,  7 Jul 2020 18:05:29 +0200
+Message-Id: <20200707160613.848843-2-armbru@redhat.com>
 In-Reply-To: <20200707160613.848843-1-armbru@redhat.com>
 References: <20200707160613.848843-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -105,100 +104,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pass &error_abort instead of NULL where the returned value is
-dereferenced or asserted to be non-null.  Drop a now redundant
-assertion.
+Mark a bad example more clearly.  Fix the error_propagate_prepend()
+example.  Add a missing declaration and a second error pileup example.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/core/platform-bus.c     | 6 +++---
- hw/ppc/spapr_drc.c         | 3 ++-
- hw/ppc/spapr_hcall.c       | 3 ++-
- hw/ppc/spapr_pci_nvlink2.c | 3 ++-
- ui/vnc.c                   | 2 +-
- 5 files changed, 10 insertions(+), 7 deletions(-)
+ include/qapi/error.h | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-index d494e5cec1..5037ca265e 100644
---- a/hw/core/platform-bus.c
-+++ b/hw/core/platform-bus.c
-@@ -22,6 +22,7 @@
- #include "qemu/osdep.h"
- #include "hw/platform-bus.h"
- #include "hw/qdev-properties.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index ad5b6e896d..e8960eaad5 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -24,7 +24,7 @@
+  *                       "charm, top, bottom.\n");
+  *
+  * Do *not* contract this to
+- *     error_setg(&err, "invalid quark\n"
++ *     error_setg(&err, "invalid quark\n" // WRONG!
+  *                "Valid quarks are up, down, strange, charm, top, bottom.");
+  *
+  * Report an error to the current monitor if we have one, else stderr:
+@@ -52,7 +52,8 @@
+  * where Error **errp is a parameter, by convention the last one.
+  *
+  * Pass an existing error to the caller with the message modified:
+- *     error_propagate_prepend(errp, err);
++ *     error_propagate_prepend(errp, err,
++ *                             "Could not frobnicate '%s': ", name);
+  *
+  * Avoid
+  *     error_propagate(errp, err);
+@@ -108,12 +109,23 @@
+  *     }
+  *
+  * Do *not* "optimize" this to
++ *     Error *err = NULL;
+  *     foo(arg, &err);
+  *     bar(arg, &err); // WRONG!
+  *     if (err) {
+  *         handle the error...
+  *     }
+  * because this may pass a non-null err to bar().
++ *
++ * Likewise, do *not*
++ *     Error *err = NULL;
++ *     if (cond1) {
++ *         error_setg(&err, ...);
++ *     }
++ *     if (cond2) {
++ *         error_setg(&err, ...); // WRONG!
++ *     }
++ * because this may pass a non-null err to error_setg().
+  */
  
-@@ -63,9 +64,8 @@ hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice *sbdev,
-         return -1;
-     }
- 
--    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container", NULL);
--
--    assert(parent_mr);
-+    parent_mr = object_property_get_link(OBJECT(sbdev_mr), "container",
-+                                         &error_abort);
-     if (parent_mr != pbus_mr_obj) {
-         /* MMIO region is not mapped on platform bus */
-         return -1;
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index d10193f39e..1f18b79348 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -870,7 +870,8 @@ int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type_mask)
-             continue;
-         }
- 
--        obj = object_property_get_link(root_container, prop->name, NULL);
-+        obj = object_property_get_link(root_container, prop->name,
-+                                       &error_abort);
-         drc = SPAPR_DR_CONNECTOR(obj);
-         drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
- 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 0f54988f2e..c1d01228c6 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1655,7 +1655,8 @@ static void spapr_handle_transient_dev_before_cas(SpaprMachineState *spapr)
-             continue;
-         }
-         drc = SPAPR_DR_CONNECTOR(object_property_get_link(drc_container,
--                                                          prop->name, NULL));
-+                                                          prop->name,
-+                                                          &error_abort));
- 
-         if (spapr_drc_transient(drc)) {
-             spapr_drc_reset(drc);
-diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
-index 8332d5694e..dd8cd6db96 100644
---- a/hw/ppc/spapr_pci_nvlink2.c
-+++ b/hw/ppc/spapr_pci_nvlink2.c
-@@ -358,7 +358,8 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
-     for (i = 0; i < sphb->nvgpus->num; ++i) {
-         SpaprPhbPciNvGpuSlot *nvslot = &sphb->nvgpus->slots[i];
-         Object *nv_mrobj = object_property_get_link(OBJECT(nvslot->gpdev),
--                                                    "nvlink2-mr[0]", NULL);
-+                                                    "nvlink2-mr[0]",
-+                                                    &error_abort);
-         uint32_t associativity[] = {
-             cpu_to_be32(0x4),
-             SPAPR_GPU_NUMA_ID,
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 527ad25124..f006aa1afd 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -568,7 +568,7 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
-                        &info->vencrypt, &info->has_vencrypt);
-         if (vd->dcl.con) {
-             dev = DEVICE(object_property_get_link(OBJECT(vd->dcl.con),
--                                                  "device", NULL));
-+                                                  "device", &error_abort));
-             info->has_display = true;
-             info->display = g_strdup(dev->id);
-         }
+ #ifndef ERROR_H
 -- 
 2.26.2
 
