@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1A3C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 509AAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:57:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCBB6206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E4D0206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:57:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ma/Nz3Xm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCBB6206DF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CGibH+Zk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E4D0206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jslHZ-0000jA-6E
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:57:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36816)
+	id 1jslHd-0000sF-Ak
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:57:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFm-0005XX-57
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:11 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51424
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFu-0005rb-Ky
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:18 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60497
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFj-0000ZA-RY
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:09 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFs-0000cO-M4
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594119307;
+ s=mimecast20190719; t=1594119315;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+csh8d78jiJ6IpwwA7BaSdmhDgIcAcPvraWjeiPjsaM=;
- b=Ma/Nz3XmzLMBPa2TKTT0EA8imcrQL4j1iqQsEPHOfs/m0mbQZG3DMh/YZI1tKSwCEQ8OA3
- WATj47PUMcXrtXxXhg3o9ZOdpDyNl/4Qbap7PWLPGYEm6fwpxMqvu/I4JaXe3OJTOug3o3
- mxvhNvjKHDg4XYy5SXZRczuVzD7nkos=
+ bh=kM6g8wl011f7C4nPCBtDKAy9ilTQLzhl2uS1gmBAxjs=;
+ b=CGibH+ZkKccKgI7hji6kJL7+c/j7qhcOipgbW1CkkSe7wULikdG0B4OlyEprn5AfTCeprN
+ MKzySo75mo9lXxOKk+K+6IrtXA+xeb2E7hmzjQBI6hylG7c/qKV4+ce3w85HaNQE1tN4WA
+ QLINoD3FXwbn2IkVZPvkCvGSVRjsdQU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-BJQINg7FN1WYusmMthhFgg-1; Tue, 07 Jul 2020 06:55:05 -0400
-X-MC-Unique: BJQINg7FN1WYusmMthhFgg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-285-uCKDG2LHNKO9yMo4UAXgKQ-1; Tue, 07 Jul 2020 06:55:14 -0400
+X-MC-Unique: uCKDG2LHNKO9yMo4UAXgKQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C201800413;
- Tue,  7 Jul 2020 10:55:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06AEA1054F91;
+ Tue,  7 Jul 2020 10:55:13 +0000 (UTC)
 Received: from localhost (ovpn-113-54.ams2.redhat.com [10.36.113.54])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5133C7B400;
- Tue,  7 Jul 2020 10:54:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A0BCF60BF3;
+ Tue,  7 Jul 2020 10:55:06 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>,
 	Halil Pasic <pasic@linux.ibm.com>
-Subject: [PATCH 1/2] virtio: list legacy-capable devices
-Date: Tue,  7 Jul 2020 12:54:45 +0200
-Message-Id: <20200707105446.677966-2-cohuck@redhat.com>
+Subject: [PATCH 2/2] virtio: verify that legacy support is not accidentally on
+Date: Tue,  7 Jul 2020 12:54:46 +0200
+Message-Id: <20200707105446.677966-3-cohuck@redhat.com>
 In-Reply-To: <20200707105446.677966-1-cohuck@redhat.com>
 References: <20200707105446.677966-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,76 +100,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several types of virtio devices had already been around before the
-virtio standard was specified. These devices support virtio in legacy
-(and transitional) mode.
+If a virtio device does not have legacy support, make sure that
+it is actually off, and bail out if not.
 
-Devices that have been added in the virtio standard are considered
-non-transitional (i.e. with no support for legacy virtio).
+For virtio-pci, this means that any device without legacy support
+that has been specified to modern-only (or that has been forced
+to it) will work.
 
-Provide a helper function so virtio transports can figure that out
-easily.
+For virtio-ccw, this duplicates the check that is currently done
+prior to realization for any device that explicitly specified no
+support for legacy.
+
+This catches devices that have not been fenced properly.
 
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/virtio/virtio.c         | 25 +++++++++++++++++++++++++
- include/hw/virtio/virtio.h |  2 ++
- 2 files changed, 27 insertions(+)
+ hw/s390x/virtio-ccw.c  | 6 ++++++
+ hw/virtio/virtio-pci.c | 4 ++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index cc9c9dc1621e..c713698df7ab 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -27,6 +27,7 @@
- #include "hw/virtio/virtio-access.h"
- #include "sysemu/dma.h"
- #include "sysemu/runstate.h"
-+#include "standard-headers/linux/virtio_ids.h"
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 3c988a000b5b..0e602702971b 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1121,6 +1121,12 @@ static void virtio_ccw_device_plugged(DeviceState *d, Error **errp)
+         dev->max_rev = 0;
+     }
  
- /*
-  * The alignment to use between consumer and producer parts of vring.
-@@ -3279,6 +3280,30 @@ void virtio_init(VirtIODevice *vdev, const char *name,
-     vdev->use_guest_notifier_mask = true;
- }
- 
-+/*
-+ * Only devices that have already been around prior to defining the virtio
-+ * standard support legacy mode; this includes devices not specified in the
-+ * standard. All newer devices conform to the virtio standard only.
-+ */
-+bool virtio_legacy_allowed(VirtIODevice *vdev)
-+{
-+    switch (vdev->device_id) {
-+    case VIRTIO_ID_NET:
-+    case VIRTIO_ID_BLOCK:
-+    case VIRTIO_ID_CONSOLE:
-+    case VIRTIO_ID_RNG:
-+    case VIRTIO_ID_BALLOON:
-+    case VIRTIO_ID_RPMSG:
-+    case VIRTIO_ID_SCSI:
-+    case VIRTIO_ID_9P:
-+    case VIRTIO_ID_RPROC_SERIAL:
-+    case VIRTIO_ID_CAIF:
-+        return true;
-+    default:
-+        return false;
++    if (!virtio_ccw_rev_max(dev) && !virtio_legacy_allowed(vdev)) {
++        error_setg(errp, "Invalid value of property max_rev "
++                   "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
++        return;
 +    }
-+}
 +
- hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
- {
-     return vdev->vq[n].vring.desc;
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index b69d51749635..198ffc762678 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -396,4 +396,6 @@ static inline bool virtio_device_disabled(VirtIODevice *vdev)
-     return unlikely(vdev->disabled || vdev->broken);
- }
+     if (virtio_get_num_queues(vdev) > VIRTIO_QUEUE_MAX) {
+         error_setg(errp, "The number of virtqueues %d "
+                    "exceeds virtio limit %d", n,
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 7bc8c1c056e9..d4c4128ea507 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1569,6 +1569,10 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
+     }
  
-+bool virtio_legacy_allowed(VirtIODevice *vdev);
-+
- #endif
+     if (legacy) {
++        if (!virtio_legacy_allowed(vdev)) {
++            error_setg(errp, "device is modern-only, use disable-legacy=on");
++            return;
++        }
+         if (virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
+             error_setg(errp, "VIRTIO_F_IOMMU_PLATFORM was supported by"
+                        " neither legacy nor transitional device");
 -- 
 2.25.4
 
