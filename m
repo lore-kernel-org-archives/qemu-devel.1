@@ -2,86 +2,72 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1113BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3385C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:53:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D06812064C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:43:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IrLdUdwJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D06812064C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A966B206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:53:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A966B206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsl40-0007i7-48
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:43:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33696)
+	id 1jslEW-0002k5-UN
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:53:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jsl3Q-0007It-JC
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:42:24 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42110)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jsl3O-0006sX-Sa
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:42:24 -0400
-Received: by mail-ot1-x342.google.com with SMTP id g37so10221499otb.9
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 03:42:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xe6wzVtyFtO0yZFy+dMrqSP+KugZ/vZTcyMjg7ltY3k=;
- b=IrLdUdwJydVRUDfscBw7MuZf8KTVKDtqf4ZUGGNJweccyiuBoMsVclKSfRUuXTaQ2l
- paoy6MPjUWGA+ghyuLEb4Nw7HIUnVT8ydaEJDTwUi0SR0xI4ofUP7pZf6Yg06rwb12R9
- ELOWyoZeDtGgEQa+LNi7SjtxY4Zr/ww9DxZka5hI5KA1E20QPvp1xfLLX68PgQs2Xrzu
- b8XsySKCieyZvtiAj4GFUs9Wygc0eB5NnTNq38tqU2k70KCds9Od8/ZYP8Dwl50Y7h7v
- vjR/zQT1c369z8bk3nCONO4YIqUUgUOikEN/34Kmuyw71uvWwnem6a/iI02EHdAiwdaA
- erJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xe6wzVtyFtO0yZFy+dMrqSP+KugZ/vZTcyMjg7ltY3k=;
- b=b+TlIJoXT69Swl5Zg1vID5UFXQWjLRKgLptJbdjnufK/y9avfL1suhWewKI1oEIAtl
- ywZ8TuKu4PNNrBYBfuYpEdFUoHduIvJ3piQl/cyQH31qgIwKbZcUZ1H5YXYg7bKYx2j6
- Pxu1/BRCq9Hu5I+hcVC3ZgOTHMGeIcwCnNWaq2OoGbjkTNgkZtRE1na+Zh+c5lY7iiOk
- CwXJ4cHuEAc9YuYdfxk/eUVQXduOl20BJpA4ofbJQKRImwns46Z83dyHTuVavkfXKfnf
- tt8uU4yKlWD+C/IYEjP9mBgROtPY+mKc1/vH/w8DiLcS3vakXnU94JLMr5ZKAQq9w4pk
- b+mg==
-X-Gm-Message-State: AOAM532p2YI7ZiAPLvpSGDDq9NAQ59aSbnyI9OUAbxCLQPTfSnFaK49f
- A8QdAvHGFXmGoYaPSiCsL+tUcWjRvwA+ckMf358xLg==
-X-Google-Smtp-Source: ABdhPJxBfZ38Iu5UipXG1+lFDAsSQYkYbOsrt03JFmbWuRyRLvz6kMHmxK2spD6LSDl7zo2Wu3vPI76LffC0/JYVAZ0=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr42485377ota.91.1594118541398; 
- Tue, 07 Jul 2020 03:42:21 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jslDi-0001Ed-I6; Tue, 07 Jul 2020 06:53:02 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:41381)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jslDg-0000Lg-KM; Tue, 07 Jul 2020 06:53:02 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1N5mWp-1kzscE2JJb-017HbN; Tue, 07 Jul 2020 12:52:57 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/7] Trivial branch for 5.1 patches
+Date: Tue,  7 Jul 2020 12:52:48 +0200
+Message-Id: <20200707105255.362318-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200706202345.193676-1-richard.henderson@linaro.org>
-In-Reply-To: <20200706202345.193676-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Jul 2020 11:42:08 +0100
-Message-ID: <CAFEAcA9u46jMWPi2oyH3AiPP8cCfC83n_-LukcA2qxseAcwozA@mail.gmail.com>
-Subject: Re: [PATCH] target/arm: Fix mtedesc for do_mem_zpz
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1l5DsXF8ueSUHUSlGRNVVLaomKJW/m/X6je67xnzY9/z8FaJ+nu
+ By5/FCnfB3FmuvRtzk2DSoz893CkY9YM32bpDe52ZZUpEGeUf/gUVo94Qz5NkAq/QruXdHb
+ c1y7gOAskNxBwy8gXxv3W/9qxIFRkc6J5PQdp+tJVeF2tD0HADXaNah68diVDyoocKVQk89
+ yGmye1iBeSyoxKwSwtKCQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pd7gfTErXd0=:eizhLW7tyBaXgjnfEjVPjj
+ 2sjE9JdGvmj9+J7nMGIvkTodtLOltwlKIQc9Vm21yg8So90B3Y/iy6HvmXp21sSIvgaMAi/yM
+ 2HCHqSa2k+H5MHTx0HQBQFVDx9nsR15wGqzNVG9twKiREdMIlmIWKiG2+Xnd2tVmCKqobG5/H
+ c3UUwSOlmuVT7OnEJLSOWXg5I7wKg8M3q4tL1QITuVrkAleoAfCCtRoaQnltzCmkoTNn0tnkt
+ qMf8C1jjbQAund61ZjsNZs8g/PnKHWG8msEzgLnHtY73Jh2qNG6dARTgV7/AzfvCngrmMo97C
+ IetCvLv5IdSxzUDyrUrRgx55fJMxQ2dKy3kbnGB3khAsaqDvSuw+yn5cEIjsE4eG8VJoamJMm
+ dLFXkOw3QpEk6atTPNL+EaCFPc/QSgF8WSFA+vWX8517Eq7/lg5Thsh1AFEDj7KtQgQ0KssiQ
+ Z74Lh6qs1DGvxKlj6DRX8GS4YNpsGzjDAT5b6nxC7u9Iwaqq70oOq88zuANntWx1Q1Jvn+DDV
+ LJomxAYPTJQfQiBuhCgVLbVP4zQiL5yXvE1/HYRhtS2LX8y1xwxICys7Zjg1NrAkm+yHjVvPI
+ gEfZDRMpzX7Ay9KC9EhPc1FtCzoGLfy0k6UYe2i4RO7IPXsAbDEHCqZ/5OmcJ+HUWWecEHvKX
+ wKdMkFcwUDlR7NOwHZGzDjFOVGaduwk5FNVtB2IC0QDU//pdyf9e6ikrmF++vEOZANlRuYkLd
+ EOmP5qj8za5vpQJwtoeCcw1C54RSM2sDUK2pCASYM48++OohbnH2O1yzW7megxfefS6vG0C78
+ Ob3JvuIQEl+kpGeaIh6PkL8x2U9rAS9E+nrplE6V8/tZo01V+aaQe222ZADgkfn4j2SSMS8
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:52:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,26 +80,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Jul 2020 at 21:23, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The mtedesc that was contructed was not actually passed in.
-> Found by Coverity (CID 1429996).
->
-> Fixes: d28d12f008e
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-sve.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-
-
-Applied to target-arm.next (with the commit message typo fixed), thanks.
-
--- PMM
+The following changes since commit eb6490f544388dd24c0d054a96dd304bc7284450=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200=
+70=3D=0D
+3' into staging (2020-07-04 16:08:41 +0100)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  git://github.com/vivier/qemu.git tags/trivial-branch-for-5.1-pull-request=
+=0D
+=0D
+for you to fetch changes up to 89615cfef57e04da0e5a1bd212a62f8696468e79:=0D
+=0D
+  net/tap-solaris.c: Include qemu-common.h for TFR macro (2020-07-07 12:38:=
+50=3D=0D
+ +0200)=0D
+=0D
+----------------------------------------------------------------=0D
+trivial branch patches 20200707=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Christophe de Dinechin (1):=0D
+  trivial: Respect alphabetical order of .o files in Makefile.objs=0D
+=0D
+Lijun Pan (1):=0D
+  fix the prototype of muls64/mulu64=0D
+=0D
+Menno Lageman (1):=0D
+  intel_iommu: "aw-bits" error message still refers to "x-aw-bits"=0D
+=0D
+Peter Maydell (1):=0D
+  net/tap-solaris.c: Include qemu-common.h for TFR macro=0D
+=0D
+Philippe Mathieu-Daud=3DC3=3DA9 (2):=0D
+  .mailmap: Update Alexander Graf email address=0D
+  util/qemu-option: Document the get_opt_value() function=0D
+=0D
+Radoslaw Biernacki (1):=0D
+  MAINTAINERS: Update Radoslaw Biernacki email address=0D
+=0D
+ .mailmap                  |  2 ++=0D
+ MAINTAINERS               |  2 +-=0D
+ hw/i386/intel_iommu.c     |  2 +-=0D
+ include/qemu/host-utils.h |  4 ++--=0D
+ include/qemu/option.h     | 13 +++++++++++++=0D
+ net/tap-solaris.c         |  1 +=0D
+ stubs/Makefile.objs       |  2 +-=0D
+ 7 files changed, 21 insertions(+), 5 deletions(-)=0D
+=0D
+--=3D20=0D
+2.26.2=0D
+=0D
 
