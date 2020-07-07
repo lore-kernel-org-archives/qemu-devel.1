@@ -2,88 +2,89 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B7BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35142C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0430020708
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:50:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 017142065D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:51:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LvB3oZYG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0430020708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HDXRopji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 017142065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsqo6-0002tL-6k
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:50:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
+	id 1jsqp0-0004cy-84
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsqZn-0008E1-Cq
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:36:11 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53582
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsqZj-0004Fc-56
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:36:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594139766;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DdaB25yWPzDpqrSx4Dkn+Ay1YVyVUTLKcicTCCvTG14=;
- b=LvB3oZYGmSHhDXyN1pLnx1pDBIPCfmelCMb1hvavm1P1ixqtoX92rjCeTbDwKiClX+UHDP
- 49iTgAo5LESgu0wfRL1mAV4xp7FUmbrE8/W3cSxBER3sth2FjwYNFbgRz7jtan/XwvjWDt
- ZzlfmhRUtcNuaBIKAvFjfaPmcsfZ1Yk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-xphObT5pOSKjbxXxTh58nA-1; Tue, 07 Jul 2020 12:35:46 -0400
-X-MC-Unique: xphObT5pOSKjbxXxTh58nA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9941D84E21A;
- Tue,  7 Jul 2020 16:35:44 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-113.ams2.redhat.com
- [10.36.114.113])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2908F71674;
- Tue,  7 Jul 2020 16:35:43 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 03/12] qemu-img: Flush stdout before before potential stderr
- messages
-Date: Tue,  7 Jul 2020 18:34:55 +0200
-Message-Id: <20200707163504.194740-4-kwolf@redhat.com>
-In-Reply-To: <20200707163504.194740-1-kwolf@redhat.com>
-References: <20200707163504.194740-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jsqUW-0005QR-NA
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:30:44 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39407)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jsqUU-0002nk-Kx
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:30:44 -0400
+Received: by mail-oi1-x241.google.com with SMTP id w17so34661013oie.6
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 09:30:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=RNfpKk23M0bTzOFvcU7+HeuBwIMbVogaO8o61htyF10=;
+ b=HDXRopjiM4RzPhPO88mYUuT+FS8pjDTU2RErSngr5i9hn32ad/mSclRDXarVypDLwt
+ f38iVAT0OPct68C6wgsQ+oETfZmOT1I/4wvxKgbvd/1t4AzyyqlJhztJnJYXjT7/HJ2i
+ Akupg/28SI7srsa3RzVDin5ojl/+fuWTXizP2c3lbOW6QbTmCDVJw3whCv/ll9+m98eU
+ l/ZbtN1x61ZoMP612Yq0kKTb5KIUj5YxkNsmf4xu2O04o9QF893dJOOQqiwQpQNlPwI4
+ d5fgUdq4WRhCH44p1rVgDSJyotSjNgdkl6LMCdUXT870DazXfXpuhIt8yxKsqi3Z08mR
+ z+2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=RNfpKk23M0bTzOFvcU7+HeuBwIMbVogaO8o61htyF10=;
+ b=d6LZ8hdfftJ+18s2iz4xKsP2frnr1LRZwdeYmHaYF6YiknokZT8ZQW6rHRbQ31OkXf
+ L6knERd1iF43fFkiXYwcC9AKqFssaPxE9BhSm2txBL7JPiI4YHqO3KKrNlvCM0WpjNSA
+ 9SOnwyGJ6PfERkBnGguNj+ERXEMsK+WLfjhk/11scv6C5crR43zyKUGo1KU+LP4tXTvz
+ vmf5NK8B4kEGFQPjp4Uf4TozeNAdF1XNgME3zdAQpfT0oQ49a+PLwznPMhxb9p3nSfVq
+ RlEVzFTNgdLYe9wzCSM3nkrQ6+LGv6/+uO3OruS7wgOtKLkrlOBompdpS5Y/n2AECvdb
+ hRbA==
+X-Gm-Message-State: AOAM530kzb+OmxQzYaJvzUI7Zd/TbMV6oytEdsZUcQcwhHzwJLBzzH2Y
+ M6CTyz4CWb7m5e66UmJ0and9MrGrbbwYEx4KVfcHFg==
+X-Google-Smtp-Source: ABdhPJxgx960yZ0cBqPK2pfkLgskniNKfkstDgA5dY/h2ddPTw6fkxgLmLF78NneQz0ALk1rc2GWVJ9ODY5GmdoCl7o=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr3685942oix.48.1594139440565;
+ Tue, 07 Jul 2020 09:30:40 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200705211016.15241-1-f4bug@amsat.org>
+ <20200705211016.15241-3-f4bug@amsat.org>
+In-Reply-To: <20200705211016.15241-3-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Jul 2020 17:30:27 +0100
+Message-ID: <CAFEAcA-oXwam0QmJaPnUnFLWsv62tKOcoCbqqj5W+Bn=yybLzg@mail.gmail.com>
+Subject: Re: [PATCH 2/4] hw/lm32/milkymist: Comment to remember some IRQs
+ lines are left unwired
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,155 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Michael Walle <michael@walle.cc>, Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Blake <eblake@redhat.com>
+On Sun, 5 Jul 2020 at 22:10, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> The 'card is readonly' and 'card inserted' IRQs are not wired.
+> Add a comment in case someone know where to wire them.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/lm32/milkymist.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+> index 469e3c4322..117973c967 100644
+> --- a/hw/lm32/milkymist.c
+> +++ b/hw/lm32/milkymist.c
+> @@ -87,6 +87,7 @@ static DeviceState *milkymist_memcard_create(hwaddr bas=
+e)
+>      dev =3D qdev_new("milkymist-memcard");
+>      sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+> +    /* FIXME wire 'card is readonly' and 'card inserted' IRQs? */
 
-During 'qemu-img create ... 2>&1', if --quiet is not in force, we can
-end up with buffered I/O in stdout that was produced before failure,
-but which appears in output after failure.  This is confusing; the fix
-is to flush stdout prior to attempting anything that might produce an
-error message.  Several iotests demonstrate the resulting ordering
-change now that the merged outputs now reflect chronology.  (An even
-better fix would be to avoid printf from within block.c altogether,
-but that's much more invasive...)
+It's possible that these lines are correctly not wired up
+(ie that the hardware does not provide any kind of indication
+of the r/o or insertion events). The milkymist mmc device is a
+very simple one. AIUI the RTL for the board is on github if
+anybody wants to go check.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200706203954.341758-2-eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block.c                    | 1 +
- tests/qemu-iotests/049.out | 8 ++++----
- tests/qemu-iotests/054.out | 2 +-
- tests/qemu-iotests/079.out | 2 +-
- tests/qemu-iotests/112.out | 4 ++--
- tests/qemu-iotests/259.out | 2 +-
- 6 files changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/block.c b/block.c
-index 6dbcb7e083..a568196ba2 100644
---- a/block.c
-+++ b/block.c
-@@ -6186,6 +6186,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
-         printf("Formatting '%s', fmt=%s ", filename, fmt);
-         qemu_opts_print(opts, " ");
-         puts("");
-+        fflush(stdout);
-     }
- 
-     ret = bdrv_create(drv, filename, opts, &local_err);
-diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-index c54ae21b86..22f395246b 100644
---- a/tests/qemu-iotests/049.out
-+++ b/tests/qemu-iotests/049.out
-@@ -167,12 +167,12 @@ qemu-img create -f qcow2 -o compat=1.1 TEST_DIR/t.qcow2 64M
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=0.42 TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: Invalid parameter '0.42'
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
-+qemu-img: TEST_DIR/t.qcow2: Invalid parameter '0.42'
- 
- qemu-img create -f qcow2 -o compat=foobar TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: Invalid parameter 'foobar'
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
-+qemu-img: TEST_DIR/t.qcow2: Invalid parameter 'foobar'
- 
- == Check preallocation option ==
- 
-@@ -183,8 +183,8 @@ qemu-img create -f qcow2 -o preallocation=metadata TEST_DIR/t.qcow2 64M
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o preallocation=1234 TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: Invalid parameter '1234'
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=1234 lazy_refcounts=off refcount_bits=16 compression_type=zlib
-+qemu-img: TEST_DIR/t.qcow2: Invalid parameter '1234'
- 
- == Check encryption option ==
- 
-@@ -206,7 +206,7 @@ qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=off TEST_DIR/t.qcow2 64M
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=on TEST_DIR/t.qcow2 64M
--qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibility level 1.1 and above (use version=v3 or greater)
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=on refcount_bits=16 compression_type=zlib
-+qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibility level 1.1 and above (use version=v3 or greater)
- 
- *** done
-diff --git a/tests/qemu-iotests/054.out b/tests/qemu-iotests/054.out
-index e6ec430edd..71f18bb987 100644
---- a/tests/qemu-iotests/054.out
-+++ b/tests/qemu-iotests/054.out
-@@ -1,8 +1,8 @@
- QA output created by 054
- 
- creating too large image (1 EB)
--qemu-img: TEST_DIR/t.IMGFMT: The image size is too large for file format 'IMGFMT' (try using a larger cluster size)
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1152921504606846976
-+qemu-img: TEST_DIR/t.IMGFMT: The image size is too large for file format 'IMGFMT' (try using a larger cluster size)
- 
- creating too large image (1 EB) using qcow2.py
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296
-diff --git a/tests/qemu-iotests/079.out b/tests/qemu-iotests/079.out
-index aab922fb36..f65a9ca84f 100644
---- a/tests/qemu-iotests/079.out
-+++ b/tests/qemu-iotests/079.out
-@@ -9,6 +9,6 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296 preallocation=metadat
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296 preallocation=metadata
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296 preallocation=metadata
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296 preallocation=metadata
--qemu-img: TEST_DIR/t.IMGFMT: Cluster size must be a power of two between 512 and 2048k
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296 preallocation=metadata
-+qemu-img: TEST_DIR/t.IMGFMT: Cluster size must be a power of two between 512 and 2048k
- *** done
-diff --git a/tests/qemu-iotests/112.out b/tests/qemu-iotests/112.out
-index ae0318cabe..5e77e38a7a 100644
---- a/tests/qemu-iotests/112.out
-+++ b/tests/qemu-iotests/112.out
-@@ -2,7 +2,6 @@ QA output created by 112
- 
- === refcount_bits limits ===
- 
--qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 refcount_bits=-1
-@@ -10,6 +9,7 @@ qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not e
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- refcount bits: 1
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-@@ -21,10 +21,10 @@ refcount bits: 16
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- refcount bits: 16
--qemu-img: TEST_DIR/t.IMGFMT: Different refcount widths than 16 bits require compatibility level 1.1 or above (use version=v3 or greater)
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- qemu-img: TEST_DIR/t.IMGFMT: Different refcount widths than 16 bits require compatibility level 1.1 or above (use version=v3 or greater)
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+qemu-img: TEST_DIR/t.IMGFMT: Different refcount widths than 16 bits require compatibility level 1.1 or above (use version=v3 or greater)
- 
- === Snapshot limit on refcount_bits=1 ===
- 
-diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
-index ffed19c2a0..e27b9ff38d 100644
---- a/tests/qemu-iotests/259.out
-+++ b/tests/qemu-iotests/259.out
-@@ -9,6 +9,6 @@ virtual size: 64 MiB (67108864 bytes)
- disk size: unavailable
- 
- --- Testing creation for which the node would need to grow ---
--qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Image format driver does not support resize
- Formatting 'TEST_DIR/t.IMGFMT', fmt=qcow2 size=67108864 preallocation=metadata
-+qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Image format driver does not support resize
- *** done
--- 
-2.25.4
-
+thanks
+-- PMM
 
