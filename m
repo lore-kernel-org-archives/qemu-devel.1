@@ -4,79 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8232DC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9EEC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:40:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32263206A1
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED6AB206A1
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:40:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DmuY19GZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32263206A1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DTXXYuwQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED6AB206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtHnN-0000ZG-AS
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:40:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34390)
+	id 1jtHnQ-0000eI-1s
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:40:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHc6-0000ZU-W8
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:28:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33298
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHbw-0000Dw-1D
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:28:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56933
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHc3-0002A0-V8
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:28:22 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHbs-00027a-4Y
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:28:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594243699;
+ s=mimecast20190719; t=1594243687;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j6waQIv+9cgJl2a9MXsxDuDPDfNIMK4eanc8qBBuKeI=;
- b=DmuY19GZ7OTYiHqN+ezBnzu3Q8WAdGWSBWJq6qranN8R5Yxu4/X7XLad2tDpR580TgHMSv
- QYwTkU5ZVWuxbzmBRzbVJmMTWdBhQu+kE93GZIFkuJL/z77cLkhNkGahMsWYV2IjoiVYaX
- rTwPu+2m+RYxvoIZAPaDDWnBIFa/YuA=
+ bh=SXulJO9eh/D7edMI1KLF1edmChInbH9biQBSrLj4Vu8=;
+ b=DTXXYuwQw832kuBxeWb+Gxt7WgThe0Pq2ca9xT/Ncyw/DyqeLJ1UpzX28r9ft1W3vChaAV
+ cZCwD209ejaVdUWI07HsJGIj0QH2SYvglUnmeES1b20MgX6P/OX7+gywN6fjBfqxsvVO9d
+ UjBkDB4OYTDfTnB0hBwGUy+bErdWdeU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205--rss5cH5NAyoynckNcL9jw-1; Tue, 07 Jul 2020 17:25:21 -0400
-X-MC-Unique: -rss5cH5NAyoynckNcL9jw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-185-RQYARO42Ms-SFMcYFttO9Q-1; Tue, 07 Jul 2020 17:25:21 -0400
+X-MC-Unique: RQYARO42Ms-SFMcYFttO9Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48DDF18FE861;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17BC718FE860;
  Tue,  7 Jul 2020 21:25:20 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADEE9797E1;
- Tue,  7 Jul 2020 21:25:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B664D78468;
+ Tue,  7 Jul 2020 21:25:18 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C366010C4AEB; Tue,  7 Jul 2020 23:25:04 +0200 (CEST)
+ id 3CCE01144255; Tue,  7 Jul 2020 23:25:04 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 46/53] error: New macro ERRP_GUARD()
-Date: Tue,  7 Jul 2020 23:24:56 +0200
-Message-Id: <20200707212503.1495927-47-armbru@redhat.com>
+Subject: [PULL 19/53] qapi: Use returned bool to check for failure, manual part
+Date: Tue,  7 Jul 2020 23:24:29 +0200
+Message-Id: <20200707212503.1495927-20-armbru@redhat.com>
 In-Reply-To: <20200707212503.1495927-1-armbru@redhat.com>
 References: <20200707212503.1495927-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -97,295 +96,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Greg Kurz <groug@kaod.org>, Paul Durrant <paul@xen.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The previous commit used Coccinelle to convert from checking the Error
+object to checking the return value.  Convert a few more manually.
+Also tweak control flow in places to conform to the conventional "if
+error bail out" pattern.
 
-Introduce a new ERRP_GUARD() macro, to be used at start of functions
-with an errp OUT parameter.
-
-It has three goals:
-
-1. Fix issue with error_fatal and error_prepend/error_append_hint: the
-user can't see this additional information, because exit() happens in
-error_setg earlier than information is added. [Reported by Greg Kurz]
-
-2. Fix issue with error_abort and error_propagate: when we wrap
-error_abort by local_err+error_propagate, the resulting coredump will
-refer to error_propagate and not to the place where error happened.
-(the macro itself doesn't fix the issue, but it allows us to [3.] drop
-the local_err+error_propagate pattern, which will definitely fix the
-issue) [Reported by Kevin Wolf]
-
-3. Drop local_err+error_propagate pattern, which is used to workaround
-void functions with errp parameter, when caller wants to know resulting
-status. (Note: actually these functions could be merely updated to
-return int error code).
-
-To achieve these goals, later patches will add invocations
-of this macro at the start of functions with either use
-error_prepend/error_append_hint (solving 1) or which use
-local_err+error_propagate to check errors, switching those
-functions to use *errp instead (solving 2 and 3).
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Paul Durrant <paul@xen.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[Merge comments properly with recent commit "error: Document Error API
-usage rules", and edit for clarity.  Put ERRP_AUTO_PROPAGATE() before
-its helpers, and touch up style.  Tweak commit message.]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200707165037.1026246-2-armbru@redhat.com>
-[Rename ERRP_AUTO_PROPAGATE() to ERRP_GUARD(), tweak commit message
-again]
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20200707160613.848843-20-armbru@redhat.com>
 ---
- include/qapi/error.h | 158 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 139 insertions(+), 19 deletions(-)
+ accel/kvm/kvm-all.c       | 50 ++++++++++++++++++---------------------
+ block/throttle-groups.c   |  5 ++--
+ bootdevice.c              |  4 ++--
+ hw/core/qdev-properties.c | 12 +++++-----
+ hw/ide/qdev.c             |  4 ++--
+ hw/mem/nvdimm.c           |  9 +++----
+ hw/net/ne2000-isa.c       |  4 ++--
+ hw/usb/dev-storage.c      |  4 ++--
+ net/net.c                 |  8 ++-----
+ 9 files changed, 44 insertions(+), 56 deletions(-)
 
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index 2c189abb04..85df875a3a 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -30,6 +30,10 @@
-  *   job.  Since the value of @errp is about handling the error, the
-  *   function should not examine it.
-  *
-+ * - The function may pass @errp to functions it calls to pass on
-+ *   their errors to its caller.  If it dereferences @errp to check
-+ *   for errors, it must use ERRP_GUARD().
-+ *
-  * - On success, the function should not touch *errp.  On failure, it
-  *   should set a new error, e.g. with error_setg(errp, ...), or
-  *   propagate an existing one, e.g. with error_propagate(errp, ...).
-@@ -45,15 +49,17 @@
-  * = Creating errors =
-  *
-  * Create an error:
-- *     error_setg(&err, "situation normal, all fouled up");
-+ *     error_setg(errp, "situation normal, all fouled up");
-+ * where @errp points to the location to receive the error.
-  *
-  * Create an error and add additional explanation:
-- *     error_setg(&err, "invalid quark");
-- *     error_append_hint(&err, "Valid quarks are up, down, strange, "
-+ *     error_setg(errp, "invalid quark");
-+ *     error_append_hint(errp, "Valid quarks are up, down, strange, "
-  *                       "charm, top, bottom.\n");
-+ * This may require use of ERRP_GUARD(); more on that below.
-  *
-  * Do *not* contract this to
-- *     error_setg(&err, "invalid quark\n" // WRONG!
-+ *     error_setg(errp, "invalid quark\n" // WRONG!
-  *                "Valid quarks are up, down, strange, charm, top, bottom.");
-  *
-  * = Reporting and destroying errors =
-@@ -107,18 +113,6 @@
-  * Errors get passed to the caller through the conventional @errp
-  * parameter.
-  *
-- * Pass an existing error to the caller:
-- *     error_propagate(errp, err);
-- * where Error **errp is a parameter, by convention the last one.
-- *
-- * Pass an existing error to the caller with the message modified:
-- *     error_propagate_prepend(errp, err,
-- *                             "Could not frobnicate '%s': ", name);
-- * This is more concise than
-- *     error_propagate(errp, err); // don't do this
-- *     error_prepend(errp, "Could not frobnicate '%s': ", name);
-- * and works even when @errp is &error_fatal.
-- *
-  * Create a new error and pass it to the caller:
-  *     error_setg(errp, "situation normal, all fouled up");
-  *
-@@ -129,18 +123,26 @@
-  *         handle the error...
-  *     }
-  * - when it does not, say because it is a void function:
-+ *     ERRP_GUARD();
-+ *     foo(arg, errp);
-+ *     if (*errp) {
-+ *         handle the error...
-+ *     }
-+ * More on ERRP_GUARD() below.
-+ *
-+ * Code predating ERRP_GUARD() still exists, and looks like this:
-  *     Error *err = NULL;
-  *     foo(arg, &err);
-  *     if (err) {
-  *         handle the error...
-- *         error_propagate(errp, err);
-+ *         error_propagate(errp, err); // deprecated
-  *     }
-- * Do *not* "optimize" this to
-+ * Avoid in new code.  Do *not* "optimize" it to
-  *     foo(arg, errp);
-  *     if (*errp) { // WRONG!
-  *         handle the error...
-  *     }
-- * because errp may be NULL!
-+ * because errp may be NULL without the ERRP_GUARD() guard.
-  *
-  * But when all you do with the error is pass it on, please use
-  *     foo(arg, errp);
-@@ -160,6 +162,19 @@
-  *         handle the error...
-  *     }
-  *
-+ * Pass an existing error to the caller:
-+ *     error_propagate(errp, err);
-+ * This is rarely needed.  When @err is a local variable, use of
-+ * ERRP_GUARD() commonly results in more readable code.
-+ *
-+ * Pass an existing error to the caller with the message modified:
-+ *     error_propagate_prepend(errp, err,
-+ *                             "Could not frobnicate '%s': ", name);
-+ * This is more concise than
-+ *     error_propagate(errp, err); // don't do this
-+ *     error_prepend(errp, "Could not frobnicate '%s': ", name);
-+ * and works even when @errp is &error_fatal.
-+ *
-  * Receive and accumulate multiple errors (first one wins):
-  *     Error *err = NULL, *local_err = NULL;
-  *     foo(arg, &err);
-@@ -187,6 +202,69 @@
-  *         error_setg(&err, ...); // WRONG!
-  *     }
-  * because this may pass a non-null err to error_setg().
-+ *
-+ * = Why, when and how to use ERRP_GUARD() =
-+ *
-+ * Without ERRP_GUARD(), use of the @errp parameter is restricted:
-+ * - It must not be dereferenced, because it may be null.
-+ * - It should not be passed to error_prepend() or
-+ *   error_append_hint(), because that doesn't work with &error_fatal.
-+ * ERRP_GUARD() lifts these restrictions.
-+ *
-+ * To use ERRP_GUARD(), add it right at the beginning of the function.
-+ * @errp can then be used without worrying about the argument being
-+ * NULL or &error_fatal.
-+ *
-+ * Using it when it's not needed is safe, but please avoid cluttering
-+ * the source with useless code.
-+ *
-+ * = Converting to ERRP_GUARD() =
-+ *
-+ * To convert a function to use ERRP_GUARD():
-+ *
-+ * 0. If the Error ** parameter is not named @errp, rename it to
-+ *    @errp.
-+ *
-+ * 1. Add an ERRP_GUARD() invocation, by convention right at the
-+ *    beginning of the function.  This makes @errp safe to use.
-+ *
-+ * 2. Replace &err by errp, and err by *errp.  Delete local variable
-+ *    @err.
-+ *
-+ * 3. Delete error_propagate(errp, *errp), replace
-+ *    error_propagate_prepend(errp, *errp, ...) by error_prepend(errp, ...)
-+ *
-+ * 4. Ensure @errp is valid at return: when you destroy *errp, set
-+ *    errp = NULL.
-+ *
-+ * Example:
-+ *
-+ *     bool fn(..., Error **errp)
-+ *     {
-+ *         Error *err = NULL;
-+ *
-+ *         foo(arg, &err);
-+ *         if (err) {
-+ *             handle the error...
-+ *             error_propagate(errp, err);
-+ *             return false;
-+ *         }
-+ *         ...
-+ *     }
-+ *
-+ * becomes
-+ *
-+ *     bool fn(..., Error **errp)
-+ *     {
-+ *         ERRP_GUARD();
-+ *
-+ *         foo(arg, errp);
-+ *         if (*errp) {
-+ *             handle the error...
-+ *             return false;
-+ *         }
-+ *         ...
-+ *     }
-  */
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 375e29fb69..ab1a6ff0ee 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3128,37 +3128,33 @@ static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
+                                    const char *name, void *opaque,
+                                    Error **errp)
+ {
+-    Error *err = NULL;
+     KVMState *s = KVM_STATE(obj);
+     OnOffSplit mode;
  
- #ifndef ERROR_H
-@@ -287,6 +365,7 @@ void error_setg_win32_internal(Error **errp,
-  * the error object.
-  * Else, move the error object from @local_err to *@dst_errp.
-  * On return, @local_err is invalid.
-+ * Please use ERRP_GUARD() instead when possible.
-  * Please don't error_propagate(&error_fatal, ...), use
-  * error_report_err() and exit(), because that's more obvious.
-  */
-@@ -298,6 +377,7 @@ void error_propagate(Error **dst_errp, Error *local_err);
-  * Behaves like
-  *     error_prepend(&local_err, fmt, ...);
-  *     error_propagate(dst_errp, local_err);
-+ * Please use ERRP_GUARD() and error_prepend() instead when possible.
-  */
- void error_propagate_prepend(Error **dst_errp, Error *local_err,
-                              const char *fmt, ...);
-@@ -395,6 +475,46 @@ void error_set_internal(Error **errp,
-                         ErrorClass err_class, const char *fmt, ...)
-     GCC_FMT_ATTR(6, 7);
+-    visit_type_OnOffSplit(v, name, &mode, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    if (!visit_type_OnOffSplit(v, name, &mode, errp)) {
+         return;
+-    } else {
+-        switch (mode) {
+-        case ON_OFF_SPLIT_ON:
+-            s->kernel_irqchip_allowed = true;
+-            s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+-            break;
+-        case ON_OFF_SPLIT_OFF:
+-            s->kernel_irqchip_allowed = false;
+-            s->kernel_irqchip_required = false;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+-            break;
+-        case ON_OFF_SPLIT_SPLIT:
+-            s->kernel_irqchip_allowed = true;
+-            s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = ON_OFF_AUTO_ON;
+-            break;
+-        default:
+-            /* The value was checked in visit_type_OnOffSplit() above. If
+-             * we get here, then something is wrong in QEMU.
+-             */
+-            abort();
+-        }
++    }
++    switch (mode) {
++    case ON_OFF_SPLIT_ON:
++        s->kernel_irqchip_allowed = true;
++        s->kernel_irqchip_required = true;
++        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
++        break;
++    case ON_OFF_SPLIT_OFF:
++        s->kernel_irqchip_allowed = false;
++        s->kernel_irqchip_required = false;
++        s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
++        break;
++    case ON_OFF_SPLIT_SPLIT:
++        s->kernel_irqchip_allowed = true;
++        s->kernel_irqchip_required = true;
++        s->kernel_irqchip_split = ON_OFF_AUTO_ON;
++        break;
++    default:
++        /* The value was checked in visit_type_OnOffSplit() above. If
++         * we get here, then something is wrong in QEMU.
++         */
++        abort();
+     }
+ }
  
-+/*
-+ * Make @errp parameter easier to use regardless of argument value
-+ *
-+ * This macro is for use right at the beginning of a function that
-+ * takes an Error **errp parameter to pass errors to its caller.  The
-+ * parameter must be named @errp.
-+ *
-+ * It must be used when the function dereferences @errp or passes
-+ * @errp to error_prepend(), error_vprepend(), or error_append_hint().
-+ * It is safe to use even when it's not needed, but please avoid
-+ * cluttering the source with useless code.
-+ *
-+ * If @errp is NULL or &error_fatal, rewrite it to point to a local
-+ * Error variable, which will be automatically propagated to the
-+ * original @errp on function exit.
-+ *
-+ * Note: &error_abort is not rewritten, because that would move the
-+ * abort from the place where the error is created to the place where
-+ * it's propagated.
-+ */
-+#define ERRP_GUARD()                                            \
-+    g_auto(ErrorPropagator) _auto_errp_prop = {.errp = errp};   \
-+    do {                                                        \
-+        if (!errp || errp == &error_fatal) {                    \
-+            errp = &_auto_errp_prop.local_err;                  \
-+        }                                                       \
-+    } while (0)
-+
-+typedef struct ErrorPropagator {
-+    Error *local_err;
-+    Error **errp;
-+} ErrorPropagator;
-+
-+static inline void error_propagator_cleanup(ErrorPropagator *prop)
-+{
-+    error_propagate(prop->errp, prop->local_err);
-+}
-+
-+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
-+
- /*
-  * Special error destination to abort on error.
-  * See error_setg() and error_propagate() for details.
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index bb242fde1a..e411051160 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -895,8 +895,8 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+     ThrottleLimits *argp;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_ThrottleLimits(v, name, &argp, &local_err)) {
+-        goto ret;
++    if (!visit_type_ThrottleLimits(v, name, &argp, errp)) {
++        return;
+     }
+     qemu_mutex_lock(&tg->lock);
+     throttle_get_config(&tg->ts, &cfg);
+@@ -908,7 +908,6 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+ 
+ unlock:
+     qemu_mutex_unlock(&tg->lock);
+-ret:
+     qapi_free_ThrottleLimits(argp);
+     error_propagate(errp, local_err);
+     return;
+diff --git a/bootdevice.c b/bootdevice.c
+index fb09d3c668..769f40c77d 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -297,8 +297,8 @@ static void device_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 3cb6faa12b..4c7a8a05a5 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -761,15 +761,15 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+     if (!visit_type_str(v, name, &str, &local_err)) {
+         error_free(local_err);
+         local_err = NULL;
+-        visit_type_int32(v, name, &value, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-        } else if (value < -1 || value > 255) {
++        if (!visit_type_int32(v, name, &value, errp)) {
++            return;
++        }
++        if (value < -1 || value > 255) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                        name ? name : "null", "pci_devfn");
+-        } else {
+-            *ptr = value;
++            return;
+         }
++        *ptr = value;
+         return;
+     }
+ 
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 358f10a92e..ba8b0d7f02 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -245,8 +245,8 @@ static void ide_dev_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index ec92ffd415..1fa976c56c 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -85,21 +85,18 @@ static void nvdimm_set_uuid(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
+ {
+     NVDIMMDevice *nvdimm = NVDIMM(obj);
+-    Error *local_err = NULL;
+     char *value;
+ 
+-    if (!visit_type_str(v, name, &value, &local_err)) {
+-        goto out;
++    if (!visit_type_str(v, name, &value, errp)) {
++        return;
+     }
+ 
+     if (qemu_uuid_parse(value, &nvdimm->uuid) != 0) {
+         error_setg(errp, "Property '%s.%s' has invalid value",
+                    object_get_typename(obj), name);
+     }
+-    g_free(value);
+ 
+-out:
+-    error_propagate(errp, local_err);
++    g_free(value);
+ }
+ 
+ 
+diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
+index 765bcd1f0b..0594abd93a 100644
+--- a/hw/net/ne2000-isa.c
++++ b/hw/net/ne2000-isa.c
+@@ -113,8 +113,8 @@ static void isa_ne2000_set_bootindex(Object *obj, Visitor *v,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index 1c3bd2578c..721665191e 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -736,8 +736,8 @@ static void usb_msd_set_bootindex(Object *obj, Visitor *v, const char *name,
+     int32_t boot_index;
+     Error *local_err = NULL;
+ 
+-    if (!visit_type_int32(v, name, &boot_index, &local_err)) {
+-        goto out;
++    if (!visit_type_int32(v, name, &boot_index, errp)) {
++        return;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+     check_boot_index(boot_index, &local_err);
+diff --git a/net/net.c b/net/net.c
+index 94dc546fb2..6fe74c80bb 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1062,7 +1062,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+ {
+     gchar **substrings = NULL;
+     Netdev *object = NULL;
+-    Error *err = NULL;
+     int ret = -1;
+     Visitor *v = opts_visitor_new(opts);
+ 
+@@ -1110,16 +1109,13 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+         qemu_opts_set_id(opts, g_strdup_printf("__org.qemu.net%i", idx++));
+     }
+ 
+-    visit_type_Netdev(v, NULL, &object, &err);
+-
+-    if (!err) {
+-        ret = net_client_init1(object, is_netdev, &err);
++    if (visit_type_Netdev(v, NULL, &object, errp)) {
++        ret = net_client_init1(object, is_netdev, errp);
+     }
+ 
+     qapi_free_Netdev(object);
+ 
+ out:
+-    error_propagate(errp, err);
+     g_strfreev(substrings);
+     visit_free(v);
+     return ret;
 -- 
 2.26.2
 
