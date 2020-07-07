@@ -2,83 +2,82 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C44C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 12:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26488C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 12:15:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3811B206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 12:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5FCC20708
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 12:15:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MlEp+Yyo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3811B206F6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YFiEeGcE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5FCC20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsmNC-0004fk-HM
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 08:06:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54800)
+	id 1jsmVQ-00015t-2T
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 08:15:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsmMJ-0003oy-NI
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:05:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51698
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsmU8-0000Bg-4Y
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:14:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34184
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsmMH-0004xC-IB
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:05:59 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsmU5-0006Fy-RB
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:14:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594123557;
+ s=mimecast20190719; t=1594124040;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+gLFuRBvLwoGvjKxJIwA+Kcn0+Go9lcau+AdrV9kDmw=;
- b=MlEp+Yyo4pxTKowcPSxFNOJ5wr1iIhxy+6BoTXsO+R0KrSVm/qBhTK+hl0d62Ht4CPzWZh
- hmytRaULv46bnmTUhMDtzJ+W4CbZ9aDJZAl2Oui//b1+csPfWw9Zs76NYdDKKWZ7Ja3my6
- fcQs1/hNzRNFMwLebpzH5N7ErgpMTro=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=wzCblOMjOcRCdmstSk2KSH4SxvzXr1ZI5duyBkvP6bs=;
+ b=YFiEeGcEKuufu+Fy3UfF3+n0shWhaFPjMeW2qYpzXVvhwAGNdloQCGWmuanqENZiCwCfOp
+ rwqqLlD2ElvfQqqB05mx3x5Mqh99k9yAgptWA+tKfaDVMeXPf712SJxtf+OiYtgkGHwKBE
+ OyxHQGuiIkGoulhZgDZbJzwLSdIwSeM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-slYNxlJKPtWnVSSzPxh5Gg-1; Tue, 07 Jul 2020 08:04:40 -0400
-X-MC-Unique: slYNxlJKPtWnVSSzPxh5Gg-1
+ us-mta-319-U9-BYozfM4yfGYSsn6VqdA-1; Tue, 07 Jul 2020 08:13:59 -0400
+X-MC-Unique: U9-BYozfM4yfGYSsn6VqdA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2664107B265;
- Tue,  7 Jul 2020 12:04:39 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8782B19724;
- Tue,  7 Jul 2020 12:04:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 052351132FD2; Tue,  7 Jul 2020 14:04:38 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2] util/qemu-option: Document the get_opt_value() function
-References: <20200629070858.19850-1-philmd@redhat.com>
- <1dec6cd5-42f8-8e9f-cc87-108e46a926cc@linaro.org>
- <87r1tnanuq.fsf@dusky.pond.sub.org>
- <ba9d8dc5-e654-99a7-1481-c5174e366540@redhat.com>
-Date: Tue, 07 Jul 2020 14:04:37 +0200
-In-Reply-To: <ba9d8dc5-e654-99a7-1481-c5174e366540@redhat.com> (Thomas Huth's
- message of "Tue, 7 Jul 2020 07:48:11 +0200")
-Message-ID: <87lfjv7cq2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E286D802DD4;
+ Tue,  7 Jul 2020 12:13:26 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-114-248.ams2.redhat.com [10.36.114.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BDA8919D61;
+ Tue,  7 Jul 2020 12:13:25 +0000 (UTC)
+Subject: Re: [qemu-web PATCH] blog post: Anatomy of a Boot, a QEMU perspective
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+References: <20200703173948.22156-1-alex.bennee@linaro.org>
+ <4b10e325-32df-9bc8-99ab-27f26eeed46f@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8675bec7-6ff5-3f3b-c125-f2244660eb0a@redhat.com>
+Date: Tue, 7 Jul 2020 14:13:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <4b10e325-32df-9bc8-99ab-27f26eeed46f@redhat.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,52 +100,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, Kevin Wolf <kwolf@redhat.com>,
- "Daniel P . =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+On 07/07/2020 12.33, Paolo Bonzini wrote:
+> On 03/07/20 19:39, Alex Bennée wrote:
+>> While working on some test cases I realised there was quite a lot of
+>> assumed knowledge about how things boot up. I thought it would be
+>> worth gathering this together in a user facing document where we could
+>> pour in the details and background to the boot process. The consensus
+>> seems to be this is better as a blog post.
+>>
+>> The post follows the socratic method and leaves the reader to ask
+>> themselves some questions in an effort to elucidate them about any
+>> problems they may be having before telling them that they probably
+>> wanted to use virt-manager all along.
+>>
+>> Based on Message-Id: <20200701161153.30988-2-alex.bennee@linaro.org>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> [rth: review of doc form]
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> Looks good to me.
 
-> On 07/07/2020 07.35, Markus Armbruster wrote:
->> Richard Henderson <richard.henderson@linaro.org> writes:
->>=20
->>> On 6/29/20 12:08 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> Coverity noticed commit 950c4e6c94 introduced a dereference before
->>>> null check in get_opt_value (CID1391003):
->>>>
->>>>   In get_opt_value: All paths that lead to this null pointer
->>>>   comparison already dereference the pointer earlier (CWE-476)
->>>>
->>>> We fixed this in commit 6e3ad3f0e31, but relaxed the check in commit
->>>> 0c2f6e7ee99 because "No callers of get_opt_value() pass in a NULL
->>>> for the 'value' parameter".
->>>>
->>>> Since this function is publicly exposed, it risks new users to do
->>>> the same error again. Avoid that documenting the 'value' argument
->>>> must not be NULL.
->>>
->>> I think we should also add some use of __attribute__((nonnull(...))) to=
- enforce
->>> this within the compiler.
->>>
->>> I recently did this without a qemu/compiler.h QEMU_FOO wrapper within
->>> target/arm.  But the nonnull option has optional arguments, so it might=
- be
->>> difficult to wrap in macros.
->>=20
->> Do we support building with a compuler that lacks this attribute?
->
-> It seems to be available in GCC 4.0 already:
->
-> https://gcc.gnu.org/onlinedocs/gcc-4.0.0/gcc/Function-Attributes.html
->
-> ... so the answer to your question is certainly "no". All supported
-> compilers should have this attribute.
+Looks good to me, too. Pushed.
 
-Why a macro then?
+ Thanks,
+  Thomas
 
 
