@@ -2,37 +2,37 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4375C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F4BC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:59:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7975320738
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:59:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7975320738
+	by mail.kernel.org (Postfix) with ESMTPS id 0FAE920738
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:59:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FAE920738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jso7j-0004u8-PK
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 09:59:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54122)
+	id 1jso7m-00051B-41
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 09:59:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jso6z-0003iC-9i
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 09:58:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45906)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jso70-0003iU-0P
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 09:58:18 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45964)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jso6w-0007FS-U5
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 09:58:16 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jso6x-0007Fr-RR
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 09:58:17 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id D9ECAAD68;
- Tue,  7 Jul 2020 13:58:13 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id 157B4AEE7;
+ Tue,  7 Jul 2020 13:58:15 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Laurent Vivier <lvivier@redhat.com>,
@@ -41,10 +41,12 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>,
  Markus Armbruster <armbru@redhat.com>
-Subject: [RFC v2 0/6] QEMU cpus.c refactoring part2
-Date: Tue,  7 Jul 2020 15:58:02 +0200
-Message-Id: <20200707135808.9241-1-cfontana@suse.de>
+Subject: [RFC v2 3/6] cpus: extract out kvm-specific code to accel/kvm
+Date: Tue,  7 Jul 2020 15:58:05 +0200
+Message-Id: <20200707135808.9241-4-cfontana@suse.de>
 X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20200707135808.9241-1-cfontana@suse.de>
+References: <20200707135808.9241-1-cfontana@suse.de>
 Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
  helo=mx2.suse.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 23:42:16
@@ -76,225 +78,364 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Motivation and higher level steps:
-
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
-
-This is based on and requires "QEMU cpus.c refactoring part1":
-
-https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09401.html
-
-OPEN ITEMS:
-
-* needs review
-* requires HVF patches before this can be committed (Roman).
-
-RFC v1 -> v2:
-
-* split the cpus.c accelerator refactoring into 6 patches.
-
-* other minor changes to be able to proceed step by step.
-
-----
-
-* Rebased on commit 255ae6e2158c743717bed76c9a2365ee4bcd326e,
-"replay: notify the main loop when there are no instructions"
-
-[SPLIT into part1 and part2]
-
-----
-
-v6 -> v7:
-
-* rebased changes on top of Pavel Dovgalyuk changes to dma-helpers.c
-  "icount: make dma reads deterministic"
-
-----
-
-v5 -> v6:
-
-* rebased changes on top of Emilio G. Cota changes to cpus.c
-  "cpu: convert queued work to a QSIMPLEQ"
-
-* keep a pointer in cpus.c instead of a copy of CpusAccel
-  (Alex)
-
-----
-
-
-v4 -> v5: rebase on latest master
-
-* rebased changes on top of roman series to remove one of the extra states for hvf.
-  (Is the result now functional for HVF?)
-
-* rebased changes on top of icount changes and fixes to icount_configure and
-  the new shift vmstate. (Markus)
-
-v3 -> v4:
-
-* overall: added copyright headers to all files that were missing them
-  (used copyright and license of the module the stuff was extracted from).
-  For the new interface files, added SUSE LLC.
-
-* 1/4 (move softmmu only files from root):
-
-  MAINTAINERS: moved softmmu/cpus.c to its final location (from patch 2)
-
-* 2/4 (cpu-throttle):
-
-  MAINTAINERS (to patch 1),
-  copyright Fabrice Bellard and license from cpus.c
-
-* 3/4 (cpu-timers, icount):
-
-  - MAINTAINERS: add cpu-timers.c and icount.c to Paolo
-
-  - break very long lines (patchew)
-
-  - add copyright SUSE LLC, GPLv2 to cpu-timers.h
-
-  - add copyright Fabrice Bellard and license from cpus.c to timers-state.h
-    as it is lifted from cpus.c
-
-  - vl.c: in configure_accelerators bail out if icount_enabled()
-    and !tcg_enabled() as qtest does not enable icount anymore.
-
-* 4/4 (accel stuff to accel):
-
-  - add copyright SUSE LLC to files that mostly only consist of the
-    new interface. Add whatever copyright was in the accelerator code
-    if instead they mostly consist of accelerator code.
-
-  - change a comment to mention the result of the AccelClass experiment
-
-  - moved qtest accelerator into accel/qtest/ , make it like the others.
-
-  - rename xxx-cpus-interface to xxx-cpus (remove "interface" from names)
-
-  - rename accel_int to cpus_accel
-
-  - rename CpusAccel functions from cpu_synchronize_* to synchronize_*
-
-
---------
-
-v2 -> v3:
-
-* turned into a 4 patch series, adding a first patch moving
-  softmmu code currently in top_srcdir to softmmu/
-
-* cpu-throttle: moved to softmmu/
-
-* cpu-timers, icount:
-
-  - moved to softmmu/
-
-  - fixed assumption of qtest_enabled() => icount_enabled()
-  causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
-
-  Fix is in hw/core/ptimer.c,
-
-  where the artificial timeout rate limit should not be applied
-  under qtest_enabled(), in a similar way to how it is not applied
-  for icount_enabled().
-
-* CpuAccelInterface: no change.
-
-
---------
-
-
-v1 -> v2:
-
-* 1/3 (cpu-throttle): provide a description in the commit message
-
-* 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
-  as icount is actually TCG-specific. Only build it under CONFIG_TCG.
-
-  To do this, qtest had to be detached from icount. To this end, a
-  trivial global counter for qtest has been introduced.
-
-* 3/3 (CpuAccelInterface): provided a description.
-
-This is point 8) in that plan. The idea is to extract the unrelated parts
-in cpus, and register interfaces from each single accelerator to the main
-cpus module (cpus.c).
-
-While doing this RFC, I noticed some assumptions about Windows being
-either TCG or HAX (not considering WHPX) that might need to be revisited.
-I added a comment there.
-
-The thing builds successfully based on Linux cross-compilations for
-windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
-
-Tests run successully for tcg and kvm configurations, but did not test on
-windows or darwin.
-
-Welcome your feedback and help on this,
-
-Claudio
-
-Claudio Fontana (6):
-  cpus: extract out TCG-specific code to accel/tcg
-  cpus: extract out qtest-specific code to accel/qtest
-  cpus: extract out kvm-specific code to accel/kvm
-  cpus: extract out hax-specific code to target/i386/
-  cpus: extract out whpx-specific code to target/i386/
-  cpus: extract out hvf-specific code to target/i386/hvf/
-
- MAINTAINERS                   |   3 +-
- accel/Makefile.objs           |   2 +-
- accel/kvm/Makefile.objs       |   2 +
- accel/kvm/kvm-all.c           |  14 +-
- accel/kvm/kvm-cpus.c          |  94 +++++
- accel/kvm/kvm-cpus.h          |  17 +
- accel/qtest/Makefile.objs     |   2 +
- accel/qtest/qtest-cpus.c      | 104 +++++
- accel/qtest/qtest-cpus.h      |  17 +
- accel/{ => qtest}/qtest.c     |   7 +
- accel/stubs/kvm-stub.c        |   3 +-
- accel/tcg/Makefile.objs       |   1 +
- accel/tcg/tcg-all.c           |  12 +-
- accel/tcg/tcg-cpus.c          | 532 ++++++++++++++++++++++++
- accel/tcg/tcg-cpus.h          |  17 +
- hw/core/cpu.c                 |   1 +
- include/sysemu/cpus.h         |  33 ++
- include/sysemu/hw_accel.h     |  57 +--
- include/sysemu/kvm.h          |   2 +-
- softmmu/cpus.c                | 917 ++++--------------------------------------
- stubs/Makefile.objs           |   1 +
- stubs/cpu-synchronize-state.c |  15 +
- target/i386/Makefile.objs     |   7 +-
- target/i386/hax-all.c         |   6 +-
- target/i386/hax-cpus.c        |  85 ++++
- target/i386/hax-cpus.h        |  17 +
- target/i386/hax-i386.h        |   2 +
- target/i386/hax-posix.c       |  12 +
- target/i386/hax-windows.c     |  20 +
- target/i386/hvf/Makefile.objs |   2 +-
- target/i386/hvf/hvf-cpus.c    | 141 +++++++
- target/i386/hvf/hvf-cpus.h    |  17 +
- target/i386/hvf/hvf.c         |   3 +
- target/i386/whpx-all.c        |   3 +
- target/i386/whpx-cpus.c       |  96 +++++
- target/i386/whpx-cpus.h       |  17 +
- 36 files changed, 1368 insertions(+), 913 deletions(-)
+register a "CpusAccel" interface for KVM as well.
+
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ accel/kvm/Makefile.objs |  2 ++
+ accel/kvm/kvm-all.c     | 14 +++++++-
+ accel/kvm/kvm-cpus.c    | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
+ accel/kvm/kvm-cpus.h    | 17 +++++++++
+ accel/stubs/kvm-stub.c  |  3 +-
+ include/sysemu/kvm.h    |  2 +-
+ softmmu/cpus.c          | 77 ----------------------------------------
+ 7 files changed, 128 insertions(+), 81 deletions(-)
  create mode 100644 accel/kvm/kvm-cpus.c
  create mode 100644 accel/kvm/kvm-cpus.h
- create mode 100644 accel/qtest/Makefile.objs
- create mode 100644 accel/qtest/qtest-cpus.c
- create mode 100644 accel/qtest/qtest-cpus.h
- rename accel/{ => qtest}/qtest.c (86%)
- create mode 100644 accel/tcg/tcg-cpus.c
- create mode 100644 accel/tcg/tcg-cpus.h
- create mode 100644 stubs/cpu-synchronize-state.c
- create mode 100644 target/i386/hax-cpus.c
- create mode 100644 target/i386/hax-cpus.h
- create mode 100644 target/i386/hvf/hvf-cpus.c
- create mode 100644 target/i386/hvf/hvf-cpus.h
- create mode 100644 target/i386/whpx-cpus.c
- create mode 100644 target/i386/whpx-cpus.h
 
+diff --git a/accel/kvm/Makefile.objs b/accel/kvm/Makefile.objs
+index fdfa481578..ce0f492b8d 100644
+--- a/accel/kvm/Makefile.objs
++++ b/accel/kvm/Makefile.objs
+@@ -1,2 +1,4 @@
+ obj-y += kvm-all.o
++obj-y += kvm-cpus.o
++
+ obj-$(call lnot,$(CONFIG_SEV)) += sev-stub.o
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index d54a8701d8..0932f7cb94 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -45,6 +45,9 @@
+ #include "qapi/qapi-types-common.h"
+ #include "qapi/qapi-visit-common.h"
+ #include "sysemu/reset.h"
++#include "qemu/guest-random.h"
++#include "sysemu/hw_accel.h"
++#include "kvm-cpus.h"
+ 
+ #include "hw/boards.h"
+ 
+@@ -379,7 +382,7 @@ err:
+     return ret;
+ }
+ 
+-int kvm_destroy_vcpu(CPUState *cpu)
++static int do_kvm_destroy_vcpu(CPUState *cpu)
+ {
+     KVMState *s = kvm_state;
+     long mmap_size;
+@@ -413,6 +416,14 @@ err:
+     return ret;
+ }
+ 
++void kvm_destroy_vcpu(CPUState *cpu)
++{
++    if (do_kvm_destroy_vcpu(cpu) < 0) {
++        error_report("kvm_destroy_vcpu failed");
++        exit(EXIT_FAILURE);
++    }
++}
++
+ static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
+ {
+     struct KVMParkedVcpu *cpu;
+@@ -2232,6 +2243,7 @@ static int kvm_init(MachineState *ms)
+         qemu_balloon_inhibit(true);
+     }
+ 
++    cpus_register_accel(&kvm_cpus);
+     return 0;
+ 
+ err:
+diff --git a/accel/kvm/kvm-cpus.c b/accel/kvm/kvm-cpus.c
+new file mode 100644
+index 0000000000..ac6945a9e6
+--- /dev/null
++++ b/accel/kvm/kvm-cpus.c
+@@ -0,0 +1,94 @@
++/*
++ * QEMU KVM support
++ *
++ * Copyright IBM, Corp. 2008
++ *           Red Hat, Inc. 2008
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Glauber Costa     <gcosta@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "qemu/main-loop.h"
++#include "sysemu/kvm_int.h"
++#include "sysemu/runstate.h"
++#include "sysemu/cpus.h"
++#include "qemu/guest-random.h"
++
++#include "kvm-cpus.h"
++
++static void kvm_kick_vcpu_thread(CPUState *cpu)
++{
++    cpus_kick_thread(cpu);
++}
++
++static void *kvm_vcpu_thread_fn(void *arg)
++{
++    CPUState *cpu = arg;
++    int r;
++
++    rcu_register_thread();
++
++    qemu_mutex_lock_iothread();
++    qemu_thread_get_self(cpu->thread);
++    cpu->thread_id = qemu_get_thread_id();
++    cpu->can_do_io = 1;
++    current_cpu = cpu;
++
++    r = kvm_init_vcpu(cpu);
++    if (r < 0) {
++        error_report("kvm_init_vcpu failed: %s", strerror(-r));
++        exit(1);
++    }
++
++    kvm_init_cpu_signals(cpu);
++
++    /* signal CPU creation */
++    cpu_thread_signal_created(cpu);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
++
++    do {
++        if (cpu_can_run(cpu)) {
++            r = kvm_cpu_exec(cpu);
++            if (r == EXCP_DEBUG) {
++                cpu_handle_guest_debug(cpu);
++            }
++        }
++        qemu_wait_io_event(cpu);
++    } while (!cpu->unplug || cpu_can_run(cpu));
++
++    kvm_destroy_vcpu(cpu);
++    cpu_thread_signal_destroyed(cpu);
++    qemu_mutex_unlock_iothread();
++    rcu_unregister_thread();
++    return NULL;
++}
++
++static void kvm_start_vcpu_thread(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
++
++    cpu->thread = g_malloc0(sizeof(QemuThread));
++    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++    qemu_cond_init(cpu->halt_cond);
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
++             cpu->cpu_index);
++    qemu_thread_create(cpu->thread, thread_name, kvm_vcpu_thread_fn,
++                       cpu, QEMU_THREAD_JOINABLE);
++}
++
++CpusAccel kvm_cpus = {
++    .create_vcpu_thread = kvm_start_vcpu_thread,
++    .kick_vcpu_thread = kvm_kick_vcpu_thread,
++
++    .synchronize_post_reset = kvm_cpu_synchronize_post_reset,
++    .synchronize_post_init = kvm_cpu_synchronize_post_init,
++    .synchronize_state = kvm_cpu_synchronize_state,
++    .synchronize_pre_loadvm = kvm_cpu_synchronize_pre_loadvm,
++};
+diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
+new file mode 100644
+index 0000000000..62fbc911d9
+--- /dev/null
++++ b/accel/kvm/kvm-cpus.h
+@@ -0,0 +1,17 @@
++/*
++ * Accelerator CPUS Interface
++ *
++ * Copyright 2020 SUSE LLC
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef KVM_CPUS_H
++#define KVM_CPUS_H
++
++#include "sysemu/cpus.h"
++
++extern CpusAccel kvm_cpus;
++
++#endif /* KVM_CPUS_H */
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 82f118d2df..69f8a842da 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -32,9 +32,8 @@ bool kvm_readonly_mem_allowed;
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
+ 
+-int kvm_destroy_vcpu(CPUState *cpu)
++void kvm_destroy_vcpu(CPUState *cpu)
+ {
+-    return -ENOSYS;
+ }
+ 
+ int kvm_init_vcpu(CPUState *cpu)
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index b4174d941c..7a5f973b6f 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -218,7 +218,7 @@ int kvm_has_intx_set_mask(void);
+ 
+ int kvm_init_vcpu(CPUState *cpu);
+ int kvm_cpu_exec(CPUState *cpu);
+-int kvm_destroy_vcpu(CPUState *cpu);
++void kvm_destroy_vcpu(CPUState *cpu);
+ 
+ /**
+  * kvm_arm_supports_user_irq
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index bb1e534601..9a55bd2c4e 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -192,9 +192,6 @@ void cpu_synchronize_state(CPUState *cpu)
+         /* accelerator already implements the CpusAccel interface */
+         cpus_accel->synchronize_state(cpu);
+     }
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_state(cpu);
+-    }
+     if (hax_enabled()) {
+         hax_cpu_synchronize_state(cpu);
+     }
+@@ -209,9 +206,6 @@ void cpu_synchronize_post_reset(CPUState *cpu)
+         /* accelerator already implements the CpusAccel interface */
+         cpus_accel->synchronize_post_reset(cpu);
+     }
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_reset(cpu);
+-    }
+     if (hax_enabled()) {
+         hax_cpu_synchronize_post_reset(cpu);
+     }
+@@ -226,9 +220,6 @@ void cpu_synchronize_post_init(CPUState *cpu)
+         /* accelerator already implements the CpusAccel interface */
+         cpus_accel->synchronize_post_init(cpu);
+     }
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_init(cpu);
+-    }
+     if (hax_enabled()) {
+         hax_cpu_synchronize_post_init(cpu);
+     }
+@@ -243,9 +234,6 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu)
+         /* accelerator already implements the CpusAccel interface */
+         cpus_accel->synchronize_pre_loadvm(cpu);
+     }
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_pre_loadvm(cpu);
+-    }
+     if (hax_enabled()) {
+         hax_cpu_synchronize_pre_loadvm(cpu);
+     }
+@@ -376,14 +364,6 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+     do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
+ }
+ 
+-static void qemu_kvm_destroy_vcpu(CPUState *cpu)
+-{
+-    if (kvm_destroy_vcpu(cpu) < 0) {
+-        error_report("kvm_destroy_vcpu failed");
+-        exit(EXIT_FAILURE);
+-    }
+-}
+-
+ static void qemu_cpu_stop(CPUState *cpu, bool exit)
+ {
+     g_assert(qemu_cpu_is_self(cpu));
+@@ -429,48 +409,6 @@ void qemu_wait_io_event(CPUState *cpu)
+     qemu_wait_io_event_common(cpu);
+ }
+ 
+-static void *qemu_kvm_cpu_thread_fn(void *arg)
+-{
+-    CPUState *cpu = arg;
+-    int r;
+-
+-    rcu_register_thread();
+-
+-    qemu_mutex_lock_iothread();
+-    qemu_thread_get_self(cpu->thread);
+-    cpu->thread_id = qemu_get_thread_id();
+-    cpu->can_do_io = 1;
+-    current_cpu = cpu;
+-
+-    r = kvm_init_vcpu(cpu);
+-    if (r < 0) {
+-        error_report("kvm_init_vcpu failed: %s", strerror(-r));
+-        exit(1);
+-    }
+-
+-    kvm_init_cpu_signals(cpu);
+-
+-    /* signal CPU creation */
+-    cpu_thread_signal_created(cpu);
+-    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+-
+-    do {
+-        if (cpu_can_run(cpu)) {
+-            r = kvm_cpu_exec(cpu);
+-            if (r == EXCP_DEBUG) {
+-                cpu_handle_guest_debug(cpu);
+-            }
+-        }
+-        qemu_wait_io_event(cpu);
+-    } while (!cpu->unplug || cpu_can_run(cpu));
+-
+-    qemu_kvm_destroy_vcpu(cpu);
+-    cpu_thread_signal_destroyed(cpu);
+-    qemu_mutex_unlock_iothread();
+-    rcu_unregister_thread();
+-    return NULL;
+-}
+-
+ static void *qemu_hax_cpu_thread_fn(void *arg)
+ {
+     CPUState *cpu = arg;
+@@ -795,19 +733,6 @@ static void qemu_hax_start_vcpu(CPUState *cpu)
+ #endif
+ }
+ 
+-static void qemu_kvm_start_vcpu(CPUState *cpu)
+-{
+-    char thread_name[VCPU_THREAD_NAME_SIZE];
+-
+-    cpu->thread = g_malloc0(sizeof(QemuThread));
+-    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
+-    qemu_cond_init(cpu->halt_cond);
+-    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
+-             cpu->cpu_index);
+-    qemu_thread_create(cpu->thread, thread_name, qemu_kvm_cpu_thread_fn,
+-                       cpu, QEMU_THREAD_JOINABLE);
+-}
+-
+ static void qemu_hvf_start_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+@@ -868,8 +793,6 @@ void qemu_init_vcpu(CPUState *cpu)
+     if (cpus_accel) {
+         /* accelerator already implements the CpusAccel interface */
+         cpus_accel->create_vcpu_thread(cpu);
+-    } else if (kvm_enabled()) {
+-        qemu_kvm_start_vcpu(cpu);
+     } else if (hax_enabled()) {
+         qemu_hax_start_vcpu(cpu);
+     } else if (hvf_enabled()) {
 -- 
 2.16.4
 
