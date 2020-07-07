@@ -2,100 +2,84 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4BBC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 14:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFDAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 14:47:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B96392063A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 14:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F3D5207E8
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 14:47:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DYkYLqBc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96392063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W324qQbH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F3D5207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsogV-0006f7-23
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 10:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35458)
+	id 1jsosj-0006Jr-Ip
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 10:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jsofe-0006BQ-Ra
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 10:34:06 -0400
-Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:36696)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jsofZ-0005Jh-If
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 10:34:06 -0400
-Received: by mail-pg1-x530.google.com with SMTP id p3so20091822pgh.3
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 07:34:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=VkhryAMj56Ic41hCjigbkYozmz9svCwrLuCjmy3HJuQ=;
- b=DYkYLqBcx29MJAvF0DNnHnz/vi8bflv+uVDod2EXNxjX9mHzZCOfz0IGjwnQu609zj
- g8/8rF16onb+NBo5TTnEDsWWcC7hayOBTQLgX+KEYXyk7RHcE3QzhTeSZPhzyaN6nirW
- fYX9qblMUOO5xzuhFEfeVZXRKUOxBp+RhUQ7x7g32U4kK9gT5vU3l4H6Q3L4tf57zrTy
- Uq72y/rwwNiiuyLrhdwJNwVWaXbykHED1kafcg0mjyRc0pzDU6QBni4PaDz8U/3AvDV2
- EG7VtsQ2Y8/TfCPiwNYksGWUdynisgxD4G6Jb435mzv/pSa0wiDinRW4+osbBGD2NRdx
- 0iLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=VkhryAMj56Ic41hCjigbkYozmz9svCwrLuCjmy3HJuQ=;
- b=V3rP4GHcndhCG6YVYA6lqz3h0SyX3/bliZQNUtHPH3ZT6NwUktIWXoqyw4b43Qm79f
- ssjKeqZ+5lJGE2+3rV27fuAUhoNuIdHTSjVL3QsrZ7yYaopuqWWC1bexmfXuEOcvyQdG
- 4XEAfZ2FQsfvth3hNx5FDOT+VN3CIkLwdXoAUhY8F/avFLxF0FJnrDzcaRYK6Cykd3o8
- JTF04rFqKRVFDw1MFmaY5P9PIvVGfSOmY20Kpp1uQyWbGDBnLrRc1A2IUyRsESyEGcmG
- Y2lpzd7Ys4xf3Hchqox2wvvSERTEQ6kiNGdE9uzhTp57l6Xw6IDr3cWuXZNHaafABl6p
- WwuA==
-X-Gm-Message-State: AOAM531IXl0Gc5deOGHMIFeujCVvLy5JKUCnQWfJEL3Y9HGuFEiXAgzN
- sowr7sB4WTZFRzmQ7++aI5jUsg==
-X-Google-Smtp-Source: ABdhPJzoZdp2gY7pPz/5w1chGwYc5LoTPXD73l5rU+z/n/yhTrSmbY4HaGsQOyEGzIZjXD0L8ITETg==
-X-Received: by 2002:a63:b06:: with SMTP id 6mr43629858pgl.116.1594132440130;
- Tue, 07 Jul 2020 07:34:00 -0700 (PDT)
-Received: from [192.168.149.206] (097-090-106-114.biz.spectrum.com.
- [97.90.106.114])
- by smtp.gmail.com with ESMTPSA id v28sm1240478pgc.44.2020.07.07.07.33.58
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jul 2020 07:33:59 -0700 (PDT)
-Subject: Re: [PULL v2 12/64] target/riscv: add vector amo operations
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>,
- Alistair Francis <alistair.francis@wdc.com>
-References: <20200702162354.928528-1-alistair.francis@wdc.com>
- <20200702162354.928528-13-alistair.francis@wdc.com>
- <CAFEAcA8b7Rk8ZDDu689tRDCqcSKRbCGVf=75e0f0WNd2GJ9dmg@mail.gmail.com>
- <e86ece6b-5295-dfb2-6fdb-bf0004ec9b70@linaro.org>
- <82652a07-e592-9d84-353d-5a0e94b77e84@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <dfdea992-cb76-5cc7-0d02-71fe9daa6532@linaro.org>
-Date: Tue, 7 Jul 2020 07:33:55 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsorv-0005k7-7w
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 10:46:47 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47277
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsorp-0007hT-7p
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 10:46:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594133199;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=8uRqbq9+MGzTzxMr5ja7NLIkCymq/NQVdrEfBxzsaNI=;
+ b=W324qQbHVPQrPVPfNx+m5RZl4deiWjCGxHTbZ7ad8qfjE/1zpKFoSRn6QGvRcBDsPEES4f
+ 3QRV2SdIX1iHpdmXMmcASp2wIAv4O7zn+m0gigKAbndjZMZP0oxwxwBwwB0/9mt2foq5iL
+ 32RcU8MPaoFp37ZvtnjUl6XKFMw2fD8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-hGipqnMGMciNUEmyxoNk1Q-1; Tue, 07 Jul 2020 10:46:38 -0400
+X-MC-Unique: hGipqnMGMciNUEmyxoNk1Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E69941005510;
+ Tue,  7 Jul 2020 14:46:36 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-113.ams2.redhat.com
+ [10.36.114.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D1D5F5C1B2;
+ Tue,  7 Jul 2020 14:46:33 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH] qemu-img map: Don't limit block status request size
+Date: Tue,  7 Jul 2020 16:46:29 +0200
+Message-Id: <20200707144629.51235-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <82652a07-e592-9d84-353d-5a0e94b77e84@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::530;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x530.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,22 +92,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Alistair Francis <alistair23@gmail.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/7/20 7:26 AM, LIU Zhiwei wrote:
-> As  there are not only the atomic instructions have this question, all
-> instructions that use
-> GEN_VEXT_TRANS have the same question too. It's some difficult to address this
-> question by this way.
+Limiting each loop iteration of qemu-img map to 1 GB was arbitrary from
+the beginning, though it only cut the maximum in half then because the
+interface a signed 32 bit byte count. These days, bdrv_block_status()
+supports a 64 bit byte count, so the arbitrary limit is even worse.
 
-Oh yes, I missed that.  Ok, perhaps the simpler assert would be best right now
-before softfreeze.
+On file-posix, bdrv_block_status() eventually maps to SEEK_HOLE and
+SEEK_DATA, which don't support a limit, but always do all of the work
+necessary to find the start of the next hole/data. Much of this work may
+be repeated if we don't use this information fully, but query with an
+only slightly larger offset in the next loop iteration. Therefore, if
+bdrv_block_status() is called in a loop, it should always pass the
+full number of bytes that the whole loop is interested in.
 
+This removes the arbitrary limit and speeds up 'qemu-img map'
+significantly on heavily fragmented images.
 
-r~
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qemu-img.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index bdb9f6aa46..74946f81ca 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3217,12 +3217,9 @@ static int img_map(int argc, char **argv)
+     curr.start = start_offset;
+     while (curr.start + curr.length < length) {
+         int64_t offset = curr.start + curr.length;
+-        int64_t n;
++        int64_t n = length - offset;
+ 
+-        /* Probe up to 1 GiB at a time.  */
+-        n = MIN(1 * GiB, length - offset);
+         ret = get_block_status(bs, offset, n, &next);
+-
+         if (ret < 0) {
+             error_report("Could not read file metadata: %s", strerror(-ret));
+             goto out;
+-- 
+2.25.4
+
 
