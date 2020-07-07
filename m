@@ -2,138 +2,121 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEF6C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB234C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:39:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3651D2065F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:39:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="ac/9yihR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3651D2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	by mail.kernel.org (Postfix) with ESMTPS id C08482065F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:39:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C08482065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsl0E-0003Wn-Gv
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:39:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60996)
+	id 1jsl0g-00046T-2C
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:39:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <felipe@nutanix.com>)
- id 1jskzN-0002Mf-JB
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:38:13 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:21836)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jskzU-0002VT-KW; Tue, 07 Jul 2020 06:38:20 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:39371)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <felipe@nutanix.com>)
- id 1jskzJ-00067u-Mx
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:38:13 -0400
-Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 067AaH7X010688; Tue, 7 Jul 2020 03:38:04 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=68SNL55or8Ri2uCK00neGUoChdUp9lmnPv+NYO/x6uM=;
- b=ac/9yihRiEbNZo9fg0tKJ3FLLtnAM8peImWxz8rJJjy7pY9183TfelbgtC8QO/40WLtd
- V8zrdnqdR564uFMurafw5t7LqTVSQ2WiHlHJYB/zxs0DS9xqUVF6mS/eYwRqmil9/+wJ
- pgG1QhKyriaIB3yfQ1fszEsFkeTN36pCVSnZJVEyOpH0AUkKqMfT3nKOyrIHddmTx6Zt
- 0THStlJ5e4oonfX5OfWUKmLz6lRUzjDR4tlNGRaIbl+lBg1d/wkdMyvwLTmd3/FGgZXC
- zxG+RmVSNniyNlbHCVP5xoETea1Af9yJFWS2eOhLAqT/r1UUWXvRYi/HXhL/RSvkgLXs 5Q== 
-Received: from nam12-dm6-obe.outbound.protection.outlook.com
- (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
- by mx0b-002c1b01.pphosted.com with ESMTP id 322qaa5mqj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 07 Jul 2020 03:38:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oSTCXxhc6/iTdYmqL//9BOBagPkWtD6+NkKKPQv8D/iAvL8SBDGXRBe3kVBZWPENblKsXhLg7oK10H1rScAyG7FTyq6v13t0O1s7OVZVtiq0l5o0Lsxzo73IjyBb/Q2pSp7PSjn572GnvqYgN/nHPDtT3ZeT4IDg8o4PO49HDz/cJbhXE7cp0aNqT8tXhJsf+C6OnY6uxs9Ej7OdgWWn56agtgctmJQ/h8PmOdr/iOdsCUyOrSJFdHTaW8oaaBangM1+i7XbqKhILbGdE3FaVaMuMcftwC7Cvz58G/20kkM9Avjx4Y4+leZsuAKDcBl0PXzoalV/rrKpSHDu+YhIxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=68SNL55or8Ri2uCK00neGUoChdUp9lmnPv+NYO/x6uM=;
- b=Ghk4gGOBnNwv13xOHAeZ/j1gVKORjUq5NRewtV9NfTW9ROGVQrc+3NcNYu+dq896OVr4XeLHDBwZ79Pn2zEzErGxjeu7di3AOivi0f1Kk9oO/hbuNlbWgZ8rm/fFrkNnwbTSRCxELOB+LJ35z2AmtWUqwdH1aeKBLWwBLD9jVGXaQNQ1HxOD/XA0MksjMh9HiWmrpBozZJWX/Wfv+XynA7/siIupaaBRyw4SYWyi8LrB0k7n85kWxYMkfHVGf3rODFL1fSffOJ8h+sNwVrZiGV06y9u404tdGGq4R+e3IvLExD6oR+gnmMXFtFVk6lKHbqNR2tLDo6xLNFuq72FtQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from BYAPR02MB4358.namprd02.prod.outlook.com (2603:10b6:a03:11::17)
- by BY5PR02MB6754.namprd02.prod.outlook.com (2603:10b6:a03:213::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Tue, 7 Jul
- 2020 10:38:01 +0000
-Received: from BYAPR02MB4358.namprd02.prod.outlook.com
- ([fe80::ac30:926:2dff:b777]) by BYAPR02MB4358.namprd02.prod.outlook.com
- ([fe80::ac30:926:2dff:b777%7]) with mapi id 15.20.3174.020; Tue, 7 Jul 2020
- 10:38:01 +0000
-From: Felipe Franciosi <felipe@nutanix.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: DMA region abruptly removed from PCI device
-Thread-Topic: DMA region abruptly removed from PCI device
-Thread-Index: AdZTg3uLE9L5RNQrTJ25kTkeyN20cwAHQ8YAACqJBoA=
-Date: Tue, 7 Jul 2020 10:38:01 +0000
-Message-ID: <9F290836-753A-4ACF-A593-F736C2FA0508@nutanix.com>
-References: <MW2PR02MB3723509CC4795066274C9D4C8B690@MW2PR02MB3723.namprd02.prod.outlook.com>
- <20200706082004.5c887c67@x1.home>
-In-Reply-To: <20200706082004.5c887c67@x1.home>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3608.80.23.2.2)
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [82.9.225.166]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: dc95f092-d98d-492e-4d5a-08d82261d2c2
-x-ms-traffictypediagnostic: BY5PR02MB6754:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR02MB675426354B5EE67B4EEF59D2D7660@BY5PR02MB6754.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0457F11EAF
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /Ab8uVVYVfr0+sJOpi8pZVIJPetAtJejilecec8UdC81LO3YbvjzimHU2TMeqIMfU67Vi2i9tjb8/jKIRP+PbXacKBU5V2v7aj1gwqJ/GwLebaf/2OgiXrpRejMr5eeoeyNogh4pGFuu83Oudq8w8eFIQ7FlR9SCY46PYF5152zLuQaqAnAVrwEsKlYIXkupHzhTDwvCvdYniRnVfM2FgR2TYoGXOG06FOqXMcQM/poR9CHGBRhywcf5sDob7OKZR4bTAYyj7DLbYo9jru0q7rpBwqu4PNTCQQkxoWs3Ew6+HRgIbR7ne5vqWnsRncke6OfgO21kcmahUml9neO4QtxvFxBDf0I7CLbzmezD/1Ul5rJ9/uONcImWyslDMjuWZF7WRex8d4hfZwcSzgXnFg==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BYAPR02MB4358.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39860400002)(376002)(136003)(346002)(366004)(396003)(5660300002)(6916009)(6486002)(86362001)(26005)(54906003)(36756003)(6512007)(6506007)(186003)(53546011)(8676002)(2906002)(316002)(76116006)(66946007)(64756008)(66446008)(66476007)(4326008)(2616005)(8936002)(71200400001)(83380400001)(33656002)(478600001)(66556008);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: aZf50fXNa688F+K9hj5VZAPQm+cA5ha7yekjbG294/BddFwlvLcYj5Kj1989MCbhpByB5+h7uuekkQ0UVM9lrq4q9cO0/NcCLx//bPwOQdGxfXG0TGVUFm7IUBkw2bawcuYkHY+9JtE0tNH/ZcqBbVbogNEBihdVhdKsJrfopgpLHAAM2xujyjPVb1FDculep/28Pc7F7yy7F057dN8Mp8ra9Ooys3FHmenYKmRbnYGDKzeySiIYFIY8zybj+MpTKea5djd1/idKvZX7bRofXDfLWoWQyyUAN7VS7dutG6geXlDaqW/qekQjI9DNHg0d0rWj5MLR8N9l3AnbszatrhGSmUuGs+5ygOhgUuhJEkReDxLXIb98sRVJe5XdlnGfBcOCxc4K+Xyh2p/GIrtKaxmeGBXgTyd3jgZgD4UzWz6x+n8HucjIVIh+CZsd4TfhoJ0VssEgwey9YLIl+XMsmF7j/qLngCgFtEgf6HEBbkU=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <D6F368BBE3115E469F0CC11B9FD4474C@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jskzS-00069j-LU; Tue, 07 Jul 2020 06:38:20 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MUooJ-1kJOh041dB-00Qo0x; Tue, 07 Jul 2020 12:38:12 +0200
+Subject: Re: [PATCH] hw/core/null-machine: Do not initialize unused chardev
+ backends
+From: Laurent Vivier <laurent@vivier.eu>
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, qemu-devel@nongnu.org
+References: <20200624105611.1049-1-f4bug@amsat.org>
+ <bd458cb8-e005-0ea9-bbaf-bcb541bfdc89@redhat.com>
+ <2631a1b9-a501-8633-6dbd-37fce4b116bd@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <acb0a747-148f-c739-e625-d213d23ed40a@vivier.eu>
+Date: Tue, 7 Jul 2020 12:38:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR02MB4358.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc95f092-d98d-492e-4d5a-08d82261d2c2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2020 10:38:01.3587 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5BIpfrtgF+tcG2Sk08rizZuLtgHbR3ch0rRIEda2sfeGp012jnVPyK/V3bA6492v2Y96t565crEqnt3h3Pz+vDtE37Hua/YpRpF26KZj0mM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6754
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-07_06:2020-07-07,
- 2020-07-07 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.155.12; envelope-from=felipe@nutanix.com;
- helo=mx0b-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:38:07
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <2631a1b9-a501-8633-6dbd-37fce4b116bd@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:NFYHeTuEBzgG0ktWmf7fzCoSQyCp4yM0HVUjd/yPS9+VkfAsJN/
+ dKIIllf6uu3QqNkidhOTK0WTyeEf7E32lGEGhq/e0XdZyn+GwigMvHvnF8CAjISoXhbMOhA
+ 6tI2A/ES5CuZKjbmLg7481s6KiF4c7YlosVXw0eirj524TMzSs+Ljvp4RTfA9liiSW9jBqp
+ p3Niigy66ACb1Vouub6WQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:m5FsKqhW3rg=:8FzTEsq24aeNEpVSQEBGcS
+ vaqfCIYZT2Sp8aJDGIbee+BZ0oVOkriDWgP9iaCXO8Fr8XkhU9dGmW4Tq1OyZpTkXoWwdyYqZ
+ HL4shYjOPa7u9ILUGZowFGk1+dxrJf7gcuOBy71uANZ50umooidXkggJCEB/tuqs1n/MErAP4
+ EBgvPRCRvNk9uC7nBXteCHT/ZUPNyvpHBVgxGJ6jBen/SIPz3KY88hySD/dH0flcDSzBV5MVZ
+ AH7NfmfMiB3jp4ZpXhs6KeJMfswwNs5ATPrSi+94IYhctKmPEr1AWx19YxSeCZ1THW+1pBvYj
+ +x8/MCrmP5zrhexLze4v0/AneziswgCkfDQ+ycywa3WBVCCvPHbPnJ/3W/0V96v+V3kNMaRpG
+ okhsY8XR2pg9fZVWfyrVoAvixwe7nU9vW9Ci+JuoPkDtWApKgLDby//zshgNOw9FMdWocCEyn
+ F+IH3mry/WStbch4hxiI60Tjw4k848PijXS8TeEX3AD7z2+GkfcTaYHw4MJalTl1jFeJhV0h/
+ NmcTMniLANynhxyRnhkihDBfEP0/mLGoNS3e0NqzemSJiW/Idst5wo2xLwlwmoi6gOgRC84uU
+ ZawmOMyq4vXiMVGPonjK66hyWappUvJoG8SgBgAeEGAvxzO61vTmP5r1j0GUtF0d3B2fkM1CE
+ vHiSbGkkVjr9lf74/WZ2n2XEDg3YDmAGZur6q9NCAVzdKRpE3ghQKD1WBFBmPD9diqSkzbAqV
+ jWGUA87KbHQdMJ/3PMABDl0AEOFzHz2G5+gsB1u+I0DQbudQVZJGIOZQbgjh0Z6p61A6b1zAo
+ wwXSnmz6tDVx4Ah40B3au1Dovl3AfeUAtWocfI84inC4DE87uYEEN07e5XqQSD8QwsKGeEM
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:38:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -146,118 +129,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>, "Liu, 
- Changpeng" <changpeng.liu@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Le 06/07/2020 à 18:24, Laurent Vivier a écrit :
+> Le 24/06/2020 à 13:01, Thomas Huth a écrit :
+>> On 24/06/2020 12.56, Philippe Mathieu-Daudé wrote:
+>>> The MachineClass uses an inverted logic (inherited from the
+>>> PC machines [*]) to create the chardev backends for the default
+>>> devices (see commits 998bbd74b9d..aa40fc9c964 and ac33f8fad14).
+>>>
+>>> As the none-machine doesn't have any hardware device, it is
+>>> pointless to initialize chardev backends. Fix by setting the
+>>> 'no_defaults' bits in its MachineClass.
+>>>
+>>> Suggested-by: Thomas Huth <thuth@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>   hw/core/null-machine.c | 5 +++++
+>>>   1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+>>> index cb47d9d4f8..7e693523d7 100644
+>>> --- a/hw/core/null-machine.c
+>>> +++ b/hw/core/null-machine.c
+>>> @@ -50,6 +50,11 @@ static void machine_none_machine_init(MachineClass
+>>> *mc)
+>>>       mc->max_cpus = 1;
+>>>       mc->default_ram_size = 0;
+>>>       mc->default_ram_id = "ram";
+>>> +    mc->no_serial = 1;
+>>> +    mc->no_parallel = 1;
+>>> +    mc->no_floppy = 1;
+>>> +    mc->no_cdrom = 1;
+>>> +    mc->no_sdcard = 1;
+>>>   }
+>>>     DEFINE_MACHINE("none", machine_none_machine_init)
+>>>
+>>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>
+>>
+> 
+> Applied to my trivial-patches-for-5.1 branch.
 
-
-> On Jul 6, 2020, at 3:20 PM, Alex Williamson <alex.williamson@redhat.com> =
-wrote:
->=20
-> On Mon, 6 Jul 2020 10:55:00 +0000
-> Thanos Makatos <thanos.makatos@nutanix.com> wrote:
->=20
->> We have an issue when using the VFIO-over-socket libmuser PoC
->> (https://www.mail-archive.com/qemu-devel@nongnu.org/msg692251.html) inst=
-ead of
->> the VFIO kernel module: we notice that DMA regions used by the emulated =
-device
->> can be abruptly removed while the device is still using them.
->>=20
->> The PCI device we've implemented is an NVMe controller using SPDK, so it=
- polls
->> the submission queues for new requests. We use the latest SeaBIOS where =
-it tries
->> to boot from the NVMe controller. Several DMA regions are registered
->> (VFIO_IOMMU_MAP_DMA) and then the admin and a submission queues are crea=
-ted.
->> From this point SPDK polls both queues. Then, the DMA region where the
->> submission queue lies is removed (VFIO_IOMMU_UNMAP_DMA) and then re-adde=
-d at the
->> same IOVA but at a different offset. SPDK crashes soon after as it acces=
-ses
->> invalid memory. There is no other event (e.g. some PCI config space or N=
-VMe
->> register write) happening between unmapping and mapping the DMA region. =
-My guess
->> is that this behavior is legitimate and that this is solved in the VFIO =
-kernel
->> module by releasing the DMA region only after all references to it have =
-been
->> released, which is handled by vfio_pin/unpin_pages, correct? If this is =
-the case
->> then I suppose we need to implement the same logic in libmuser, but I ju=
-st want
->> to make sure I'm not missing anything as this is a substantial change.
->=20
-> The vfio_{pin,unpin}_pages() interface only comes into play for mdev
-> devices and even then it's an announcement that a given mapping is
-> going away and the vendor driver is required to release references.
-> For normal PCI device assignment, vfio-pci is (aside from a few quirks)
-> device agnostic and the IOMMU container mappings are independent of the
-> device.  We do not have any device specific knowledge to know if DMA
-> pages still have device references.  The user's unmap request is
-> absolute, it cannot fail (aside from invalid usage) and upon return
-> there must be no residual mappings or references of the pages.
->=20
-> If you say there's no config space write, ex. clearing bus master from
-> the command register, then something like turning on a vIOMMU might
-> cause a change in the entire address space accessible by the device.
-> This would cause the identity map of IOVA to GPA to be replaced by a
-> new one, perhaps another identity map if iommu=3Dpt or a more restricted
-> mapping if the vIOMMU is used for isolation.
->=20
-> It sounds like you have an incomplete device model, physical devices
-> have their address space adjusted by an IOMMU independent of, but
-> hopefully in collaboration with a device driver.  If a physical device
-> manages to bridge this transition, do what it does.  Thanks,
-
-Hi,
-
-That's what we are trying to work out. IIUC, the problem we are having
-is that a mapping removal was requested but the device was still
-operational. We can surely figure out how to handle that gracefully,
-but I'm trying to get my head around how real hardware handles that.
-Maybe you can add some colour here. :)
-
-What happens when a device tries to write to a physical address that
-has no memory behind it? Is it an MCE of sorts?
-
-I haven't really ever looked at memory hot unplug in detail, but
-after reading some QEMU code this is my understanding:
-
-1) QEMU makes an ACPI request to the guest OS for mem unplug
-2) Guest OS acks that memory can be pulled out
-3) QEMU pulls the memory from the guest
-
-Before step 3, I'm guessing that QEMU tells all device backends that
-this memory is going away. I suppose that in normal operation, the
-Guest OS will have already stopped using the memory (ie. before step
-2), so there shouldn't be much to it. But I also suppose a malicious
-guest could go "ah, you want to remove this dimm? sure, let me just
-ask all these devices to start using it first... ok, there you go."
-
-Is this understanding correct?
-
-I don't think that's the case we're running into, though, but I think
-we need to consider it at this time. What's probably happening here is
-that the guest went from SeaBIOS to the kernel, a PCI reset happened
-and we didn't plumb that message through correctly. While we are at
-it, we should review the memory hot unplug business.
+Removed as it is in Paolo's PR.
 
 Thanks,
-Felipe
-
->=20
-> Alex
->=20
+Laurent
 
 
