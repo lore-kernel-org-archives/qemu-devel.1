@@ -1,92 +1,80 @@
 Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E53F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38675C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B5C206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:58:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04E95206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfQRWZwM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B5C206CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XIzp+5gi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04E95206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jssnC-0001Wt-1G
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43050)
+	id 1jssnT-00020I-B6
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43890)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsseW-0002rO-6y
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:49:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50573
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jssiP-0001pu-FU
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:53:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27902
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jsseU-0007tz-JZ
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:49:11 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jssiM-0008T7-Or
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:53:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594147749;
+ s=mimecast20190719; t=1594147990;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mcIBbbNp6MkqqzKMP2EUPSx/4Lp2CssnF6segfvEJiY=;
- b=hfQRWZwMzbEGjCxeLho9tejTXuHYUgrAfvMTdlTtUgiHZ13OvphS9THcpa//35C5nA1rep
- 49bH5Clw+vSouyW2g2lKiI8/vjJ0XiZDjaa+0IUGbW/gqZX44J/qIwGUsD3D/9mMJRdq2u
- NHfga8M1qFJLJ2FYZ5/61Bvfhp2qJ4o=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-R3yv1P3RNlO6hAVzj2U8ow-1; Tue, 07 Jul 2020 14:49:06 -0400
-X-MC-Unique: R3yv1P3RNlO6hAVzj2U8ow-1
-Received: by mail-ed1-f72.google.com with SMTP id da18so55198346edb.13
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:49:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mcIBbbNp6MkqqzKMP2EUPSx/4Lp2CssnF6segfvEJiY=;
- b=eMkz5vDMMujTVsegGI0pcRTpyeINND6sOAlFQPpJCcYMhjaKhG7SnATLSi+02s7IES
- sMHyVVyRi8qJiyJB47L2EV4u4zeZfmuSB1+4eRKdD5mvbHkDsBnVU5utp4/exuCBjnjf
- OIa0Vgcg1ZmARBvh40coFCPckHKRtPCDw8AhUEa6Cz1gFqv5iU5IbnL6dPj/WOyfkktu
- hKJBOUv3VPzkCbrMp2CGprlRLFvPz5714xI9v+wP4W3gnz9hDQrlNljtUDE2UNswGn2y
- SsWK1xf314fkmeRfWUfYYeqiXTfWPOZbbZRbge6onLvSwnK6UwHc+lFyhHF8ASRqTEfQ
- VoyA==
-X-Gm-Message-State: AOAM531etfVtfWWkNNZIiIioLUGexJ718FIp3EupzIFyTqk91FqM9NXB
- mYTV2lKafx1m2plmBKEQQ6TU1W6isaJb9kYyFNVvd3HHtAb057P8hLkrcKvIq1qn8Y1i8ZAAUtY
- LfJR4V4FIHjy3qlim8TYzMeSco7YEjzo=
-X-Received: by 2002:a17:906:7d90:: with SMTP id
- v16mr22612051ejo.27.1594147745111; 
- Tue, 07 Jul 2020 11:49:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnP3yibEgJDYoBhejsCgeq5BfHnfa5qyyeNilP8HfDm21Zro9e7Z36QVBAVFlTqG3SohJVxotM2BSQoYBOqlM=
-X-Received: by 2002:a17:906:7d90:: with SMTP id
- v16mr22612039ejo.27.1594147744918; 
- Tue, 07 Jul 2020 11:49:04 -0700 (PDT)
+ bh=P2nrkPBSg7lKn7Db+eLD8ivJZ2CITjUcGCMtuRpONqg=;
+ b=XIzp+5giJwOYTNnfwcmdWhZE13Gkx/6qAwtgOVs90d0j2qaMpSGduwHC5kKUyTsM6YJ+hJ
+ qYIpeOeAP0AoKL+ULV2rUXM5Xp65wPzVrVAw15aIyb4vnV5p0nYn9aziv0XdmPNmys04gg
+ ePcm9/UjB97BC2SyB4jpXoXm1Uy6xg8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-495-Wt_SiSRhOAuuW8c8FQiGcQ-1; Tue, 07 Jul 2020 14:52:53 -0400
+X-MC-Unique: Wt_SiSRhOAuuW8c8FQiGcQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 297121B18BC7;
+ Tue,  7 Jul 2020 18:52:51 +0000 (UTC)
+Received: from [10.3.115.46] (ovpn-115-46.phx2.redhat.com [10.3.115.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A27A73FC5;
+ Tue,  7 Jul 2020 18:52:44 +0000 (UTC)
+Subject: Re: [PATCH v12 0/8] error: auto propagated local_err part I
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200707165037.1026246-1-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <bbfca52b-0732-1242-ca85-59713d125e26@redhat.com>
+Date: Tue, 7 Jul 2020 13:52:43 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200706164155.24696-1-pbonzini@redhat.com>
- <CAFEAcA-F1FGde+=c3iS3wcRWG+i0RgYj5-jwafn0sX6EEYEsWA@mail.gmail.com>
- <CAFEAcA_9Yh02ecxuYR0cGJHkf1dzNT7ain7Nv01a+QL2wnrQAA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_9Yh02ecxuYR0cGJHkf1dzNT7ain7Nv01a+QL2wnrQAA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 7 Jul 2020 20:48:53 +0200
-Message-ID: <CABgObfZxSzbkdkY_qsLDwahz+6UegAiykuud38TJ7FPeUwAdxg@mail.gmail.com>
-Subject: Re: [PULL 00/53] Misc patches for QEMU 5.1 soft freeze
-To: Peter Maydell <peter.maydell@linaro.org>
+In-Reply-To: <20200707165037.1026246-1-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="0000000000000e47c905a9de72ae"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,9 +83,8 @@ X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,66 +97,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, groug@kaod.org,
+ Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000e47c905a9de72ae
-Content-Type: text/plain; charset="UTF-8"
+On 7/7/20 11:50 AM, Markus Armbruster wrote:
+> To speed things up, I'm taking the liberty to respin Vladimir's series
+> with my documentation amendments.
+> 
+> After my documentation work, I'm very much inclined to rename
+> ERRP_AUTO_PROPAGATE() to ERRP_GUARD().  The fact that it propagates
+> below the hood is detail.  What matters to its users is that it lets
+> them use @errp more freely.  Thoughts?
 
-Il mar 7 lug 2020, 20:42 Peter Maydell <peter.maydell@linaro.org> ha
-scritto:
+I like it - the shorter name is easier to type.
 
-> Also it broke my working tree, in the sense that when I
-> rolled back to current master incremental-rebuild didn't
-> work but instead failed with:
->
-> make: *** No rule to make target '/home/ubuntu/qemu/Kconfig', needed
-> by 'aarch64-softmmu/config-devices.mak'.  Stop.
->
+(The rename is a mechanical change, so if we agree to it, we should do 
+it up front to minimize the churn to all the functions where we add use 
+of the macro)
 
-The latter is unfortunately expected. I am curious about the s390 failure
-and especially the x86 link failure which might be a semantic conflict. I
-will try to reproduce them locally.
+> 
+> Based-on: Message-Id: <20200707160613.848843-1-armbru@redhat.com>
+> 
+> Available from my public repository https://repo.or.cz/qemu/armbru.git
+> on branch error-auto.
+> 
+> v12: (based on "[PATCH v4 00/45] Less clumsy error checking")
+> 01: Comments merged properly with recent commit "error: Document Error
+> API usage rules", and edited for clarity.  Put ERRP_AUTO_PROPAGATE()
+> before its helpers, and touch up style.
+> 01-08: Commit messages tweaked
+> 
 
-Paolo
-
->
-> thanks
-> -- PMM
->
->
-
---0000000000000e47c905a9de72ae
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il mar 7 lug 2020, 20:42 Peter Maydell &lt;<a href=3D"=
-mailto:peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; ha scritt=
-o:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
-rder-left:1px #ccc solid;padding-left:1ex">Also it broke my working tree, i=
-n the sense that when I<br>
-rolled back to current master incremental-rebuild didn&#39;t<br>
-work but instead failed with:<br>
-<br>
-make: *** No rule to make target &#39;/home/ubuntu/qemu/Kconfig&#39;, neede=
-d<br>
-by &#39;aarch64-softmmu/config-devices.mak&#39;.=C2=A0 Stop.<br></blockquot=
-e></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">The latter is u=
-nfortunately expected. I am curious about the s390 failure and especially t=
-he x86 link failure which might be a semantic conflict. I will try to repro=
-duce them locally.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo=
-</div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gma=
-il_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-lef=
-t:1ex">
-<br>
-thanks<br>
--- PMM<br>
-<br>
-</blockquote></div></div></div>
-
---0000000000000e47c905a9de72ae--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
