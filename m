@@ -2,95 +2,88 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 586AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F5FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22174206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:11:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A0CD206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BFD6pV2k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22174206DF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AD2Se/Fz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A0CD206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtII2-0005Sm-BZ
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:11:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36890)
+	id 1jtIIA-0005od-60
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:11:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jtHkc-000510-7M
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:37:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50777
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHkm-0005AA-RR
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:37:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20434
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jtHkX-0003K3-Pd
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:37:08 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHkk-0003Ke-VA
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:37:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594244222;
+ s=mimecast20190719; t=1594244236;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UuAdTDv+dUPrs6AoSqoCsiFBVr4wGjrphEtfpnHhCR4=;
- b=BFD6pV2kMlpVWAyLzSwlM7eH4BnXN7YfiLcwttwKbbHMT6d4cvb6jaXtMUpAql/f1a8CZA
- nsJ4fE7g1csWjrFffLwCVMOegwSd4fx3KgAddATbY1nibH20XKTnLLOPFaVX2kIitp7/3q
- gvr1xDNA81PpVeTizJ8a1IKjvO9U+ec=
+ bh=nwtEnvGM0KUGrkSlt/EYsca1fPXadzeawI4DMdJ6CBc=;
+ b=AD2Se/FzK8Mbn9O039sxNlbdLlojqe7m9aD+UFWd6uXNiodi0uzmmOcWHfJgnChi/w5ZfU
+ YKXLQYOSRDTWVLe9R+D6MffrIetYXMxFfhhMatov0FUCrPJK7fuj0Golfop0A0TT0aTwKH
+ tZDKceFTgQoPLLpwkBWAb/O0nHeGlZk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-dAW7sxZcMbGcfPTp7gCcpg-1; Wed, 08 Jul 2020 13:36:23 -0400
-X-MC-Unique: dAW7sxZcMbGcfPTp7gCcpg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-108-kb3BZbOlOT6UUHp9k8RMsg-1; Tue, 07 Jul 2020 17:25:19 -0400
+X-MC-Unique: kb3BZbOlOT6UUHp9k8RMsg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EE8819253C2;
- Wed,  8 Jul 2020 17:36:22 +0000 (UTC)
-Received: from localhost (ovpn-116-140.rdu2.redhat.com [10.10.116.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B6E011A7CA;
- Wed,  8 Jul 2020 17:36:21 +0000 (UTC)
-Date: Wed, 8 Jul 2020 13:36:20 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] cpu: Add starts_halted() method
-Message-ID: <20200708173620.GB780932@habkost.net>
-References: <20200707204333.261506-1-bauerman@linux.ibm.com>
- <20200707214917.GX7276@habkost.net>
- <87y2nu3nxq.fsf@morokweng.localdomain>
- <c53b36b7-ee7b-bb66-8220-cce788fd631d@redhat.com>
- <20200708100038.GG18595@umbus.fritz.box>
- <CAFEAcA9V7Uha9-rz+JY-5HkazCWuTk1vkLnw1m9Lw-bXXKbkvw@mail.gmail.com>
- <20200708152540.GZ7276@habkost.net>
- <CAFEAcA8mFM-O=mgCQHNz4TNB5N3Trid2o95s0Nx7JVp_q_dSrw@mail.gmail.com>
- <20200708160316.GA7276@habkost.net>
- <CAFEAcA89ueUQuVPC9O9xqbBBDEzdXmbCLL69OHvk0MJ=VvSnbw@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28A7F1005510;
+ Tue,  7 Jul 2020 21:25:18 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C6E1910013C2;
+ Tue,  7 Jul 2020 21:25:17 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7C75A11275F7; Tue,  7 Jul 2020 23:25:04 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 29/53] qom: Use returned bool to check for failure, manual part
+Date: Tue,  7 Jul 2020 23:24:39 +0200
+Message-Id: <20200707212503.1495927-30-armbru@redhat.com>
+In-Reply-To: <20200707212503.1495927-1-armbru@redhat.com>
+References: <20200707212503.1495927-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA89ueUQuVPC9O9xqbBBDEzdXmbCLL69OHvk0MJ=VvSnbw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,58 +96,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Thiago Jung Bauermann <bauerman@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 08, 2020 at 06:09:49PM +0100, Peter Maydell wrote:
-> On Wed, 8 Jul 2020 at 17:03, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >
-> > On Wed, Jul 08, 2020 at 04:32:51PM +0100, Peter Maydell wrote:
-> > > On Wed, 8 Jul 2020 at 16:25, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > > On Wed, Jul 08, 2020 at 02:14:03PM +0100, Peter Maydell wrote:
-> > > > > The original bug as described in the commit message sounds
-> > > > > to me like something we should look to fix in the implementation
-> > > > > of async_run_on_cpu() -- it shouldn't cause a CPU that's halfway
-> > > > > through reset to do a KVM_RUN or otherwise run guest code,
-> > > > > whether that CPU is going to start powered-up or powered-down.
-> > > >
-> > > > What "halfway through reset" means, exactly?  Isn't halted==1
-> > > > enough to indicate the CPU is in that state?
-> > >
-> > > I mean "while we're in the middle of the CPU method that's
-> > > called by cpu_reset()". "halted==1" says "the CPU is halted";
-> > > that's not the same thing. KVM_RUN happening
-> > > as a side effect in the middle of that code is a bug
-> > > whether the CPU happens to be intended to be put into the
-> > > halted state or not. If the CPU is intended to be created
-> > > not-halted then KVM_RUN can happen after cpu reset
-> > > completes, but not before.
-> >
-> > Wait, I thought we already had mechanisms to prevent that from
-> > happening.  Otherwise, it would never be safe for cpu_reset() to
-> > touch the CPU registers.
-> 
-> Exactly. It appears that there's a bug in our mechanisms,
-> which is why I'm suggesting that the right thing is
-> to fix that bug rather than marking the CPU as halted
-> earlier in the reset process so that the KVM_RUN happens
-> to do nothing...
+The previous commit used Coccinelle to convert from checking the Error
+object to checking the return value.  Convert a few more manually.
 
-I agree this is necessary, but it doesn't seem sufficient.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20200707160613.848843-30-armbru@redhat.com>
+---
+ hw/core/bus.c              |  6 +-----
+ hw/core/qdev.c             |  7 +------
+ hw/s390x/s390-virtio-ccw.c | 13 +++++++------
+ 3 files changed, 9 insertions(+), 17 deletions(-)
 
-Having cpu_reset() set halted=0 on spapr (and probably other
-machines) is also a bug, as it could still trigger unwanted
-KVM_RUN when cpu_reset() returns (and before machine code sets
-halted=1).
-
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index 00d1d31762..6b987b6946 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -166,11 +166,7 @@ BusState *qbus_create(const char *typename, DeviceState *parent, const char *nam
+ 
+ bool qbus_realize(BusState *bus, Error **errp)
+ {
+-    Error *err = NULL;
+-
+-    object_property_set_bool(OBJECT(bus), "realized", true, &err);
+-    error_propagate(errp, err);
+-    return !err;
++    return object_property_set_bool(OBJECT(bus), "realized", true, errp);
+ }
+ 
+ void qbus_unrealize(BusState *bus)
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index d6416fb894..17bd8fc2ec 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -386,8 +386,6 @@ void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+  */
+ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
+ {
+-    Error *err = NULL;
+-
+     assert(!dev->realized && !dev->parent_bus);
+ 
+     if (bus) {
+@@ -396,10 +394,7 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
+         assert(!DEVICE_GET_CLASS(dev)->bus_type);
+     }
+ 
+-    if (!object_property_set_bool(OBJECT(dev), "realized", true, &err)) {
+-        error_propagate(errp, err);
+-    }
+-    return !err;
++    return object_property_set_bool(OBJECT(dev), "realized", true, errp);
+ }
+ 
+ /*
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 1a171f0c96..20e8e95c61 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -69,19 +69,20 @@ static S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id,
+ {
+     S390CPU *cpu = S390_CPU(object_new(typename));
+     Error *err = NULL;
++    S390CPU *ret = NULL;
+ 
+     if (!object_property_set_int(OBJECT(cpu), "core-id", core_id, &err)) {
+         goto out;
+     }
+-    qdev_realize(DEVICE(cpu), NULL, &err);
++    if (!qdev_realize(DEVICE(cpu), NULL, &err)) {
++        goto out;
++    }
++    ret = cpu;
+ 
+ out:
+     object_unref(OBJECT(cpu));
+-    if (err) {
+-        error_propagate(errp, err);
+-        cpu = NULL;
+-    }
+-    return cpu;
++    error_propagate(errp, err);
++    return ret;
+ }
+ 
+ static void s390_init_cpus(MachineState *machine)
 -- 
-Eduardo
+2.26.2
 
 
