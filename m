@@ -2,81 +2,77 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4558BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FBDC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:33:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 110992073E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:30:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D62442075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJK/P/uo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 110992073E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hiHjoYvK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D62442075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsrQi-00055x-Ak
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 13:30:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51952)
+	id 1jsrTN-0006Lu-6W
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 13:33:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsrPu-0004Q1-QF; Tue, 07 Jul 2020 13:30:02 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:40046)
+ id 1jsrSq-0005vH-3h; Tue, 07 Jul 2020 13:33:04 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:38786)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jsrPt-0003yb-1N; Tue, 07 Jul 2020 13:30:02 -0400
-Received: by mail-io1-xd41.google.com with SMTP id q8so44051978iow.7;
- Tue, 07 Jul 2020 10:30:00 -0700 (PDT)
+ id 1jsrSo-0004eP-DX; Tue, 07 Jul 2020 13:33:03 -0400
+Received: by mail-il1-x141.google.com with SMTP id s21so21560448ilk.5;
+ Tue, 07 Jul 2020 10:33:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=rLt3e0hI/eZ5dLp6vWtmVMpb8Frs6XxfQeKeBZLZRzw=;
- b=bJK/P/uoxKmXyTxi4pW5KCk5nXWaYV76z9vWTiDAbrs8FqhikFEk/tvz/P6XUuCzYc
- R3vS8qlxXGLKL+bgjPfO3rxN6bMFto7QgbzaTCqGaDjLDf8XInMs+9QWRK6hBPCct9Wf
- 7PFa2o6J9xCgZJzOb14AImfJeclJtpFgBhWkuHTihBgSxiLqGJ9Xi8c8oEgPnt9eviRm
- WRi24L29awdJnzyKcGsCjhaFjPkuA/z1jlxNs4GwptJ3j5QE6P4g2DO+eYrjh6l2GT25
- fDons5yfd7ZjlL3oo8PHbgeTTa8fcc/8uXYlZLN/OcyryF80T1tcCXILNtxNBdc8kk7R
- 1BFg==
+ :cc; bh=g9OwooJI0AmcpojJjAr6Vy6fVO8FPlaZL1UKue2QGKo=;
+ b=hiHjoYvK/Ael3g6o94XmWkoTM6tXhC1Acj6z2JON77EyTv6jwJGtP+3jnpUpCHLTDO
+ lAfN838nRJSHwXdkmRL2DdFgN3bn8+g5xW3HHdXh2tucIgwll5GAQJvU/GVJIm/3k22L
+ yB9Z2CuO28Qczqw83GxFpUv2pJRcwS0GzciEYoUIEhELnLy5udtb4baVlVVJfkj4ro2p
+ RU4/qeP2jlP0VzC5str9xmATvywbbKKM9ZdwGe+JdpQEkEpglWRWfpTE5tOnOQ4viS1E
+ gqjbIZTXhiBpSO7tfH68CjvDBbm75u+DqZqoqJSEXHhKy9M0IKDjdTLuowJFb/SvKUSe
+ PQRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=rLt3e0hI/eZ5dLp6vWtmVMpb8Frs6XxfQeKeBZLZRzw=;
- b=nlv6q58aBNZpHD+oIwUMv6pDkaQ4ZPftHc8CY5itkIBECAz8QehnVIGMlcmVQJWUNe
- iUL795PvsmhYQhENVUkHd4N04heAB12oLz7ggyrSY0FuTDtdyEZDxQgtbxZ0tm9mNXX6
- /j92Ih7uWMiSDi5CMx9HxKcIDBB7dIzZnSoYDmZ1qMGmbpYOftHe6QOPNmEHqYN51aOH
- QOQdK1Pnk/7pNQnRjstuKkLxsyl9A5kjuebzuMvl704JHjDCK3Iq9R3tZlnkGJfCX4EE
- uAmopsLr+CmgNrDpIf1ws66z63QUB0TEM2+/3cUJ+gQFeLUDukzXH/uZNGB1LtoeBdyA
- LXMw==
-X-Gm-Message-State: AOAM531TsNErB5QyMj21v64j4BodX1h7yQa5nUHSPVsVu68OGR665zkf
- WTuUdQdhQuQ5scu3DM3Nc4pq/JCb/Klk0mkOiWA=
-X-Google-Smtp-Source: ABdhPJzP7MBZZcXgpvh/HhqUwjyTNHJZz9JuYZdadHXiUvFHKIxmlTn7bEzMrtM3AMotOzgqwMSfddN3HSYc9A2ABEU=
-X-Received: by 2002:a6b:8dd1:: with SMTP id
- p200mr32366991iod.118.1594142999622; 
- Tue, 07 Jul 2020 10:29:59 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=g9OwooJI0AmcpojJjAr6Vy6fVO8FPlaZL1UKue2QGKo=;
+ b=qPgfVCdcG8gu3zw3CYoSuZoNI1F5QPPC/ZCoxuxE/gcz3Mal7+CQ/AUj+al1qViuKF
+ Cx8EBPKP7RxGyBfjiJGuqOdPKcZoMVwe22BztL1Mx9UdF4Lukj/HeLvIq+0ISC6hcAt5
+ NiphsLRxoqz3N0YtzOx2DN1o7P4m4zZ0BlzJqtNiD0Wmtejz13lWIlQJevoKYsgSVP8V
+ fe3v4L1hro+otoisE0CQsgH9MEvV9GVMh9kh6GLbM+XKwCwC0NfiWFMd9JOKZSQ/Z3vA
+ 84BFmHUDUbekPn4gDUcsgBOx1AsNs++jzgZ7hzoLAjSP+mMv2rbsdQjJjzVeNZtdwyi7
+ RGiw==
+X-Gm-Message-State: AOAM530pvTgcSNGuDKtmhNE8GYU/YUxm6qV5XkugYAoKbATH5ukVnrRD
+ uwKa6d/zpAKGPAoCzzGm7T2F1sqnoPDSzPOY6hg=
+X-Google-Smtp-Source: ABdhPJzyGXuAQ+2VHVNSdz9SNVBY/rdkhlMGjookpzlGVnDLjHGHvfOXT7eojeFRyrxo55XPxTUcEOpIBSXYGnmhUPo=
+X-Received: by 2002:a92:c213:: with SMTP id j19mr37607448ilo.40.1594143180983; 
+ Tue, 07 Jul 2020 10:33:00 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1593547870.git.alistair.francis@wdc.com>
- <bd1e09bc3c721bf92e3f0e3e260d0f548acbce8f.1593547870.git.alistair.francis@wdc.com>
- <3e856aa3-9142-feae-3259-3936b47bef17@amsat.org>
-In-Reply-To: <3e856aa3-9142-feae-3259-3936b47bef17@amsat.org>
+ <ea4f280e6f77e734c8e555e3c98d10085ce9f5b6.1593547870.git.alistair.francis@wdc.com>
+ <CAEUhbmVsQX+es-xw5Omj+-dsU1Km2kKNAZa_NJ6PipE4ZAEucA@mail.gmail.com>
+In-Reply-To: <CAEUhbmVsQX+es-xw5Omj+-dsU1Km2kKNAZa_NJ6PipE4ZAEucA@mail.gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 7 Jul 2020 10:20:11 -0700
-Message-ID: <CAKmqyKPgvDDhbG-qX-TO+xLLGwKyTYBqDTvmC=hY4WYABZPD7A@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] hw/char: Convert the Ibex UART to use the qdev
- Clock model
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 7 Jul 2020 10:23:12 -0700
+Message-ID: <CAKmqyKPDUVCVcm8d8bAqr=M_atAgfsFSAMhv6DZ5hOC5aAUHXQ@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] target/riscv: Regen floating point rounding mode
+ in dynamic mode
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -99,8 +95,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
  Palmer Dabbelt <palmer@dabbelt.com>,
  Alistair Francis <alistair.francis@wdc.com>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
@@ -108,133 +103,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 3, 2020 at 12:42 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
+On Thu, Jul 2, 2020 at 6:25 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> +Damien
->
-> On 6/30/20 10:12 PM, Alistair Francis wrote:
-> > Conver the Ibex UART to use the recently added qdev-clock functions.
->
-> Yeah! This is our first user \o/
-
-:)
-
->
+> On Wed, Jul 1, 2020 at 4:23 AM Alistair Francis
+> <alistair.francis@wdc.com> wrote:
 > >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  include/hw/char/ibex_uart.h |  2 ++
-> >  hw/char/ibex_uart.c         | 19 ++++++++++++++++++-
-> >  2 files changed, 20 insertions(+), 1 deletion(-)
+> > When a guest specificies the the rounding mode should be dynamic 0b111
+> > then we want to re-caclulate the rounding mode on each instruction. The
+> > gen_helper_set_rounding_mode() function will correctly check the
+> > rounding mode and handle a dynamic rounding, we just need to make sure
+> > it's always called if dynamic rounding is selected.
 > >
-> > diff --git a/include/hw/char/ibex_uart.h b/include/hw/char/ibex_uart.h
-> > index 2bec772615..322bfffd8b 100644
-> > --- a/include/hw/char/ibex_uart.h
-> > +++ b/include/hw/char/ibex_uart.h
-> > @@ -101,6 +101,8 @@ typedef struct {
-> >      uint32_t uart_val;
-> >      uint32_t uart_timeout_ctrl;
-> >
-> > +    Clock *f_clk;
-> > +
-> >      CharBackend chr;
-> >      qemu_irq tx_watermark;
-> >      qemu_irq rx_watermark;
-> > diff --git a/hw/char/ibex_uart.c b/hw/char/ibex_uart.c
-> > index 45cd724998..f967e6919a 100644
-> > --- a/hw/char/ibex_uart.c
-> > +++ b/hw/char/ibex_uart.c
-> > @@ -28,6 +28,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "hw/char/ibex_uart.h"
-> >  #include "hw/irq.h"
-> > +#include "hw/qdev-clock.h"
-> >  #include "hw/qdev-properties.h"
-> >  #include "migration/vmstate.h"
-> >  #include "qemu/log.h"
-> > @@ -330,7 +331,7 @@ static void ibex_uart_write(void *opaque, hwaddr ad=
-dr,
-> >          }
-> >          if (value & UART_CTRL_NCO) {
-> >              uint64_t baud =3D ((value & UART_CTRL_NCO) >> 16);
+> > Fixes: 1885350 ("RISCV dynamic rounding mode is not behaving correctly")
 >
-> UART_CTRL_NCO is defined as:
->
->   #define UART_CTRL_NCO           (0xFFFF << 16)
->
-> Note for later, convert to the clearer registerfields API?
+> I can't find this commit id.
 
-Done, I have added a patch to do this.
-
->
-> > -            baud *=3D 1000;
-> > +            baud *=3D clock_get_hz(s->f_clk);
-> >              baud >>=3D 20;
-> >
-> >              s->char_tx_time =3D (NANOSECONDS_PER_SECOND / baud) * 10;
-> > @@ -385,6 +386,18 @@ static void ibex_uart_write(void *opaque, hwaddr a=
-ddr,
-> >      }
-> >  }
-> >
-> > +static void ibex_uart_clk_update(void *opaque)
-> > +{
-> > +    IbexUartState *s =3D opaque;
-> > +
-> > +    /* recompute uart's speed on clock change */
-> > +    uint64_t baud =3D ((s->uart_ctrl & UART_CTRL_NCO) >> 16);
-> > +    baud *=3D clock_get_hz(s->f_clk);
-> > +    baud >>=3D 20;
->
-> Maybe worth to extract:
->
->   uint64_t ibex_uart_get_baud(IbexUartState *s)
->   {
->        uint64_t baud;
->
->        baud =3D ((s->uart_ctrl & UART_CTRL_NCO) >> 16);
->        baud *=3D clock_get_hz(s->f_clk);
->        baud >>=3D 20;
->
->        return baud;
->   }
-
-Done.
-
->
-> > +
-> > +    s->char_tx_time =3D (NANOSECONDS_PER_SECOND / baud) * 10;
-> > +}
-> > +
-> >  static void fifo_trigger_update(void *opaque)
-> >  {
-> >      IbexUartState *s =3D opaque;
-> > @@ -444,6 +457,10 @@ static void ibex_uart_init(Object *obj)
-> >  {
-> >      IbexUartState *s =3D IBEX_UART(obj);
-> >
-> > +    s->f_clk =3D qdev_init_clock_in(DEVICE(obj), "f_clock",
-> > +                                  ibex_uart_clk_update, s);
-> > +    clock_set_hz(s->f_clk, 50000000);
->
-> Can you add a definition for this 50 MHz value:
-
-Done.
-
->
-> Otherwise:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Thanks!
+It's a launchpad bug case: https://bugs.launchpad.net/qemu/+bug/1885350
 
 Alistair
 
 >
-> > +
-> >      sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->tx_watermark);
-> >      sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->rx_watermark);
-> >      sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->tx_empty);
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/translate.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > >
 >
+> Regards,
+> Bin
 
