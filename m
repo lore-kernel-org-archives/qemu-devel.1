@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A38C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 243CEC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:53:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0BE920708
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:52:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDBB520708
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:53:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dk4/KnyY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0BE920708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dYjWzQzG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDBB520708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtHz4-00030O-UX
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:52:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34352)
+	id 1jtI0G-0005Aw-5Z
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:53:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHc1-0000Qb-H9
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:28:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48583
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHf8-0004hA-Tb
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:31:30 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60349
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHby-00029E-E2
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:28:17 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHf7-0002bo-6J
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:31:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594243693;
+ s=mimecast20190719; t=1594243888;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AxrEBM3W1S+8AanFK4ANX96Ih7Meu1Llcm0KAxDX5CI=;
- b=Dk4/KnyYSLq1h2HoMSe0lUvTN5LEO2EBNBHLAg9hRAyexpNSrncuJRiniJmQwDlOBwG+AG
- uV8Ys67hO5epIzAFpmfcEorxCACtPKjQ5CUL/xnJrDib30MzQS8TsCj+ZM3TULvoGgmTel
- meVSjNTSpboGFyQk2joJcv6xuTYQZfY=
+ bh=B4bOWOA2GCPKzmHj5bguQDTbcnF2NXFQw18yndi9V3g=;
+ b=dYjWzQzG0f/lqXogWnv/vMbfUXdiJFPDvoz35+bp8vHoyK09lKVoA9YEVt1mee5Eobw237
+ u+OxEFpGSpdimyfOjYiTwoH4FUCZtZ9TVh9E31B230pf9wbPHxcl0fbwPr2yy6pWvgTD76
+ LDWWu+M+1G/m1xJC/h9xumqGXKozY9o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-9UZ4BdYDNBiiXpJApqiS2g-1; Tue, 07 Jul 2020 17:25:21 -0400
-X-MC-Unique: 9UZ4BdYDNBiiXpJApqiS2g-1
+ us-mta-177-fBP-uEwfMhebXTzuRMaigg-1; Tue, 07 Jul 2020 17:25:12 -0400
+X-MC-Unique: fBP-uEwfMhebXTzuRMaigg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C3A9100CCC0;
- Tue,  7 Jul 2020 21:25:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5460E100CCC1;
+ Tue,  7 Jul 2020 21:25:11 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D0E855C1D0;
- Tue,  7 Jul 2020 21:25:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 247A25C1D0;
+ Tue,  7 Jul 2020 21:25:11 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 809D911275F8; Tue,  7 Jul 2020 23:25:04 +0200 (CEST)
+ id 051E21141CC7; Tue,  7 Jul 2020 23:25:04 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 30/53] qom: Make functions taking Error ** return bool, not 0/-1
-Date: Tue,  7 Jul 2020 23:24:40 +0200
-Message-Id: <20200707212503.1495927-31-armbru@redhat.com>
+Subject: [PULL 12/53] qemu-option: Replace opt_set() by cleaner opt_validate()
+Date: Tue,  7 Jul 2020 23:24:22 +0200
+Message-Id: <20200707212503.1495927-13-armbru@redhat.com>
 In-Reply-To: <20200707212503.1495927-1-armbru@redhat.com>
 References: <20200707212503.1495927-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -74,17 +74,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,134 +102,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just for consistency.  Also fix the example in object_set_props()'s
-documentation.
+opt_set() frees its argument @value on failure.  Slightly unclean;
+functions ideally do nothing on failure.
+
+To tidy this up, move opt_create() from opt_set() into its callers,
+along with the cleanup.  Rename opt_set() to opt_validate(), noting
+its similarity to qemu_opts_validate().  Drop redundant parameter
+@opts; use opt->opts instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20200707160613.848843-31-armbru@redhat.com>
+Message-Id: <20200707160613.848843-13-armbru@redhat.com>
 ---
- include/qom/object.h | 28 +++++++++++-----------------
- qom/object.c         | 14 +++++++-------
- 2 files changed, 18 insertions(+), 24 deletions(-)
+ util/qemu-option.c | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 189f8ecbf6..04271ea5de 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -729,15 +729,13 @@ void object_apply_compat_props(Object *obj);
-  *   Error *err = NULL;
-  *   Object *obj = ...get / create object...;
-  *
-- *   obj = object_set_props(obj,
-- *                          &err,
-- *                          "share", "yes",
-- *                          "mem-path", "/dev/shm/somefile",
-- *                          "prealloc", "yes",
-- *                          "size", "1048576",
-- *                          NULL);
-- *
-- *   if (!obj) {
-+ *   if (!object_set_props(obj,
-+ *                         &err,
-+ *                         "share", "yes",
-+ *                         "mem-path", "/dev/shm/somefile",
-+ *                         "prealloc", "yes",
-+ *                         "size", "1048576",
-+ *                         NULL)) {
-  *     error_reportf_err(err, "Cannot set properties: ");
-  *   }
-  *   </programlisting>
-@@ -746,11 +744,9 @@ void object_apply_compat_props(Object *obj);
-  * The returned object will have one stable reference maintained
-  * for as long as it is present in the object hierarchy.
-  *
-- * Returns: -1 on error, 0 on success
-+ * Returns: %true on success, %false on error.
-  */
--int object_set_props(Object *obj,
--                     Error **errp,
--                     ...) QEMU_SENTINEL;
-+bool object_set_props(Object *obj, Error **errp, ...) QEMU_SENTINEL;
- 
- /**
-  * object_set_propv:
-@@ -760,11 +756,9 @@ int object_set_props(Object *obj,
-  *
-  * See object_set_props() for documentation.
-  *
-- * Returns: -1 on error, 0 on success
-+ * Returns: %true on success, %false on error.
-  */
--int object_set_propv(Object *obj,
--                     Error **errp,
--                     va_list vargs);
-+bool object_set_propv(Object *obj, Error **errp, va_list vargs);
- 
- /**
-  * object_initialize:
-diff --git a/qom/object.c b/qom/object.c
-index 25c5ddb78f..97c4e0af07 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -557,7 +557,7 @@ bool object_initialize_child_with_propsv(Object *parentobj,
-     object_initialize(childobj, size, type);
-     obj = OBJECT(childobj);
- 
--    if (object_set_propv(obj, errp, vargs) < 0) {
-+    if (!object_set_propv(obj, errp, vargs)) {
-         goto out;
-     }
- 
-@@ -752,7 +752,7 @@ Object *object_new_with_propv(const char *typename,
-     }
-     obj = object_new_with_type(klass->type);
- 
--    if (object_set_propv(obj, errp, vargs) < 0) {
-+    if (!object_set_propv(obj, errp, vargs)) {
-         goto error;
-     }
- 
-@@ -780,12 +780,12 @@ Object *object_new_with_propv(const char *typename,
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 1023fe7527..d8233b3b35 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -516,36 +516,39 @@ static QemuOpt *opt_create(QemuOpts *opts, const char *name, char *value,
+     return opt;
  }
  
- 
--int object_set_props(Object *obj,
-+bool object_set_props(Object *obj,
-                      Error **errp,
-                      ...)
+-static void opt_set(QemuOpts *opts, const char *name, char *value,
+-                    bool prepend, bool *help_wanted, Error **errp)
++static bool opt_validate(QemuOpt *opt, bool *help_wanted,
++                         Error **errp)
  {
-     va_list vargs;
--    int ret;
-+    bool ret;
+-    QemuOpt *opt;
+     const QemuOptDesc *desc;
+     Error *local_err = NULL;
  
-     va_start(vargs, errp);
-     ret = object_set_propv(obj, errp, vargs);
-@@ -795,7 +795,7 @@ int object_set_props(Object *obj,
- }
- 
- 
--int object_set_propv(Object *obj,
-+bool object_set_propv(Object *obj,
-                      Error **errp,
-                      va_list vargs)
- {
-@@ -809,12 +809,12 @@ int object_set_propv(Object *obj,
-         g_assert(value != NULL);
-         if (!object_property_parse(obj, propname, value, &local_err)) {
-             error_propagate(errp, local_err);
--            return -1;
-+            return false;
+-    desc = find_desc_by_name(opts->list->desc, name);
+-    if (!desc && !opts_accepts_any(opts)) {
+-        g_free(value);
+-        error_setg(errp, QERR_INVALID_PARAMETER, name);
+-        if (help_wanted && is_help_option(name)) {
++    desc = find_desc_by_name(opt->opts->list->desc, opt->name);
++    if (!desc && !opts_accepts_any(opt->opts)) {
++        error_setg(errp, QERR_INVALID_PARAMETER, opt->name);
++        if (help_wanted && is_help_option(opt->name)) {
+             *help_wanted = true;
          }
-         propname = va_arg(vargs, char *);
+-        return;
++        return false;
      }
  
--    return 0;
+-    opt = opt_create(opts, name, value, prepend);
+     opt->desc = desc;
+     qemu_opt_parse(opt, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        qemu_opt_del(opt);
++        return false;
+     }
++
 +    return true;
  }
  
+ void qemu_opt_set(QemuOpts *opts, const char *name, const char *value,
+                   Error **errp)
+ {
+-    opt_set(opts, name, g_strdup(value), false, NULL, errp);
++    QemuOpt *opt = opt_create(opts, name, g_strdup(value), false);
++
++    if (!opt_validate(opt, NULL, errp)) {
++        qemu_opt_del(opt);
++    }
+ }
  
+ void qemu_opt_set_bool(QemuOpts *opts, const char *name, bool val,
+@@ -817,9 +820,9 @@ static void opts_do_parse(QemuOpts *opts, const char *params,
+                           const char *firstname, bool prepend,
+                           bool *help_wanted, Error **errp)
+ {
+-    Error *local_err = NULL;
+     char *option, *value;
+     const char *p;
++    QemuOpt *opt;
+ 
+     for (p = params; *p;) {
+         p = get_opt_name_value(p, firstname, &option, &value);
+@@ -831,10 +834,10 @@ static void opts_do_parse(QemuOpts *opts, const char *params,
+             continue;
+         }
+ 
+-        opt_set(opts, option, value, prepend, help_wanted, &local_err);
++        opt = opt_create(opts, option, value, prepend);
+         g_free(option);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (!opt_validate(opt, help_wanted, errp)) {
++            qemu_opt_del(opt);
+             return;
+         }
+     }
 -- 
 2.26.2
 
