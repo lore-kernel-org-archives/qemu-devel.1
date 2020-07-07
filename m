@@ -2,88 +2,96 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3CEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 02:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A96BAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 02:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56C16206E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 02:08:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74C992070C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 02:09:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TfSt0N1N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C16206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/HpK3Vc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74C992070C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsd28-0005ub-Jz
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 22:08:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54742)
+	id 1jsd2m-00070i-P5
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jul 2020 22:09:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcfaracco@gmail.com>)
- id 1jsd1N-0005Sq-Sw; Mon, 06 Jul 2020 22:07:45 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:35743)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsd2A-00064y-D0
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 22:08:34 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55977)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcfaracco@gmail.com>)
- id 1jsd1K-0005bb-7S; Mon, 06 Jul 2020 22:07:45 -0400
-Received: by mail-qt1-x843.google.com with SMTP id b25so9213599qto.2;
- Mon, 06 Jul 2020 19:07:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsd28-0005ga-KM
+ for qemu-devel@nongnu.org; Mon, 06 Jul 2020 22:08:34 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g75so41319259wme.5
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 19:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=YmRCz4CwArI7TD+I+EW3fguN01b3jj4dYKCICNEeHC4=;
- b=TfSt0N1N9W77+ZlljQ6gGaYzMJg2ImLigjRQfF2w2/MTEim/xEMIUVDY4k2JFoqgBc
- qewGHL4vNugZZVq5J6ySJLWpVjLBylJ99PqNKyp5WVsQ6Gbu/QGeHZGwYUxBmwrxt2JF
- OxoKprEP/9/gOpMbyrMqR11S1gW/appK77/jueYGBayCWGz/lWXFnNm4qejaYP9QNOgh
- DKIHvmEYeA0oyPJg2hamy28315Mh33GLATitz6oB2c9I8ugY7DhyB8/k4Wi9TgnVhlQ9
- 3cgFSqmluuQPbaCxylT3B5/hnM8ndf0m/aqieH6SRKzDGMd2xyVxwuCkd3EManYt6i6u
- VtkQ==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=mDcH6VoquFxrN55+jeRO1Hkb2P20kDXO0Hhj0jRCs1Q=;
+ b=R/HpK3VcXFE5WwsoGvXwzCs7U+7AVtoe/I3PHycbsXcJAUkDmoP4pSYfuEts2DffFz
+ 2mJgFfta/873onnpFivAGbQ8jsRo/Phb5NxwexnC5dYyK5rgjgBl7z3B6xgjMpP1pTja
+ yR7rNIQ0q4oAoJQdOhiJhCjrODhlbOogy0jgfKUdsz7Cf4hBuWkPN5xcbIPxTF2fMioB
+ RS+v/BBGFh1Tqa4dyrd3CmbQlM6PCiIn4TMQQCm+Knouyk9WbtH4mYMbUXga1fvTNYwa
+ 5eDHsF1Hdevq8V7NcP2X6mN/nqgssjenP/5xecwceu7rSYIq/RKMfEgHrMS4ZTe4AJbw
+ pJ2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=YmRCz4CwArI7TD+I+EW3fguN01b3jj4dYKCICNEeHC4=;
- b=YhQEcZQdymRogz80w8sZVnNRs4JuQm5SqRgDVnRTuKv+MTPrSOMJ5f0NG/ivnmXcQ0
- iqNVvbL5C1NRJ3tiUpa/Oe9kPhZW8LZqAMrcQ/SNv4+il9qHjOUH4Mjvo/k1HGu+PLV+
- +lk6F7a4Y2+Yu6Jx6bEx4QuMst8G1OLfL2o4mBEdgLmxmRTOwybJLHliQFjgYAhZdhFD
- ipRS8ZwCn3gudtwffOcW0j/CNFZ8ppDnChIMdBpT6tc9zOeJaRDjv31ykX8c5YtZ7ZT1
- XUwpE3ApgCUqi/qon1qkJi2Iz7q2ltiliCEOdCe+U8jt+U7rEYJ6BbsMDCFYnt6ykvhk
- tMAw==
-X-Gm-Message-State: AOAM530JiUDJKG0XsReibNMWWEwPBQRpheFWK27DZe6LC9ScCg+2VmI1
- uxPv+JAsult3WYzd+/fMdEilDQ+47rw=
-X-Google-Smtp-Source: ABdhPJz7mPRSBvkiD/TR4KVHXeuIjk50m84eEH8vtO6+mk4Zgmmc/pBPZsR+YTmTYEYdyMrvyyfv7g==
-X-Received: by 2002:ac8:4e03:: with SMTP id c3mr52498987qtw.82.1594087659942; 
- Mon, 06 Jul 2020 19:07:39 -0700 (PDT)
-Received: from localhost.localdomain ([177.188.126.13])
- by smtp.gmail.com with ESMTPSA id t36sm25323735qtj.58.2020.07.06.19.07.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jul 2020 19:07:39 -0700 (PDT)
-From: Julio Faracco <jcfaracco@gmail.com>
-To: qemu-riscv@nongnu.org
-Subject: [PATCH] riscv: Add OpenTitan Big Number (OTBN) device address
-Date: Mon,  6 Jul 2020 23:07:28 -0300
-Message-Id: <20200707020728.23420-1-jcfaracco@gmail.com>
-X-Mailer: git-send-email 2.25.1
+ bh=mDcH6VoquFxrN55+jeRO1Hkb2P20kDXO0Hhj0jRCs1Q=;
+ b=b4i861319cz+DJX2PuFGmt2Hz8ooy4nVNmP0c4SQL7AqgoagcMNkuNcstsI05K7JNp
+ z0P2TTKcLSEvE62CZWiH7kYqjVR9zCXDFDlbpFL3DWHzkzwzlS3xU9f2d16s0xCFjORH
+ 7qPHrU50evjtQ7UqTSoNSy1OnbrzxjDocjcnPwgn9v9GReswvIl3/sAbPhYRtT6nhIs/
+ hN7UaQOQ09C5dnmt2GyL2RiiIpq4vdQDa7YkfDhlRgPgr6+ek51rxr2sjQEnLeQYHyMz
+ vlY8zpK76pXCComs8OuU/sUr/cg72U0zrL5ZZLz03lm3JYyAI7VklYprnRw8kihZcqrx
+ fydw==
+X-Gm-Message-State: AOAM531d8Gh27wxoaQr8xfuvoGNzZkAm+lwQ4Dd4PiqxySoEahR9n+Gm
+ k5TsnZfRoz3RyjR8yx8585k=
+X-Google-Smtp-Source: ABdhPJzQwrvQBlcD/jrf3wd6FgO891+xRIJQQX3Ic2E4q2XhUYRMLP1mJzv+gEA8RHoYo21Ji9xGPg==
+X-Received: by 2002:a1c:a589:: with SMTP id o131mr1634755wme.12.1594087710626; 
+ Mon, 06 Jul 2020 19:08:30 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id d18sm27251016wrj.8.2020.07.06.19.08.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jul 2020 19:08:29 -0700 (PDT)
+Subject: Re: [PATCH] target/arm: Fix mtedesc for do_mem_zpz
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200706202345.193676-1-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d86be7e0-d73a-f10b-94be-1fb17a938563@amsat.org>
+Date: Tue, 7 Jul 2020 04:08:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200706202345.193676-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::843;
- envelope-from=jcfaracco@gmail.com; helo=mail-qt1-x843.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,60 +104,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- qemu-devel@nongnu.org, palmer@dabbelt.com, Alistair.Francis@wdc.com,
- Julio Faracco <jcfaracco@gmail.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit adds basics skecthes to implemente a OTBN unit.
-OTBN has address 0x50000000 and size 0x400000.
-For further reference, see OTBN docummentation:
-https://docs.opentitan.org/hw/ip/otbn/doc/
+On 7/6/20 10:23 PM, Richard Henderson wrote:
+> The mtedesc that was contructed was not actually passed in.
 
-Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
----
- hw/riscv/opentitan.c         | 5 ++++-
- include/hw/riscv/opentitan.h | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+Typo "constructed".
 
-diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
-index 19223e4c29..8a5d060b57 100644
---- a/hw/riscv/opentitan.c
-+++ b/hw/riscv/opentitan.c
-@@ -50,7 +50,8 @@ static const struct MemmapEntry {
-     [IBEX_ALERT_HANDLER] =  {  0x40130000,  0x10000 },
-     [IBEX_NMI_GEN] =        {  0x40140000,  0x10000 },
-     [IBEX_USBDEV] =         {  0x40150000,  0x10000 },
--    [IBEX_PADCTRL] =        {  0x40160000,  0x10000 }
-+    [IBEX_PADCTRL] =        {  0x40160000,  0x10000 },
-+    [IBEX_OTBN] =           {  0x50000000, 0x400000 }
- };
- 
- static void opentitan_board_init(MachineState *machine)
-@@ -183,6 +184,8 @@ static void lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-         memmap[IBEX_USBDEV].base, memmap[IBEX_USBDEV].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.padctrl",
-         memmap[IBEX_PADCTRL].base, memmap[IBEX_PADCTRL].size);
-+    create_unimplemented_device("riscv.lowrisc.ibex.otbn",
-+        memmap[IBEX_PADCTRL].base, memmap[IBEX_OTBN].size);
- }
- 
- static void lowrisc_ibex_soc_class_init(ObjectClass *oc, void *data)
-diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
-index 8f29b9cbbf..c739d44fbc 100644
---- a/include/hw/riscv/opentitan.h
-+++ b/include/hw/riscv/opentitan.h
-@@ -68,6 +68,7 @@ enum {
-     IBEX_NMI_GEN,
-     IBEX_USBDEV,
-     IBEX_PADCTRL,
-+    IBEX_OTBN,
- };
- 
- enum {
--- 
-2.25.1
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> Found by Coverity (CID 1429996).
+> 
+> Fixes: d28d12f008e
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-sve.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+> index 08f0fd15b2..88a2fb271d 100644
+> --- a/target/arm/translate-sve.c
+> +++ b/target/arm/translate-sve.c
+> @@ -5275,7 +5275,7 @@ static void do_mem_zpz(DisasContext *s, int zt, int pg, int zm,
+>          desc = FIELD_DP32(desc, MTEDESC, ESIZE, 1 << msz);
+>          desc <<= SVE_MTEDESC_SHIFT;
+>      }
+> -    desc = simd_desc(vsz, vsz, scale);
+> +    desc = simd_desc(vsz, vsz, desc | scale);
+>      t_desc = tcg_const_i32(desc);
+>  
+>      tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
+> 
 
 
