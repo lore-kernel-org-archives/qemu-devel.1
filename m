@@ -6,61 +6,59 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7EEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BDAC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:55:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45E13206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:54:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E13206DF
+	by mail.kernel.org (Postfix) with ESMTPS id DAFFB206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:55:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAFFB206DF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jslF3-0003Ty-HL
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:54:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36290)
+	id 1jslG2-0005Sa-4j
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:55:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36250)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jslDn-0001Kf-6e; Tue, 07 Jul 2020 06:53:07 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:56337)
+ id 1jslDl-0001IP-Ul; Tue, 07 Jul 2020 06:53:05 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:55691)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jslDl-0000MB-9q; Tue, 07 Jul 2020 06:53:06 -0400
+ id 1jslDk-0000M5-6l; Tue, 07 Jul 2020 06:53:05 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MqbI0-1kfJSl2I64-00mbHm; Tue, 07 Jul 2020 12:52:59 +0200
+ id 1Mt7Ll-1km6xX10Jt-00tU5b; Tue, 07 Jul 2020 12:52:58 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/7] trivial: Respect alphabetical order of .o files in
- Makefile.objs
-Date: Tue,  7 Jul 2020 12:52:50 +0200
-Message-Id: <20200707105255.362318-3-laurent@vivier.eu>
+Subject: [PULL 1/7] fix the prototype of muls64/mulu64
+Date: Tue,  7 Jul 2020 12:52:49 +0200
+Message-Id: <20200707105255.362318-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200707105255.362318-1-laurent@vivier.eu>
 References: <20200707105255.362318-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:caHFmPI/lW0jdW3g9PzSMiD2mqyDGyv8osdr8ngh5ARSGYKArjf
- 6iL+sSlNyiMNxNSkLkyhFKKDp4riHiRFYCodT9awDYaI1wIySFzE1x2aCM3EzvzkQ7VpLdU
- 3tmQqHMx8OOkcl1CUciA54pIHSv6wTSSfbEaMMmOTQy+9z2vTAEDuvv3pm6ZPmROQK8Dszy
- Y9M1DIq66KcZ2afQC2JJw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sZ2ylmb0Ies=:OYe5qlD+XsN50hjz+4xJZt
- y0+hCjy/g5xM4LWN8HYcA+3YgBZFt6KAxXMge4qooWMEC7X88kkf6W7cWMq/EAJurhrt5lDUn
- iCHvlpzsPPUYPCv3ou90hmj/Jfh9b83gbXtpKvFD9vplty4KHRMeaLqdsq3F+NoOjXh8QDCQm
- ED4awX3vWsUhKauDBlLnxGR5mqEBVgQQLMGKTVE6Ynea14/Urn2kjPckCZa+HHkf1MgExJ6Kz
- rU89CwYFoNmj1/1403ldbmWzaHopg6a9vQrHKcsvZPiixxU0wfTCiTBIc7jBlfCF364oiUmEA
- dnpFHp3SAeZIsmu7ENz7L8cIfOHahWOEWrAcsteu2lHmxpcsGKF8qefa/yB8J738CXenGrjhO
- W+kLUNCbriVaGulHZgdLCCbkCkr3kgRPJA7FcF8xrChbLgraaQANMK6ZCdwMpZKETd0kkFXUE
- S7aORzyE9/IjJkObM4MbmDjWv6Q/HaOs2KRk5t8BfmT8gNvgJNyS1pj7GB664K6547p13KWuH
- SJkfHbQdEzMPp5gezrL2HXmcmk/MFg82zeDMcQ5bnfNCuYJ1RZLgWtJYIxkf1ns3D58cx3VTU
- jfFDwH+rLLdGbjwGkOKRvTYBkBlKh6di/Qwai9LSMZGhF+eNdMRRq5MF/Q8TdqhTQ20TCrH6p
- vvbkdVJ5t+ACM0KJ6eJ+Wb3xIRpFltlMcpKt6dSV45dxDbaQxenxqrXMI9hhJrcIs6LRqYQ7e
- mkvkYp8NptaBqCvFMARAVVTyTbYu1NW/8QqcHB1zpBDKGpb64/j6IX4DLho+Qw70tzqv90Ahk
- dSREfOjot1yY0T3h0Pc2hlMUa3Tqqht4oLNqHrJwlOD6RoWm5uwV+rRb5XQmqYZvgWiQlZ7
+X-Provags-ID: V03:K1:BUoMo39jGy6GF1XgD/UoYfsWaDEFsIM0YiRFiPc1eU5F/G4+x8W
+ kxGOKjQif+7tZEB69NrdVmWuT2ZH3WFCMvJPLoDqjeR/lhuekrIRk79p6cvZXvkeV8mCOM0
+ uErjqvYTRv6mKAFUFgQCdXMm438Z8LYGXnWLk/VidyBslWD7DnxAHf/4SV7GgWhLLc+34YR
+ SAXaCbA7BuXaxPg+4dKLQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1BMuvl2WX5E=:+9ubi42N74bGBUvgEdXGmU
+ M3zCsGgFRMy3M61FVv0BK4yVsevSauq7fDHeK8xoQByZaEFHRzlAtdd7mFqOYIzNUimLlyRJF
+ nR1F07/bYOWurL3YNLHtQT62n7jCoDRxkfKaZlb0T4w0FurAtaUdvM0JFGQWIrA+uruG1uBOF
+ 8Njs97gF3iVnLNMsg7o983Ka9YR84hP+RIfSRO9wpAx+PGP+koSFN8uh0knz1x9TceQejK2kY
+ MDs+j+2BuKl6wa6hXU5djWShg7sV0a9UVJsMAepJaDEKj8d40T8cKWqCQgTFuhu96aYXSb6n0
+ 52w4f0RQTRQuRSjOIQHr9U3vPoM+bJDzZZL9DYRCloUY8oeXYpzjMMWx4DSeL57Qey/4EVZaw
+ ZsvYknJXN3SX/6jrhzA4G2ezLtkQHgXSnBiKDBVXJ8FdArBMYBhwBulCO4F9xhy9XnCgJk318
+ gKgRjbJweAfEN3Og75Wt+WFJSdp9HWZARMHQ5KtSak82JwWFwAtF3DfgTIjsj+Qg4VXa6D/e5
+ mHb3tt+IgPDDi3w6atFd5p3ftMgF6fKZK1pmJW1mslpSGD/h4mnLOU49O4jFQ1dKIEgsuJSBy
+ B6NV0wzLBoFtNZiEceLC7YvDKuM9hoLdrfnZqO/c1n8x0rm/oQNT/kNv02dgQ9M2GrT1qdSr7
+ Pz9BEXsO24SL/Pbq9R1ct8vs09D6XIrptF5rpezhxnVnOObqd9OpbV4tiSukkHvveOT3pUOP2
+ k1b2cuYXpHe22UJjy0hlvjjqGwkNkE3KLLBSqcZxWlIFibKDcu0y7bhxlW3zFP5BsQzS4Tlba
+ 08KXDGzUDrXRJ1d0kp1GhjhiBapsSlwCMgG4jIHOnjZj7mE+GaO/UN6JmW0GyK50vfu5xm4
 Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:53:02
@@ -82,43 +80,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Christophe de Dinechin <dinechin@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Lijun Pan <ljp@linux.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Christophe de Dinechin <dinechin@redhat.com>
+From: Lijun Pan <ljp@linux.ibm.com>
 
-The vmgenid.o is the only file that is not in alphabetical order.
+The prototypes of muls64/mulu64 in host-utils.h should match the
+definitions in host-utils.c
 
-Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200629094934.2081180-1-dinechin@redhat.com>
+Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+Message-Id: <20200701234344.91843-10-ljp@linux.ibm.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- stubs/Makefile.objs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/qemu/host-utils.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index f32b9e47a3d8..1df8bb3814fc 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -19,10 +19,10 @@ stub-obj-y += replay.o
- stub-obj-y += runstate-check.o
- stub-obj-$(CONFIG_SOFTMMU) += semihost.o
- stub-obj-y += set-fd-handler.o
--stub-obj-y += vmgenid.o
- stub-obj-y += sysbus.o
- stub-obj-y += tpm.o
- stub-obj-y += trace-control.o
-+stub-obj-y += vmgenid.o
- stub-obj-y += vmstate.o
- stub-obj-$(CONFIG_SOFTMMU) += win32-kbd-hook.o
+diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
+index 4cd170e6cd53..cdca2991d8a8 100644
+--- a/include/qemu/host-utils.h
++++ b/include/qemu/host-utils.h
+@@ -77,8 +77,8 @@ static inline int divs128(int64_t *plow, int64_t *phigh, int64_t divisor)
+     }
+ }
+ #else
+-void muls64(uint64_t *phigh, uint64_t *plow, int64_t a, int64_t b);
+-void mulu64(uint64_t *phigh, uint64_t *plow, uint64_t a, uint64_t b);
++void muls64(uint64_t *plow, uint64_t *phigh, int64_t a, int64_t b);
++void mulu64(uint64_t *plow, uint64_t *phigh, uint64_t a, uint64_t b);
+ int divu128(uint64_t *plow, uint64_t *phigh, uint64_t divisor);
+ int divs128(int64_t *plow, int64_t *phigh, int64_t divisor);
  
 -- 
 2.26.2
