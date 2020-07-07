@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95166C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:19:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 595A6C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:19:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63679206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:19:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23FE120675
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:19:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CsamUib+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63679206E2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SRv6DbNz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23FE120675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jshtI-0008RZ-Kd
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:19:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43624)
+	id 1jshtV-0000Wg-CJ
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:19:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshoI-0006hl-46
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:34 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:46644)
+ id 1jshjD-0004t6-Nt
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:19 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:44807)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshoG-0004rK-Fg
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:33 -0400
-Received: by mail-wr1-x430.google.com with SMTP id r12so43920459wrj.13
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:14:32 -0700 (PDT)
+ id 1jshjC-000464-4f
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:19 -0400
+Received: by mail-wr1-x433.google.com with SMTP id b6so43951047wrs.11
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:09:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QcDsGkNTaeJACoHN9Zi8eoA/LmcFjDZTuPYv9J/13u0=;
- b=CsamUib+kh/ukEfM4sBKp7U6RVCw/zg0f0XctfckiI3X9EwWY6vSgR9pyhzVh3E5Q/
- OmknDa8+3dY9kRH+CkJ4BaRqWBI9fau7TDaTLFkHWTHR32+C5LjjZoBbbmrjcJdaodw/
- RA38T2OjQRtN/OJV0CQD6MbF6GpBtmUnTImKX+It89XY+h2RT7dNOJGagzmorb0FqEvr
- QeVLSCPWhAvxMo0bGv2z67qB/k0f6WT2eUZF4v2tJUQ7QPCzw1Ri3i054qDvymZzNngn
- mlg+NeNsyX3as+yhNh50EYX4+qiiTEwICHrVZEUCCX1ArjSwdNZDLPrbj9HXQD1OKI3q
- EP5g==
+ bh=YDO/x/b94zhIGLCoE0QO5NlUEy4S35DFUXq1lVsSN7c=;
+ b=SRv6DbNzX+7Wwk1aRSvwZJ4D4Vy80rygPlGFJ+EXIu/mU/bLf6ZDyD0NuUjQdDURiG
+ 0lhv2N5UwoVhbqK66W68BcxWGIVPc0SeaZH72ZhmlSrDOcGhs58eAYJ4khg9OK/Pm1Qn
+ JenOKeGEY1vKxlmnoH5EC+zhG8rnzEgbJpt6cpxCvZZlAaJzJe4i66waKwpfAOnStRmV
+ aO0f8Ig/tD510En6s5ZLok2avf2bo/PBcl+qGYWUlpSFXKWQe4K7HCNFDX9iTfUyt917
+ D3cmXoxLfTqSR/qWnuhm5IcwB8dCuKYQ3sSI0mxS/V3/aUI4wLZgSEM7wJGnw8crkDDM
+ rbVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QcDsGkNTaeJACoHN9Zi8eoA/LmcFjDZTuPYv9J/13u0=;
- b=kkfIBuWYeCxhsvAKWho7l41d9ofQM8GwteJRV6Ze2U1QT+OGHBSwQ993W8ZjmnBffC
- jvdt/q2jjvN9SDXFd0c2e7jqLC61KXRAl7FcWEJ9OQkQgf/MeUiFYdVGP3F1vk5fJ4ri
- 21fozWHBOO/ZZiFOJJOT6Xk1hB3tTAxTEstCRR2Px7iginWcEDxHYQPNULGOOiPE+RuQ
- f55QjfEHMjJNA/GN2gymoeNqI32HJLQI/Ol4/GmcoXxHhii2vaTtWpIhBpK7T9HNbqyg
- fEnepo/3dYDluPXCXGewqK5QkocLKax1f6JXzjKqucz1kgJWzszxgmgqQE3WE3ZAbZOl
- 8+Gg==
-X-Gm-Message-State: AOAM5317n8dPjMAKeLvZd0IS+/qcX/oep+IKkkDdL5PTlAFo9+54USFR
- mHD1Mv8EFyvV7KGGbI9C0o1oXQ==
-X-Google-Smtp-Source: ABdhPJxCy12zDGlE8PAdQk8DlOrg6KGDeEbOmeuaYbBkMXDnRBwskD9/uoZ5rEs70KA/bbJrb+9b7A==
-X-Received: by 2002:adf:fa8b:: with SMTP id h11mr52440866wrr.391.1594106071075; 
- Tue, 07 Jul 2020 00:14:31 -0700 (PDT)
+ bh=YDO/x/b94zhIGLCoE0QO5NlUEy4S35DFUXq1lVsSN7c=;
+ b=nGOboFVjhzyQh7AST62jZpy2Gb9N5m6Y0sm5SABF6BDPhHULW7Utu/J/hp6W7B2+Rv
+ jT+BJCYCG+vo7j0So7m7FhZgATBgu3hUKfc5BTswtFlY2JcF4SmfcLJv4CMCSV2BuCj9
+ WUWCFxDnbyUPiEYmBAnRd0+Vis4rLVtLeZfT0XaqB6M9/W+OhwZpohal/ZENeT5z/Qbs
+ qD9DfFHoPKO+R2Bif0Kz01VutJJSuSXLyXMLegZH3oun+Yy1EVB6OjVTnEQqWLp3GI3x
+ JHunnmR6/n17rArWpGBbRaLoTTLLk6NHbiiZBu3LlbGtW0aRbkrSKvuoZmC7YXa6CqsB
+ xxDQ==
+X-Gm-Message-State: AOAM531MyfuR4ZWSb/n7Tc+5qsK+QAQdFkjVIT2pPeJVMHujcLBt3ikT
+ o2WXsmUBQc1YKfy1BMnzLipy9w==
+X-Google-Smtp-Source: ABdhPJwgNggmXBOb08syE7t2gKFfMHJw1GOGZqrzIy4pRiqIV+3Vbz1o9iEf9wHdCDGL9oKBcSo5Jg==
+X-Received: by 2002:adf:e7c2:: with SMTP id e2mr55959035wrn.179.1594105756726; 
+ Tue, 07 Jul 2020 00:09:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j15sm17963248wrx.69.2020.07.07.00.14.27
+ by smtp.gmail.com with ESMTPSA id 2sm2128427wmo.44.2020.07.07.00.09.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 00:14:31 -0700 (PDT)
+ Tue, 07 Jul 2020 00:09:12 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4B1491FFA5;
- Tue,  7 Jul 2020 08:09:00 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id D16711FF9D;
+ Tue,  7 Jul 2020 08:08:59 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 17/41] gitlab-ci: Fix the change rules after moving the YML
- files
-Date: Tue,  7 Jul 2020 08:08:34 +0100
-Message-Id: <20200707070858.6622-18-alex.bennee@linaro.org>
+Subject: [PULL 14/41] tests/docker: check for an parameters not empty string
+Date: Tue,  7 Jul 2020 08:08:31 +0100
+Message-Id: <20200707070858.6622-15-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200707070858.6622-1-alex.bennee@linaro.org>
 References: <20200707070858.6622-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x433.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,54 +103,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
-
-The edk2.yml and opensbi.yml files have recently been moved/renamed,
-but the change has not been reflected in the rules in the YML files
-yet.
-
-Fixes: 922febe2af ("Move edk2 and opensbi YAML files to .gitlab-ci.d folder")
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Message-Id: <20200625151627.24986-1-thuth@redhat.com>
-Message-Id: <20200701135652.1366-20-alex.bennee@linaro.org>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/.gitlab-ci.d/edk2.yml b/.gitlab-ci.d/edk2.yml
-index 088ba4b43a33..a9990b71475f 100644
---- a/.gitlab-ci.d/edk2.yml
-+++ b/.gitlab-ci.d/edk2.yml
-@@ -2,7 +2,7 @@ docker-edk2:
-  stage: build
-  rules: # Only run this job when the Dockerfile is modified
-  - changes:
--   - .gitlab-ci-edk2.yml
-+   - .gitlab-ci.d/edk2.yml
-    - .gitlab-ci.d/edk2/Dockerfile
-    when: always
-  image: docker:19.03.1
-diff --git a/.gitlab-ci.d/opensbi.yml b/.gitlab-ci.d/opensbi.yml
-index dd051c01245d..6a1750784ac1 100644
---- a/.gitlab-ci.d/opensbi.yml
-+++ b/.gitlab-ci.d/opensbi.yml
-@@ -2,7 +2,7 @@ docker-opensbi:
-  stage: build
-  rules: # Only run this job when the Dockerfile is modified
-  - changes:
--   - .gitlab-ci-opensbi.yml
-+   - .gitlab-ci.d/opensbi.yml
-    - .gitlab-ci.d/opensbi/Dockerfile
-    when: always
-  image: docker:19.03.1
+Message-Id: <20200701135652.1366-17-alex.bennee@linaro.org>
+
+diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+index 02cd67a8c5e8..ebc5b97ecf91 100755
+--- a/tests/docker/common.rc
++++ b/tests/docker/common.rc
+@@ -47,7 +47,7 @@ build_qemu()
+ check_qemu()
+ {
+     # default to make check unless the caller specifies
+-    if test -z "$@"; then
++    if [ $# = 0 ]; then
+         INVOCATION="check"
+     else
+         INVOCATION="$@"
 -- 
 2.20.1
 
