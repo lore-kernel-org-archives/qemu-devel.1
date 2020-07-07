@@ -2,91 +2,68 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C00FDC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26193C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:03:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88DCF206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:00:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLJfbklr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88DCF206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3377206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 15:03:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3377206E2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsp55-0004Tl-P6
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 11:00:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42436)
+	id 1jsp8X-0007po-9L
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 11:03:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jsp4H-0003bW-Ji
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 10:59:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32848
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jsp4F-0001Jx-SG
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 10:59:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594133970;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pRFBEFQA4aqU9wYDWHRKrElE1LW+6BtejFrfNGzPAYg=;
- b=hLJfbklrHvTx50uHxljrSghtJfUEkzMAY/BQJaD7IkgACGo2LXRLGhaHYOD26FM8/QJg/P
- EKy9eii3KPXducwouGp4ogWo2nXRPoqODW0j/7b6e1Q67tk+ixKRFygMBR/unJLzX+Bxeh
- Q6aKWTnZUjKpQltmiURsywDrruZAB3E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-d2YQSLC_N52PjkLqABtZiQ-1; Tue, 07 Jul 2020 10:59:26 -0400
-X-MC-Unique: d2YQSLC_N52PjkLqABtZiQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB13D8005B0
- for <qemu-devel@nongnu.org>; Tue,  7 Jul 2020 14:59:25 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-90.ams2.redhat.com
- [10.36.114.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2EBCF797E8;
- Tue,  7 Jul 2020 14:59:19 +0000 (UTC)
-Subject: Re: [PATCH v2] MAINTAINERS: Cover the firmware JSON schema
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200703183450.32398-1-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <25e37ce6-848c-8993-265e-3d047ce30c12@redhat.com>
-Date: Tue, 7 Jul 2020 16:59:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <20200703183450.32398-1-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lersek@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
+ id 1jsp7H-0006ww-62
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 11:02:39 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:38065)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jsp7E-0002Ge-O8
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 11:02:38 -0400
+Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
+ [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 9AB8110F90A;
+ Wed,  8 Jul 2020 00:02:30 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ae231069.dynamic.ppp.asahi-net.or.jp
+ [14.3.231.69])
+ by sakura.ysato.name (Postfix) with ESMTPSA id A518C1C06F3;
+ Wed,  8 Jul 2020 00:02:29 +0900 (JST)
+Date: Wed, 08 Jul 2020 00:02:29 +0900
+Message-ID: <878sfv9xmi.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PULL 07/15] hw/timer: RX62N 8-Bit timer (TMR)
+In-Reply-To: <1448b050-4f78-2ae3-95db-6c47baad5909@amsat.org>
+References: <20200621124807.17226-1-f4bug@amsat.org>
+ <20200621124807.17226-8-f4bug@amsat.org>
+ <CAFEAcA8c2dywr=Zxz1ExAV-48JwFU5vbBDDfA=_KE98XamnXiA@mail.gmail.com>
+ <1448b050-4f78-2ae3-95db-6c47baad5909@amsat.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=202.224.55.13;
+ envelope-from=ysato@users.sourceforge.jp; helo=mail01.asahi-net.or.jp
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 11:02:31
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_RP_RNBL=1.31, SPF_HELO_NONE=0.001,
+ SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,62 +76,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/03/20 20:34, Philippe Mathieu-Daudé wrote:
-> Add an entry to cover firmware.json (see commit 3a0adfc9bf:
-> schema that describes the different uses and properties of
-> virtual machine firmware).
-> 
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Kashyap Chamarthy <kchamart@redhat.com>
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> Since RFC v1:
-> - Added Daniel & Kashyap as reviewer
-> - Added myself as co-maintainer with Laszlo
-> 
-> Based on a comment from Laszlo:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg604925.html
-> Background info from Kashyap:
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg01978.html
-> ---
->  MAINTAINERS | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index dec252f38b..64bcea658d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2601,6 +2601,14 @@ F: include/hw/i2c/smbus_master.h
->  F: include/hw/i2c/smbus_slave.h
->  F: include/hw/i2c/smbus_eeprom.h
->  
-> +Firmware schema specifications
-> +M: Laszlo Ersek <lersek@redhat.com>
-> +M: Philippe Mathieu-Daudé <philmd@redhat.com>
-> +R: Daniel P. Berrange <berrange@redhat.com>
-> +R: Kashyap Chamarthy <kchamart@redhat.com>
-> +S: Maintained
-> +F: docs/interop/firmware.json
-> +
->  EDK2 Firmware
->  M: Laszlo Ersek <lersek@redhat.com>
->  M: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
+On Mon, 29 Jun 2020 18:58:56 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> Hi Yoshinori,
+>=20
+> On 6/25/20 11:25 AM, Peter Maydell wrote:
+> > On Sun, 21 Jun 2020 at 13:54, Philippe Mathieu-Daud=E9 <f4bug@amsat.org=
+> wrote:
+> >>
+> >> From: Yoshinori Sato <ysato@users.sourceforge.jp>
+> >>
+> >> renesas_tmr: 8bit timer modules.
+> >=20
+> > Hi; the recent Coverity run reports a potential bug in this
+> > code: (CID 1429976)
+> >=20
+> >=20
+> >> +static uint16_t read_tcnt(RTMRState *tmr, unsigned size, int ch)
+> >> +{
+> >> +    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> >> +    int elapsed, ovf =3D 0;
+> >> +    uint16_t tcnt[2];
+> >=20
+> > Here we declare tcnt[] but do not initialize its contents...
+> >=20
+> >> +    uint32_t ret;
+> >> +
+> >> +    delta =3D (now - tmr->tick) * NANOSECONDS_PER_SECOND / tmr->input=
+_freq;
+> >> +    if (delta > 0) {
+> >> +        tmr->tick =3D now;
+> >> +
+> >> +        if (FIELD_EX8(tmr->tccr[1], TCCR, CSS) =3D=3D INTERNAL) {
+> >> +            /* timer1 count update */
+> >> +            elapsed =3D elapsed_time(tmr, 1, delta);
+> >> +            if (elapsed >=3D 0x100) {
+> >> +                ovf =3D elapsed >> 8;
+> >> +            }
+> >> +            tcnt[1] =3D tmr->tcnt[1] + (elapsed & 0xff);
+> >> +        }
+> >> +        switch (FIELD_EX8(tmr->tccr[0], TCCR, CSS)) {
+> >> +        case INTERNAL:
+> >> +            elapsed =3D elapsed_time(tmr, 0, delta);
+> >> +            tcnt[0] =3D tmr->tcnt[0] + elapsed;
+> >> +            break;
+> >> +        case CASCADING:
+> >> +            if (ovf > 0) {
+> >> +                tcnt[0] =3D tmr->tcnt[0] + ovf;
+> >> +            }
+> >> +            break;
+> >> +        }
+> >=20
+> > ...but not all cases here set both tcnt[0] and tcnt[1]
+> > (for instance in the "case CASCADING:" if ovf <=3D0 we
+> > won't set either of them)...
+> >=20
+> >> +    } else {
+> >> +        tcnt[0] =3D tmr->tcnt[0];
+> >> +        tcnt[1] =3D tmr->tcnt[1];
+> >> +    }
+> >> +    if (size =3D=3D 1) {
+> >> +        return tcnt[ch];
+> >> +    } else {
+> >> +        ret =3D 0;
+> >> +        ret =3D deposit32(ret, 0, 8, tcnt[1]);
+> >> +        ret =3D deposit32(ret, 8, 8, tcnt[0]);
+> >> +        return ret;
+> >=20
+> > ...and so here we will end up returning uninitialized
+> > data. Presumably the spec says what value is actually
+> > supposed to be returned in these cases?
+> >=20
+> > PS: the "else" branch with the deposit32() calls could be
+> > rewritten more simply as
+> >   return lduw_be_p(tcnt);
+> >=20
+> >> +static uint64_t tmr_read(void *opaque, hwaddr addr, unsigned size)
+> >> +{
+> >=20
+> > In this function Coverity reports a missing "break" (CID 1429977):
+> >=20
+> >> +    case A_TCORA:
+> >> +        if (size =3D=3D 1) {
+> >> +            return tmr->tcora[ch];
+> >> +        } else if (ch =3D=3D 0) {
+> >> +            return concat_reg(tmr->tcora);
+> >> +        }
+> >=20
+> > Here execution can fall through but there is no 'break' or '/* fallthro=
+ugh */'.
+> >=20
+> >> +    case A_TCORB:
+> >> +        if (size =3D=3D 1) {
+> >> +            return tmr->tcorb[ch];
+> >> +        } else {
+> >> +            return concat_reg(tmr->tcorb);
+> >> +        }
+> >=20
+> > Is it correct that the A_TCORA and A_TCORB code is different?
+> > It looks odd, so if this is intentional then a comment describing
+> > why it is so might be helpful to readers.
+>=20
+> Can you address Peter's comments please?
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+This register can 8bit and 16bit access.
+8bit case return separate single TCORA or TCORB.
+16bit case return merged two channel's TCORA or TCORB.
+high byte: channel 0 register.
+low byte: channel 1 register
 
-Thank you!
-Laszlo
+> >=20
+> > thanks
+> > -- PMM
+> >=20
+>=20
 
+--=20
+Yosinori Sato
 
