@@ -6,73 +6,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601E9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8B3C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:17:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3695D2158C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:17:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3695D2158C
+	by mail.kernel.org (Postfix) with ESMTPS id 62CDA2158C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:17:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CDA2158C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsu26-0000oz-G4
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 16:17:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34032)
+	id 1jsu2C-00012h-LK
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 16:17:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jsu18-0007tQ-HY; Tue, 07 Jul 2020 16:16:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28834
- helo=mx0a-001b2d01.pphosted.com)
+ id 1jsu17-0007rR-7n; Tue, 07 Jul 2020 16:16:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53190)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jsu14-0004JP-LV; Tue, 07 Jul 2020 16:16:38 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 067K8Xf8024087; Tue, 7 Jul 2020 16:16:29 -0400
+ id 1jsu14-0004JL-Gu; Tue, 07 Jul 2020 16:16:36 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 067KDK6Q001621; Tue, 7 Jul 2020 16:16:29 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 324fdhknqw-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 324yw002fv-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Tue, 07 Jul 2020 16:16:29 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 067KA8Wv027905;
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 067KEimx004104;
  Tue, 7 Jul 2020 16:16:29 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0b-001b2d01.pphosted.com with ESMTP id 324fdhknqf-1
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 324yw002ff-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 07 Jul 2020 16:16:29 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 067K1Lcd010549;
- Tue, 7 Jul 2020 20:16:28 GMT
+ Tue, 07 Jul 2020 16:16:28 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 067K4mal023567;
+ Tue, 7 Jul 2020 20:16:27 GMT
 Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma02dal.us.ibm.com with ESMTP id 322hd994pc-1
+ [9.57.198.24]) by ppma03wdc.us.ibm.com with ESMTP id 322hd8jku6-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 07 Jul 2020 20:16:28 +0000
+ Tue, 07 Jul 2020 20:16:27 +0000
 Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
  [9.57.199.108])
  by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 067KGRTn52691328
+ 067KGRld53084514
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Tue, 7 Jul 2020 20:16:27 GMT
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 71239B2068;
+ by IMSVA (Postfix) with ESMTP id 47A8DB2064;
  Tue,  7 Jul 2020 20:16:27 +0000 (GMT)
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4AC11B2065;
+ by IMSVA (Postfix) with ESMTP id 22893B2066;
  Tue,  7 Jul 2020 20:16:27 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
  Tue,  7 Jul 2020 20:16:27 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-ppc@nongnu.org, marcandre.lureau@redhat.com
-Subject: [PATCH v3 2/2] tests: tpm: Skip over pcrUpdateCounter byte in result
- comparison
-Date: Tue,  7 Jul 2020 16:16:25 -0400
-Message-Id: <20200707201625.4177419-3-stefanb@linux.vnet.ibm.com>
+Subject: [PATCH v3 1/2] tpm: tpm_spapr: Exit on TPM backend failures
+Date: Tue,  7 Jul 2020 16:16:24 -0400
+Message-Id: <20200707201625.4177419-2-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200707201625.4177419-1-stefanb@linux.vnet.ibm.com>
 References: <20200707201625.4177419-1-stefanb@linux.vnet.ibm.com>
@@ -83,15 +81,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-07_13:2020-07-07,
  2020-07-07 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0
- clxscore=1015 lowpriorityscore=0 priorityscore=1501 phishscore=0
- cotscore=-2147483648 suspectscore=0 bulkscore=0 spamscore=0 mlxscore=0
- mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007070132
-Received-SPF: none client-ip=148.163.158.5;
+ mlxlogscore=999 clxscore=1015
+ suspectscore=0 priorityscore=1501 cotscore=-2147483648 bulkscore=0
+ lowpriorityscore=0 malwarescore=0 spamscore=0 adultscore=0 mlxscore=0
+ phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2007070134
+Received-SPF: none client-ip=148.163.156.1;
  envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 16:16:33
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 14:32:03
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -116,35 +114,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TPM 2 code in libtpms was fixed to handle the PCR 'TCB group' according
-to the PCClient profile. The change of the PCRs belonging to the 'TCB group'
-now affects the pcrUpdateCounter in the TPM2_PCRRead() responses where its
-value is now different (typically lower by '1') than what it was before. To
-not fail the tests, we skip the comparison of the 14th byte, which
-represents the pcrUpdateCounter.
+Exit on TPM backend failures in the same way as the TPM CRB and TIS device
+models do. With this change we now get an error report when the backend
+did not start up properly:
+
+error: internal error: qemu unexpectedly closed the monitor:
+2020-07-07T12:49:28.333928Z qemu-system-ppc64: tpm-emulator: \
+  TPM result for CMD_INIT: 0x101 operation failed
 
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- tests/qtest/tpm-util.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/tpm/tpm_spapr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qtest/tpm-util.c b/tests/qtest/tpm-util.c
-index 34efae8f18..58a9593745 100644
---- a/tests/qtest/tpm-util.c
-+++ b/tests/qtest/tpm-util.c
-@@ -139,7 +139,11 @@ void tpm_util_pcrread(QTestState *s, tx_func *tx,
+diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+index cb4dfd1e6a..8288ab0a15 100644
+--- a/hw/tpm/tpm_spapr.c
++++ b/hw/tpm/tpm_spapr.c
+@@ -306,7 +306,10 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
+                             TPM_SPAPR_BUFFER_MAX);
  
-     tx(s, tpm_pcrread, sizeof(tpm_pcrread), buffer, sizeof(buffer));
- 
--    g_assert_cmpmem(buffer, exp_resp_size, exp_resp, exp_resp_size);
-+    /* skip pcrUpdateCounter (14th byte) in comparison */
-+    g_assert(exp_resp_size >= 15);
-+    g_assert_cmpmem(buffer, 13, exp_resp, 13);
-+    g_assert_cmpmem(&buffer[14], exp_resp_size - 14,
-+                    &exp_resp[14], exp_resp_size - 14);
+     tpm_backend_reset(s->be_driver);
+-    tpm_spapr_do_startup_tpm(s, s->be_buffer_size);
++
++    if (tpm_spapr_do_startup_tpm(s, s->be_buffer_size) < 0) {
++        exit(1);
++    }
  }
  
- bool tpm_util_swtpm_has_tpm2(void)
+ static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
 -- 
 2.24.1
 
