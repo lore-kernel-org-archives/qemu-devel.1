@@ -6,84 +6,81 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A002AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A8FEC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 688312064C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA6172064C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:38:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ED8mS574"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 688312064C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZODaebLb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA6172064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsqc5-0003Bi-MQ
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:38:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60156)
+	id 1jsqcD-0003Km-8S
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:38:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq7e-0003JG-M4
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:07:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37111
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsqI6-0007N8-TY
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:17:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54706
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq7E-0006uH-IE
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:07:06 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsqI3-0000PY-Gf
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:17:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594137999;
+ s=mimecast20190719; t=1594138669;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7RGv5ZXfgxJJyOl+k/aDW7Jx1xinunsjgM2Klsul6Wc=;
- b=ED8mS574+pC+JOWn7dD6vRrVXfOWAQ9wsF6Xsqu5GRCGt20EXO+xnaLSavoe3eeyEm6UPl
- fBW9l+ASSIfwZOD64lfWS8Awohe0yjsnJGIGPasO1ltiqiJv6CbS5qut2FtbBPHX8C8NO9
- yovejpi/1SN5LerO/3muPkSNUg6+1TA=
+ bh=mNwIqI2mu4rkbqL6dTb2rqwPthcR/vKO4uaRRUKp7S8=;
+ b=ZODaebLbo76rl5i2MTiBFQeisc+i4G59j37++7Qx8ylKH2//nMDryV50kI6TZEcwIDH1NU
+ LgUh4aA+7JlmaTKLMqHmfH6ypHOiEpBBzdIKAffh7MhCd4Lq74sc7EvCnlQjwL8T6y9wUc
+ XyyGbD0t8r3K8N7cma+tDX+Nlj6pb6Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-sKU6dhArMNqEjOfSjHUZ-w-1; Tue, 07 Jul 2020 12:06:36 -0400
-X-MC-Unique: sKU6dhArMNqEjOfSjHUZ-w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-482-b8VO6wBNOLS_ABkxkOYEAg-1; Tue, 07 Jul 2020 12:17:45 -0400
+X-MC-Unique: b8VO6wBNOLS_ABkxkOYEAg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01059BFC0;
- Tue,  7 Jul 2020 16:06:35 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C134C7922B;
- Tue,  7 Jul 2020 16:06:31 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2766C10C4AE4; Tue,  7 Jul 2020 18:06:14 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 41/45] qapi: Purge error_propagate() from QAPI core
-Date: Tue,  7 Jul 2020 18:06:09 +0200
-Message-Id: <20200707160613.848843-42-armbru@redhat.com>
-In-Reply-To: <20200707160613.848843-1-armbru@redhat.com>
-References: <20200707160613.848843-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FBDA800D5C;
+ Tue,  7 Jul 2020 16:17:44 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-113.ams2.redhat.com [10.36.114.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2428F77892;
+ Tue,  7 Jul 2020 16:17:42 +0000 (UTC)
+Date: Tue, 7 Jul 2020 18:17:41 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: Re: [PATCH for-5.1] file-posix: Mitigate file fragmentation with
+ extent size hints
+Message-ID: <20200707161741.GG7002@linux.fritz.box>
+References: <20200707142329.48303-1-kwolf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200707142329.48303-1-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,121 +93,315 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, groug@kaod.org,
- pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- qapi/qapi-visit-core.c | 40 +++++++++++++++++++---------------------
- 1 file changed, 19 insertions(+), 21 deletions(-)
+Am 07.07.2020 um 16:23 hat Kevin Wolf geschrieben:
+> Espeically when O_DIRECT is used with image files so that the page cache
+> indirection can't cause a merge of allocating requests, the file will
+> fragment on the file system layer, with a potentially very small
+> fragment size (this depends on the requests the guest sent).
+> 
+> On Linux, fragmentation can be reduced by setting an extent size hint
+> when creating the file (at least on XFS, it can't be set any more after
+> the first extent has been allocated), basically giving raw files a
+> "cluster size" for allocation.
+> 
+> This adds an create option to set the extent size hint, and changes the
+> default from not setting a hint to setting it to 1 MB. The main reason
+> why qcow2 defaults to smaller cluster sizes is that COW becomes more
+> expensive, which is not an issue with raw files, so we can choose a
+> larger file. The tradeoff here is only potentially wasted disk space.
+> 
+> For qcow2 (or other image formats) over file-posix, the advantage should
+> even be greater because they grow sequentially without leaving holes, so
+> there won't be wasted space. Setting even larger extent size hints for
+> such images may make sense. This can be done with the new option, but
+> let's keep the default conservative for now.
+> 
+> The effect is very visible with a test that intentionally creates a
+> badly fragmented file with qemu-img bench (the time difference while
+> creating the file is already remarkable) and then looks at the number of
+> extents and the take a simple "qemu-img map" takes.
+> 
+> Without an extent size hint:
+> 
+>     $ ./qemu-img create -f raw -o extent_size_hint=0 ~/tmp/test.raw 10G
+>     Formatting '/home/kwolf/tmp/test.raw', fmt=raw size=10737418240 extent_size_hint=0
+>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -S 8192 -o 0
+>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (starting at offset 0, step size 8192)
+>     Run completed in 25.848 seconds.
+>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -S 8192 -o 4096
+>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (starting at offset 4096, step size 8192)
+>     Run completed in 19.616 seconds.
+>     $ filefrag ~/tmp/test.raw
+>     /home/kwolf/tmp/test.raw: 2000000 extents found
+>     $ time ./qemu-img map ~/tmp/test.raw
+>     Offset          Length          Mapped to       File
+>     0               0x1e8480000     0               /home/kwolf/tmp/test.raw
+> 
+>     real    0m1,279s
+>     user    0m0,043s
+>     sys     0m1,226s
+> 
+> With the new default extent size hint of 1 MB:
+> 
+>     $ ./qemu-img create -f raw -o extent_size_hint=1M ~/tmp/test.raw 10G
+>     Formatting '/home/kwolf/tmp/test.raw', fmt=raw size=10737418240 extent_size_hint=1048576
+>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -S 8192 -o 0
+>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (starting at offset 0, step size 8192)
+>     Run completed in 11.833 seconds.
+>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -S 8192 -o 4096
+>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (starting at offset 4096, step size 8192)
+>     Run completed in 10.155 seconds.
+>     $ filefrag ~/tmp/test.raw
+>     /home/kwolf/tmp/test.raw: 178 extents found
+>     $ time ./qemu-img map ~/tmp/test.raw
+>     Offset          Length          Mapped to       File
+>     0               0x1e8480000     0               /home/kwolf/tmp/test.raw
+> 
+>     real    0m0,061s
+>     user    0m0,040s
+>     sys     0m0,014s
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 5a9c47aabf..7e5f40e7f0 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -39,19 +39,18 @@ void visit_free(Visitor *v)
- bool visit_start_struct(Visitor *v, const char *name, void **obj,
-                         size_t size, Error **errp)
- {
--    Error *err = NULL;
-+    bool ok;
+I also need to squash in a few trivial qemu-iotests updates, for which I
+won't send a v2:
+
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index 1b0a75c8f9..0d7c5e8342 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -62,6 +62,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -86,6 +87,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -110,6 +112,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -134,6 +137,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -158,6 +162,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -182,6 +187,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -206,6 +212,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -230,6 +237,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -353,6 +361,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -377,6 +386,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -401,6 +411,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -425,6 +436,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -449,6 +461,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -473,6 +486,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -497,6 +511,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+@@ -521,6 +536,7 @@ Supported options:
+   encrypt.ivgen-hash-alg=<str> - Name of IV generator hash algorithm
+   encrypt.key-secret=<str> - ID of secret providing qcow AES key or LUKS passphrase
+   encryption=<bool (on/off)> - Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++  extent_size_hint=<size> - Extent size hint for the image file, 0 to disable
+   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
+   nocow=<bool (on/off)>  - Turn off copy-on-write (valid only on btrfs)
+   preallocation=<str>    - Preallocation mode (allowed values: off, metadata, falloc, full)
+diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
+index a61852f6d9..17388a4644 100755
+--- a/tests/qemu-iotests/243
++++ b/tests/qemu-iotests/243
+@@ -51,7 +51,7 @@ for mode in off metadata falloc full; do
+     echo "=== preallocation=$mode ==="
+     echo
  
-     trace_visit_start_struct(v, name, obj, size);
-     if (obj) {
-         assert(size);
-         assert(!(v->type & VISITOR_OUTPUT) || *obj);
-     }
--    v->start_struct(v, name, obj, size, &err);
-+    ok = v->start_struct(v, name, obj, size, errp);
-     if (obj && (v->type & VISITOR_INPUT)) {
--        assert(!err != !*obj);
-+        assert(ok != !*obj);
-     }
--    error_propagate(errp, err);
--    return !err;
-+    return ok;
- }
+-    _make_test_img -o "preallocation=$mode" 64M
++    _make_test_img -o "preallocation=$mode,extent_size_hint=0" 64M
  
- bool visit_check_struct(Visitor *v, Error **errp)
-@@ -69,16 +68,15 @@ void visit_end_struct(Visitor *v, void **obj)
- bool visit_start_list(Visitor *v, const char *name, GenericList **list,
-                       size_t size, Error **errp)
- {
--    Error *err = NULL;
-+    bool ok;
+     printf "File size: "
+     du -b $TEST_IMG | cut -f1
+@@ -68,7 +68,8 @@ for mode in off metadata falloc full; do
+     echo "=== External data file: preallocation=$mode ==="
+     echo
  
-     assert(!list || size >= sizeof(GenericList));
-     trace_visit_start_list(v, name, list, size);
--    v->start_list(v, name, list, size, &err);
-+    ok = v->start_list(v, name, list, size, errp);
-     if (list && (v->type & VISITOR_INPUT)) {
--        assert(!(err && *list));
-+        assert(ok || !*list);
-     }
--    error_propagate(errp, err);
--    return !err;
-+    return ok;
- }
+-    _make_test_img -o "data_file=$TEST_IMG.data,preallocation=$mode" 64M
++    _make_test_img \
++        -o "data_file=$TEST_IMG.data,preallocation=$mode,extent_size_hint=0" 64M
  
- GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size)
-@@ -104,19 +102,20 @@ bool visit_start_alternate(Visitor *v, const char *name,
-                            GenericAlternate **obj, size_t size,
-                            Error **errp)
- {
--    Error *err = NULL;
-+    bool ok;
+     echo -n "qcow2 file size: "
+     du -b $TEST_IMG | cut -f1
+@@ -79,7 +80,7 @@ for mode in off metadata falloc full; do
+     echo -n "qcow2 disk usage: "
+     [ $(du -B1 $TEST_IMG | cut -f1) -lt 1048576 ] && echo "low" || echo "high"
+     echo -n "data disk usage:  "
+-    [ $(du -B1 $TEST_IMG.data | cut -f1) -lt 1048576 ] && echo "low" || echo "high"
++    [ $(du -B1 $TEST_IMG.data | cut -f1) -lt 2097152 ] && echo "low" || echo "high"
  
-     assert(obj && size >= sizeof(GenericAlternate));
-     assert(!(v->type & VISITOR_OUTPUT) || *obj);
-     trace_visit_start_alternate(v, name, obj, size);
--    if (v->start_alternate) {
--        v->start_alternate(v, name, obj, size, &err);
-+    if (!v->start_alternate) {
-+        assert(!(v->type & VISITOR_INPUT));
-+        return true;
-     }
-+    ok = v->start_alternate(v, name, obj, size, errp);
-     if (v->type & VISITOR_INPUT) {
--        assert(v->start_alternate && !err != !*obj);
-+        assert(ok != !*obj);
-     }
--    error_propagate(errp, err);
--    return !err;
-+    return ok;
- }
+ done
  
- void visit_end_alternate(Visitor *v, void **obj)
-@@ -309,7 +308,7 @@ bool visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+diff --git a/tests/qemu-iotests/243.out b/tests/qemu-iotests/243.out
+index dcb33fac32..8bd3d79d66 100644
+--- a/tests/qemu-iotests/243.out
++++ b/tests/qemu-iotests/243.out
+@@ -2,31 +2,31 @@ QA output created by 243
  
- bool visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
- {
--    Error *err = NULL;
-+    bool ok;
+ === preallocation=off ===
  
-     assert(obj);
-     /* TODO: Fix callers to not pass NULL when they mean "", so that we
-@@ -317,12 +316,11 @@ bool visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
-     assert(!(v->type & VISITOR_OUTPUT) || *obj);
-      */
-     trace_visit_type_str(v, name, obj);
--    v->type_str(v, name, obj, &err);
-+    ok = v->type_str(v, name, obj, errp);
-     if (v->type & VISITOR_INPUT) {
--        assert(!err != !*obj);
-+        assert(ok != !*obj);
-     }
--    error_propagate(errp, err);
--    return !err;
-+    return ok;
- }
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=off
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=off extent_size_hint=0
+ File size: 196616
+ Disk usage: low
  
- bool visit_type_number(Visitor *v, const char *name, double *obj,
--- 
-2.26.2
+ === preallocation=metadata ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=metadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=metadata extent_size_hint=0
+ File size: 67436544
+ Disk usage: low
+ 
+ === preallocation=falloc ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=falloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=falloc extent_size_hint=0
+ File size: 67436544
+ Disk usage: high
+ 
+ === preallocation=full ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=full
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=full extent_size_hint=0
+ File size: 67436544
+ Disk usage: high
+ 
+ === External data file: preallocation=off ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=off
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=off extent_size_hint=0
+ qcow2 file size: 196616
+ data file size:  67108864
+ qcow2 disk usage: low
+@@ -34,7 +34,7 @@ data disk usage:  low
+ 
+ === External data file: preallocation=metadata ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=metadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=metadata extent_size_hint=0
+ qcow2 file size: 327680
+ data file size:  67108864
+ qcow2 disk usage: low
+@@ -42,7 +42,7 @@ data disk usage:  low
+ 
+ === External data file: preallocation=falloc ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=falloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=falloc extent_size_hint=0
+ qcow2 file size: 327680
+ data file size:  67108864
+ qcow2 disk usage: low
+@@ -50,7 +50,7 @@ data disk usage:  high
+ 
+ === External data file: preallocation=full ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=full
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data preallocation=full extent_size_hint=0
+ qcow2 file size: 327680
+ data file size:  67108864
+ qcow2 disk usage: low
 
 
