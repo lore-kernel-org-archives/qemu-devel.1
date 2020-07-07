@@ -2,89 +2,89 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08047C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A51B0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE392206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75B28206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:49:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtudMlL2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE392206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b098FiyA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B28206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsscw-0007rI-42
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:47:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41868)
+	id 1jsseN-00027h-Nd
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:49:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jssb8-00058x-EU
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:45:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29680
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jssb6-0007F7-5q
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:45:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594147539;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gR59wA1IW8js6Hw+yLL7CoKyJyCyFu9O9hAYxwg3x/g=;
- b=AtudMlL2idEYCZyB0XmO9431jxX06UeYQhYDnq/aOPXEPc/tLO1AxPj0xpPWlIdfJ1JRfh
- 0C/L+3DWZULPEsSxI6KnUw/s3h3IVaPTw+WaIkPHRyJqPA+t8CE6M30wHxRTwWX9AvwKp1
- DsmN0CSw05Z0fKjwsQrdEEDP1rLU+PQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-PmzJJ0vkMFCZwxRWW8bRDg-1; Tue, 07 Jul 2020 14:45:36 -0400
-X-MC-Unique: PmzJJ0vkMFCZwxRWW8bRDg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E73A68015CE;
- Tue,  7 Jul 2020 18:45:35 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-112-252.ams2.redhat.com
- [10.36.112.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 121DB61981;
- Tue,  7 Jul 2020 18:45:23 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/2] net: check if the file descriptor is valid before
- using it
-Date: Tue,  7 Jul 2020 20:45:14 +0200
-Message-Id: <20200707184515.371476-2-lvivier@redhat.com>
-In-Reply-To: <20200707184515.371476-1-lvivier@redhat.com>
-References: <20200707184515.371476-1-lvivier@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:04:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ (Exim 4.90_1) (envelope-from
+ <3ScMEXwsKCuAJUMKPPGOQGPIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--hskinnemoen.bounces.google.com>)
+ id 1jssd3-0008NW-N0
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:47:41 -0400
+Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:46138)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from
+ <3ScMEXwsKCuAJUMKPPGOQGPIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--hskinnemoen.bounces.google.com>)
+ id 1jssd1-0007XI-EG
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:47:41 -0400
+Received: by mail-yb1-xb4a.google.com with SMTP id u64so33637920ybf.13
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:47:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=UfjGjuK6ki2IMCiDVXtnyZH2TsHuq1C3vdhKvOLJ4Fk=;
+ b=b098FiyAo7LmLc1/dvCNRpWQVcm5qdABPS/Z1FDuaG1o5fYQ5548EqsTrhBWwG8l10
+ PwIW7SK9m08LDqByQGa/BuAm997q2kkndZuhQBTes5vXvT4IlmrRXtzXmODRRb8b950P
+ 2BX2x/VfFwGt4st/BWSBB9ow1+1PkpDH1DaCuTj6v2e0d/HEc0bHH44OYmFV/BNBh2ep
+ +kMqunrUvQ5v/WjejSq0JU0H0l/2IELjlJfLMGcIsk3/nqHZB5b4C6WRc/sogfNHuZBG
+ DsVROIg9ISOydmQagUKQ4Ebnpy+lMcb9Bofkb2jG1qq5J1mVJlfuhHHcswcMbsAGoPpg
+ eSZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=UfjGjuK6ki2IMCiDVXtnyZH2TsHuq1C3vdhKvOLJ4Fk=;
+ b=BbyPgjIQVUzyOu0OyOy+FyOG2E+pRWhGkj+oq1KMQPjKb3A5/tFkafbWD3lO+br4LS
+ W0vYBaLxGxb+Nl9qj2BxFeI7szr6+n2XPfFJWaAP34dIe02uqqP6j9bi1hKw2dsOfGVE
+ LEs1K47MmgvczjJ5K2tzc9Iogjl0m8Qn9m94jHGganQ1f24mqll9clCrR2iUzkjkobbd
+ Y02VeLuFIcJAX5BIp3o3sG1gPVYlAidShHDkr/ko5gB0OGiScYZnrf/DD5qlf+DxeGQ0
+ cU+KGkQaGj55qogh5/muHnJxNTfWWMDVMsIyOVQeRUmf4LGnvK7vvQ15ZjvMokBIv7pf
+ G4Lg==
+X-Gm-Message-State: AOAM530qIDk3akm5L5nYZzptmgeSNYs0hDBm15G3JQrxh0iTQFc1E/G8
+ CvM8eEzt22EU3QNkR3uuBYg1AXMce5ICWnFdaQ==
+X-Google-Smtp-Source: ABdhPJxp3JGSLgf1o0yLY7oP/eDrpTeKopzJ7ux0E85MgMELy9iyq1PXZ6nx0VmBgLYrwC0jlxiJHZzbOiA86e6GDg==
+X-Received: by 2002:a25:ad03:: with SMTP id y3mr4310535ybi.411.1594147657712; 
+ Tue, 07 Jul 2020 11:47:37 -0700 (PDT)
+Date: Tue,  7 Jul 2020 11:47:18 -0700
+Message-Id: <20200707184730.3047754-1-hskinnemoen@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+Subject: [PATCH v4 00/12] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC machines
+From: Havard Skinnemoen <hskinnemoen@google.com>
+To: peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
+ kfting@nuvoton.com, philmd@redhat.com, 
+ Havard Skinnemoen <hskinnemoen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
+ envelope-from=3ScMEXwsKCuAJUMKPPGOQGPIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--hskinnemoen.bounces.google.com;
+ helo=mail-yb1-xb4a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -105
+X-Spam_score: -10.6
+X-Spam_bar: ----------
+X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,288 +97,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu_set_nonblock() checks that the file descriptor can be used and, if
-not, crashes QEMU. An assert() is used for that. The use of assert() is
-used to detect programming error and the coredump will allow to debug
-the problem.
+I also pushed this and the previous two patchsets to my qemu fork on github.
+The branches are named npcm7xx-v[1-4].
 
-But in the case of the tap device, this assert() can be triggered by
-a misconfiguration by the user. At startup, it's not a real problem, but it
-can also happen during the hot-plug of a new device, and here it's a
-problem because we can crash a perfectly healthy system.
+  https://github.com/hskinnemoen/qemu
 
-For instance:
- # ip link add link virbr0 name macvtap0 type macvtap mode bridge
- # ip link set macvtap0 up
- # TAP=/dev/tap$(ip -o link show macvtap0 | cut -d: -f1)
- # qemu-system-x86_64 -machine q35 -device pcie-root-port,id=pcie-root-port-0 -monitor stdio 9<> $TAP
- (qemu) netdev_add type=tap,id=hostnet0,vhost=on,fd=9
- (qemu) device_add driver=virtio-net-pci,netdev=hostnet0,id=net0,bus=pcie-root-port-0
- (qemu) device_del net0
- (qemu) netdev_del hostnet0
- (qemu) netdev_add type=tap,id=hostnet1,vhost=on,fd=9
- qemu-system-x86_64: .../util/oslib-posix.c:247: qemu_set_nonblock: Assertion `f != -1' failed.
- Aborted (core dumped)
+This patch series models enough of the Nuvoton NPCM730 and NPCM750 SoCs to boot
+an OpenBMC image built for quanta-gsj. This includes device models for:
 
-To avoid that, add a function, qemu_try_set_nonblock(), that allows to report the
-problem without crashing.
+  - Global Configuration Registers
+  - Clock Control
+  - Timers
+  - Fuses
+  - Memory Controller
+  - Flash Controller
 
-In the same way, we also update the function for vhostfd in net_init_tap_one() and
-for fd in net_init_socket() (both descriptors are provided by the user and can
-be wrong).
+These modules, along with the existing Cortex A9 CPU cores and built-in
+peripherals, are integrated into a NPCM730 or NPCM750 SoC, which in turn form
+the foundation for the quanta-gsj and npcm750-evb machines, respectively. The
+two SoCs are very similar; the only difference is that NPCM730 is missing some
+peripherals that NPCM750 has, and which are not considered essential for
+datacenter use (e.g. graphics controllers). For more information, see
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- include/qemu/sockets.h |  1 +
- net/socket.c           |  9 +++++--
- net/tap.c              | 25 +++++++++++++++---
- util/oslib-posix.c     | 26 +++++++++++++------
- util/oslib-win32.c     | 57 ++++++++++++++++++++++++------------------
- 5 files changed, 79 insertions(+), 39 deletions(-)
+https://www.nuvoton.com/products/cloud-computing/ibmc/
 
-diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-index 57cd049d6edd..7d1f8135767d 100644
---- a/include/qemu/sockets.h
-+++ b/include/qemu/sockets.h
-@@ -18,6 +18,7 @@ int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
- int socket_set_cork(int fd, int v);
- int socket_set_nodelay(int fd);
- void qemu_set_block(int fd);
-+int qemu_try_set_nonblock(int fd);
- void qemu_set_nonblock(int fd);
- int socket_set_fast_reuse(int fd);
- 
-diff --git a/net/socket.c b/net/socket.c
-index c92354049bca..2d21fddd9cd6 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -725,13 +725,18 @@ int net_init_socket(const Netdev *netdev, const char *name,
-     }
- 
-     if (sock->has_fd) {
--        int fd;
-+        int fd, ret;
- 
-         fd = monitor_fd_param(cur_mon, sock->fd, errp);
-         if (fd == -1) {
-             return -1;
-         }
--        qemu_set_nonblock(fd);
-+        ret = qemu_try_set_nonblock(fd);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                             name, fd);
-+            return -1;
-+        }
-         if (!net_socket_fd_init(peer, "socket", name, fd, 1, sock->mcast,
-                                 errp)) {
-             return -1;
-diff --git a/net/tap.c b/net/tap.c
-index 6207f61f84ab..41a20102fd0b 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -689,6 +689,8 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-         }
- 
-         if (vhostfdname) {
-+            int ret;
-+
-             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
-             if (vhostfd == -1) {
-                 if (tap->has_vhostforce && tap->vhostforce) {
-@@ -698,7 +700,12 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-                 }
-                 return;
-             }
--            qemu_set_nonblock(vhostfd);
-+            ret = qemu_try_set_nonblock(vhostfd);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                                 name, fd);
-+                return;
-+            }
-         } else {
-             vhostfd = open("/dev/vhost-net", O_RDWR);
-             if (vhostfd < 0) {
-@@ -766,6 +773,7 @@ int net_init_tap(const Netdev *netdev, const char *name,
-     Error *err = NULL;
-     const char *vhostfdname;
-     char ifname[128];
-+    int ret = 0;
- 
-     assert(netdev->type == NET_CLIENT_DRIVER_TAP);
-     tap = &netdev->u.tap;
-@@ -795,7 +803,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             return -1;
-         }
- 
--        qemu_set_nonblock(fd);
-+        ret = qemu_try_set_nonblock(fd);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                             name, fd);
-+            return -1;
-+        }
- 
-         vnet_hdr = tap_probe_vnet_hdr(fd);
- 
-@@ -810,7 +823,6 @@ int net_init_tap(const Netdev *netdev, const char *name,
-         char **fds;
-         char **vhost_fds;
-         int nfds = 0, nvhosts = 0;
--        int ret = 0;
- 
-         if (tap->has_ifname || tap->has_script || tap->has_downscript ||
-             tap->has_vnet_hdr || tap->has_helper || tap->has_queues ||
-@@ -843,7 +855,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
-                 goto free_fail;
-             }
- 
--            qemu_set_nonblock(fd);
-+            ret = qemu_try_set_nonblock(fd);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                                 name, fd);
-+                goto free_fail;
-+            }
- 
-             if (i == 0) {
-                 vnet_hdr = tap_probe_vnet_hdr(fd);
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 916f1be2243a..149254cd691f 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -253,25 +253,35 @@ void qemu_set_block(int fd)
-     assert(f != -1);
- }
- 
--void qemu_set_nonblock(int fd)
-+int qemu_try_set_nonblock(int fd)
- {
-     int f;
-     f = fcntl(fd, F_GETFL);
--    assert(f != -1);
--    f = fcntl(fd, F_SETFL, f | O_NONBLOCK);
--#ifdef __OpenBSD__
-     if (f == -1) {
-+        return -errno;
-+    }
-+    if (fcntl(fd, F_SETFL, f | O_NONBLOCK) == -1) {
-+#ifdef __OpenBSD__
-         /*
-          * Previous to OpenBSD 6.3, fcntl(F_SETFL) is not permitted on
-          * memory devices and sets errno to ENODEV.
-          * It's OK if we fail to set O_NONBLOCK on devices like /dev/null,
-          * because they will never block anyway.
-          */
--        assert(errno == ENODEV);
--    }
--#else
--    assert(f != -1);
-+        if (errno == ENODEV) {
-+            return 0;
-+        }
- #endif
-+        return -errno;
-+    }
-+    return 0;
-+}
-+
-+void qemu_set_nonblock(int fd)
-+{
-+    int f;
-+    f = qemu_try_set_nonblock(fd);
-+    assert(f == 0);
- }
- 
- int socket_set_fast_reuse(int fd)
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index e9b14ab17847..5548ce6038f3 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -132,31 +132,6 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
- }
- #endif /* CONFIG_LOCALTIME_R */
- 
--void qemu_set_block(int fd)
--{
--    unsigned long opt = 0;
--    WSAEventSelect(fd, NULL, 0);
--    ioctlsocket(fd, FIONBIO, &opt);
--}
--
--void qemu_set_nonblock(int fd)
--{
--    unsigned long opt = 1;
--    ioctlsocket(fd, FIONBIO, &opt);
--    qemu_fd_register(fd);
--}
--
--int socket_set_fast_reuse(int fd)
--{
--    /* Enabling the reuse of an endpoint that was used by a socket still in
--     * TIME_WAIT state is usually performed by setting SO_REUSEADDR. On Windows
--     * fast reuse is the default and SO_REUSEADDR does strange things. So we
--     * don't have to do anything here. More info can be found at:
--     * http://msdn.microsoft.com/en-us/library/windows/desktop/ms740621.aspx */
--    return 0;
--}
--
--
- static int socket_error(void)
- {
-     switch (WSAGetLastError()) {
-@@ -233,6 +208,38 @@ static int socket_error(void)
-     }
- }
- 
-+void qemu_set_block(int fd)
-+{
-+    unsigned long opt = 0;
-+    WSAEventSelect(fd, NULL, 0);
-+    ioctlsocket(fd, FIONBIO, &opt);
-+}
-+
-+int qemu_try_set_nonblock(int fd)
-+{
-+    unsigned long opt = 1;
-+    if (ioctlsocket(fd, FIONBIO, &opt) != NO_ERROR) {
-+        return -socket_error();
-+    }
-+    qemu_fd_register(fd);
-+    return 0;
-+}
-+
-+void qemu_set_nonblock(int fd)
-+{
-+    (void)qemu_try_set_nonblock(fd);
-+}
-+
-+int socket_set_fast_reuse(int fd)
-+{
-+    /* Enabling the reuse of an endpoint that was used by a socket still in
-+     * TIME_WAIT state is usually performed by setting SO_REUSEADDR. On Windows
-+     * fast reuse is the default and SO_REUSEADDR does strange things. So we
-+     * don't have to do anything here. More info can be found at:
-+     * http://msdn.microsoft.com/en-us/library/windows/desktop/ms740621.aspx */
-+    return 0;
-+}
-+
- int inet_aton(const char *cp, struct in_addr *ia)
- {
-     uint32_t addr = inet_addr(cp);
+Both quanta-gsj and npcm750-evb correspond to real boards supported by OpenBMC.
+At the end of the series, qemu can boot an OpenBMC image built for one of these
+boards with some minor modifications.
+
+The patches in this series were developed by Google and reviewed by Nuvoton. We
+will be maintaining the machine and peripheral support together.
+
+The data sheet for these SoCs is not generally available. Please let me know if
+more comments are needed to understand the device behavior.
+
+Changes since v3:
+
+  - License headers are now GPL v2-or-later throughout.
+  - Added vmstate throughout (except the memory controller, which doesn't
+    really have any state worth saving). Successfully booted a gsj image
+    with two stop/savevm/quit/loadvm cycles along the way.
+      - JFFS2 really doesn't like it if I let qemu keep running after savevm,
+        and then jump back in time with loadvm. I assume this is expected.
+  - Fixed an error API violation in npcm7xx_realize, removed pointless error
+    check after object_property_set_link().
+  - Switched the OTP device to use an embedded array instead of a g_malloc0'd
+    one because I couldn't figure out how to set up vmstate for the latter.
+
+Changes since v2:
+
+  - Simplified the MAINTAINERS entry.
+  - Added link to OpenPOWER jenkins for gsj BMC images.
+  - Reverted the smpboot change, back to byte swapping.
+  - Adapted to upstream API changes:
+      - sysbus_init_child_obj -> object_initialize_child
+      - object_property_set_bool -> qdev_realize / sysbus_realize
+      - ssi_create_slave_no_init -> qdev_new
+      - qdev_init_nofail -> qdev_realize_and_unref
+      - ssi_auto_connect_slaves removed
+  - Moved Boot ROM loading from soc to machine init.
+  - Plumbed power-on-straps property from GCR to the machine init code so it
+    can be properly initialized. Turns out npcm750 memory init doesn't work
+    without this. npcm730 is fine either way, though I'm not sure why.
+  - Reworked the flash init code so it looks more like aspeed (i.e. the flash
+    device gets added even if there's no drive).
+
+Changes since v1 (requested by reviewers):
+
+  - Clarify the source of CLK reset values.
+  - Made smpboot a constant byte array, eliinated byte swapping.
+  - NPCM7xxState now stores an array of ARMCPUs, not pointers to ARMCPUs.
+  - Clarify why EL3 is disabled.
+  - Introduce NPCM7XX_NUM_IRQ constant.
+  - Set the number of CPUs according to SoC variant, and disallow command line
+    overrides (i.e. you can no longer override the number of CPUs with the -smp
+    parameter). This is trying to follow the spirit of
+    https://patchwork.kernel.org/patch/11595407/.
+  - Switch register operations to DEVICE_LITTLE_ENDIAN throughout.
+  - Machine documentation added (new patch).
+
+Changes since v1 to support flash booting:
+
+  - GCR reset value changes to get past memory initialization when booting
+    from flash (patches 2 and 5):
+      - INTCR2 now indicates that the DDR controller is initialized.
+      - INTCR3 is initialized according to DDR memory size. A realize()
+	method was implemented to achieve this.
+  - Refactor the machine initialization a bit to make it easier to drop in
+    machine-specific flash initialization (patch 6).
+  - Extend the series with additional patches to enable booting from flash:
+      - Boot ROM (through the -bios option).
+      - OTP (fuse) controller.
+      - Memory Controller stub (just enough to skip memory training).
+      - Flash controller.
+      - Board-specific flash initialization.
+
+Thanks for reviewing,
+
+Havard
+
+Havard Skinnemoen (12):
+  npcm7xx: Add config symbol
+  hw/misc: Add NPCM7xx System Global Control Registers device model
+  hw/misc: Add NPCM7xx Clock Controller device model
+  hw/timer: Add NPCM7xx Timer device model
+  hw/arm: Add NPCM730 and NPCM750 SoC models
+  hw/arm: Add two NPCM7xx-based machines
+  hw/arm: Load -bios image as a boot ROM for npcm7xx
+  hw/nvram: NPCM7xx OTP device model
+  hw/mem: Stubbed out NPCM7xx Memory Controller model
+  hw/ssi: NPCM7xx Flash Interface Unit device model
+  hw/arm: Wire up BMC boot flash for npcm750-evb and quanta-gsj
+  docs/system: Add Nuvoton machine documentation
+
+ MAINTAINERS                      |   8 +
+ default-configs/arm-softmmu.mak  |   1 +
+ docs/system/arm/nuvoton.rst      |  92 ++++++
+ docs/system/target-arm.rst       |   1 +
+ hw/arm/Kconfig                   |   9 +
+ hw/arm/Makefile.objs             |   1 +
+ hw/arm/npcm7xx.c                 | 427 ++++++++++++++++++++++++++
+ hw/arm/npcm7xx_boards.c          | 189 ++++++++++++
+ hw/mem/Makefile.objs             |   1 +
+ hw/mem/npcm7xx_mc.c              |  84 +++++
+ hw/misc/Makefile.objs            |   2 +
+ hw/misc/npcm7xx_clk.c            | 230 ++++++++++++++
+ hw/misc/npcm7xx_gcr.c            | 224 ++++++++++++++
+ hw/misc/trace-events             |   8 +
+ hw/nvram/Makefile.objs           |   1 +
+ hw/nvram/npcm7xx_otp.c           | 405 ++++++++++++++++++++++++
+ hw/ssi/Makefile.objs             |   1 +
+ hw/ssi/npcm7xx_fiu.c             | 510 +++++++++++++++++++++++++++++++
+ hw/ssi/trace-events              |   9 +
+ hw/timer/Makefile.objs           |   1 +
+ hw/timer/npcm7xx_timer.c         | 468 ++++++++++++++++++++++++++++
+ hw/timer/trace-events            |   5 +
+ include/hw/arm/npcm7xx.h         | 107 +++++++
+ include/hw/mem/npcm7xx_mc.h      |  36 +++
+ include/hw/misc/npcm7xx_clk.h    |  66 ++++
+ include/hw/misc/npcm7xx_gcr.h    |  77 +++++
+ include/hw/nvram/npcm7xx_otp.h   |  94 ++++++
+ include/hw/ssi/npcm7xx_fiu.h     | 100 ++++++
+ include/hw/timer/npcm7xx_timer.h |  96 ++++++
+ 29 files changed, 3253 insertions(+)
+ create mode 100644 docs/system/arm/nuvoton.rst
+ create mode 100644 hw/arm/npcm7xx.c
+ create mode 100644 hw/arm/npcm7xx_boards.c
+ create mode 100644 hw/mem/npcm7xx_mc.c
+ create mode 100644 hw/misc/npcm7xx_clk.c
+ create mode 100644 hw/misc/npcm7xx_gcr.c
+ create mode 100644 hw/nvram/npcm7xx_otp.c
+ create mode 100644 hw/ssi/npcm7xx_fiu.c
+ create mode 100644 hw/timer/npcm7xx_timer.c
+ create mode 100644 include/hw/arm/npcm7xx.h
+ create mode 100644 include/hw/mem/npcm7xx_mc.h
+ create mode 100644 include/hw/misc/npcm7xx_clk.h
+ create mode 100644 include/hw/misc/npcm7xx_gcr.h
+ create mode 100644 include/hw/nvram/npcm7xx_otp.h
+ create mode 100644 include/hw/ssi/npcm7xx_fiu.h
+ create mode 100644 include/hw/timer/npcm7xx_timer.h
+
 -- 
-2.26.2
+2.27.0.212.ge8ba1cc988-goog
 
 
