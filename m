@@ -2,71 +2,145 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A116C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92680C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:12:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F99A206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:11:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F99A206F6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4E3E6206F6
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:12:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="k1/8rM5Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E3E6206F6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsr8J-0002YR-CF
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 13:11:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48070)
+	id 1jsr8u-0003P1-IA
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 13:12:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jsr7U-0001D4-2z; Tue, 07 Jul 2020 13:11:00 -0400
-Resent-Date: Tue, 07 Jul 2020 13:11:00 -0400
-Resent-Message-Id: <E1jsr7U-0001D4-2z@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21763)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jsr7R-0001UV-8g; Tue, 07 Jul 2020 13:10:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594141829; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=O4LOSosL1cbH443g6TMbFALOQsEdXcVm9a0OxBUJX4X9aJPtcionkxKSOG/4sxseWqS4+9uqQFbZRVGG1UcUu67Gea+Ce5NxezturyP2jw+oPdXu1yTdkUMRMoj4RmRTqHdLemHOT5/nVsgNyn0y/zAu6GpzfrfPrxNd7J4OJ/4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594141829;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=2pfTGPMYKz2Icqpmtc/3xqCi6Dge6HNcaQ8alJiAVV4=; 
- b=U9NRYbIRePRXd50vlrP29wk/5VKb/TJ0pcuxStwqJWRDtfzGuiGL0LJzGS9n+BQFR3ry5Rlhq1ZPoaJ8eD4dHwuyb5969u92G4kJry9isZPuf296JgApcsI4xFNJEwqCdLpIxMn6T1W7uEgML5L0Ht5pjkJEYVnNdxnH646RFh0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1594141824953839.6643113489325;
- Tue, 7 Jul 2020 10:10:24 -0700 (PDT)
-Subject: Re: [PATCH v4 00/45] Less clumsy error checking
-Message-ID: <159414182321.3636.3298351127539113638@07a7f0d89f7d>
-In-Reply-To: <20200707160613.848843-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1jsqsW-0004QI-D0
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:55:32 -0400
+Received: from mail-dm6nam11on2073.outbound.protection.outlook.com
+ ([40.107.223.73]:59008 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1jsqsQ-0007CB-2A
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:55:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b8lBAKOU4JmkimpULEvFFwHO2rpVY8AZCk9D9X2L4C13OqBxZUY0Q8wDrmzHJthEZVzapL5je6hn6ocnw3wLP0vGw9gUth7+FmtkcBtB011xRCFTzOJOvOHK5UByTwwRAktwJ5OU9VEKtIh+67Ntof3I0RtqeJhdwZ5KszdyV38zfHZ/B2/gcoNbofYpR2soqw9hEuQ7tiQmpCPiSeG8wyPtKvpTrr3pHp3dlF9G6wfZu7vcIPo3SX10aiKZCIyvYW+sMcZLipYdgub1R77VizG8/GNdogTeZYEbhuEx8MmL89I3JuEHGzaQL8owKwAOl0Z/oYWCAFCZF5MxH212IA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Cjt9EbqZl8h/te347O1Na0uYflpzWN9ZYZrP/vrcpXA=;
+ b=dImeHGdFHX/bQ7dfglCrhf7pnghsgyiGOJWj61bHqhhD1hlH3FuzgKnsBwHG32b7SFbfIJr5Kj4qXd2NAK/QYlrgvPA093oqg+d575yrOQytmXyQB9kYB6uwEvwKYH8DzeVaQvToDqX1Jm4NjrjXzkmnITz/VwPTCBsKVvRFONRF2IEmYOsKXKQakM/K8G7jPtIcatp+IskJLsWOI20+8q7bs8sKk9NcNAUTNAVZFwvMiGgOcPr1wcBks0eKTuVL1UwNm72LxqKbv8pQ/ePWcUJiNu/vM5ZNmgiwoSw92iTeZohcUEfMeVC/l/WOlhRe5aiozG1wMKEw0AdsRjHIWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Cjt9EbqZl8h/te347O1Na0uYflpzWN9ZYZrP/vrcpXA=;
+ b=k1/8rM5QbGfeVhN0McP1xq1dE9+ktl9MA7SYHA2htCgwAjj+yTZ3B/+HN0tvgMxvD60qhQuupTJh4FSsn/Ov72pvyxLLTa6Ap5hQFtlVIQTZVa7kbwxHGofuOHvXwmoAgQdhmsC6a9p0Z3lYjqwlXikxAWe6DLlhBvhekFq+Nl0=
+Received: from CY4PR1101CA0023.namprd11.prod.outlook.com
+ (2603:10b6:910:15::33) by BYAPR02MB5797.namprd02.prod.outlook.com
+ (2603:10b6:a03:11c::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.27; Tue, 7 Jul
+ 2020 16:55:23 +0000
+Received: from CY1NAM02FT043.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:910:15:cafe::f3) by CY4PR1101CA0023.outlook.office365.com
+ (2603:10b6:910:15::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend
+ Transport; Tue, 7 Jul 2020 16:55:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ CY1NAM02FT043.mail.protection.outlook.com (10.152.74.182) with Microsoft SMTP
+ Server id 15.20.3153.24 via Frontend Transport; Tue, 7 Jul 2020 16:55:23
+ +0000
+Received: from [149.199.38.66] (port=59980 helo=xsj-pvapsmtp01)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1jsqqs-0003gx-Vl; Tue, 07 Jul 2020 09:53:50 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp2.xlnx.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1jsqsM-0001fR-U6; Tue, 07 Jul 2020 09:55:22 -0700
+Received: from xsj-pvapsmtp01 (xsj-smtp.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 067GtIrZ015049; 
+ Tue, 7 Jul 2020 09:55:18 -0700
+Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <saipava@xhdsaipava40.xilinx.com>)
+ id 1jsqsI-0001ee-8a; Tue, 07 Jul 2020 09:55:18 -0700
+Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
+ id E8F3F13C0366; Tue,  7 Jul 2020 22:14:39 +0530 (IST)
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: Gerd Hoffmann <kraxel@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
+Subject: [PATCH v3 2/3] usb/hcd-xhci: Move qemu-xhci device to hcd-xhci-pci.c
+Date: Tue,  7 Jul 2020 22:14:30 +0530
+Message-Id: <1594140271-16462-3-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1594140271-16462-1-git-send-email-sai.pavan.boddu@xilinx.com>
+References: <1594140271-16462-1-git-send-email-sai.pavan.boddu@xilinx.com>
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFTY:;
+ SFS:(46966005)(8676002)(70586007)(70206006)(5660300002)(186003)(2616005)(4326008)(54906003)(498600001)(36756003)(26005)(8936002)(107886003)(6666004)(81166007)(7416002)(47076004)(83380400001)(426003)(110136005)(42186006)(356005)(82310400002)(2906002)(336012)(6266002)(2004002);
+ DIR:OUT; SFP:1101; 
+X-MS-PublicTrafficType: Email
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Tue, 7 Jul 2020 10:10:24 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 13:10:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 904ead4d-a57b-4197-be19-08d822968a3c
+X-MS-TrafficTypeDiagnostic: BYAPR02MB5797:
+X-Microsoft-Antispam-PRVS: <BYAPR02MB5797B1A0025146EA007469D6CA660@BYAPR02MB5797.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-Forefront-PRVS: 0457F11EAF
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LFyCsxQLZtT5hlahPb7dhFCCY+jZpDm1vgjoXqwIbFyITyJ7X6tJ8HQ1hZE3+lXOr2ZIFAUcbER3wVNxXVwlGY9m6cWTHSQnjI8OOcpo9CpdNzEkdq8j5cksUJg8uxYOCiT2yifqqTcLZ91x0UbSlruN571HKbW4ifOPnhffP85xgWp03wajxmikyz5+LppTjQBLgHfQ2knuJ9VlMI/Ke75eb2rVGCyaaZvtzE3YHqeLVNAXBY+U7k0vIdHq6WiCZebJSsZyAA1vzi+12BAbs0yGOEoDLWyseTKcr0oow8d8PlTcfyZVXlEShBSe63h260lc9wsXfkXirI16IthBMPGNOluw2Q2e7gk1swVdw/N30m+5WTGYql5d6F0Yh37nUlTIjH3WXbcOyrkhglJwKaFArS3KQbr6GtpIbzeZgVQQH2XXasjhD11CIXFGNmSBYCZEa+NrHbfWka0shiyUmgOJV4CQFXPs9VkMz/gfgxy89sHQ36+VlW2mXQlPOAqc
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2020 16:55:23.2410 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 904ead4d-a57b-4197-be19-08d822968a3c
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT043.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5797
+Received-SPF: pass client-ip=40.107.223.73; envelope-from=saipava@xilinx.com;
+ helo=NAM11-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 12:55:24
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,193 +153,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- groug@kaod.org, pbonzini@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Vikram Garhwal <fnuv@xilinx.com>, sai.pavan.boddu@xilinx.com,
+ qemu-devel@nongnu.org, Paul Zimmerman <pauldzim@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ying Fang <fangying1@huawei.com>,
+ =?UTF-8?q?=27Marc-Andr=C3=A9=20Lureau=27?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?=27Philippe=20Mathieu-Daud=C3=A9=27?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwNzE2MDYxMy44NDg4
-NDMtMS1hcm1icnVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwNzA3MTYwNjEzLjg0ODg0
-My0xLWFybWJydUByZWRoYXQuY29tClN1YmplY3Q6IFtQQVRDSCB2NCAwMC80NV0gTGVzcyBjbHVt
-c3kgZXJyb3IgY2hlY2tpbmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
-Z2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
-cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
-cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAg
-IHBhdGNoZXcvMTU5NDEzOTc1NzUyLjE2OTExNi41ODA4OTY4NTgwNjQ5MjU1MzgyLnN0Z2l0QGJh
-aGlhLmxhbiAtPiBwYXRjaGV3LzE1OTQxMzk3NTc1Mi4xNjkxMTYuNTgwODk2ODU4MDY0OTI1NTM4
-Mi5zdGdpdEBiYWhpYS5sYW4KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNTk0MTQwMDYy
-LTIzNTIyLTEtZ2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5xZW11LmRldmVsQGdtYWlsLmNvbSAt
-PiBwYXRjaGV3LzE1OTQxNDAwNjItMjM1MjItMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLnFl
-bXUuZGV2ZWxAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA3MDcx
-NjM1MDQuMTk0NzQwLTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwNzA3MTYzNTA0
-LjE5NDc0MC0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-Jwo1ZGFkODYzIGhtcDogSWdub3JlIEVycm9yIG9iamVjdHMgd2hlcmUgdGhlIHJldHVybiB2YWx1
-ZSBzdWZmaWNlcwo5OWZhM2YyIHFkZXY6IElnbm9yZSBFcnJvciBvYmplY3RzIHdoZXJlIHRoZSBy
-ZXR1cm4gdmFsdWUgc3VmZmljZXMKNmVlOTdjMCBxZW11LWltZzogSWdub3JlIEVycm9yIG9iamVj
-dHMgd2hlcmUgdGhlIHJldHVybiB2YWx1ZSBzdWZmaWNlcwo2NzcyNTZmIGVycm9yOiBBdm9pZCBl
-cnJvcl9wcm9wYWdhdGUoKSBhZnRlciBtaWdyYXRlX2FkZF9ibG9ja2VyKCkKOTc0YzUyYiBxYXBp
-OiBQdXJnZSBlcnJvcl9wcm9wYWdhdGUoKSBmcm9tIFFBUEkgY29yZQpiNjY0Y2ExIHFhcGk6IFNt
-b290aCB2aXNpdG9yIGVycm9yIGNoZWNraW5nIGluIGdlbmVyYXRlZCBjb2RlCjU4NTI5ZTggcWFw
-aTogU21vb3RoIGFub3RoZXIgdmlzaXRvciBlcnJvciBjaGVja2luZyBwYXR0ZXJuCjg3NjFjYmQg
-YmxvY2svcGFyYWxsZWxzOiBTaW1wbGlmeSBwYXJhbGxlbHNfb3BlbigpIGFmdGVyIHByZXZpb3Vz
-IGNvbW1pdAo2ODIxYWRiIGVycm9yOiBSZWR1Y2UgdW5uZWNlc3NhcnkgZXJyb3IgcHJvcGFnYXRp
-b24KOGVkMGVmYyBlcnJvcjogRWxpbWluYXRlIGVycm9yX3Byb3BhZ2F0ZSgpIG1hbnVhbGx5Cjlm
-OGNkNTEgZXJyb3I6IEVsaW1pbmF0ZSBlcnJvcl9wcm9wYWdhdGUoKSB3aXRoIENvY2NpbmVsbGUs
-IHBhcnQgMgo0NTE2YTJiIGVycm9yOiBFbGltaW5hdGUgZXJyb3JfcHJvcGFnYXRlKCkgd2l0aCBD
-b2NjaW5lbGxlLCBwYXJ0IDEKZTc3NmE5YyBlcnJvcjogQXZvaWQgdW5uZWNlc3NhcnkgZXJyb3Jf
-cHJvcGFnYXRlKCkgYWZ0ZXIgZXJyb3Jfc2V0ZygpCjk3YThhZTcgcWRldjogVXNlIHJldHVybmVk
-IGJvb2wgdG8gY2hlY2sgZm9yIGZhaWx1cmUsIENvY2NpbmVsbGUgcGFydApiNDg5ZmVmIHFkZXY6
-IE1ha2UgZnVuY3Rpb25zIHRha2luZyBFcnJvciAqKiByZXR1cm4gYm9vbCwgbm90IHZvaWQKYzU2
-NTFlOSBxb206IE1ha2UgZnVuY3Rpb25zIHRha2luZyBFcnJvciAqKiByZXR1cm4gYm9vbCwgbm90
-IDAvLTEKMWU5YTFjMyBxb206IFVzZSByZXR1cm5lZCBib29sIHRvIGNoZWNrIGZvciBmYWlsdXJl
-LCBtYW51YWwgcGFydApiMTU4ZGU2IHFvbTogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hlY2sgZm9y
-IGZhaWx1cmUsIENvY2NpbmVsbGUgcGFydAo5MTFkYmI0IHFvbTogTWFrZSBmdW5jdGlvbnMgdGFr
-aW5nIEVycm9yICoqIHJldHVybiBib29sLCBub3Qgdm9pZAo5NGM0YWQxIHFvbTogUHV0IG5hbWUg
-cGFyYW1ldGVyIGJlZm9yZSB2YWx1ZSAvIHZpc2l0b3IgcGFyYW1ldGVyCmE2NWVhZGMgcW9tOiBV
-c2UgcmV0dXJuIHZhbHVlcyB0byBjaGVjayBmb3IgZXJyb3Igd2hlcmUgdGhhdCdzIHNpbXBsZXIK
-YWZmM2Y0MSBxb206IERvbid0IGhhbmRsZSBpbXBvc3NpYmxlIG9iamVjdF9wcm9wZXJ0eV9nZXRf
-bGluaygpIGZhaWx1cmUKZjE3MWQ1OSBxb206IENyYXNoIG1vcmUgbmljZWx5IG9uIG9iamVjdF9w
-cm9wZXJ0eV9nZXRfbGluaygpIGZhaWx1cmUKZDFkN2IxNCBxb206IFJlbmFtZSBxZGV2X2dldF90
-eXBlKCkgdG8gb2JqZWN0X2dldF90eXBlKCkKNTRlOTA3YyBxb206IFVzZSBlcnJvcl9yZXBvcnRm
-X2VycigpIGluc3RlYWQgb2YgZ19wcmludGVycigpIGluIGV4YW1wbGVzCmFhNDAyYzQgczM5MHgv
-cGNpOiBGaXggaGFybWxlc3MgbWlzdGFrZSBpbiB6cGNpJ3MgcHJvcGVydHkgZmlkJ3Mgc2V0dGVy
-CmUzYTAxZjAgcWFwaTogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hlY2sgZm9yIGZhaWx1cmUsIG1h
-bnVhbCBwYXJ0CmVlMmE0YTcgcWFwaTogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hlY2sgZm9yIGZh
-aWx1cmUsIENvY2NpbmVsbGUgcGFydApkNzhmZDIxIHFhcGk6IE1ha2UgdmlzaXRvciBmdW5jdGlv
-bnMgdGFraW5nIEVycm9yICoqIHJldHVybiBib29sLCBub3Qgdm9pZAo0NWNjMGQ4IGhtcDogRWxp
-bWluYXRlIGEgdmFyaWFibGUgaW4gaG1wX21pZ3JhdGVfc2V0X3BhcmFtZXRlcigpCjE4ZmEzMGYg
-YmxvY2s6IEF2b2lkIGVycm9yIGFjY3VtdWxhdGlvbiBpbiBiZHJ2X2ltZ19jcmVhdGUoKQpkNWZh
-NDE3IHFlbXUtb3B0aW9uOiBVc2UgcmV0dXJuZWQgYm9vbCB0byBjaGVjayBmb3IgZmFpbHVyZQoz
-NWE0Zjk5IHFlbXUtb3B0aW9uOiBNYWtlIGZ1bmN0aW9ucyB0YWtpbmcgRXJyb3IgKiogcmV0dXJu
-IGJvb2wsIG5vdCB2b2lkCjlmY2JmMGIgcWVtdS1vcHRpb246IFJlcGxhY2Ugb3B0X3NldCgpIGJ5
-IGNsZWFuZXIgb3B0X3ZhbGlkYXRlKCkKMDlmZGMwZSBxZW11LW9wdGlvbjogRmFjdG9yIG91dCBo
-ZWxwZXIgb3B0X2NyZWF0ZSgpCmYyMzcwZmMgcWVtdS1vcHRpb246IFNpbXBsaWZ5IGFyb3VuZCBm
-aW5kX2RlZmF1bHRfYnlfbmFtZSgpCmU4ZDQ4ZjQgcWVtdS1vcHRpb246IEZhY3RvciBvdXQgaGVs
-cGVyIGZpbmRfZGVmYXVsdF9ieV9uYW1lKCkKZDljZDJlNCBxZW11LW9wdGlvbjogTWFrZSB1c2Vz
-IG9mIGZpbmRfZGVzY19ieV9uYW1lKCkgbW9yZSBzaW1pbGFyCjMwZDc4ZWEgcWVtdS1vcHRpb246
-IENoZWNrIHJldHVybiB2YWx1ZSBpbnN0ZWFkIG9mIEBlcnIgd2hlcmUgY29udmVuaWVudApjNjcw
-ZTdjIHZpcnRpby1jcnlwdG8tcGNpOiBUaWR5IHVwIHZpcnRpb19jcnlwdG9fcGNpX3JlYWxpemUo
-KQoyMjI1MmM2IG1hY2lvOiBUaWR5IHVwIGVycm9yIGhhbmRsaW5nIGluIG1hY2lvX25ld3dvcmxk
-X3JlYWxpemUoKQo4YzFiOThhIHFkZXY6IFVzZSByZXR1cm5lZCBib29sIHRvIGNoZWNrIGZvciBx
-ZGV2X3JlYWxpemUoKSBldGMuIGZhaWx1cmUKOTk5OTBjZSBlcnJvcjogRG9jdW1lbnQgRXJyb3Ig
-QVBJIHVzYWdlIHJ1bGVzCjJhZTRjZTggZXJyb3I6IEltcHJvdmUgZXJyb3IuaCdzIGJpZyBjb21t
-ZW50CjhkMjdmNjQgZXJyb3I6IEZpeCBleGFtcGxlcyBpbiBlcnJvci5oJ3MgYmlnIGNvbW1lbnQK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNDUgQ2hlY2tpbmcgY29tbWl0IDhkMjdmNjQ3MzRmOSAo
-ZXJyb3I6IEZpeCBleGFtcGxlcyBpbiBlcnJvci5oJ3MgYmlnIGNvbW1lbnQpCkVSUk9SOiBFcnJv
-ciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzI1OiBGSUxFOiBpbmNsdWRl
-L3FhcGkvZXJyb3IuaDoyNzoKKyAqICAgICBlcnJvcl9zZXRnKCZlcnIsICJpbnZhbGlkIHF1YXJr
-XG4iIC8vIFdST05HIQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAxLzQ1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzQ1IENoZWNraW5n
-IGNvbW1pdCAyYWU0Y2U4NGM3MTIgKGVycm9yOiBJbXByb3ZlIGVycm9yLmgncyBiaWcgY29tbWVu
-dCkKMy80NSBDaGVja2luZyBjb21taXQgOTk5OTBjZTJhYmMwIChlcnJvcjogRG9jdW1lbnQgRXJy
-b3IgQVBJIHVzYWdlIHJ1bGVzKQo0LzQ1IENoZWNraW5nIGNvbW1pdCA4YzFiOThhYzYxOGEgKHFk
-ZXY6IFVzZSByZXR1cm5lZCBib29sIHRvIGNoZWNrIGZvciBxZGV2X3JlYWxpemUoKSBldGMuIGZh
-aWx1cmUpCjUvNDUgQ2hlY2tpbmcgY29tbWl0IDIyMjUyYzYzODdmZCAobWFjaW86IFRpZHkgdXAg
-ZXJyb3IgaGFuZGxpbmcgaW4gbWFjaW9fbmV3d29ybGRfcmVhbGl6ZSgpKQo2LzQ1IENoZWNraW5n
-IGNvbW1pdCBjNjcwZTdjNDY5OGEgKHZpcnRpby1jcnlwdG8tcGNpOiBUaWR5IHVwIHZpcnRpb19j
-cnlwdG9fcGNpX3JlYWxpemUoKSkKNy80NSBDaGVja2luZyBjb21taXQgMzBkNzhlYWU2NGFjIChx
-ZW11LW9wdGlvbjogQ2hlY2sgcmV0dXJuIHZhbHVlIGluc3RlYWQgb2YgQGVyciB3aGVyZSBjb252
-ZW5pZW50KQo4LzQ1IENoZWNraW5nIGNvbW1pdCBkOWNkMmU0ZGNiMGQgKHFlbXUtb3B0aW9uOiBN
-YWtlIHVzZXMgb2YgZmluZF9kZXNjX2J5X25hbWUoKSBtb3JlIHNpbWlsYXIpCjkvNDUgQ2hlY2tp
-bmcgY29tbWl0IGU4ZDQ4ZjQ4ODliMyAocWVtdS1vcHRpb246IEZhY3RvciBvdXQgaGVscGVyIGZp
-bmRfZGVmYXVsdF9ieV9uYW1lKCkpCjEwLzQ1IENoZWNraW5nIGNvbW1pdCBmMjM3MGZjZjgyYzIg
-KHFlbXUtb3B0aW9uOiBTaW1wbGlmeSBhcm91bmQgZmluZF9kZWZhdWx0X2J5X25hbWUoKSkKMTEv
-NDUgQ2hlY2tpbmcgY29tbWl0IDA5ZmRjMGU0N2FkNyAocWVtdS1vcHRpb246IEZhY3RvciBvdXQg
-aGVscGVyIG9wdF9jcmVhdGUoKSkKMTIvNDUgQ2hlY2tpbmcgY29tbWl0IDlmY2JmMGJhMjE5OSAo
-cWVtdS1vcHRpb246IFJlcGxhY2Ugb3B0X3NldCgpIGJ5IGNsZWFuZXIgb3B0X3ZhbGlkYXRlKCkp
-CjEzLzQ1IENoZWNraW5nIGNvbW1pdCAzNWE0Zjk5N2E2YzkgKHFlbXUtb3B0aW9uOiBNYWtlIGZ1
-bmN0aW9ucyB0YWtpbmcgRXJyb3IgKiogcmV0dXJuIGJvb2wsIG5vdCB2b2lkKQoxNC80NSBDaGVj
-a2luZyBjb21taXQgZDVmYTQxN2ExMmU5IChxZW11LW9wdGlvbjogVXNlIHJldHVybmVkIGJvb2wg
-dG8gY2hlY2sgZm9yIGZhaWx1cmUpCjE1LzQ1IENoZWNraW5nIGNvbW1pdCAxOGZhMzBmNGRiNmUg
-KGJsb2NrOiBBdm9pZCBlcnJvciBhY2N1bXVsYXRpb24gaW4gYmRydl9pbWdfY3JlYXRlKCkpCjE2
-LzQ1IENoZWNraW5nIGNvbW1pdCA0NWNjMGQ4Y2FiYzggKGhtcDogRWxpbWluYXRlIGEgdmFyaWFi
-bGUgaW4gaG1wX21pZ3JhdGVfc2V0X3BhcmFtZXRlcigpKQoxNy80NSBDaGVja2luZyBjb21taXQg
-ZDc4ZmQyMTQzOWUwIChxYXBpOiBNYWtlIHZpc2l0b3IgZnVuY3Rpb25zIHRha2luZyBFcnJvciAq
-KiByZXR1cm4gYm9vbCwgbm90IHZvaWQpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiMyNDU1OiBGSUxFOiBzY3JpcHRzL3FhcGkvdmlzaXQucHk6MjY6Citib29sIHZpc2l0X3R5cGVf
-JShjX25hbWUpcyhWaXNpdG9yICp2LCBjb25zdCBjaGFyICpuYW1lLCAlKGNfdHlwZSlzb2JqLCBF
-cnJvciAqKmVycnApOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI1MjM6IEZJ
-TEU6IHNjcmlwdHMvcWFwaS92aXNpdC5weToxMjQ6Citib29sIHZpc2l0X3R5cGVfJShjX25hbWUp
-cyhWaXNpdG9yICp2LCBjb25zdCBjaGFyICpuYW1lLCAlKGNfbmFtZSlzICoqb2JqLCBFcnJvciAq
-KmVycnApCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjU1MjogRklMRTogc2Ny
-aXB0cy9xYXBpL3Zpc2l0LnB5OjE2MDoKK2Jvb2wgdmlzaXRfdHlwZV8lKGNfbmFtZSlzKFZpc2l0
-b3IgKnYsIGNvbnN0IGNoYXIgKm5hbWUsICUoY19uYW1lKXMgKm9iaiwgRXJyb3IgKiplcnJwKQoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI1Njc6IEZJTEU6IHNjcmlwdHMvcWFw
-aS92aXNpdC5weToxNzQ6Citib29sIHZpc2l0X3R5cGVfJShjX25hbWUpcyhWaXNpdG9yICp2LCBj
-b25zdCBjaGFyICpuYW1lLCAlKGNfbmFtZSlzICoqb2JqLCBFcnJvciAqKmVycnApCgpXQVJOSU5H
-OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjU5NjogRklMRTogc2NyaXB0cy9xYXBpL3Zpc2l0
-LnB5OjI1MToKK2Jvb2wgdmlzaXRfdHlwZV8lKGNfbmFtZSlzKFZpc2l0b3IgKnYsIGNvbnN0IGNo
-YXIgKm5hbWUsICUoY19uYW1lKXMgKipvYmosIEVycm9yICoqZXJycCkKCnRvdGFsOiAwIGVycm9y
-cywgNSB3YXJuaW5ncywgMjQxMyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy80NSBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoxOC80NSBDaGVja2luZyBjb21taXQgZWUyYTRhN2E0ZDk4IChxYXBp
-OiBVc2UgcmV0dXJuZWQgYm9vbCB0byBjaGVjayBmb3IgZmFpbHVyZSwgQ29jY2luZWxsZSBwYXJ0
-KQoxOS80NSBDaGVja2luZyBjb21taXQgZTNhMDFmMDUwMTNhIChxYXBpOiBVc2UgcmV0dXJuZWQg
-Ym9vbCB0byBjaGVjayBmb3IgZmFpbHVyZSwgbWFudWFsIHBhcnQpCldBUk5JTkc6IEJsb2NrIGNv
-bW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM3NTogRklMRTogYWNj
-ZWwva3ZtL2t2bS1hbGwuYzozMTU0OgorICAgICAgICAvKiBUaGUgdmFsdWUgd2FzIGNoZWNrZWQg
-aW4gdmlzaXRfdHlwZV9Pbk9mZlNwbGl0KCkgYWJvdmUuIElmCgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE4NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOS80NSBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoyMC80NSBDaGVja2luZyBjb21taXQgYWE0MDJjNDQwYWM4IChzMzkweC9wY2k6
-IEZpeCBoYXJtbGVzcyBtaXN0YWtlIGluIHpwY2kncyBwcm9wZXJ0eSBmaWQncyBzZXR0ZXIpCjIx
-LzQ1IENoZWNraW5nIGNvbW1pdCA1NGU5MDdjMDYzYTcgKHFvbTogVXNlIGVycm9yX3JlcG9ydGZf
-ZXJyKCkgaW5zdGVhZCBvZiBnX3ByaW50ZXJyKCkgaW4gZXhhbXBsZXMpCjIyLzQ1IENoZWNraW5n
-IGNvbW1pdCBkMWQ3YjE0NWZmNjYgKHFvbTogUmVuYW1lIHFkZXZfZ2V0X3R5cGUoKSB0byBvYmpl
-Y3RfZ2V0X3R5cGUoKSkKMjMvNDUgQ2hlY2tpbmcgY29tbWl0IGYxNzFkNTk1MmZhOCAocW9tOiBD
-cmFzaCBtb3JlIG5pY2VseSBvbiBvYmplY3RfcHJvcGVydHlfZ2V0X2xpbmsoKSBmYWlsdXJlKQoy
-NC80NSBDaGVja2luZyBjb21taXQgYWZmM2Y0MTIyNjE1IChxb206IERvbid0IGhhbmRsZSBpbXBv
-c3NpYmxlIG9iamVjdF9wcm9wZXJ0eV9nZXRfbGluaygpIGZhaWx1cmUpCjI1LzQ1IENoZWNraW5n
-IGNvbW1pdCBhNjVlYWRjZTUwMjIgKHFvbTogVXNlIHJldHVybiB2YWx1ZXMgdG8gY2hlY2sgZm9y
-IGVycm9yIHdoZXJlIHRoYXQncyBzaW1wbGVyKQoyNi80NSBDaGVja2luZyBjb21taXQgOTRjNGFk
-MWMxNmEyIChxb206IFB1dCBuYW1lIHBhcmFtZXRlciBiZWZvcmUgdmFsdWUgLyB2aXNpdG9yIHBh
-cmFtZXRlcikKMjcvNDUgQ2hlY2tpbmcgY29tbWl0IDkxMWRiYjQ2YzhkNyAocW9tOiBNYWtlIGZ1
-bmN0aW9ucyB0YWtpbmcgRXJyb3IgKiogcmV0dXJuIGJvb2wsIG5vdCB2b2lkKQoyOC80NSBDaGVj
-a2luZyBjb21taXQgYjE1OGRlNjY2Yjg5IChxb206IFVzZSByZXR1cm5lZCBib29sIHRvIGNoZWNr
-IGZvciBmYWlsdXJlLCBDb2NjaW5lbGxlIHBhcnQpCjI5LzQ1IENoZWNraW5nIGNvbW1pdCAxZTlh
-MWMzZjQwNDUgKHFvbTogVXNlIHJldHVybmVkIGJvb2wgdG8gY2hlY2sgZm9yIGZhaWx1cmUsIG1h
-bnVhbCBwYXJ0KQozMC80NSBDaGVja2luZyBjb21taXQgYzU2NTFlOTRiOGY4IChxb206IE1ha2Ug
-ZnVuY3Rpb25zIHRha2luZyBFcnJvciAqKiByZXR1cm4gYm9vbCwgbm90IDAvLTEpCjMxLzQ1IENo
-ZWNraW5nIGNvbW1pdCBiNDg5ZmVmOTU5NDYgKHFkZXY6IE1ha2UgZnVuY3Rpb25zIHRha2luZyBF
-cnJvciAqKiByZXR1cm4gYm9vbCwgbm90IHZvaWQpCjMyLzQ1IENoZWNraW5nIGNvbW1pdCA5N2E4
-YWU3YzJhNzIgKHFkZXY6IFVzZSByZXR1cm5lZCBib29sIHRvIGNoZWNrIGZvciBmYWlsdXJlLCBD
-b2NjaW5lbGxlIHBhcnQpCjMzLzQ1IENoZWNraW5nIGNvbW1pdCBlNzc2YTljYWJlNzkgKGVycm9y
-OiBBdm9pZCB1bm5lY2Vzc2FyeSBlcnJvcl9wcm9wYWdhdGUoKSBhZnRlciBlcnJvcl9zZXRnKCkp
-CjM0LzQ1IENoZWNraW5nIGNvbW1pdCA0NTE2YTJiYWViYzYgKGVycm9yOiBFbGltaW5hdGUgZXJy
-b3JfcHJvcGFnYXRlKCkgd2l0aCBDb2NjaW5lbGxlLCBwYXJ0IDEpCjM1LzQ1IENoZWNraW5nIGNv
-bW1pdCA5ZjhjZDUxMzJjZTUgKGVycm9yOiBFbGltaW5hdGUgZXJyb3JfcHJvcGFnYXRlKCkgd2l0
-aCBDb2NjaW5lbGxlLCBwYXJ0IDIpCjM2LzQ1IENoZWNraW5nIGNvbW1pdCA4ZWQwZWZjOGMwMWQg
-KGVycm9yOiBFbGltaW5hdGUgZXJyb3JfcHJvcGFnYXRlKCkgbWFudWFsbHkpCjM3LzQ1IENoZWNr
-aW5nIGNvbW1pdCA2ODIxYWRiOWM1YmQgKGVycm9yOiBSZWR1Y2UgdW5uZWNlc3NhcnkgZXJyb3Ig
-cHJvcGFnYXRpb24pCjM4LzQ1IENoZWNraW5nIGNvbW1pdCA4NzYxY2JkNDkxZTQgKGJsb2NrL3Bh
-cmFsbGVsczogU2ltcGxpZnkgcGFyYWxsZWxzX29wZW4oKSBhZnRlciBwcmV2aW91cyBjb21taXQp
-CjM5LzQ1IENoZWNraW5nIGNvbW1pdCA1ODUyOWU4YmYyNTUgKHFhcGk6IFNtb290aCBhbm90aGVy
-IHZpc2l0b3IgZXJyb3IgY2hlY2tpbmcgcGF0dGVybikKNDAvNDUgQ2hlY2tpbmcgY29tbWl0IGI2
-NjRjYTE4ZDIxNiAocWFwaTogU21vb3RoIHZpc2l0b3IgZXJyb3IgY2hlY2tpbmcgaW4gZ2VuZXJh
-dGVkIGNvZGUpCjQxLzQ1IENoZWNraW5nIGNvbW1pdCA5NzRjNTJiYWE4OGIgKHFhcGk6IFB1cmdl
-IGVycm9yX3Byb3BhZ2F0ZSgpIGZyb20gUUFQSSBjb3JlKQo0Mi80NSBDaGVja2luZyBjb21taXQg
-Njc3MjU2ZjliOTM4IChlcnJvcjogQXZvaWQgZXJyb3JfcHJvcGFnYXRlKCkgYWZ0ZXIgbWlncmF0
-ZV9hZGRfYmxvY2tlcigpKQo0My80NSBDaGVja2luZyBjb21taXQgNmVlOTdjMGY0Y2VjIChxZW11
-LWltZzogSWdub3JlIEVycm9yIG9iamVjdHMgd2hlcmUgdGhlIHJldHVybiB2YWx1ZSBzdWZmaWNl
-cykKNDQvNDUgQ2hlY2tpbmcgY29tbWl0IDk5ZmEzZjJhNTBjMSAocWRldjogSWdub3JlIEVycm9y
-IG9iamVjdHMgd2hlcmUgdGhlIHJldHVybiB2YWx1ZSBzdWZmaWNlcykKNDUvNDUgQ2hlY2tpbmcg
-Y29tbWl0IDVkYWQ4NjM4ZWY5NyAoaG1wOiBJZ25vcmUgRXJyb3Igb2JqZWN0cyB3aGVyZSB0aGUg
-cmV0dXJuIHZhbHVlIHN1ZmZpY2VzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDIwMDcwNzE2MDYxMy44NDg4NDMtMS1hcm1icnVAcmVkaGF0LmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Move pci specific devices to new file. This set the environment to move all
+pci specific hooks in hcd-xhci.c to hcd-xhci-pci.c.
+
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+---
+ hw/usb/hcd-xhci-pci.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/usb/hcd-xhci.c     | 40 ++------------------------------
+ hw/usb/hcd-xhci.h     |  2 ++
+ 3 files changed, 68 insertions(+), 38 deletions(-)
+ create mode 100644 hw/usb/hcd-xhci-pci.c
+
+diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
+new file mode 100644
+index 0000000..26af683
+--- /dev/null
++++ b/hw/usb/hcd-xhci-pci.c
+@@ -0,0 +1,64 @@
++/*
++ * USB xHCI controller with PCI system bus emulation
++ *
++ * Copyright (c) 2011 Securiforest
++ * Date: 2011-05-11 ;  Author: Hector Martin <hector@marcansoft.com>
++ * Based on usb-ohci.c, emulates Renesas NEC USB 3.0
++ * Date: 2020-03-01; Author: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
++ * Moved the pci specific content for hcd-xhci.c to hcd-xhci-pci.c
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/osdep.h"
++#include "hw/pci/pci.h"
++#include "hw/qdev-properties.h"
++#include "hw/pci/msi.h"
++#include "hw/pci/msix.h"
++#include "hcd-xhci.h"
++#include "trace.h"
++#include "qapi/error.h"
++
++static void qemu_xhci_class_init(ObjectClass *klass, void *data)
++{
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
++    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
++    k->revision     = 0x01;
++}
++
++static void qemu_xhci_instance_init(Object *obj)
++{
++    XHCIState *xhci = XHCI(obj);
++
++    xhci->msi      = ON_OFF_AUTO_OFF;
++    xhci->msix     = ON_OFF_AUTO_AUTO;
++    xhci->numintrs = MAXINTRS;
++    xhci->numslots = MAXSLOTS;
++    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
++}
++
++static const TypeInfo qemu_xhci_info = {
++    .name          = TYPE_QEMU_XHCI,
++    .parent        = TYPE_XHCI,
++    .class_init    = qemu_xhci_class_init,
++    .instance_init = qemu_xhci_instance_init,
++};
++
++static void xhci_register_types(void)
++{
++    type_register_static(&qemu_xhci_info);
++}
++
++type_init(xhci_register_types)
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index fa6ce98..052e26e 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -429,12 +429,12 @@ static const char *ep_state_name(uint32_t state)
+                        ARRAY_SIZE(ep_state_names));
+ }
+ 
+-static bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
++bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
+ {
+     return xhci->flags & (1 << bit);
+ }
+ 
+-static void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
++void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
+ {
+     xhci->flags |= (1 << bit);
+ }
+@@ -3692,13 +3692,6 @@ static Property xhci_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-static void xhci_instance_init(Object *obj)
+-{
+-    /* QEMU_PCI_CAP_EXPRESS initialization does not depend on QEMU command
+-     * line, therefore, no need to wait to realize like other devices */
+-    PCI_DEVICE(obj)->cap_present |= QEMU_PCI_CAP_EXPRESS;
+-}
+-
+ static void xhci_class_init(ObjectClass *klass, void *data)
+ {
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+@@ -3718,7 +3711,6 @@ static const TypeInfo xhci_info = {
+     .parent        = TYPE_PCI_DEVICE,
+     .instance_size = sizeof(XHCIState),
+     .class_init    = xhci_class_init,
+-    .instance_init = xhci_instance_init,
+     .abstract      = true,
+     .interfaces = (InterfaceInfo[]) {
+         { INTERFACE_PCIE_DEVICE },
+@@ -3727,37 +3719,9 @@ static const TypeInfo xhci_info = {
+     },
+ };
+ 
+-static void qemu_xhci_class_init(ObjectClass *klass, void *data)
+-{
+-    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+-
+-    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
+-    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
+-    k->revision     = 0x01;
+-}
+-
+-static void qemu_xhci_instance_init(Object *obj)
+-{
+-    XHCIState *xhci = XHCI(obj);
+-
+-    xhci->msi      = ON_OFF_AUTO_OFF;
+-    xhci->msix     = ON_OFF_AUTO_AUTO;
+-    xhci->numintrs = MAXINTRS;
+-    xhci->numslots = MAXSLOTS;
+-    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
+-}
+-
+-static const TypeInfo qemu_xhci_info = {
+-    .name          = TYPE_QEMU_XHCI,
+-    .parent        = TYPE_XHCI,
+-    .class_init    = qemu_xhci_class_init,
+-    .instance_init = qemu_xhci_instance_init,
+-};
+-
+ static void xhci_register_types(void)
+ {
+     type_register_static(&xhci_info);
+-    type_register_static(&qemu_xhci_info);
+ }
+ 
+ type_init(xhci_register_types)
+diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+index edbd926..34bdb22 100644
+--- a/hw/usb/hcd-xhci.h
++++ b/hw/usb/hcd-xhci.h
+@@ -232,4 +232,6 @@ struct XHCIState {
+     bool nec_quirks;
+ };
+ 
++bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit);
++void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit);
+ #endif
+-- 
+2.7.4
+
 
