@@ -2,93 +2,97 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B770C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3BEC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ADB52065F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:34:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A4362065F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:35:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPMidhnU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ADB52065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nvPt8nQN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A4362065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jskw3-0007kN-CG
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:34:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59882)
+	id 1jskwd-0000EF-KI
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:35:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jskv4-0006sy-12
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:33:46 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55844
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jskv1-0005IL-4B
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:33:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594118022;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ILm3e8DojcXLC7g7JGo5aJu8v1+4oqCqjulabZTFBNQ=;
- b=dPMidhnUL5SP6Ssr3atuPjMX261lqc+7aeSkPpaGIKIJNPqZISWtt0xoafjlw1hNjLWfeT
- yIZrMwSxzpcxD7sMkm3f4AKHl6w0VC6ln4Oz5GDcTPky2rvD2qAhi6QgrImW7YX1iwmBxb
- rvUjWPY0pcSDkcXG648EtDxpAAibht4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-P917rZpXN3mx27GRH8OvoQ-1; Tue, 07 Jul 2020 06:33:38 -0400
-X-MC-Unique: P917rZpXN3mx27GRH8OvoQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D002107B274;
- Tue,  7 Jul 2020 10:33:37 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-113.ams2.redhat.com [10.36.114.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A029607A0;
- Tue,  7 Jul 2020 10:33:32 +0000 (UTC)
-Date: Tue, 7 Jul 2020 12:33:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Peter Krempa <pkrempa@redhat.com>
-Subject: Re: [PATCH 2/6] migration: introduce savevm, loadvm, delvm QMP
- commands
-Message-ID: <20200707103331.GB7002@linux.fritz.box>
-References: <20200702175754.2211821-1-berrange@redhat.com>
- <20200702175754.2211821-3-berrange@redhat.com>
- <fcff0e8b-fd60-2897-0553-49ab24a9b7fa@redhat.com>
- <20200702182452.GP1888119@redhat.com>
- <20200703154933.GE6641@work-vm>
- <20200703160235.GM2213227@redhat.com>
- <20200706161555.GE5052@linux.fritz.box>
- <20200707063853.GA9048@angien.pipo.sk>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jskvp-0007l0-De; Tue, 07 Jul 2020 06:34:33 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50402)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jskvn-0005Om-Aq; Tue, 07 Jul 2020 06:34:33 -0400
+Received: by mail-wm1-x341.google.com with SMTP id l17so42744674wmj.0;
+ Tue, 07 Jul 2020 03:34:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=SHHrVlrgvYvdr+UupFcWTLa2FKml67HTUSieo4VrRf0=;
+ b=nvPt8nQNVzUfinh6qmaQvMOy6uE3C2yqo32AfeZz1KNfkzdzTkBsVNO96X3sT3J9mS
+ Cv+ANZAvqoQgaWHfvkHM+4Df3aVBnFYAnUF2K3OWa1mCbfi3iOBHqf8WaWs9yBmHSYaF
+ HswmjIyYwbQUb2prJVq2jUMJxzUnPGgxrpTmQ+kvOyLMZqCqJdANT0fHgbBWKlbD6Wyb
+ G6bgiVIr/53Bg1ZBpN0q9Js+3wxoHTlFux3OBisVFsfyj8jKBdbHRxRaEENpC/d05nAJ
+ 6tFu4hLyDNpf4ksyB4cS4OAZbq46P2kHDbdXoqNTgIhFd9bGAY3lzn++6K6RF8KIg3zx
+ zIdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SHHrVlrgvYvdr+UupFcWTLa2FKml67HTUSieo4VrRf0=;
+ b=U4Hz7QqcHcpumV+alReNkgMSuOXqIQQMH8kjiCsHatO9QbZMkFSQrPS8MvsmtX0B+s
+ TjhTSPRyrtJlYmADA7T64m5FTjSpjvPNf93ZIldiP3PAPKtTJVP/ZsM2fnViDNYmUZ/s
+ WYYLQO4x8oPuCsQocHCu19pCVD330X605/abkFR7gmdGaM0yWyDJe/ww8GPpxhrsUCq/
+ kcwIcVmw8iJn5wvTqnv/lL/gyE010VygXWzF2/Cwc93k7rczJS+tfPby3A6WUQWyUIlq
+ VqwOZma2aV36Y5qbL2tbvWk7KQjTRrbegkqL6Ihq/wrcK9Cun7NcHwHlyPhgSR/6e6XA
+ M52w==
+X-Gm-Message-State: AOAM531hYUiPgeiXIo0Qixz5wZSVGvxPlIcROfd0THJw+dfDgjju3mxw
+ TJIx/QaU3vN0tUXCTZqWs3E=
+X-Google-Smtp-Source: ABdhPJzO0PVB8b5p4NaspE667CjOBMks1GRyZfYGjgC5HrDRyuM24PuyDprQBsbuH4KsIK7RY9z1bA==
+X-Received: by 2002:a1c:e088:: with SMTP id x130mr3344874wmg.14.1594118069411; 
+ Tue, 07 Jul 2020 03:34:29 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id r10sm491680wrm.17.2020.07.07.03.34.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jul 2020 03:34:28 -0700 (PDT)
+Subject: Re: [PATCH v7 05/17] hw/sd/sdcard: Do not switch to ReceivingData if
+ address is invalid
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200630133912.9428-1-f4bug@amsat.org>
+ <20200630133912.9428-6-f4bug@amsat.org>
+ <CAP+75-V-Uu8-Uk8jMwkgb3xJpFoef=k6p=ejaY4=+njkdb3ZeQ@mail.gmail.com>
+ <3b0a65bc-97a7-9f49-da3a-5c680c4b5722@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0d5d56c8-02ea-17ab-c935-077fa96dcf56@amsat.org>
+Date: Tue, 7 Jul 2020 12:34:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200707063853.GA9048@angien.pipo.sk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <3b0a65bc-97a7-9f49-da3a-5c680c4b5722@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,68 +106,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.07.2020 um 08:38 hat Peter Krempa geschrieben:
-> On Mon, Jul 06, 2020 at 18:15:55 +0200, Kevin Wolf wrote:
-> > Am 03.07.2020 um 18:02 hat Daniel P. Berrangé geschrieben:
-> > > On Fri, Jul 03, 2020 at 04:49:33PM +0100, Dr. David Alan Gilbert wrote:
-> > > > * Daniel P. Berrangé (berrange@redhat.com) wrote:
-> > > > > On Thu, Jul 02, 2020 at 01:12:52PM -0500, Eric Blake wrote:
-> > > > > > On 7/2/20 12:57 PM, Daniel P. Berrangé wrote:
-> 
-> [...]
-> 
-> > > migration only does vmstate, not disks. The current blockdev commands
-> > > are all related to external snapshots, nothing for internal snapshots
-> > > AFAIK. So we still need commands to load/save internal snapshots of
-> > > the disk data in the qcow2 files.
-> > > 
-> > > So we could look at loadvm/savevm conceptually as a syntax sugar above
-> > > a migration transport that targets disk images, and blockdev QMP command
-> > > that can do internal snapshots. Neither of these exist though and feel
-> > > like a significantly larger amount of work than using existing functionality
-> > > that is currently working.
-> > 
-> > There is blockdev-snapshot-internal-sync, which does a disk-only
-> > snapshot of a single node. A snapshot of multiple nodes can be taken by
-> > putting multiple blockdev-snapshot-internal-sync inside a 'transaction'
-> > command.
-> 
-> Libvirt never implemented support for disk-only internal snapshots as I
-> didn't think they are worth it. We also made a mistake by using the
-> VIR_DOMAIN_SNAPSHOT_DISK_ONLY to switch to an external snapshot, so
-> while the XML can modify the snapshot to be internal it's not very clear
-> nor user-friendly to force an internal disk only snapshot.
-> 
-> > If we want to build on top of this, we'd have to implement a
-> > transactionable command for storing only the VM state to a specific
-> > node. This would probably still be a long-running job.
-> 
-> IMO we really want this also for external snapshots. Driving the
-> migration as standard migration is really suboptimal especially when the
-> user wants minimal downtime. Transactioning a post-copy style copy-on
-> write migration would simplify this a lot. I agree though that this is
-> for a different conversation.
+On 7/7/20 12:24 PM, Philippe Mathieu-Daudé wrote:
+> On 7/7/20 10:30 AM, Philippe Mathieu-Daudé wrote:
+>> On Tue, Jun 30, 2020 at 3:39 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>
+>>> Only move the state machine to ReceivingData if there is no
+>>> pending error. This avoids later OOB access while processing
+>>> commands queued.
+>>>
+>>>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+>>>
+>>>   4.3.3 Data Read
+>>>
+>>>   Read command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>>   occurred and no data transfer is performed.
+>>>
+>>>   4.3.4 Data Write
+>>>
+>>>   Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>>   occurred and no data transfer is performed.
+>>>
+>>> WP_VIOLATION errors are not modified: the error bit is set, we
+>>> stay in receive-data state, wait for a stop command. All further
+>>> data transfer is ignored. See the check on sd->card_status at the
+>>> beginning of sd_read_data() and sd_write_data().
+>>>
+>>> Fixes: CVE-2020-13253
+>>> Cc: Prasad J Pandit <pjp@fedoraproject.org>
+>>> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+>>> Buglink: https://bugs.launchpad.net/qemu/+bug/1880822
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>> v4: Only modify ADDRESS_ERROR, not WP_VIOLATION (pm215)
+>>> ---
+>>>  hw/sd/sd.c | 34 ++++++++++++++++++++++------------
+>>>  1 file changed, 22 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>>> index 04451fdad2..7e0d684aca 100644
+>>> --- a/hw/sd/sd.c
+>>> +++ b/hw/sd/sd.c
+>>> @@ -1167,13 +1167,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>>>      case 17:   /* CMD17:  READ_SINGLE_BLOCK */
+>>>          switch (sd->state) {
+>>>          case sd_transfer_state:
+>>> -            sd->state = sd_sendingdata_state;
+>>> -            sd->data_start = addr;
+>>> -            sd->data_offset = 0;
+>>>
+>>>              if (sd->data_start + sd->blk_len > sd->size) {
+>>>                  sd->card_status |= ADDRESS_ERROR;
+>>> +                return sd_r1;
+>>>              }
+>>> +
+>>> +            sd->state = sd_sendingdata_state;
+>>> +            sd->data_start = addr;
+>>> +            sd->data_offset = 0;
+>>>              return sd_r1;
+>>>
+>>>          default:
+>>> @@ -1184,13 +1186,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>>>      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
+>>>          switch (sd->state) {
+>>>          case sd_transfer_state:
+>>> -            sd->state = sd_sendingdata_state;
+>>> -            sd->data_start = addr;
+>>> -            sd->data_offset = 0;
+>>>
+>>>              if (sd->data_start + sd->blk_len > sd->size) {
+>>>                  sd->card_status |= ADDRESS_ERROR;
+>>> +                return sd_r1;
+>>
+>> Unfortunately this breaks guests (Linux at least) when sd->size is not
+>> a power of 2,
+>> as Linux doesn't expect unrealistic SD card sizes.
 
-This is an interesting point actually. And while the implementation of
-the post-copy style live snapshotting is for a different conversation, I
-think the implications it has on the API are relevant for us now.
+I'll go with Peter's suggestion from IRC:
+"insist the blk device is the right size and make it an error if not".
 
-But even if we have an all-in-one snapshot job instead of a transaction
-to group all the individual operations together, I think you could still
-represent that by just specifying an empty list of nodes to be
-snapshotted. (I feel this is another argument for passing the nodes to
-include rather than nodes to exclude from the disk snapshot.)
-
-Kevin
-
+> 
+> I can use blk_truncate() to expand the image (which must be RW anyway)
+> to the ceil pow2 with something like:
+> 
+> -- >8 --
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index b44999c864..052934f867 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -2121,11 +2121,28 @@ static void sd_realize(DeviceState *dev, Error
+> **errp)
+>      }
+> 
+>      if (sd->blk) {
+> +        int64_t blk_size;
+> +
+>          if (blk_is_read_only(sd->blk)) {
+>              error_setg(errp, "Cannot use read-only drive as SD card");
+>              return;
+>          }
+> 
+> +        blk_size = blk_getlength(sd->blk);
+> +        if (blk_size > 0) {
+> +            int64_t blk_size_aligned = pow2ceil(blk_size);
+> +
+> +            if (blk_size != blk_size_aligned) {
+> +                ret = blk_truncate(sd->blk, blk_size_aligned, false,
+> +                                   PREALLOC_MODE_FALLOC,
+> +                                   BDRV_REQ_ZERO_WRITE, errp);
+> +                if (ret < 0) {
+> +                    error_prepend(errp, "Could not resize image: ");
+> +                    return;
+> +                }
+> +            }
+> +        }
+> +
+>          ret = blk_set_perm(sd->blk, BLK_PERM_CONSISTENT_READ |
+> BLK_PERM_WRITE,
+>                             BLK_PERM_ALL, errp);
+>          if (ret < 0) {
+> ---
 
