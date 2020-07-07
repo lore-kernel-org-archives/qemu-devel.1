@@ -2,83 +2,86 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F758C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C1DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:03:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C771206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:00:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12E73206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:03:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bM3RH3mH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C771206DF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRof3WvZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E73206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jslLJ-00065k-AY
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 07:00:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36770)
+	id 1jslNV-0008ET-Br
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 07:03:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFd-0005I6-LT
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33853
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jslMU-0007hB-0h
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:02:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57438
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFb-0000Ya-TA
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:01 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jslMS-0001rX-GX
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:02:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594119299;
+ s=mimecast20190719; t=1594119723;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=GarDlEUFY4DjkI1O4QVvSFSEtdnp67AHeBeVcC772hY=;
- b=bM3RH3mHRPh0dZBSoCC0Qbb+6+h0BaNE6jdI1hclW2VRm0iK2uVBoDzTbxupm3mlXAqcDw
- MHrdBo25Hw86L/DZRy2ZHWbDPfp8ySP99iRAP/UQy3KnXq1q4QeJGYV1TPC2awrUPgHfy8
- s/lyWNOSkMG5JCj8OdlBvyEw71TNf30=
+ content-transfer-encoding:content-transfer-encoding:openpgp:openpgp;
+ bh=1MLm6o6Xg2RNS4OVfM+TbqKzm0RGJmRg9n5H+VfrDLg=;
+ b=BRof3WvZ6kRquVnLQGkshm7aMOXh1focfm9dOK94/qs9iYWEJhqd2eT6DEYxbJfZOt3pzr
+ A03CywYqbkGJ2JZ/4CZRo+kbWOTBOOpBOCYpIagMraefahaWOek0IbfhISO3FdQF7oNeyM
+ 0X0OodtSqFydFZJBdTLpEU6HATjSB7k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-KcJvyt2-OVOywON414ppvg-1; Tue, 07 Jul 2020 06:54:57 -0400
-X-MC-Unique: KcJvyt2-OVOywON414ppvg-1
+ us-mta-355-OmJj5fNHPXCnlbOWInBpwg-1; Tue, 07 Jul 2020 07:02:00 -0400
+X-MC-Unique: OmJj5fNHPXCnlbOWInBpwg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1FB7EC1A0;
- Tue,  7 Jul 2020 10:54:56 +0000 (UTC)
-Received: from localhost (ovpn-113-54.ams2.redhat.com [10.36.113.54])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 36ABC2DE60;
- Tue,  7 Jul 2020 10:54:49 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>
-Subject: [PATCH 0/2] virtio: non-legacy device handling
-Date: Tue,  7 Jul 2020 12:54:44 +0200
-Message-Id: <20200707105446.677966-1-cohuck@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC95C801E6A;
+ Tue,  7 Jul 2020 11:01:57 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-77.ams2.redhat.com [10.36.112.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 31CDA19D7B;
+ Tue,  7 Jul 2020 11:01:56 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>
+From: Thomas Huth <thuth@redhat.com>
+Subject: hw/intc/xics.c:605: ics_realize: Assertion `ics->xics' failed
+Openpgp: preference=signencrypt
+Message-ID: <104a1848-4686-0b6f-fb0c-e09e2ffbd031@redhat.com>
+Date: Tue, 7 Jul 2020 13:01:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,43 +94,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As discussed in "virtio-fs: force virtio 1.x usage", it seems like
-a good idea to make sure that any new virtio device (which does not
-support legacy virtio) is indeed a non-transitional device, just to
-catch accidental misconfigurations. We can easily compile a list
-of virtio devices with legacy support and have transports verify
-in their plugged callbacks that legacy support is off for any device
-not in that list.
 
-Most new virtio devices force non-transitional already, so nothing
-changes for them. vhost-user-fs-pci even does not allow to configure
-a non-transitional device, so it is fine as well.
+ Hi Greg,
 
-One problematic device, however, is virtio-iommu-pci. It currently
-offers both the transitional and the non-transitional variety of the
-device, and does not force anything. I'm unsure whether we should
-consider transitional virtio-iommu unsupported, or if we should add
-some compat handling. (The support for legacy or not generally may
-change based upon the bus, IIUC, so I'm unsure how to come up with
-something generic.)
+I just ran  scripts/device-crash-test and it triggered the assert that
+you've added in commit b015a9809427c8 ("xics: Link ICS_PROP_XICS
+property to ICSState::xics pointer"):
 
-Cornelia Huck (2):
-  virtio: list legacy-capable devices
-  virtio: verify that legacy support is not accidentally on
+$ qemu-system-ppc64 -S -M powernv9,accel=tcg -device pnv-psi-POWER8
+qemu-system-ppc64: hw/intc/xics.c:605: ics_realize: Assertion
+`ics->xics' failed.
+Aborted (core dumped)
 
- hw/s390x/virtio-ccw.c      |  6 ++++++
- hw/virtio/virtio-pci.c     |  4 ++++
- hw/virtio/virtio.c         | 25 +++++++++++++++++++++++++
- include/hw/virtio/virtio.h |  2 ++
- 4 files changed, 37 insertions(+)
+That's ugly. Could you please have a look how this could be done in a
+nicer way? (Maybe set errp and return in that case?)
 
--- 
-2.25.4
+ Thanks,
+  Thomas
 
 
