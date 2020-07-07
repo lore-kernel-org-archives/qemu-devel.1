@@ -2,95 +2,90 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAC7C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C6FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1488F2065F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:40:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8A952065F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 09:41:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bzMeK7DD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1488F2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VGVgllsE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8A952065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsk57-0000aB-C0
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 05:40:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48544)
+	id 1jsk63-0001aW-EM
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 05:41:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jsk4W-0000A5-25
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:39:28 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41862)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jsk4T-0004Fu-Np
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:39:27 -0400
-Received: by mail-wr1-x443.google.com with SMTP id z15so33147603wrl.8
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 02:39:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=uBJLp60jM7B2FFavYDPsLTn0F3+4Ug/iZ+EgErWI2FE=;
- b=bzMeK7DDJFWiSBywoCbwWFyv+FmW0mo4oUKA/WtOrLNpFefCmj0fUuUxlN7mUog5Bi
- ab42JFkG/SabQ8nph4Sbh+iJOCAeaMcjqdAYGVqVMIP9yN1ECttm8JwAxQc6LFnpWFSz
- nSdhIE6TkMobKLUTqgbE17mtb2yGLPOeppKwkt0NKi5vJEqV8Sw9tojWTZjcc16Do0QG
- InXi0Wcm5nAwB8jhrUxZ17x9XRCEI4hkR6r3/yWeBuc6Aan9atA9bOpx1864E5qyZLDa
- YiVScjlw6yHshMJlU3MolpILNvB8txCq0VxDfjBzH4YbPoWvHIjVsfzDCK8CNkfgwvB9
- 9mKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=uBJLp60jM7B2FFavYDPsLTn0F3+4Ug/iZ+EgErWI2FE=;
- b=oQ+4aaAXZSUGwfh47HQto8VHvIgyJDk2kwXFnPwYZU+YqisD0rK6UvBCoRm/+OqLX2
- Ldxg02QSJc4Yh8xUB9xISfChzHLqzO4N40fp8VNxtOc9fiNEA3HSqXgTQsi2MrjBO79a
- qP4icnkVajzVFO2rgvPMXNoCZwV2tQuIdiDrEo1TEsDKir06vEZWOx8lp5+El1A8Uadd
- grSCn0B1mjl6jEQwUiU4s1JtbVpY6KX/jNgvmbV8Vy+1Rl8D4KRF1BX3OJI4FWRAVGIu
- ha+bwp2+3Bp2Fkrf/zRNQsgqV9vXOxTjOOq+HSRRycYM1VARmpeyOJTbV8CSudTEq1sb
- IkKQ==
-X-Gm-Message-State: AOAM531HufeagVpXQx7i0AwFDMYHfyfwvBO5LkSUtCscgjEq1Je3galu
- Vi2mtaCQijM2wz/3ceU6xXBc5A==
-X-Google-Smtp-Source: ABdhPJydegnPyGpsTF1v0d+28A1Y3rGnieLz94sE7YLcRIkx/+qPS2kGWpJiTU9VIhZwzMs5vkUdTw==
-X-Received: by 2002:adf:8501:: with SMTP id 1mr58259886wrh.153.1594114763598; 
- Tue, 07 Jul 2020 02:39:23 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 1sm312014wmf.0.2020.07.07.02.39.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 02:39:22 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AE2AC1FF7E;
- Tue,  7 Jul 2020 10:39:21 +0100 (BST)
-References: <20200707070858.6622-1-alex.bennee@linaro.org>
-User-agent: mu4e 1.5.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: Re: [PULL 00/41] testing updates (vm, gitlab, misc build fixes)
-In-reply-to: <20200707070858.6622-1-alex.bennee@linaro.org>
-Date: Tue, 07 Jul 2020 10:39:21 +0100
-Message-ID: <874kqjpsty.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jsk5M-0000u9-2j
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:40:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55077
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jsk5K-0004SW-0p
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 05:40:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594114816;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=zI5Z7RQP3rBg7MrBNUAelWh4881OkbBao63JmFMXZyE=;
+ b=VGVgllsEeHt4CFpFhQcAI+3KKIwYfCN4JpzBaWF2cK8BfiZ3yCf5Ny1EiAdLpbuBTblu+Q
+ CEVb/bXIECLo+Z63qQyTa1UeBiyW0JAq/sE/LuzpF5rRU9YhYKdRugTAT6992Lyzg5TzPZ
+ gl2YNT35uek6A1icAf+PR/vzRpR3YXY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-a-bEgep7NSejpAcb9zpGCw-1; Tue, 07 Jul 2020 05:40:14 -0400
+X-MC-Unique: a-bEgep7NSejpAcb9zpGCw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F893800D5C;
+ Tue,  7 Jul 2020 09:40:13 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A409971674;
+ Tue,  7 Jul 2020 09:40:09 +0000 (UTC)
+Date: Tue, 7 Jul 2020 10:40:06 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Slow down with: 'Make "info qom-tree" show children sorted'
+Message-ID: <20200707094006.GE2649462@redhat.com>
+References: <20200527084754.7531-1-armbru@redhat.com>
+ <20200527084754.7531-3-armbru@redhat.com>
+ <49bea110-0a3d-5a40-6647-67b116fb41b5@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <49bea110-0a3d-5a40-6647-67b116fb41b5@redhat.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,187 +98,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, ehabkost@redhat.com,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ mark.cave-ayland@ilande.co.uk, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ David Gibson <dgibson@redhat.com>, pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Jul 07, 2020 at 06:45:57AM +0200, Thomas Huth wrote:
+> On 27/05/2020 10.47, Markus Armbruster wrote:
+> > "info qom-tree" prints children in unstable order.  This is a pain
+> > when diffing output for different versions to find change.  Print it
+> > sorted.
+> > 
+> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> > ---
+> >  qom/qom-hmp-cmds.c | 24 ++++++++++++++++--------
+> >  1 file changed, 16 insertions(+), 8 deletions(-)
+> 
+>  Hi Markus,
+> 
+> this patch causes a slow down of the qtests which becomes quite massive
+> when e.g. using the ppc64 and thourough testing. When I'm running
+> 
+> QTEST_QEMU_BINARY="ppc64-softmmu/qemu-system-ppc64" time \
+> ./tests/qtest/device-introspect-test -m slow | tail -n 10
+> 
+> the test runs for ca. 6m40s here before the patch got applied, and for
+> mor than 20 minutes after the patch got applied!
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+I think the test case itself could be optimized. Currently it does
+approx
 
-> There will be some docker failures until the official repository has
-> seeded but local builds should continue to work.
+   for each device type
+      info qom-tree
+      device_addr type,help
+      info qom-tree
 
-You can force the docker builds to use my registry for example by setting:
+it compares the before/after qom-tree to look for stray objects or
+to try to trigger crashes.
 
-  make docker-test-build REGISTRY=3Dregistry.gitlab.com/stsquad/qemu
->
-> ----
->
-> The following changes since commit eb6490f544388dd24c0d054a96dd304bc72844=
-50:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-202=
-00703' into staging (2020-07-04 16:08:41 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-testing-and-misc-070720-1
->
-> for you to fetch changes up to 6a726e8ca0286e3ed69945abd447099f6f6a903c:
->
->   tests/qht-bench: Adjust threshold computation (2020-07-07 07:57:41 +010=
-0)
->
-> ----------------------------------------------------------------
-> Testing and build updates:
->
->   - tests/vm support for aarch64 VMs
->   - tests/tcg better cross-compiler detection
->   - update docker tooling to support registries
->   - gitlab build docker images and store in registry
->   - gitlab use docker images for builds
->   - a number of skipIf updates to support move
->   - linux-user MAP_FIXED_NOREPLACE fix
->   - qht-bench compiler tweaks
->   - configure fix for secret keyring
->   - tsan fiber annotation clean-up
->
-> ----------------------------------------------------------------
-> Alex Benn=C3=A9e (23):
->       tests/vm: switch from optsparse to argparse
->       tests/vm: allow us to take advantage of MTTCG
->       tests/docker: check for an parameters not empty string
->       tests/docker: change tag naming scheme of our images
->       .gitignore: un-ignore .gitlab-ci.d
->       gitlab: build containers with buildkit and metadata
->       tests/docker: add --registry support to tooling
->       tests/docker: add packages needed for check-acceptance
->       tests/acceptance: skip s390x_ccw_vrtio_tcg on GitLab
->       tests/acceptance: fix dtb path for machine_rx_gdbsim
->       tests/acceptance: skip multicore mips_malta tests on GitLab
->       tests/acceptance: skip LinuxInitrd 2gib with v4.16 on GitLab
->       gitlab: add acceptance testing to system builds
->       tests/tcg: add more default compilers to configure.sh
->       tests/docker: add a linux-user testing focused image
->       linux-user/elfload: use MAP_FIXED_NOREPLACE in pgb_reserved_va
->       gitlab: enable check-tcg for linux-user tests
->       gitlab: add avocado asset caching
->       gitlab: split build-disabled into two phases
->       gitlab: limit re-builds of the containers
->       containers.yml: build with docker.py tooling
->       testing: add check-build target
->       shippable: pull images from registry instead of building
->
-> Daniel P. Berrang=C3=A9 (3):
->       gitlab: introduce explicit "container" and "build" stages
->       gitlab: build all container images during CI
->       gitlab: convert jobs to use custom built containers
->
-> David Edmondson (1):
->       crypto/linux_keyring: fix 'secret_keyring' configure test
->
-> Richard Henderson (2):
->       tests/qht-bench: Adjust testing rate by -1
->       tests/qht-bench: Adjust threshold computation
->
-> Robert Foley (10):
->       util/coroutine: Cleanup start_switch_fiber_ for TSAN.
->       tests/vm: pass args through to BaseVM's __init__
->       tests/vm: Add configuration to basevm.py
->       tests/vm: Added configuration file support
->       tests/vm: Add common Ubuntu python module
->       tests/vm: Added a new script for ubuntu.aarch64.
->       tests/vm: Added a new script for centos.aarch64.
->       tests/vm: change scripts to use self._config
->       python/qemu: Add ConsoleSocket for optional use in QEMUMachine
->       tests/vm: Add workaround to consume console
->
-> Thomas Huth (2):
->       gitlab-ci: Fix the change rules after moving the YML files
->       travis.yml: Test also the other targets on s390x
->
->  configure                                          |  31 +-
->  linux-user/elfload.c                               |  10 +-
->  tests/qht-bench.c                                  |  40 ++-
->  util/coroutine-ucontext.c                          |  52 ++--
->  .gitignore                                         |   1 +
->  .gitlab-ci.d/containers.yml                        | 263 ++++++++++++++++
->  .gitlab-ci.d/edk2.yml                              |   5 +-
->  .gitlab-ci.d/opensbi.yml                           |   5 +-
->  .gitlab-ci.yml                                     | 281 ++++++++++-----=
---
->  .shippable.yml                                     |   8 +-
->  .travis.yml                                        |  62 ++--
->  python/qemu/console_socket.py                      | 110 +++++++
->  python/qemu/machine.py                             |  23 +-
->  tests/Makefile.include                             |  19 +-
->  tests/acceptance/boot_linux.py                     |   2 +
->  tests/acceptance/linux_initrd.py                   |   3 +
->  tests/acceptance/machine_mips_malta.py             |   3 +
->  tests/acceptance/machine_rx_gdbsim.py              |   2 +-
->  tests/acceptance/replay_kernel.py                  |   2 +-
->  tests/docker/Makefile.include                      |  17 +-
->  tests/docker/common.rc                             |   2 +-
->  tests/docker/docker.py                             |  46 ++-
->  .../dockerfiles/debian-all-test-cross.docker       |  53 ++++
->  tests/docker/dockerfiles/debian-alpha-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-amd64-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-amd64.docker       |   2 +-
->  tests/docker/dockerfiles/debian-arm64-cross.docker |   2 +-
->  .../dockerfiles/debian-arm64-test-cross.docker     |   2 +-
->  tests/docker/dockerfiles/debian-armel-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-armhf-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-hppa-cross.docker  |   2 +-
->  tests/docker/dockerfiles/debian-m68k-cross.docker  |   2 +-
->  tests/docker/dockerfiles/debian-mips-cross.docker  |   2 +-
->  .../docker/dockerfiles/debian-mips64-cross.docker  |   2 +-
->  .../dockerfiles/debian-mips64el-cross.docker       |   2 +-
->  .../docker/dockerfiles/debian-mipsel-cross.docker  |   2 +-
->  .../docker/dockerfiles/debian-powerpc-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-ppc64-cross.docker |   2 +-
->  .../docker/dockerfiles/debian-ppc64el-cross.docker |   2 +-
->  .../docker/dockerfiles/debian-riscv64-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-s390x-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-sh4-cross.docker   |   2 +-
->  .../docker/dockerfiles/debian-sparc64-cross.docker |   2 +-
->  .../docker/dockerfiles/debian-tricore-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-win32-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian-win64-cross.docker |   2 +-
->  tests/docker/dockerfiles/debian9-mxe.docker        |   2 +-
->  tests/docker/dockerfiles/fedora.docker             |   7 +
->  tests/docker/dockerfiles/ubuntu2004.docker         |  10 +-
->  tests/tcg/Makefile.qemu                            |   4 +-
->  tests/tcg/configure.sh                             |  19 +-
->  tests/vm/Makefile.include                          |  22 ++
->  tests/vm/aarch64vm.py                              | 106 +++++++
->  tests/vm/basevm.py                                 | 344 +++++++++++++++=
-------
->  tests/vm/centos-8-aarch64.ks                       |  51 +++
->  tests/vm/centos.aarch64                            | 227 ++++++++++++++
->  tests/vm/conf_example_aarch64.yml                  |  51 +++
->  tests/vm/conf_example_x86.yml                      |  50 +++
->  tests/vm/fedora                                    |  17 +-
->  tests/vm/freebsd                                   |  16 +-
->  tests/vm/netbsd                                    |  19 +-
->  tests/vm/openbsd                                   |  17 +-
->  tests/vm/ubuntu.aarch64                            |  68 ++++
->  tests/vm/ubuntu.i386                               |  46 +--
->  tests/vm/ubuntuvm.py                               |  60 ++++
->  65 files changed, 1839 insertions(+), 383 deletions(-)
->  create mode 100644 .gitlab-ci.d/containers.yml
->  create mode 100644 python/qemu/console_socket.py
->  create mode 100644 tests/docker/dockerfiles/debian-all-test-cross.docker
->  create mode 100644 tests/vm/aarch64vm.py
->  create mode 100644 tests/vm/centos-8-aarch64.ks
->  create mode 100755 tests/vm/centos.aarch64
->  create mode 100644 tests/vm/conf_example_aarch64.yml
->  create mode 100644 tests/vm/conf_example_x86.yml
->  create mode 100755 tests/vm/ubuntu.aarch64
->  create mode 100644 tests/vm/ubuntuvm.py
+The info qom-tree calls could be pushed outside the loop
+
+   info qom-tree
+   for each device type
+      device_addr type,help
+   info qom-tree
+
+Taking /x86_64/device/introspect/concrete/defaults/pc-q35-5.1 as a
+example, this change is the difference between 20 seconds running and
+3 seconds running.
+
+Reverting Markus' change actually didn't make much difference, only
+reducing the 20 seconds to 17 seconds.
+
+The downside is that if there is a stray object/crash, it would not
+immediately associate with the device type. I'm not sure that's a
+real problem though. Especially if we are running this as pre-merge
+CI we'll only need to look at the patch series to find the broken
+device. If this is quick enough that we can run it as standard,
+instead of only with -m slow, then its a net win I think.
 
 
---=20
-Alex Benn=C3=A9e
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
