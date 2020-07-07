@@ -2,92 +2,89 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE93C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFE7C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:24:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA383206BE
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:21:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 475DA206BE
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 20:24:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEt2Wj+t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA383206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="txrh3jKc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475DA206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsu5V-0003MA-Pc
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 16:21:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34972)
+	id 1jsu8X-0004Sr-K9
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 16:24:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsu4e-0002pv-7z
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 16:20:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28617
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jsu4b-0004dw-JC
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 16:20:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594153211;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=3zLjhzdd0tcuk5mJaSqmcdSc4NJNFYLwjDuAyZnPtXk=;
- b=JEt2Wj+tph37SK+VxT4pEUudNjk/gtwDBgGzQQ2Ju5Hwv3L4AQn3f0TeWo3uhHyRElil5p
- Xh+Wve1DlRZoyuOpC6euM6OR0DhSZdyhL7JxBaWV7ThpaLe2iib48yIR053WtNtzWyp3jH
- r3gFMhpzsqUUOYGHEqYQos2HAmRwUTk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-_Ky0ii7GN5SdbVQzfs3DaA-1; Tue, 07 Jul 2020 16:20:07 -0400
-X-MC-Unique: _Ky0ii7GN5SdbVQzfs3DaA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADB4B8015CE;
- Tue,  7 Jul 2020 20:20:05 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-28.ams2.redhat.com [10.36.112.28])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8881F60BF3;
- Tue,  7 Jul 2020 20:19:57 +0000 (UTC)
-Subject: Re: [PULL 0/3] MIPS + TCG Continuous Benchmarking queue for July 7th, 
- 2020
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-devel@nongnu.org, peter.maydell@linaro.org
-References: <1594140062-23522-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <05a9301c-dbad-f11c-12a0-3c60fe0fcccb@redhat.com>
-Date: Tue, 7 Jul 2020 22:19:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jsu7u-0003yy-Vp
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 16:23:39 -0400
+Received: from mail-io1-xd29.google.com ([2607:f8b0:4864:20::d29]:44171)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jsu7t-00058K-3C
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 16:23:38 -0400
+Received: by mail-io1-xd29.google.com with SMTP id i4so44544042iov.11
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 13:23:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ziYWx1Xx1YGUk5hJjypGblLR218V4SSYUHoq7OhI9og=;
+ b=txrh3jKcwm1hT8n5f8WsUNnUG6hIh0QhDdea1zkTuBIn+8q2e/UY2mfKjx6ewxPMVK
+ VeCMTeBW3jMYpJoxyU2WPeMUMfaI+VlAk+WAMihq62Yrq+Wq5rkd+rL/xzYKz2q9HrXP
+ AnpWwJM0+KVPcJWjxExVCukQa+mz8ILOx1Xziw0xPSX5+qOcF+mm3xWA4hEN+LPJk33h
+ Fx7aBqstzPq4VFs8DHo/9dRwjZLRSj6kFT7xDg+mLb/of3cPMYFuJOg0PEmaC7K0l0Vs
+ QyILQRyIU04AmO7cXC6vAe8YS9ngez2kLl5czSlOmUw5BWwAP95MJU3t3+sa3M6sNWVW
+ zbvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ziYWx1Xx1YGUk5hJjypGblLR218V4SSYUHoq7OhI9og=;
+ b=LNfVv4CgV/IVCQwhNqNFEXaU4t2xFN+b2bxtn5ih2rQWiRLoGAIXYOVgfpfUNDuCrU
+ PyTk4UKztgujXYBXSJIu6E1B4bgAgiXtraD4dNHv6NIarnpCYhr0tTxFoSvuPoQjXZOX
+ lZ4K2go/qQBpqUXhACC6+r3KcB7DzRcDTmwQucGPLPOyeCWj0eeeBxOcwkOIKyaWTfFD
+ VrR+fMhHtaawf3S5UIb7nsmIYFcvlM5b6vhYiza1fPx7nmrnJi7x4hplnfVmyoifwzcK
+ OjFw1y8vTvPr8cTqBNLlbReIhHw9p1TWZ4BOKDOEzZamhHIqOeaSeykeztdTlDGk/UwK
+ wq+g==
+X-Gm-Message-State: AOAM5303hTCcSUinZQ/A7B9F5ntzgjSUtr+Uoz63aLnxay7KaKflqsbo
+ l47KUo4OUS5lS+M7v+sFrx/o2dPxaOjh06n2KCY=
+X-Google-Smtp-Source: ABdhPJxgqLfFVry733DNOKPvH4QXB4kbe6SrACHb/LG0c9LEOsGFu78K9d3pwe2On0/9GCZgWhDuAmoGkNJ7CJ3UlKc=
+X-Received: by 2002:a5d:96d7:: with SMTP id r23mr33070160iol.126.1594153415893; 
+ Tue, 07 Jul 2020 13:23:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1594140062-23522-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:04:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <BY5PR02MB677298C4D2C2B63EF409AA5CCA6B0@BY5PR02MB6772.namprd02.prod.outlook.com>
+ <CADBGO7-hp4Pyfn+rq9d=ZxHmpMwitv-oLjYPJmCKSH6cLHVx=w@mail.gmail.com>
+ <CADBGO78-mqwapj+mdpFUO-puL0OZ_1QeBc+4yo4S9g1O4deNjg@mail.gmail.com>
+ <2d312ec0-d280-c0e3-2b1e-ff9c70c3168f@gmail.com>
+ <20200707075740.dkc76ceb7wytdoem@sirius.home.kraxel.org>
+In-Reply-To: <20200707075740.dkc76ceb7wytdoem@sirius.home.kraxel.org>
+From: Paul Zimmerman <pauldzim@gmail.com>
+Date: Tue, 7 Jul 2020 13:23:09 -0700
+Message-ID: <CADBGO79KSm3KV7=otOg=u7WjwBV=j3T7iU0fcTF-nGgtZvy+Aw@mail.gmail.com>
+Subject: Re: Failure prints during format or mounting a usb storage device
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001268ac05a9dfc4a6"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d29;
+ envelope-from=pauldzim@gmail.com; helo=mail-io1-xd29.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,103 +97,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@csgraf.de>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+Cc: Sai Pavan Boddu <saipava@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Vikram Garhwal <fnuv@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/07/2020 18.40, Aleksandar Markovic wrote:
-> The following changes since commit 710fb08fd297d7a92163debce1959fae8f3b6ed7:
-> 
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-07-06' into staging (2020-07-07 12:41:15 +0100)
-> 
-> are available in the git repository at:
-> 
->   https://github.com/AMarkovic/qemu tags/mips-queue-jul-07-2020
-> 
-> for you to fetch changes up to fa6e7da119b6da4067e757924e165bc737bb1260:
-> 
->   scripts/performance: Add dissect.py script (2020-07-07 18:32:20 +0200)
-> 
-> ----------------------------------------------------------------
-> 
-> MIPS + TCG Continuous Benchmarking queue for July 7th, 2020
-> 
->   Highlights:
-> 
->      - Fix for a regression in FPU emulation add.s.
->      - Add Loongson 2F disassembler.
->      - Add a script for a GSoC project.
-> 
->   Note:
-> 
->      - A checkpatch error and a checkpatch warning are known and
->      should be ignored.
-> 
-> ----------------------------------------------------------------
-> 
-> Ahmed Karaman (1):
->   scripts/performance: Add dissect.py script
-> 
-> Alex Richardson (1):
->   target/mips: fpu: Fix recent regression in add.s after 1ace099f2a
-> 
-> Stefan Brankovic (1):
->   disas: mips: Add Loongson 2F disassembler
-> 
->  configure                      |    1 +
->  disas/loongson2f.h             | 2562 +++++++++++++
->  include/disas/dis-asm.h        |    1 +
->  include/exec/poison.h          |    1 +
->  target/mips/cpu.c              |    6 +
->  target/mips/fpu_helper.c       |    2 +-
->  MAINTAINERS                    |    1 +
->  disas/Makefile.objs            |    1 +
->  disas/loongson2f.cpp           | 8154 ++++++++++++++++++++++++++++++++++++++++
+--0000000000001268ac05a9dfc4a6
+Content-Type: text/plain; charset="UTF-8"
 
-Honestly, no. Peter, please don't merge this pull request.
+On Tue, Jul 7, 2020 at 12:57 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-That disassembler source code is really huge, and I think someone should
-give this a *proper* review first before we include this in our repo. I
-just had a quick look at it, and I don't think that it is in the right
-shape already. For example, there are hard-coded magic numbers there, like:
+>   Hi,
+> >
+> > Gerd, do you know the purpose of the 'short_not_ok' parameter to
+> > usb_packet_setup()?
+>
+> Well, some usb host controllers have a flag in the transfer control
+> blocks to indicate the host controller should stop processing requests
+> in case of a short transfer.
+>
+> The usb core uses the flag to just to that (i.e. halt the endpoint on
+> short transfers).  It is also checked when usb-host pipelines requests
+> (requests queued after a short-not-ok packet can't be pipelined because
+> we don't know yet whenever we should continue processing the endpoint or
+> not).
+>
+> xhci has no such flag so the flag is never set.
+>
+> > The simple patch below fixes the reported problem,
+> > but I don't know if it could cause some other problems for XHCI.
+> > hcd-ehci, hcd-ohci, hcd-uhci all set the parameter conditionally,
+> > but hcd-xhci never sets it. I don't understand the purpose of the
+> > parameter myself.
+> >
+> > diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> > index b330e36fe6..9fb96fdd66 100644
+> > --- a/hw/usb/hcd-xhci.c
+> > +++ b/hw/usb/hcd-xhci.c
+> > @@ -1614,7 +1614,7 @@ static int xhci_setup_packet(XHCITransfer *xfer)
+> >      xhci_xfer_create_sgl(xfer, dir == USB_TOKEN_IN); /* Also sets
+> int_req */
+> >      usb_packet_setup(&xfer->packet, dir, ep, xfer->streamid,
+> > -                     xfer->trbs[0].addr, false, xfer->int_req);
+> > +                     xfer->trbs[0].addr, dir == USB_TOKEN_IN,
+> xfer->int_req);
+>
+> I suspect this might lead to queues being halted even though they should
+> not.
+>
+> Why does 7ad3d51ebb8a522ffcad391c4bef281245739dde look at short-not-ok?
+>
 
-bool ADD::disas_output(disassemble_info *info)
-+{
-+    char alias1[5];
-+    char alias2[5];
-+    char alias3[5];
-...
+Because the patch changes dev-storage to terminate the transfer if a
+short packet is received, so I figured 'short-not-ok' should affect
+that behavior.
 
-and in a completely different function, this hard-coded 5 is used again:
+I guess instead I could add another flag that only hcd-dwc2 sets. Does
+that sound OK to you?
 
-+void Instruction32::getAlias(char *buffer, int regNo)
-+{
-+    switch (regNo) {
-+    case 0:
-+        strncpy(buffer, "zero", 5);
-+        break;
-+    case 1:
-+        strncpy(buffer, "at", 5);
-...
+Thanks,
+Paul
 
-That definitely needs to be turned into a proper #define or the length
-needs to be passed as parameter to the function.
 
-Also the coding style is weird in a couple of places, and there were
-checkpatch warnings.
+> take care,
+>   Gerd
+>
+>
 
-Apart from that, Paolo asked you to take a break from MIPS
-maintainership for a while, Aleksandar. I strongly support that
-suggestion. Your derogatory behavior during the last weeks, especially
-in the last one, looked completely unacceptable to me. In my opinion you
-really need some time to reflect yourself. You, and we all as a
-community, now cannot continue just like nothing happened.
+--0000000000001268ac05a9dfc4a6
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
- Thanks,
-  Thomas
+<div dir=3D"ltr"><div dir=3D"ltr"><div class=3D"gmail_default" style=3D"fon=
+t-family:monospace"><br></div></div><br><div class=3D"gmail_quote"><div dir=
+=3D"ltr" class=3D"gmail_attr">On Tue, Jul 7, 2020 at 12:57 AM Gerd Hoffmann=
+ &lt;<a href=3D"mailto:kraxel@redhat.com">kraxel@redhat.com</a>&gt; wrote:<=
+br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
+x;border-left:1px solid rgb(204,204,204);padding-left:1ex">=C2=A0 Hi,<br>
+&gt; <br>
+&gt; Gerd, do you know the purpose of the &#39;short_not_ok&#39; parameter =
+to<br>
+&gt; usb_packet_setup()?<br>
+<br>
+Well, some usb host controllers have a flag in the transfer control<br>
+blocks to indicate the host controller should stop processing requests<br>
+in case of a short transfer.<br>
+<br>
+The usb core uses the flag to just to that (i.e. halt the endpoint on<br>
+short transfers).=C2=A0 It is also checked when usb-host pipelines requests=
+<br>
+(requests queued after a short-not-ok packet can&#39;t be pipelined because=
+<br>
+we don&#39;t know yet whenever we should continue processing the endpoint o=
+r<br>
+not).<br>
+<br>
+xhci has no such flag so the flag is never set.<br>
+<br>
+&gt; The simple patch below fixes the reported problem,<br>
+&gt; but I don&#39;t know if it could cause some other problems for XHCI.<b=
+r>
+&gt; hcd-ehci, hcd-ohci, hcd-uhci all set the parameter conditionally,<br>
+&gt; but hcd-xhci never sets it. I don&#39;t understand the purpose of the<=
+br>
+&gt; parameter myself.<br>
+&gt; <br>
+&gt; diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c<br>
+&gt; index b330e36fe6..9fb96fdd66 100644<br>
+&gt; --- a/hw/usb/hcd-xhci.c<br>
+&gt; +++ b/hw/usb/hcd-xhci.c<br>
+&gt; @@ -1614,7 +1614,7 @@ static int xhci_setup_packet(XHCITransfer *xfer)=
+<br>&gt;=C2=A0 =C2=A0 =C2=A0 xhci_xfer_create_sgl(xfer, dir =3D=3D USB_TOKE=
+N_IN); /* Also sets int_req */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 usb_packet_setup(&amp;xfer-&gt;packet, dir, ep, xf=
+er-&gt;streamid,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0xfer-&gt;trbs[0].addr, false, xfer-&gt;int_req);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0xfer-&gt;trbs[0].addr, dir =3D=3D USB_TOKEN_IN, xfer-&gt;int_req);<b=
+r>
+<br>
+I suspect this might lead to queues being halted even though they should<br=
+>
+not.<br>
+<br>
+Why does 7ad3d51ebb8a522ffcad391c4bef281245739dde look at short-not-ok?<br>=
+</blockquote><div><span class=3D"gmail_default" style=3D"font-family:monosp=
+ace"><br></span></div><div><span class=3D"gmail_default" style=3D"font-fami=
+ly:monospace">Because=C2=A0the patch changes dev-storage to terminate the t=
+ransfer if a</span></div><div><span class=3D"gmail_default" style=3D"font-f=
+amily:monospace">short packet is received, so I figured &#39;short-not-ok&#=
+39; should affect</span></div><div><span class=3D"gmail_default" style=3D"f=
+ont-family:monospace">that behavior.</span><br></div><div><span class=3D"gm=
+ail_default" style=3D"font-family:monospace"><br></span></div><div><span cl=
+ass=3D"gmail_default" style=3D"font-family:monospace">I guess instead I cou=
+ld add another flag that only hcd-dwc2 sets. Does</span></div><div><span cl=
+ass=3D"gmail_default" style=3D"font-family:monospace">that sound OK to you?=
+</span></div><div><span class=3D"gmail_default" style=3D"font-family:monosp=
+ace"><br></span></div><div><span class=3D"gmail_default" style=3D"font-fami=
+ly:monospace">Thanks,</span></div><div><span class=3D"gmail_default" style=
+=3D"font-family:monospace">Paul</span></div><div><br></div><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
+gb(204,204,204);padding-left:1ex">
+<br>
+take care,<br>
+=C2=A0 Gerd<br>
+<br>
+</blockquote></div></div>
 
+--0000000000001268ac05a9dfc4a6--
 
