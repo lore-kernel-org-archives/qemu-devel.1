@@ -2,85 +2,90 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECD7C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC9DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AE5D206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:41:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD3A220739
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 11:43:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="luLN5QAu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AE5D206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKaAQJZu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD3A220739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jslyr-0004o4-I0
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 07:41:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47544)
+	id 1jsm0Z-0005sS-4V
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 07:43:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jsly1-0004Ml-K1
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:40:53 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46954)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jslxz-0000Dx-V8
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:40:53 -0400
-Received: by mail-oi1-x244.google.com with SMTP id l63so33181096oih.13
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 04:40:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6hKK0pPuh8CecxBqlkjR3ganqcN3m0licd12d2QR7CI=;
- b=luLN5QAuAzEuuPi8sza1j/xzGagzmdlUjFANof2WYeILdiY3vvSv6BL2wkY+idbbMN
- dfw9bdJ6lMsgfE1pIhObr0IkBqJ7VFGyty1dhlzMYswijoR5ZXeFZddIr1fsYZDAlm+Z
- Io2MOIH9ipyfJvV4xhfrUnkS2Mcr/zty3gjzm6hfOBn4nlsSm1kQ/rfBp0HFJTV5g5li
- PYmaPWZVXMhufHwmMU/+oLLCpmrvDcislonib9V5THTO7gREdyVKZ8M3og2FTsAuy4Rg
- Ulwtg5sy6nTwVo5hGoMc2E4KUjdwAMrOVAMqJjyQRMH2Ivj5BrM2YPJVRObBLGFlCJk4
- hYbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6hKK0pPuh8CecxBqlkjR3ganqcN3m0licd12d2QR7CI=;
- b=P780KS/1XVK456bBLBLloAAb07kC61GF9Nl179Q8zsPCHfcTIjko0ZCjXK0Y6b+0fK
- PKPHBsSK2D70iObaGawqq+w9BAVPHSsbWkPu2QFinFb5FiCNQuYam6QpuYE+X5lALAZJ
- JcfYI3KnYG44TZbmVprl16kNv3nFKbrrezChaxr1itnocGGChUE84JIT57pGuC4JTgVV
- 6qW85GJmdx1hdFZ3+D+PjuPdTHw2Yh0GNLXpJp03GrHlih8vn1FofVdFTfUPqq57T7AE
- NR1yKMMJXjcTxx/ZUh8e4bAxN/r7cCobxsDOU4L95ldWnVDTLRHuqRgoQlzJNyd0ddCl
- TZfA==
-X-Gm-Message-State: AOAM531a8uETB2xcf91wV5iLF44v+BulUt2ng833Uq86bKDkZx9ZpLQm
- Mh4mkpdgnjUv808kF4zaYqIcVm4bL2UwSZD21uSAAQ==
-X-Google-Smtp-Source: ABdhPJwa9+2ejcHxHKuMOOi0hmqm0TSyvlX39JNcZFtXLKa5Q83zUvTch2w+HbUBT+J/rIQZYd2Zegm3ECPOr+F5hiw=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr2686191oix.48.1594122050690;
- Tue, 07 Jul 2020 04:40:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jslzP-0005IU-6B
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:42:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49857
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jslzN-0000O3-9K
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 07:42:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594122136;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PNRjZkM1jw/UBiVaHM0k+sGvjhVHLJOLQ39yN4Iy2LE=;
+ b=fKaAQJZuAcbMJZ+5SY0hjW03faCWOEQsevwiUXcOnK1uyBmChFG/SqS3NW8NH3tHKn/J4S
+ lwzGwSqL2alMAXPaDjqFHXaCy3ZzHeFdBZ/67PmZBSKMPM+BpP26J806jM8R6d2wUZ4qF0
+ S294f2/eghanFZ8KTSTnHtmY0HIZFxU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-v43ue8FAOsq-K8mB6nmVGQ-1; Tue, 07 Jul 2020 07:42:14 -0400
+X-MC-Unique: v43ue8FAOsq-K8mB6nmVGQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9576FEC1AF;
+ Tue,  7 Jul 2020 11:42:13 +0000 (UTC)
+Received: from starship (unknown [10.35.206.237])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 879285D9F3;
+ Tue,  7 Jul 2020 11:42:12 +0000 (UTC)
+Message-ID: <55c743389f61f010b901dfe211f2a832112d53b5.camel@redhat.com>
+Subject: Re: [PULL 31/53] KVM: x86: believe what KVM says about WAITPKG
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Date: Tue, 07 Jul 2020 14:42:11 +0300
+In-Reply-To: <20200706164155.24696-32-pbonzini@redhat.com>
+References: <20200706164155.24696-1-pbonzini@redhat.com>
+ <20200706164155.24696-32-pbonzini@redhat.com>
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
 MIME-Version: 1.0
-References: <20200704182750.1088103-1-mst@redhat.com>
-In-Reply-To: <20200704182750.1088103-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Jul 2020 12:40:38 +0100
-Message-ID: <CAFEAcA_LrhvLmbwsSrhHUYZ+z9EZoDZwct+s3xfoaGLyLkOPfg@mail.gmail.com>
-Subject: Re: [PULL v2 00/41] virtio,acpi: features, fixes, cleanups.
-To: "Michael S. Tsirkin" <mst@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,53 +98,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 4 Jul 2020 at 19:29, Michael S. Tsirkin <mst@redhat.com> wrote:
->
->
-> v2 of the pull, fixing non-Linux builds.
->
->
-> The following changes since commit fc1bff958998910ec8d25db86cd2f53ff125f7ab:
->
->   hw/misc/pca9552: Add missing TypeInfo::class_size field (2020-06-29 21:16:10 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to f7d98068bf7a0913744dd4ac0a28e8c841df2af5:
->
->   vhost-vdpa: introduce vhost-vdpa net client (2020-07-04 11:13:50 -0400)
->
-> ----------------------------------------------------------------
-> virtio,acpi: features, fixes, cleanups.
->
-> vdpa support
-> virtio-mem support
-> a handy script for disassembling acpi tables
-> misc fixes and cleanups
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
+On Mon, 2020-07-06 at 12:41 -0400, Paolo Bonzini wrote:
+> Currently, QEMU is overriding KVM_GET_SUPPORTED_CPUID's answer for
+> the WAITPKG bit depending on the "-overcommit cpu-pm" setting.  This is a
+> bad idea because it does not even check if the host supports it, but it
+> can be done in x86_cpu_realizefn just like we do for the MONITOR bit.
+> 
+> This patch moves it there, while making it conditional on host
+> support for the related UMWAIT MSR.
+> 
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/i386/cpu.c      |  3 +++
+>  target/i386/kvm.c      | 11 +++++------
+>  target/i386/kvm_i386.h |  1 +
+>  3 files changed, 9 insertions(+), 6 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index c44cc510e1..dc9ba06f1f 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6536,6 +6536,9 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>              host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+>                         &cpu->mwait.ecx, &cpu->mwait.edx);
+>              env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
+> +            if (kvm_enabled() && kvm_has_waitpkg()) {
+> +                env->features[FEAT_7_0_ECX] |= CPUID_7_0_ECX_WAITPKG;
+> +            }
+>          }
+>          if (kvm_enabled() && cpu->ucode_rev == 0) {
+>              cpu->ucode_rev = kvm_arch_get_supported_msr_feature(kvm_state,
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 2b6b7443d2..b8455c89ed 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -411,12 +411,6 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+>          if (host_tsx_blacklisted()) {
+>              ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+>          }
+> -    } else if (function == 7 && index == 0 && reg == R_ECX) {
+> -        if (enable_cpu_pm) {
+> -            ret |= CPUID_7_0_ECX_WAITPKG;
+> -        } else {
+> -            ret &= ~CPUID_7_0_ECX_WAITPKG;
+> -        }
+>      } else if (function == 7 && index == 0 && reg == R_EDX) {
+>          /*
+>           * Linux v4.17-v4.20 incorrectly return ARCH_CAPABILITIES on SVM hosts.
+> @@ -4730,3 +4724,8 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+>  {
+>      abort();
+>  }
+> +
+> +bool kvm_has_waitpkg(void)
+> +{
+> +    return has_msr_umwait;
+Note that this depends on the fix in the kernel
+to report this msr only when UMWAIT is supported.
+I personally don't mind that.
 
-Hi; I'm afraid this fails to build on 32-bit:
+If we want to support older kernels that don't,
+then we have to run 'cpuid' ourselves and check the result.
 
-/home/peter.maydell/qemu/hw/virtio/vhost-vdpa.c: In function
-'vhost_vdpa_dma_map':
-/home/peter.maydell/qemu/hw/virtio/vhost-vdpa.c:48:23: error: cast
-from pointer to integer of different size
-[-Werror=pointer-to-int-cast]
-     msg.iotlb.uaddr = (uint64_t)vaddr;
-                       ^
+Otherwise looks good to me.
 
-This should probably be "= (uintptr_t)vaddr".
+Best regards,
+	Maxim Levitsky
 
-thanks
--- PMM
+> +}
+> diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
+> index 00bde7acaf..064b8798a2 100644
+> --- a/target/i386/kvm_i386.h
+> +++ b/target/i386/kvm_i386.h
+> @@ -44,6 +44,7 @@ void kvm_put_apicbase(X86CPU *cpu, uint64_t value);
+>  
+>  bool kvm_enable_x2apic(void);
+>  bool kvm_has_x2apic_api(void);
+> +bool kvm_has_waitpkg(void);
+>  
+>  bool kvm_hv_vpindex_settable(void);
+>  
+
+
 
