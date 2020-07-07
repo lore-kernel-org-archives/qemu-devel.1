@@ -2,90 +2,130 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 415F0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD7DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:31:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A555206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 881E4206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:31:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/nFjY+3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A555206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c5jKvg+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 881E4206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsh1H-0005Vq-AF
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 02:23:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34252)
+	id 1jsh8r-00082u-SH
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 02:31:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsh0c-0004xY-Ej; Tue, 07 Jul 2020 02:23:14 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40463)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsh0a-0005Ok-Ul; Tue, 07 Jul 2020 02:23:14 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f139so45216907wmf.5;
- Mon, 06 Jul 2020 23:23:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jwMl8vysdrK8IlFWcENFsp/LshAOHF4ix0mG4WX1FoI=;
- b=h/nFjY+3cMz5v0FC7Wl/iJvg9upeYg31vHY8BAweZkbsTwXo18oJSQAUjEMjoemOgr
- BNwZeKZsMM9OrYltPAALvomjxCP9OAm6YH6XO9kQmi2CncgLyQlHVqMhzObNp9ccpeKy
- WgecPR8B5DlMywtBK0AKTPXSPSF6KrDxVj5MECoj06ruxADOZEAe2WF4gfZRew4Kprb6
- CT7Zd0u5Wj1tNCYrMvE1CMIybMb+qYUh8e9iPQ6leTxOxjZobw1UWCbYnuC0bUWWOcpT
- 9vuhDBSDg+uaysbPRetQn+Lx51JHaTa8qTobr/vH8Eu7h3OOY5KYFG2oeDXccwUXFce+
- LH3A==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsh89-0007YG-Jd
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 02:31:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30251
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsh86-0006ml-Jp
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 02:31:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594103456;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=TIlOS+fH2+kNcT94DHPhOYCXyRnRJKOh6d8C77P+usQ=;
+ b=c5jKvg+wyQPSQI1+r+zSnZxmdxUq56Albw+GeR2H2LgxIDgEELw6ZVFYaP9UU+1cgNQj/C
+ Jd3MphxixiB8o57pptC8JEK/+vBlXaGwY7A0/K1WBkTagUUC42vFhKjsstOXmJpvhi9F3r
+ N5thD+GddtUr0KjUVKZ1chAalJy11Kk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-pPEayNGuNOu8eeZ4Iyn7ug-1; Tue, 07 Jul 2020 02:30:55 -0400
+X-MC-Unique: pPEayNGuNOu8eeZ4Iyn7ug-1
+Received: by mail-wr1-f71.google.com with SMTP id j5so47593823wro.6
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 23:30:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=jwMl8vysdrK8IlFWcENFsp/LshAOHF4ix0mG4WX1FoI=;
- b=aU80Vs12I6c/8tAbg+AVN0Pg8w7RDHEAa9kwy8POzvnh8D+7QHvNK/JRxsTRPC2zXO
- 7i9YDx8rppwFU8AYhcvkZMbTHW4ojF+Z+xxp/5LswhZmnZuPeZAI8jW4M+NXrS3QokL5
- gb6fw+1lX42lTjGX0Nk0qfrIjBzm6DHjiKsnSpnF0CYU0/zqnMrbHpgKzPJNftbc0mWP
- 3ZCZ6MvHWK4GYBK7mmHIkKqHjT5RwmmfVdYy993gXmIMBo0IkWql4cLMSSk8BOzU1NUl
- R1lXgSMSVcklmUbdZGkVMAt77zjUPuC1i2VjvkQTsqPUc/B8fLpLLfT81hj8zU7cuaPI
- pKCA==
-X-Gm-Message-State: AOAM5318qN+Dlzq9JeOLbBZqaUnr8xrJxcupx+9aX0l4hMIV6ya6EOUa
- TuHnM3oT0EuQmyb+g4HKydZ6pj/k
-X-Google-Smtp-Source: ABdhPJxXKIBW5/HB3CX8UMeQLWohmsIAXJY1Wtr7eAeqCJ+fk4bgMdATH4PNIl0tPYm0C3l3LKRXww==
-X-Received: by 2002:a7b:cf10:: with SMTP id l16mr2504643wmg.93.1594102990653; 
- Mon, 06 Jul 2020 23:23:10 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id m10sm26864645wru.4.2020.07.06.23.23.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jul 2020 23:23:10 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/register: Document register_init_block @memory_size
-Date: Tue,  7 Jul 2020 08:23:08 +0200
-Message-Id: <20200707062308.4531-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=TIlOS+fH2+kNcT94DHPhOYCXyRnRJKOh6d8C77P+usQ=;
+ b=mcWlhe3KfOg7Hxz9OvqdV4oT9SHUIqMWOs3M6ZayPniYWBFRCkT//u4rg3tNDHIA+f
+ ET4Bw91YtpH1RTfD5zXlXfvzqo2rOLG3AnrFU1X+5jHl3TwhrU6ASSGNlQLpu5a0HZz/
+ r5bk/i4Ok7L98sa60jAXJEh2zuCC2GflL8w0Uc5wF4R/DX8dr52JdJit8HWN3lDo/Okj
+ kMH5NNCe6eBFEi0z0QzNyOfQFJka2lVTwom/VMhAODtsB/IanwijBeLMHQe3OQc7bHIQ
+ qIoMsOm7pouZYjfDQnzjpoKMP7ckpxPj5O6QPX9B8uR5LpY/lk8ZVsE9gmH3PVC8qMxI
+ u5eA==
+X-Gm-Message-State: AOAM532iPSZL7kktrYM6dNJjofqAaxQrIJ556aAX79Wk87cQJvP2bMzV
+ KEECxWLHwgWRDuFrUmoDlrhviDNggnOncdxOnKrvPxs6m9KmHRW3TXcJF9zFBqOW759pt26xh6Y
+ rIB9O8AfoSF2n42E=
+X-Received: by 2002:a1c:e914:: with SMTP id q20mr2429487wmc.145.1594103453866; 
+ Mon, 06 Jul 2020 23:30:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwCFzu8rL3EF8tT/iicDRq0gKBECbIBvqwbnYLBMqBmcjd7GVcQa6XLQP+4Il/1b4FJedZMQA==
+X-Received: by 2002:a1c:e914:: with SMTP id q20mr2429463wmc.145.1594103453615; 
+ Mon, 06 Jul 2020 23:30:53 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id f16sm2031135wmh.27.2020.07.06.23.30.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jul 2020 23:30:52 -0700 (PDT)
+Subject: Re: [PATCH] MAINTAINERS: update nvme entry
+To: Keith Busch <kbusch@kernel.org>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+References: <20200706194342.1996219-1-kbusch@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <105bd6d0-a67b-e8d2-5a13-27e0f5c81472@redhat.com>
+Date: Tue, 7 Jul 2020 08:30:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200706194342.1996219-1-kbusch@kernel.org>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/06 23:10:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,33 +138,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document the 'memory_size' argument of register_init_block().
+On 7/6/20 9:43 PM, Keith Busch wrote:
+> The nvme emulated device development pace has increased recently.  Klaus
+> has offered to co-maintain, and since we have many new contributions
+> coming through, we're adding a repository to accumulate and test new
+> features.
 
-Fixes: a74229597e ("register: Add block initialise helper")
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/register.h | 1 +
- 1 file changed, 1 insertion(+)
+Thanks Klaus for helping!
 
-diff --git a/include/hw/register.h b/include/hw/register.h
-index 5d2c565ae0..fdac5e69b5 100644
---- a/include/hw/register.h
-+++ b/include/hw/register.h
-@@ -181,6 +181,7 @@ uint64_t register_read_memory(void *opaque, hwaddr addr, unsigned size);
-  * @data: Array to use for register data, must already be allocated
-  * @ops: Memory region ops to access registers.
-  * @debug enabled: turn on/off verbose debug information
-+ * @memory_size: Size of the memory region
-  * returns: A structure containing all of the registers and an initialized
-  *          memory region (r_array->mem) the caller should add to a container.
-  */
--- 
-2.21.3
+> 
+> Cc: Klaus Jensen <its@irrelevant.dk>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  MAINTAINERS | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index c31c878c63..fbeba04dc5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1793,10 +1793,12 @@ F: include/hw/virtio/virtio-crypto.h
+>  
+>  nvme
+>  M: Keith Busch <kbusch@kernel.org>
+> +M: Klaus Jensen <its@irrelevant.dk>
+
+Is that the correct email you want to use?
+
+Regardless:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>  L: qemu-block@nongnu.org
+>  S: Supported
+>  F: hw/block/nvme*
+>  F: tests/qtest/nvme-test.c
+> +T: git git://git.infradead.org/qemu-nvme.git nvme-next
+>  
+>  megasas
+>  M: Hannes Reinecke <hare@suse.com>
+> 
 
 
