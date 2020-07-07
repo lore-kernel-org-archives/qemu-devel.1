@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 595A6C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BD1C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23FE120675
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:19:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9540D2065D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SRv6DbNz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23FE120675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ha9b2I93"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9540D2065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jshtV-0000Wg-CJ
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:19:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42624)
+	id 1jshuX-0002fx-S4
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:21:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshjD-0004t6-Nt
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:19 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:44807)
+ id 1jshjH-000528-S6
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:23 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33550)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshjC-000464-4f
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:19 -0400
-Received: by mail-wr1-x433.google.com with SMTP id b6so43951047wrs.11
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:09:17 -0700 (PDT)
+ id 1jshjF-00046i-Vk
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:23 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a6so1070448wmm.0
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:09:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=YDO/x/b94zhIGLCoE0QO5NlUEy4S35DFUXq1lVsSN7c=;
- b=SRv6DbNzX+7Wwk1aRSvwZJ4D4Vy80rygPlGFJ+EXIu/mU/bLf6ZDyD0NuUjQdDURiG
- 0lhv2N5UwoVhbqK66W68BcxWGIVPc0SeaZH72ZhmlSrDOcGhs58eAYJ4khg9OK/Pm1Qn
- JenOKeGEY1vKxlmnoH5EC+zhG8rnzEgbJpt6cpxCvZZlAaJzJe4i66waKwpfAOnStRmV
- aO0f8Ig/tD510En6s5ZLok2avf2bo/PBcl+qGYWUlpSFXKWQe4K7HCNFDX9iTfUyt917
- D3cmXoxLfTqSR/qWnuhm5IcwB8dCuKYQ3sSI0mxS/V3/aUI4wLZgSEM7wJGnw8crkDDM
- rbVw==
+ bh=Y0AvFK9jDhQslOqQ/+Gd4Ly1wJW6CnLI4eXMz6hvfIk=;
+ b=Ha9b2I93IMyiA/qZRUClTEq9hMNYNlV7RFMmE/GrnzS0CDKv0d7t5f96jZ2qknQ4sX
+ +fImQQ1b7HpWPKnEqiCkJAxOwK4TaS86K9H2SqMB+MVJz7DH+LfTLT0kpqTcXuAqDHwx
+ ztHy3KZDmHqcUxDQMdCdLQ0aN/O3ZRsdCkgL+F+eiMq5HcDuZJ2YE0LILxPR0trGiezP
+ F2X84S6Nl5ZS/TDxqLtD1v6En8QyywJm6n6T6b4y7q26nweebo/XcbxSyPYWLlw1CcXn
+ IUiYFbnp8VPscIzvIxHPHOJUzOHuywIDNXuBvwJlRjml8yEiPF44DuyXh1C2zaTmLK6+
+ Pzng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=YDO/x/b94zhIGLCoE0QO5NlUEy4S35DFUXq1lVsSN7c=;
- b=nGOboFVjhzyQh7AST62jZpy2Gb9N5m6Y0sm5SABF6BDPhHULW7Utu/J/hp6W7B2+Rv
- jT+BJCYCG+vo7j0So7m7FhZgATBgu3hUKfc5BTswtFlY2JcF4SmfcLJv4CMCSV2BuCj9
- WUWCFxDnbyUPiEYmBAnRd0+Vis4rLVtLeZfT0XaqB6M9/W+OhwZpohal/ZENeT5z/Qbs
- qD9DfFHoPKO+R2Bif0Kz01VutJJSuSXLyXMLegZH3oun+Yy1EVB6OjVTnEQqWLp3GI3x
- JHunnmR6/n17rArWpGBbRaLoTTLLk6NHbiiZBu3LlbGtW0aRbkrSKvuoZmC7YXa6CqsB
- xxDQ==
-X-Gm-Message-State: AOAM531MyfuR4ZWSb/n7Tc+5qsK+QAQdFkjVIT2pPeJVMHujcLBt3ikT
- o2WXsmUBQc1YKfy1BMnzLipy9w==
-X-Google-Smtp-Source: ABdhPJwgNggmXBOb08syE7t2gKFfMHJw1GOGZqrzIy4pRiqIV+3Vbz1o9iEf9wHdCDGL9oKBcSo5Jg==
-X-Received: by 2002:adf:e7c2:: with SMTP id e2mr55959035wrn.179.1594105756726; 
- Tue, 07 Jul 2020 00:09:16 -0700 (PDT)
+ bh=Y0AvFK9jDhQslOqQ/+Gd4Ly1wJW6CnLI4eXMz6hvfIk=;
+ b=K9NHfWoJ8ePWTroaGHJ++gUEsyYziWRdKQl58plZVA5DHyT0kifRpA5yY4INy1VnCC
+ pBux3i8SQu0bH7Tgjfi5jD/abx9+Ch/wuA7RaZZUNSWZ7xY+s5Y7UBBdLWUVXkoNQJVF
+ NSC+Eka1H6H2yak5jsN7witTKZZdVtr6juo/4Sduq8uUI6h9484ENXl7Q6KZYPP4e73D
+ OX4ASZhPyNCrwPHpUOpJ6pFqR29R9O4zMolGWvLGYZ5Ef1dYzuDhhe+edMnrzb90w0No
+ KMZGJQnd6t/75j7O1OGahwnFpjdBAJcb4g44upTncLy/0Y0TefV/LPIu454lzhbeJGmy
+ rOvg==
+X-Gm-Message-State: AOAM5323jhkqiFIkjlj9FLNvhP4XTG6TYpdUM5wU4R/iL6AlXoKalHdv
+ LLtiDykJ/tLC1qT0nQ23dL+/uz4BeNI=
+X-Google-Smtp-Source: ABdhPJwKFsCTuTNtjG1EsPH+Lg2g69X0JvXXEsXrjl8CVk60wzkuG72cJvlWPgtAHEUAtxEoLZSCUg==
+X-Received: by 2002:a1c:303:: with SMTP id 3mr2730816wmd.180.1594105760534;
+ Tue, 07 Jul 2020 00:09:20 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 2sm2128427wmo.44.2020.07.07.00.09.05
+ by smtp.gmail.com with ESMTPSA id n17sm26170287wrs.2.2020.07.07.00.09.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 00:09:12 -0700 (PDT)
+ Tue, 07 Jul 2020 00:09:13 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D16711FF9D;
- Tue,  7 Jul 2020 08:08:59 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 6F0461FFB5;
+ Tue,  7 Jul 2020 08:09:01 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 14/41] tests/docker: check for an parameters not empty string
-Date: Tue,  7 Jul 2020 08:08:31 +0100
-Message-Id: <20200707070858.6622-15-alex.bennee@linaro.org>
+Subject: [PULL 29/41] tests/tcg: add more default compilers to configure.sh
+Date: Tue,  7 Jul 2020 08:08:46 +0100
+Message-Id: <20200707070858.6622-30-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200707070858.6622-1-alex.bennee@linaro.org>
 References: <20200707070858.6622-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::433;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x433.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -89,8 +89,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,33 +103,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+We were missing a bunch of compilers which we could use if they were
+locally installed. The defaults are based on Debian as they seem to be
+the best distro for well distributed cross-build compilers.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200701135652.1366-32-alex.bennee@linaro.org>
 
-Message-Id: <20200701135652.1366-17-alex.bennee@linaro.org>
-
-diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-index 02cd67a8c5e8..ebc5b97ecf91 100755
---- a/tests/docker/common.rc
-+++ b/tests/docker/common.rc
-@@ -47,7 +47,7 @@ build_qemu()
- check_qemu()
- {
-     # default to make check unless the caller specifies
--    if test -z "$@"; then
-+    if [ $# = 0 ]; then
-         INVOCATION="check"
-     else
-         INVOCATION="$@"
+diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
+index 2326f978562f..37e49736ca40 100755
+--- a/tests/tcg/configure.sh
++++ b/tests/tcg/configure.sh
+@@ -46,20 +46,29 @@ fi
+ : ${cross_cc_aarch64="aarch64-linux-gnu-gcc"}
+ : ${cross_cc_aarch64_be="$cross_cc_aarch64"}
+ : ${cross_cc_cflags_aarch64_be="-mbig-endian"}
++: $(cross_cc_alpha="alpha-linux-gnu-gcc")
+ : ${cross_cc_arm="arm-linux-gnueabihf-gcc"}
+ : ${cross_cc_cflags_armeb="-mbig-endian"}
++: ${cross_cc_hppa="hppa-linux-gnu-gcc"}
+ : ${cross_cc_i386="i386-pc-linux-gnu-gcc"}
+ : ${cross_cc_cflags_i386="-m32"}
+-: ${cross_cc_x86_64="x86_64-pc-linux-gnu-gcc"}
+-: ${cross_cc_cflags_x86_64="-m64"}
++: ${cross_cc_m68k="m68k-linux-gnu-gcc"}
++: $(cross_cc_mips64el="mips64el-linux-gnuabi64-gcc")
++: $(cross_cc_mips64="mips64-linux-gnuabi64-gcc")
++: $(cross_cc_mipsel="mipsel-linux-gnu-gcc")
++: $(cross_cc_mips="mips-linux-gnu-gcc")
+ : ${cross_cc_ppc="powerpc-linux-gnu-gcc"}
+ : ${cross_cc_cflags_ppc="-m32"}
+-: ${cross_cc_ppc64="powerpc-linux-gnu-gcc"}
+-: ${cross_cc_cflags_ppc64="-m64"}
++: ${cross_cc_ppc64="powerpc64-linux-gnu-gcc"}
+ : ${cross_cc_ppc64le="powerpc64le-linux-gnu-gcc"}
+-: ${cross_cc_cflags_s390x="-m64"}
++: $(cross_cc_riscv64="riscv64-linux-gnu-gcc")
++: ${cross_cc_s390x="s390x-linux-gnu-gcc"}
++: $(cross_cc_sh4="sh4-linux-gnu-gcc")
+ : ${cross_cc_cflags_sparc="-m32 -mv8plus -mcpu=ultrasparc"}
++: ${cross_cc_sparc64="sparc64-linux-gnu-gcc"}
+ : ${cross_cc_cflags_sparc64="-m64 -mcpu=ultrasparc"}
++: ${cross_cc_x86_64="x86_64-pc-linux-gnu-gcc"}
++: ${cross_cc_cflags_x86_64="-m64"}
+ 
+ for target in $target_list; do
+   arch=${target%%-*}
 -- 
 2.20.1
 
