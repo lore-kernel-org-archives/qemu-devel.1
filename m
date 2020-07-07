@@ -2,72 +2,116 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BDAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14859C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:55:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAFFB206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:55:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAFFB206DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id D5A7D206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:55:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7h+Ynh9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A7D206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jslG2-0005Sa-4j
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:55:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36250)
+	id 1jslGH-0006Ic-0w
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:55:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jslDl-0001IP-Ul; Tue, 07 Jul 2020 06:53:05 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:55691)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jslDk-0000M5-6l; Tue, 07 Jul 2020 06:53:05 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mt7Ll-1km6xX10Jt-00tU5b; Tue, 07 Jul 2020 12:52:58 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/7] fix the prototype of muls64/mulu64
-Date: Tue,  7 Jul 2020 12:52:49 +0200
-Message-Id: <20200707105255.362318-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200707105255.362318-1-laurent@vivier.eu>
-References: <20200707105255.362318-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jslFI-0004RC-4m
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:54:40 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21354
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jslFF-0000W3-6x
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:54:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594119275;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Kbb+6XCP4QqXXv2Sm4IrqgHfBggIh46EwYB2OmGndh4=;
+ b=J7h+Ynh9vuphtJ3vBFLmU4iMTbxc/2xF4vVn0f6USpKzDTuucAH71fmfj/ibnGBH5EcVTY
+ hhWVue2ok2C6KXpeAM8REBP3hk9mL1tIg7zcpBR+P6YY+HvTfGuylGiw1605S0cRBN7nWg
+ Su1YW5BrxB1CkxLYvJME5nsCF4iW9VE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-gC64ud2xPV2odD7mKXfWFQ-1; Tue, 07 Jul 2020 06:54:34 -0400
+X-MC-Unique: gC64ud2xPV2odD7mKXfWFQ-1
+Received: by mail-wm1-f72.google.com with SMTP id q20so42376199wme.3
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 03:54:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Kbb+6XCP4QqXXv2Sm4IrqgHfBggIh46EwYB2OmGndh4=;
+ b=b8HWh9sGGfRzESQyyxzUkNmRGNuqnOE2gZgUnbxCC/fdcSdnOJBO0CGZYHIDl8F0aP
+ THHd8C+WaA5dNL+OSFjqywY62O9dIS5uqKedSA39bQWdq0FpYklN0l+T6nUFTsr1w8+f
+ gFZxsYrw1jDydGFFIi2Kb4eUhCZnP7X0TMdZRDY/8wBVSvXAk52JGW2G2Bs/o49cE+lJ
+ jWMxHosa85i1+3PlCPWC5gC6C4HC7e/WtHdzWGAqgiYyD1Lf7FtN1xFFVg84AdKx8R+e
+ vdDyhF3flGIbJwA0ikeit8bI5DI+0Ouna2q6XX02z6uJaRyXVWyHR+uB1lT3YA7K/TPa
+ U/sw==
+X-Gm-Message-State: AOAM531BMpY29+3sKA9VGXPQIG7c+/y3n5GP7EG/IsYBn31NsiyPAWc9
+ ut+8uutb4+Y5tZmrocfT7LM5kLNcAj2Utub4y9EJXWmszzuneFkExjGg4wQGlpjfpRbS6VJy6FW
+ dDXA2X2jpZUZFglk=
+X-Received: by 2002:a5d:4202:: with SMTP id n2mr51844054wrq.171.1594119272988; 
+ Tue, 07 Jul 2020 03:54:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxu6t/kieTQ2hhqH1LiyNqTp9hbCrz1nvGufIHprBNguKKUj5PrxiFxMh8mbpN/+nyERMovtw==
+X-Received: by 2002:a5d:4202:: with SMTP id n2mr51844043wrq.171.1594119272735; 
+ Tue, 07 Jul 2020 03:54:32 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e95f:9718:ec18:4c46?
+ ([2001:b07:6468:f312:e95f:9718:ec18:4c46])
+ by smtp.gmail.com with ESMTPSA id c11sm479934wmb.45.2020.07.07.03.54.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jul 2020 03:54:32 -0700 (PDT)
+Subject: Re: [PATCH 2/2] hyperv/synic: Allocate as ram_device
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20200108135353.75471-1-dgilbert@redhat.com>
+ <20200108135353.75471-3-dgilbert@redhat.com>
+ <20200109064527-mutt-send-email-mst@kernel.org>
+ <20200109120820.GB6795@work-vm>
+ <20200109071454-mutt-send-email-mst@kernel.org>
+ <20200109122237.GD6795@work-vm>
+ <20200109080412-mutt-send-email-mst@kernel.org>
+ <20200109132242.GF6795@work-vm>
+ <3162676e-da40-7a3f-1777-2ed4f3efffe1@redhat.com>
+ <87h814r639.fsf@vitty.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <57b450ab-313d-5582-0ba9-43c1de0c9e75@redhat.com>
+Date: Tue, 7 Jul 2020 12:54:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BUoMo39jGy6GF1XgD/UoYfsWaDEFsIM0YiRFiPc1eU5F/G4+x8W
- kxGOKjQif+7tZEB69NrdVmWuT2ZH3WFCMvJPLoDqjeR/lhuekrIRk79p6cvZXvkeV8mCOM0
- uErjqvYTRv6mKAFUFgQCdXMm438Z8LYGXnWLk/VidyBslWD7DnxAHf/4SV7GgWhLLc+34YR
- SAXaCbA7BuXaxPg+4dKLQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:1BMuvl2WX5E=:+9ubi42N74bGBUvgEdXGmU
- M3zCsGgFRMy3M61FVv0BK4yVsevSauq7fDHeK8xoQByZaEFHRzlAtdd7mFqOYIzNUimLlyRJF
- nR1F07/bYOWurL3YNLHtQT62n7jCoDRxkfKaZlb0T4w0FurAtaUdvM0JFGQWIrA+uruG1uBOF
- 8Njs97gF3iVnLNMsg7o983Ka9YR84hP+RIfSRO9wpAx+PGP+koSFN8uh0knz1x9TceQejK2kY
- MDs+j+2BuKl6wa6hXU5djWShg7sV0a9UVJsMAepJaDEKj8d40T8cKWqCQgTFuhu96aYXSb6n0
- 52w4f0RQTRQuRSjOIQHr9U3vPoM+bJDzZZL9DYRCloUY8oeXYpzjMMWx4DSeL57Qey/4EVZaw
- ZsvYknJXN3SX/6jrhzA4G2ezLtkQHgXSnBiKDBVXJ8FdArBMYBhwBulCO4F9xhy9XnCgJk318
- gKgRjbJweAfEN3Og75Wt+WFJSdp9HWZARMHQ5KtSak82JwWFwAtF3DfgTIjsj+Qg4VXa6D/e5
- mHb3tt+IgPDDi3w6atFd5p3ftMgF6fKZK1pmJW1mslpSGD/h4mnLOU49O4jFQ1dKIEgsuJSBy
- B6NV0wzLBoFtNZiEceLC7YvDKuM9hoLdrfnZqO/c1n8x0rm/oQNT/kNv02dgQ9M2GrT1qdSr7
- Pz9BEXsO24SL/Pbq9R1ct8vs09D6XIrptF5rpezhxnVnOObqd9OpbV4tiSukkHvveOT3pUOP2
- k1b2cuYXpHe22UJjy0hlvjjqGwkNkE3KLLBSqcZxWlIFibKDcu0y7bhxlW3zFP5BsQzS4Tlba
- 08KXDGzUDrXRJ1d0kp1GhjhiBapsSlwCMgG4jIHOnjZj7mE+GaO/UN6JmW0GyK50vfu5xm4
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:53:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <87h814r639.fsf@vitty.brq.redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,42 +124,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Lijun Pan <ljp@linux.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, jasowang@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lijun Pan <ljp@linux.ibm.com>
+On 09/01/20 16:40, Vitaly Kuznetsov wrote:
+>>>>> Do we want a new memory_region_init for that or just to be able to add
+>>>>> a flag?
+>>>>>
+>>>> I think a flag API is preferable since this can apply to any kind of
+>>>> region. But can go either way, Paolo's the maintainer there.
+>>> (Copying Paolo in)
+>>> So what exactly does this flag mean; to me it's 'no vhost' - but is it
+>>> actually more general?
+>> It has two more effects in addition to no vhost:
+>>
+>> 1) it is skipped when dumping the guest (is this a good or bad idea for
+>> SynIC?)
+> Imagine we have an not yet consumed message sitting in message page, or
+> a signalled event, do I understand correctly that these are going to get
+> lost upon migration? This may not work then -- unless we transfer
+> in-QEMU synic state somehow separately.
 
-The prototypes of muls64/mulu64 in host-utils.h should match the
-definitions in host-utils.c
+(Thread necromancy).
 
-Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
-Message-Id: <20200701234344.91843-10-ljp@linux.ibm.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- include/qemu/host-utils.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This is just dumping (and it should probably be extended to core
+dumping, i.e. MADV_DONTDUMP).  Migration is controlled separately with
+vmstate_register_ram.
 
-diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
-index 4cd170e6cd53..cdca2991d8a8 100644
---- a/include/qemu/host-utils.h
-+++ b/include/qemu/host-utils.h
-@@ -77,8 +77,8 @@ static inline int divs128(int64_t *plow, int64_t *phigh, int64_t divisor)
-     }
- }
- #else
--void muls64(uint64_t *phigh, uint64_t *plow, int64_t a, int64_t b);
--void mulu64(uint64_t *phigh, uint64_t *plow, uint64_t a, uint64_t b);
-+void muls64(uint64_t *plow, uint64_t *phigh, int64_t a, int64_t b);
-+void mulu64(uint64_t *plow, uint64_t *phigh, uint64_t a, uint64_t b);
- int divu128(uint64_t *plow, uint64_t *phigh, uint64_t divisor);
- int divs128(int64_t *plow, int64_t *phigh, int64_t divisor);
- 
--- 
-2.26.2
+Paolo
 
 
