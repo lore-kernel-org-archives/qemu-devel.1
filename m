@@ -2,86 +2,73 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 509AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD79C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:58:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E4D0206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:57:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CGibH+Zk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E4D0206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C2D8F206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:58:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2D8F206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jslHd-0000sF-Ak
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:57:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36866)
+	id 1jslIr-0003Gs-41
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:58:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFu-0005rb-Ky
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60497
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jslFs-0000cO-M4
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:55:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594119315;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kM6g8wl011f7C4nPCBtDKAy9ilTQLzhl2uS1gmBAxjs=;
- b=CGibH+ZkKccKgI7hji6kJL7+c/j7qhcOipgbW1CkkSe7wULikdG0B4OlyEprn5AfTCeprN
- MKzySo75mo9lXxOKk+K+6IrtXA+xeb2E7hmzjQBI6hylG7c/qKV4+ce3w85HaNQE1tN4WA
- QLINoD3FXwbn2IkVZPvkCvGSVRjsdQU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-uCKDG2LHNKO9yMo4UAXgKQ-1; Tue, 07 Jul 2020 06:55:14 -0400
-X-MC-Unique: uCKDG2LHNKO9yMo4UAXgKQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06AEA1054F91;
- Tue,  7 Jul 2020 10:55:13 +0000 (UTC)
-Received: from localhost (ovpn-113-54.ams2.redhat.com [10.36.113.54])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A0BCF60BF3;
- Tue,  7 Jul 2020 10:55:06 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>
-Subject: [PATCH 2/2] virtio: verify that legacy support is not accidentally on
-Date: Tue,  7 Jul 2020 12:54:46 +0200
-Message-Id: <20200707105446.677966-3-cohuck@redhat.com>
-In-Reply-To: <20200707105446.677966-1-cohuck@redhat.com>
-References: <20200707105446.677966-1-cohuck@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jslDo-0001NW-LC; Tue, 07 Jul 2020 06:53:08 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:51313)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jslDm-0000MU-3F; Tue, 07 Jul 2020 06:53:08 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MJVY8-1kCV1h2rAO-00JsDq; Tue, 07 Jul 2020 12:53:01 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 5/7] util/qemu-option: Document the get_opt_value() function
+Date: Tue,  7 Jul 2020 12:52:53 +0200
+Message-Id: <20200707105255.362318-6-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200707105255.362318-1-laurent@vivier.eu>
+References: <20200707105255.362318-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Provags-ID: V03:K1:9oCtGKpKKzsIv9cTlg4Q4qrtDD+02QyzdTAM7K0KJVjmwVgjIB0
+ YjA4owjy/8K63CYlHSCMIxC6r/yqE5XDbEeXVauhjo21iJRiJ3bK9JOlYGohopklAhxsfOk
+ 8dRQjr7HKydHU9JCuyKSRFMmBN3O8TW26Rd9rPjBXRPWxLXSnXUMDRHTdvBh+BA6SaDvEP+
+ VM74WGwV+r89243yE7uZQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:JYFHMDF+G0A=:TaUbJbDIIicS7n5Y8PEHW5
+ M/bB2QL24al2GWCr2KY033XOQ4QGwGLfjk0PmvaQqDjekaGqA+en49XwI67ZpCKl1QTU1z98l
+ DnkPuibI/MUMyuVfv1SI4J/lOw3gy49dRGuStuPt8irhad/3c3GgzNSjsXw2rJaA6cEqNG6a5
+ bP3857t5PMPb/Ut5/WtWyLftvRLCcTz3qacfLNC16kJzRV1I7lgTZAKa+4IBkIYeXcNcbUYhp
+ NIiJJNXeVZ8uTed0/+XTKQden+COptlpfUH47+ynuYeK/xdksIE6jifbGk40D8gWxv8tI+eIm
+ UObfQRdhWdKR24JbnvMyBPa0YBYCBv/TZVpzf6NnIbAt00xvvU59Uq0Qsb+kQxXNL/87UEqp9
+ g6+RT8rdV34KUBKfCSgOwMokmVwjrJpWaJbLboTyQOBhmX3qjoUg84fJ3T7LykJJVIay21Kzy
+ VKpIEu8b5AXvQqTLqhIwYCox/WhXv2lYfivaieA/QRhCdCb2lznkU6uT9MtbrHuSBpra3/6VX
+ HpO//6DJVakNgI5j1H2/x9t6ALwrxcn9FhBtr0XaHQVsSKCKODOUdSqY/A+rYQXvpzuybVdQp
+ tgKalg9ntaIqRkuRlEQNDdNw5neThIO7/5Vpex8/wluXqhvTV4J11DKHY10SA7UHsr3InUiVe
+ Q23o/MsDjb0kkteixJdotaO6rBlyuxgcF5JB/NxEeURPs+p1YONMOqH5ETk/KfNgB4hFtOgra
+ bXzLob61mF8rbDGhwD+vG3i1syye7pg/AwxTf79mITTARnTmiEll5WL0WP5xxgkTvz73dc1M4
+ JdBN/sYX0K29yEKb2L9bM+GVeQoQHEjPwjiLVpVPWGsi2JrSYotNyu57jRSmp7+0ZxFz+8Z
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:53:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,64 +81,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a virtio device does not have legacy support, make sure that
-it is actually off, and bail out if not.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-For virtio-pci, this means that any device without legacy support
-that has been specified to modern-only (or that has been forced
-to it) will work.
+Coverity noticed commit 950c4e6c94 introduced a dereference before
+null check in get_opt_value (CID1391003):
 
-For virtio-ccw, this duplicates the check that is currently done
-prior to realization for any device that explicitly specified no
-support for legacy.
+  In get_opt_value: All paths that lead to this null pointer
+  comparison already dereference the pointer earlier (CWE-476)
 
-This catches devices that have not been fenced properly.
+We fixed this in commit 6e3ad3f0e31, but relaxed the check in commit
+0c2f6e7ee99 because "No callers of get_opt_value() pass in a NULL
+for the 'value' parameter".
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Since this function is publicly exposed, it risks new users to do
+the same error again. Avoid that documenting the 'value' argument
+must not be NULL.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200629070858.19850-1-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/s390x/virtio-ccw.c  | 6 ++++++
- hw/virtio/virtio-pci.c | 4 ++++
- 2 files changed, 10 insertions(+)
+ include/qemu/option.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 3c988a000b5b..0e602702971b 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1121,6 +1121,12 @@ static void virtio_ccw_device_plugged(DeviceState *d, Error **errp)
-         dev->max_rev = 0;
-     }
+diff --git a/include/qemu/option.h b/include/qemu/option.h
+index eb4097889d52..ac50d257746a 100644
+--- a/include/qemu/option.h
++++ b/include/qemu/option.h
+@@ -28,6 +28,19 @@
  
-+    if (!virtio_ccw_rev_max(dev) && !virtio_legacy_allowed(vdev)) {
-+        error_setg(errp, "Invalid value of property max_rev "
-+                   "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
-+        return;
-+    }
-+
-     if (virtio_get_num_queues(vdev) > VIRTIO_QUEUE_MAX) {
-         error_setg(errp, "The number of virtqueues %d "
-                    "exceeds virtio limit %d", n,
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 7bc8c1c056e9..d4c4128ea507 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1569,6 +1569,10 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
-     }
+ #include "qemu/queue.h"
  
-     if (legacy) {
-+        if (!virtio_legacy_allowed(vdev)) {
-+            error_setg(errp, "device is modern-only, use disable-legacy=on");
-+            return;
-+        }
-         if (virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
-             error_setg(errp, "VIRTIO_F_IOMMU_PLATFORM was supported by"
-                        " neither legacy nor transitional device");
++/**
++ * get_opt_value
++ * @p: a pointer to the option name, delimited by commas
++ * @value: a non-NULL pointer that will received the delimited options
++ *
++ * The @value char pointer will be allocated and filled with
++ * the delimited options.
++ *
++ * Returns the position of the comma delimiter/zero byte after the
++ * option name in @p.
++ * The memory pointer in @value must be released with a call to g_free()
++ * when no longer required.
++ */
+ const char *get_opt_value(const char *p, char **value);
+ 
+ void parse_option_size(const char *name, const char *value,
 -- 
-2.25.4
+2.26.2
 
 
