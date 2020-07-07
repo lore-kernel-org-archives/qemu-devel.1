@@ -2,91 +2,68 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB052C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50733C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:43:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAD8B206BE
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:37:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GdY270aW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD8B206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2CF25206BE
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:43:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF25206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jstOo-0007pm-0J
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 15:37:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53620)
+	id 1jstV3-00017q-Cw
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 15:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jstOF-0007Ot-NY
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:36:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60748
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jstOD-0006kr-Ky
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:36:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594150584;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=s4pxyif6vCA7Q2ARf0cNNXCLU62fQ7KvB9o94CRQIdw=;
- b=GdY270aWt7AsPaiQzolf8QNkDAoM7dX+I611ZDO2JjQRA5IwJ4xeCnAF95i7Yh469G0z/i
- etVD1R4hM2dwC3ea/aSDUEYNw/E62eLtGcf0Ey+WSwsaxr0J8cjOQM3tifaaJSHp2dab+K
- pf0tIVunAOzxIN2/AzhIcsCkYK06hlg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-lslRWG3pO1GJwf3QQRsP1Q-1; Tue, 07 Jul 2020 15:36:12 -0400
-X-MC-Unique: lslRWG3pO1GJwf3QQRsP1Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0EA3800D5C;
- Tue,  7 Jul 2020 19:36:09 +0000 (UTC)
-Received: from [10.3.115.46] (ovpn-115-46.phx2.redhat.com [10.3.115.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A97601A7CE;
- Tue,  7 Jul 2020 19:36:02 +0000 (UTC)
-Subject: Re: [PATCH v12 2/8] scripts: Coccinelle script to use
- ERRP_AUTO_PROPAGATE()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200707165037.1026246-1-armbru@redhat.com>
- <20200707165037.1026246-3-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <764387d7-0d42-a291-d720-60df303c15e4@redhat.com>
-Date: Tue, 7 Jul 2020 14:36:02 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jstUV-0000iC-SF
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:42:55 -0400
+Received: from 15.mo6.mail-out.ovh.net ([188.165.39.161]:59459)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jstUT-0007Xk-NW
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:42:55 -0400
+Received: from player786.ha.ovh.net (unknown [10.110.208.44])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 184CA21D8D1
+ for <qemu-devel@nongnu.org>; Tue,  7 Jul 2020 21:42:50 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id A4B39144DB712;
+ Tue,  7 Jul 2020 19:42:39 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G002e4195d9f-1e2e-42f1-adfc-2102b706d2fb,E152094F47616500A3A802F2EB970733BF761B34)
+ smtp.auth=groug@kaod.org
+Date: Tue, 7 Jul 2020 21:42:38 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v4 02/45] error: Improve error.h's big comment
+Message-ID: <20200707214238.15ac8fc4@bahia.lan>
+In-Reply-To: <20200707160613.848843-3-armbru@redhat.com>
+References: <20200707160613.848843-1-armbru@redhat.com>
+ <20200707160613.848843-3-armbru@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200707165037.1026246-3-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:04:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+X-Ovh-Tracer-Id: 15004305108617042318
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudehgddufeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=188.165.39.161; envelope-from=groug@kaod.org;
+ helo=15.mo6.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 15:42:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,108 +77,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, groug@kaod.org,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/7/20 11:50 AM, Markus Armbruster wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Tue,  7 Jul 2020 18:05:30 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Add headlines to the big comment.
 > 
-> Script adds ERRP_AUTO_PROPAGATE macro invocation where appropriate and
-> does corresponding changes in code (look for details in
-> include/qapi/error.h)
+> Explain examples for NULL, &error_abort and &error_fatal argument
+> better.
 > 
-> Usage example:
-> spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->   --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
->   --max-width 80 FILES...
+> Tweak rationale for error_propagate_prepend().
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   scripts/coccinelle/auto-propagated-errp.cocci | 337 ++++++++++++++++++
->   include/qapi/error.h                          |   3 +
->   MAINTAINERS                                   |   1 +
->   3 files changed, 341 insertions(+)
->   create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
 
-Needs a tweak if we go with ERRP_GUARD.  But that's easy.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> +
-> +// Convert special case with goto separately.
-> +// I tried merging this into the following rule the obvious way, but
-> +// it made Coccinelle hang on block.c
-> +//
-> +// Note interesting thing: if we don't do it here, and try to fixup
-> +// "out: }" things later after all transformations (the rule will be
-> +// the same, just without error_propagate() call), coccinelle fails to
-> +// match this "out: }".
-
-"out: }" is not valid C; would referring to "out: ; }" fare any better?
-
-> +@ disable optional_qualifier@
-> +identifier rule1.fn, rule1.local_err, out;
-> +symbol errp;
-> +@@
-> +
-> + fn(..., Error ** ____, ...)
-> + {
-> +     <...
-> +-    goto out;
-> ++    return;
-> +     ...>
-> +- out:
-> +-    error_propagate(errp, local_err);
-> + }
-> +
-> +// Convert most of local_err related stuff.
-> +//
-> +// Note, that we inherit rule1.fn and rule1.local_err names, not
-> +// objects themselves. We may match something not related to the
-> +// pattern matched by rule1. For example, local_err may be defined with
-> +// the same name in different blocks inside one function, and in one
-> +// block follow the propagation pattern and in other block doesn't.
-> +//
-> +// Note also that errp-cleaning functions
-> +//   error_free_errp
-> +//   error_report_errp
-> +//   error_reportf_errp
-> +//   warn_report_errp
-> +//   warn_reportf_errp
-> +// are not yet implemented. They must call corresponding Error* -
-> +// freeing function and then set *errp to NULL, to avoid further
-> +// propagation to original errp (consider ERRP_AUTO_PROPAGATE in use).
-> +// For example, error_free_errp may look like this:
-> +//
-> +//    void error_free_errp(Error **errp)
-> +//    {
-> +//        error_free(*errp);
-> +//        *errp = NULL;
-> +//    }
-
-I guess we can still decide later if we want these additional functions, 
-or if they will even help after the number of places we have already 
-improved after applying this script as-is and with Markus' cleanups in 
-place.
-
-While I won't call myself a Coccinelle expert, it at least looks sane 
-enough that I'm comfortable if you add:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+>  include/qapi/error.h | 51 +++++++++++++++++++++++++++++++-------------
+>  1 file changed, 36 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index e8960eaad5..6d079c58b7 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -15,6 +15,8 @@
+>  /*
+>   * Error reporting system loosely patterned after Glib's GError.
+>   *
+> + * = Creating errors =
+> + *
+>   * Create an error:
+>   *     error_setg(&err, "situation normal, all fouled up");
+>   *
+> @@ -27,6 +29,8 @@
+>   *     error_setg(&err, "invalid quark\n" // WRONG!
+>   *                "Valid quarks are up, down, strange, charm, top, bottom.");
+>   *
+> + * = Reporting and destroying errors =
+> + *
+>   * Report an error to the current monitor if we have one, else stderr:
+>   *     error_report_err(err);
+>   * This frees the error object.
+> @@ -40,6 +44,30 @@
+>   *     error_free(err);
+>   * Note that this loses hints added with error_append_hint().
+>   *
+> + * Call a function ignoring errors:
+> + *     foo(arg, NULL);
+> + * This is more concise than
+> + *     Error *err = NULL;
+> + *     foo(arg, &err);
+> + *     error_free(err); // don't do this
+> + *
+> + * Call a function aborting on errors:
+> + *     foo(arg, &error_abort);
+> + * This is more concise and fails more nicely than
+> + *     Error *err = NULL;
+> + *     foo(arg, &err);
+> + *     assert(!err); // don't do this
+> + *
+> + * Call a function treating errors as fatal:
+> + *     foo(arg, &error_fatal);
+> + * This is more concise than
+> + *     Error *err = NULL;
+> + *     foo(arg, &err);
+> + *     if (err) { // don't do this
+> + *         error_report_err(err);
+> + *         exit(1);
+> + *     }
+> + *
+>   * Handle an error without reporting it (just for completeness):
+>   *     error_free(err);
+>   *
+> @@ -47,6 +75,11 @@
+>   * reporting it (primarily useful in testsuites):
+>   *     error_free_or_abort(&err);
+>   *
+> + * = Passing errors around =
+> + *
+> + * Errors get passed to the caller through the conventional @errp
+> + * parameter.
+> + *
+>   * Pass an existing error to the caller:
+>   *     error_propagate(errp, err);
+>   * where Error **errp is a parameter, by convention the last one.
+> @@ -54,11 +87,10 @@
+>   * Pass an existing error to the caller with the message modified:
+>   *     error_propagate_prepend(errp, err,
+>   *                             "Could not frobnicate '%s': ", name);
+> - *
+> - * Avoid
+> - *     error_propagate(errp, err);
+> + * This is more concise than
+> + *     error_propagate(errp, err); // don't do this
+>   *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+> - * because this fails to prepend when @errp is &error_fatal.
+> + * and works even when @errp is &error_fatal.
+>   *
+>   * Create a new error and pass it to the caller:
+>   *     error_setg(errp, "situation normal, all fouled up");
+> @@ -70,15 +102,6 @@
+>   *         handle the error...
+>   *     }
+>   *
+> - * Call a function ignoring errors:
+> - *     foo(arg, NULL);
+> - *
+> - * Call a function aborting on errors:
+> - *     foo(arg, &error_abort);
+> - *
+> - * Call a function treating errors as fatal:
+> - *     foo(arg, &error_fatal);
+> - *
+>   * Receive an error and pass it on to the caller:
+>   *     Error *err = NULL;
+>   *     foo(arg, &err);
+> @@ -86,8 +109,6 @@
+>   *         handle the error...
+>   *         error_propagate(errp, err);
+>   *     }
+> - * where Error **errp is a parameter, by convention the last one.
+> - *
+>   * Do *not* "optimize" this to
+>   *     foo(arg, errp);
+>   *     if (*errp) { // WRONG!
 
 
