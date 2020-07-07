@@ -2,89 +2,131 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51B0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B6BC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:49:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75B28206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:49:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F22A206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:49:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b098FiyA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B28206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hyh3Sbf2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F22A206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsseN-00027h-Nd
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:49:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42328)
+	id 1jsseU-0002GY-TS
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:49:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42142)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3ScMEXwsKCuAJUMKPPGOQGPIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--hskinnemoen.bounces.google.com>)
- id 1jssd3-0008NW-N0
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:47:41 -0400
-Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:46138)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3ScMEXwsKCuAJUMKPPGOQGPIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--hskinnemoen.bounces.google.com>)
- id 1jssd1-0007XI-EG
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:47:41 -0400
-Received: by mail-yb1-xb4a.google.com with SMTP id u64so33637920ybf.13
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=UfjGjuK6ki2IMCiDVXtnyZH2TsHuq1C3vdhKvOLJ4Fk=;
- b=b098FiyAo7LmLc1/dvCNRpWQVcm5qdABPS/Z1FDuaG1o5fYQ5548EqsTrhBWwG8l10
- PwIW7SK9m08LDqByQGa/BuAm997q2kkndZuhQBTes5vXvT4IlmrRXtzXmODRRb8b950P
- 2BX2x/VfFwGt4st/BWSBB9ow1+1PkpDH1DaCuTj6v2e0d/HEc0bHH44OYmFV/BNBh2ep
- +kMqunrUvQ5v/WjejSq0JU0H0l/2IELjlJfLMGcIsk3/nqHZB5b4C6WRc/sogfNHuZBG
- DsVROIg9ISOydmQagUKQ4Ebnpy+lMcb9Bofkb2jG1qq5J1mVJlfuhHHcswcMbsAGoPpg
- eSZQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsscO-0007F5-BV
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:47:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29931
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsscM-0007V4-4c
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:47:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594147617;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=s63Bjx41fzkohGfU6tG+SE5L3DFShxV9dQrrfTe+VI4=;
+ b=hyh3Sbf2WYaEjeOvRkJqwoljGIGoVPBoATwiGgCzPnOueMYvjHmRQTtBmroIZOlR3jX0nr
+ YzziY1/dBCD6cTVScDrwdZYGB33J+dc5imGgqJnFVPe1NNtbFYVo2dN6ktegz/KFvQqqps
+ e3qlj17vimYAhjcNG9AUc+s3zWO6vWE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-EKiU2_B_PFCVWmlLAwS19A-1; Tue, 07 Jul 2020 14:46:54 -0400
+X-MC-Unique: EKiU2_B_PFCVWmlLAwS19A-1
+Received: by mail-wr1-f69.google.com with SMTP id j3so29831731wrq.9
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:46:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=UfjGjuK6ki2IMCiDVXtnyZH2TsHuq1C3vdhKvOLJ4Fk=;
- b=BbyPgjIQVUzyOu0OyOy+FyOG2E+pRWhGkj+oq1KMQPjKb3A5/tFkafbWD3lO+br4LS
- W0vYBaLxGxb+Nl9qj2BxFeI7szr6+n2XPfFJWaAP34dIe02uqqP6j9bi1hKw2dsOfGVE
- LEs1K47MmgvczjJ5K2tzc9Iogjl0m8Qn9m94jHGganQ1f24mqll9clCrR2iUzkjkobbd
- Y02VeLuFIcJAX5BIp3o3sG1gPVYlAidShHDkr/ko5gB0OGiScYZnrf/DD5qlf+DxeGQ0
- cU+KGkQaGj55qogh5/muHnJxNTfWWMDVMsIyOVQeRUmf4LGnvK7vvQ15ZjvMokBIv7pf
- G4Lg==
-X-Gm-Message-State: AOAM530qIDk3akm5L5nYZzptmgeSNYs0hDBm15G3JQrxh0iTQFc1E/G8
- CvM8eEzt22EU3QNkR3uuBYg1AXMce5ICWnFdaQ==
-X-Google-Smtp-Source: ABdhPJxp3JGSLgf1o0yLY7oP/eDrpTeKopzJ7ux0E85MgMELy9iyq1PXZ6nx0VmBgLYrwC0jlxiJHZzbOiA86e6GDg==
-X-Received: by 2002:a25:ad03:: with SMTP id y3mr4310535ybi.411.1594147657712; 
- Tue, 07 Jul 2020 11:47:37 -0700 (PDT)
-Date: Tue,  7 Jul 2020 11:47:18 -0700
-Message-Id: <20200707184730.3047754-1-hskinnemoen@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
-Subject: [PATCH v4 00/12] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC machines
-From: Havard Skinnemoen <hskinnemoen@google.com>
-To: peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
- kfting@nuvoton.com, philmd@redhat.com, 
- Havard Skinnemoen <hskinnemoen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
- envelope-from=3ScMEXwsKCuAJUMKPPGOQGPIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--hskinnemoen.bounces.google.com;
- helo=mail-yb1-xb4a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=s63Bjx41fzkohGfU6tG+SE5L3DFShxV9dQrrfTe+VI4=;
+ b=jchEJgB5XZq2FeuhfM9b+0CxurJ0GlZmk96dKpB5Qa/vS2EubVmeFyINwKL7IFWYsR
+ UTC5/G5x28GVvPljpElPQA9LQFLxJq+8BA6y3NWoZhG72lKfI7KrMMyieUJ96afyC44T
+ hp+a59zlsBIgNz/TE4Bl/n1pQAHlOBsWKzhPB4/e3zJQb8gSNF08g+lpVcCtcTj59O8L
+ C8RTRjakuAPvFxl9TJ/ZZSPNRw60kPTMo813qP8iE7VWA2luumo0oFA78pekHZX0DFw4
+ Ayvj8b5mA7XxkPiufP+R2Pj3vOoyhn+rU+GcbaKMn9FLhopFqixIbahpc9rHf6cBCAF4
+ /0Mw==
+X-Gm-Message-State: AOAM5327vJIG/dr+Gy29pHyLWMWB6vPOLnLB/pmI6JrMWMYMUX0xzpbx
+ nkjGuPMdiEFsrwfBh5I/+Ny1iuqsoMJS6FrM2v8gA8ngWg0V6CeDm6dEOSCL8VdbAbS7exHLorQ
+ 7YLZl0YfoE+o7dCU=
+X-Received: by 2002:adf:dc90:: with SMTP id r16mr55711232wrj.264.1594147612327; 
+ Tue, 07 Jul 2020 11:46:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0X6B9wiKXNBeamPvhYotgmpUfsyyh/cK0CjILxJh5sTyHNudMR/BLpQVEaSvcCx+uL+SLIw==
+X-Received: by 2002:adf:dc90:: with SMTP id r16mr55711209wrj.264.1594147611988; 
+ Tue, 07 Jul 2020 11:46:51 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id t4sm2323224wmf.4.2020.07.07.11.46.50
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jul 2020 11:46:51 -0700 (PDT)
+Subject: Re: [PATCH v4 2/2] net: detect errors from probing vnet hdr flag for
+ TAP devices
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200707184515.371476-1-lvivier@redhat.com>
+ <20200707184515.371476-3-lvivier@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <cf92db61-f45a-7349-869e-8d6545e04b57@redhat.com>
+Date: Tue, 7 Jul 2020 20:46:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200707184515.371476-3-lvivier@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,171 +139,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I also pushed this and the previous two patchsets to my qemu fork on github.
-The branches are named npcm7xx-v[1-4].
+On 7/7/20 8:45 PM, Laurent Vivier wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+> 
+> When QEMU sets up a tap based network device backend, it mostly ignores errors
+> reported from various ioctl() calls it makes, assuming the TAP file descriptor
+> is valid. This assumption can easily be violated when the user is passing in a
+> pre-opened file descriptor. At best, the ioctls may fail with a -EBADF, but if
+> the user passes in a bogus FD number that happens to clash with a FD number that
+> QEMU has opened internally for another reason, a wide variety of errnos may
+> result, as the TUNGETIFF ioctl number may map to a completely different command
+> on a different type of file.
+> 
+> By ignoring all these errors, QEMU sets up a zombie network backend that will
+> never pass any data. Even worse, when QEMU shuts down, or that network backend
+> is hot-removed, it will close this bogus file descriptor, which could belong to
+> another QEMU device backend.
+> 
+> There's no obvious guaranteed reliable way to detect that a FD genuinely is a
+> TAP device, as opposed to a UNIX socket, or pipe, or something else. Checking
+> the errno from probing vnet hdr flag though, does catch the big common cases.
+> ie calling TUNGETIFF will return EBADF for an invalid FD, and ENOTTY when FD is
+> a UNIX socket, or pipe which catches accidental collisions with FDs used for
+> stdio, or monitor socket.
+> 
+> Previously the example below where bogus fd 9 collides with the FD used for the
+> chardev saw:
+> 
+> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+>   -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+>   -monitor stdio -vnc :0
+> qemu-system-x86_64: -netdev tap,id=hostnet0,fd=9: TUNGETIFF ioctl() failed: Inappropriate ioctl for device
+> TUNSETOFFLOAD ioctl() failed: Bad address
+> QEMU 2.9.1 monitor - type 'help' for more information
+> (qemu) Warning: netdev hostnet0 has no peer
+> 
+> which gives a running QEMU with a zombie network backend.
+> 
+> With this change applied we get an error message and QEMU immediately exits
+> before carrying on and making a bigger disaster:
+> 
+> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+>   -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+>   -monitor stdio -vnc :0
+> qemu-system-x86_64: -netdev tap,id=hostnet0,vhost=on,fd=9: Unable to query TUNGETIFF on FD 9: Inappropriate ioctl for device
+> 
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Message-id: 20171027085548.3472-1-berrange@redhat.com
+> [lv: to simplify, don't check on EINVAL with TUNGETIFF as it exists since v2.6.27]
 
-  https://github.com/hskinnemoen/qemu
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-This patch series models enough of the Nuvoton NPCM730 and NPCM750 SoCs to boot
-an OpenBMC image built for quanta-gsj. This includes device models for:
-
-  - Global Configuration Registers
-  - Clock Control
-  - Timers
-  - Fuses
-  - Memory Controller
-  - Flash Controller
-
-These modules, along with the existing Cortex A9 CPU cores and built-in
-peripherals, are integrated into a NPCM730 or NPCM750 SoC, which in turn form
-the foundation for the quanta-gsj and npcm750-evb machines, respectively. The
-two SoCs are very similar; the only difference is that NPCM730 is missing some
-peripherals that NPCM750 has, and which are not considered essential for
-datacenter use (e.g. graphics controllers). For more information, see
-
-https://www.nuvoton.com/products/cloud-computing/ibmc/
-
-Both quanta-gsj and npcm750-evb correspond to real boards supported by OpenBMC.
-At the end of the series, qemu can boot an OpenBMC image built for one of these
-boards with some minor modifications.
-
-The patches in this series were developed by Google and reviewed by Nuvoton. We
-will be maintaining the machine and peripheral support together.
-
-The data sheet for these SoCs is not generally available. Please let me know if
-more comments are needed to understand the device behavior.
-
-Changes since v3:
-
-  - License headers are now GPL v2-or-later throughout.
-  - Added vmstate throughout (except the memory controller, which doesn't
-    really have any state worth saving). Successfully booted a gsj image
-    with two stop/savevm/quit/loadvm cycles along the way.
-      - JFFS2 really doesn't like it if I let qemu keep running after savevm,
-        and then jump back in time with loadvm. I assume this is expected.
-  - Fixed an error API violation in npcm7xx_realize, removed pointless error
-    check after object_property_set_link().
-  - Switched the OTP device to use an embedded array instead of a g_malloc0'd
-    one because I couldn't figure out how to set up vmstate for the latter.
-
-Changes since v2:
-
-  - Simplified the MAINTAINERS entry.
-  - Added link to OpenPOWER jenkins for gsj BMC images.
-  - Reverted the smpboot change, back to byte swapping.
-  - Adapted to upstream API changes:
-      - sysbus_init_child_obj -> object_initialize_child
-      - object_property_set_bool -> qdev_realize / sysbus_realize
-      - ssi_create_slave_no_init -> qdev_new
-      - qdev_init_nofail -> qdev_realize_and_unref
-      - ssi_auto_connect_slaves removed
-  - Moved Boot ROM loading from soc to machine init.
-  - Plumbed power-on-straps property from GCR to the machine init code so it
-    can be properly initialized. Turns out npcm750 memory init doesn't work
-    without this. npcm730 is fine either way, though I'm not sure why.
-  - Reworked the flash init code so it looks more like aspeed (i.e. the flash
-    device gets added even if there's no drive).
-
-Changes since v1 (requested by reviewers):
-
-  - Clarify the source of CLK reset values.
-  - Made smpboot a constant byte array, eliinated byte swapping.
-  - NPCM7xxState now stores an array of ARMCPUs, not pointers to ARMCPUs.
-  - Clarify why EL3 is disabled.
-  - Introduce NPCM7XX_NUM_IRQ constant.
-  - Set the number of CPUs according to SoC variant, and disallow command line
-    overrides (i.e. you can no longer override the number of CPUs with the -smp
-    parameter). This is trying to follow the spirit of
-    https://patchwork.kernel.org/patch/11595407/.
-  - Switch register operations to DEVICE_LITTLE_ENDIAN throughout.
-  - Machine documentation added (new patch).
-
-Changes since v1 to support flash booting:
-
-  - GCR reset value changes to get past memory initialization when booting
-    from flash (patches 2 and 5):
-      - INTCR2 now indicates that the DDR controller is initialized.
-      - INTCR3 is initialized according to DDR memory size. A realize()
-	method was implemented to achieve this.
-  - Refactor the machine initialization a bit to make it easier to drop in
-    machine-specific flash initialization (patch 6).
-  - Extend the series with additional patches to enable booting from flash:
-      - Boot ROM (through the -bios option).
-      - OTP (fuse) controller.
-      - Memory Controller stub (just enough to skip memory training).
-      - Flash controller.
-      - Board-specific flash initialization.
-
-Thanks for reviewing,
-
-Havard
-
-Havard Skinnemoen (12):
-  npcm7xx: Add config symbol
-  hw/misc: Add NPCM7xx System Global Control Registers device model
-  hw/misc: Add NPCM7xx Clock Controller device model
-  hw/timer: Add NPCM7xx Timer device model
-  hw/arm: Add NPCM730 and NPCM750 SoC models
-  hw/arm: Add two NPCM7xx-based machines
-  hw/arm: Load -bios image as a boot ROM for npcm7xx
-  hw/nvram: NPCM7xx OTP device model
-  hw/mem: Stubbed out NPCM7xx Memory Controller model
-  hw/ssi: NPCM7xx Flash Interface Unit device model
-  hw/arm: Wire up BMC boot flash for npcm750-evb and quanta-gsj
-  docs/system: Add Nuvoton machine documentation
-
- MAINTAINERS                      |   8 +
- default-configs/arm-softmmu.mak  |   1 +
- docs/system/arm/nuvoton.rst      |  92 ++++++
- docs/system/target-arm.rst       |   1 +
- hw/arm/Kconfig                   |   9 +
- hw/arm/Makefile.objs             |   1 +
- hw/arm/npcm7xx.c                 | 427 ++++++++++++++++++++++++++
- hw/arm/npcm7xx_boards.c          | 189 ++++++++++++
- hw/mem/Makefile.objs             |   1 +
- hw/mem/npcm7xx_mc.c              |  84 +++++
- hw/misc/Makefile.objs            |   2 +
- hw/misc/npcm7xx_clk.c            | 230 ++++++++++++++
- hw/misc/npcm7xx_gcr.c            | 224 ++++++++++++++
- hw/misc/trace-events             |   8 +
- hw/nvram/Makefile.objs           |   1 +
- hw/nvram/npcm7xx_otp.c           | 405 ++++++++++++++++++++++++
- hw/ssi/Makefile.objs             |   1 +
- hw/ssi/npcm7xx_fiu.c             | 510 +++++++++++++++++++++++++++++++
- hw/ssi/trace-events              |   9 +
- hw/timer/Makefile.objs           |   1 +
- hw/timer/npcm7xx_timer.c         | 468 ++++++++++++++++++++++++++++
- hw/timer/trace-events            |   5 +
- include/hw/arm/npcm7xx.h         | 107 +++++++
- include/hw/mem/npcm7xx_mc.h      |  36 +++
- include/hw/misc/npcm7xx_clk.h    |  66 ++++
- include/hw/misc/npcm7xx_gcr.h    |  77 +++++
- include/hw/nvram/npcm7xx_otp.h   |  94 ++++++
- include/hw/ssi/npcm7xx_fiu.h     | 100 ++++++
- include/hw/timer/npcm7xx_timer.h |  96 ++++++
- 29 files changed, 3253 insertions(+)
- create mode 100644 docs/system/arm/nuvoton.rst
- create mode 100644 hw/arm/npcm7xx.c
- create mode 100644 hw/arm/npcm7xx_boards.c
- create mode 100644 hw/mem/npcm7xx_mc.c
- create mode 100644 hw/misc/npcm7xx_clk.c
- create mode 100644 hw/misc/npcm7xx_gcr.c
- create mode 100644 hw/nvram/npcm7xx_otp.c
- create mode 100644 hw/ssi/npcm7xx_fiu.c
- create mode 100644 hw/timer/npcm7xx_timer.c
- create mode 100644 include/hw/arm/npcm7xx.h
- create mode 100644 include/hw/mem/npcm7xx_mc.h
- create mode 100644 include/hw/misc/npcm7xx_clk.h
- create mode 100644 include/hw/misc/npcm7xx_gcr.h
- create mode 100644 include/hw/nvram/npcm7xx_otp.h
- create mode 100644 include/hw/ssi/npcm7xx_fiu.h
- create mode 100644 include/hw/timer/npcm7xx_timer.h
-
--- 
-2.27.0.212.ge8ba1cc988-goog
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  net/tap-bsd.c     |  2 +-
+>  net/tap-linux.c   |  8 +++++---
+>  net/tap-solaris.c |  2 +-
+>  net/tap-stub.c    |  2 +-
+>  net/tap.c         | 25 ++++++++++++++++++++-----
+>  net/tap_int.h     |  2 +-
+>  6 files changed, 29 insertions(+), 12 deletions(-)
+> 
+> diff --git a/net/tap-bsd.c b/net/tap-bsd.c
+> index a5c3707f806d..77aaf674b19d 100644
+> --- a/net/tap-bsd.c
+> +++ b/net/tap-bsd.c
+> @@ -211,7 +211,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>  {
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      return 0;
+>  }
+> diff --git a/net/tap-linux.c b/net/tap-linux.c
+> index e0dd442ee34f..b0635e9e32ce 100644
+> --- a/net/tap-linux.c
+> +++ b/net/tap-linux.c
+> @@ -147,13 +147,15 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>      }
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      struct ifreq ifr;
+>  
+>      if (ioctl(fd, TUNGETIFF, &ifr) != 0) {
+> -        error_report("TUNGETIFF ioctl() failed: %s", strerror(errno));
+> -        return 0;
+> +        /* TUNGETIFF is available since kernel v2.6.27 */
+> +        error_setg_errno(errp, errno,
+> +                         "Unable to query TUNGETIFF on FD %d", fd);
+> +        return -1;
+>      }
+>  
+>      return ifr.ifr_flags & IFF_VNET_HDR;
+> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+> index 4725d2314eef..ae2ba6828415 100644
+> --- a/net/tap-solaris.c
+> +++ b/net/tap-solaris.c
+> @@ -206,7 +206,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>  {
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      return 0;
+>  }
+> diff --git a/net/tap-stub.c b/net/tap-stub.c
+> index a9ab8f829362..de525a2e69d4 100644
+> --- a/net/tap-stub.c
+> +++ b/net/tap-stub.c
+> @@ -37,7 +37,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+>  {
+>  }
+>  
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>  {
+>      return 0;
+>  }
+> diff --git a/net/tap.c b/net/tap.c
+> index 41a20102fd0b..b37ccae00cd3 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -597,7 +597,11 @@ int net_init_bridge(const Netdev *netdev, const char *name,
+>      }
+>  
+>      qemu_set_nonblock(fd);
+> -    vnet_hdr = tap_probe_vnet_hdr(fd);
+> +    vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +    if (vnet_hdr < 0) {
+> +        close(fd);
+> +        return -1;
+> +    }
+>      s = net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
+>  
+>      snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=%s,br=%s", helper,
+> @@ -810,7 +814,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>              return -1;
+>          }
+>  
+> -        vnet_hdr = tap_probe_vnet_hdr(fd);
+> +        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +        if (vnet_hdr < 0) {
+> +            close(fd);
+> +            return -1;
+> +        }
+>  
+>          net_init_tap_one(tap, peer, "tap", name, NULL,
+>                           script, downscript,
+> @@ -863,8 +871,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
+>              }
+>  
+>              if (i == 0) {
+> -                vnet_hdr = tap_probe_vnet_hdr(fd);
+> -            } else if (vnet_hdr != tap_probe_vnet_hdr(fd)) {
+> +                vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +                if (vnet_hdr < 0) {
+> +                    goto free_fail;
+> +                }
+> +            } else if (vnet_hdr != tap_probe_vnet_hdr(fd, NULL)) {
+>                  error_setg(errp,
+>                             "vnet_hdr not consistent across given tap fds");
+>                  ret = -1;
+> @@ -909,7 +920,11 @@ free_fail:
+>          }
+>  
+>          qemu_set_nonblock(fd);
+> -        vnet_hdr = tap_probe_vnet_hdr(fd);
+> +        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
+> +        if (vnet_hdr < 0) {
+> +            close(fd);
+> +            return -1;
+> +        }
+>  
+>          net_init_tap_one(tap, peer, "bridge", name, ifname,
+>                           script, downscript, vhostfdname,
+> diff --git a/net/tap_int.h b/net/tap_int.h
+> index e3194b23f47d..225a49ea4843 100644
+> --- a/net/tap_int.h
+> +++ b/net/tap_int.h
+> @@ -34,7 +34,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+>  ssize_t tap_read_packet(int tapfd, uint8_t *buf, int maxlen);
+>  
+>  void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp);
+> -int tap_probe_vnet_hdr(int fd);
+> +int tap_probe_vnet_hdr(int fd, Error **errp);
+>  int tap_probe_vnet_hdr_len(int fd, int len);
+>  int tap_probe_has_ufo(int fd);
+>  void tap_fd_set_offload(int fd, int csum, int tso4, int tso6, int ecn, int ufo);
+> 
 
 
