@@ -2,75 +2,77 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC490C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C10C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:02:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95E2720672
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6A9720672
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 17:02:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aU//MHM6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E2720672
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iBczFjlv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A9720672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsqyh-0006ZJ-RF
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 13:01:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43502)
+	id 1jsqyo-0006u0-VT
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 13:02:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsqoH-0003lD-7f
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:51:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51523
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsqZd-0007w0-T9
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:36:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22100
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsqoF-0006jJ-5n
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:51:08 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsqZb-0004CV-Pk
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:36:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594140666;
+ s=mimecast20190719; t=1594139758;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=10CNakQ3NgheZX/vjI8iYykwppKbLWYe9EuKJd8Y9yA=;
- b=aU//MHM6Ucn6juLqpNhfkLuo/9vFOdr1vza3ZQ28CY5EdaaT4Y+KSh06nbozhIm6J0Ba8a
- XacwEP1QkiIC+EALGNhXYFxlJ9pGBsiosLnxZQ1e7xs6mWm92DCjzrcxRNb2wsTn2rRIH2
- VK1rQc9qJMPDuEGi/ewVYXgyLWdkXY4=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aORuYeoGufZzWhhAy1jwkNQHbMQmMo2DR1yYPUCz9Ec=;
+ b=iBczFjlvxYoqxDnz6h6UIQWBmC6ordFF8u/OtU1GdWxE6SbZw1cu7esRrHgWMCqBfBV1Em
+ a9d2iMtZxVD6d8JIFiEnKnmmoEZuGZYkx9Z2Nhkj6YW8DT/hL8084O/braIfDEbwLC19Wd
+ +eHZIAwgIfawOgn8iD6zzvNfZsYjJYw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-dQR7_YpFNua-zqFIhuDs5w-1; Tue, 07 Jul 2020 12:50:50 -0400
-X-MC-Unique: dQR7_YpFNua-zqFIhuDs5w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-456-kpQe7hhrMB6dFsHoy7teJg-1; Tue, 07 Jul 2020 12:35:53 -0400
+X-MC-Unique: kpQe7hhrMB6dFsHoy7teJg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2A12461;
- Tue,  7 Jul 2020 16:50:48 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DE0F5D9F3;
- Tue,  7 Jul 2020 16:50:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1B50B1132FD2; Tue,  7 Jul 2020 18:50:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v12 0/8] error: auto propagated local_err part I
-Date: Tue,  7 Jul 2020 18:50:29 +0200
-Message-Id: <20200707165037.1026246-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 672751005510;
+ Tue,  7 Jul 2020 16:35:50 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-113.ams2.redhat.com
+ [10.36.114.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 75B27512FE;
+ Tue,  7 Jul 2020 16:35:49 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 07/12] qcow: Tolerate backing_fmt=
+Date: Tue,  7 Jul 2020 18:34:59 +0200
+Message-Id: <20200707163504.194740-8-kwolf@redhat.com>
+In-Reply-To: <20200707163504.194740-1-kwolf@redhat.com>
+References: <20200707163504.194740-1-kwolf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:04:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -80,7 +82,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,120 +95,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, groug@kaod.org,
- Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To speed things up, I'm taking the liberty to respin Vladimir's series
-with my documentation amendments.
+From: Eric Blake <eblake@redhat.com>
 
-After my documentation work, I'm very much inclined to rename
-ERRP_AUTO_PROPAGATE() to ERRP_GUARD().  The fact that it propagates
-below the hood is detail.  What matters to its users is that it lets
-them use @errp more freely.  Thoughts?
+qcow has no space in the metadata to store a backing format, and there
+are existing qcow images backed both by raw or by other formats
+(usually qcow) images, reliant on probing to tell the difference.  On
+the bright side, because we probe every time, raw files are marked as
+probed and we thus forbid a commit action into the backing file where
+guest-controlled contents could change the result of the probe next
+time around (the iotest added here proves that).
 
-Based-on: Message-Id: <20200707160613.848843-1-armbru@redhat.com>
+Still, allowing the user to specify the backing format during
+creation, even if we can't record it, is a good thing.  This patch
+blindly allows any value that resolves to a known driver, even if the
+user's request is a mismatch from what probing finds; then the next
+patch will further enhance things to verify that the user's request
+matches what we actually probe.  With this and the next patch in
+place, we will finally be ready to deprecate the creation of images
+where a backing format was not explicitly specified by the user.
 
-Available from my public repository https://repo.or.cz/qemu/armbru.git
-on branch error-auto.
+Note that this is only for QemuOpts usage; there is no change to the
+QAPI to allow a format through -blockdev.
 
-v12: (based on "[PATCH v4 00/45] Less clumsy error checking")
-01: Comments merged properly with recent commit "error: Document Error
-API usage rules", and edited for clarity.  Put ERRP_AUTO_PROPAGATE()
-before its helpers, and touch up style.
-01-08: Commit messages tweaked
+Add a new iotest 293 just for qcow, to demonstrate the latest
+behavior, and to make it easier to show the improvements made in the
+next patch.
 
-Vladimir's cover letter for v11:
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200706203954.341758-6-eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qcow.c               | 20 ++++++++-
+ tests/qemu-iotests/293     | 88 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/293.out | 60 ++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 168 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/293
+ create mode 100644 tests/qemu-iotests/293.out
 
-v11: (based-on "[PATCH v2 00/44] Less clumsy error checking")
-01: minor rebase of documentation, keep r-bs
-02: - minor comment tweaks [Markus]
-    - use explicit file name in MAINTAINERS instead of pattern
-    - add Markus's r-b
-03,07,08: rabase changes, drop r-bs
-
-
-v11 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v11
-v10 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v10
-
-In these series, there is no commit-per-subsystem script, each generated
-commit is generated in separate.
-
-Still, generating commands are very similar, and looks like
-
-    sed -n '/^<Subsystem name>$/,/^$/{s/^F: //p}' MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Note, that in each generated commit, generation command is the only
-text, indented by 8 spaces in 'git log -1' output, so, to regenerate all
-commits (for example, after rebase, or change in coccinelle script), you
-may use the following command:
-
-git rebase -x "sh -c \"git show --pretty= --name-only | xargs git checkout HEAD^ -- ; git reset; git log -1 | grep '^        ' | sh\"" HEAD~6
-
-Which will start automated interactive rebase for generated patches,
-which will stop if generated patch changed
-(you may do git commit --amend to apply updated generated changes).
-
-Note:
-  git show --pretty= --name-only   - lists files, changed in HEAD
-  git log -1 | grep '^        ' | sh   - rerun generation command of HEAD
-
-
-Check for compilation of changed .c files
-git rebase -x "sh -c \"git show --pretty= --name-only | sed -n 's/\.c$/.o/p' | xargs make -j9\"" HEAD~6
-
-Vladimir Sementsov-Ogievskiy (8):
-  error: New macro ERRP_AUTO_PROPAGATE()
-  scripts: Coccinelle script to use ERRP_AUTO_PROPAGATE()
-  sd: Use ERRP_AUTO_PROPAGATE()
-  pflash: Use ERRP_AUTO_PROPAGATE()
-  fw_cfg: Use ERRP_AUTO_PROPAGATE()
-  virtio-9p: Use ERRP_AUTO_PROPAGATE()
-  nbd: Use ERRP_AUTO_PROPAGATE()
-  xen: Use ERRP_AUTO_PROPAGATE()
-
- scripts/coccinelle/auto-propagated-errp.cocci | 337 ++++++++++++++++++
- include/block/nbd.h                           |   1 +
- include/qapi/error.h                          | 163 ++++++++-
- block/nbd.c                                   |   7 +-
- hw/9pfs/9p-local.c                            |  12 +-
- hw/9pfs/9p.c                                  |   1 +
- hw/block/dataplane/xen-block.c                |  17 +-
- hw/block/pflash_cfi01.c                       |   7 +-
- hw/block/pflash_cfi02.c                       |   7 +-
- hw/block/xen-block.c                          | 102 +++---
- hw/nvram/fw_cfg.c                             |  14 +-
- hw/pci-host/xen_igd_pt.c                      |   7 +-
- hw/sd/sdhci-pci.c                             |   7 +-
- hw/sd/sdhci.c                                 |  21 +-
- hw/sd/ssi-sd.c                                |  10 +-
- hw/xen/xen-backend.c                          |   7 +-
- hw/xen/xen-bus.c                              |  92 ++---
- hw/xen/xen-host-pci-device.c                  |  27 +-
- hw/xen/xen_pt.c                               |  25 +-
- hw/xen/xen_pt_config_init.c                   |  17 +-
- nbd/client.c                                  |   5 +
- nbd/server.c                                  |   5 +
- MAINTAINERS                                   |   1 +
- 23 files changed, 659 insertions(+), 233 deletions(-)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
-
+diff --git a/block/qcow.c b/block/qcow.c
+index ee5d35fe20..e91aa2d8c4 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -940,11 +940,12 @@ static int coroutine_fn qcow_co_create_opts(BlockDriver *drv,
+ {
+     BlockdevCreateOptions *create_options = NULL;
+     BlockDriverState *bs = NULL;
+-    QDict *qdict;
++    QDict *qdict = NULL;
+     Visitor *v;
+     const char *val;
+     Error *local_err = NULL;
+     int ret;
++    char *backing_fmt;
+ 
+     static const QDictRenames opt_renames[] = {
+         { BLOCK_OPT_BACKING_FILE,       "backing-file" },
+@@ -952,6 +953,17 @@ static int coroutine_fn qcow_co_create_opts(BlockDriver *drv,
+         { NULL, NULL },
+     };
+ 
++    /*
++     * We can't actually store a backing format, but can check that
++     * the user's request made sense.
++     */
++    backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
++    if (backing_fmt && !bdrv_find_format(backing_fmt)) {
++        error_setg(errp, "unrecognized backing format '%s'", backing_fmt);
++        ret = -EINVAL;
++        goto fail;
++    }
++
+     /* Parse options and convert legacy syntax */
+     qdict = qemu_opts_to_qdict_filtered(opts, NULL, &qcow_create_opts, true);
+ 
+@@ -1018,6 +1030,7 @@ static int coroutine_fn qcow_co_create_opts(BlockDriver *drv,
+ 
+     ret = 0;
+ fail:
++    g_free(backing_fmt);
+     qobject_unref(qdict);
+     bdrv_unref(bs);
+     qapi_free_BlockdevCreateOptions(create_options);
+@@ -1152,6 +1165,11 @@ static QemuOptsList qcow_create_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "File name of a base image"
+         },
++        {
++            .name = BLOCK_OPT_BACKING_FMT,
++            .type = QEMU_OPT_STRING,
++            .help = "Format of the backing image",
++        },
+         {
+             .name = BLOCK_OPT_ENCRYPT,
+             .type = QEMU_OPT_BOOL,
+diff --git a/tests/qemu-iotests/293 b/tests/qemu-iotests/293
+new file mode 100755
+index 0000000000..3823e95617
+--- /dev/null
++++ b/tests/qemu-iotests/293
+@@ -0,0 +1,88 @@
++#!/usr/bin/env bash
++#
++# Test qcow backing file warnings
++#
++# Copyright (C) 2020 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++status=1 # failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++    _rm_test_img "$TEST_IMG.qcow2"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow
++_supported_proto file
++_supported_os Linux
++
++size=32M
++
++echo
++echo "== qcow backed by qcow =="
++
++TEST_IMG="$TEST_IMG.base" _make_test_img $size
++_make_test_img -b "$TEST_IMG.base" $size
++_img_info
++_make_test_img -b "$TEST_IMG.base" -F $IMGFMT $size
++_img_info
++
++echo
++echo "== mismatched command line detection =="
++
++_make_test_img -b "$TEST_IMG.base" -F vmdk
++_make_test_img -b "$TEST_IMG.base" -F vmdk $size
++echo
++# Use of -u bypasses the backing format sanity check
++_make_test_img -u -b "$TEST_IMG.base" -F vmdk
++_make_test_img -u -b "$TEST_IMG.base" -F vmdk $size
++echo
++# But the format must still be recognized
++_make_test_img -b "$TEST_IMG.base" -F garbage $size
++_make_test_img -u -b "$TEST_IMG.base" -F garbage $size
++_img_info
++
++echo
++echo "== qcow backed by raw =="
++
++rm "$TEST_IMG.base"
++truncate --size=$size "$TEST_IMG.base"
++_make_test_img -b "$TEST_IMG.base" $size
++_img_info
++_make_test_img -b "$TEST_IMG.base" -F raw $size
++_img_info
++
++echo
++echo "== commit cannot change type of raw backing file =="
++TEST_IMG="$TEST_IMG.qcow2" IMGFMT=qcow2 _make_test_img $size
++truncate --size=$size "$TEST_IMG.qcow2"
++$QEMU_IMG convert -n -f raw -O $IMGFMT "$TEST_IMG.qcow2" "$TEST_IMG"
++$QEMU_IMG commit -f $IMGFMT "$TEST_IMG" && echo "unexpected success"
++TEST_IMG="$TEST_IMG.base" _img_info
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/293.out b/tests/qemu-iotests/293.out
+new file mode 100644
+index 0000000000..d07918b6d7
+--- /dev/null
++++ b/tests/qemu-iotests/293.out
+@@ -0,0 +1,60 @@
++QA output created by 293
++
++== qcow backed by qcow ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=33554432
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32 MiB (33554432 bytes)
++cluster_size: 512
++backing file: TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32 MiB (33554432 bytes)
++cluster_size: 512
++backing file: TEST_DIR/t.IMGFMT.base
++
++== mismatched command line detection ==
++qemu-img: TEST_DIR/t.IMGFMT: invalid VMDK image descriptor
++Could not open backing image to determine size.
++qemu-img: warning: Could not verify backing image. This may become an error in future versions.
++invalid VMDK image descriptor
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=vmdk
++
++qemu-img: TEST_DIR/t.IMGFMT: Image creation needs a size parameter
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=vmdk
++
++qemu-img: warning: Could not verify backing image. This may become an error in future versions.
++Unknown driver 'garbage'
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=garbage
++qemu-img: TEST_DIR/t.IMGFMT: unrecognized backing format 'garbage'
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=garbage
++qemu-img: TEST_DIR/t.IMGFMT: unrecognized backing format 'garbage'
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32 MiB (33554432 bytes)
++cluster_size: 512
++backing file: TEST_DIR/t.IMGFMT.base
++
++== qcow backed by raw ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32 MiB (33554432 bytes)
++cluster_size: 512
++backing file: TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 32 MiB (33554432 bytes)
++cluster_size: 512
++backing file: TEST_DIR/t.IMGFMT.base
++
++== commit cannot change type of raw backing file ==
++Formatting 'TEST_DIR/t.qcow.IMGFMT', fmt=IMGFMT size=33554432
++qemu-img: Block job failed: Operation not permitted
++image: TEST_DIR/t.IMGFMT.base
++file format: raw
++virtual size: 32 MiB (33554432 bytes)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index d886fa0cb3..0dcfffdcad 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -301,4 +301,5 @@
+ 290 rw auto quick
+ 291 rw quick
+ 292 rw auto quick
++293 backing quick
+ 297 meta
 -- 
-2.26.2
+2.25.4
 
 
