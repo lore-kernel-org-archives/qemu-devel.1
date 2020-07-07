@@ -2,146 +2,96 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED072C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC120C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:24:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CAB420708
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BA822065F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:24:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GuR4xiAs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAB420708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3T3tmO7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA822065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jskjs-0004UK-FA
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:22:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57308)
+	id 1jskmO-0006LF-S7
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:24:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jskiy-00043y-Cn
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:21:16 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21634
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jskis-00037H-Uv
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:21:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594117269;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=762Md/qXxC7a/VaTqSycmrq9QY9LLt4vmEAIV0xKt9o=;
- b=GuR4xiAsFUEGAuzf6tkzECPLccPRkVYe2wabP22P3Moghn6CK7VNvMS6ds4pq+Dvl6ULuL
- SL/vaM+LuaidPLTLNCLQ356bXdGi8lXD24XoAAZgz3p2cdXOGtiRhfs6zo8uiu7fJhGBq6
- xvnS7PU9MJQ+haiAAhyqq6aUyfVibCU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-9hpWR6UjPk2kSWPRjMcphg-1; Tue, 07 Jul 2020 06:21:07 -0400
-X-MC-Unique: 9hpWR6UjPk2kSWPRjMcphg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB1C118A8225;
- Tue,  7 Jul 2020 10:21:06 +0000 (UTC)
-Received: from [10.36.112.252] (ovpn-112-252.ams2.redhat.com [10.36.112.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D157079CEC;
- Tue,  7 Jul 2020 10:21:03 +0000 (UTC)
-Subject: Re: [PATCH v3 1/2] net: tap: check if the file descriptor is valid
- before using it
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-References: <20200701193951.36248-1-lvivier@redhat.com>
- <20200701193951.36248-2-lvivier@redhat.com>
- <c6ad433e-7327-4fcb-180c-e161919c0aa3@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <67907426-ef2d-705d-32f8-8bb6b101c527@redhat.com>
-Date: Tue, 7 Jul 2020 12:21:02 +0200
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsklk-0005p9-2L; Tue, 07 Jul 2020 06:24:08 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33557)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jskli-0003Qx-Ac; Tue, 07 Jul 2020 06:24:07 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a6so1426487wmm.0;
+ Tue, 07 Jul 2020 03:24:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=n49OJ6eNQ6h3yEXOrI5/t968r1z4wUSmMEgUCt+ZiEg=;
+ b=N3T3tmO7x3Kt4XJa5aQLTp5wUs7uSgmaZIa7CL2uc5BpK069PGn7DVJjtRDNF36J0y
+ aFNbOLMKU8q8qv79pAn2y7FkaOIluuO2U41U3VJJ1U2/vd2J9pMpSUF6zplnlbQsh4PM
+ MhCY0hHpQL+8/ChN2I6pfdMZeHftJz9yVao2sTvNdKZDWb1j4LcZL2aKyMVIOYz/rm2k
+ +1/SsyMb1pYi14+VqHlo24Mu890cxXD5QOUm0xTO0I83MSwRkcwjueS6wMkSbELuEL0Z
+ TGNOnfCfcYhUOX3c7WC32L/htgUF3/9cP8fJpofuj3+vBVSrB8jSrZcQV6SG0RsQmU2N
+ qU/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=n49OJ6eNQ6h3yEXOrI5/t968r1z4wUSmMEgUCt+ZiEg=;
+ b=XVGb+ObxX4ywfChqYJ9dlhbmeGAwXAjk67zxssH8lEXvbB55BIbfFmpMqfQuW0+3Qk
+ s5tltXDzxvAVVxQBSuDk0z4A7wSt5sbpGO9c6dvMZBeVy9NvfcBcnFF1Db00LibsH6Xl
+ nwyfX/EVRjEjpVc/aiRW2YizRw1gAqoLpkdCB130qmCQPg34fjUAPZc16FcM2gR7wBOv
+ f5gE9P/aHF4RyuNG1DuKHGZ7S+60lOU6eZ/4uOWvdENi4e0IxAIKLGosHXSQspLVAer0
+ 53/PaW9ELJztg9KLKRuAQjeURcX+m7y0PpmuH3eTajuaxclPhz+4+y2RnNvqxo3S696h
+ tlJw==
+X-Gm-Message-State: AOAM530nA8Ul+j1Tr33CHgWJ1uLFxAaxdpSkt/yL2yLr84pbKtvD7UFX
+ fy/zXUXhs0sCrHbV6wbAB1g=
+X-Google-Smtp-Source: ABdhPJyM9iCLdXB+xBNgzIn8+F/Dwys7z3lxhnajGhxwAKVTe5eC7X0eMdOYYcimP9hBUPRa2fgk6Q==
+X-Received: by 2002:a7b:c956:: with SMTP id i22mr3633749wml.95.1594117444458; 
+ Tue, 07 Jul 2020 03:24:04 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id c20sm488541wrb.65.2020.07.07.03.24.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jul 2020 03:24:03 -0700 (PDT)
+Subject: Re: [PATCH v7 05/17] hw/sd/sdcard: Do not switch to ReceivingData if
+ address is invalid
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200630133912.9428-1-f4bug@amsat.org>
+ <20200630133912.9428-6-f4bug@amsat.org>
+ <CAP+75-V-Uu8-Uk8jMwkgb3xJpFoef=k6p=ejaY4=+njkdb3ZeQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3b0a65bc-97a7-9f49-da3a-5c680c4b5722@amsat.org>
+Date: Tue, 7 Jul 2020 12:24:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <c6ad433e-7327-4fcb-180c-e161919c0aa3@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAP+75-V-Uu8-Uk8jMwkgb3xJpFoef=k6p=ejaY4=+njkdb3ZeQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lvivier@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -155,69 +105,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/07/2020 09:56, Jason Wang wrote:
+On 7/7/20 10:30 AM, Philippe Mathieu-Daudé wrote:
+> On Tue, Jun 30, 2020 at 3:39 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> Only move the state machine to ReceivingData if there is no
+>> pending error. This avoids later OOB access while processing
+>> commands queued.
+>>
+>>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+>>
+>>   4.3.3 Data Read
+>>
+>>   Read command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>   occurred and no data transfer is performed.
+>>
+>>   4.3.4 Data Write
+>>
+>>   Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>   occurred and no data transfer is performed.
+>>
+>> WP_VIOLATION errors are not modified: the error bit is set, we
+>> stay in receive-data state, wait for a stop command. All further
+>> data transfer is ignored. See the check on sd->card_status at the
+>> beginning of sd_read_data() and sd_write_data().
+>>
+>> Fixes: CVE-2020-13253
+>> Cc: Prasad J Pandit <pjp@fedoraproject.org>
+>> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1880822
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> v4: Only modify ADDRESS_ERROR, not WP_VIOLATION (pm215)
+>> ---
+>>  hw/sd/sd.c | 34 ++++++++++++++++++++++------------
+>>  1 file changed, 22 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>> index 04451fdad2..7e0d684aca 100644
+>> --- a/hw/sd/sd.c
+>> +++ b/hw/sd/sd.c
+>> @@ -1167,13 +1167,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>>      case 17:   /* CMD17:  READ_SINGLE_BLOCK */
+>>          switch (sd->state) {
+>>          case sd_transfer_state:
+>> -            sd->state = sd_sendingdata_state;
+>> -            sd->data_start = addr;
+>> -            sd->data_offset = 0;
+>>
+>>              if (sd->data_start + sd->blk_len > sd->size) {
+>>                  sd->card_status |= ADDRESS_ERROR;
+>> +                return sd_r1;
+>>              }
+>> +
+>> +            sd->state = sd_sendingdata_state;
+>> +            sd->data_start = addr;
+>> +            sd->data_offset = 0;
+>>              return sd_r1;
+>>
+>>          default:
+>> @@ -1184,13 +1186,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>>      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
+>>          switch (sd->state) {
+>>          case sd_transfer_state:
+>> -            sd->state = sd_sendingdata_state;
+>> -            sd->data_start = addr;
+>> -            sd->data_offset = 0;
+>>
+>>              if (sd->data_start + sd->blk_len > sd->size) {
+>>                  sd->card_status |= ADDRESS_ERROR;
+>> +                return sd_r1;
 > 
-> On 2020/7/2 上午3:39, Laurent Vivier wrote:
->> +void qemu_set_nonblock(int fd)
->> +{
->> +    int f;
->> +    f = qemu_try_set_nonblock(fd);
->> +    assert(f == 0);
->>   }
-> 
-> 
-> So we keep this assert which means it can still be triggered from monitor?
-> 
-> I don't check all the callers, but I got:
-> 
-> in tap_init_one() we had:
-> 
->         if (vhostfdname) {
->             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
->             if (vhostfd == -1) {
->                 if (tap->has_vhostforce && tap->vhostforce) {
->                     error_propagate(errp, err);
->                 } else {
->                     warn_report_err(err);
->                 }
->                 return;
->             }
->             qemu_set_nonblock(vhostfd);
->         } else {
-> 
-> and in net_init_socket() we had:
-> 
->     if (sock->has_fd) {
->         int fd;
-> 
->         fd = monitor_fd_param(cur_mon, sock->fd, errp);
->         if (fd == -1) {
->             return -1;
->         }
->         qemu_set_nonblock(fd);
->         if (!net_socket_fd_init(peer, "socket", name, fd, 1, sock->mcast,
->                                 errp)) {
->             return -1;
->         }
->         return 0;
->     }
-> 
+> Unfortunately this breaks guests (Linux at least) when sd->size is not
+> a power of 2,
+> as Linux doesn't expect unrealistic SD card sizes.
 
-Yes, I think you're right, all fd that come from monitor and passed to
-qemu_set_nonblock() before any other use should use
-qemu_try_set_nonblock() and report an error.
+I can use blk_truncate() to expand the image (which must be RW anyway)
+to the ceil pow2 with something like:
 
-I update my patch accordingly.
+-- >8 --
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index b44999c864..052934f867 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -2121,11 +2121,28 @@ static void sd_realize(DeviceState *dev, Error
+**errp)
+     }
 
-Thanks,
-Laurent
+     if (sd->blk) {
++        int64_t blk_size;
++
+         if (blk_is_read_only(sd->blk)) {
+             error_setg(errp, "Cannot use read-only drive as SD card");
+             return;
+         }
 
++        blk_size = blk_getlength(sd->blk);
++        if (blk_size > 0) {
++            int64_t blk_size_aligned = pow2ceil(blk_size);
++
++            if (blk_size != blk_size_aligned) {
++                ret = blk_truncate(sd->blk, blk_size_aligned, false,
++                                   PREALLOC_MODE_FALLOC,
++                                   BDRV_REQ_ZERO_WRITE, errp);
++                if (ret < 0) {
++                    error_prepend(errp, "Could not resize image: ");
++                    return;
++                }
++            }
++        }
++
+         ret = blk_set_perm(sd->blk, BLK_PERM_CONSISTENT_READ |
+BLK_PERM_WRITE,
+                            BLK_PERM_ALL, errp);
+         if (ret < 0) {
+---
+
+> 
+>>              }
+>> +
+>> +            sd->state = sd_sendingdata_state;
+>> +            sd->data_start = addr;
+>> +            sd->data_offset = 0;
+>>              return sd_r1;
+>>
+>>          default:
+>> @@ -1230,14 +1234,17 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>>              /* Writing in SPI mode not implemented.  */
+>>              if (sd->spi)
+>>                  break;
+>> +
+>> +            if (sd->data_start + sd->blk_len > sd->size) {
+>> +                sd->card_status |= ADDRESS_ERROR;
+>> +                return sd_r1;
+>> +            }
+>> +
+>>              sd->state = sd_receivingdata_state;
+>>              sd->data_start = addr;
+>>              sd->data_offset = 0;
+>>              sd->blk_written = 0;
+>>
+>> -            if (sd->data_start + sd->blk_len > sd->size) {
+>> -                sd->card_status |= ADDRESS_ERROR;
+>> -            }
+>>              if (sd_wp_addr(sd, sd->data_start)) {
+>>                  sd->card_status |= WP_VIOLATION;
+>>              }
+>> @@ -1257,14 +1264,17 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+>>              /* Writing in SPI mode not implemented.  */
+>>              if (sd->spi)
+>>                  break;
+>> +
+>> +            if (sd->data_start + sd->blk_len > sd->size) {
+>> +                sd->card_status |= ADDRESS_ERROR;
+>> +                return sd_r1;
+>> +            }
+>> +
+>>              sd->state = sd_receivingdata_state;
+>>              sd->data_start = addr;
+>>              sd->data_offset = 0;
+>>              sd->blk_written = 0;
+>>
+>> -            if (sd->data_start + sd->blk_len > sd->size) {
+>> -                sd->card_status |= ADDRESS_ERROR;
+>> -            }
+>>              if (sd_wp_addr(sd, sd->data_start)) {
+>>                  sd->card_status |= WP_VIOLATION;
+>>              }
+>> --
+>> 2.21.3
+>>
 
