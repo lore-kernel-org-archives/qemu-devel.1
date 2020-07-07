@@ -6,80 +6,80 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F98AC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AADC0C433DF
 	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 12:58:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D43120771
+	by mail.kernel.org (Postfix) with ESMTPS id 7937820771
 	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 12:58:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E0JfvDek"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D43120771
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TZzMNINw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7937820771
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsnAq-0004wE-8R
+	id 1jsnAq-0004wg-Lh
 	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 08:58:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38170)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsn7S-0007sz-0o
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:54:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20703
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsn7e-0008A0-L4
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:54:55 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35627
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsn7Q-0004oS-4a
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:54:41 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsn7c-0004r8-HL
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 08:54:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594126479;
+ s=mimecast20190719; t=1594126490;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=MNTlxHdwoZD1i7fR0/VxIsjSfZdUtlBEEDJL/FTCXj8=;
- b=E0JfvDekVN0Ufy23cw96yO0DpmIJt7QqPes335UVx52NlSLWbyq3w4ECfwTpM/+NXb0x8K
- d3nYVgv6oEhmDahQuZUqiaVXxZCBZt6CjiAuHfC7eur0oNxsl51DdIkytE/kx+K/KdKQRM
- bWEcQL2eYRvakqi0C7xIWd2lclBi+QU=
+ references:references; bh=Wc9PJg0y+gZhnz3nm4G7K97xAl+wSVatR2UZc498+YQ=;
+ b=TZzMNINwR4Q1X2hmNe5sW9phCl5Le7xEXeitPhJCpkKtzx/Bt53eot5/cd0UgpgxOFmahJ
+ xdITqGM5f12VknptKRWz2lYpwhjISIbowoxuJrx9BDMntA7Gi9YfmSJlRpLJBijyZkyh3Y
+ qEBHHKvN6J+/alygHCdcdLWAVR3snq4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-vdRgpab0Oyu0ysiBpjyUEQ-1; Tue, 07 Jul 2020 08:54:36 -0400
-X-MC-Unique: vdRgpab0Oyu0ysiBpjyUEQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-274-rGa8oTprOhuGOAAV5d4ISw-1; Tue, 07 Jul 2020 08:54:47 -0400
+X-MC-Unique: rGa8oTprOhuGOAAV5d4ISw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CCB38AF840;
- Tue,  7 Jul 2020 12:54:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3885469899;
+ Tue,  7 Jul 2020 12:54:29 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com
  [10.36.112.200])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E570660BF3;
- Tue,  7 Jul 2020 12:54:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D9B017610C;
+ Tue,  7 Jul 2020 12:54:16 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id CA71B31FAA; Tue,  7 Jul 2020 14:53:57 +0200 (CEST)
+ id 777FD31F73; Tue,  7 Jul 2020 14:53:57 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 20/20] tests/acpi: update expected data files for microvm
-Date: Tue,  7 Jul 2020 14:53:56 +0200
-Message-Id: <20200707125356.32450-21-kraxel@redhat.com>
+Subject: [PATCH v5 13/20] x86: constify x86_machine_is_*_enabled
+Date: Tue,  7 Jul 2020 14:53:49 +0200
+Message-Id: <20200707125356.32450-14-kraxel@redhat.com>
 In-Reply-To: <20200707125356.32450-1-kraxel@redhat.com>
 References: <20200707125356.32450-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,59 +103,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Also clear tests/qtest/bios-tables-test-allowed-diff.h
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- tests/qtest/bios-tables-test-allowed-diff.h |   3 ---
- tests/data/acpi/microvm/APIC                | Bin 0 -> 70 bytes
- tests/data/acpi/microvm/DSDT                | Bin 0 -> 365 bytes
- tests/data/acpi/microvm/FACP                | Bin 0 -> 268 bytes
- 4 files changed, 3 deletions(-)
+ include/hw/i386/x86.h | 4 ++--
+ hw/i386/x86.c         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index 97c3fa621b7f..dfb8523c8bf4 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1,4 +1 @@
- /* List of comma-separated changed AML files to ignore */
--"tests/data/acpi/microvm/APIC",
--"tests/data/acpi/microvm/DSDT",
--"tests/data/acpi/microvm/FACP",
-diff --git a/tests/data/acpi/microvm/APIC b/tests/data/acpi/microvm/APIC
-index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..7472c7e830b6c7139720e93dd544d4441556661d 100644
-GIT binary patch
-literal 70
-zcmZ<^@N{-#U|?Xp?&R<65v<@85#a0y6k`O6f!H9Lf#JbFFwFr}2jnsGfW!{`1CcCj
-H|A7Jk<Z=uF
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/data/acpi/microvm/DSDT b/tests/data/acpi/microvm/DSDT
-index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..b7297dfe9a34bede2ad0d65281f0bc7497bbd358 100644
-GIT binary patch
-literal 365
-zcmX9(%WA?v6uqN~#;dW@2S^JA=?9e2B3&nwF$SVZGd>C_j6YE5wz#n_gs%GoenLN`
-zpW{k;$86@Fd(Irrxsi_M?+m~-VJ0WKAHL=?B917q*iIf_8y%W*_c&h3v1cYp<iDut
-zLI^Pg&**u8ZO_O;U;2nK<1Tku=M&1^P-fG?`F|()bD3urNkp$TTvP^*e$0;bV;#H)
-z4%U-4VilPxB#?O`#NdfS$mx?n$mVph{oQ~%Yf(EgZB?OS=l~o}=#*b=yGo^1+P}Fs
-zYB_Ix*kyg-Kbtky0BievRfM=LcefT)Vfic<QphTciiFOx5YLsC&Wen#9aSPWsf7&a
-j65Hhtd;1nJ=>DFd20*<S>z#XX{ze8pGFMFpU84R0a<feV
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/data/acpi/microvm/FACP b/tests/data/acpi/microvm/FACP
-index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..e52b16d24ac4f7b95a7d11a5f2ad801c0cb87147 100644
-GIT binary patch
-literal 268
-zcmZ>BbPnKQWME*eb@F%i2v%^42yk`-iUEZfKx`0ARlp*^z`()4z{IrRAIMxM1_r8I
-SLD0QG`x&72gWSRhWdi`;u?ztK
-
-literal 0
-HcmV?d00001
-
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index b79f24e28545..a350ea3609f5 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -110,8 +110,8 @@ void x86_load_linux(X86MachineState *x86ms,
+                     bool pvh_enabled,
+                     bool linuxboot_dma_enabled);
+ 
+-bool x86_machine_is_smm_enabled(X86MachineState *x86ms);
+-bool x86_machine_is_acpi_enabled(X86MachineState *x86ms);
++bool x86_machine_is_smm_enabled(const X86MachineState *x86ms);
++bool x86_machine_is_acpi_enabled(const X86MachineState *x86ms);
+ 
+ /* Global System Interrupts */
+ 
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 93f7371a5693..2d2beff3d4f6 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -848,7 +848,7 @@ void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
+                                 bios);
+ }
+ 
+-bool x86_machine_is_smm_enabled(X86MachineState *x86ms)
++bool x86_machine_is_smm_enabled(const X86MachineState *x86ms)
+ {
+     bool smm_available = false;
+ 
+@@ -890,7 +890,7 @@ static void x86_machine_set_smm(Object *obj, Visitor *v, const char *name,
+     visit_type_OnOffAuto(v, name, &x86ms->smm, errp);
+ }
+ 
+-bool x86_machine_is_acpi_enabled(X86MachineState *x86ms)
++bool x86_machine_is_acpi_enabled(const X86MachineState *x86ms)
+ {
+     if (x86ms->acpi == ON_OFF_AUTO_OFF) {
+         return false;
 -- 
 2.18.4
 
