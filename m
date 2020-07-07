@@ -2,130 +2,98 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AB0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 04:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3FBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 04:23:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ECD720702
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 04:21:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B46B320702
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 04:23:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q/e8aq8D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECD720702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iydyx3CV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B46B320702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsf6s-0005i1-7K
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 00:21:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46158)
+	id 1jsf8O-0006aw-1w
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 00:23:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsf6I-00056u-4z
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 00:20:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28052
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jsf6F-0003pu-Mj
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 00:20:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594095654;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Zh7rmnl5N4wnRyaCh44r65qigLXyOnQ7ck7qUUOCkec=;
- b=Q/e8aq8Df38x1uoOmWv4Ik5ZQPiXaf5KOa1zQpIZbzLA8oY2lcYNkgHqFMtv8Oq0GUUts/
- 5wg8eTHQrik6S6cyzqbI9xmcHuJliU+lu2pEglCtsYBqAmaWTg0qWnSxEZznxBMAnDTKgr
- O7HRdiNkNP9Ezd+L2cWFlIk2IdLvoo8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-aafLoHSkMEO3GEBbcpYOpQ-1; Tue, 07 Jul 2020 00:20:52 -0400
-X-MC-Unique: aafLoHSkMEO3GEBbcpYOpQ-1
-Received: by mail-wm1-f69.google.com with SMTP id e15so51110458wme.8
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 21:20:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsf7q-0006By-UE
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 00:22:34 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:44846)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jsf7p-0003wo-BQ
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 00:22:34 -0400
+Received: by mail-wr1-x430.google.com with SMTP id b6so43630340wrs.11
+ for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 21:22:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WziQb7IA8JycSqAdGbPvQ100GDf7ag07slUNrT9ByAM=;
+ b=Iydyx3CV6Vyth56OtmOmpeB8NE0nyht7c1JrHNMr1/3wRfYB0uhBaZX4aV/2+e48qQ
+ JDDv0yBkTeZcpC14CEKkr1UblVSY3BZpCRsfwDU2WTizGHmMVVt0gCTAtCiZvIrtVf65
+ 0CzKIZlREfzwN8GImh0+yIwaCEPLc5j5693ixjC7pogk0qXYIQrM799sTor/9VisDnlK
+ uWG2bd9BvEtv82ZCIBpa8qUnJc+cTDssr7yW171zAEJha32xkEy5B+CWrk8hpQBj3gHK
+ 98A8u7P68/gv9QIHv/fm9TbphOT/IghLaAFqA1geSebS80DNKVXomJByAdRb8BjHg1h7
+ LCYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=Zh7rmnl5N4wnRyaCh44r65qigLXyOnQ7ck7qUUOCkec=;
- b=YtlMVu9B/2CGjIma7gq+8ZqUdYue9xKxwhAUMK84AemdESOhGI85KA7uxWyw8UnucR
- W5Hup439DJrYUVTZ7jex3niCaxSxk/H91WnpobyEWmAnKkwEhiJ5lqKQMljMcCEQAsOb
- qSQ+Skq02D1mGbFsiENqfb/JjIxgK28mdjhU6zgBX+UyGKm84eu90R5cQMdRq8cEDJTK
- pqFs3PbcaolZ5Xq8FGsIT9FCSSX3mgtoHwUrYChp0EiDsGb3rTdCq+0OyEvG8e0BBJGT
- yxALf1yeb+i1FV60/y2G4enXEFA8mNxvztt+PkvYndHQCl+1tWipkfOI7nvj/TOV9Wwq
- xWGA==
-X-Gm-Message-State: AOAM531RK8DRnhEeCqXdC5fO77DZdYUuZTxbGpBzJcwDdhJ8QWRZUuKt
- uAFoCtHSxuvfGTakSg4CuHAuu7ORb8S25mpsDM8d3UmnPL8VskTGcrrysHQm8CQi/gcSjpzt0jm
- hwRSmFDvrtvz/Bdk=
-X-Received: by 2002:a1c:2485:: with SMTP id k127mr2013354wmk.138.1594095651491; 
- Mon, 06 Jul 2020 21:20:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwT2nN004XxgjREDMNQlFyEspPcQA3n/b6GuuGEYk3qZf4ikeUAoxAhDBNpkZhkgujkxv95Kg==
-X-Received: by 2002:a1c:2485:: with SMTP id k127mr2013339wmk.138.1594095651256; 
- Mon, 06 Jul 2020 21:20:51 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WziQb7IA8JycSqAdGbPvQ100GDf7ag07slUNrT9ByAM=;
+ b=nlTtFYJQDsAdfL/GmtYfqm50tiJFmmXqd5pqvezk7IAQt0/3GPtEnQvo6mJVnTQyjN
+ 7xGO1I5BURJbsRdp4Yr+aYd54kM7IovnMZKl0Q2+GnMyyNmYnA7j0978wg4+mlT7TRnD
+ /oaflr2HTlqSTY4TtiWRt9qNyTV/A6PeCNx0KKvMYaKWfcTtUkiqhlAVXbQ5YdQxRk9n
+ nIh8SV0tmjmd4Vsn0IgiISCu5SAKqaAfJQUJjnU+tCeBH9AqdlAhkNIdhzGiFr4Y4sU8
+ YrgUs8hUILYRltXdeQWkibuPz10zReZkZbx57UjbAFEdRjVq2rgVO8rpBK2sKMrPTUdQ
+ jadw==
+X-Gm-Message-State: AOAM531GDAPDg7IGcaZB0T7VVTzTIEgxU+WrEUr1vpUIubfFQmzQOuy1
+ UkAJbwXvcaXWkKnaaCXCdEo=
+X-Google-Smtp-Source: ABdhPJy7aArfeWF98jOFG19dfWRlQW1NLzC5/xV2AKegBfMpn2zY0i4T+MXBgsxPOAGj3561nFQFbQ==
+X-Received: by 2002:adf:f889:: with SMTP id u9mr56857207wrp.149.1594095751619; 
+ Mon, 06 Jul 2020 21:22:31 -0700 (PDT)
 Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id y16sm26618705wro.71.2020.07.06.21.20.49
+ by smtp.gmail.com with ESMTPSA id c206sm1759808wmf.36.2020.07.06.21.22.30
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 06 Jul 2020 21:20:50 -0700 (PDT)
-Subject: Re: [PATCH v2 1/2] tpm: tpm_spapr: Exit on TPM backend failures
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
- marcandre.lureau@redhat.com
-References: <20200707040522.4013885-1-stefanb@linux.vnet.ibm.com>
- <20200707040522.4013885-2-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <aa63c5f3-308e-59e1-11ff-0e0d923658e8@redhat.com>
-Date: Tue, 7 Jul 2020 06:20:49 +0200
+ Mon, 06 Jul 2020 21:22:30 -0700 (PDT)
+Subject: Re: [PULL 07/15] hw/timer: RX62N 8-Bit timer (TMR)
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
+References: <20200621124807.17226-1-f4bug@amsat.org>
+ <20200621124807.17226-8-f4bug@amsat.org>
+ <CAFEAcA8c2dywr=Zxz1ExAV-48JwFU5vbBDDfA=_KE98XamnXiA@mail.gmail.com>
+ <1448b050-4f78-2ae3-95db-6c47baad5909@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <baca2d47-a731-f3e5-37a0-c8d5c254f0c0@amsat.org>
+Date: Tue, 7 Jul 2020 06:22:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200707040522.4013885-2-stefanb@linux.vnet.ibm.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <1448b050-4f78-2ae3-95db-6c47baad5909@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x430.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -139,50 +107,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@gibson.dropbear.id.au, qemu-devel@nongnu.org,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Magnus Damm <magnus.damm@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+ping...?
 
-On 7/7/20 6:05 AM, Stefan Berger wrote:
-> Exit on TPM backend failures in the same way as the TPM CRB and TIS device
-> models do.
-
-Maybe the other models are not the best examples ;)
-
+On 6/29/20 11:58 AM, Philippe Mathieu-Daudé wrote:
+> Hi Yoshinori,
 > 
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> ---
->  hw/tpm/tpm_spapr.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+> On 6/25/20 11:25 AM, Peter Maydell wrote:
+>> On Sun, 21 Jun 2020 at 13:54, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>
+>>> From: Yoshinori Sato <ysato@users.sourceforge.jp>
+>>>
+>>> renesas_tmr: 8bit timer modules.
+>>
+>> Hi; the recent Coverity run reports a potential bug in this
+>> code: (CID 1429976)
+>>
+>>
+>>> +static uint16_t read_tcnt(RTMRState *tmr, unsigned size, int ch)
+>>> +{
+>>> +    int64_t delta, now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>>> +    int elapsed, ovf = 0;
+>>> +    uint16_t tcnt[2];
+>>
+>> Here we declare tcnt[] but do not initialize its contents...
+>>
+>>> +    uint32_t ret;
+>>> +
+>>> +    delta = (now - tmr->tick) * NANOSECONDS_PER_SECOND / tmr->input_freq;
+>>> +    if (delta > 0) {
+>>> +        tmr->tick = now;
+>>> +
+>>> +        if (FIELD_EX8(tmr->tccr[1], TCCR, CSS) == INTERNAL) {
+>>> +            /* timer1 count update */
+>>> +            elapsed = elapsed_time(tmr, 1, delta);
+>>> +            if (elapsed >= 0x100) {
+>>> +                ovf = elapsed >> 8;
+>>> +            }
+>>> +            tcnt[1] = tmr->tcnt[1] + (elapsed & 0xff);
+>>> +        }
+>>> +        switch (FIELD_EX8(tmr->tccr[0], TCCR, CSS)) {
+>>> +        case INTERNAL:
+>>> +            elapsed = elapsed_time(tmr, 0, delta);
+>>> +            tcnt[0] = tmr->tcnt[0] + elapsed;
+>>> +            break;
+>>> +        case CASCADING:
+>>> +            if (ovf > 0) {
+>>> +                tcnt[0] = tmr->tcnt[0] + ovf;
+>>> +            }
+>>> +            break;
+>>> +        }
+>>
+>> ...but not all cases here set both tcnt[0] and tcnt[1]
+>> (for instance in the "case CASCADING:" if ovf <=0 we
+>> won't set either of them)...
+>>
+>>> +    } else {
+>>> +        tcnt[0] = tmr->tcnt[0];
+>>> +        tcnt[1] = tmr->tcnt[1];
+>>> +    }
+>>> +    if (size == 1) {
+>>> +        return tcnt[ch];
+>>> +    } else {
+>>> +        ret = 0;
+>>> +        ret = deposit32(ret, 0, 8, tcnt[1]);
+>>> +        ret = deposit32(ret, 8, 8, tcnt[0]);
+>>> +        return ret;
+>>
+>> ...and so here we will end up returning uninitialized
+>> data. Presumably the spec says what value is actually
+>> supposed to be returned in these cases?
+>>
+>> PS: the "else" branch with the deposit32() calls could be
+>> rewritten more simply as
+>>   return lduw_be_p(tcnt);
+>>
+>>> +static uint64_t tmr_read(void *opaque, hwaddr addr, unsigned size)
+>>> +{
+>>
+>> In this function Coverity reports a missing "break" (CID 1429977):
+>>
+>>> +    case A_TCORA:
+>>> +        if (size == 1) {
+>>> +            return tmr->tcora[ch];
+>>> +        } else if (ch == 0) {
+>>> +            return concat_reg(tmr->tcora);
+>>> +        }
+>>
+>> Here execution can fall through but there is no 'break' or '/* fallthrough */'.
+>>
+>>> +    case A_TCORB:
+>>> +        if (size == 1) {
+>>> +            return tmr->tcorb[ch];
+>>> +        } else {
+>>> +            return concat_reg(tmr->tcorb);
+>>> +        }
+>>
+>> Is it correct that the A_TCORA and A_TCORB code is different?
+>> It looks odd, so if this is intentional then a comment describing
+>> why it is so might be helpful to readers.
 > 
-> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-> index cb4dfd1e6a..8288ab0a15 100644
-> --- a/hw/tpm/tpm_spapr.c
-> +++ b/hw/tpm/tpm_spapr.c
-> @@ -306,7 +306,10 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
->                              TPM_SPAPR_BUFFER_MAX);
->  
->      tpm_backend_reset(s->be_driver);
-> -    tpm_spapr_do_startup_tpm(s, s->be_buffer_size);
-> +
-> +    if (tpm_spapr_do_startup_tpm(s, s->be_buffer_size) < 0) {
-
-I don't see error reported, how users can know the cause of the exit?
-
-> +        exit(1);
-
-What about using this instead?
-
-           qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_ERROR);
-
-> +    }
->  }
->  
->  static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
+> Can you address Peter's comments please?
+> 
+>>
+>> thanks
+>> -- PMM
+>>
 > 
 
 
