@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE77C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DBDC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:22:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A6C920675
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:22:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 940C720675
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:22:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ErYYCwn2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A6C920675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnxJjT/q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 940C720675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jssEy-0007dv-Cb
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:22:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35488)
+	id 1jssF6-0007sd-SF
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:22:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jss9n-0007VY-T8
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:27 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:35586)
+ id 1jssA3-0008Do-Hg
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:43 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:53139)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jss9m-0002sV-8D
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:27 -0400
-Received: by mail-wm1-x334.google.com with SMTP id l2so91745wmf.0
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:25 -0700 (PDT)
+ id 1jssA1-0002uL-Vo
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:43 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id q15so91336wmj.2
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=s/JhSdXpcoybmAAgefympk9swhlKDHAfPJ59qTtpwus=;
- b=ErYYCwn2/qbCHwAVy5rv7+DhnGPbfMFDO9iW6iZ4Vf8FzreJqhcR956w+C4UV/A4BS
- Vz4a+d95onuiHOC2DaOFiXL8+qaJrdSy2mLJFVl5zYxjuqot6MUz+dnyMMSAdJ+XXZZv
- ucoTsGJBcs82PfrMQPd5XgC9s+t2W9g3P8rnzCdkLSoq6OCDARpmKxLxcl5GJ4Ge+ZVI
- 1AzhcysiRisx4oLj5GTou44gNzywIaFMPTFpArGpWF1yIqNq4NIIaKK7p1VaONYr+274
- DQChlmZfhRmmy8E6/oeiTTr9afsuuDwOri7JnQnljT0OiPS+KZwFI/Kuw/Nni2oPs/6J
- xESQ==
+ bh=1jGgUn8n64EZU2ryhW3hJoW2n7Ym7P4t06vbhhxU5So=;
+ b=AnxJjT/qC/LYizVBPCd2ZGQvw8v1Q1dMO6W6tlRwm4pQ6yMjfdFyLhcfcRuJ1whOgF
+ eRpL90imlt2t3sOtU11L3XTOovHhVg2suM46N4Wj4v7lEy9a2ydd3p6GYcakvaSandB4
+ V8THBLxWujZ+SIJtj1DwkKvjk16O2WehtcAdmsx0UEZ0AR7EupYbuo4AegJnaWXz/oe0
+ dntevPhNEG20a4QjOfH3ldQ7qErakh1f5C2KobGCwyqAkDrdv6ErZZkkwIXpIdSJsC0G
+ 7dQbGXBa3KDZVRZKOhUmiUWoOHsqHXLeu47KU8W70D5jl1H8IprQXmma2Pu59gcrfIy/
+ RR8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=s/JhSdXpcoybmAAgefympk9swhlKDHAfPJ59qTtpwus=;
- b=R1F+rkJEYHBAe0cAQquAGocR7oyQgZRQ6mTsOdCOiv6FjVy2fjogDkww4LNmyk/33n
- ppl24SMVxeMu+g1jnl8r5Gz6qfNsRpAvAzHDzWgn1WBZcy4N0uK4+fhTCyQeBqMaxa64
- /w7UxZTt35s8SX1UYmrl762LWqy/738fqUrrERwpuYdyP8GpJbz2Ji80DlE79RqfjuOF
- B1N96njpm/kKyhYDx8XoMu+RIhVlM1IIbd96UAervrv+scJ2GR+m5YyTYHYD7a2ITcvn
- ii0HuuWuqQn//7nIjBk1oIa80S6BQgOIsuHoei6pyK0QtvjBonKjcRLxlgTJe2pvJaJY
- y4IQ==
-X-Gm-Message-State: AOAM530gLNQ9/kXEn/KAIYgE7wOhIckO2SDYcBWnuyhAVNCfOlMFzroV
- v0gAKGbRWADjj6DIOWVQTiOl3gOp
-X-Google-Smtp-Source: ABdhPJyqDIUafeSazF2qLOYMuiVOrRJuM12pldRGzulNYUtGmrZ3pJlqAq+TPqo0L7UNs6u2VMJqNw==
-X-Received: by 2002:a05:600c:204d:: with SMTP id
- p13mr5407067wmg.88.1594145844694; 
- Tue, 07 Jul 2020 11:17:24 -0700 (PDT)
+ bh=1jGgUn8n64EZU2ryhW3hJoW2n7Ym7P4t06vbhhxU5So=;
+ b=RAJuqUbdXqw3boKv/vNEhUU7IkTa7MZK5u8X4inl3V6YJ89QeGXps5aACsbTVTnrd6
+ tjf+DGGsJ2zYkQqsKckbu9w+ZEKTT1JFJrwVt/m52Tz68fAUBpUJ+GtjDNhkYfn4w8+e
+ bDpymy/kFL8kuDqhoTPR3EAO6BNX+Vec7UxwFL1sV7nB8yn2Q49FM9wNf0fl5U2hYPRp
+ UQkgmN7Vc3ALNXRPZP5clX+S/u7Njk91vRYXOdi4bTdHmsD58HG0oOoOnwuPXQMC/QDs
+ Wn3DeWI+SNUF7C9BZWgrZbZgwXGtwtNbPEvWtRSZ3zgSg0dk+CdcSqKa3qGVTIfdhD8F
+ Ddfg==
+X-Gm-Message-State: AOAM530dAelu6q4pR6T4gt3LT8JJQv8LgWEMqTFVntzMKDBvFCPf8N/W
+ Ge5XzrV2rPme4LjcYbeiSNhJvZ+U
+X-Google-Smtp-Source: ABdhPJwtcHgNS3qPVa0sPRGVVqpbi7xyPMWG5WHYT/We00EX0d1LiYTHy3CHPX53rI1ny0V1mXSh7w==
+X-Received: by 2002:a7b:c8c8:: with SMTP id f8mr5647207wml.142.1594145860528; 
+ Tue, 07 Jul 2020 11:17:40 -0700 (PDT)
 Received: from localhost.localdomain
  (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.23
+ by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 11:17:24 -0700 (PDT)
+ Tue, 07 Jul 2020 11:17:39 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/32] target/avr: Introduce enumeration AVRFeature
-Date: Tue,  7 Jul 2020 20:16:45 +0200
-Message-Id: <20200707181710.30950-8-f4bug@amsat.org>
+Subject: [PULL 17/32] target/avr: Initialize TCG register variables
+Date: Tue,  7 Jul 2020 20:16:55 +0200
+Message-Id: <20200707181710.30950-18-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200707181710.30950-1-f4bug@amsat.org>
 References: <20200707181710.30950-1-f4bug@amsat.org>
@@ -80,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -104,8 +103,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
- Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Cleber Rosa <crosa@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
@@ -125,90 +123,62 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-This patch introduces enumeration "AVRFeature" that will be
-used for defining various AVR core types.
+Initialize TCG register variables.
 
-[AM: Split a larger AVR introduction patch into logical units]
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Co-developed-by: Richard Henderson <richard.henderson@linaro.org>
 Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-Message-Id: <20200705140315.260514-8-huth@tuxfamily.org>
+Message-Id: <20200705140315.260514-18-huth@tuxfamily.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/avr/cpu.h | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ target/avr/translate.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index 6f231d096c..f229ff78c0 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -72,6 +72,42 @@
-  */
- #define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 7ad3dec031..3d8a77e5ae 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -128,6 +128,35 @@ struct DisasContext {
+     bool free_skip_var0;
+ };
  
-+typedef enum AVRFeature {
-+    AVR_FEATURE_SRAM,
-+
-+    AVR_FEATURE_1_BYTE_PC,
-+    AVR_FEATURE_2_BYTE_PC,
-+    AVR_FEATURE_3_BYTE_PC,
-+
-+    AVR_FEATURE_1_BYTE_SP,
-+    AVR_FEATURE_2_BYTE_SP,
-+
-+    AVR_FEATURE_BREAK,
-+    AVR_FEATURE_DES,
-+    AVR_FEATURE_RMW, /* Read Modify Write - XCH LAC LAS LAT */
-+
-+    AVR_FEATURE_EIJMP_EICALL,
-+    AVR_FEATURE_IJMP_ICALL,
-+    AVR_FEATURE_JMP_CALL,
-+
-+    AVR_FEATURE_ADIW_SBIW,
-+
-+    AVR_FEATURE_SPM,
-+    AVR_FEATURE_SPMX,
-+
-+    AVR_FEATURE_ELPMX,
-+    AVR_FEATURE_ELPM,
-+    AVR_FEATURE_LPMX,
-+    AVR_FEATURE_LPM,
-+
-+    AVR_FEATURE_MOVW,
-+    AVR_FEATURE_MUL,
-+    AVR_FEATURE_RAMPD,
-+    AVR_FEATURE_RAMPX,
-+    AVR_FEATURE_RAMPY,
-+    AVR_FEATURE_RAMPZ,
-+} AVRFeature;
-+
- typedef struct CPUAVRState CPUAVRState;
- 
- struct CPUAVRState {
-@@ -126,6 +162,16 @@ hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- int avr_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
- int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- 
-+static inline int avr_feature(CPUAVRState *env, AVRFeature feature)
++void avr_cpu_tcg_init(void)
 +{
-+    return (env->features & (1U << feature)) != 0;
++    int i;
++
++#define AVR_REG_OFFS(x) offsetof(CPUAVRState, x)
++    cpu_pc = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(pc_w), "pc");
++    cpu_Cf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregC), "Cf");
++    cpu_Zf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregZ), "Zf");
++    cpu_Nf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregN), "Nf");
++    cpu_Vf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregV), "Vf");
++    cpu_Sf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregS), "Sf");
++    cpu_Hf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregH), "Hf");
++    cpu_Tf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregT), "Tf");
++    cpu_If = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregI), "If");
++    cpu_rampD = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampD), "rampD");
++    cpu_rampX = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampX), "rampX");
++    cpu_rampY = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampY), "rampY");
++    cpu_rampZ = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampZ), "rampZ");
++    cpu_eind = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(eind), "eind");
++    cpu_sp = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sp), "sp");
++    cpu_skip = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(skip), "skip");
++
++    for (i = 0; i < NUMBER_OF_CPU_REGISTERS; i++) {
++        cpu_r[i] = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]),
++                                          reg_names[i]);
++    }
++#undef AVR_REG_OFFS
 +}
 +
-+static inline void set_avr_feature(CPUAVRState *env, int feature)
-+{
-+    env->features |= (1U << feature);
-+}
-+
- #define cpu_list avr_cpu_list
- #define cpu_signal_handler cpu_avr_signal_handler
- #define cpu_mmu_index avr_cpu_mmu_index
+ static int to_regs_16_31_by_one(DisasContext *ctx, int indx)
+ {
+     return 16 + (indx % 16);
 -- 
 2.21.3
 
