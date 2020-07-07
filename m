@@ -2,97 +2,88 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC120C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED62C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:27:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BA822065F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:24:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D4E92065F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:27:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3T3tmO7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA822065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGU6y4+S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D4E92065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jskmO-0006LF-S7
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:24:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57904)
+	id 1jskok-0000eW-Jp
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:27:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jsklk-0005p9-2L; Tue, 07 Jul 2020 06:24:08 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33557)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jskli-0003Qx-Ac; Tue, 07 Jul 2020 06:24:07 -0400
-Received: by mail-wm1-x341.google.com with SMTP id a6so1426487wmm.0;
- Tue, 07 Jul 2020 03:24:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=n49OJ6eNQ6h3yEXOrI5/t968r1z4wUSmMEgUCt+ZiEg=;
- b=N3T3tmO7x3Kt4XJa5aQLTp5wUs7uSgmaZIa7CL2uc5BpK069PGn7DVJjtRDNF36J0y
- aFNbOLMKU8q8qv79pAn2y7FkaOIluuO2U41U3VJJ1U2/vd2J9pMpSUF6zplnlbQsh4PM
- MhCY0hHpQL+8/ChN2I6pfdMZeHftJz9yVao2sTvNdKZDWb1j4LcZL2aKyMVIOYz/rm2k
- +1/SsyMb1pYi14+VqHlo24Mu890cxXD5QOUm0xTO0I83MSwRkcwjueS6wMkSbELuEL0Z
- TGNOnfCfcYhUOX3c7WC32L/htgUF3/9cP8fJpofuj3+vBVSrB8jSrZcQV6SG0RsQmU2N
- qU/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=n49OJ6eNQ6h3yEXOrI5/t968r1z4wUSmMEgUCt+ZiEg=;
- b=XVGb+ObxX4ywfChqYJ9dlhbmeGAwXAjk67zxssH8lEXvbB55BIbfFmpMqfQuW0+3Qk
- s5tltXDzxvAVVxQBSuDk0z4A7wSt5sbpGO9c6dvMZBeVy9NvfcBcnFF1Db00LibsH6Xl
- nwyfX/EVRjEjpVc/aiRW2YizRw1gAqoLpkdCB130qmCQPg34fjUAPZc16FcM2gR7wBOv
- f5gE9P/aHF4RyuNG1DuKHGZ7S+60lOU6eZ/4uOWvdENi4e0IxAIKLGosHXSQspLVAer0
- 53/PaW9ELJztg9KLKRuAQjeURcX+m7y0PpmuH3eTajuaxclPhz+4+y2RnNvqxo3S696h
- tlJw==
-X-Gm-Message-State: AOAM530nA8Ul+j1Tr33CHgWJ1uLFxAaxdpSkt/yL2yLr84pbKtvD7UFX
- fy/zXUXhs0sCrHbV6wbAB1g=
-X-Google-Smtp-Source: ABdhPJyM9iCLdXB+xBNgzIn8+F/Dwys7z3lxhnajGhxwAKVTe5eC7X0eMdOYYcimP9hBUPRa2fgk6Q==
-X-Received: by 2002:a7b:c956:: with SMTP id i22mr3633749wml.95.1594117444458; 
- Tue, 07 Jul 2020 03:24:04 -0700 (PDT)
-Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id c20sm488541wrb.65.2020.07.07.03.24.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jul 2020 03:24:03 -0700 (PDT)
-Subject: Re: [PATCH v7 05/17] hw/sd/sdcard: Do not switch to ReceivingData if
- address is invalid
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200630133912.9428-1-f4bug@amsat.org>
- <20200630133912.9428-6-f4bug@amsat.org>
- <CAP+75-V-Uu8-Uk8jMwkgb3xJpFoef=k6p=ejaY4=+njkdb3ZeQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3b0a65bc-97a7-9f49-da3a-5c680c4b5722@amsat.org>
-Date: Tue, 7 Jul 2020 12:24:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jsknx-0008HW-PV
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:26:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39592
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jsknv-00047E-Lg
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:26:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594117582;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=Ksh7qm6adGST/ZaaaSRGOC5KkyimhdVy3s/dSUsS2wc=;
+ b=XGU6y4+StnZo91tkuOdh5X2SManb75uwPNIrht8vP2Q1v2ahhaoSOXfvCxU8zaMFIVYoL1
+ +d7yZ/jb8mfbBsBShpa+eivTKSk9Jjjm5QgBEjkzW6HSgxreKerq80z7gqzBO9XgFHyK+0
+ wTJj6ChglurfvG5t3HxzZHwgnEu/hZA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-OgGMpmGzP4aC_p9nKwLp_w-1; Tue, 07 Jul 2020 06:25:55 -0400
+X-MC-Unique: OgGMpmGzP4aC_p9nKwLp_w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 742B2879511;
+ Tue,  7 Jul 2020 10:25:50 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DEF315D9F3;
+ Tue,  7 Jul 2020 10:25:13 +0000 (UTC)
+Date: Tue, 7 Jul 2020 11:25:10 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: [PATCH] trivial: Remove trailing whitespaces
+Message-ID: <20200707102510.GF2649462@redhat.com>
+References: <20200706162300.1084753-1-dinechin@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAP+75-V-Uu8-Uk8jMwkgb3xJpFoef=k6p=ejaY4=+njkdb3ZeQ@mail.gmail.com>
+In-Reply-To: <20200706162300.1084753-1-dinechin@redhat.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,180 +96,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Prasad J Pandit <pjp@fedoraproject.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Marek Vasut <marex@denx.de>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org, Paul Durrant <paul@xen.org>,
+ Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Eduardo Habkost <ehabkost@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Riku Voipio <riku.voipio@iki.fi>, Peter Lieven <pl@kamp.de>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, xen-devel@lists.xenproject.org,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/7/20 10:30 AM, Philippe Mathieu-Daudé wrote:
-> On Tue, Jun 30, 2020 at 3:39 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> Only move the state machine to ReceivingData if there is no
->> pending error. This avoids later OOB access while processing
->> commands queued.
->>
->>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
->>
->>   4.3.3 Data Read
->>
->>   Read command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
->>   occurred and no data transfer is performed.
->>
->>   4.3.4 Data Write
->>
->>   Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
->>   occurred and no data transfer is performed.
->>
->> WP_VIOLATION errors are not modified: the error bit is set, we
->> stay in receive-data state, wait for a stop command. All further
->> data transfer is ignored. See the check on sd->card_status at the
->> beginning of sd_read_data() and sd_write_data().
->>
->> Fixes: CVE-2020-13253
->> Cc: Prasad J Pandit <pjp@fedoraproject.org>
->> Reported-by: Alexander Bulekov <alxndr@bu.edu>
->> Buglink: https://bugs.launchpad.net/qemu/+bug/1880822
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> v4: Only modify ADDRESS_ERROR, not WP_VIOLATION (pm215)
->> ---
->>  hw/sd/sd.c | 34 ++++++++++++++++++++++------------
->>  1 file changed, 22 insertions(+), 12 deletions(-)
->>
->> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> index 04451fdad2..7e0d684aca 100644
->> --- a/hw/sd/sd.c
->> +++ b/hw/sd/sd.c
->> @@ -1167,13 +1167,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
->>      case 17:   /* CMD17:  READ_SINGLE_BLOCK */
->>          switch (sd->state) {
->>          case sd_transfer_state:
->> -            sd->state = sd_sendingdata_state;
->> -            sd->data_start = addr;
->> -            sd->data_offset = 0;
->>
->>              if (sd->data_start + sd->blk_len > sd->size) {
->>                  sd->card_status |= ADDRESS_ERROR;
->> +                return sd_r1;
->>              }
->> +
->> +            sd->state = sd_sendingdata_state;
->> +            sd->data_start = addr;
->> +            sd->data_offset = 0;
->>              return sd_r1;
->>
->>          default:
->> @@ -1184,13 +1186,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
->>      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
->>          switch (sd->state) {
->>          case sd_transfer_state:
->> -            sd->state = sd_sendingdata_state;
->> -            sd->data_start = addr;
->> -            sd->data_offset = 0;
->>
->>              if (sd->data_start + sd->blk_len > sd->size) {
->>                  sd->card_status |= ADDRESS_ERROR;
->> +                return sd_r1;
+On Mon, Jul 06, 2020 at 06:23:00PM +0200, Christophe de Dinechin wrote:
+> There are a number of unnecessary trailing whitespaces that have
+> accumulated over time in the source code. They cause stray changes
+> in patches if you use tools that automatically remove them.
 > 
-> Unfortunately this breaks guests (Linux at least) when sd->size is not
-> a power of 2,
-> as Linux doesn't expect unrealistic SD card sizes.
+> Tested by doing a `git diff -w` after the change.
+> 
+> This could probably be turned into a pre-commit hook.
 
-I can use blk_truncate() to expand the image (which must be RW anyway)
-to the ceil pow2 with something like:
-
--- >8 --
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index b44999c864..052934f867 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -2121,11 +2121,28 @@ static void sd_realize(DeviceState *dev, Error
-**errp)
-     }
-
-     if (sd->blk) {
-+        int64_t blk_size;
-+
-         if (blk_is_read_only(sd->blk)) {
-             error_setg(errp, "Cannot use read-only drive as SD card");
-             return;
-         }
-
-+        blk_size = blk_getlength(sd->blk);
-+        if (blk_size > 0) {
-+            int64_t blk_size_aligned = pow2ceil(blk_size);
-+
-+            if (blk_size != blk_size_aligned) {
-+                ret = blk_truncate(sd->blk, blk_size_aligned, false,
-+                                   PREALLOC_MODE_FALLOC,
-+                                   BDRV_REQ_ZERO_WRITE, errp);
-+                if (ret < 0) {
-+                    error_prepend(errp, "Could not resize image: ");
-+                    return;
-+                }
-+            }
-+        }
-+
-         ret = blk_set_perm(sd->blk, BLK_PERM_CONSISTENT_READ |
-BLK_PERM_WRITE,
-                            BLK_PERM_ALL, errp);
-         if (ret < 0) {
----
+scripts/checkpatch.pl ought to be made to check it.
 
 > 
->>              }
->> +
->> +            sd->state = sd_sendingdata_state;
->> +            sd->data_start = addr;
->> +            sd->data_offset = 0;
->>              return sd_r1;
->>
->>          default:
->> @@ -1230,14 +1234,17 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
->>              /* Writing in SPI mode not implemented.  */
->>              if (sd->spi)
->>                  break;
->> +
->> +            if (sd->data_start + sd->blk_len > sd->size) {
->> +                sd->card_status |= ADDRESS_ERROR;
->> +                return sd_r1;
->> +            }
->> +
->>              sd->state = sd_receivingdata_state;
->>              sd->data_start = addr;
->>              sd->data_offset = 0;
->>              sd->blk_written = 0;
->>
->> -            if (sd->data_start + sd->blk_len > sd->size) {
->> -                sd->card_status |= ADDRESS_ERROR;
->> -            }
->>              if (sd_wp_addr(sd, sd->data_start)) {
->>                  sd->card_status |= WP_VIOLATION;
->>              }
->> @@ -1257,14 +1264,17 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
->>              /* Writing in SPI mode not implemented.  */
->>              if (sd->spi)
->>                  break;
->> +
->> +            if (sd->data_start + sd->blk_len > sd->size) {
->> +                sd->card_status |= ADDRESS_ERROR;
->> +                return sd_r1;
->> +            }
->> +
->>              sd->state = sd_receivingdata_state;
->>              sd->data_start = addr;
->>              sd->data_offset = 0;
->>              sd->blk_written = 0;
->>
->> -            if (sd->data_start + sd->blk_len > sd->size) {
->> -                sd->card_status |= ADDRESS_ERROR;
->> -            }
->>              if (sd_wp_addr(sd, sd->data_start)) {
->>                  sd->card_status |= WP_VIOLATION;
->>              }
->> --
->> 2.21.3
->>
+> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+> ---
+>  block/iscsi.c                                 |   2 +-
+>  disas/cris.c                                  |   2 +-
+>  disas/microblaze.c                            |  80 +++---
+>  disas/nios2.c                                 | 256 +++++++++---------
+>  hmp-commands.hx                               |   2 +-
+>  hw/alpha/typhoon.c                            |   6 +-
+>  hw/arm/gumstix.c                              |   6 +-
+>  hw/arm/omap1.c                                |   2 +-
+>  hw/arm/stellaris.c                            |   2 +-
+>  hw/char/etraxfs_ser.c                         |   2 +-
+>  hw/core/ptimer.c                              |   2 +-
+>  hw/cris/axis_dev88.c                          |   2 +-
+>  hw/cris/boot.c                                |   2 +-
+>  hw/display/qxl.c                              |   2 +-
+>  hw/dma/etraxfs_dma.c                          |  18 +-
+>  hw/dma/i82374.c                               |   2 +-
+>  hw/i2c/bitbang_i2c.c                          |   2 +-
+>  hw/input/tsc2005.c                            |   2 +-
+>  hw/input/tsc210x.c                            |   2 +-
+>  hw/intc/etraxfs_pic.c                         |   8 +-
+>  hw/intc/sh_intc.c                             |  10 +-
+>  hw/intc/xilinx_intc.c                         |   2 +-
+>  hw/misc/imx25_ccm.c                           |   6 +-
+>  hw/misc/imx31_ccm.c                           |   2 +-
+>  hw/net/vmxnet3.h                              |   2 +-
+>  hw/net/xilinx_ethlite.c                       |   2 +-
+>  hw/pci/pcie.c                                 |   2 +-
+>  hw/sd/omap_mmc.c                              |   2 +-
+>  hw/sh4/shix.c                                 |   2 +-
+>  hw/sparc64/sun4u.c                            |   2 +-
+>  hw/timer/etraxfs_timer.c                      |   2 +-
+>  hw/timer/xilinx_timer.c                       |   4 +-
+>  hw/usb/hcd-musb.c                             |  10 +-
+>  hw/usb/hcd-ohci.c                             |   6 +-
+>  hw/usb/hcd-uhci.c                             |   2 +-
+>  hw/virtio/virtio-pci.c                        |   2 +-
+>  include/hw/cris/etraxfs_dma.h                 |   4 +-
+>  include/hw/net/lance.h                        |   2 +-
+>  include/hw/ppc/spapr.h                        |   2 +-
+>  include/hw/xen/interface/io/ring.h            |  34 +--
+>  include/qemu/log.h                            |   2 +-
+>  include/qom/object.h                          |   4 +-
+>  linux-user/cris/cpu_loop.c                    |  16 +-
+>  linux-user/microblaze/cpu_loop.c              |  16 +-
+>  linux-user/mmap.c                             |   8 +-
+>  linux-user/sparc/signal.c                     |   4 +-
+>  linux-user/syscall.c                          |  24 +-
+>  linux-user/syscall_defs.h                     |   2 +-
+>  linux-user/uaccess.c                          |   2 +-
+>  os-posix.c                                    |   2 +-
+>  qapi/qapi-util.c                              |   2 +-
+>  qemu-img.c                                    |   2 +-
+>  qemu-options.hx                               |  26 +-
+>  qom/object.c                                  |   2 +-
+>  target/cris/translate.c                       |  28 +-
+>  target/cris/translate_v10.inc.c               |   6 +-
+>  target/i386/hvf/hvf.c                         |   4 +-
+>  target/i386/hvf/x86.c                         |   4 +-
+>  target/i386/hvf/x86_decode.c                  |  20 +-
+>  target/i386/hvf/x86_decode.h                  |   4 +-
+>  target/i386/hvf/x86_descr.c                   |   2 +-
+>  target/i386/hvf/x86_emu.c                     |   2 +-
+>  target/i386/hvf/x86_mmu.c                     |   6 +-
+>  target/i386/hvf/x86_task.c                    |   2 +-
+>  target/i386/hvf/x86hvf.c                      |  42 +--
+>  target/i386/translate.c                       |   8 +-
+>  target/microblaze/mmu.c                       |   2 +-
+>  target/microblaze/translate.c                 |   2 +-
+>  target/sh4/op_helper.c                        |   4 +-
+>  target/xtensa/core-de212/core-isa.h           |   6 +-
+>  .../xtensa/core-sample_controller/core-isa.h  |   6 +-
+>  target/xtensa/core-test_kc705_be/core-isa.h   |   2 +-
+>  tcg/sparc/tcg-target.inc.c                    |   2 +-
+>  tcg/tcg.c                                     |  32 +--
+>  tests/tcg/multiarch/test-mmap.c               |  72 ++---
+>  ui/curses.c                                   |   4 +-
+>  ui/curses_keys.h                              |   4 +-
+>  util/cutils.c                                 |   2 +-
+>  78 files changed, 440 insertions(+), 440 deletions(-)
+
+The cleanup is a good idea, however, I think it is probably better to
+split the patch approx into subsystems. That will make it much easier
+to cherry-pick for people doing backports.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
