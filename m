@@ -2,76 +2,80 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D78CC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A002AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:38:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA2D520708
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:37:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 688312064C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 16:38:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AXPrggNl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA2D520708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ED8mS574"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 688312064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsqbS-0002l2-2S
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:37:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60772)
+	id 1jsqc5-0003Bi-MQ
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 12:38:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsq97-0006bi-R4
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:08:37 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59763
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq7e-0003JG-M4
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:07:06 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37111
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jsq96-0007Cu-1I
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:08:37 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jsq7E-0006uH-IE
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 12:07:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594138115;
+ s=mimecast20190719; t=1594137999;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rRF06x4AP6FPE5HTzsEqzMYpwgR0+j+oUBclduMjByA=;
- b=AXPrggNlMYWJgNt7wdqT2g6nL4vi6SgDNQNSr0/8FILbTDeZvm+vvfjgkN6ZW43Bljgt2x
- VJMTH44wvF/eTP1sY0pscWTN1e4pUSBnry3Drk1TKyQ5Pa2MnQ7ZjEKfVMFEHx5EYmK6NW
- KLtFbsfRf7d6OAeglI6sqYTHGc32pQA=
+ bh=7RGv5ZXfgxJJyOl+k/aDW7Jx1xinunsjgM2Klsul6Wc=;
+ b=ED8mS574+pC+JOWn7dD6vRrVXfOWAQ9wsF6Xsqu5GRCGt20EXO+xnaLSavoe3eeyEm6UPl
+ fBW9l+ASSIfwZOD64lfWS8Awohe0yjsnJGIGPasO1ltiqiJv6CbS5qut2FtbBPHX8C8NO9
+ yovejpi/1SN5LerO/3muPkSNUg6+1TA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-JclbFqonOyKr9Lwu-nldaw-1; Tue, 07 Jul 2020 12:08:27 -0400
-X-MC-Unique: JclbFqonOyKr9Lwu-nldaw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-426-sKU6dhArMNqEjOfSjHUZ-w-1; Tue, 07 Jul 2020 12:06:36 -0400
+X-MC-Unique: sKU6dhArMNqEjOfSjHUZ-w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2F4F804001;
- Tue,  7 Jul 2020 16:08:26 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-113.ams2.redhat.com [10.36.114.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F36219D7B;
- Tue,  7 Jul 2020 16:08:22 +0000 (UTC)
-Date: Tue, 7 Jul 2020 18:08:21 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v6 00/10] Tighten qemu-img rules on missing backing format
-Message-ID: <20200707160821.GF7002@linux.fritz.box>
-References: <20200706203954.341758-1-eblake@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01059BFC0;
+ Tue,  7 Jul 2020 16:06:35 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C134C7922B;
+ Tue,  7 Jul 2020 16:06:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2766C10C4AE4; Tue,  7 Jul 2020 18:06:14 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 41/45] qapi: Purge error_propagate() from QAPI core
+Date: Tue,  7 Jul 2020 18:06:09 +0200
+Message-Id: <20200707160613.848843-42-armbru@redhat.com>
+In-Reply-To: <20200707160613.848843-1-armbru@redhat.com>
+References: <20200707160613.848843-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200706203954.341758-1-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -92,30 +96,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-block@nongnu.org, kchamart@redhat.com,
- libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, groug@kaod.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.07.2020 um 22:39 hat Eric Blake geschrieben:
-> v5 was here:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg00679.html
-> In v6:
-> - add a few more patches
-> - change qcow semantics based on several iterations of mailing list
-> debates on what behavior is easiest to support
-> - add iotesting that a probed raw file cannot be committed into
-> - instead of recording an implicit probed raw file, instead we record
-> only a non-raw file
-> - rebase to a few more affected iotests, plus s/5.0/5.1/
-> 
-> Yes, I know this is really short notice to make it in before feature
-> freeze for 5.1 (removal in 6.0), so it may end up slipping into 5.2
-> (removal in 6.1); but we'll see how things go.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ qapi/qapi-visit-core.c | 40 +++++++++++++++++++---------------------
+ 1 file changed, 19 insertions(+), 21 deletions(-)
 
-Thanks, applied to the block branch.
-
-Kevin
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 5a9c47aabf..7e5f40e7f0 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -39,19 +39,18 @@ void visit_free(Visitor *v)
+ bool visit_start_struct(Visitor *v, const char *name, void **obj,
+                         size_t size, Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok;
+ 
+     trace_visit_start_struct(v, name, obj, size);
+     if (obj) {
+         assert(size);
+         assert(!(v->type & VISITOR_OUTPUT) || *obj);
+     }
+-    v->start_struct(v, name, obj, size, &err);
++    ok = v->start_struct(v, name, obj, size, errp);
+     if (obj && (v->type & VISITOR_INPUT)) {
+-        assert(!err != !*obj);
++        assert(ok != !*obj);
+     }
+-    error_propagate(errp, err);
+-    return !err;
++    return ok;
+ }
+ 
+ bool visit_check_struct(Visitor *v, Error **errp)
+@@ -69,16 +68,15 @@ void visit_end_struct(Visitor *v, void **obj)
+ bool visit_start_list(Visitor *v, const char *name, GenericList **list,
+                       size_t size, Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok;
+ 
+     assert(!list || size >= sizeof(GenericList));
+     trace_visit_start_list(v, name, list, size);
+-    v->start_list(v, name, list, size, &err);
++    ok = v->start_list(v, name, list, size, errp);
+     if (list && (v->type & VISITOR_INPUT)) {
+-        assert(!(err && *list));
++        assert(ok || !*list);
+     }
+-    error_propagate(errp, err);
+-    return !err;
++    return ok;
+ }
+ 
+ GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size)
+@@ -104,19 +102,20 @@ bool visit_start_alternate(Visitor *v, const char *name,
+                            GenericAlternate **obj, size_t size,
+                            Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok;
+ 
+     assert(obj && size >= sizeof(GenericAlternate));
+     assert(!(v->type & VISITOR_OUTPUT) || *obj);
+     trace_visit_start_alternate(v, name, obj, size);
+-    if (v->start_alternate) {
+-        v->start_alternate(v, name, obj, size, &err);
++    if (!v->start_alternate) {
++        assert(!(v->type & VISITOR_INPUT));
++        return true;
+     }
++    ok = v->start_alternate(v, name, obj, size, errp);
+     if (v->type & VISITOR_INPUT) {
+-        assert(v->start_alternate && !err != !*obj);
++        assert(ok != !*obj);
+     }
+-    error_propagate(errp, err);
+-    return !err;
++    return ok;
+ }
+ 
+ void visit_end_alternate(Visitor *v, void **obj)
+@@ -309,7 +308,7 @@ bool visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ 
+ bool visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+ {
+-    Error *err = NULL;
++    bool ok;
+ 
+     assert(obj);
+     /* TODO: Fix callers to not pass NULL when they mean "", so that we
+@@ -317,12 +316,11 @@ bool visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+     assert(!(v->type & VISITOR_OUTPUT) || *obj);
+      */
+     trace_visit_type_str(v, name, obj);
+-    v->type_str(v, name, obj, &err);
++    ok = v->type_str(v, name, obj, errp);
+     if (v->type & VISITOR_INPUT) {
+-        assert(!err != !*obj);
++        assert(ok != !*obj);
+     }
+-    error_propagate(errp, err);
+-    return !err;
++    return ok;
+ }
+ 
+ bool visit_type_number(Visitor *v, const char *name, double *obj,
+-- 
+2.26.2
 
 
