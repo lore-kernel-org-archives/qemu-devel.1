@@ -7,71 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BE0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C43BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:31:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 234C4206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:31:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 691C1206F6
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:31:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hW5eELTR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234C4206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nyV2KIsl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691C1206F6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jssN5-0003PF-Ax
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:31:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35760)
+	id 1jssN8-0003Ux-Ma
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:31:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jssAG-0000Cs-Mb
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:56 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51448)
+ id 1jssA2-00089R-2U
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:42 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:56231)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jssAE-0002ww-JV
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:55 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 22so98567wmg.1
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:52 -0700 (PDT)
+ id 1jss9z-0002u1-1N
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:41 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id g75so70423wme.5
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HbsTKp/p4cEpKC8gDBC3GLx2PfsjnhiMt227ELg1lQQ=;
- b=hW5eELTRQ1vN7XsTdY+DVD7zjvYq9mawplQxUkIAcxYJAX0GEhKFKsFuiWQK0+X7yG
- k66Gdb3Et9eOIxJdgT23fHDDMOo44ZirOSwsYMGmW6+al7kLI4l27ivoLuLZ+FBkRW86
- ClsainyOxWaGD3+VYszBKccXoOezYlQZEIaTyx5vW9Si+21YhVG///EAF3Vh5wS8ED9K
- rj8hSCBKsvvv/6XjjqVrq/aUFIKPM988zjhhaiFhJU+taHu63TnBVnVc1qoHFA0p7Y3B
- ifY5NtQRorQkMfFJov5q5T4GXM2hTuAiVbFM7HL8RglVfLkG801v7+R7FI32F7pWmOs9
- /D3Q==
+ bh=K8Od5RoTrgZHXT0STiHKBSYH0Kuox0fs2mOyzEFa/Yg=;
+ b=nyV2KIsllIk9bJ2/1vkkafWPHrdM0pumAZ3pvSPF5sUWrB6G+3qXZwJ9IwVOMI8kIi
+ 9q3oy4XEu0j6CXqq0ZbcLl/5EIcdecSSkd7LSUjWLKopihGrJhXaXDTBbzsChTPmsBw0
+ oi6evbzeYGMzB9zX8CksDHVPkMVIBU9p/xYMFqD4ltxHUtilUdOb8yy2Knd4G/Eo40kh
+ anBq1GCLFAdYwK0LuSxSY+Te47FqJEy4RJGnoZmY+Fd6xeVGibQWASCqKhrufkHHVI6+
+ onsYeYiwMc/Rsr77Iw6LnHawK88I9P7uVdGJOlZ0LZ4w9Y6npm7HU2clUhaozIxIB4LB
+ sYaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=HbsTKp/p4cEpKC8gDBC3GLx2PfsjnhiMt227ELg1lQQ=;
- b=PW9zZh4gAnedncqc/iSS+kP14NmLvz2v1wAmYyve+1RFCLyFqeyDNc0eSmZ/fhQWvD
- gx/cHH9yYRiH9HYalgDY6zgnjtvcqQ37d2oS+dRg6gweL8eXZScCfFHc713oqUhA5flv
- wJbz5NORAsgqBaipGKpCn6RTr3GlhPbmebh69Ihc8vtX9WCdhgaiBTcUWLzkGHv93MvV
- DH3x+H7VwVpWwn4Le7NsTfQQwCc+T7E2GcvFS3iK9S/dm/GCI7AdW4BxT9SPIxPfdrSm
- TzKoPivAkFBru+K4OtlHC7iNofPZFi75/fByhn+imlJGXrVAUDQ83jYu8MDD6SkQpLw7
- 58rA==
-X-Gm-Message-State: AOAM532yFX6M3nX4e0nEYWgRnDtmrPjRo0KmJirRzLB1bmHPDE517Vm1
- ptUw3FwnDw4xVSqLNx9x+6jhJrDt
-X-Google-Smtp-Source: ABdhPJw/ue8XCB8OirYiKhW1nIBACUuPrB60bhN5cJlRiqRy79zPOrbyqjVzJKR1b6BI4BqEnRiIJg==
-X-Received: by 2002:a1c:4e08:: with SMTP id g8mr5678446wmh.77.1594145871548;
- Tue, 07 Jul 2020 11:17:51 -0700 (PDT)
+ bh=K8Od5RoTrgZHXT0STiHKBSYH0Kuox0fs2mOyzEFa/Yg=;
+ b=EU8U+IZPv4l4IIZTEF9VMbGbP1wQ7HV7tKardJQCzO6bGZclGFHbNO40m1f6thritt
+ gPFEdJgM++vVALXcqNWtFOQSLEafz2LvkxWvDjukCI48vXHMCtUNcSe3X4Zw2Zrs3A29
+ R+YwWA49XFoNBBZY5ka3UnB6VjaePXAibxK8Psv5fvZlOEXC/R+uyPTh9BmODq9/1kj3
+ 3GN30/+GOmdUB652XFzJ7Z6e9xDygpZspp4RTZ1HnPBvd3Pcn82DzC1v19FtUNl/HzdS
+ /Kg5VT8lRqcZRNTgtVtIRgWu6KQPlsWIk0yKvL48gcCjXB5QYrq+Fcw1EeC05IgVrrOS
+ wS2Q==
+X-Gm-Message-State: AOAM530iyTGXqpUeSyGKrffAXSHeas4v+kEhyCuymQjFfCzVioqBsHFB
+ rcXHuL1A1ukr/8lS+9NF0WUZSaP3
+X-Google-Smtp-Source: ABdhPJyFhPzdbxlpwFdFdNFnmlb4BXAe03iYfjiUozqfHROQon3iGjz8x+6grY/hBhz2XsEPL/rXKg==
+X-Received: by 2002:a05:600c:21ca:: with SMTP id
+ x10mr5377021wmj.63.1594145857464; 
+ Tue, 07 Jul 2020 11:17:37 -0700 (PDT)
 Received: from localhost.localdomain
  (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.50
+ by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 11:17:51 -0700 (PDT)
+ Tue, 07 Jul 2020 11:17:36 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 24/32] hw/avr: Add support for loading ELF/raw binaries
-Date: Tue,  7 Jul 2020 20:17:02 +0200
-Message-Id: <20200707181710.30950-25-f4bug@amsat.org>
+Subject: [PULL 15/32] target/avr: Add instruction translation - MCU Control
+ Instructions
+Date: Tue,  7 Jul 2020 20:16:53 +0200
+Message-Id: <20200707181710.30950-16-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200707181710.30950-1-f4bug@amsat.org>
 References: <20200707181710.30950-1-f4bug@amsat.org>
@@ -79,8 +81,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -105,7 +107,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Laurent Vivier <lvivier@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
  Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -119,231 +123,115 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add avr_load_firmware() function to load firmware in ELF or
-raw binary format.
+From: Michael Rolnik <mrolnik@gmail.com>
 
-[AM: Corrected the type of the variable containing e_flags]
-[AM: Moved definition of e_flags conversion function to boot.c]
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This includes:
+    - BREAK
+    - NOP
+    - SLEEP
+    - WDR
+
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-Message-Id: <20200705140315.260514-24-huth@tuxfamily.org>
-[PMD: Replace load_image_targphys() by load_image_mr()]
+Message-Id: <20200705140315.260514-16-huth@tuxfamily.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/avr/boot.h        |  33 +++++++++++++
- include/elf.h        |   4 ++
- hw/avr/boot.c        | 115 +++++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS          |   1 +
- hw/avr/Makefile.objs |   1 +
- 5 files changed, 154 insertions(+)
- create mode 100644 hw/avr/boot.h
- create mode 100644 hw/avr/boot.c
- create mode 100644 hw/avr/Makefile.objs
+ target/avr/insn.decode |  8 ++++++
+ target/avr/translate.c | 65 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
 
-diff --git a/hw/avr/boot.h b/hw/avr/boot.h
-new file mode 100644
-index 0000000000..684d553322
---- /dev/null
-+++ b/hw/avr/boot.h
-@@ -0,0 +1,33 @@
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+index 7bb6ce7495..482c23ad0c 100644
+--- a/target/avr/insn.decode
++++ b/target/avr/insn.decode
+@@ -177,3 +177,11 @@ BST             1111 101 rd:5 0 bit:3
+ BLD             1111 100 rd:5 0 bit:3
+ BSET            1001 0100 0 bit:3 1000
+ BCLR            1001 0100 1 bit:3 1000
++
++#
++# MCU Control Instructions
++#
++BREAK           1001 0101 1001 1000
++NOP             0000 0000 0000 0000
++SLEEP           1001 0101 1000 1000
++WDR             1001 0101 1010 1000
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 884fbb6081..ee7811995a 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -2740,3 +2740,68 @@ static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
+ 
+     return true;
+ }
++
 +/*
-+ * AVR loader helpers
-+ *
-+ * Copyright (c) 2019-2020 Philippe Mathieu-Daudé
-+ *
-+ * This work is licensed under the terms of the GNU GPLv2 or later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
++ * MCU Control Instructions
 + */
 +
-+#ifndef HW_AVR_BOOT_H
-+#define HW_AVR_BOOT_H
-+
-+#include "hw/boards.h"
-+#include "cpu.h"
-+
-+/**
-+ * avr_load_firmware:   load an image into a memory region
-+ *
-+ * @cpu:        Handle a AVR CPU object
-+ * @ms:         A MachineState
-+ * @mr:         Memory Region to load into
-+ * @firmware:   Path to the firmware file (raw binary or ELF format)
-+ *
-+ * Load a firmware supplied by the machine or by the user  with the
-+ * '-bios' command line option, and put it in target memory.
-+ *
-+ * Returns: true on success, false on error.
++/*
++ *  The BREAK instruction is used by the On-chip Debug system, and is
++ *  normally not used in the application software. When the BREAK instruction is
++ *  executed, the AVR CPU is set in the Stopped Mode. This gives the On-chip
++ *  Debugger access to internal resources.  If any Lock bits are set, or either
++ *  the JTAGEN or OCDEN Fuses are unprogrammed, the CPU will treat the BREAK
++ *  instruction as a NOP and will not enter the Stopped mode.  This instruction
++ *  is not available in all devices. Refer to the device specific instruction
++ *  set summary.
 + */
-+bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
-+                       MemoryRegion *mr, const char *firmware);
++static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_BREAK)) {
++        return true;
++    }
 +
++#ifdef BREAKPOINT_ON_BREAK
++    tcg_gen_movi_tl(cpu_pc, ctx->npc - 1);
++    gen_helper_debug(cpu_env);
++    ctx->bstate = DISAS_EXIT;
++#else
++    /* NOP */
 +#endif
-diff --git a/include/elf.h b/include/elf.h
-index 8fbfe60e09..5b06b55f28 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -160,6 +160,8 @@ typedef struct mips_elf_abiflags_v0 {
- 
- #define EM_CRIS         76      /* Axis Communications 32-bit embedded processor */
- 
-+#define EM_AVR          83      /* AVR 8-bit microcontroller */
 +
- #define EM_V850		87	/* NEC v850 */
- 
- #define EM_H8_300H      47      /* Hitachi H8/300H */
-@@ -202,6 +204,8 @@ typedef struct mips_elf_abiflags_v0 {
- #define EM_MOXIE           223     /* Moxie processor family */
- #define EM_MOXIE_OLD       0xFEED
- 
-+#define EF_AVR_MACH     0x7F       /* Mask for AVR e_flags to get core type */
-+
- /* This is the info that is needed to parse the dynamic section of the file */
- #define DT_NULL		0
- #define DT_NEEDED	1
-diff --git a/hw/avr/boot.c b/hw/avr/boot.c
-new file mode 100644
-index 0000000000..6fbcde4061
---- /dev/null
-+++ b/hw/avr/boot.c
-@@ -0,0 +1,115 @@
-+/*
-+ * AVR loader helpers
-+ *
-+ * Copyright (c) 2019-2020 Philippe Mathieu-Daudé
-+ *
-+ * This work is licensed under the terms of the GNU GPLv2 or later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/loader.h"
-+#include "elf.h"
-+#include "boot.h"
-+#include "qemu/error-report.h"
-+
-+static const char *avr_elf_e_flags_to_cpu_type(uint32_t flags)
-+{
-+    switch (flags & EF_AVR_MACH) {
-+    case bfd_mach_avr1:
-+        return AVR_CPU_TYPE_NAME("avr1");
-+    case bfd_mach_avr2:
-+        return AVR_CPU_TYPE_NAME("avr2");
-+    case bfd_mach_avr25:
-+        return AVR_CPU_TYPE_NAME("avr25");
-+    case bfd_mach_avr3:
-+        return AVR_CPU_TYPE_NAME("avr3");
-+    case bfd_mach_avr31:
-+        return AVR_CPU_TYPE_NAME("avr31");
-+    case bfd_mach_avr35:
-+        return AVR_CPU_TYPE_NAME("avr35");
-+    case bfd_mach_avr4:
-+        return AVR_CPU_TYPE_NAME("avr4");
-+    case bfd_mach_avr5:
-+        return AVR_CPU_TYPE_NAME("avr5");
-+    case bfd_mach_avr51:
-+        return AVR_CPU_TYPE_NAME("avr51");
-+    case bfd_mach_avr6:
-+        return AVR_CPU_TYPE_NAME("avr6");
-+    case bfd_mach_avrtiny:
-+        return AVR_CPU_TYPE_NAME("avrtiny");
-+    case bfd_mach_avrxmega2:
-+        return AVR_CPU_TYPE_NAME("xmega2");
-+    case bfd_mach_avrxmega3:
-+        return AVR_CPU_TYPE_NAME("xmega3");
-+    case bfd_mach_avrxmega4:
-+        return AVR_CPU_TYPE_NAME("xmega4");
-+    case bfd_mach_avrxmega5:
-+        return AVR_CPU_TYPE_NAME("xmega5");
-+    case bfd_mach_avrxmega6:
-+        return AVR_CPU_TYPE_NAME("xmega6");
-+    case bfd_mach_avrxmega7:
-+        return AVR_CPU_TYPE_NAME("xmega7");
-+    default:
-+        return NULL;
-+    }
-+}
-+
-+bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
-+                       MemoryRegion *program_mr, const char *firmware)
-+{
-+    const char *filename;
-+    int bytes_loaded;
-+    uint64_t entry;
-+    uint32_t e_flags;
-+
-+    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-+    if (filename == NULL) {
-+        error_report("Unable to find %s", firmware);
-+        return false;
-+    }
-+
-+    bytes_loaded = load_elf_ram_sym(filename,
-+                                    NULL, NULL, NULL,
-+                                    &entry, NULL, NULL,
-+                                    &e_flags, 0, EM_AVR, 0, 0,
-+                                    NULL, true, NULL);
-+    if (bytes_loaded >= 0) {
-+        /* If ELF file is provided, determine CPU type reading ELF e_flags. */
-+        const char *elf_cpu = avr_elf_e_flags_to_cpu_type(e_flags);
-+        const char *mcu_cpu_type = object_get_typename(OBJECT(cpu));
-+        int cpu_len = strlen(mcu_cpu_type) - strlen(AVR_CPU_TYPE_SUFFIX);
-+
-+        if (entry) {
-+            error_report("BIOS entry_point must be 0x0000 "
-+                         "(ELF image '%s' has entry_point 0x%04" PRIx64 ")",
-+                         firmware, entry);
-+            return false;
-+        }
-+        if (!elf_cpu) {
-+            warn_report("Could not determine CPU type for ELF image '%s', "
-+                        "assuming '%.*s' CPU",
-+                         firmware, cpu_len, mcu_cpu_type);
-+            return true;
-+        }
-+        if (strcmp(elf_cpu, mcu_cpu_type)) {
-+            error_report("Current machine: %s with '%.*s' CPU",
-+                         MACHINE_GET_CLASS(ms)->desc, cpu_len, mcu_cpu_type);
-+            error_report("ELF image '%s' is for '%.*s' CPU",
-+                         firmware,
-+                         (int)(strlen(elf_cpu) - strlen(AVR_CPU_TYPE_SUFFIX)),
-+                         elf_cpu);
-+            return false;
-+        }
-+    } else {
-+        bytes_loaded = load_image_mr(filename, program_mr);
-+    }
-+    if (bytes_loaded < 0) {
-+        error_report("Unable to load firmware image %s as ELF or raw binary",
-+                     firmware);
-+        return false;
-+    }
 +    return true;
 +}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 443b377a72..a78d4e56ff 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -983,6 +983,7 @@ M: Michael Rolnik <mrolnik@gmail.com>
- R: Sarah Harris <S.E.Harris@kent.ac.uk>
- S: Maintained
- F: default-configs/avr-softmmu.mak
-+F: hw/avr/
- F: include/hw/char/avr_usart.h
- F: hw/char/avr_usart.c
- F: include/hw/timer/avr_timer16.h
-diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
-new file mode 100644
-index 0000000000..123f174f0e
---- /dev/null
-+++ b/hw/avr/Makefile.objs
-@@ -0,0 +1 @@
-+obj-y += boot.o
++
++/*
++ *  This instruction performs a single cycle No Operation.
++ */
++static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
++{
++
++    /* NOP */
++
++    return true;
++}
++
++/*
++ *  This instruction sets the circuit in sleep mode defined by the MCU
++ *  Control Register.
++ */
++static bool trans_SLEEP(DisasContext *ctx, arg_SLEEP *a)
++{
++    gen_helper_sleep(cpu_env);
++    ctx->bstate = DISAS_NORETURN;
++    return true;
++}
++
++/*
++ *  This instruction resets the Watchdog Timer. This instruction must be
++ *  executed within a limited time given by the WD prescaler. See the Watchdog
++ *  Timer hardware specification.
++ */
++static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
++{
++    gen_helper_wdr(cpu_env);
++
++    return true;
++}
 -- 
 2.21.3
 
