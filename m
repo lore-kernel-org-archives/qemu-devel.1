@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1514DC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 931E7C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:34:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97B44206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:33:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50EA6206F6
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:34:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iy5sJM2K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97B44206F6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="edDvCar2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50EA6206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jssPc-0008Cc-Ot
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:33:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35794)
+	id 1jssPp-00008X-KF
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:34:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jssAK-0000FA-KY
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:18:01 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39928)
+ id 1jssAE-0000An-Sl
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:54 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:36513)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jssAI-0002xQ-8U
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:59 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id q5so46208541wru.6
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:57 -0700 (PDT)
+ id 1jssAB-0002wk-QI
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:53 -0400
+Received: by mail-wm1-x330.google.com with SMTP id 17so87331wmo.1
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gqKTEnLB2iuxK7jGK7ZUL1Ecj0AJQZnfl86LWY8+k7U=;
- b=Iy5sJM2K90j0vyDR35kRJnyd2WzynU1QMOOFXXP4GHH0p3/36SpK29BXgo9bkw5B1E
- 7yDMDyZa+N3HkvdQ/FhvJbKMWk7zpFlpp1QvHuLL+y50UkrriXTw44vSMIyk/jdknI6f
- xjIRX/S8zki11dn95m06L2kJ/YoB7UXjXCVL7gLn/Gem+zxsPsWTmvyz2DMI52fTjtje
- xx++z1dzGlDUPy6pVFCZYloxx0PZJemEHcb2c95Q5YrAd1R+2hvtoN3cRYSFTEjTlJWs
- BPRFQx0IV8Ca2KqNlEr1/WxqK4Zsx1ISdFz/mVvqbbthEXCQiB+eWmMp/FCaHUGkh0jz
- s9Uw==
+ bh=zsTv03VARaihe+oGT92uCGB4KZTAlGdB70IybG3Qeu4=;
+ b=edDvCar2cn9eMjXOdlh2Y7NDKzzd593p4RCZTIwlYx/SuoBwEFWjKEtqfR2kdKsFy7
+ Mj44IjIKC3P0dEgF49Q4v12NNPAy7/7RALlpf4LbwiBmklqjsupAVm6xSvwavRfCaIiS
+ 3qo3C5P8KVemVSffLchjtt80ORMl8o9L1mdmvRBmTB1QoJUHlScSpNkybv74PIoAmC3v
+ Vvq3BGahvW90KIZgNT8FSNOwoF2KZV/oH766WcRZ8zhHsiVSs3zl+xrybO7hQWdeqnHa
+ WjouK4kpqeBDhO8+y0hqzNvJ4JyNQgou3aL7UI5olmhet5EdiyQum2Xk0/1gmUME+ot6
+ fhxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gqKTEnLB2iuxK7jGK7ZUL1Ecj0AJQZnfl86LWY8+k7U=;
- b=axUuRukiVpQjkU9iiLImCJgjbgabAuREsGTJc9sSmnZKNbGYAC0PJZ5acrCilvpang
- UckmD5m1hygmknamQo11XKNB83UrkubZ9U3Pr04M8hSYwgiGXL2Wf1C0j2JCE3CrCqV+
- jijFckRD8mC1tG+fQaaa/kyAIhyrRsNS5KzAas3FKHHWYNga6Ty5vP/uFJRT9U51W92d
- LlPnxPbqBo4B25FvKBBCog7Xe4278PzMwCV23Yngvotg4nG3cccr8Vu28ARtTfzxFVxi
- SgYorKQIiJEuLSZC/Yrsb25qqzLaYMtXp8xofbNpGwfur01J8VvvqOmsZsx0p+K8K2Yw
- r75Q==
-X-Gm-Message-State: AOAM532U2rx2rdJTmKEUAJIMwX7uGitiTXo7R+9VVOWjd/xQnMu2GtWP
- V9qXeDEum65rMKVVtT4Y+aPvkb8F
-X-Google-Smtp-Source: ABdhPJzE7PljyI4A8dcxcIQ6/f72Slds82YJHzyAseJ9WHm1pZMQdm0vzH7nvcz4schr4p/sFT+odA==
-X-Received: by 2002:a5d:4710:: with SMTP id y16mr56973951wrq.189.1594145876077; 
- Tue, 07 Jul 2020 11:17:56 -0700 (PDT)
+ bh=zsTv03VARaihe+oGT92uCGB4KZTAlGdB70IybG3Qeu4=;
+ b=cmZYcnHOJaLk3jnC+vMxQJ7mCttfeyoZNgmvem85wGdI/i5Sb5raRzlZSWCgxq+o9K
+ 9g/5r4r6dtrUPwJUS+bqtq55jDYcQuFno4uO5LQL+vWYj6nEstlwVB3F1gHQQDKJW8+L
+ wBTgtMlCJbTD2w/gc3ZEfnQab1/rFqmS5g7uHT5l7xv23JMZEnfaxglgxHgGT9d+MLQ4
+ 7CDM4t+3wbLDxzUodxO0DK7cyh8wOpZh3S2RLfBOOYdpEOmnFkhHt4isCpvVOLDPW4ld
+ /IN+MdERe1VE+HYl1jcrGzWr0+utHDQmaMePxuJ+OId3eP0nx53EHhmOGQJ3Z22kGpwW
+ yrsQ==
+X-Gm-Message-State: AOAM530/8QnR7s5+K2VhfR8iRyytP7WXbO8GdOlO9vo/rVekDVY6G+Ek
+ O/2lPBgxm41tQytXAAXo1G7djpyH
+X-Google-Smtp-Source: ABdhPJzlmqyfprzO9P3m8lD9u//smozCTVLQkk/fTb/HItQPf8oOoZHBIyUKGG1WjPUulDbE6GK6xA==
+X-Received: by 2002:a1c:2392:: with SMTP id j140mr5338922wmj.6.1594145870108; 
+ Tue, 07 Jul 2020 11:17:50 -0700 (PDT)
 Received: from localhost.localdomain
  (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.54
+ by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 11:17:55 -0700 (PDT)
+ Tue, 07 Jul 2020 11:17:49 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/32] tests/boot-serial: Test some Arduino boards (AVR based)
-Date: Tue,  7 Jul 2020 20:17:05 +0200
-Message-Id: <20200707181710.30950-28-f4bug@amsat.org>
+Subject: [PULL 23/32] hw/misc: avr: Add limited support for power reduction
+ device
+Date: Tue,  7 Jul 2020 20:17:01 +0200
+Message-Id: <20200707181710.30950-24-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200707181710.30950-1-f4bug@amsat.org>
 References: <20200707181710.30950-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42e.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::330;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x330.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -123,69 +124,252 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Print out 'T' through serial port.
+This is a simple device of just one register, and whenever this
+register is written to it calls qemu_set_irq function for each
+of 8 bits/IRQs. It is used to implement AVR Power Reduction.
 
-The Arduino Duemilanove is based on a AVR5 CPU, while the
-Arduino MEGA2560 on a AVR6 CPU.
-
+[AM: Remove word 'Atmel' from filenames and all elements of code]
+Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[rth: Squash Arduino adjustments from f4bug]
-Tested-by: Richard Henderson <richard.henderson@linaro.org>
+[rth: Squash include fix and file rename from f4bug]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-Message-Id: <20200705140315.260514-29-huth@tuxfamily.org>
+Message-Id: <20200705140315.260514-22-huth@tuxfamily.org>
 ---
- tests/qtest/boot-serial-test.c | 11 +++++++++++
- tests/qtest/Makefile.include   |  2 ++
- 2 files changed, 13 insertions(+)
+ include/hw/misc/avr_power.h |  46 +++++++++++++++
+ hw/misc/avr_power.c         | 113 ++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                 |   2 +
+ hw/misc/Kconfig             |   3 +
+ hw/misc/Makefile.objs       |   2 +
+ hw/misc/trace-events        |   4 ++
+ 6 files changed, 170 insertions(+)
+ create mode 100644 include/hw/misc/avr_power.h
+ create mode 100644 hw/misc/avr_power.c
 
-diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-test.c
-index 85a3614286..bfe7624dc6 100644
---- a/tests/qtest/boot-serial-test.c
-+++ b/tests/qtest/boot-serial-test.c
-@@ -17,6 +17,15 @@
- #include "libqtest.h"
- #include "libqos/libqos-spapr.h"
- 
-+static const uint8_t bios_avr[] = {
-+    0x88, 0xe0,             /* ldi r24, 0x08   */
-+    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
-+    0x86, 0xe0,             /* ldi r24, 0x06   */
-+    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 */
-+    0x84, 0xe5,             /* ldi r24, 0x54   */
-+    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
+diff --git a/include/hw/misc/avr_power.h b/include/hw/misc/avr_power.h
+new file mode 100644
+index 0000000000..e08e44f629
+--- /dev/null
++++ b/include/hw/misc/avr_power.h
+@@ -0,0 +1,46 @@
++/*
++ * AVR Power Reduction Management
++ *
++ * Copyright (c) 2019-2020 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_MISC_AVR_POWER_H
++#define HW_MISC_AVR_POWER_H
++
++#include "hw/sysbus.h"
++#include "hw/hw.h"
++
++
++#define TYPE_AVR_MASK "avr-power"
++#define AVR_MASK(obj) OBJECT_CHECK(AVRMaskState, (obj), TYPE_AVR_MASK)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion iomem;
++
++    uint8_t val;
++    qemu_irq irq[8];
++} AVRMaskState;
++
++#endif /* HW_MISC_AVR_POWER_H */
+diff --git a/hw/misc/avr_power.c b/hw/misc/avr_power.c
+new file mode 100644
+index 0000000000..a5412f2cfe
+--- /dev/null
++++ b/hw/misc/avr_power.c
+@@ -0,0 +1,113 @@
++/*
++ * AVR Power Reduction Management
++ *
++ * Copyright (c) 2019-2020 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/misc/avr_power.h"
++#include "qemu/log.h"
++#include "hw/qdev-properties.h"
++#include "hw/irq.h"
++#include "trace.h"
++
++static void avr_mask_reset(DeviceState *dev)
++{
++    AVRMaskState *s = AVR_MASK(dev);
++
++    s->val = 0x00;
++
++    for (int i = 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], 0);
++    }
++}
++
++static uint64_t avr_mask_read(void *opaque, hwaddr offset, unsigned size)
++{
++    assert(size == 1);
++    assert(offset == 0);
++    AVRMaskState *s = opaque;
++
++    trace_avr_power_read(s->val);
++
++    return (uint64_t)s->val;
++}
++
++static void avr_mask_write(void *opaque, hwaddr offset,
++                           uint64_t val64, unsigned size)
++{
++    assert(size == 1);
++    assert(offset == 0);
++    AVRMaskState *s = opaque;
++    uint8_t val8 = val64;
++
++    trace_avr_power_write(val8);
++    s->val = val8;
++    for (int i = 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], (val8 & (1 << i)) != 0);
++    }
++}
++
++static const MemoryRegionOps avr_mask_ops = {
++    .read = avr_mask_read,
++    .write = avr_mask_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        .max_access_size = 1,
++    },
 +};
 +
- static const uint8_t kernel_mcf5208[] = {
-     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-@@ -104,6 +113,8 @@ typedef struct testdef {
- 
- static testdef_t tests[] = {
-     { "alpha", "clipper", "", "PCI:" },
-+    { "avr", "arduino-duemilanove", "", "T", sizeof(bios_avr), NULL, bios_avr },
-+    { "avr", "arduino-mega-2560-v3", "", "T", sizeof(bios_avr), NULL, bios_avr},
-     { "ppc", "ppce500", "", "U-Boot" },
-     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
-     { "ppc", "g3beige", "", "PowerPC,750" },
-diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
-index 98af2c2d93..994ac47399 100644
---- a/tests/qtest/Makefile.include
-+++ b/tests/qtest/Makefile.include
-@@ -66,6 +66,8 @@ check-qtest-i386-y += numa-test
- 
- check-qtest-x86_64-y += $(check-qtest-i386-y)
- 
-+check-qtest-avr-y += boot-serial-test
++static void avr_mask_init(Object *dev)
++{
++    AVRMaskState *s = AVR_MASK(dev);
++    SysBusDevice *busdev = SYS_BUS_DEVICE(dev);
 +
- check-qtest-alpha-y += boot-serial-test
- check-qtest-alpha-$(CONFIG_VGA) += display-vga-test
++    memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_MASK,
++                          0x01);
++    sysbus_init_mmio(busdev, &s->iomem);
++
++    for (int i = 0; i < 8; i++) {
++        sysbus_init_irq(busdev, &s->irq[i]);
++    }
++    s->val = 0x00;
++}
++
++static void avr_mask_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_mask_reset;
++}
++
++static const TypeInfo avr_mask_info = {
++    .name          = TYPE_AVR_MASK,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRMaskState),
++    .class_init    = avr_mask_class_init,
++    .instance_init = avr_mask_init,
++};
++
++static void avr_mask_register_types(void)
++{
++    type_register_static(&avr_mask_info);
++}
++
++type_init(avr_mask_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 61a6017342..443b377a72 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -987,6 +987,8 @@ F: include/hw/char/avr_usart.h
+ F: hw/char/avr_usart.c
+ F: include/hw/timer/avr_timer16.h
+ F: hw/timer/avr_timer16.c
++F: include/hw/misc/avr_power.h
++F: hw/misc/avr_power.c
  
+ CRIS Machines
+ -------------
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index bdd77d8020..92c397ca07 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -131,4 +131,7 @@ config MAC_VIA
+     select MOS6522
+     select ADB
+ 
++config AVR_POWER
++    bool
++
+ source macio/Kconfig
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 5aaca8a039..6be3d255ab 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -91,3 +91,5 @@ common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+ obj-$(CONFIG_MAC_VIA) += mac_via.o
+ 
+ common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
++
++obj-$(CONFIG_AVR_POWER) += avr_power.o
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index ebea53735c..066752aa90 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -19,6 +19,10 @@ allwinner_h3_dramphy_write(uint64_t offset, uint64_t data, unsigned size) "write
+ allwinner_sid_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+ allwinner_sid_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+ 
++# avr_power.c
++avr_power_read(uint8_t value) "power_reduc read value:%u"
++avr_power_write(uint8_t value) "power_reduc write value:%u"
++
+ # eccmemctl.c
+ ecc_mem_writel_mer(uint32_t val) "Write memory enable 0x%08x"
+ ecc_mem_writel_mdr(uint32_t val) "Write memory delay 0x%08x"
 -- 
 2.21.3
 
