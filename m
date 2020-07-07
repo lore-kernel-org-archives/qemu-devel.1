@@ -6,61 +6,59 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C85C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 08:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61DA4C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 08:27:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B688206E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 08:26:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B688206E2
+	by mail.kernel.org (Postfix) with ESMTPS id 35BB7206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 08:27:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35BB7206DF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsiw4-0004ez-Ik
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 04:26:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57700)
+	id 1jsiwZ-0005Iq-F7
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 04:27:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsivN-000449-Bm
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 04:25:57 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:51632)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsivj-0004Sp-27
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 04:26:19 -0400
+Received: from 5.mo3.mail-out.ovh.net ([87.98.178.36]:57117)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsivH-00089X-SF
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 04:25:57 -0400
-Received: from player714.ha.ovh.net (unknown [10.108.54.230])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id BA08F1E192C
- for <qemu-devel@nongnu.org>; Tue,  7 Jul 2020 10:25:39 +0200 (CEST)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jsivh-0008KC-1M
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 04:26:18 -0400
+Received: from player168.ha.ovh.net (unknown [10.110.103.226])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 02F3D258479
+ for <qemu-devel@nongnu.org>; Tue,  7 Jul 2020 10:26:13 +0200 (CEST)
 Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
  [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player714.ha.ovh.net (Postfix) with ESMTPSA id D7813140D8925;
- Tue,  7 Jul 2020 08:25:29 +0000 (UTC)
+ by player168.ha.ovh.net (Postfix) with ESMTPSA id A96BB14163190;
+ Tue,  7 Jul 2020 08:26:04 +0000 (UTC)
 Authentication-Results: garm.ovh; auth=pass
- (GARM-97G0026803412c-1cb8-4627-91bc-9c6fc86ef39b,E152094F47616500A3A802F2EB970733BF761B34)
+ (GARM-103G005e4918421-b6bb-4bf9-9074-daa97007fe4b,E152094F47616500A3A802F2EB970733BF761B34)
  smtp.auth=groug@kaod.org
-Date: Tue, 7 Jul 2020 10:25:28 +0200
+Date: Tue, 7 Jul 2020 10:26:03 +0200
 From: Greg Kurz <groug@kaod.org>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v3 06/44] qemu-option: Check return value instead of
- @err where convenient
-Message-ID: <20200707102528.2cec2bbb@bahia.lan>
-In-Reply-To: <871rloct0d.fsf@dusky.pond.sub.org>
+Subject: Re: [PATCH v3 07/44] qemu-option: Make uses of find_desc_by_name()
+ more similar
+Message-ID: <20200707102603.525ace75@bahia.lan>
+In-Reply-To: <20200706080950.403087-8-armbru@redhat.com>
 References: <20200706080950.403087-1-armbru@redhat.com>
- <20200706080950.403087-7-armbru@redhat.com>
- <20200706175917.460e4817@bahia.lan>
- <871rloct0d.fsf@dusky.pond.sub.org>
+ <20200706080950.403087-8-armbru@redhat.com>
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 3567695330479806862
+X-Ovh-Tracer-Id: 3577265482111949198
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeggddufeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=87.98.165.38; envelope-from=groug@kaod.org;
- helo=6.mo2.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 04:25:40
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeggddufeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedunecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhduieekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=87.98.178.36; envelope-from=groug@kaod.org;
+ helo=5.mo3.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 04:26:15
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -87,150 +85,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 06 Jul 2020 22:01:38 +0200
+On Mon,  6 Jul 2020 10:09:13 +0200
 Markus Armbruster <armbru@redhat.com> wrote:
 
-> Greg Kurz <groug@kaod.org> writes:
+> This is to make the next commit easier to review.
 > 
-> > On Mon,  6 Jul 2020 10:09:12 +0200
-> > Markus Armbruster <armbru@redhat.com> wrote:
-> >
-> >> Convert uses like
-> >> 
-> >>     opts = qemu_opts_create(..., &err);
-> >>     if (err) {
-> >>         ...
-> >>     }
-> >> 
-> >> to
-> >> 
-> >>     opts = qemu_opts_create(..., &err);
-> >
-> > The patch doesn't strictly do that since it also converts &err to errp.
-> 
-> Yes, and that's actually why I do it.  I'll change the commit message to
-> say so:
-> 
->    to
->    
->        opts = qemu_opts_create(..., errp);
-> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-Ok.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> > This is okay because most of the changes also drop the associated
-> > error_propagate(), with the exception of block/parallels.c for which
-> > I had to check how local_err is used. As already noted by Vladimir
-> > earlier this generates an harmless "no-op error_propagate", but it
-> > could be worth mentioning that in the changelog for future reviews :)
+>  util/qemu-option.c | 32 ++++++++++++++++++--------------
+>  1 file changed, 18 insertions(+), 14 deletions(-)
 > 
-> Yes, error_propagate() becomes a no-op for one out of three error paths
-> through it.  There's similar "partial no-opification" elsewhere in this
-> series, notably in PATCH 36.
-> 
-> Concrete suggestions for improving the commit message further are
-> welcome!
-> 
+> diff --git a/util/qemu-option.c b/util/qemu-option.c
+> index fd1fd23521..1df55bc881 100644
+> --- a/util/qemu-option.c
+> +++ b/util/qemu-option.c
+> @@ -270,6 +270,7 @@ static void qemu_opt_del_all(QemuOpts *opts, const char *name)
+>  const char *qemu_opt_get(QemuOpts *opts, const char *name)
+>  {
+>      QemuOpt *opt;
+> +    const QemuOptDesc *desc;
+>  
+>      if (opts == NULL) {
+>          return NULL;
+> @@ -277,7 +278,7 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
+>  
+>      opt = qemu_opt_find(opts, name);
+>      if (!opt) {
+> -        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
+> +        desc = find_desc_by_name(opts->list->desc, name);
+>          if (desc && desc->def_value_str) {
+>              return desc->def_value_str;
+>          }
+> @@ -348,6 +349,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
+>                                       bool defval, bool del)
+>  {
+>      QemuOpt *opt;
+> +    const QemuOptDesc *desc;
+>      bool ret = defval;
+>  
+>      if (opts == NULL) {
+> @@ -356,7 +358,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
+>  
+>      opt = qemu_opt_find(opts, name);
+>      if (opt == NULL) {
+> -        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
+> +        desc = find_desc_by_name(opts->list->desc, name);
+>          if (desc && desc->def_value_str) {
+>              parse_option_bool(name, desc->def_value_str, &ret, &error_abort);
+>          }
+> @@ -384,6 +386,7 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
+>                                             uint64_t defval, bool del)
+>  {
+>      QemuOpt *opt;
+> +    const QemuOptDesc *desc;
+>      uint64_t ret = defval;
+>  
+>      if (opts == NULL) {
+> @@ -392,7 +395,7 @@ static uint64_t qemu_opt_get_number_helper(QemuOpts *opts, const char *name,
+>  
+>      opt = qemu_opt_find(opts, name);
+>      if (opt == NULL) {
+> -        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
+> +        desc = find_desc_by_name(opts->list->desc, name);
+>          if (desc && desc->def_value_str) {
+>              parse_option_number(name, desc->def_value_str, &ret, &error_abort);
+>          }
+> @@ -421,6 +424,7 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
+>                                           uint64_t defval, bool del)
+>  {
+>      QemuOpt *opt;
+> +    const QemuOptDesc *desc;
+>      uint64_t ret = defval;
+>  
+>      if (opts == NULL) {
+> @@ -429,7 +433,7 @@ static uint64_t qemu_opt_get_size_helper(QemuOpts *opts, const char *name,
+>  
+>      opt = qemu_opt_find(opts, name);
+>      if (opt == NULL) {
+> -        const QemuOptDesc *desc = find_desc_by_name(opts->list->desc, name);
+> +        desc = find_desc_by_name(opts->list->desc, name);
+>          if (desc && desc->def_value_str) {
+>              parse_option_size(name, desc->def_value_str, &ret, &error_abort);
+>          }
+> @@ -540,18 +544,18 @@ void qemu_opt_set_bool(QemuOpts *opts, const char *name, bool val,
+>                         Error **errp)
+>  {
+>      QemuOpt *opt;
+> -    const QemuOptDesc *desc = opts->list->desc;
+> +    const QemuOptDesc *desc;
+>  
+> -    opt = g_malloc0(sizeof(*opt));
+> -    opt->desc = find_desc_by_name(desc, name);
+> -    if (!opt->desc && !opts_accepts_any(opts)) {
+> +    desc = find_desc_by_name(opts->list->desc, name);
+> +    if (!desc && !opts_accepts_any(opts)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER, name);
+> -        g_free(opt);
+>          return;
+>      }
+>  
+> +    opt = g_malloc0(sizeof(*opt));
+>      opt->name = g_strdup(name);
+>      opt->opts = opts;
+> +    opt->desc = desc;
+>      opt->value.boolean = !!val;
+>      opt->str = g_strdup(val ? "on" : "off");
+>      QTAILQ_INSERT_TAIL(&opts->head, opt, next);
+> @@ -561,18 +565,18 @@ void qemu_opt_set_number(QemuOpts *opts, const char *name, int64_t val,
+>                           Error **errp)
+>  {
+>      QemuOpt *opt;
+> -    const QemuOptDesc *desc = opts->list->desc;
+> +    const QemuOptDesc *desc;
+>  
+> -    opt = g_malloc0(sizeof(*opt));
+> -    opt->desc = find_desc_by_name(desc, name);
+> -    if (!opt->desc && !opts_accepts_any(opts)) {
+> +    desc = find_desc_by_name(opts->list->desc, name);
+> +    if (!desc && !opts_accepts_any(opts)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER, name);
+> -        g_free(opt);
+>          return;
+>      }
+>  
+> +    opt = g_malloc0(sizeof(*opt));
+>      opt->name = g_strdup(name);
+>      opt->opts = opts;
+> +    opt->desc = desc;
+>      opt->value.uint = val;
+>      opt->str = g_strdup_printf("%" PRId64, val);
+>      QTAILQ_INSERT_TAIL(&opts->head, opt, next);
 
-What about this ?
-
-The change in block/parallels.c doesn't provide any clue on the usage
-of local_err. As usual it is expected to be equal to NULL at the time
-qemu_opts_create() is called, and the goto on the error path jumps
-here:
-
-fail_options:
-    error_propagate(errp, local_err);
-
-So, if qemu_opts_create() fails, we end up doing error_propagate(errp, NULL)
-which is a harmles no-op.
-
-> >>     if (!opts) {
-> >>         ...
-> >>     }
-> >> 
-> >> Eliminate error_propagate() that are now unnecessary.  Delete @err
-> >> that are now unused.
-> >> 
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >> ---
-> >>  block/parallels.c  |  4 ++--
-> >>  blockdev.c         |  5 ++---
-> >>  qdev-monitor.c     |  5 ++---
-> >>  util/qemu-config.c | 10 ++++------
-> >>  util/qemu-option.c | 12 ++++--------
-> >
-> > Maybe some other potential candidates ?
-> >
-> > chardev/char.c:
-> >
-> >    opts = qemu_opts_create(qemu_find_opts("chardev"), label, 1, &local_err);
-> >     if (local_err) {
-> >         error_report_err(local_err);
-> >         return NULL;
-> >     }
-> >
-> > monitor/hmp-cmds.c:
-> >
-> >     opts = qemu_opts_from_qdict(qemu_find_opts("netdev"), qdict, &err);
-> >     if (err) {
-> >         goto out;
-> >     }
-> >
-> >
-> >     opts = qemu_opts_from_qdict(qemu_find_opts("object"), qdict, &err);
-> >     if (err) {
-> >         goto end;
-> >     }
-> 
-> Don't fit my clarified commit message, because I can't replace &err by
-> errp there.
-> 
-
-Sure.
-
-> I found these:
-> 
->   diff --git a/block/blkdebug.c b/block/blkdebug.c
->   index 7194bc7f06..471b597dfe 100644
->   --- a/block/blkdebug.c
->   +++ b/block/blkdebug.c
->   @@ -294,17 +294,13 @@ static int read_config(BDRVBlkdebugState *s, const char *filename,
-> 
->        d.s = s;
->        d.action = ACTION_INJECT_ERROR;
->   -    qemu_opts_foreach(&inject_error_opts, add_rule, &d, &local_err);
->   -    if (local_err) {
->   -        error_propagate(errp, local_err);
->   +    if (qemu_opts_foreach(&inject_error_opts, add_rule, &d, errp)) {
->            ret = -EINVAL;
->            goto fail;
->        }
-> 
->        d.action = ACTION_SET_STATE;
->   -    qemu_opts_foreach(&set_state_opts, add_rule, &d, &local_err);
->   -    if (local_err) {
->   -        error_propagate(errp, local_err);
->   +    if (qemu_opts_foreach(&set_state_opts, add_rule, &d, errp)) {
->            ret = -EINVAL;
->            goto fail;
->        }
-> 
-> However, I really need to get a pull request out...  Can patch them
-> later.
-> 
-
-Yeah and we might probably find a few more, but certainly not much
-after this colossal effort of yours.
-
-> > With or without the extra changes:
-> >
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> 
-> Thanks!
-> 
-
-My pleasure.
 
