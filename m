@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F8AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F7EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:32:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77946206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:32:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C06F206F6
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 18:32:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRZ/BTdw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77946206F6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AbXhgQMC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C06F206F6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jssOH-0005bT-PF
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:32:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35782)
+	id 1jssOW-00064v-D4
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 14:32:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jssAI-0000Eh-NC
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:18:00 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:41271)
+ id 1jssAB-00005E-4W
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:51 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35079)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jssAG-0002x3-DL
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:58 -0400
-Received: by mail-wr1-x436.google.com with SMTP id z15so34959125wrl.8
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:54 -0700 (PDT)
+ id 1jssA8-0002vJ-Rw
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 14:17:50 -0400
+Received: by mail-wr1-x431.google.com with SMTP id z2so23970476wrp.2
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 11:17:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=VMm53XjaB19n/NZsPZmrfhwD6Ddbf2X3cNEE6NOM/uM=;
- b=KRZ/BTdwQuT5Q3eh8Fr4BFgSQ4z8EReg1EYGoe6Jyu7t4oZJPKSJ0s4vVaSqCB23FF
- a5h08uOYTKcrY87JWPDmb/NHfMMU5MWgbemVCwF8IiAlDDR0h/F0hQL5Bs77Vsa1t+Yr
- FvDj2ijlBhXkthMeI9tQcnNnRDZCBXCVSRofv5TA1o1wYGsDPzgYSBgkl83/aU3h/fZj
- 2KzD/r6uy7ZmeHLuBEGP+8N635zv5POCM/leRfUo8w9VBmRuQb/Z2mU/ddwDPeq2Np1c
- vTSusaNZHaFhM+x9Y46zeJVRnvpOx8PHzn/zNulPNf9i+jDCpoFKoxnhAZYldgTPtcSr
- +55A==
+ bh=YQD7juLDKBc6RUeHkV7cEGFtIW4PcBk8LgRbj/h55ro=;
+ b=AbXhgQMCnm12Ns2KkMKVwhCc5f5E/A+c9lTa/6GGJsZ2rw8kDre3n9ubW93PTWGrf4
+ Zq/PC8pdb6FlpZ/JuPJ9xo3Oke2bVyEgBgvo3puBFjh/4ue2EV1RHSg3uTJ5cwqlpzz9
+ 275mBvAnBhbAI5wlOxjxO0Ziud9PJl7EBrMLf+oRXQWDokxCksmgcHS/ioFQStwcdR7U
+ xZJI7AMulYKyTWsNPpwrmYV3h3usb55TW4qF1+wJ/KB/6MPjstR+NqdZYQgCKKaYnUwB
+ p918uvyfRwt1T0VXSTmU7eNhSGQ8PuEAQHnBixUhlISIXVQWxLi0gIb6Dilxl8HxhUCR
+ +qMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=VMm53XjaB19n/NZsPZmrfhwD6Ddbf2X3cNEE6NOM/uM=;
- b=Ob8qnd6wJ+utBFyqWhxpbCP7Gcw3+596ngUCV4K9tZh+JzT24qzTMNna7dd5KogDO0
- B+/P5GvbJwmWx1z1i+zWICSLicPYxtAs5YBEsptgrBkLBscqVX445PN5fUzW68f/aO5l
- Cub07LvNkfFWoiwla1Oi/LyijyzPE8dzGSz9vRut/rfmd/aoJScB1T7fpY2tqElhvdb+
- JTtTQ+VIowWeLKFykH58GA2rWKM0eRiwgSmVj9tLtT4yur5I7GsZFs8OpmiXvc2QzfrN
- ZWNdvv7au1VoaMnOkb66iJP7wxKHLkWdAGDfWFKKypMXNLFGSftyKmBQbYNv+wQSkZLQ
- 1oFA==
-X-Gm-Message-State: AOAM531+WF5cv9fwh4GV+0kni4oVzBTYN4oZmy/d3cwdjoPuzinOZGyV
- H+ntvgrxbUXnidFNR3xxpruU8D2C
-X-Google-Smtp-Source: ABdhPJyP69duXc0CfZor1QKDYWAXvFOZIWZ3FnmKMc0oBlGXq06Me2D2NahXtYh9yheiiAWWeooyDQ==
-X-Received: by 2002:a5d:6045:: with SMTP id j5mr54080286wrt.209.1594145872999; 
- Tue, 07 Jul 2020 11:17:52 -0700 (PDT)
+ bh=YQD7juLDKBc6RUeHkV7cEGFtIW4PcBk8LgRbj/h55ro=;
+ b=XxoKL87lmQhv/ZH/cuUNJa9RdjG16ZYbBcjfDvh8InRN/PHL1sJwYfmq0LBT/zqKJI
+ uHSDH+K3Xax0xJds/7aZFXl3CE7FGHDZHtKHXA5hA0QgrwYoGUK5iM3//m2H5lxaRbis
+ DNkMmjrr0glUOvwo2ke8j82rLOQUThMJ4eY8zFCHMmNpuxgcRzBr+qDAoR34zMv7bm82
+ Lu+6MBEQ4pHrsCdvUumNIJ/TDaQeOIr1FHSiefALvsyDIkw1M6iPxMAK6y74S+tdvOeo
+ 2qiH1BlQJABD0HTZFWgUQpczaAx108OS6R61bw6NwJ8JP4WjMNopQJsVLGExdpSJx5fm
+ diKQ==
+X-Gm-Message-State: AOAM530di/u6zxe94FIX8jzde+rvtjKRlJfJCif717FTjcAerL0JDj+4
+ YWF2o8mr2uIjxgq5LN/60TWWH8mV
+X-Google-Smtp-Source: ABdhPJxk23CRqDpJKLs/3Rv2UxQiRd4B4CtU1KsXRroSYOkxmaxMXNbO7ZlZDI4gYbWryebVXK3GBA==
+X-Received: by 2002:a5d:6a06:: with SMTP id m6mr54589495wru.321.1594145866917; 
+ Tue, 07 Jul 2020 11:17:46 -0700 (PDT)
 Received: from localhost.localdomain
  (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.51
+ by smtp.gmail.com with ESMTPSA id 65sm2253337wma.48.2020.07.07.11.17.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 11:17:52 -0700 (PDT)
+ Tue, 07 Jul 2020 11:17:46 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/32] hw/avr: Add some ATmega microcontrollers
-Date: Tue,  7 Jul 2020 20:17:03 +0200
-Message-Id: <20200707181710.30950-26-f4bug@amsat.org>
+Subject: [PULL 21/32] hw/char: avr: Add limited support for USART peripheral
+Date: Tue,  7 Jul 2020 20:16:59 +0200
+Message-Id: <20200707181710.30950-22-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200707181710.30950-1-f4bug@amsat.org>
 References: <20200707181710.30950-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x436.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -89,7 +89,7 @@ X-Spam_bar: /
 X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
  HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,574 +121,495 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add some AVR microcontrollers from the ATmega family:
+From: Michael Rolnik <mrolnik@gmail.com>
 
-  - middle range: ATmega168 and ATmega328
-  - high range: ATmega1280 and ATmega2560
-
-For product comparison:
-  https://www.microchip.com/wwwproducts/ProductCompare/ATmega168P/ATmega328P
-  https://www.microchip.com/wwwproducts/ProductCompare/ATmega1280/ATmega2560
-
-Datasheets:
-  http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
-  http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2549-8-bit-AVR-Microcontroller-ATmega640-1280-1281-2560-2561_datasheet.pdf
+These were designed to facilitate testing but should provide enough
+function to be useful in other contexts.  Only a subset of the functions
+of each peripheral is implemented, mainly due to the lack of a standard
+way to handle electrical connections (like GPIO pins).
 
 [AM: Remove word 'Atmel' from filenames and all elements of code]
 Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[rth: Squash I/O size fix and file rename from f4bug]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-[thuth: Rebased to master, fixed object_initialize_child() calls etc.]
+Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-Message-Id: <20200705140315.260514-25-huth@tuxfamily.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200705140315.260514-20-huth@tuxfamily.org>
 ---
- hw/avr/atmega.h      |  48 +++++
- hw/avr/atmega.c      | 458 +++++++++++++++++++++++++++++++++++++++++++
- hw/avr/Kconfig       |   5 +
- hw/avr/Makefile.objs |   1 +
- 4 files changed, 512 insertions(+)
- create mode 100644 hw/avr/atmega.h
- create mode 100644 hw/avr/atmega.c
- create mode 100644 hw/avr/Kconfig
+ include/hw/char/avr_usart.h |  93 +++++++++++
+ hw/char/avr_usart.c         | 320 ++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                 |   2 +
+ hw/char/Kconfig             |   3 +
+ hw/char/Makefile.objs       |   1 +
+ 5 files changed, 419 insertions(+)
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 hw/char/avr_usart.c
 
-diff --git a/hw/avr/atmega.h b/hw/avr/atmega.h
+diff --git a/include/hw/char/avr_usart.h b/include/hw/char/avr_usart.h
 new file mode 100644
-index 0000000000..0928cb0ce6
+index 0000000000..5739aaf26f
 --- /dev/null
-+++ b/hw/avr/atmega.h
-@@ -0,0 +1,48 @@
++++ b/include/hw/char/avr_usart.h
+@@ -0,0 +1,93 @@
 +/*
-+ * QEMU ATmega MCU
++ * AVR USART
 + *
-+ * Copyright (c) 2019-2020 Philippe Mathieu-Daudé
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
 + *
-+ * This work is licensed under the terms of the GNU GPLv2 or later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
 +
-+#ifndef HW_AVR_ATMEGA_H
-+#define HW_AVR_ATMEGA_H
++#ifndef HW_CHAR_AVR_USART_H
++#define HW_CHAR_AVR_USART_H
 +
-+#include "hw/char/avr_usart.h"
-+#include "hw/timer/avr_timer16.h"
-+#include "hw/misc/avr_power.h"
-+#include "target/avr/cpu.h"
++#include "hw/sysbus.h"
++#include "chardev/char-fe.h"
++#include "hw/hw.h"
 +
-+#define TYPE_ATMEGA_MCU     "ATmega"
-+#define TYPE_ATMEGA168_MCU  "ATmega168"
-+#define TYPE_ATMEGA328_MCU  "ATmega328"
-+#define TYPE_ATMEGA1280_MCU "ATmega1280"
-+#define TYPE_ATMEGA2560_MCU "ATmega2560"
++/* Offsets of registers. */
++#define USART_DR   0x06
++#define USART_CSRA  0x00
++#define USART_CSRB  0x01
++#define USART_CSRC  0x02
++#define USART_BRRH 0x05
++#define USART_BRRL 0x04
 +
-+#define ATMEGA_MCU(obj) OBJECT_CHECK(AtmegaMcuState, (obj), TYPE_ATMEGA_MCU)
++/* Relevant bits in regiters. */
++#define USART_CSRA_RXC    (1 << 7)
++#define USART_CSRA_TXC    (1 << 6)
++#define USART_CSRA_DRE    (1 << 5)
++#define USART_CSRA_MPCM   (1 << 0)
 +
-+#define POWER_MAX 2
-+#define USART_MAX 4
-+#define TIMER_MAX 6
-+#define GPIO_MAX 12
++#define USART_CSRB_RXCIE  (1 << 7)
++#define USART_CSRB_TXCIE  (1 << 6)
++#define USART_CSRB_DREIE  (1 << 5)
++#define USART_CSRB_RXEN   (1 << 4)
++#define USART_CSRB_TXEN   (1 << 3)
++#define USART_CSRB_CSZ2   (1 << 2)
++#define USART_CSRB_RXB8   (1 << 1)
++#define USART_CSRB_TXB8   (1 << 0)
 +
-+typedef struct AtmegaMcuState {
-+    /*< private >*/
++#define USART_CSRC_MSEL1  (1 << 7)
++#define USART_CSRC_MSEL0  (1 << 6)
++#define USART_CSRC_PM1    (1 << 5)
++#define USART_CSRC_PM0    (1 << 4)
++#define USART_CSRC_CSZ1   (1 << 2)
++#define USART_CSRC_CSZ0   (1 << 1)
++
++#define TYPE_AVR_USART "avr-usart"
++#define AVR_USART(obj) \
++    OBJECT_CHECK(AVRUsartState, (obj), TYPE_AVR_USART)
++
++typedef struct {
++    /* <private> */
 +    SysBusDevice parent_obj;
-+    /*< public >*/
 +
-+    AVRCPU cpu;
-+    MemoryRegion flash;
-+    MemoryRegion eeprom;
-+    MemoryRegion sram;
-+    DeviceState *io;
-+    AVRMaskState pwr[POWER_MAX];
-+    AVRUsartState usart[USART_MAX];
-+    AVRTimer16State timer[TIMER_MAX];
-+    uint64_t xtal_freq_hz;
-+} AtmegaMcuState;
++    /* <public> */
++    MemoryRegion mmio;
 +
-+#endif /* HW_AVR_ATMEGA_H */
-diff --git a/hw/avr/atmega.c b/hw/avr/atmega.c
++    CharBackend chr;
++
++    bool enabled;
++
++    uint8_t data;
++    bool data_valid;
++    uint8_t char_mask;
++    /* Control and Status Registers */
++    uint8_t csra;
++    uint8_t csrb;
++    uint8_t csrc;
++    /* Baud Rate Registers (low/high byte) */
++    uint8_t brrh;
++    uint8_t brrl;
++
++    /* Receive Complete */
++    qemu_irq rxc_irq;
++    /* Transmit Complete */
++    qemu_irq txc_irq;
++    /* Data Register Empty */
++    qemu_irq dre_irq;
++} AVRUsartState;
++
++#endif /* HW_CHAR_AVR_USART_H */
+diff --git a/hw/char/avr_usart.c b/hw/char/avr_usart.c
 new file mode 100644
-index 0000000000..49ec8047f9
+index 0000000000..fbe2a112b7
 --- /dev/null
-+++ b/hw/avr/atmega.c
-@@ -0,0 +1,458 @@
++++ b/hw/char/avr_usart.c
+@@ -0,0 +1,320 @@
 +/*
-+ * QEMU ATmega MCU
++ * AVR USART
 + *
-+ * Copyright (c) 2019-2020 Philippe Mathieu-Daudé
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
 + *
-+ * This work is licensed under the terms of the GNU GPLv2 or later.
-+ * See the COPYING file in the top-level directory.
-+ * SPDX-License-Identifier: GPL-2.0-or-later
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qemu/units.h"
-+#include "qapi/error.h"
-+#include "exec/memory.h"
-+#include "exec/address-spaces.h"
-+#include "sysemu/sysemu.h"
++#include "hw/char/avr_usart.h"
++#include "qemu/log.h"
++#include "hw/irq.h"
 +#include "hw/qdev-properties.h"
-+#include "hw/sysbus.h"
-+#include "hw/boards.h" /* FIXME memory_region_allocate_system_memory for sram */
-+#include "hw/misc/unimp.h"
-+#include "atmega.h"
 +
-+enum AtmegaPeripheral {
-+    POWER0, POWER1,
-+    GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF,
-+    GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK, GPIOL,
-+    USART0, USART1, USART2, USART3,
-+    TIMER0, TIMER1, TIMER2, TIMER3, TIMER4, TIMER5,
-+    PERIFMAX
-+};
-+
-+#define GPIO(n)     (n + GPIOA)
-+#define USART(n)    (n + USART0)
-+#define TIMER(n)    (n + TIMER0)
-+#define POWER(n)    (n + POWER0)
-+
-+typedef struct {
-+    uint16_t addr;
-+    enum AtmegaPeripheral power_index;
-+    uint8_t power_bit;
-+    /* timer specific */
-+    uint16_t intmask_addr;
-+    uint16_t intflag_addr;
-+    bool is_timer16;
-+} peripheral_cfg;
-+
-+typedef struct AtmegaMcuClass {
-+    /*< private >*/
-+    SysBusDeviceClass parent_class;
-+    /*< public >*/
-+    const char *uc_name;
-+    const char *cpu_type;
-+    size_t flash_size;
-+    size_t eeprom_size;
-+    size_t sram_size;
-+    size_t io_size;
-+    size_t gpio_count;
-+    size_t adc_count;
-+    const uint8_t *irq;
-+    const peripheral_cfg *dev;
-+} AtmegaMcuClass;
-+
-+#define ATMEGA_MCU_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(AtmegaMcuClass, (klass), TYPE_ATMEGA_MCU)
-+#define ATMEGA_MCU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(AtmegaMcuClass, (obj), TYPE_ATMEGA_MCU)
-+
-+static const peripheral_cfg dev168_328[PERIFMAX] = {
-+    [USART0]        = {  0xc0, POWER0, 1 },
-+    [TIMER2]        = {  0xb0, POWER0, 6, 0x70, 0x37, false },
-+    [TIMER1]        = {  0x80, POWER0, 3, 0x6f, 0x36, true },
-+    [POWER0]        = {  0x64 },
-+    [TIMER0]        = {  0x44, POWER0, 5, 0x6e, 0x35, false },
-+    [GPIOD]         = {  0x29 },
-+    [GPIOC]         = {  0x26 },
-+    [GPIOB]         = {  0x23 },
-+}, dev1280_2560[PERIFMAX] = {
-+    [USART3]        = { 0x130, POWER1, 2 },
-+    [TIMER5]        = { 0x120, POWER1, 5, 0x73, 0x3a, true },
-+    [GPIOL]         = { 0x109 },
-+    [GPIOK]         = { 0x106 },
-+    [GPIOJ]         = { 0x103 },
-+    [GPIOH]         = { 0x100 },
-+    [USART2]        = {  0xd0, POWER1, 1 },
-+    [USART1]        = {  0xc8, POWER1, 0 },
-+    [USART0]        = {  0xc0, POWER0, 1 },
-+    [TIMER2]        = {  0xb0, POWER0, 6, 0x70, 0x37, false }, /* TODO async */
-+    [TIMER4]        = {  0xa0, POWER1, 4, 0x72, 0x39, true },
-+    [TIMER3]        = {  0x90, POWER1, 3, 0x71, 0x38, true },
-+    [TIMER1]        = {  0x80, POWER0, 3, 0x6f, 0x36, true },
-+    [POWER1]        = {  0x65 },
-+    [POWER0]        = {  0x64 },
-+    [TIMER0]        = {  0x44, POWER0, 5, 0x6e, 0x35, false },
-+    [GPIOG]         = {  0x32 },
-+    [GPIOF]         = {  0x2f },
-+    [GPIOE]         = {  0x2c },
-+    [GPIOD]         = {  0x29 },
-+    [GPIOC]         = {  0x26 },
-+    [GPIOB]         = {  0x23 },
-+    [GPIOA]         = {  0x20 },
-+};
-+
-+enum AtmegaIrq {
-+    USART0_RXC_IRQ, USART0_DRE_IRQ, USART0_TXC_IRQ,
-+    USART1_RXC_IRQ, USART1_DRE_IRQ, USART1_TXC_IRQ,
-+    USART2_RXC_IRQ, USART2_DRE_IRQ, USART2_TXC_IRQ,
-+    USART3_RXC_IRQ, USART3_DRE_IRQ, USART3_TXC_IRQ,
-+    TIMER0_CAPT_IRQ, TIMER0_COMPA_IRQ, TIMER0_COMPB_IRQ,
-+        TIMER0_COMPC_IRQ, TIMER0_OVF_IRQ,
-+    TIMER1_CAPT_IRQ, TIMER1_COMPA_IRQ, TIMER1_COMPB_IRQ,
-+        TIMER1_COMPC_IRQ, TIMER1_OVF_IRQ,
-+    TIMER2_CAPT_IRQ, TIMER2_COMPA_IRQ, TIMER2_COMPB_IRQ,
-+        TIMER2_COMPC_IRQ, TIMER2_OVF_IRQ,
-+    TIMER3_CAPT_IRQ, TIMER3_COMPA_IRQ, TIMER3_COMPB_IRQ,
-+        TIMER3_COMPC_IRQ, TIMER3_OVF_IRQ,
-+    TIMER4_CAPT_IRQ, TIMER4_COMPA_IRQ, TIMER4_COMPB_IRQ,
-+        TIMER4_COMPC_IRQ, TIMER4_OVF_IRQ,
-+    TIMER5_CAPT_IRQ, TIMER5_COMPA_IRQ, TIMER5_COMPB_IRQ,
-+        TIMER5_COMPC_IRQ, TIMER5_OVF_IRQ,
-+    IRQ_COUNT
-+};
-+
-+#define USART_IRQ_COUNT     3
-+#define USART_RXC_IRQ(n)    (n * USART_IRQ_COUNT + USART0_RXC_IRQ)
-+#define USART_DRE_IRQ(n)    (n * USART_IRQ_COUNT + USART0_DRE_IRQ)
-+#define USART_TXC_IRQ(n)    (n * USART_IRQ_COUNT + USART0_TXC_IRQ)
-+#define TIMER_IRQ_COUNT     5
-+#define TIMER_CAPT_IRQ(n)   (n * TIMER_IRQ_COUNT + TIMER0_CAPT_IRQ)
-+#define TIMER_COMPA_IRQ(n)  (n * TIMER_IRQ_COUNT + TIMER0_COMPA_IRQ)
-+#define TIMER_COMPB_IRQ(n)  (n * TIMER_IRQ_COUNT + TIMER0_COMPB_IRQ)
-+#define TIMER_COMPC_IRQ(n)  (n * TIMER_IRQ_COUNT + TIMER0_COMPC_IRQ)
-+#define TIMER_OVF_IRQ(n)    (n * TIMER_IRQ_COUNT + TIMER0_OVF_IRQ)
-+
-+static const uint8_t irq168_328[IRQ_COUNT] = {
-+    [TIMER2_COMPA_IRQ]      = 8,
-+    [TIMER2_COMPB_IRQ]      = 9,
-+    [TIMER2_OVF_IRQ]        = 10,
-+    [TIMER1_CAPT_IRQ]       = 11,
-+    [TIMER1_COMPA_IRQ]      = 12,
-+    [TIMER1_COMPB_IRQ]      = 13,
-+    [TIMER1_OVF_IRQ]        = 14,
-+    [TIMER0_COMPA_IRQ]      = 15,
-+    [TIMER0_COMPB_IRQ]      = 16,
-+    [TIMER0_OVF_IRQ]        = 17,
-+    [USART0_RXC_IRQ]        = 19,
-+    [USART0_DRE_IRQ]        = 20,
-+    [USART0_TXC_IRQ]        = 21,
-+}, irq1280_2560[IRQ_COUNT] = {
-+    [TIMER2_COMPA_IRQ]      = 14,
-+    [TIMER2_COMPB_IRQ]      = 15,
-+    [TIMER2_OVF_IRQ]        = 16,
-+    [TIMER1_CAPT_IRQ]       = 17,
-+    [TIMER1_COMPA_IRQ]      = 18,
-+    [TIMER1_COMPB_IRQ]      = 19,
-+    [TIMER1_COMPC_IRQ]      = 20,
-+    [TIMER1_OVF_IRQ]        = 21,
-+    [TIMER0_COMPA_IRQ]      = 22,
-+    [TIMER0_COMPB_IRQ]      = 23,
-+    [TIMER0_OVF_IRQ]        = 24,
-+    [USART0_RXC_IRQ]        = 26,
-+    [USART0_DRE_IRQ]        = 27,
-+    [USART0_TXC_IRQ]        = 28,
-+    [TIMER3_CAPT_IRQ]       = 32,
-+    [TIMER3_COMPA_IRQ]      = 33,
-+    [TIMER3_COMPB_IRQ]      = 34,
-+    [TIMER3_COMPC_IRQ]      = 35,
-+    [TIMER3_OVF_IRQ]        = 36,
-+    [USART1_RXC_IRQ]        = 37,
-+    [USART1_DRE_IRQ]        = 38,
-+    [USART1_TXC_IRQ]        = 39,
-+    [TIMER4_CAPT_IRQ]       = 42,
-+    [TIMER4_COMPA_IRQ]      = 43,
-+    [TIMER4_COMPB_IRQ]      = 44,
-+    [TIMER4_COMPC_IRQ]      = 45,
-+    [TIMER4_OVF_IRQ]        = 46,
-+    [TIMER5_CAPT_IRQ]       = 47,
-+    [TIMER5_COMPA_IRQ]      = 48,
-+    [TIMER5_COMPB_IRQ]      = 49,
-+    [TIMER5_COMPC_IRQ]      = 50,
-+    [TIMER5_OVF_IRQ]        = 51,
-+    [USART2_RXC_IRQ]        = 52,
-+    [USART2_DRE_IRQ]        = 53,
-+    [USART2_TXC_IRQ]        = 54,
-+    [USART3_RXC_IRQ]        = 55,
-+    [USART3_DRE_IRQ]        = 56,
-+    [USART3_TXC_IRQ]        = 57,
-+};
-+
-+static void connect_peripheral_irq(const AtmegaMcuClass *k,
-+                                   SysBusDevice *dev, int dev_irqn,
-+                                   DeviceState *cpu,
-+                                   unsigned peripheral_index)
++static int avr_usart_can_receive(void *opaque)
 +{
-+    int cpu_irq = k->irq[peripheral_index];
++    AVRUsartState *usart = opaque;
 +
-+    if (!cpu_irq) {
-+        return;
++    if (usart->data_valid || !(usart->csrb & USART_CSRB_RXEN)) {
++        return 0;
 +    }
-+    /* FIXME move that to avr_cpu_set_int() once 'sample' board is removed */
-+    assert(cpu_irq >= 2);
-+    cpu_irq -= 2;
-+
-+    sysbus_connect_irq(dev, dev_irqn, qdev_get_gpio_in(cpu, cpu_irq));
++    return 1;
 +}
 +
-+static void connect_power_reduction_gpio(AtmegaMcuState *s,
-+                                         const AtmegaMcuClass *k,
-+                                         DeviceState *cpu,
-+                                         unsigned peripheral_index)
++static void avr_usart_receive(void *opaque, const uint8_t *buffer, int size)
 +{
-+    unsigned power_index = k->dev[peripheral_index].power_index;
-+    assert(k->dev[power_index].addr);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pwr[power_index - POWER0]),
-+                       k->dev[peripheral_index].power_bit,
-+                       qdev_get_gpio_in(cpu, 0));
++    AVRUsartState *usart = opaque;
++    assert(size == 1);
++    assert(!usart->data_valid);
++    usart->data = buffer[0];
++    usart->data_valid = true;
++    usart->csra |= USART_CSRA_RXC;
++    if (usart->csrb & USART_CSRB_RXCIE) {
++        qemu_set_irq(usart->rxc_irq, 1);
++    }
 +}
 +
-+static void atmega_realize(DeviceState *dev, Error **errp)
++static void update_char_mask(AVRUsartState *usart)
 +{
-+    AtmegaMcuState *s = ATMEGA_MCU(dev);
-+    const AtmegaMcuClass *mc = ATMEGA_MCU_GET_CLASS(dev);
-+    DeviceState *cpudev;
-+    SysBusDevice *sbd;
-+    char *devname;
-+    size_t i;
++    uint8_t mode = ((usart->csrc & USART_CSRC_CSZ0) ? 1 : 0) |
++        ((usart->csrc & USART_CSRC_CSZ1) ? 2 : 0) |
++        ((usart->csrb & USART_CSRB_CSZ2) ? 4 : 0);
++    switch (mode) {
++    case 0:
++        usart->char_mask = 0b11111;
++        break;
++    case 1:
++        usart->char_mask = 0b111111;
++        break;
++    case 2:
++        usart->char_mask = 0b1111111;
++        break;
++    case 3:
++        usart->char_mask = 0b11111111;
++        break;
++    case 4:
++        /* Fallthrough. */
++    case 5:
++        /* Fallthrough. */
++    case 6:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Reserved character size 0x%x\n",
++            __func__,
++            mode);
++        break;
++    case 7:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Nine bit character size not supported (forcing eight)\n",
++            __func__);
++        usart->char_mask = 0b11111111;
++        break;
++    default:
++        assert(0);
++    }
++}
 +
-+    assert(mc->io_size <= 0x200);
++static void avr_usart_reset(DeviceState *dev)
++{
++    AVRUsartState *usart = AVR_USART(dev);
++    usart->data_valid = false;
++    usart->csra = 0b00100000;
++    usart->csrb = 0b00000000;
++    usart->csrc = 0b00000110;
++    usart->brrl = 0;
++    usart->brrh = 0;
++    update_char_mask(usart);
++    qemu_set_irq(usart->rxc_irq, 0);
++    qemu_set_irq(usart->txc_irq, 0);
++    qemu_set_irq(usart->dre_irq, 0);
++}
 +
-+    if (!s->xtal_freq_hz) {
-+        error_setg(errp, "\"xtal-frequency-hz\" property must be provided.");
++static uint64_t avr_usart_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    AVRUsartState *usart = opaque;
++    uint8_t data;
++    assert(size == 1);
++
++    if (!usart->enabled) {
++        return 0;
++    }
++
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_RXEN)) {
++            /* Receiver disabled, ignore. */
++            return 0;
++        }
++        if (usart->data_valid) {
++            data = usart->data & usart->char_mask;
++            usart->data_valid = false;
++        } else {
++            data = 0;
++        }
++        usart->csra &= 0xff ^ USART_CSRA_RXC;
++        qemu_set_irq(usart->rxc_irq, 0);
++        qemu_chr_fe_accept_input(&usart->chr);
++        return data;
++    case USART_CSRA:
++        return usart->csra;
++    case USART_CSRB:
++        return usart->csrb;
++    case USART_CSRC:
++        return usart->csrc;
++    case USART_BRRL:
++        return usart->brrl;
++    case USART_BRRH:
++        return usart->brrh;
++    default:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
++    }
++    return 0;
++}
++
++static void avr_usart_write(void *opaque, hwaddr addr, uint64_t value,
++                                unsigned int size)
++{
++    AVRUsartState *usart = opaque;
++    uint8_t mask;
++    uint8_t data;
++    assert((value & 0xff) == value);
++    assert(size == 1);
++
++    if (!usart->enabled) {
 +        return;
 +    }
 +
-+    /* CPU */
-+    object_initialize_child(OBJECT(dev), "cpu", &s->cpu, mc->cpu_type);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &error_abort);
-+    cpudev = DEVICE(&s->cpu);
-+
-+    /* SRAM */
-+    memory_region_init_ram(&s->sram, OBJECT(dev), "sram", mc->sram_size,
-+                           &error_abort);
-+    memory_region_add_subregion(get_system_memory(),
-+                                OFFSET_DATA + mc->io_size, &s->sram);
-+
-+    /* Flash */
-+    memory_region_init_rom(&s->flash, OBJECT(dev),
-+                           "flash", mc->flash_size, &error_fatal);
-+    memory_region_add_subregion(get_system_memory(), OFFSET_CODE, &s->flash);
-+
-+    /*
-+     * I/O
-+     *
-+     * 0x00 - 0x1f: Registers
-+     * 0x20 - 0x5f: I/O memory
-+     * 0x60 - 0xff: Extended I/O
-+     */
-+    s->io = qdev_new(TYPE_UNIMPLEMENTED_DEVICE);
-+    qdev_prop_set_string(s->io, "name", "I/O");
-+    qdev_prop_set_uint64(s->io, "size", mc->io_size);
-+    sysbus_realize_and_unref(SYS_BUS_DEVICE(s->io), &error_fatal);
-+    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(s->io), 0, OFFSET_DATA, -1234);
-+
-+    /* Power Reduction */
-+    for (i = 0; i < POWER_MAX; i++) {
-+        int idx = POWER(i);
-+        if (!mc->dev[idx].addr) {
-+            continue;
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_TXEN)) {
++            /* Transmitter disabled, ignore. */
++            return;
 +        }
-+        devname = g_strdup_printf("power%zu", i);
-+        object_initialize_child(OBJECT(dev), devname, &s->pwr[i],
-+                                TYPE_AVR_MASK);
-+        sysbus_realize(SYS_BUS_DEVICE(&s->pwr[i]), &error_abort);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->pwr[i]), 0,
-+                        OFFSET_DATA + mc->dev[idx].addr);
-+        g_free(devname);
++        usart->csra |= USART_CSRA_TXC;
++        usart->csra |= USART_CSRA_DRE;
++        if (usart->csrb & USART_CSRB_TXCIE) {
++            qemu_set_irq(usart->txc_irq, 1);
++            usart->csra &= 0xff ^ USART_CSRA_TXC;
++        }
++        if (usart->csrb & USART_CSRB_DREIE) {
++            qemu_set_irq(usart->dre_irq, 1);
++        }
++        data = value;
++        qemu_chr_fe_write_all(&usart->chr, &data, 1);
++        break;
++    case USART_CSRA:
++        mask = 0b01000011;
++        /* Mask read-only bits. */
++        value = (value & mask) | (usart->csra & (0xff ^ mask));
++        usart->csra = value;
++        if (value & USART_CSRA_TXC) {
++            usart->csra ^= USART_CSRA_TXC;
++            qemu_set_irq(usart->txc_irq, 0);
++        }
++        if (value & USART_CSRA_MPCM) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: MPCM not supported by USART\n",
++                __func__);
++        }
++        break;
++    case USART_CSRB:
++        mask = 0b11111101;
++        /* Mask read-only bits. */
++        value = (value & mask) | (usart->csrb & (0xff ^ mask));
++        usart->csrb = value;
++        if (!(value & USART_CSRB_RXEN)) {
++            /* Receiver disabled, flush input buffer. */
++            usart->data_valid = false;
++        }
++        qemu_set_irq(usart->rxc_irq,
++            ((value & USART_CSRB_RXCIE) &&
++            (usart->csra & USART_CSRA_RXC)) ? 1 : 0);
++        qemu_set_irq(usart->txc_irq,
++            ((value & USART_CSRB_TXCIE) &&
++            (usart->csra & USART_CSRA_TXC)) ? 1 : 0);
++        qemu_set_irq(usart->dre_irq,
++            ((value & USART_CSRB_DREIE) &&
++            (usart->csra & USART_CSRA_DRE)) ? 1 : 0);
++        update_char_mask(usart);
++        break;
++    case USART_CSRC:
++        usart->csrc = value;
++        if ((value & USART_CSRC_MSEL1) && (value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: SPI mode not supported by USART\n",
++                __func__);
++        }
++        if ((value & USART_CSRC_MSEL1) && !(value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad USART mode\n", __func__);
++        }
++        if (!(value & USART_CSRC_PM1) && (value & USART_CSRC_PM0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: Bad USART parity mode\n",
++                __func__);
++        }
++        update_char_mask(usart);
++        break;
++    case USART_BRRL:
++        usart->brrl = value;
++        break;
++    case USART_BRRH:
++        usart->brrh = value & 0b00001111;
++        break;
++    default:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
 +    }
-+
-+    /* GPIO */
-+    for (i = 0; i < GPIO_MAX; i++) {
-+        int idx = GPIO(i);
-+        if (!mc->dev[idx].addr) {
-+            continue;
-+        }
-+        devname = g_strdup_printf("atmega-gpio-%c", 'a' + (char)i);
-+        create_unimplemented_device(devname,
-+                                    OFFSET_DATA + mc->dev[idx].addr, 3);
-+        g_free(devname);
-+    }
-+
-+    /* USART */
-+    for (i = 0; i < USART_MAX; i++) {
-+        int idx = USART(i);
-+        if (!mc->dev[idx].addr) {
-+            continue;
-+        }
-+        devname = g_strdup_printf("usart%zu", i);
-+        object_initialize_child(OBJECT(dev), devname, &s->usart[i],
-+                                TYPE_AVR_USART);
-+        qdev_prop_set_chr(DEVICE(&s->usart[i]), "chardev", serial_hd(i));
-+        sbd = SYS_BUS_DEVICE(&s->usart[i]);
-+        sysbus_realize(sbd, &error_abort);
-+        sysbus_mmio_map(sbd, 0, OFFSET_DATA + mc->dev[USART(i)].addr);
-+        connect_peripheral_irq(mc, sbd, 0, cpudev, USART_RXC_IRQ(i));
-+        connect_peripheral_irq(mc, sbd, 1, cpudev, USART_DRE_IRQ(i));
-+        connect_peripheral_irq(mc, sbd, 2, cpudev, USART_TXC_IRQ(i));
-+        connect_power_reduction_gpio(s, mc, DEVICE(&s->usart[i]), idx);
-+        g_free(devname);
-+    }
-+
-+    /* Timer */
-+    for (i = 0; i < TIMER_MAX; i++) {
-+        int idx = TIMER(i);
-+        if (!mc->dev[idx].addr) {
-+            continue;
-+        }
-+        if (!mc->dev[idx].is_timer16) {
-+            create_unimplemented_device("avr-timer8",
-+                                        OFFSET_DATA + mc->dev[idx].addr, 5);
-+            create_unimplemented_device("avr-timer8-intmask",
-+                                        OFFSET_DATA
-+                                        + mc->dev[idx].intmask_addr, 1);
-+            create_unimplemented_device("avr-timer8-intflag",
-+                                        OFFSET_DATA
-+                                        + mc->dev[idx].intflag_addr, 1);
-+            continue;
-+        }
-+        devname = g_strdup_printf("timer%zu", i);
-+        object_initialize_child(OBJECT(dev), devname, &s->timer[i],
-+                                TYPE_AVR_TIMER16);
-+        object_property_set_uint(OBJECT(&s->timer[i]), s->xtal_freq_hz,
-+                                 "cpu-frequency-hz", &error_abort);
-+        sbd = SYS_BUS_DEVICE(&s->timer[i]);
-+        sysbus_realize(sbd, &error_abort);
-+        sysbus_mmio_map(sbd, 0, OFFSET_DATA + mc->dev[idx].addr);
-+        sysbus_mmio_map(sbd, 1, OFFSET_DATA + mc->dev[idx].intmask_addr);
-+        sysbus_mmio_map(sbd, 2, OFFSET_DATA + mc->dev[idx].intflag_addr);
-+        connect_peripheral_irq(mc, sbd, 0, cpudev, TIMER_CAPT_IRQ(i));
-+        connect_peripheral_irq(mc, sbd, 1, cpudev, TIMER_COMPA_IRQ(i));
-+        connect_peripheral_irq(mc, sbd, 2, cpudev, TIMER_COMPB_IRQ(i));
-+        connect_peripheral_irq(mc, sbd, 3, cpudev, TIMER_COMPC_IRQ(i));
-+        connect_peripheral_irq(mc, sbd, 4, cpudev, TIMER_OVF_IRQ(i));
-+        connect_power_reduction_gpio(s, mc, DEVICE(&s->timer[i]), idx);
-+        g_free(devname);
-+    }
-+
-+    create_unimplemented_device("avr-twi",          OFFSET_DATA + 0x0b8, 6);
-+    create_unimplemented_device("avr-adc",          OFFSET_DATA + 0x078, 8);
-+    create_unimplemented_device("avr-ext-mem-ctrl", OFFSET_DATA + 0x074, 2);
-+    create_unimplemented_device("avr-watchdog",     OFFSET_DATA + 0x060, 1);
-+    create_unimplemented_device("avr-spi",          OFFSET_DATA + 0x04c, 3);
-+    create_unimplemented_device("avr-eeprom",       OFFSET_DATA + 0x03f, 3);
 +}
 +
-+static Property atmega_props[] = {
-+    DEFINE_PROP_UINT64("xtal-frequency-hz", AtmegaMcuState,
-+                       xtal_freq_hz, 0),
-+    DEFINE_PROP_END_OF_LIST()
++static const MemoryRegionOps avr_usart_ops = {
++    .read = avr_usart_read,
++    .write = avr_usart_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.min_access_size = 1, .max_access_size = 1}
 +};
 +
-+static void atmega_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
++static Property avr_usart_properties[] = {
++    DEFINE_PROP_CHR("chardev", AVRUsartState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+    dc->realize = atmega_realize;
-+    device_class_set_props(dc, atmega_props);
-+    /* Reason: Mapped at fixed location on the system bus */
-+    dc->user_creatable = false;
++static void avr_usart_pr(void *opaque, int irq, int level)
++{
++    AVRUsartState *s = AVR_USART(opaque);
++
++    s->enabled = !level;
++
++    if (!s->enabled) {
++        avr_usart_reset(DEVICE(s));
++    }
 +}
 +
-+static void atmega168_class_init(ObjectClass *oc, void *data)
++static void avr_usart_init(Object *obj)
 +{
-+    AtmegaMcuClass *amc = ATMEGA_MCU_CLASS(oc);
++    AVRUsartState *s = AVR_USART(obj);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->rxc_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->dre_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->txc_irq);
++    memory_region_init_io(&s->mmio, obj, &avr_usart_ops, s, TYPE_AVR_USART, 7);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++    qdev_init_gpio_in(DEVICE(s), avr_usart_pr, 1);
++    s->enabled = true;
++}
 +
-+    amc->cpu_type = AVR_CPU_TYPE_NAME("avr5");
-+    amc->flash_size = 16 * KiB;
-+    amc->eeprom_size = 512;
-+    amc->sram_size = 1 * KiB;
-+    amc->io_size = 256;
-+    amc->gpio_count = 23;
-+    amc->adc_count = 6;
-+    amc->irq = irq168_328;
-+    amc->dev = dev168_328;
-+};
-+
-+static void atmega328_class_init(ObjectClass *oc, void *data)
++static void avr_usart_realize(DeviceState *dev, Error **errp)
 +{
-+    AtmegaMcuClass *amc = ATMEGA_MCU_CLASS(oc);
++    AVRUsartState *s = AVR_USART(dev);
++    qemu_chr_fe_set_handlers(&s->chr, avr_usart_can_receive,
++                             avr_usart_receive, NULL, NULL,
++                             s, NULL, true);
++    avr_usart_reset(dev);
++}
 +
-+    amc->cpu_type = AVR_CPU_TYPE_NAME("avr5");
-+    amc->flash_size = 32 * KiB;
-+    amc->eeprom_size = 1 * KiB;
-+    amc->sram_size = 2 * KiB;
-+    amc->io_size = 256;
-+    amc->gpio_count = 23;
-+    amc->adc_count = 6;
-+    amc->irq = irq168_328;
-+    amc->dev = dev168_328;
-+};
-+
-+static void atmega1280_class_init(ObjectClass *oc, void *data)
++static void avr_usart_class_init(ObjectClass *klass, void *data)
 +{
-+    AtmegaMcuClass *amc = ATMEGA_MCU_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    amc->cpu_type = AVR_CPU_TYPE_NAME("avr6");
-+    amc->flash_size = 128 * KiB;
-+    amc->eeprom_size = 4 * KiB;
-+    amc->sram_size = 8 * KiB;
-+    amc->io_size = 512;
-+    amc->gpio_count = 86;
-+    amc->adc_count = 16;
-+    amc->irq = irq1280_2560;
-+    amc->dev = dev1280_2560;
++    dc->reset = avr_usart_reset;
++    device_class_set_props(dc, avr_usart_properties);
++    dc->realize = avr_usart_realize;
++}
++
++static const TypeInfo avr_usart_info = {
++    .name          = TYPE_AVR_USART,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRUsartState),
++    .instance_init = avr_usart_init,
++    .class_init    = avr_usart_class_init,
 +};
 +
-+static void atmega2560_class_init(ObjectClass *oc, void *data)
++static void avr_usart_register_types(void)
 +{
-+    AtmegaMcuClass *amc = ATMEGA_MCU_CLASS(oc);
++    type_register_static(&avr_usart_info);
++}
 +
-+    amc->cpu_type = AVR_CPU_TYPE_NAME("avr6");
-+    amc->flash_size = 256 * KiB;
-+    amc->eeprom_size = 4 * KiB;
-+    amc->sram_size = 8 * KiB;
-+    amc->io_size = 512;
-+    amc->gpio_count = 54;
-+    amc->adc_count = 16;
-+    amc->irq = irq1280_2560;
-+    amc->dev = dev1280_2560;
-+};
++type_init(avr_usart_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3e6651ecc3..ff26272a6f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -983,6 +983,8 @@ M: Michael Rolnik <mrolnik@gmail.com>
+ R: Sarah Harris <S.E.Harris@kent.ac.uk>
+ S: Maintained
+ F: default-configs/avr-softmmu.mak
++F: include/hw/char/avr_usart.h
++F: hw/char/avr_usart.c
+ 
+ CRIS Machines
+ -------------
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 874627520c..b7e0e4d5fa 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -49,3 +49,6 @@ config TERMINAL3270
+ 
+ config RENESAS_SCI
+     bool
 +
-+static const TypeInfo atmega_mcu_types[] = {
-+    {
-+        .name           = TYPE_ATMEGA168_MCU,
-+        .parent         = TYPE_ATMEGA_MCU,
-+        .class_init     = atmega168_class_init,
-+    }, {
-+        .name           = TYPE_ATMEGA328_MCU,
-+        .parent         = TYPE_ATMEGA_MCU,
-+        .class_init     = atmega328_class_init,
-+    }, {
-+        .name           = TYPE_ATMEGA1280_MCU,
-+        .parent         = TYPE_ATMEGA_MCU,
-+        .class_init     = atmega1280_class_init,
-+    }, {
-+        .name           = TYPE_ATMEGA2560_MCU,
-+        .parent         = TYPE_ATMEGA_MCU,
-+        .class_init     = atmega2560_class_init,
-+    }, {
-+        .name           = TYPE_ATMEGA_MCU,
-+        .parent         = TYPE_SYS_BUS_DEVICE,
-+        .instance_size  = sizeof(AtmegaMcuState),
-+        .class_size     = sizeof(AtmegaMcuClass),
-+        .class_init     = atmega_class_init,
-+        .abstract       = true,
-+    }
-+};
-+
-+DEFINE_TYPES(atmega_mcu_types)
-diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
-new file mode 100644
-index 0000000000..9e6527e1f3
---- /dev/null
-+++ b/hw/avr/Kconfig
-@@ -0,0 +1,5 @@
-+config AVR_ATMEGA_MCU
++config AVR_USART
 +    bool
-+    select AVR_TIMER16
-+    select AVR_USART
-+    select AVR_POWER
-diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
-index 123f174f0e..af0fddeb13 100644
---- a/hw/avr/Makefile.objs
-+++ b/hw/avr/Makefile.objs
-@@ -1 +1,2 @@
- obj-y += boot.o
-+obj-$(CONFIG_AVR_ATMEGA_MCU) += atmega.o
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 8306c4a789..bf177ac41d 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -22,6 +22,7 @@ common-obj-$(CONFIG_DIGIC) += digic-uart.o
+ common-obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_aux.o
+ common-obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
++common-obj-$(CONFIG_AVR_USART) += avr_usart.o
+ 
+ common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
 -- 
 2.21.3
 
