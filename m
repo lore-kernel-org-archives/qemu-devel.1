@@ -2,90 +2,94 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AA9FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C951C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 358A720578
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:58:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFC0920578
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:59:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDcF4ZWa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 358A720578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e/NaAKLg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC0920578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsiUm-0007rH-DZ
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:58:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51528)
+	id 1jsiVu-0000Q3-7f
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:59:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsiU7-0007Q9-Dz
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:57:47 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32565
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsiU5-0003Pn-RZ
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:57:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594108664;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=smu51rxsARqdnFRQ1nsp1ekiPByyl0crm5fbsZmVpxM=;
- b=bDcF4ZWaxbCqCQcibtwp+ROEXa6jxLWkNGWc5uRu5O/bl1JehGd5GhF8UzuZ6pqYyfCQ3v
- MjkxfG2k36ooXV1mDI+DDKs+wgxYkyPZWUnIC3L7YWEUuV+VGg5ArX6V2XxgGr33ASJfCB
- PwvqWWz7b57HQDJwQ/95izCNjRdnMSA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-ZdnDMRnbOfuAkFjiVLfWqA-1; Tue, 07 Jul 2020 03:57:43 -0400
-X-MC-Unique: ZdnDMRnbOfuAkFjiVLfWqA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDF1E461;
- Tue,  7 Jul 2020 07:57:41 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com
- [10.36.112.200])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6979760CC0;
- Tue,  7 Jul 2020 07:57:41 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8DA2831E60; Tue,  7 Jul 2020 09:57:40 +0200 (CEST)
-Date: Tue, 7 Jul 2020 09:57:40 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Paul Zimmerman <pauldzim@gmail.com>
-Subject: Re: Failure prints during format or mounting a usb storage device
-Message-ID: <20200707075740.dkc76ceb7wytdoem@sirius.home.kraxel.org>
-References: <BY5PR02MB677298C4D2C2B63EF409AA5CCA6B0@BY5PR02MB6772.namprd02.prod.outlook.com>
- <CADBGO7-hp4Pyfn+rq9d=ZxHmpMwitv-oLjYPJmCKSH6cLHVx=w@mail.gmail.com>
- <CADBGO78-mqwapj+mdpFUO-puL0OZ_1QeBc+4yo4S9g1O4deNjg@mail.gmail.com>
- <2d312ec0-d280-c0e3-2b1e-ff9c70c3168f@gmail.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jsiVG-0008J0-Hy
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:58:58 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54270)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jsiVD-0003W5-UT
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:58:58 -0400
+Received: by mail-wm1-x342.google.com with SMTP id j18so42251973wmi.3
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:58:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=jvLidYTk3Gwk+8RiJSnhs2zD4i65Sr1+CzDXLCD0Iuw=;
+ b=e/NaAKLgASeagYNbsRUxfqFMmbFFxUkHfgwH7Wzx0jtqYahcwYXZBmS9gZ8SMbZpfr
+ 6NHHlFjyZgd0DU4nPgG+o5CCVBbdOQQrpA1H0m2fo4LAJJLnwJtuW9vZee6jOtPvaIPP
+ 72TI7zFCeq3mIQyfFndbYwTm8j877mG9wp0nOuwsFQRQpmHlCjy9dSxQMgNUKZRXmgQn
+ xyBYjg0vIpu3n9I1D/6a2YkzJy7+yphCLH255EbaCs7O1eppDt9087I2StmsNpBOUqgu
+ 3hiNFW4SZXPJ/VQYj2OQD8DvB0+r99ZY4Xuu22ct5XS86PRoCvNWMj8MBch1O+LIPLih
+ EXGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=jvLidYTk3Gwk+8RiJSnhs2zD4i65Sr1+CzDXLCD0Iuw=;
+ b=JexNnsCkFY25a7g0ky0F2NjyBAQ07x7j5hpdPxdUJCvInP3KiY+0M43fcsUm223J8A
+ RXmkb8QQWgEo0549Fs+bn3fAJMvuZDKOj3FuPGlIK8QrK5wrY2NHwck+Zgaxp/UsghDx
+ ZxnXOXWYzewKLRAXdOZCeci75sSbcf2azyZ2snP5adq8JTjraNGhMsNWJ6mWXuvZYrLE
+ LOVHaNGwBrRoVcBLKWjF0z/0VTy+zJ0UGNRkvWThtpDBk0bOH3c3t1FCvnYqTND3dF/J
+ I2O+7vVsZJbBClEIPEHe8ZBLN2ODqakuTFqFwWwIjr2d5B3P2dJOZoVTtQoY/oW1W7o/
+ oLVw==
+X-Gm-Message-State: AOAM533gElbeAz0kRrJhvP6Za+ojn1AEjLWrn8bcRuvWhL75sRrPe3sk
+ WNcbJLy09Ewx8Y4L8VGsOUsSfw==
+X-Google-Smtp-Source: ABdhPJwUf05BWVZzcEaK7gfjY0YSZFrV14V1pOsZH9K4oyBR8phLwfcu66PjErfnaZwnAK3pcswi+A==
+X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr2673332wmi.99.1594108733976; 
+ Tue, 07 Jul 2020 00:58:53 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u20sm2219170wmm.15.2020.07.07.00.58.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jul 2020 00:58:53 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5EE921FF7E;
+ Tue,  7 Jul 2020 08:58:52 +0100 (BST)
+References: <20200601171609.1665397-1-arilou@gmail.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+Subject: Re: [v1] docs: Add to gdbstub documentation the PhyMemMode
+In-reply-to: <20200601171609.1665397-1-arilou@gmail.com>
+Date: Tue, 07 Jul 2020 08:58:52 +0100
+Message-ID: <87fta3pxhf.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <2d312ec0-d280-c0e3-2b1e-ff9c70c3168f@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,54 +102,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <saipava@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vikram Garhwal <fnuv@xilinx.com>
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
-> 
-> Gerd, do you know the purpose of the 'short_not_ok' parameter to
-> usb_packet_setup()?
 
-Well, some usb host controllers have a flag in the transfer control
-blocks to indicate the host controller should stop processing requests
-in case of a short transfer.
+Jon Doron <arilou@gmail.com> writes:
 
-The usb core uses the flag to just to that (i.e. halt the endpoint on
-short transfers).  It is also checked when usb-host pipelines requests
-(requests queued after a short-not-ok packet can't be pipelined because
-we don't know yet whenever we should continue processing the endpoint or
-not).
+> The PhyMemMode gdb extension command was missing from the gdb.rst
+> document.
+>
+> Signed-off-by: Jon Doron <arilou@gmail.com>
 
-xhci has no such flag so the flag is never set.
+Queued to docs/next, thanks.
 
-> The simple patch below fixes the reported problem,
-> but I don't know if it could cause some other problems for XHCI.
-> hcd-ehci, hcd-ohci, hcd-uhci all set the parameter conditionally,
-> but hcd-xhci never sets it. I don't understand the purpose of the
-> parameter myself.
-> 
-> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> index b330e36fe6..9fb96fdd66 100644
-> --- a/hw/usb/hcd-xhci.c
-> +++ b/hw/usb/hcd-xhci.c
-> @@ -1614,7 +1614,7 @@ static int xhci_setup_packet(XHCITransfer *xfer)
->      xhci_xfer_create_sgl(xfer, dir == USB_TOKEN_IN); /* Also sets int_req */
->      xhci_xfer_create_sgl(xfer, dir == USB_TOKEN_IN); /* Also sets int_req */
->      usb_packet_setup(&xfer->packet, dir, ep, xfer->streamid,
-> -                     xfer->trbs[0].addr, false, xfer->int_req);
-> +                     xfer->trbs[0].addr, dir == USB_TOKEN_IN, xfer->int_req);
+> ---
+>  docs/system/gdb.rst | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>
+> diff --git a/docs/system/gdb.rst b/docs/system/gdb.rst
+> index a40145fcf8..abda961e2b 100644
+> --- a/docs/system/gdb.rst
+> +++ b/docs/system/gdb.rst
+> @@ -87,3 +87,23 @@ three commands you can query and set the single step b=
+ehavior:
+>        (gdb) maintenance packet Qqemu.sstep=3D0x5
+>        sending: "qemu.sstep=3D0x5"
+>        received: "OK"
+> +
+> +
+> +Another feature that QEMU gdbstub provides is to toggle the memory GDB
+> +works with, by default GDB will show the current process memory respecti=
+ng
+> +the virtual address translation.
+> +
+> +If you want to examine/change the physical memory you can set the gdbstub
+> +to work with the physical memory rather with the virtual one.
+> +
+> +The memory mode can be checked by sending the following command:
+> +
+> +``maintenance packet qqemu.PhyMemMode``
+> +    This will return either 0 or 1, 1 indicates you are currently in the
+> +    physical memory mode.
+> +
+> +``maintenance packet Qqemu.PhyMemMode:1``
+> +    This will change the memory mode to physical memory.
+> +
+> +``maintenance packet Qqemu.PhyMemMode:0``
+> +    This will change it back to normal memory mode.
 
-I suspect this might lead to queues being halted even though they should
-not.
 
-Why does 7ad3d51ebb8a522ffcad391c4bef281245739dde look at short-not-ok?
-
-take care,
-  Gerd
-
+--=20
+Alex Benn=C3=A9e
 
