@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B9EC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF805C433E0
 	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:12:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF9C820656
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC70420656
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:12:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ojj2axe4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF9C820656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RQeNH/EW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC70420656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jshlo-00011n-0I
+	id 1jshlo-000163-Ms
 	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:12:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42458)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshj1-0004No-R3
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:07 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34547)
+ id 1jshj2-0004PW-QW
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:09 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:34549)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshiz-00043O-JX
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:07 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id f7so40959425wrw.1
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:09:05 -0700 (PDT)
+ id 1jshj0-00043W-W3
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:09:08 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id f7so40959475wrw.1
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:09:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ryQZtDkkMiGG0LRwlJZrH9SXH+wC9CMjzKlJDj1nBHY=;
- b=Ojj2axe4pV40LvHtuaFDhAe1bwnEZ4eaLJmxYZtm+646l1etH8+rGaAI8opsZTruA/
- 97C1kafgAQ5xr3Ohsuf7iLa5fuPOvDiGLcXLLHUfU3GuMnUJqoqdd1lkH3WrQQv91K0U
- Pgn38WHO+NvGBg2xHCbxGefn6vKC5IaztkyEGJi68isRaOvVRYmVjs8mtK818xVhIEzO
- 5VEJJw8+hhhllFxmLK392CTZfWMso4wBk7MJNAUn8yIZ5lQ/LogZLtnTb3qn4c7vJ57L
- nqJbjT3hCWJaFaJDm4O6hORUlhf+l9mgHD/w2Dk4gKswXpwBIgoYj368E7z24wFvMm/5
- BARQ==
+ bh=0qqS4w4mRnCRDCTfWQqRgg26scMxtoAIPpRe2SvN8Gk=;
+ b=RQeNH/EWZqgdFsCUzh4H97+zKDBdI28lkG6B4qicotvqO80bI/hyKfy1nMuWVrCy25
+ vA7ijNBi00ddkc1DzKSKhvapsBJBXXHWj/6as2U5/WQsPfJCp+S5dN0nkUarUR+Y4V2w
+ r/5Ml5kiS2ZH/STPZnDNEkT8ZmRwR5+lMxB8W65RMsXxwPQQ1zL1ex/SUHHug+t818n1
+ 19mnHstgArAs5Wpsp9XABoKreF1DdPRN1zp2gULPCBbYNCvQLJ+mR2P8p8RdXxBPlokP
+ 3WUOlSntttjtd275XDqcM6iwby9i4Jn6kj00X+nmqHSKf0DmjzbYRwn1ncPrWaBy1ofi
+ aPIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ryQZtDkkMiGG0LRwlJZrH9SXH+wC9CMjzKlJDj1nBHY=;
- b=F44IYqErAGyW9wanouxS4nCq2iBYlMamDc3pcOM2UPZa3j+/fabkJKMuQ+Glr4J6nh
- yFGX0nwv91uDRZpqip7VColhO4fVN5sH+1CUTXSb6GZtQhrc6KpKKtYqwG2ctvCcKaYF
- WpT0e8JRvG03+GtL/z6ur8s7UclVYduRYhlGFGpewmUQZ9viyJCkWobjoNILeZ7FPcZg
- 8jeatoILH4sJdNoWy8aTk541mDq3KoNx/PFTYDYWjYfFPhFuEAfinRo51DdFtMjm8aff
- 3YtnQkfhD/4qbcnSqTR27kGe/75XviPFV32zN7hWCQ0JRaWYyBS1tFD6daHCB7P+dfoW
- oFlg==
-X-Gm-Message-State: AOAM531MEUHmKLiaVVshFDhfDenvVaQmI485e5i+jK1QBcYO8YyLC9Bk
- cB5xJ7Fm1PZfWN3v1HUpRvulDw==
-X-Google-Smtp-Source: ABdhPJxjGYsQydGsgvpA//gipOuKApjX1/4SjcPjtksEDz2uRWvk/kOiw8uGCspZoJCRW8mxMD+QAg==
-X-Received: by 2002:adf:f20a:: with SMTP id p10mr55555920wro.41.1594105744080; 
- Tue, 07 Jul 2020 00:09:04 -0700 (PDT)
+ bh=0qqS4w4mRnCRDCTfWQqRgg26scMxtoAIPpRe2SvN8Gk=;
+ b=leolTC7Zdcjp8jUYrJNKeTMLi4DRAe4PLqLlwix3kB9/T7YuYikH50/tiHeEeAmFKP
+ 0JiKlYHzsjnkBZwZ1S9FBo5J9QDZjBEyMh4evIE6M/1mvTgg5fEhsH6L9VDAUo9qrj8q
+ uHBehSE+WnwDP+8I40hLpRMxeazXzTRyqzGijhFDi6iOAfsspTGDG1zZ9sFT4uA6p1c8
+ hgkmzxcJ09kAxasZPf59jGRelZt/1JwVMgS5bP/U40DSGqCTiZIxvtcrOkjeYTz0Jia1
+ Q4JFZBQwneE5JZmLOzXLvvi7rjlmQACvq6Vo68iqs7wSqT9NnpmrJojwg3TjUs1rrFl7
+ 8fLQ==
+X-Gm-Message-State: AOAM530ol0msfAa/D/+1gsDn9nSQXd2NykucXYQXs8VJWAkixjBQHWXr
+ tgeY3Ebl8PC0tp5t6+vi8dzSXw==
+X-Google-Smtp-Source: ABdhPJxwQnADNtnOWFDm+mhL/66k1bNonrCjKjVq/1hpPNQVr66Boj/tUEtXVE5k9pDA3O4ad3cbCw==
+X-Received: by 2002:a05:6000:1c8:: with SMTP id
+ t8mr56219990wrx.73.1594105745480; 
+ Tue, 07 Jul 2020 00:09:05 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g145sm2637160wmg.23.2020.07.07.00.08.59
+ by smtp.gmail.com with ESMTPSA id o9sm26892564wrs.1.2020.07.07.00.08.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 00:09:00 -0700 (PDT)
+ Tue, 07 Jul 2020 00:09:02 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D17C61FF90;
+ by zen.linaroharston (Postfix) with ESMTP id A638F1FF8C;
  Tue,  7 Jul 2020 08:08:58 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 04/41] tests/vm: Add configuration to basevm.py
-Date: Tue,  7 Jul 2020 08:08:21 +0100
-Message-Id: <20200707070858.6622-5-alex.bennee@linaro.org>
+Subject: [PULL 02/41] util/coroutine: Cleanup start_switch_fiber_ for TSAN.
+Date: Tue,  7 Jul 2020 08:08:19 +0100
+Message-Id: <20200707070858.6622-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200707070858.6622-1-alex.bennee@linaro.org>
 References: <20200707070858.6622-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -89,8 +90,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,302 +104,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Robert Foley <robert.foley@linaro.org>,
+Cc: Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Peter Puhov <peter.puhov@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Stefan Hajnoczi <stefanha@redhat.com>, Robert Foley <robert.foley@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Robert Foley <robert.foley@linaro.org>
 
-Added use of a configuration to tests/vm/basevm.py.
-The configuration provides parameters used to configure a VM.
-This allows for providing alternate configurations to the VM being
-created/launched. cpu, machine, memory, and NUMA configuration are all
-examples of configuration which we might want to vary on the VM being created
-or launched.
-This will for example allow for creating an aarch64 vm.
+This is a cleanup patch to follow-up the patch which introduced TSAN.
+This patch makes separate start_switch_fiber_ functions for TSAN and ASAN.
+
+This does two things:
+1. Unrelated ASAN and TSAN code is separate and each function only
+   has arguments that are actually needed.
+2. The co->tsan_caller_fiber and co->tsan_co_fiber fields are only
+   access from within #ifdef CONFIG_TSAN.
 
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200601211421.1277-3-robert.foley@linaro.org>
-Message-Id: <20200701135652.1366-7-alex.bennee@linaro.org>
+Message-Id: <20200626170001.27017-1-robert.foley@linaro.org>
+Message-Id: <20200701135652.1366-5-alex.bennee@linaro.org>
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 5a58e6c39300..cfe20c58f7ef 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -29,16 +29,41 @@ import tempfile
- import shutil
- import multiprocessing
- import traceback
--
--SSH_KEY = open(os.path.join(os.path.dirname(__file__),
--               "..", "keys", "id_rsa")).read()
--SSH_PUB_KEY = open(os.path.join(os.path.dirname(__file__),
--                   "..", "keys", "id_rsa.pub")).read()
--
-+import shlex
-+
-+SSH_KEY_FILE = os.path.join(os.path.dirname(__file__),
-+               "..", "keys", "id_rsa")
-+SSH_PUB_KEY_FILE = os.path.join(os.path.dirname(__file__),
-+                   "..", "keys", "id_rsa.pub")
-+
-+# This is the standard configuration.
-+# Any or all of these can be overridden by
-+# passing in a config argument to the VM constructor.
-+DEFAULT_CONFIG = {
-+    'cpu'             : "max",
-+    'machine'         : 'pc',
-+    'guest_user'      : "qemu",
-+    'guest_pass'      : "qemupass",
-+    'root_pass'       : "qemupass",
-+    'ssh_key_file'    : SSH_KEY_FILE,
-+    'ssh_pub_key_file': SSH_PUB_KEY_FILE,
-+    'memory'          : "4G",
-+    'extra_args'      : [],
-+    'qemu_args'       : "",
-+    'dns'             : "",
-+    'ssh_port'        : 0,
-+    'install_cmds'    : "",
-+    'boot_dev_type'   : "block",
-+    'ssh_timeout'     : 1,
+diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+index f0b66320e102..fff20aad80a4 100644
+--- a/util/coroutine-ucontext.c
++++ b/util/coroutine-ucontext.c
+@@ -52,8 +52,10 @@ typedef struct {
+ #endif
+     sigjmp_buf env;
+ 
++#ifdef CONFIG_TSAN
+     void *tsan_co_fiber;
+     void *tsan_caller_fiber;
++#endif
+ 
+ #ifdef CONFIG_VALGRIND_H
+     unsigned int valgrind_stack_id;
+@@ -77,7 +79,10 @@ union cc_arg {
+     int i[2];
+ };
+ 
+-/* QEMU_ALWAYS_INLINE only does so if __OPTIMIZE__, so we cannot use it. */
++/*
++ * QEMU_ALWAYS_INLINE only does so if __OPTIMIZE__, so we cannot use it.
++ * always_inline is required to avoid TSan runtime fatal errors.
++ */
+ static inline __attribute__((always_inline))
+ void on_new_fiber(CoroutineUContext *co)
+ {
+@@ -87,6 +92,7 @@ void on_new_fiber(CoroutineUContext *co)
+ #endif
+ }
+ 
++/* always_inline is required to avoid TSan runtime fatal errors. */
+ static inline __attribute__((always_inline))
+ void finish_switch_fiber(void *fake_stack_save)
+ {
+@@ -109,18 +115,29 @@ void finish_switch_fiber(void *fake_stack_save)
+ #endif
+ }
+ 
+-static inline __attribute__((always_inline)) void start_switch_fiber(
+-    CoroutineAction action, void **fake_stack_save,
+-    const void *bottom, size_t size, void *new_fiber)
++/* always_inline is required to avoid TSan runtime fatal errors. */
++static inline __attribute__((always_inline))
++void start_switch_fiber_asan(CoroutineAction action, void **fake_stack_save,
++                             const void *bottom, size_t size)
+ {
+ #ifdef CONFIG_ASAN
+     __sanitizer_start_switch_fiber(
+             action == COROUTINE_TERMINATE ? NULL : fake_stack_save,
+             bottom, size);
+ #endif
 +}
-+BOOT_DEVICE = {
-+    'block' :  "-drive file={},if=none,id=drive0,cache=writeback "\
-+               "-device virtio-blk,drive=drive0,bootindex=0",
-+    'scsi'  :  "-device virtio-scsi-device,id=scsi "\
-+               "-drive file={},format=raw,if=none,id=hd0 "\
-+               "-device scsi-hd,drive=hd0,bootindex=0",
-+}
- class BaseVM(object):
--    GUEST_USER = "qemu"
--    GUEST_PASS = "qemupass"
--    ROOT_PASS = "qemupass"
- 
-     envvars = [
-         "https_proxy",
-@@ -57,25 +82,38 @@ class BaseVM(object):
-     poweroff = "poweroff"
-     # enable IPv6 networking
-     ipv6 = True
-+    # This is the timeout on the wait for console bytes.
-+    socket_timeout = 120
-     # Scale up some timeouts under TCG.
-     # 4 is arbitrary, but greater than 2,
-     # since we found we need to wait more than twice as long.
-     tcg_ssh_timeout_multiplier = 4
--    def __init__(self, args):
-+    def __init__(self, args, config=None):
-         self._guest = None
-         self._genisoimage = args.genisoimage
-         self._build_path = args.build_path
-+        # Allow input config to override defaults.
-+        self._config = DEFAULT_CONFIG.copy()
-+        if config != None:
-+            self._config.update(config)
-+        self.validate_ssh_keys()
-         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
-                                                          suffix=".tmp",
-                                                          dir="."))
-         atexit.register(shutil.rmtree, self._tmpdir)
--
--        self._ssh_key_file = os.path.join(self._tmpdir, "id_rsa")
--        open(self._ssh_key_file, "w").write(SSH_KEY)
--        subprocess.check_call(["chmod", "600", self._ssh_key_file])
--
--        self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
--        open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
-+        # Copy the key files to a temporary directory.
-+        # Also chmod the key file to agree with ssh requirements.
-+        self._config['ssh_key'] = \
-+            open(self._config['ssh_key_file']).read().rstrip()
-+        self._config['ssh_pub_key'] = \
-+            open(self._config['ssh_pub_key_file']).read().rstrip()
-+        self._ssh_tmp_key_file = os.path.join(self._tmpdir, "id_rsa")
-+        open(self._ssh_tmp_key_file, "w").write(self._config['ssh_key'])
-+        subprocess.check_call(["chmod", "600", self._ssh_tmp_key_file])
 +
-+        self._ssh_tmp_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
-+        open(self._ssh_tmp_pub_key_file,
-+             "w").write(self._config['ssh_pub_key'])
++/* always_inline is required to avoid TSan runtime fatal errors. */
++static inline __attribute__((always_inline))
++void start_switch_fiber_tsan(void **fake_stack_save,
++                             CoroutineUContext *co,
++                             bool caller)
++{
+ #ifdef CONFIG_TSAN
+-    void *curr_fiber =
+-        __tsan_get_current_fiber();
++    void *new_fiber = caller ?
++                      co->tsan_caller_fiber :
++                      co->tsan_co_fiber;
++    void *curr_fiber = __tsan_get_current_fiber();
+     __tsan_acquire(curr_fiber);
  
-         self.debug = args.debug
-         self._stderr = sys.stderr
-@@ -84,11 +122,14 @@ class BaseVM(object):
-             self._stdout = sys.stdout
-         else:
-             self._stdout = self._devnull
-+        netdev = "user,id=vnet,hostfwd=:127.0.0.1:{}-:22"
-         self._args = [ \
--            "-nodefaults", "-m", "4G",
--            "-cpu", "max",
--            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22" +
--                       (",ipv6=no" if not self.ipv6 else ""),
-+            "-nodefaults", "-m", self._config['memory'],
-+            "-cpu", self._config['cpu'],
-+            "-netdev",
-+            netdev.format(self._config['ssh_port']) +
-+            (",ipv6=no" if not self.ipv6 else "") +
-+            (",dns=" + self._config['dns'] if self._config['dns'] else ""),
-             "-device", "virtio-net-pci,netdev=vnet",
-             "-vnc", "127.0.0.1:0,to=20"]
-         if args.jobs and args.jobs > 1:
-@@ -99,6 +140,55 @@ class BaseVM(object):
-             logging.info("KVM not available, not using -enable-kvm")
-         self._data_args = []
+     *fake_stack_save = curr_fiber;
+@@ -144,12 +161,9 @@ static void coroutine_trampoline(int i0, int i1)
  
-+        if self._config['qemu_args'] != None:
-+            qemu_args = self._config['qemu_args']
-+            qemu_args = qemu_args.replace('\n',' ').replace('\r','')
-+            # shlex groups quoted arguments together
-+            # we need this to keep the quoted args together for when
-+            # the QEMU command is issued later.
-+            args = shlex.split(qemu_args)
-+            self._config['extra_args'] = []
-+            for arg in args:
-+                if arg:
-+                    # Preserve quotes around arguments.
-+                    # shlex above takes them out, so add them in.
-+                    if " " in arg:
-+                        arg = '"{}"'.format(arg)
-+                    self._config['extra_args'].append(arg)
-+
-+    def validate_ssh_keys(self):
-+        """Check to see if the ssh key files exist."""
-+        if 'ssh_key_file' not in self._config or\
-+           not os.path.exists(self._config['ssh_key_file']):
-+            raise Exception("ssh key file not found.")
-+        if 'ssh_pub_key_file' not in self._config or\
-+           not os.path.exists(self._config['ssh_pub_key_file']):
-+               raise Exception("ssh pub key file not found.")
-+
-+    def wait_boot(self, wait_string=None):
-+        """Wait for the standard string we expect
-+           on completion of a normal boot.
-+           The user can also choose to override with an
-+           alternate string to wait for."""
-+        if wait_string is None:
-+            if self.login_prompt is None:
-+                raise Exception("self.login_prompt not defined")
-+            wait_string = self.login_prompt
-+        # Intentionally bump up the default timeout under TCG,
-+        # since the console wait below takes longer.
-+        timeout = self.socket_timeout
-+        if not kvm_available(self.arch):
-+            timeout *= 8
-+        self.console_init(timeout=timeout)
-+        self.console_wait(wait_string)
-+
-+    def __getattr__(self, name):
-+        # Support direct access to config by key.
-+        # for example, access self._config['cpu'] by self.cpu
-+        if name.lower() in self._config.keys():
-+            return self._config[name.lower()]
-+        return object.__getattribute__(self, name)
-+
-     def _download_with_cache(self, url, sha256sum=None, sha512sum=None):
-         def check_sha256sum(fname):
-             if not sha256sum:
-@@ -130,8 +220,9 @@ class BaseVM(object):
-                    "-t",
-                    "-o", "StrictHostKeyChecking=no",
-                    "-o", "UserKnownHostsFile=" + os.devnull,
--                   "-o", "ConnectTimeout=1",
--                   "-p", self.ssh_port, "-i", self._ssh_key_file]
-+                   "-o",
-+                   "ConnectTimeout={}".format(self._config["ssh_timeout"]),
-+                   "-p", self.ssh_port, "-i", self._ssh_tmp_key_file]
-         # If not in debug mode, set ssh to quiet mode to
-         # avoid printing the results of commands.
-         if not self.debug:
-@@ -180,14 +271,14 @@ class BaseVM(object):
-                             "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
+     /* Initialize longjmp environment and switch back the caller */
+     if (!sigsetjmp(self->env, 0)) {
+-        start_switch_fiber(
+-            COROUTINE_YIELD,
+-            &fake_stack_save,
+-            leader.stack,
+-            leader.stack_size,
+-            self->tsan_caller_fiber);
++        start_switch_fiber_asan(COROUTINE_YIELD, &fake_stack_save, leader.stack,
++                                leader.stack_size);
++        start_switch_fiber_tsan(&fake_stack_save, self, true); /* true=caller */
+         siglongjmp(*(sigjmp_buf *)co->entry_arg, 1);
+     }
  
-     def boot(self, img, extra_args=[]):
--        args = self._args + [
--            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
--            "-device", "virtio-blk,drive=drive0,bootindex=0"]
--        args += self._data_args + extra_args
-+        boot_dev = BOOT_DEVICE[self._config['boot_dev_type']]
-+        boot_params = boot_dev.format(img)
-+        args = self._args + boot_params.split(' ')
-+        args += self._data_args + extra_args + self._config['extra_args']
-         logging.debug("QEMU args: %s", " ".join(args))
-         qemu_path = get_qemu_path(self.arch, self._build_path)
-         guest = QEMUMachine(binary=qemu_path, args=args)
--        guest.set_machine('pc')
-+        guest.set_machine(self._config['machine'])
-         guest.set_console()
-         try:
-             guest.launch()
-@@ -301,7 +392,8 @@ class BaseVM(object):
-         self.console_send(command)
+@@ -208,10 +222,10 @@ Coroutine *qemu_coroutine_new(void)
  
-     def console_ssh_init(self, prompt, user, pw):
--        sshkey_cmd = "echo '%s' > .ssh/authorized_keys\n" % SSH_PUB_KEY.rstrip()
-+        sshkey_cmd = "echo '%s' > .ssh/authorized_keys\n" \
-+                     % self._config['ssh_pub_key'].rstrip()
-         self.console_wait_send("login:",    "%s\n" % user)
-         self.console_wait_send("Password:", "%s\n" % pw)
-         self.console_wait_send(prompt,      "mkdir .ssh\n")
-@@ -360,23 +452,23 @@ class BaseVM(object):
-                           "local-hostname: {}-guest\n".format(name)])
-         mdata.close()
-         udata = open(os.path.join(cidir, "user-data"), "w")
--        print("guest user:pw {}:{}".format(self.GUEST_USER,
--                                           self.GUEST_PASS))
-+        print("guest user:pw {}:{}".format(self._config['guest_user'],
-+                                           self._config['guest_pass']))
-         udata.writelines(["#cloud-config\n",
-                           "chpasswd:\n",
-                           "  list: |\n",
--                          "    root:%s\n" % self.ROOT_PASS,
--                          "    %s:%s\n" % (self.GUEST_USER,
--                                           self.GUEST_PASS),
-+                          "    root:%s\n" % self._config['root_pass'],
-+                          "    %s:%s\n" % (self._config['guest_user'],
-+                                           self._config['guest_pass']),
-                           "  expire: False\n",
-                           "users:\n",
--                          "  - name: %s\n" % self.GUEST_USER,
-+                          "  - name: %s\n" % self._config['guest_user'],
-                           "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
-                           "    ssh-authorized-keys:\n",
--                          "    - %s\n" % SSH_PUB_KEY,
-+                          "    - %s\n" % self._config['ssh_pub_key'],
-                           "  - name: root\n",
-                           "    ssh-authorized-keys:\n",
--                          "    - %s\n" % SSH_PUB_KEY,
-+                          "    - %s\n" % self._config['ssh_pub_key'],
-                           "locale: en_US.UTF-8\n"])
-         proxy = os.environ.get("http_proxy")
-         if not proxy is None:
-@@ -447,15 +539,17 @@ def parse_args(vmcls):
-     parser.disable_interspersed_args()
-     return parser.parse_args()
+     /* swapcontext() in, siglongjmp() back out */
+     if (!sigsetjmp(old_env, 0)) {
+-        start_switch_fiber(
+-            COROUTINE_YIELD,
+-            &fake_stack_save,
+-            co->stack, co->stack_size, co->tsan_co_fiber);
++        start_switch_fiber_asan(COROUTINE_YIELD, &fake_stack_save, co->stack,
++                                co->stack_size);
++        start_switch_fiber_tsan(&fake_stack_save,
++                                co, false); /* false=not caller */
  
--def main(vmcls):
-+def main(vmcls, config=None):
-     try:
-+        if config == None:
-+            config = {}
-         args, argv = parse_args(vmcls)
-         if not argv and not args.build_qemu and not args.build_image:
-             print("Nothing to do?")
-             return 1
-         logging.basicConfig(level=(logging.DEBUG if args.debug
-                                    else logging.WARN))
--        vm = vmcls(args)
-+        vm = vmcls(args, config=config)
-         if args.build_image:
-             if os.path.exists(args.image) and not args.force:
-                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
+ #ifdef CONFIG_SAFESTACK
+         /*
+@@ -287,8 +301,10 @@ qemu_coroutine_switch(Coroutine *from_, Coroutine *to_,
+ 
+     ret = sigsetjmp(from->env, 0);
+     if (ret == 0) {
+-        start_switch_fiber(action, &fake_stack_save,
+-                           to->stack, to->stack_size, to->tsan_co_fiber);
++        start_switch_fiber_asan(action, &fake_stack_save, to->stack,
++                                to->stack_size);
++        start_switch_fiber_tsan(&fake_stack_save,
++                                to, false); /* false=not caller */
+         siglongjmp(to->env, action);
+     }
+ 
 -- 
 2.20.1
 
