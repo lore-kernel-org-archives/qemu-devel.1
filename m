@@ -2,94 +2,93 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 052A9C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:48:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B2CFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:49:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C961120675
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:48:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 229C920675
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 06:49:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJZsYghd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C961120675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="exsStQ49"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 229C920675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jshOk-0007aT-Td
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 02:48:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38680)
+	id 1jshPi-0000aR-DX
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 02:49:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jshNV-0005wP-OS
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 02:46:53 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:36070)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jshNU-0000cE-Fc
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 02:46:53 -0400
-Received: by mail-wm1-x332.google.com with SMTP id 17so45206812wmo.1
- for <qemu-devel@nongnu.org>; Mon, 06 Jul 2020 23:46:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OAALL/cw7n/+7fM0VWJqcBq9KNUXzDegINtW6gZFwpE=;
- b=gJZsYghd9IMqY6Xpzg4t1DXJxI4iLNVJsRsfTuB+J6fsNNt8zB9sLvbXRysZr+VhqX
- H6rtbbyXrEnqVTN9zmYmHmGpeXPaxY3z01s8mw4iLSqbn2ZtpdjNjEIi2R3Ro5p6wIOR
- v5Q7od1EXZgFPAT/cAzABR5xNN08wLogQt7zohgPHTrBJNeZTBTHAEE0xUo3rDJIF2kx
- 2/cFnazRgANFJybh1wlTJhk99KK7XBczT+Y9fSj32APOYxk4Nq8E87hNx1mycdd9+nb3
- kVWNoJFVWv/OCQI9WsGOatiszOWTiFy5gF7uWTpgTY4q0DQspfgOZZlJ7+xfuRwt3LlR
- njZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=OAALL/cw7n/+7fM0VWJqcBq9KNUXzDegINtW6gZFwpE=;
- b=l2wY+si0E8JFuGWpOVX8lyuTZTKKmXjYpa35iMM25s14jDZjLyq0wW/rcnwwls90AO
- yOY4U0A77avXlpTrcMQGZMqxKmbXzuD+7QcBk2r5m5MER8wo98MuPVJhDLzc3u84ixwi
- 4QXn77NBiMcuqd2rbiA8IEMCzN5DUmioyJ+gjEFpbDe6OByJa1QudtmfXtOkmat2Pbir
- Ak/QpzbIQUlmunEIC3dieG/XAJSfg6tl2BMBBaw2YSKXGcS2SuAEAhITyoC/EDMlBLX8
- dkx+dWbVQtvEL8g3fZ6fhXWnEjCxkbmWEyRPVTXi5iv5mOFAL6xIiysTl451RiqbE5yW
- 4Hgw==
-X-Gm-Message-State: AOAM531SksvJwLmVNHvEMkIh3K7lUpkJM95kN5ZpfrFM5Brrplkf3Ye0
- EA0jpUVA3eCObjZHdQeLP/SBzYkr
-X-Google-Smtp-Source: ABdhPJyFEDx+NByKlEgjZnpSWjc+gK2vB1pJBtONnNTJJxU4TgBxHNYJ6Zdr1fRLhyDfwNPmFMjVTQ==
-X-Received: by 2002:a05:600c:2116:: with SMTP id
- u22mr2512882wml.82.1594104410976; 
- Mon, 06 Jul 2020 23:46:50 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 5sm2172545wmk.9.2020.07.06.23.46.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jul 2020 23:46:50 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/3] target/avr: Fix $PC displayed address
-Date: Tue,  7 Jul 2020 08:46:45 +0200
-Message-Id: <20200707064646.7603-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200707064646.7603-1-f4bug@amsat.org>
-References: <20200707064646.7603-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1jshOO-0007JH-1D
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 02:47:48 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20756
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1jshOL-0000gd-8B
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 02:47:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594104463;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PqMarEvLLdYTERwCgzqYfxISP+EuYNnSGyBf+U9vmog=;
+ b=exsStQ49B9XNYIyLfuKlEpghycaynyl/1fDtNcYzV38/I+jyNNkoEFzPDGTaJ9HEiR+2M+
+ ydOlih/mARC1DxLktcX6nvZuzi0DAY+asJ+wC/m1yQqsa04R/ggNShEehKlTUi/ce+/jq/
+ xAWFFo1D/tRCKGw7/mGK53CC+WfD150=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-C3ptYPdgMeOTflP43OpsSA-1; Tue, 07 Jul 2020 02:47:42 -0400
+X-MC-Unique: C3ptYPdgMeOTflP43OpsSA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 043FC107ACCD;
+ Tue,  7 Jul 2020 06:47:41 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.40.208.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D7E3E60BF3;
+ Tue,  7 Jul 2020 06:47:35 +0000 (UTC)
+Date: Tue, 7 Jul 2020 08:47:32 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH 1/2] hw/sd/ssi-sd: Deprecate the SPI to SD card
+ 'adapter'
+Message-ID: <20200707064732.GB9048@angien.pipo.sk>
+References: <20200705220731.28101-1-f4bug@amsat.org>
+ <20200705220731.28101-2-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200705220731.28101-2-f4bug@amsat.org>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pkrempa@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::332;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x332.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pkrempa@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:20:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,38 +102,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Thomas Huth <huth@tuxfamily.org>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Michael Rolnik <mrolnik@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <huth@tuxfamily.org>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ libvir-list@redhat.com, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-$PC is 16-bit wide. Other registers display addresses on a byte
-granularity.
-To have a coherent ouput, display $PC using byte granularity too.
+On Mon, Jul 06, 2020 at 00:07:30 +0200, Philippe Mathieu-Daudé wrote:
+> This device duplicate the SPI mode of the sd-card device. The
+> SPI protocol is better handler in the sd-card, however as the
+> TYPE_SSI_SLAVE is not an interface, the sd-card can not implement
+> it easily to be pluggable on a SPI bus. Meanwhile the ssi-sd
+> device acts as a bridge, but is bitroting. Deprecate it.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  docs/system/deprecated.rst | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+> index 47f84be8e0..5e67d7f3e0 100644
+> --- a/docs/system/deprecated.rst
+> +++ b/docs/system/deprecated.rst
+> @@ -343,6 +343,11 @@ The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
+>  The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
+>  'scsi-cd' as appropriate to get a SCSI hard disk or CD-ROM as needed.
+>  
+> +``ssi-sd`` (since 5.1)
+> +'''''''''''''''''''''''''
+> +
+> +The 'ssi-sd' (SSI to SD card adapter) device is deprecated.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/avr/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+libvirt didn't allow configuring this device yet, so from our view it's
+okay to remove it.
 
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index 50fb1c378b..9be464991f 100644
---- a/target/avr/cpu.c
-+++ b/target/avr/cpu.c
-@@ -151,7 +151,7 @@ static void avr_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-     int i;
- 
-     qemu_fprintf(f, "\n");
--    qemu_fprintf(f, "PC:    %06x\n", env->pc_w);
-+    qemu_fprintf(f, "PC:    %06x\n", env->pc_w * 2);
-     qemu_fprintf(f, "SP:      %04x\n", env->sp);
-     qemu_fprintf(f, "rampD:     %02x\n", env->rampD >> 16);
-     qemu_fprintf(f, "rampX:     %02x\n", env->rampX >> 16);
--- 
-2.21.3
+ACKed-by: Peter Krempa <pkrempa@redhat.com>
 
 
