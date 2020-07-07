@@ -2,96 +2,89 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E88C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB15DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A246D206E9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:22:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABF0A2065D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 19:24:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jfhYITud"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A246D206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TBJ+wZDW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABF0A2065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jstAv-0003Bu-Ub
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 15:22:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50744)
+	id 1jstCa-0004Fd-VR
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 15:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jstAC-0002lP-Vs
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:21:57 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53586)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jstAA-0004WO-Er
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:21:56 -0400
-Received: by mail-wm1-x341.google.com with SMTP id j18so305632wmi.3
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 12:21:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=+UPksFEtj0BfztmjkHTlNTGEc53bcz2OT1EGm/FHc78=;
- b=jfhYITud1QS4YbTRmetWx7wvaLe3GUUe2YoACHHIpsJ/YODni2X8JFEQnVBQIPGP3r
- TejpkMeHRshJrzc32C5ZUv/U2zmQJ2UUE/T/q0YhLs1eGWyNEqg4lcZCbWPI5bCX5XGL
- IlxveWYHLB57UPiokQe+c1E19XzyjLFiycK5XhOMOyXjgldW3iJREb7A6LDo+0pEz0ay
- RzcLZE4T8/b9CAI8Qt71XJBQFN6IvQ2XXjCH2uSNnfBCyyqWi4SuAJQSj6ckFY8jq1kt
- CDxhnPWjukQKocrGnv1SNW+odZVPgAOYNG+Hu2DV+47Rcp7siAtFQv3jTuxWDsMUx7Yy
- LXXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=+UPksFEtj0BfztmjkHTlNTGEc53bcz2OT1EGm/FHc78=;
- b=lUMbY7rfz0c7yS5Tx2qMh6OHzemq3bCisrOwjUOvoicEYf0/0RebMXBJ25OQ2NNjfz
- AmDAP07vCXiwx3asLxeyqYQFB1LKVXEca0VQy76si5OIEF094j+xpAfdLIzqkbtIyWlN
- o0TqWmLTICPXkeqkIpj0n9/dkx/cUvyT2FVcXRF0XW+p8BojVGJuqI5lTSJWMJYIWOJw
- ToufyBNdb38RmX1k9VhwlA2PU2VJBM737ZLiDWnN7zBqqG58YDggGv6hhbXRmj2u5iDU
- rw7npEtQPIVyLwPpiSrCCux/rqMslDlWSOrBRgVIhO/55ZqBYQDDK9mbIWLdhixI4GQC
- k1Vw==
-X-Gm-Message-State: AOAM530P0nOlfnCbJBV/xB3Bu0lQVUbkIPfq0VNEPGNkcE3PF+Zh+9CF
- 9ZepFs2yz5T/XojZP5wOpNuMfQ==
-X-Google-Smtp-Source: ABdhPJxKKkcNbV+SIhPn1P+s+DdGwXY6cVDqhXlKxZwuIpINveglwMTMjOG3c1Go5tLHXC1DEm/LHA==
-X-Received: by 2002:a1c:acc3:: with SMTP id v186mr5951926wme.79.1594149712498; 
- Tue, 07 Jul 2020 12:21:52 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y6sm2463561wmy.0.2020.07.07.12.21.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 12:21:51 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 66FA71FF7E;
- Tue,  7 Jul 2020 20:21:50 +0100 (BST)
-References: <20200706234737.32378-1-jcmvbkbc@gmail.com>
- <87pn97o93a.fsf@linaro.org>
- <CAMo8BfLH2jVLjbdMMWCCuhmh+i40NyHQFK-=bAUw3sSoAxwPww@mail.gmail.com>
-User-agent: mu4e 1.5.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Subject: Re: [PATCH 00/21] target/xtensa: implement double precision FPU
-In-reply-to: <CAMo8BfLH2jVLjbdMMWCCuhmh+i40NyHQFK-=bAUw3sSoAxwPww@mail.gmail.com>
-Date: Tue, 07 Jul 2020 20:21:50 +0100
-Message-ID: <873663nnap.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jstBt-0003l4-Nd
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:23:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38642
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jstBq-0004ei-Ub
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 15:23:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594149817;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=rUyOPqyaIg5rv6ViJqfTxZAUcD12/62GQEiCY8mDaH0=;
+ b=TBJ+wZDWYpNLQyX37mt+6obgb3kQM4yLP6V8CMpBo0ANRcTvLb0pwoJfyAdhcFKYhK4ihA
+ qzUgf7lFkNvEKrNI63Q7b1AAlwQFUCMmYCZQJIlLfqGICEquMlIK0i4lKuDlKBVprBOFuO
+ OSE89Co6htN92wuQmkfWyou00jaXL1s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-56_g5daMMtyu982OijP2OA-1; Tue, 07 Jul 2020 15:23:36 -0400
+X-MC-Unique: 56_g5daMMtyu982OijP2OA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDF2F107ACCD;
+ Tue,  7 Jul 2020 19:23:34 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 85D22100164C;
+ Tue,  7 Jul 2020 19:23:34 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 109E41132FD2; Tue,  7 Jul 2020 21:23:32 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v4 03/45] error: Document Error API usage rules
+References: <20200707160613.848843-1-armbru@redhat.com>
+ <20200707160613.848843-4-armbru@redhat.com>
+ <a2fdc2c4-62af-ff06-26d3-e9d6c5a449e2@redhat.com>
+Date: Tue, 07 Jul 2020 21:23:32 +0200
+In-Reply-To: <a2fdc2c4-62af-ff06-26d3-e9d6c5a449e2@redhat.com> (Eric Blake's
+ message of "Tue, 7 Jul 2020 13:46:28 -0500")
+Message-ID: <87y2nv6sej.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 06:04:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,48 +98,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, vsementsov@virtuozzo.com, berrange@redhat.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, groug@kaod.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Eric Blake <eblake@redhat.com> writes:
 
-Max Filippov <jcmvbkbc@gmail.com> writes:
-
-> On Tue, Jul 7, 2020 at 4:31 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->> I've only looked at the softfloat bits as I'm not familiar with xtensa
->
-> Thanks for taking a look!
->
->> at all. However you can have a vague:
+> On 7/7/20 11:05 AM, Markus Armbruster wrote:
+>> This merely codifies existing practice, with one exception: the rule
+>> advising against returning void, where existing practice is mixed.
 >>
->> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> When the Error API was created, we adopted the (unwritten) rule to
+>> return void when the function returns no useful value on success,
+>> unlike GError, which recommends to return true on success and false on
+>> error then.
 >>
->> for the series - congratulations you pass your own tests ;-)
 >
-> Unless you've built toolchains for the newly added cores and
-> run the tests on these cores it only means that new tests are
-> properly disabled for the cores without FPU/DFPU. I'll
-> take it as an independent build test (:
+>> Make the rule advising against returning void official by putting it
+>> in writing.  This will hopefully reduce confusion.
+>>
+>> Update the examples accordingly.
+>>
+>> The remainder of this series will update a substantial amount of code
+>> to honor the rule.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>> ---
+>
+>> @@ -95,14 +122,12 @@
+>>    * Create a new error and pass it to the caller:
+>>    *     error_setg(errp, "situation normal, all fouled up");
+>>    *
+>> - * Call a function and receive an error from it:
+>> - *     Error *err = NULL;
+>> - *     foo(arg, &err);
+>> - *     if (err) {
+>> + * Call a function, receive an error from it, and pass it to caller
+>
+> maybe s/to caller/to the caller/
 
-Well it ran some xtensa tests thanks to the docker cross compiler
-support. Do you know what toolchains we need?
+Yes.
 
-Currently we have the following:
+>> + * when the function returns a value that indicates failure, say false:
+>> + *     if (!foo(arg, errp)) {
+>>    *         handle the error...
+>>    *     }
+>> - *
+>> - * Receive an error and pass it on to the caller:
+>> + * when it doesn't, say a void function:
+>
+> Hmm. It looks like you have a single sentence "Call a function... when
+> the function returns", but this line now makes it obvious that you
+> have a single prefix: "Call a function, ...and pass it to the caller:"
+> with two choices "when the function returns" and "when it doesn't".
+> I'm not sure if there is a nicer way to typeset it, adding yet another
+> ":" at the end of the line looks odd.  The idea behind the text is
+> fine, I'm just trying to paint the bikeshed to see if there is a
+> better presentation.
+>
+>>    *     Error *err = NULL;
+>>    *     foo(arg, &err);
+>>    *     if (err) {
+>> @@ -120,6 +145,19 @@
+>>    *     foo(arg, errp);
+>>    * for readability.
+>>    *
+>> + * Receive an error, and handle it locally
+>> + * when the function returns a value that indicates failure, say false:
+>> + *     Error *err = NULL;
+>> + *     if (!foo(arg, &err)) {
+>> + *         handle the error...
+>> + *     }
+>> + * when it doesn't, say a void function:
+>
+> It helps that you have repeated the same pattern as above.  But that
+> means if you change the layout, both groupings should have the same
+> layout.  Maybe:
+>
+> Intro for a task:
+> - when the function returns...
+> - when it doesn't
+>
+> Also, are there functions that have a return type other than void, but
+> where the return value is not an indication of error?  If there are,
 
-  ENV CPU_LIST csp dc232b dc233c
-  ENV TOOLCHAIN_RELEASE 2018.02
+Yes, there are such functions.
 
-  RUN for cpu in $CPU_LIST; do \
-          curl -#SL http://github.com/foss-xtensa/toolchain/releases/downlo=
-ad/$TOOLCHAIN_RELEASE/x86_64-$TOOLCHAIN_RELEASE-xtensa-$cpu-elf.tar.gz \
-          | tar -xzC /opt; \
-      done
+> then the "say a void function" clause makes sense (but we should
+> probably recommend against such functions); if there are not, then
+> "say a void function" reads awkwardly.  Maybe:
+>
+> - when it does not, because it is a void function:
 
-  ENV PATH $PATH:/opt/$TOOLCHAIN_RELEASE/xtensa-dc232b-elf/bin:/opt/$TOOLCH=
-AIN_RELEASE/xtensa-dc233c-elf/bin:/opt/$TOOLCHAIN_RELEASE/xtensa-csp-elf/bin
+What about
 
---=20
-Alex Benn=C3=A9e
+  - when it does not, say because it is a void function:
+
+>> + *     Error *err = NULL;
+>> + *     foo(arg, &err);
+>> + *     if (err) {
+>> + *         handle the error...
+>> + *     }
+>> + *
+>>    * Receive and accumulate multiple errors (first one wins):
+>>    *     Error *err = NULL, *local_err = NULL;
+>>    *     foo(arg, &err);
+>>
+
+Thanks!
+
 
