@@ -2,71 +2,84 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D53DC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B53CC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E98820658
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:36:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E98820658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4519820658
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 13:43:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d8vF+U4Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4519820658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsnlV-0003hK-Aw
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 09:36:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49058)
+	id 1jsnsm-0008Kn-DO
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 09:43:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jsnkp-0002pp-9Y; Tue, 07 Jul 2020 09:35:23 -0400
-Resent-Date: Tue, 07 Jul 2020 09:35:23 -0400
-Resent-Message-Id: <E1jsnkp-0002pp-9Y@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21777)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsnrv-0006dU-0c
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 09:42:43 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36680
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jsnkn-0003Nt-DK; Tue, 07 Jul 2020 09:35:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594128906; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mv7lKHRa3bwQWJCJbEOTLK+9JmtXJXveLuJJ1/oz1seXzKdfG9NJD5mzpGBtt5A/uoBtqcrDhwI88PYoerfmetfPgCFG5k906HUun8v//FEh/bFJpgapQffGW6WITmXKYlMyrn5/h2aSDHsqCS3WLbHCTQcPgyqFEs+aVHbBe6k=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594128906;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=FR2+n9EHAapbhSXBsmA2bR4X0zhP6VOxActEmUlnz+w=; 
- b=mSuz/xeP2kc5IzColFCSx3ic0TESMm52NKTgd/+79MbhBamBcKgqFq/mGLDcGFLIaKRE173zcqZSwENIwMP96uYJJCGtBb2JS25wL0gFg7K5ZHMciYtJ59gqfDPch1NkzjexUt6cBX7D8y+J45zENyQCgIplTNLohf4034yvdHc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1594128903178233.064757862742;
- Tue, 7 Jul 2020 06:35:03 -0700 (PDT)
-Subject: Re: [PATCH v5 00/20] microvm: add acpi support
-Message-ID: <159412890128.1183.957367283880211839@07a7f0d89f7d>
-In-Reply-To: <20200707125356.32450-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kraxel@redhat.com
-Date: Tue, 7 Jul 2020 06:35:03 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 09:34:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jsnrs-0004Yw-TF
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 09:42:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594129360;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=aWEGvrK7YSjXUBMVlkvwbjgfnMCter2xKCRiNrgagJg=;
+ b=d8vF+U4Q6K4/lAGF/Td47Am782OKAB0CFUui8S34dTvkhISM2ntnUyTC6S0J++7hcVxtbO
+ +3Ikq+MMa0wPSResOxyr+kCHswUAjR9U5uRHx7jwqVmdyGYZqXy2yUXD4wXDTFDIAVm96j
+ WL8nt366U41a6S07iRwrG+wDVJhquJo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-C0MNZ5h3MkG7ScI8bTOtow-1; Tue, 07 Jul 2020 09:42:38 -0400
+X-MC-Unique: C0MNZ5h3MkG7ScI8bTOtow-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB9C7DC28
+ for <qemu-devel@nongnu.org>; Tue,  7 Jul 2020 13:42:37 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com
+ [10.36.112.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7FB6D7788F;
+ Tue,  7 Jul 2020 13:42:30 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id CA73F31F24; Tue,  7 Jul 2020 15:42:29 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 03/10] qdev: device module support
+Date: Tue,  7 Jul 2020 15:42:22 +0200
+Message-Id: <20200707134229.9773-4-kraxel@redhat.com>
+In-Reply-To: <20200707134229.9773-1-kraxel@redhat.com>
+References: <20200707134229.9773-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:31:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,55 +92,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, thuth@redhat.com,
- ehabkost@redhat.com, slp@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, kraxel@redhat.com,
- pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwNzEyNTM1Ni4zMjQ1
-MC0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCmFjcGktdGVzdDogV2FybmluZyEg
-RFNEVCBiaW5hcnkgZmlsZSBtaXNtYXRjaC4gQWN0dWFsIFthbWw6L3RtcC9hbWwtWUIzU04wXSwg
-RXhwZWN0ZWQgW2FtbDp0ZXN0cy9kYXRhL2FjcGkvbWljcm92bS9EU0RUXS4KU2VlIHNvdXJjZSBm
-aWxlIHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYyBmb3IgaW5zdHJ1Y3Rpb25zIG9uIGhv
-dyB0byB1cGRhdGUgZXhwZWN0ZWQgZmlsZXMuCnRvIHNlZSBBU0wgZGlmZiBiZXR3ZWVuIG1pc21h
-dGNoZWQgZmlsZXMgaW5zdGFsbCBJQVNMLCByZWJ1aWxkIFFFTVUgZnJvbSBzY3JhdGNoIGFuZCBy
-ZS1ydW4gdGVzdHMgd2l0aCBWPTEgZW52aXJvbm1lbnQgdmFyaWFibGUgc2V0KioKRVJST1I6L3Rt
-cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzo0OTU6dGVzdF9h
-Y3BpX2FzbDogYXNzZXJ0aW9uIGZhaWxlZDogKGFsbF90YWJsZXNfbWF0Y2gpCkVSUk9SIC0gQmFp
-bCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10
-ZXN0LmM6NDk1OnRlc3RfYWNwaV9hc2w6IGFzc2VydGlvbiBmYWlsZWQ6IChhbGxfdGFibGVzX21h
-dGNoKQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0LXg4Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogV2Fp
-dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMzAK
-ICBURVNUICAgIGlvdGVzdC1xY293MjogMDMxCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vy
-cm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQg
-J1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5z
-dGFuY2UudXVpZD04ZjVmNDFlMzg2Yjg0NWE5YTBmNWVkYzJhZGUyMzFjNycsICctdScsICcxMDAz
-JywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywg
-J1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0n
-LCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScs
-ICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2Fj
-aGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1w
-L3BhdGNoZXctdGVzdGVyLXRtcC1kZDdfdW5zZy9zcmMvZG9ja2VyLXNyYy4yMDIwLTA3LTA3LTA5
-LjE5LjIxLjEwNDU1Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90
-bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1
-cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD04ZjVmNDFl
-Mzg2Yjg0NWE5YTBmNWVkYzJhZGUyMzFjNwptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9y
-IDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
-cC1kZDdfdW5zZy9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczdd
-IEVycm9yIDIKCnJlYWwgICAgMTVtNDIuMzM1cwp1c2VyICAgIDBtOC45ODFzCgoKVGhlIGZ1bGwg
-bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDcwNzEyNTM1
-Ni4zMjQ1MC0xLWtyYXhlbEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hook module loading into the places where we
+need it when building devices as modules.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20200624131045.14512-4-kraxel@redhat.com
+---
+ hw/core/qdev.c     | 6 ++++--
+ qdev-monitor.c     | 5 +++--
+ qom/qom-qmp-cmds.c | 3 ++-
+ softmmu/vl.c       | 4 ++--
+ 4 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 2131c7f951dd..9de16eae05b7 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -137,6 +137,9 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
+  */
+ DeviceState *qdev_new(const char *name)
+ {
++    if (!object_class_by_name(name)) {
++        module_load_qom_one(name);
++    }
+     return DEVICE(object_new(name));
+ }
+ 
+@@ -147,10 +150,9 @@ DeviceState *qdev_new(const char *name)
+  */
+ DeviceState *qdev_try_new(const char *name)
+ {
+-    if (!object_class_by_name(name)) {
++    if (!module_object_class_by_name(name)) {
+         return NULL;
+     }
+-
+     return DEVICE(object_new(name));
+ }
+ 
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 22da107484c5..8e7a7f7bbdbc 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -147,6 +147,7 @@ static void qdev_print_devinfos(bool show_no_user)
+     int i;
+     bool cat_printed;
+ 
++    module_load_qom_all();
+     list = object_class_get_list_sorted(TYPE_DEVICE, false);
+ 
+     for (i = 0; i <= DEVICE_CATEGORY_MAX; i++) {
+@@ -215,13 +216,13 @@ static DeviceClass *qdev_get_device_class(const char **driver, Error **errp)
+     DeviceClass *dc;
+     const char *original_name = *driver;
+ 
+-    oc = object_class_by_name(*driver);
++    oc = module_object_class_by_name(*driver);
+     if (!oc) {
+         const char *typename = find_typename_by_alias(*driver);
+ 
+         if (typename) {
+             *driver = typename;
+-            oc = object_class_by_name(*driver);
++            oc = module_object_class_by_name(*driver);
+         }
+     }
+ 
+diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+index c5249e44d020..5e2c8cbf333f 100644
+--- a/qom/qom-qmp-cmds.c
++++ b/qom/qom-qmp-cmds.c
+@@ -116,6 +116,7 @@ ObjectTypeInfoList *qmp_qom_list_types(bool has_implements,
+ {
+     ObjectTypeInfoList *ret = NULL;
+ 
++    module_load_qom_all();
+     object_class_foreach(qom_list_types_tramp, implements, abstract, &ret);
+ 
+     return ret;
+@@ -130,7 +131,7 @@ ObjectPropertyInfoList *qmp_device_list_properties(const char *typename,
+     ObjectPropertyIterator iter;
+     ObjectPropertyInfoList *prop_list = NULL;
+ 
+-    klass = object_class_by_name(typename);
++    klass = module_object_class_by_name(typename);
+     if (klass == NULL) {
+         error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+                   "Device '%s' not found", typename);
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 3e15ee243572..5acb65d7f48c 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -1772,8 +1772,8 @@ static bool vga_interface_available(VGAInterfaceType t)
+ 
+     assert(t < VGA_TYPE_MAX);
+     return !ti->class_names[0] ||
+-           object_class_by_name(ti->class_names[0]) ||
+-           object_class_by_name(ti->class_names[1]);
++           module_object_class_by_name(ti->class_names[0]) ||
++           module_object_class_by_name(ti->class_names[1]);
+ }
+ 
+ static const char *
+-- 
+2.18.4
+
 
