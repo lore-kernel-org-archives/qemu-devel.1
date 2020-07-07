@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F51C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51642C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:29:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C00902065D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:28:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 189D320702
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:29:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tmvi6Rh6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C00902065D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K07VAVkb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 189D320702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jsi2C-0007mh-2Y
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:28:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43786)
+	id 1jsi3C-0001Ag-Bs
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:29:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshoQ-00073K-Py
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:42 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:40374)
+ id 1jshxs-0001Wc-Si
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:24:28 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:43983)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshoN-0004sZ-Nv
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:42 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id f2so16004074wrp.7
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:14:39 -0700 (PDT)
+ id 1jshxr-0006gH-47
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:24:28 -0400
+Received: by mail-wr1-x433.google.com with SMTP id j4so41598173wrp.10
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:24:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BhAPRbyJ6wjGUojYdyED7mQgTxQ6WKTzi+98H1OGLvA=;
- b=tmvi6Rh60yUjJoJdLRzyAuDs3Uetu+eqE6la3Po2XNfZOV2GmBOtY5yjLNzLOYFKJZ
- 3F3nmlxXU8WmbfjHSLXi4q6o8fk5zz1FnSdhZXyaa+hBiRH9gv0NwldCupYmsUYPMboS
- z4jVdoOrgR7breirfvpvYZf9BhFMkpw1lVB0qEDTCMZrGShE9Qf9h4aLGCgLQGyuM8i2
- d8vOMEfAHR8aVJOlz1GaIay64MpiJdSwaDymepqnZrjGEkBWoYoMCDAve8CDHxzDbtFT
- WYgwfl31Hg8/iJfTBQW7p3Ct8DdR/H21YcV4QHXjkcgh7eb9Y8ByeWXr59qCyDpjB4C4
- VuqA==
+ bh=gQ8vOrn8UzVSlnR8O9dGfbIrh6XgeWKqH3C6tmBlZYU=;
+ b=K07VAVkb1kwsCPj34I4BuKcUO9oMG355TR8agcZ23u2cc+D1juVTfgXCJl4PTniMcz
+ rfa09IAKcNu1eWNRHGJUcBaWp2TTdDQs16B/POtNxO07WHuMPP+SFEdXc2LgbqevS+/n
+ VA51b+78HrrRFmLCt5EyFHce03XRYI+Jl+nyKJyZwiAOhaPC6YBE6kWDos1kQV6ZY4Md
+ Pmcv5uE4M1d4rJqWIiUwLCP1o9xOOdjHZbnjTHUdxTZlTQ+wMA5yQvwJTojQokX4Zel8
+ vfHy4H/RCPSDH68Pzfh2Q2wkduNNLfJ8tuMNkBmhv1bcFQI0E4h9FmEasYvoEft180+W
+ nGWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BhAPRbyJ6wjGUojYdyED7mQgTxQ6WKTzi+98H1OGLvA=;
- b=pcq8Xhu6dtuCZkfWJNLP+ymLmMNSOjpZVPUHhO3NGK5orrM3y23vdT+RBMhIKWLnGO
- 86ZhjSJ7JR9OkojSwCjPYZgXWXgrjxSALx8G4RDaBHrRodZURUwJ3yLpqGULnqI7Wi9F
- OOW8Grldn1a2nNAPibFbeNg672AmZpHsSe0CS/6xJf2tjb+rnXf3BlyeGKBTNjfmoFTC
- 4eW/6lHd7Sh9tHslPSiekE4GB5XbGY/kSloy3B2VjC9G4dR4pk3YI8b7PVvyHnj67wBJ
- g9tOsZqFCgg49xVNAr1b4/rzdycrC0iL09vob266tYWjiPapjgNyH50wm/hepzGFgivm
- lGiQ==
-X-Gm-Message-State: AOAM5331/Pn407Ivv91He96uk/qcQohi7vWMlZQbNAKQ4zqc/tt1vG8F
- rfWgx+nZxBdaLhjoSOXSuOrz/A==
-X-Google-Smtp-Source: ABdhPJzYVfoILTqBuFcDySh8hEF6doRJmzMuqjMzMgr/GC/Ol0zW59P4uUjgFdkbPt4tF1usAHLNXQ==
-X-Received: by 2002:a5d:630c:: with SMTP id i12mr57737967wru.158.1594106078157; 
- Tue, 07 Jul 2020 00:14:38 -0700 (PDT)
+ bh=gQ8vOrn8UzVSlnR8O9dGfbIrh6XgeWKqH3C6tmBlZYU=;
+ b=iJP6EUi6KxDqwwPd60K2YFV/bsqeDKwM2pOs4lXDFKit4wT/EevTO6LpvOX5Lw9b2T
+ xRgWKD7MNcSFc4Z9mdS2hOWLAe+Fb6jOgaAneKRWbO5r2QJYhozWBtMAhXbVrvrq3qoN
+ 4i81r08ayktXmoDnA/0PVyFX4xzNDeKa9B4gzOa9aLVqQXcIDGLl6VZAJBwlCRZna4f5
+ 9BfFC8JqX+8qnN/Pj/IOgJkI4hr0hP2KSZ88DZ2jL0NUzWpsKA0pQZkb0M0qfwnMtGPJ
+ tlzudCfmQUNk0myaW+zVqUrT+D76GMhD9uZzcwZ4eMaDb0kC1SkA8t/nROUm7tHKT9UF
+ KciQ==
+X-Gm-Message-State: AOAM530g/ZFgo4vo+mJRzjGSKxSkZHUIfds5UESwF4w9GqhOyKCFVaXb
+ ukK91gvzbxEhK943tkIHiXD84F6+W/A=
+X-Google-Smtp-Source: ABdhPJyzchFcZ00hBCyMcViTZJ4voFtwgPdH3FBqqwXMuYMlu2hUKKrJhKi14mkZtlyPmrWhmdKAoA==
+X-Received: by 2002:adf:e546:: with SMTP id z6mr48953240wrm.99.1594106665660; 
+ Tue, 07 Jul 2020 00:24:25 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m16sm23078090wro.0.2020.07.07.00.14.26
+ by smtp.gmail.com with ESMTPSA id 92sm29119733wrr.96.2020.07.07.00.24.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 00:14:28 -0700 (PDT)
+ Tue, 07 Jul 2020 00:24:22 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DABEA1FFAC;
- Tue,  7 Jul 2020 08:09:00 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id C8C071FFBB;
+ Tue,  7 Jul 2020 08:09:01 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 23/41] tests/docker: add packages needed for check-acceptance
-Date: Tue,  7 Jul 2020 08:08:40 +0100
-Message-Id: <20200707070858.6622-24-alex.bennee@linaro.org>
+Subject: [PULL 33/41] gitlab: add avocado asset caching
+Date: Tue,  7 Jul 2020 08:08:50 +0100
+Message-Id: <20200707070858.6622-34-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200707070858.6622-1-alex.bennee@linaro.org>
 References: <20200707070858.6622-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x433.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,71 +103,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We need additional python packages to run check-acceptance. Add them
-to the docker images we will be using later.
+These can be quite big so lets cache them. I couldn't find any nots on
+ccache in the gitlab docs so I've just ignored it for now.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200701135652.1366-26-alex.bennee@linaro.org>
+Message-Id: <20200701135652.1366-36-alex.bennee@linaro.org>
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 798ddd2c3e0b..70b6186bd3ea 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -80,7 +80,12 @@ ENV PACKAGES \
-     pixman-devel \
-     python3 \
-     python3-PyYAML \
-+    python3-numpy \
-+    python3-opencv \
-+    python3-pillow \
-+    python3-pip \
-     python3-sphinx \
-+    python3-virtualenv \
-     rdma-core-devel \
-     SDL2-devel \
-     snappy-devel \
-@@ -89,6 +94,8 @@ ENV PACKAGES \
-     systemd-devel \
-     systemtap-sdt-devel \
-     tar \
-+    tesseract \
-+    tesseract-langpack-eng \
-     texinfo \
-     usbredir-devel \
-     virglrenderer-devel \
-diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
-index 6050ce7e8a80..f7aac840bf86 100644
---- a/tests/docker/dockerfiles/ubuntu2004.docker
-+++ b/tests/docker/dockerfiles/ubuntu2004.docker
-@@ -46,9 +46,17 @@ ENV PACKAGES flex bison \
-     libxen-dev \
-     libzstd-dev \
-     make \
--    python3-yaml \
-+    python3-numpy \
-+    python3-opencv \
-+    python3-pil \
-+    python3-pip \
-     python3-sphinx \
-+    python3-venv \
-+    python3-yaml \
-+    rpm2cpio \
-     sparse \
-+    tesseract-ocr \
-+    tesseract-ocr-eng \
-     texinfo \
-     xfslibs-dev\
-     vim
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 257947853b72..13e9531724d2 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -8,6 +8,12 @@ stages:
+   - build
+   - test
+ 
++# We assume GitLab has it's own caching set up for RPM/APT repositories so we
++# just take care of avocado assets here.
++cache:
++  paths:
++    - $HOME/avocado/data/cache
++
+ include:
+   - local: '/.gitlab-ci.d/edk2.yml'
+   - local: '/.gitlab-ci.d/opensbi.yml'
 -- 
 2.20.1
 
