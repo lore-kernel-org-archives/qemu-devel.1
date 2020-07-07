@@ -2,88 +2,96 @@ Return-Path: <SRS0=B5/Q=AS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED62C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 330AAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:28:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D4E92065F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:27:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1E8220702
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 10:28:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGU6y4+S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D4E92065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DrPWA+57"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E8220702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jskok-0000eW-Jp
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:27:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58606)
+	id 1jskqN-0001j0-9r
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 06:28:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jsknx-0008HW-PV
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:26:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39592
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jsknv-00047E-Lg
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:26:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594117582;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=Ksh7qm6adGST/ZaaaSRGOC5KkyimhdVy3s/dSUsS2wc=;
- b=XGU6y4+StnZo91tkuOdh5X2SManb75uwPNIrht8vP2Q1v2ahhaoSOXfvCxU8zaMFIVYoL1
- +d7yZ/jb8mfbBsBShpa+eivTKSk9Jjjm5QgBEjkzW6HSgxreKerq80z7gqzBO9XgFHyK+0
- wTJj6ChglurfvG5t3HxzZHwgnEu/hZA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-OgGMpmGzP4aC_p9nKwLp_w-1; Tue, 07 Jul 2020 06:25:55 -0400
-X-MC-Unique: OgGMpmGzP4aC_p9nKwLp_w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 742B2879511;
- Tue,  7 Jul 2020 10:25:50 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DEF315D9F3;
- Tue,  7 Jul 2020 10:25:13 +0000 (UTC)
-Date: Tue, 7 Jul 2020 11:25:10 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH] trivial: Remove trailing whitespaces
-Message-ID: <20200707102510.GF2649462@redhat.com>
-References: <20200706162300.1084753-1-dinechin@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jskpn-0001EM-5X
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:28:19 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51593)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jskpl-0004QU-4L
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 06:28:18 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 22so42726574wmg.1
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 03:28:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=p+iyROxKk6N5yZzgwF2YGEAM+nqLh739JgpDap1FNe0=;
+ b=DrPWA+571uxdePEvE2XYZTSDeRpZHYbQu3GEo3nJkHf+mm2pTVqyu3jOc9M5kca+Hf
+ pAzswQXw6O+WKgC2leBtX6+r/oj6IKczORMr2C3cN89boC3E63wsvjyuV2oXKzXq1Bs9
+ rnUBfdFzdPCIWaUZVCq9Nfh5DAdHhD+SFu3OhiiLBV3T8u/TfbR63WYBhRQ0yG2xE9+G
+ 4dZ9CJDSrhMEYJLTUV0ROzusOLRm2LPXQkm2o6Y1B7UkCca8HYQov8aCf80FBV8IlthH
+ qzmGsq/yWsuQBS5s/fi0jG41YcDbIKcKAA5TF8B3BtNv0DtKhBm0xxVW9GrgX100TEdN
+ B5Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=p+iyROxKk6N5yZzgwF2YGEAM+nqLh739JgpDap1FNe0=;
+ b=WYPCbEzkrzPsojLAE/Cb6dEhF1DW6tANAyRHt8Iiukj9y4RMZQd/g0Z+9ws7ZvAjDf
+ e77VAAy34x9+fjxBVAbyIFA2FEJwN/QN6ANY3KMAR6gbyLKfGwhz8LSzoBl+0ZHPwNuk
+ VreS6w3s3MLgcI7WQKJa2eNn5SgW/BjwRQbFP090KAKAtR2W5ufxAA6j81FHjl4Fm33b
+ wd329d314YeXgZc5SE5pTmIEt5FH0hkXzzHt3s4b69jiuoEWWekSCOGh4ABZZ8Fvrudt
+ uauffLOzXne84D0tPMefbEOat6vtDqpDPeK+3PSbNSZC4mLi2W829+3LQgbWk8IESKHT
+ JAwQ==
+X-Gm-Message-State: AOAM533MT+dmsCmC9Rew/g1/4Cvs3rioCm5HGBkbliMamhrxkzlutcdr
+ qDwlhK5pQWA695kkyDTlOZd/sw==
+X-Google-Smtp-Source: ABdhPJzk8tVYuZNC6Rugt3jjrb0KTuC62bZoVPoIggRkRzA+hPtpk26KSALPqmy6NxfMysmREru1sQ==
+X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr3514340wml.33.1594117695448; 
+ Tue, 07 Jul 2020 03:28:15 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u1sm520703wrb.78.2020.07.07.03.28.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jul 2020 03:28:14 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DC9C51FF7E;
+ Tue,  7 Jul 2020 11:28:13 +0100 (BST)
+References: <20200706234737.32378-1-jcmvbkbc@gmail.com>
+ <20200706234737.32378-2-jcmvbkbc@gmail.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Subject: Re: [PATCH 01/21] softfloat: make NO_SIGNALING_NANS runtime property
+In-reply-to: <20200706234737.32378-2-jcmvbkbc@gmail.com>
+Date: Tue, 07 Jul 2020 11:28:13 +0100
+Message-ID: <871rlnpqki.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200706162300.1084753-1-dinechin@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 00:46:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,143 +104,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Max Filippov <jcmvbkbc@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
- Marek Vasut <marex@denx.de>, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org, Paul Durrant <paul@xen.org>,
- Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Eduardo Habkost <ehabkost@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Riku Voipio <riku.voipio@iki.fi>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, xen-devel@lists.xenproject.org,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 06, 2020 at 06:23:00PM +0200, Christophe de Dinechin wrote:
-> There are a number of unnecessary trailing whitespaces that have
-> accumulated over time in the source code. They cause stray changes
-> in patches if you use tools that automatically remove them.
-> 
-> Tested by doing a `git diff -w` after the change.
-> 
-> This could probably be turned into a pre-commit hook.
 
-scripts/checkpatch.pl ought to be made to check it.
+Max Filippov <jcmvbkbc@gmail.com> writes:
 
-> 
-> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+> target/xtensa, the only user of NO_SIGNALING_NANS macro has FPU
+> implementations with and without the corresponding property. With
+> NO_SIGNALING_NANS being a macro they cannot be a part of the same QEMU
+> executable.
+> Replace macro with new property in float_status to allow cores with
+> different FPU implementations coexist.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 > ---
->  block/iscsi.c                                 |   2 +-
->  disas/cris.c                                  |   2 +-
->  disas/microblaze.c                            |  80 +++---
->  disas/nios2.c                                 | 256 +++++++++---------
->  hmp-commands.hx                               |   2 +-
->  hw/alpha/typhoon.c                            |   6 +-
->  hw/arm/gumstix.c                              |   6 +-
->  hw/arm/omap1.c                                |   2 +-
->  hw/arm/stellaris.c                            |   2 +-
->  hw/char/etraxfs_ser.c                         |   2 +-
->  hw/core/ptimer.c                              |   2 +-
->  hw/cris/axis_dev88.c                          |   2 +-
->  hw/cris/boot.c                                |   2 +-
->  hw/display/qxl.c                              |   2 +-
->  hw/dma/etraxfs_dma.c                          |  18 +-
->  hw/dma/i82374.c                               |   2 +-
->  hw/i2c/bitbang_i2c.c                          |   2 +-
->  hw/input/tsc2005.c                            |   2 +-
->  hw/input/tsc210x.c                            |   2 +-
->  hw/intc/etraxfs_pic.c                         |   8 +-
->  hw/intc/sh_intc.c                             |  10 +-
->  hw/intc/xilinx_intc.c                         |   2 +-
->  hw/misc/imx25_ccm.c                           |   6 +-
->  hw/misc/imx31_ccm.c                           |   2 +-
->  hw/net/vmxnet3.h                              |   2 +-
->  hw/net/xilinx_ethlite.c                       |   2 +-
->  hw/pci/pcie.c                                 |   2 +-
->  hw/sd/omap_mmc.c                              |   2 +-
->  hw/sh4/shix.c                                 |   2 +-
->  hw/sparc64/sun4u.c                            |   2 +-
->  hw/timer/etraxfs_timer.c                      |   2 +-
->  hw/timer/xilinx_timer.c                       |   4 +-
->  hw/usb/hcd-musb.c                             |  10 +-
->  hw/usb/hcd-ohci.c                             |   6 +-
->  hw/usb/hcd-uhci.c                             |   2 +-
->  hw/virtio/virtio-pci.c                        |   2 +-
->  include/hw/cris/etraxfs_dma.h                 |   4 +-
->  include/hw/net/lance.h                        |   2 +-
->  include/hw/ppc/spapr.h                        |   2 +-
->  include/hw/xen/interface/io/ring.h            |  34 +--
->  include/qemu/log.h                            |   2 +-
->  include/qom/object.h                          |   4 +-
->  linux-user/cris/cpu_loop.c                    |  16 +-
->  linux-user/microblaze/cpu_loop.c              |  16 +-
->  linux-user/mmap.c                             |   8 +-
->  linux-user/sparc/signal.c                     |   4 +-
->  linux-user/syscall.c                          |  24 +-
->  linux-user/syscall_defs.h                     |   2 +-
->  linux-user/uaccess.c                          |   2 +-
->  os-posix.c                                    |   2 +-
->  qapi/qapi-util.c                              |   2 +-
->  qemu-img.c                                    |   2 +-
->  qemu-options.hx                               |  26 +-
->  qom/object.c                                  |   2 +-
->  target/cris/translate.c                       |  28 +-
->  target/cris/translate_v10.inc.c               |   6 +-
->  target/i386/hvf/hvf.c                         |   4 +-
->  target/i386/hvf/x86.c                         |   4 +-
->  target/i386/hvf/x86_decode.c                  |  20 +-
->  target/i386/hvf/x86_decode.h                  |   4 +-
->  target/i386/hvf/x86_descr.c                   |   2 +-
->  target/i386/hvf/x86_emu.c                     |   2 +-
->  target/i386/hvf/x86_mmu.c                     |   6 +-
->  target/i386/hvf/x86_task.c                    |   2 +-
->  target/i386/hvf/x86hvf.c                      |  42 +--
->  target/i386/translate.c                       |   8 +-
->  target/microblaze/mmu.c                       |   2 +-
->  target/microblaze/translate.c                 |   2 +-
->  target/sh4/op_helper.c                        |   4 +-
->  target/xtensa/core-de212/core-isa.h           |   6 +-
->  .../xtensa/core-sample_controller/core-isa.h  |   6 +-
->  target/xtensa/core-test_kc705_be/core-isa.h   |   2 +-
->  tcg/sparc/tcg-target.inc.c                    |   2 +-
->  tcg/tcg.c                                     |  32 +--
->  tests/tcg/multiarch/test-mmap.c               |  72 ++---
->  ui/curses.c                                   |   4 +-
->  ui/curses_keys.h                              |   4 +-
->  util/cutils.c                                 |   2 +-
->  78 files changed, 440 insertions(+), 440 deletions(-)
+>  fpu/softfloat-specialize.inc.c  | 228 ++++++++++++++++----------------
+>  include/fpu/softfloat-helpers.h |   5 +
+>  include/fpu/softfloat-types.h   |   1 +
+>  3 files changed, 117 insertions(+), 117 deletions(-)
+>
+> diff --git a/fpu/softfloat-specialize.inc.c b/fpu/softfloat-specialize.in=
+c.c
+> index 44f5b661f831..b26bc039b0b6 100644
+> --- a/fpu/softfloat-specialize.inc.c
+> +++ b/fpu/softfloat-specialize.inc.c
+> @@ -79,13 +79,6 @@ this code that are retained.
+>   * version 2 or later. See the COPYING file in the top-level directory.
+>   */
+>=20=20
+> -/* Define for architectures which deviate from IEEE in not supporting
+> - * signaling NaNs (so all NaNs are treated as quiet).
+> - */
+> -#if defined(TARGET_XTENSA)
+> -#define NO_SIGNALING_NANS 1
+> -#endif
+> -
+>  /* Define how the architecture discriminates signaling NaNs.
+>   * This done with the most significant bit of the fraction.
+>   * In IEEE 754-1985 this was implementation defined, but in IEEE 754-2008
+> @@ -111,12 +104,12 @@ static inline bool snan_bit_is_one(float_status *st=
+atus)
+>=20=20
+>  static bool parts_is_snan_frac(uint64_t frac, float_status *status)
+>  {
+> -#ifdef NO_SIGNALING_NANS
+> -    return false;
+> -#else
+> -    bool msb =3D extract64(frac, DECOMPOSED_BINARY_POINT - 1, 1);
+> -    return msb =3D=3D snan_bit_is_one(status);
+> -#endif
+> +    if (status->no_signaling_nans) {
+> +        return false;
 
-The cleanup is a good idea, however, I think it is probably better to
-split the patch approx into subsystems. That will make it much easier
-to cherry-pick for people doing backports.
+I have no objection in principle but seeing as we go to the trouble of
+allowing snan_bit_is_one() to constant fold away I think it would be
+worth doing the same with a no_signalling_nans(status). We can then
+avoid an admittedly well predicted test for the non XTENSA case.
+
+> +    } else {
+> +        bool msb =3D extract64(frac, DECOMPOSED_BINARY_POINT - 1, 1);
+> +        return msb =3D=3D snan_bit_is_one(status);
+> +    }
+>  }
+>=20=20
+>  /*----------------------------------------------------------------------=
+------
+> @@ -170,9 +163,10 @@ static FloatParts parts_default_nan(float_status *st=
+atus)
+>=20=20
+>  static FloatParts parts_silence_nan(FloatParts a, float_status *status)
+>  {
+> -#ifdef NO_SIGNALING_NANS
+> -    g_assert_not_reached();
+
+We could then keep the assert:
+
+  g_assert(!no_signaling_nan(status))
+
+<snip>
+>      return status->tininess_before_rounding;
+> diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+> index 7680193ebc1c..10bd208e559f 100644
+> --- a/include/fpu/softfloat-types.h
+> +++ b/include/fpu/softfloat-types.h
+> @@ -167,6 +167,7 @@ typedef struct float_status {
+>      bool default_nan_mode;
+>      /* not always used -- see snan_bit_is_one() in
+>      softfloat-specialize.h */
+
+and then expand this comment:
+
+    /* the flags bellow are not used on all specializations and may
+     * constant fold away (see snan_bit_is_one()/no_signalling_nans() in
+     * softfloat-specialize.h)
+     */
+
+>      bool snan_bit_is_one;
+> +    bool no_signaling_nans;
+>  } float_status;
+>=20=20
+>  #endif /* SOFTFLOAT_TYPES_H */
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+--=20
+Alex Benn=C3=A9e
 
