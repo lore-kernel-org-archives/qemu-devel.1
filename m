@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93918C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44EDFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:18:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62B0E206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:18:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AA8E206E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jul 2020 07:18:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R9v8p9Ae"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B0E206F6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eIcbOXwJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AA8E206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jshre-0004M4-Kg
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:18:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
+	id 1jshrs-00052v-7I
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jul 2020 03:18:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshoH-0006hH-TP
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:33 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:36104)
+ id 1jshoE-0006Yu-EY
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:30 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40246)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jshoG-0004rI-8b
- for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:33 -0400
-Received: by mail-wr1-x436.google.com with SMTP id k6so44006533wrn.3
- for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:14:31 -0700 (PDT)
+ id 1jshoC-0004qZ-Mo
+ for qemu-devel@nongnu.org; Tue, 07 Jul 2020 03:14:30 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id f139so45346276wmf.5
+ for <qemu-devel@nongnu.org>; Tue, 07 Jul 2020 00:14:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fVpFU3Bn0gx8fweRN9XBf8loHnsbKZ9F1g1Uyun+Gsg=;
- b=R9v8p9AeUq2v6ydPU9XeLm7KEUpSWIYFUsXmqGq/pcbaCLgExX3UzYb8WSY1ZVO7vS
- R0N9dhWsat59BvoOOTpVaWsq+1k6+04KSYhwWYPOrSBpOMbJDz9mc+pN0Xi7yI33Pvvf
- BaAmOlCK2xYKRpG4koFGnaHFQhjGnZrCnw1BWd8o2toAK71FS24ephW2oWZCE9orVsz4
- PcDNLtKH18/L3PO470NtrWJh2FuzMVAbuDgM1jpeCfw/uXHf2EBhTjhxxrgEbAXJZ3bw
- 75en7898w2I+hSoX/2ZPLXCmZdsQeWeE3LwHRXHvQEm81XLQVmlmdqOE0AESDX0S9mL8
- ewPQ==
+ bh=0Du9+TDok3/8t4BiL1lqGOO2m2hHyL++J15tcPz/gDI=;
+ b=eIcbOXwJFxzs4KDjejfWky8SJqCIhYrm8YWjqtSH6Td/fYGRBYErOJrPZAQDc875SF
+ DZlZXjfYAX6z3LfpSrZ7f869T5vFUSVFdD+vTAizykmqO02KIfGVb9q+N842pw/1+Nj8
+ DsE2yozOeFS9JjX53dZvy1I0nLnG+9HOGgMxWsrFEaqJhvMRUar+AihtKoVjrgRRkG4j
+ k59ByDfC6nXz4Xdu/WF2rzTaBsmKSGrkpe5f2eHVkJNzkML8GN/fQcjW14YPjN0285OJ
+ todiyxB/kSgwYSIUSo7G9DGuXZ1KAvQ3zVOGSU864EtemWB0usJUe1l2CZLpw7HqGiwZ
+ 67Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fVpFU3Bn0gx8fweRN9XBf8loHnsbKZ9F1g1Uyun+Gsg=;
- b=bzvimRNmisSAHlk65IIVwkGZpREcyVja/94++UkT/ZuRnUBTSXCdfpmgKeSRLL36pS
- y9tDo5MH/BVNrNZVI4kfGrK9f8H9wiKo2Ri6tZ00GoBURHWlhatvwUSBhPTEp2+MlCtG
- t4/oqDUyBZ8Y5pTEzGAPnKJCXK+6zxCJPhitWFke3tupHxczoSSgtap8Co6KvwqGL2Lp
- 4JvjGGrO4crCp7D16tUYQSpWqO/OULPVHRZipXMO6mDWoNYj+usVhwvLj0UFuSNJ/E3a
- 0Osxuf7kOlU43wxfkU/wRVo5QDPY/SaQn2aJIBYAQt7zXKg6YRzhfVfCqBxc+cXR7xLb
- +tBg==
-X-Gm-Message-State: AOAM533WchUaytXSomYHuTQSWdBi3jKWiw3cxaq3ZJHmWagux9JSx2Az
- gM/TENOW9UzIzWjHOkSpfpsNbQ==
-X-Google-Smtp-Source: ABdhPJxmGtovh0WxrLk3sQG75lLyAVsh6Ydo/nY/kSLQ8+wgsSfpXm/1liGjffbk+W4UqRDoqXXIRA==
-X-Received: by 2002:adf:b1ca:: with SMTP id r10mr24403519wra.150.1594106070886; 
- Tue, 07 Jul 2020 00:14:30 -0700 (PDT)
+ bh=0Du9+TDok3/8t4BiL1lqGOO2m2hHyL++J15tcPz/gDI=;
+ b=OVi1e8IQPKLXHgMVk7T7sK4uu1W8Cv5zYn/F78sSLhwzQMYcxBc0lUIGhzwkVHcI8U
+ 3FStUWhhUvLvJYGkCbRfFPb5hcYr8/DW2f3xo3Z3p8I0mbDsTUvHGOALTHOTHJpasHqi
+ Dfq6LbmiSeFBzBBuNUpwZp64zz0VMr4qlTCr1jUuiM383q7oX9svu7nDqjLVefmXGZm2
+ 7BoU0AzRCQu/2JmWSYwAFD4xRhhugZa/YnnVDVqQFty8oJu8/00KJtOJsVoBcMkzAN9/
+ CPVcKM3TqskExHzuF4mnSS5y8cxi2eKhEE9e4tanKqTJeXQOrVuo356mfErRaZbjaihP
+ YqgQ==
+X-Gm-Message-State: AOAM532Kfm304UNhELQDB65h15GXbZGXqB6ot/FqO26DpSWE7rj3qdD6
+ /NaaRJY07La35wnFbgcxGYOH4g==
+X-Google-Smtp-Source: ABdhPJxi84PU07FYwFBGm783rJzKofVfrmzXPKgWhrSP3UO8OJjTEepxr5lL9Rj9cs16g/5IfpNPyg==
+X-Received: by 2002:a05:600c:2209:: with SMTP id
+ z9mr2613163wml.178.1594106066199; 
+ Tue, 07 Jul 2020 00:14:26 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c25sm2107501wml.46.2020.07.07.00.14.23
+ by smtp.gmail.com with ESMTPSA id w7sm2283183wmc.32.2020.07.07.00.14.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jul 2020 00:14:27 -0700 (PDT)
+ Tue, 07 Jul 2020 00:14:22 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3CCD21FFB3;
- Tue,  7 Jul 2020 08:09:01 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 595E81FFC0;
+ Tue,  7 Jul 2020 08:09:02 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 27/41] tests/acceptance: skip LinuxInitrd 2gib with v4.16 on
- GitLab
-Date: Tue,  7 Jul 2020 08:08:44 +0100
-Message-Id: <20200707070858.6622-28-alex.bennee@linaro.org>
+Subject: [PULL 39/41] travis.yml: Test also the other targets on s390x
+Date: Tue,  7 Jul 2020 08:08:56 +0100
+Message-Id: <20200707070858.6622-40-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200707070858.6622-1-alex.bennee@linaro.org>
 References: <20200707070858.6622-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x436.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,47 +104,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ "open list:S390 general arch..." <qemu-s390x@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fails on GitLab but not when run locally on the same container
-image. It's very confusing.
+From: Thomas Huth <thuth@redhat.com>
 
+s390x is our only big endian host in our CI, so building and testing QEMU
+there is quite valuable. Thus let's also test the other targets with
+additional jobs (also using different sets of pre-installed libraries to
+get a better coverage of the things that we test).
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200701135652.1366-30-alex.bennee@linaro.org>
+Message-Id: <20200608114049.4693-1-thuth@redhat.com>
 
-diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
-index a3e54d3fc915..a249e2f14a24 100644
---- a/tests/acceptance/linux_initrd.py
-+++ b/tests/acceptance/linux_initrd.py
-@@ -8,10 +8,12 @@
- # This work is licensed under the terms of the GNU GPL, version 2 or
- # later.  See the COPYING file in the top-level directory.
+diff --git a/.travis.yml b/.travis.yml
+index c24dfbe377f3..ab429500fc3c 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -482,6 +482,45 @@ jobs:
+               $(exit $BUILD_RC);
+           fi
  
-+import os
- import logging
- import tempfile
- 
- from avocado_qemu import Test
-+from avocado import skipIf
- 
- 
- class LinuxInitrd(Test):
-@@ -51,6 +53,7 @@ class LinuxInitrd(Test):
-                 max_size + 1)
-             self.assertRegex(self.vm.get_log(), expected_msg)
- 
-+    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
-     def test_with_2gib_file_should_work_with_linux_v4_16(self):
-         """
-         QEMU has supported up to 4 GiB initrd for recent kernel
++    - name: "[s390x] GCC (other-softmmu)"
++      arch: s390x
++      dist: bionic
++      addons:
++        apt_packages:
++          - libaio-dev
++          - libattr1-dev
++          - libcap-ng-dev
++          - libgnutls28-dev
++          - libiscsi-dev
++          - liblttng-ust-dev
++          - liblzo2-dev
++          - libncurses-dev
++          - libnfs-dev
++          - libnss3-dev
++          - libpixman-1-dev
++          - libsdl2-dev
++          - libsdl2-image-dev
++          - libseccomp-dev
++          - libsnappy-dev
++          - libzstd-dev
++          - nettle-dev
++          - xfslibs-dev
++          # Tests dependencies
++          - genisoimage
++      env:
++        - CONFIG="--disable-containers --audio-drv-list=sdl --disable-user
++                  --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
++
++    - name: "[s390x] GCC (user)"
++      arch: s390x
++      dist: bionic
++      addons:
++        apt_packages:
++          - libgcrypt20-dev
++          - libgnutls28-dev
++      env:
++        - CONFIG="--disable-containers --disable-system"
++
+     - name: "[s390x] Clang (disable-tcg)"
+       arch: s390x
+       dist: bionic
 -- 
 2.20.1
 
