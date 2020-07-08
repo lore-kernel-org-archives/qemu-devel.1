@@ -2,93 +2,94 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16158C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE29C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:01:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8678206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75B21206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:01:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HXNTqOEz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8678206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iva8lD93"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B21206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtJ3k-0005KC-2I
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:01:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57566)
+	id 1jtJ42-0005yx-Mp
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:01:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtJ1v-00022i-Hg
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:59:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32041
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtJ1u-00062u-1I
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:59:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594249145;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9uhR7QoQgVQUY3RgfAYYUsaHg7utPK8LVq8kWz3F7IM=;
- b=HXNTqOEzxdAvN1vHFP8yynsyI8Ov8FuNMsdwCFmJcToktH1TTpBAmJlsRJDXYs4G/iOSte
- 2jWGBVr+kwtUw0PVfR1NGRz1+tKYSLF/vEqlI5tYGMnnMElFuyQ+DyV8bH/EsbHnlzJWTI
- A8IwWBIjAMTGfgF9WLTNFpUnMNv3gYU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-3keVeGEvNpmx-CsyHtK7Jw-1; Wed, 08 Jul 2020 02:57:31 -0400
-X-MC-Unique: 3keVeGEvNpmx-CsyHtK7Jw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7C3F80183C;
- Wed,  8 Jul 2020 06:57:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3AFD60E1C;
- Wed,  8 Jul 2020 06:57:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 309371132FD2; Wed,  8 Jul 2020 08:57:29 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH v2 3/3] block: switch to use qemu_open_err for improved
- errors
-References: <20200702125612.2176194-1-berrange@redhat.com>
- <20200702125612.2176194-4-berrange@redhat.com>
-Date: Wed, 08 Jul 2020 08:57:29 +0200
-In-Reply-To: <20200702125612.2176194-4-berrange@redhat.com> ("Daniel
- P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Thu, 2 Jul 2020 13:56:12
- +0100")
-Message-ID: <87y2nu3352.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1jtISC-000333-EX
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:12 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42426)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1jtISA-00019K-SP
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:12 -0400
+Received: by mail-pl1-x644.google.com with SMTP id q17so4345791pls.9
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=dczlRWi7ZhKkrGTsLLmYfEd66aSo3puvzeQP9Y5BUgA=;
+ b=iva8lD93Uixcl6VTGw+PH5203uoWhAHYuCFxSNjH6pqxxFpS/DkS4PpGwWcjb4l6DF
+ UA46M7X3NKY+nUUrUa2D+Id5wOCwEKAlUhC//cigkETi1yTivytVC7nbb8NtSjKAKgRw
+ e1GfHaFZ+ejey5g/w3VWl9lX/Qc6SO9MxLRiKw3ZkOKHIT5OkjRrBgLF++2BufR2eS2J
+ 0dKSqx0p1onob8UzbqqjgfdpAIA9T9SfI8hJU6ua8CIjRfm368zXUaISBrcZ0JWP5pj0
+ PYCLHcoRpPm21FROtP12ZA+DgzeDJDpCzpgjEtfo4J7rXf7x94L/oMazahOmfX3lJS2Y
+ Uykg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=dczlRWi7ZhKkrGTsLLmYfEd66aSo3puvzeQP9Y5BUgA=;
+ b=iD767l4E/bIkm38qLifPoEuy5n53NttlxuuVywwU3KWhPjxgYqq3QlACQ69Qj4lRBu
+ FADvGbuaqyTVcDsDZ8NSjiuWZnoKSrqaEY63LgS9tkpWqpDv2WnsBy+CPJHSBieY23Ov
+ Hpdh41CjnfrIGGm+2CmsVXvQWh4jK5F8xbSvFr/r6GuB5k00v/WiljXdqmhzdAloJED4
+ WAhPd7V5Hucjr2W7nHO76EN/6iLnz45OuKaQbfg19fQxZWeXLJBWiQTysyNUPHj5Bo2L
+ ulDhohqCW3nwkI2pO5o2jeICurovExrWtUkdMNf0PdHktKnaapW4LcS5ApxsFf6yLH0i
+ y1vg==
+X-Gm-Message-State: AOAM532Q1rrIlTrfq6tyvT+rH4mtWG6iEGK4zNmj6bT8YuKC9HqBoIft
+ 8MBFm7zRqAHzKAoGX7da7RQfQS39
+X-Google-Smtp-Source: ABdhPJzY/MALJCS6cdsd2fZr4r1I5T2LuCetK9f0zZXvBRgbtdtMX1oe0e0D0fKfJmNM1odnm3VwdQ==
+X-Received: by 2002:a17:90a:26ac:: with SMTP id
+ m41mr11324831pje.169.1594246929472; 
+ Wed, 08 Jul 2020 15:22:09 -0700 (PDT)
+Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
+ by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jul 2020 15:22:08 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 18/21] tests/tcg/xtensa: test double precision load/store
+Date: Wed,  8 Jul 2020 15:20:58 -0700
+Message-Id: <20200708222101.24568-19-jcmvbkbc@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
+References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,51 +102,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- P J P <ppandit@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+Add ldi[p]/sdi[p]/ldx[p]/sdx[p] opcode tests to test_lsc.
 
-> Currently at startup if using cache=3Dnone on a filesystem lacking
-> O_DIRECT such as tmpfs, at startup QEMU prints
->
-> qemu-system-x86_64: -drive file=3D/tmp/foo.img,cache=3Dnone: file system =
-may not support O_DIRECT
-> qemu-system-x86_64: -drive file=3D/tmp/foo.img,cache=3Dnone: Could not op=
-en '/tmp/foo.img': Invalid argument
->
-> while at QMP level the hint is missing, so QEMU reports just
->
->   "error": {
->       "class": "GenericError",
->       "desc": "Could not open '/tmp/foo.img': Invalid argument"
->   }
->
-> which is close to useless for the end user trying to figure out what
-> they did wrong
->
-> With this change at startup QEMU prints
->
-> qemu-system-x86_64: -drive file=3D/tmp/foo.img,cache=3Dnone: Unable to op=
-en '/tmp/foo.img' flags 0x4000: filesystem does not support O_DIRECT
->
-> while at the QMP level QEMU reports a massively more informative
->
->   "error": {
->      "class": "GenericError",
->      "desc": "Unable to open '/tmp/foo.img' flags 0x4002: filesystem does=
- not support O_DIRECT"
->   }
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ tests/tcg/xtensa/test_lsc.S | 123 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 123 insertions(+)
 
-Narrowing down the error's cause takes extra code, but the error message
-improvement is worth it.
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/tests/tcg/xtensa/test_lsc.S b/tests/tcg/xtensa/test_lsc.S
+index 9d59c1815a9e..348822bdd359 100644
+--- a/tests/tcg/xtensa/test_lsc.S
++++ b/tests/tcg/xtensa/test_lsc.S
+@@ -140,4 +140,127 @@ test_end
+ 
+ #endif
+ 
++#if XCHAL_HAVE_DFP
++
++#if XCHAL_HAVE_BE
++#define F64_HIGH_OFF 0
++#else
++#define F64_HIGH_OFF 4
++#endif
++
++.macro movdf fr, hi, lo
++    movi    a2, \hi
++    movi    a3, \lo
++    wfrd    \fr, a2, a3
++.endm
++
++test ldi
++    movi    a2, 1
++    wsr     a2, cpenable
++
++    movi    a2, 1f
++    ldi     f1, a2, 8
++    ldi     f2, a2, 16
++    ldip    f0, a2, 16
++    movi    a3, 1f + 16
++    assert  eq, a2, a3
++    rfrd    a2, f0
++    movi    a3, 0x3ff00000
++    assert  eq, a2, a3
++    rfrd    a2, f1
++    movi    a3, 0x40000000
++    assert  eq, a2, a3
++    rfrd    a2, f2
++    movi    a3, 0x40080000
++    assert  eq, a2, a3
++.data
++    .align  8
++1:
++.double 1, 2, 3
++.text
++test_end
++
++test sdi
++    movdf   f3, 0x40800000, 0
++    movdf   f4, 0x40a00000, 0
++    movdf   f5, 0x40c00000, 0
++    movi    a2, 1f
++    sdi     f4, a2, 8
++    sdi     f5, a2, 16
++    sdip    f3, a2, 16
++    movi    a3, 1f + 16
++    assert  eq, a2, a3
++    l32i    a4, a2, -16 + F64_HIGH_OFF
++    movi    a3, 0x40800000
++    assert  eq, a4, a3
++    l32i    a4, a2, -8 + F64_HIGH_OFF
++    movi    a3, 0x40a00000
++    assert  eq, a4, a3
++    l32i    a4, a2, F64_HIGH_OFF
++    movi    a3, 0x40c00000
++    assert  eq, a4, a3
++.data
++    .align  8
++1:
++.double 0, 0, 0
++.text
++test_end
++
++test ldx
++    movi    a2, 1f
++    movi    a3, 0
++    movi    a4, 8
++    movi    a5, 16
++    ldx     f7, a2, a4
++    ldx     f8, a2, a5
++    ldxp    f6, a2, a5
++    movi    a3, 1f + 16
++    assert  eq, a2, a3
++    rfrd    a2, f6
++    movi    a3, 0x401c0000
++    assert  eq, a2, a3
++    rfrd    a2, f7
++    movi    a3, 0x40200000
++    assert  eq, a2, a3
++    rfrd    a2, f8
++    movi    a3, 0x40220000
++    assert  eq, a2, a3
++.data
++    .align  8
++1:
++.double 7, 8, 9
++.text
++test_end
++
++test sdx
++    movdf   f9, 0x41200000, 0
++    movdf   f10, 0x41300000, 0
++    movdf   f11, 0x41400000, 0
++    movi    a2, 1f
++    movi    a3, 0
++    movi    a4, 8
++    movi    a5, 16
++    sdx     f10, a2, a4
++    sdx     f11, a2, a5
++    sdxp    f9, a2, a5
++    movi    a3, 1f + 16
++    assert  eq, a2, a3
++    l32i    a4, a2, -16 + F64_HIGH_OFF
++    movi    a3, 0x41200000
++    assert  eq, a4, a3
++    l32i    a4, a2, -8 + F64_HIGH_OFF
++    movi    a3, 0x41300000
++    assert  eq, a4, a3
++    l32i    a4, a2, F64_HIGH_OFF
++    movi    a3, 0x41400000
++    assert  eq, a4, a3
++.data
++    .align  8
++1:
++.double 0, 0, 0
++.text
++test_end
++
++#endif
++
+ test_suite_end
+-- 
+2.20.1
 
 
