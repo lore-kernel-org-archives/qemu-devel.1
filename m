@@ -2,101 +2,79 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A680C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CBAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:37:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1195420775
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:37:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31A0C20775
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:37:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LaAf99VA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1195420775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PnuePO7r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A0C20775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIh0-0000zw-SB
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:37:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48138)
+	id 1jtIhA-0001Ks-Ed
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:37:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jtIQO-00086t-Hy
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:20:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48085
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRF-0001Ce-Al
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20827
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jtIQL-0000pS-Eq
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:20:20 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRD-00010x-GF
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594246816;
+ s=mimecast20190719; t=1594246870;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SAU8guv0EnKtdIROgounwh5ZS9K5pAHDQ7nVyrdiKP4=;
- b=LaAf99VAVvOWxZuwhhLqxfiFZz32iHfTMmvh7mDGkH+GwNNaWmDKywdWYNJ87IAw2IF9WX
- 5o9vajNkt/5lViG0L4cQrRU4Pm0PMiSrHhIWTsJ9CVdEh6c54eKlP39LCHxhWSns524eYR
- tQHoaz/AEfQjiBfTusSTSBHgGOVJtSY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-uWWc8G6VPMmXkR9GQGP65g-1; Wed, 08 Jul 2020 07:17:15 -0400
-X-MC-Unique: uWWc8G6VPMmXkR9GQGP65g-1
-Received: by mail-wm1-f70.google.com with SMTP id 65so2535431wmd.8
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 04:17:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SAU8guv0EnKtdIROgounwh5ZS9K5pAHDQ7nVyrdiKP4=;
- b=tYqDyssINO/qQxCfrPoH/dLoFstm05ntf7PVJNCqhhhNgn7LHkyldKaK8W0ci79vPB
- dOG17M91VFlFAcGSK7WIZ4SB/FAAIbLHu2K4MPgYKMZruYiiFcRIJuksNhhqzW3GwrQY
- aWSNhUn8KwIBfS+lhd2DKE3pcyDpJVpgdsc0ValkTGhx/OujqMokFhe0R4mBP0utvY/a
- bjhEC5DNH14aigAb6kQIY9hXt4rVxrk8n9MrIZuhGiX2BmXrrTbaWB53dnMCkk5eP3Y8
- pTSn/f2qwPPGP+uLdvMzVPvGG0+bLegJM1f5/ZLhEJkC1D16fFFe3h8WDpC1r1EaZz3d
- rMig==
-X-Gm-Message-State: AOAM532OLd4PSV9I1TQbp2INpaZgYo3EcJL59dt/VfffcxgXskK8x8ke
- WYst+3VF8yIhZc4tTyb4CSSaZN+r55dCCC6vMMaZeBflgDX15LQfvxBwCPTtw0XffdDxGq4DePO
- /GHQ0A2RZ8WOi0u4=
-X-Received: by 2002:a1c:48d:: with SMTP id 135mr9124868wme.102.1594207033776; 
- Wed, 08 Jul 2020 04:17:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/BRvLGQ+jgBLqvCSTx08SoEP8wYmVwK8vCHdhUQFRd0zI2zhoIFS7llgbZ0kkZ6lRvg7qoA==
-X-Received: by 2002:a1c:48d:: with SMTP id 135mr9124798wme.102.1594207032986; 
- Wed, 08 Jul 2020 04:17:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c?
- ([2001:b07:6468:f312:9541:9439:cb0f:89c])
- by smtp.gmail.com with ESMTPSA id u1sm6865840wrb.78.2020.07.08.04.17.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 04:17:12 -0700 (PDT)
-Subject: Re: Migrating custom qemu.org infrastructure to GitLab
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>
-References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
- <20200708105353.GE3229307@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <92e71916-0cf2-2833-6852-de76749c101d@redhat.com>
-Date: Wed, 8 Jul 2020 13:17:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ bh=CoJx7zHW47wSTdDjw41njAUitgfj9BGECJJQWkAXqV0=;
+ b=PnuePO7rvdEIWsznJytWU0NkYHh8eU8efEect/fL0yjZhfHdWRpOOWMbSNHUgyPLEBtc+v
+ GAuMU2Xw2vYVhVPCz4XM8mTHjkV2TyAIXR/i4QAFUwbxIMS39za2r46y+9zLVsZOo7pwEy
+ Vr/SSD9UFvOIk7l9nZ/nJg6u2yFJmZY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-z7u77FRmODiyS8LVEL-LLg-1; Wed, 08 Jul 2020 10:19:32 -0400
+X-MC-Unique: z7u77FRmODiyS8LVEL-LLg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB0721005510;
+ Wed,  8 Jul 2020 14:19:30 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2AACEC0076;
+ Wed,  8 Jul 2020 14:19:17 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH v3 03/11] hw/arm/smmu: Introduce smmu_get_iotlb_key()
+Date: Wed,  8 Jul 2020 16:18:48 +0200
+Message-Id: <20200708141856.15776-4-eric.auger@redhat.com>
+In-Reply-To: <20200708141856.15776-1-eric.auger@redhat.com>
+References: <20200708141856.15776-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200708105353.GE3229307@redhat.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
@@ -118,52 +96,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Cleber Rosa <cleber@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/07/20 12:53, Daniel P. Berrangé wrote:
-> Consider if qemu-web.git is hosted on gitlab, using GitLab CI to
-> generate the static site content, and GitLab pages to host the
-> website. If a user wants to contribute to qemu-web, they can fork
-> the repo and be confident that the CI jobs in their fork are going
-> to work in the exact same way as in the master repo. They can use
-> GitLab Pages to browse the generated content for their fork to
-> see exactly how it will look.
-> 
-> This eliminates the big pain point in qemu-web contribution. Many
-> times I was tripped up with the problem of qemu-web.git requiring
-> a version of Jekyll that is incompatible with the version that
-> ships on my distro.
+Introduce the smmu_get_iotlb_key() helper and the
+SMMU_IOTLB_ASID() macro. Also move smmu_get_iotlb_key and
+smmu_iotlb_key_hash in the IOTLB related code section.
 
-I would have no issue with using a pull request workflow for qemu-web.
-The lack of "git range-diff" functionality for gitlab is an absolute
-showstopper for using it in QEMU, though.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
->> GitLab's Continuous Integration (CI) system provides a powerful way to
->> perform actions defined in yaml files in qemu.git. This includes
->> running scripts, builds, publishing build artifacts, etc. We have
->> already begun using it for automated builds and tests:
->> https://gitlab.com/qemu-project/qemu/-/blob/master/.gitlab-ci.yml
-> 
-> The CI integration has probably been the single best thing about
-> libvirt's switch to GitLab.
+---
 
-How do you handle non-x86 platforms?  Has there been any progress in
-gitlab runner support for s390 and PPC?
+v1 -> v2:
+- creation
+---
+ hw/arm/smmu-internal.h       |  1 +
+ include/hw/arm/smmu-common.h |  1 +
+ hw/arm/smmu-common.c         | 66 ++++++++++++++++++++----------------
+ 3 files changed, 38 insertions(+), 30 deletions(-)
 
-> The Documentation/Platforms content arguably should be part of
-> the main qemu.git docs.
-> 
-> Many of the feature pages are probably better as part of the formal
-> QEMU documentation too.
-
-Yes, definitely; but someone has to do the work.  At least the obsolete
-features are clearly marked as so.
+diff --git a/hw/arm/smmu-internal.h b/hw/arm/smmu-internal.h
+index 7794d6d394..3104f768cd 100644
+--- a/hw/arm/smmu-internal.h
++++ b/hw/arm/smmu-internal.h
+@@ -96,4 +96,5 @@ uint64_t iova_level_offset(uint64_t iova, int inputsize,
+             MAKE_64BIT_MASK(0, gsz - 3);
+ }
+ 
++#define SMMU_IOTLB_ASID(key) ((key).asid)
+ #endif
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 1dceec5cb1..5f9f3535d2 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -155,6 +155,7 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
+ 
+ IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
+ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry);
++SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
+ void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index f3aa581f80..7dc8541e8b 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -32,10 +32,42 @@
+ 
+ /* IOTLB Management */
+ 
++static guint smmu_iotlb_key_hash(gconstpointer v)
++{
++    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
++    uint32_t a, b, c;
++
++    /* Jenkins hash */
++    a = b = c = JHASH_INITVAL + sizeof(*key);
++    a += key->asid;
++    b += extract64(key->iova, 0, 32);
++    c += extract64(key->iova, 32, 32);
++
++    __jhash_mix(a, b, c);
++    __jhash_final(a, b, c);
++
++    return c;
++}
++
++static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
++{
++    const SMMUIOTLBKey *k1 = v1;
++    const SMMUIOTLBKey *k2 = v2;
++
++    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
++}
++
++SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
++{
++    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
++
++    return key;
++}
++
+ IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+                                  hwaddr iova)
+ {
+-    SMMUIOTLBKey key = {.asid = cfg->asid, .iova = iova};
++    SMMUIOTLBKey key = smmu_get_iotlb_key(cfg->asid, iova);
+     IOMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
+ 
+     if (entry) {
+@@ -62,8 +94,7 @@ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
+         smmu_iotlb_inv_all(bs);
+     }
+ 
+-    key->asid = cfg->asid;
+-    key->iova = entry->iova;
++    *key = smmu_get_iotlb_key(cfg->asid, entry->iova);
+     trace_smmu_iotlb_insert(cfg->asid, entry->iova);
+     g_hash_table_insert(bs->iotlb, key, entry);
+ }
+@@ -80,12 +111,12 @@ static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
+     uint16_t asid = *(uint16_t *)user_data;
+     SMMUIOTLBKey *iotlb_key = (SMMUIOTLBKey *)key;
+ 
+-    return iotlb_key->asid == asid;
++    return SMMU_IOTLB_ASID(*iotlb_key) == asid;
+ }
+ 
+ inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
+ {
+-    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
++    SMMUIOTLBKey key = smmu_get_iotlb_key(asid, iova);
+ 
+     trace_smmu_iotlb_inv_iova(asid, iova);
+     g_hash_table_remove(s->iotlb, &key);
+@@ -383,31 +414,6 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
+     return NULL;
+ }
+ 
+-static guint smmu_iotlb_key_hash(gconstpointer v)
+-{
+-    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
+-    uint32_t a, b, c;
+-
+-    /* Jenkins hash */
+-    a = b = c = JHASH_INITVAL + sizeof(*key);
+-    a += key->asid;
+-    b += extract64(key->iova, 0, 32);
+-    c += extract64(key->iova, 32, 32);
+-
+-    __jhash_mix(a, b, c);
+-    __jhash_final(a, b, c);
+-
+-    return c;
+-}
+-
+-static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
+-{
+-    const SMMUIOTLBKey *k1 = v1;
+-    const SMMUIOTLBKey *k2 = v2;
+-
+-    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
+-}
+-
+ /* Unmap the whole notifier's range */
+ static void smmu_unmap_notifier_range(IOMMUNotifier *n)
+ {
+-- 
+2.21.3
 
 
