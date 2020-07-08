@@ -2,94 +2,88 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 455C8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C272C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D09B206F6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25C32206F6
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pr+htFYi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D09B206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OCTYUfAO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C32206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIqO-0002PB-91
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:47:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48964)
+	id 1jtIqT-0002aF-At
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:47:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtISB-00032E-Pe
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:11 -0400
-Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:35051)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtISA-000196-3I
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:11 -0400
-Received: by mail-pl1-x636.google.com with SMTP id x9so5107458plr.2
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=wa+AHpqfEWhhgAfAEPD77aSGzH6coLYk43PBINkaick=;
- b=pr+htFYiDbjQeJ/ARKfk6IVACEOTAI4y+LphXq0+uyJzmgdKyi8nvcCMAui0S5v98y
- 6zWtB6Hci3/uSLYhjDCXisfAZ7RssXwOBkF0va/zldcVS3+anVUYlJb/QKGXtSyG1w/q
- B2v/50toC9Qg/+Ur1+qbaq9PfbN4oo0CO+yXiKF8JqPRsWXQu1PeiTLhSt9/98pouMpa
- NvPQ6Kd3HU3kwdXyRFGs7b3w/CsQ9Cb7n8PVOYlE1T2Zmwpi8Y5q/3SR5Mv7m/z+nJcv
- b9UutvQjbH3OUJ8c6exg5pn6BUzKqITcKgqvu5s3BKSfvFc6ou+K5vZuJqchqvnwN8iu
- qopQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=wa+AHpqfEWhhgAfAEPD77aSGzH6coLYk43PBINkaick=;
- b=oXSRxmgp7J00vAj+KmspenwL8KDfkZ6c3t/XMd775BabqicdMrlrpN8tpd0I1suCHb
- x/XtOrftfJs1G+qQE6K3xjr5ok4qiBB7sGGFRKLYVAuAIsWAfRaoVEH5P9jMjQTt3hXc
- qr3/TmVsHLE/w/YsVXPFcLoSkXFGq+hZtzgxzPeZFGba0KbI51zS+Ri4ZQQ56Ecsi5J5
- g4rdZnDJAHD8tJlfBv928zL1YuJR4nMbNPG053V6apVZBwjM5hai454hC6PU2fVCS29R
- Oj2h/iD7kgkE+HsNNftqKCQhHL0s+OTlw1IRAqxR0wJwV8vEVw94ng4oau+eC24xwM7L
- zUFg==
-X-Gm-Message-State: AOAM5326uGnLYwNGQbih2FTs6OkJad00y6u5ywF1FDCqB5MeYRshwBvw
- 1G3cutvd9/jTPoPMs6LaW2VciodD
-X-Google-Smtp-Source: ABdhPJyJvfbYgusB3GZIBvjg2CjRs24TujouXE2u8HiPE+KLHeNFiz9D6l2m2n3soz/U6t+RzBUgxg==
-X-Received: by 2002:a17:90a:ec13:: with SMTP id
- l19mr10350801pjy.81.1594246928634; 
- Wed, 08 Jul 2020 15:22:08 -0700 (PDT)
-Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jul 2020 15:22:08 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 17/21] tests/tcg/xtensa: add fp0 div and sqrt tests
-Date: Wed,  8 Jul 2020 15:20:57 -0700
-Message-Id: <20200708222101.24568-18-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
-References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRK-0001K6-8h
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20382
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRF-00011H-Ua
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594246873;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9pHbirGR3ZVNpv6TxOCXiMGBepmIdSKBOyWCaC5+JJk=;
+ b=OCTYUfAOPTRJtbDAzInUaSGBNOphaR4i4HxQw8/kGRjC1mx2jm3WUx+JnoKxz0UQTvo4wb
+ MadfVwtIe9jtX2vkmMMHUwwt/GmVV3mjoD5u+BCRtUtEb5lKzhSS6/+5/G0CR/trVJbkNp
+ hwsD4k0+GWP1Viyws4KfUESaMNkBDmc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-C-qTY9cSOgq9lWp6KNjmvA-1; Wed, 08 Jul 2020 10:19:53 -0400
+X-MC-Unique: C-qTY9cSOgq9lWp6KNjmvA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A31B1083E84;
+ Wed,  8 Jul 2020 14:19:52 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83B125BAC3;
+ Wed,  8 Jul 2020 14:19:49 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH v3 07/11] hw/arm/smmuv3: Get prepared for range invalidation
+Date: Wed,  8 Jul 2020 16:18:52 +0200
+Message-Id: <20200708141856.15776-8-eric.auger@redhat.com>
+In-Reply-To: <20200708141856.15776-1-eric.auger@redhat.com>
+References: <20200708141856.15776-1-eric.auger@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::636;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pl1-x636.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,192 +96,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test exact division/sqrt DFPU sequences.
+Enhance the smmu_iotlb_inv_iova() helper with range invalidation.
+This uses the new fields passed in the NH_VA and NH_VAA commands:
+the size of the range, the level and the granule.
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+As NH_VA and NH_VAA both use those fields, their decoding and
+handling is factorized in a new smmuv3_s1_range_inval() helper.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- tests/tcg/xtensa/test_fp0_div.S  | 82 ++++++++++++++++++++++++++++++++
- tests/tcg/xtensa/test_fp0_sqrt.S | 76 +++++++++++++++++++++++++++++
- 2 files changed, 158 insertions(+)
- create mode 100644 tests/tcg/xtensa/test_fp0_div.S
- create mode 100644 tests/tcg/xtensa/test_fp0_sqrt.S
+ hw/arm/smmuv3-internal.h     |  4 +++
+ include/hw/arm/smmu-common.h |  3 +-
+ hw/arm/smmu-common.c         | 25 +++++++++++---
+ hw/arm/smmuv3.c              | 64 +++++++++++++++++++++++-------------
+ hw/arm/trace-events          |  4 +--
+ 5 files changed, 69 insertions(+), 31 deletions(-)
 
-diff --git a/tests/tcg/xtensa/test_fp0_div.S b/tests/tcg/xtensa/test_fp0_div.S
-new file mode 100644
-index 000000000000..c3e7ad7bb5b3
---- /dev/null
-+++ b/tests/tcg/xtensa/test_fp0_div.S
-@@ -0,0 +1,82 @@
-+#include "macros.inc"
-+#include "fpu.h"
+diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+index 4112394129..5babf72f7d 100644
+--- a/hw/arm/smmuv3-internal.h
++++ b/hw/arm/smmuv3-internal.h
+@@ -298,6 +298,8 @@ enum { /* Command completion notification */
+ };
+ 
+ #define CMD_TYPE(x)         extract32((x)->word[0], 0 , 8)
++#define CMD_NUM(x)          extract32((x)->word[0], 12 , 5)
++#define CMD_SCALE(x)        extract32((x)->word[0], 20 , 5)
+ #define CMD_SSEC(x)         extract32((x)->word[0], 10, 1)
+ #define CMD_SSV(x)          extract32((x)->word[0], 11, 1)
+ #define CMD_RESUME_AC(x)    extract32((x)->word[0], 12, 1)
+@@ -310,6 +312,8 @@ enum { /* Command completion notification */
+ #define CMD_RESUME_STAG(x)  extract32((x)->word[2], 0 , 16)
+ #define CMD_RESP(x)         extract32((x)->word[2], 11, 2)
+ #define CMD_LEAF(x)         extract32((x)->word[2], 0 , 1)
++#define CMD_TTL(x)          extract32((x)->word[2], 8 , 2)
++#define CMD_TG(x)           extract32((x)->word[2], 10, 2)
+ #define CMD_STE_RANGE(x)    extract32((x)->word[2], 0 , 5)
+ #define CMD_ADDR(x) ({                                        \
+             uint64_t high = (uint64_t)(x)->word[3];           \
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 8b13ab0951..192e8455aa 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -168,7 +168,8 @@ SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova,
+                                uint8_t tg, uint8_t level);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
+-void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova);
++void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova,
++                         uint8_t tg, uint64_t num_pages, uint8_t ttl);
+ 
+ /* Unmap the range of all the notifiers registered to any IOMMU mr */
+ void smmu_inv_notifiers_all(SMMUState *s);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index d373e30aa5..aa2c5d76da 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -140,15 +140,30 @@ static gboolean smmu_hash_remove_by_asid_iova(gpointer key, gpointer value,
+     if (info->asid >= 0 && info->asid != SMMU_IOTLB_ASID(iotlb_key)) {
+         return false;
+     }
+-    return (info->iova & ~entry->addr_mask) == entry->iova;
++    return ((info->iova & ~entry->addr_mask) == entry->iova) ||
++           ((entry->iova & ~info->mask) == info->iova);
+ }
+ 
+-inline void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova)
++inline void
++smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova,
++                    uint8_t tg, uint64_t num_pages, uint8_t ttl)
+ {
+-    SMMUIOTLBPageInvInfo info = {.asid = asid, .iova = iova};
++    if (ttl && (num_pages == 1)) {
++        SMMUIOTLBKey key = smmu_get_iotlb_key(asid, iova, tg, ttl);
+ 
+-    trace_smmu_iotlb_inv_iova(asid, iova);
+-    g_hash_table_foreach_remove(s->iotlb, smmu_hash_remove_by_asid_iova, &info);
++        g_hash_table_remove(s->iotlb, &key);
++    } else {
++            /* if tg is not set we use 4KB range invalidation */
++            uint8_t granule = tg ? tg * 2 + 10 : 12;
 +
-+test_suite fp0_div
++            SMMUIOTLBPageInvInfo info = {
++                 .asid = asid, .iova = iova,
++                 .mask = (num_pages * 1 << granule) - 1};
 +
-+#if XCHAL_HAVE_FP_DIV
++            g_hash_table_foreach_remove(s->iotlb,
++                                        smmu_hash_remove_by_asid_iova,
++                                        &info);
++    }
+ }
+ 
+ inline void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid)
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index e4a2cea7ad..89ab11fc36 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -785,42 +785,49 @@ epilogue:
+  * @n: notifier to be called
+  * @asid: address space ID or negative value if we don't care
+  * @iova: iova
++ * @tg: translation granule (if communicated through range invalidation)
++ * @num_pages: number of @granule sized pages (if tg != 0), otherwise 1
+  */
+ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
+                                IOMMUNotifier *n,
+-                               int asid,
+-                               dma_addr_t iova)
++                               int asid, dma_addr_t iova,
++                               uint8_t tg, uint64_t num_pages)
+ {
+     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+-    SMMUEventInfo event = {.inval_ste_allowed = true};
+-    SMMUTransTableInfo *tt;
+-    SMMUTransCfg *cfg;
+     IOMMUTLBEntry entry;
++    uint8_t granule = tg;
+ 
+-    cfg = smmuv3_get_config(sdev, &event);
+-    if (!cfg) {
+-        return;
+-    }
++    if (!tg) {
++        SMMUEventInfo event = {.inval_ste_allowed = true};
++        SMMUTransCfg *cfg = smmuv3_get_config(sdev, &event);
++        SMMUTransTableInfo *tt;
+ 
+-    if (asid >= 0 && cfg->asid != asid) {
+-        return;
+-    }
++        if (!cfg) {
++            return;
++        }
+ 
+-    tt = select_tt(cfg, iova);
+-    if (!tt) {
+-        return;
++        if (asid >= 0 && cfg->asid != asid) {
++            return;
++        }
 +
-+.macro  divs_seq q, a, b, r, y, y0, an, bn, e, ex
-+    div0.s      \y0, \b
-+    nexp01.s    \bn, \b
-+    const.s     \e, 1
-+    maddn.s     \e, \bn, \y0
-+    mov.s       \y, \y0
-+    mov.s       \ex, \b
-+    nexp01.s    \an, \a
-+    maddn.s     \y, \e, \y0
-+    const.s     \e, 1
-+    const.s     \q, 0
-+    neg.s       \r, \an
-+    maddn.s     \e, \bn, \y
-+    maddn.s     \q, \r, \y0
-+    mkdadj.s    \ex, \a
-+    maddn.s     \y, \e, \y
-+    maddn.s     \r, \bn, \q
-+    const.s     \e, 1
-+    maddn.s     \e, \bn, \y
-+    maddn.s     \q, \r, \y
-+    neg.s       \r, \an
-+    maddn.s     \y, \e, \y
-+    maddn.s     \r, \bn, \q
-+    addexpm.s   \q, \ex
-+    addexp.s    \y, \ex
-+    divn.s      \q, \r, \y
-+.endm
++        tt = select_tt(cfg, iova);
++        if (!tt) {
++            return;
++        }
++        granule = tt->granule_sz;
+     }
+ 
+     entry.target_as = &address_space_memory;
+     entry.iova = iova;
+-    entry.addr_mask = (1 << tt->granule_sz) - 1;
++    entry.addr_mask = num_pages * (1 << granule) - 1;
+     entry.perm = IOMMU_NONE;
+ 
+     memory_region_notify_one(n, &entry);
+ }
+ 
+-/* invalidate an asid/iova tuple in all mr's */
+-static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
++/* invalidate an asid/iova range tuple in all mr's */
++static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova,
++                                      uint8_t tg, uint64_t num_pages)
+ {
+     SMMUDevice *sdev;
+ 
+@@ -828,28 +835,39 @@ static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
+         IOMMUMemoryRegion *mr = &sdev->iommu;
+         IOMMUNotifier *n;
+ 
+-        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova);
++        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova,
++                                        tg, num_pages);
+ 
+         IOMMU_NOTIFIER_FOREACH(n, mr) {
+-            smmuv3_notify_iova(mr, n, asid, iova);
++            smmuv3_notify_iova(mr, n, asid, iova, tg, num_pages);
+         }
+     }
+ }
+ 
+ static void smmuv3_s1_range_inval(SMMUState *s, Cmd *cmd)
+ {
++    uint8_t scale = 0, num = 0, ttl = 0;
+     dma_addr_t addr = CMD_ADDR(cmd);
+     uint8_t type = CMD_TYPE(cmd);
+     uint16_t vmid = CMD_VMID(cmd);
+     bool leaf = CMD_LEAF(cmd);
++    uint8_t tg = CMD_TG(cmd);
++    hwaddr num_pages = 1;
+     int asid = -1;
+ 
++    if (tg) {
++        scale = CMD_SCALE(cmd);
++        num = CMD_NUM(cmd);
++        ttl = CMD_TTL(cmd);
++        num_pages = (num + 1) * (1 << (scale));
++    }
 +
-+.macro div_s fr0, fr1, fr2
-+    divs_seq    \fr0, \fr1, \fr2, f9, f10, f11, f12, f13, f14, f15
-+.endm
-+
-+.macro movfp fr, v
-+    movi        a2, \v
-+    wfr         \fr, a2
-+.endm
-+
-+.macro check_res fr, r, sr
-+    rfr         a2, \fr
-+    dump        a2
-+    movi        a3, \r
-+    assert      eq, a2, a3
-+    rur         a2, fsr
-+    movi        a3, \sr
-+    assert      eq, a2, a3
-+.endm
-+
-+test div_s
-+    movi        a2, 1
-+    wsr         a2, cpenable
-+
-+    test_op2    div_s, f0, f1, f2, 0x40000000, 0x40400000, \
-+        0x3f2aaaab, 0x3f2aaaaa, 0x3f2aaaab, 0x3f2aaaaa, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
-+    test_op2    div_s, f3, f4, f5, F32_1, F32_0, \
-+        F32_PINF, F32_PINF, F32_PINF, F32_PINF, \
-+           FSR_Z,    FSR_Z,    FSR_Z,    FSR_Z
-+    test_op2    div_s, f6, f7, f8, F32_0, F32_0, \
-+        F32_DNAN, F32_DNAN, F32_DNAN, F32_DNAN, \
-+           FSR_V,    FSR_V,    FSR_V,    FSR_V
-+
-+    /* MAX_FLOAT / 0.5 = +inf/MAX_FLOAT  */
-+    test_op2    div_s, f0, f1, f2, F32_MAX, F32_0_5, \
-+        F32_PINF, F32_MAX, F32_PINF, F32_MAX, \
-+          FSR_OI,  FSR_OI,   FSR_OI,  FSR_OI
-+
-+    /* 0.5 / MAX_FLOAT = denorm  */
-+    test_op2    div_s, f0, f1, f2, F32_0_5, F32_MAX, \
-+        0x00100000, 0x00100000, 0x00100001, 0x00100000, \
-+            FSR_UI,     FSR_UI,     FSR_UI,     FSR_UI
-+test_end
-+
-+#endif
-+
-+test_suite_end
-diff --git a/tests/tcg/xtensa/test_fp0_sqrt.S b/tests/tcg/xtensa/test_fp0_sqrt.S
-new file mode 100644
-index 000000000000..585973dce6bc
---- /dev/null
-+++ b/tests/tcg/xtensa/test_fp0_sqrt.S
-@@ -0,0 +1,76 @@
-+#include "macros.inc"
-+#include "fpu.h"
-+
-+test_suite fp0_sqrt
-+
-+#if XCHAL_HAVE_FP_SQRT
-+
-+.macro  sqrt_seq r, a, y, t1, hn, h2, t5, h
-+    sqrt0.s     \y, \a
-+    const.s     \t1, 0
-+    maddn.s     \t1, \y, \y
-+    nexp01.s    \hn, \a
-+    const.s     \r, 3
-+    addexp.s    \hn, \r
-+    maddn.s     \r, \t1, \hn
-+    nexp01.s    \t1, \a
-+    neg.s       \h2, \t1
-+    maddn.s     \y, \r, \y
-+    const.s     \r, 0
-+    const.s     \t5, 0
-+    const.s     \h, 0
-+    maddn.s     \r, \h2, \y
-+    maddn.s     \t5, \y, \hn
-+    const.s     \hn, 3
-+    maddn.s     \h, \hn, \y
-+    maddn.s     \t1, \r, \r
-+    maddn.s     \hn, \t5, \y
-+    neg.s       \y, \h
-+    maddn.s     \r, \t1, \y
-+    maddn.s     \h, \hn, \h
-+    mksadj.s    \y, \a
-+    nexp01.s    \a, \a
-+    maddn.s     \a, \r, \r
-+    neg.s       \t1, \h
-+    addexpm.s   \r, \y
-+    addexp.s    \t1, \y
-+    divn.s      \r, \a, \t1
-+.endm
-+
-+.macro sqrt_s fr0, fr1
-+    sqrt_seq    \fr0, \fr1, f10, f11, f12, f13, f14, f15
-+.endm
-+
-+.macro movfp fr, v
-+    movi        a2, \v
-+    wfr         \fr, a2
-+.endm
-+
-+.macro check_res fr, r, sr
-+    rfr         a2, \fr
-+    dump        a2
-+    movi        a3, \r
-+    assert      eq, a2, a3
-+    rur         a2, fsr
-+    movi        a3, \sr
-+    assert      eq, a2, a3
-+.endm
-+
-+test sqrt_s
-+    movi        a2, 1
-+    wsr         a2, cpenable
-+
-+    test_op1    sqrt_s, f0, f1, 0x40000000, \
-+        0x3fb504f3, 0x3fb504f3, 0x3fb504f4, 0x3fb504f3, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
-+    test_op1    sqrt_s, f3, f4, F32_1, \
-+        F32_1, F32_1, F32_1, F32_1, \
-+        FSR__, FSR__, FSR__, FSR__
-+    test_op1    sqrt_s, f6, f7, F32_MINUS | F32_1, \
-+        F32_DNAN, F32_DNAN, F32_DNAN, F32_DNAN, \
-+           FSR_V,    FSR_V,    FSR_V,    FSR_V
-+test_end
-+
-+#endif
-+
-+test_suite_end
+     if (type == SMMU_CMD_TLBI_NH_VA) {
+         asid = CMD_ASID(cmd);
+     }
+-    trace_smmuv3_s1_range_inval(vmid, asid, addr, leaf);
+-    smmuv3_inv_notifiers_iova(s, asid, addr);
+-    smmu_iotlb_inv_iova(s, asid, addr);
++    trace_smmuv3_s1_range_inval(vmid, asid, addr, tg, num_pages, ttl, leaf);
++    smmuv3_inv_notifiers_iova(s, asid, addr, tg, num_pages);
++    smmu_iotlb_inv_iova(s, asid, addr, tg, num_pages, ttl);
+ }
+ 
+ static int smmuv3_cmdq_consume(SMMUv3State *s)
+diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+index c219fe9e82..3d905e0f7d 100644
+--- a/hw/arm/trace-events
++++ b/hw/arm/trace-events
+@@ -45,11 +45,11 @@ smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
+ smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
+ smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%d)"
+ smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%d)"
+-smmuv3_s1_range_inval(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
++smmuv3_s1_range_inval(int vmid, int asid, uint64_t addr, uint8_t tg, uint64_t num_pages, uint8_t ttl, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" tg=%d num_pages=0x%"PRIx64" ttl=%d leaf=%d"
+ smmuv3_cmdq_tlbi_nh(void) ""
+ smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
+ smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
+ smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
+ smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
+-smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova) "iommu mr=%s asid=%d iova=0x%"PRIx64
++smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova, uint8_t tg, uint64_t num_pages) "iommu mr=%s asid=%d iova=0x%"PRIx64" tg=%d num_pages=0x%"PRIx64
+ 
 -- 
-2.20.1
+2.21.3
 
 
