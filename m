@@ -7,111 +7,110 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 160A7C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 433B1C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:24:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2BDF206E9
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:23:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04552206E9
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:24:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HNh4aw9R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2BDF206E9
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="e/LjSGGN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04552206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtDn3-0004ij-2F
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 13:23:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59736)
+	id 1jtDo9-0006UP-93
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 13:24:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtDkX-0001Qb-2e; Wed, 08 Jul 2020 13:20:49 -0400
-Received: from mail-am6eur05on2104.outbound.protection.outlook.com
- ([40.107.22.104]:40737 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ id 1jtDme-0004dM-BA; Wed, 08 Jul 2020 13:23:00 -0400
+Received: from mail-db8eur05on2103.outbound.protection.outlook.com
+ ([40.107.20.103]:57117 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtDkU-0004Yc-Ge; Wed, 08 Jul 2020 13:20:48 -0400
+ id 1jtDmc-0004nT-KZ; Wed, 08 Jul 2020 13:23:00 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NTPFJxQZCty9Plf+kBasESdRepaGIX/94Ecnh9X5LGcFZjjz5fdl+EtmhKwIYvWQMhliQK9hhpGlczOzM8KWcyGsGjRPkdtPHmP3iGYNSRjh1uH78a1WjGQTHrOmXIbUXhgTRsCMf0qPoIyXKfrg0ggHc5f73ezo9qcbAmVBoCm85zRTJD0YNiLZtAFm6ECoE1h3qobTbyyIge0IbpSjefVsZ5QYbiEakvQaRUfTjwUToVeNTaSfy5RGbWkrmXg9HJdIHYlXI2fJSMEkBCZZyWCwWCevF6Il8nACiLG2jRy/q+xLha6A0dWSDx/3jTjNdCNvlyV//6JSlAUp8xruYg==
+ b=mI/4cK2HcC6q6kyrpjk3DQiRZZT7D+UZ0AE1KEquU3FnstldWpB9MWQtOoJrRt2XptVI3I7c1x6et1steHUiBe8CfkU1F/P5kquhyq6CETMB+cpu2roek71+MLBqyRpkekqSD3tHCG3Z/fXNMqxHdj3c+6Jajv7bYKs7AacKLx/9KjZdsNl503Po1fChfYJnhnNyNfNkWp/R4yXWGwJW37cYCSefSaCmFEgWEuXBh7J1raGSTJb+8f5UEWl+V5aUx/RszsJjWNUV3YB1+3P4+FuJQMaxrI4Zoi9U8ER4YMU40zfpJYlOgdz0cTjH0zyc1KoExAVpSZigw3DQQPVhyA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nbe1FT7qtlAqlJJ5wRDAJuCilA7x8qVW0HRofJsUlmQ=;
- b=jPEgyF6VZVYRXvvMzyuzBOs4yPP3/qb7RsYbjnFbRTKcdkI1k05aPDooszI9CMne1azigmcURRd/+g/8T6WbAcoBI77ENZ0YrI/fOFj0EvWcPnEC7YHE9k9WgqCVNqY9Hdystn99chxfF+SkTix/JyzmWLdMKQ4EpiSpZHUWWJ3b3kQoADnI45wlCd/QUQ1x+HE3Sh+PGLqskpPXNZ+bjnfCmCZaaqU4/C2qhQeaaXtdvLd7Lah1FxozQupvpkyjQK5bhPL02bathBQSNKZJZOoF1bqZZvBtnZp98N9HykxPPDXf0pveB9FZmcvfR4uOQdVaKlZOFfNJnePP2QSDVg==
+ bh=hEU29OK5kWpejl0sv4tAguvNQqeJLIBZ7GHROwsXNlE=;
+ b=VO1Njf4TB5O147JCfiM/xeo5xS7YwIW+Coc/gags7HMc5We++tYJ9XzSoucCCJXJIg9/q7tLC9RwK7OeBad124Th2+3zaTXTnlk3i4NsCczcXPaHvSIA/kO/SjknGjLVVV8VLQn7uxQccO7o9UyPfvn5lxgCpIP/870cKDgY9sxuoywR3Y0sulwFX3V+p53bAGadN19sWvsA9mjs3xQDz68PwmE3O6IPVV+rmpTUXgRp0WohULfGKKGizA1cji30lBgB9HdMqnZpZxO61PnrgWdDL+Ufot4j6UQ28t2R2W18mXKfvFV9Kp2Fj+LGZwB/xvZzcJFZgw4esMGcWtDnzw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nbe1FT7qtlAqlJJ5wRDAJuCilA7x8qVW0HRofJsUlmQ=;
- b=HNh4aw9RuhqaKNHMF34++Go+blohbEpURkjCqATlGwCfNvvtwjY/P3fbiveXlKYm3f8kd0dmhwqGMQrpZBG7rArt8yFpf5GfWBcMmoEKbslEVjg8S7MWVYgqD4niA9HDZnSQQ1FMSWcdpzwmhqy5msjmOzruv3ZIdyVX8YuMFCI=
+ bh=hEU29OK5kWpejl0sv4tAguvNQqeJLIBZ7GHROwsXNlE=;
+ b=e/LjSGGN4UhCB4g/KYb827E8ePC5JtQd0gApqGJ06GeQ85h+cOegGeovIJRnOT+rThMuaPJ2S/KVYmXo2Ytuq/dz9oV1ca+e+MhkVukdMxgZVw5brWRPqf3KBVEWIZMIzxcwoCDYYejNU9A3KhyiWHswgq47JUOLtS6FMUqhVbU=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB4215.eurprd08.prod.outlook.com (2603:10a6:20b:90::16)
+ by AM6PR08MB2984.eurprd08.prod.outlook.com (2603:10a6:209:4e::28)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23; Wed, 8 Jul
- 2020 17:20:44 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Wed, 8 Jul
+ 2020 17:22:56 +0000
 Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
  ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
  ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.021; Wed, 8 Jul 2020
- 17:20:44 +0000
-Subject: Re: [PATCH v7 02/47] block: Add chain helper functions
+ 17:22:56 +0000
+Subject: Re: [PATCH v7 01/47] block: Add child access functions
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-3-mreitz@redhat.com>
+ <20200625152215.941773-2-mreitz@redhat.com>
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <5c2a81c7-851c-aeb4-84b7-3bd61417495e@virtuozzo.com>
-Date: Wed, 8 Jul 2020 20:20:41 +0300
+Message-ID: <7f6e56bb-9af6-3ef4-c881-1ef1017ab011@virtuozzo.com>
+Date: Wed, 8 Jul 2020 20:22:52 +0300
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
  Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-3-mreitz@redhat.com>
+In-Reply-To: <20200625152215.941773-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-GB
-X-ClientProxiedBy: AM0PR04CA0051.eurprd04.prod.outlook.com
- (2603:10a6:208:1::28) To AM6PR08MB4070.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM0PR10CA0124.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:e6::41) To AM6PR08MB4070.eurprd08.prod.outlook.com
  (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from Admins-MacBook-Pro.local (109.252.114.191) by
- AM0PR04CA0051.eurprd04.prod.outlook.com (2603:10a6:208:1::28) with Microsoft
+ AM0PR10CA0124.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:e6::41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.21 via Frontend Transport; Wed, 8 Jul 2020 17:20:43 +0000
+ 15.20.3174.22 via Frontend Transport; Wed, 8 Jul 2020 17:22:55 +0000
 X-Originating-IP: [109.252.114.191]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 98180d13-403d-4df5-a12d-08d823633f1d
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4215:
+X-MS-Office365-Filtering-Correlation-Id: ffd54d07-c918-4d92-0d29-08d823638db6
+X-MS-TrafficTypeDiagnostic: AM6PR08MB2984:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB42152D0D63869B027686DC39F4670@AM6PR08MB4215.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:569;
-X-Forefront-PRVS: 04583CED1A
+X-Microsoft-Antispam-PRVS: <AM6PR08MB2984DE63743FCB224D82B805F4670@AM6PR08MB2984.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: k5n/u05m7s+ySi7PTFnqKYFETatEDUKVbdxYvyo2xLZrNus0sE5Ww7Uwq+lKEDCan95ZMziqtDD8PNZA7PcPlqHe/8n2W9ulOokyb/gRZFgAvHqgF8nfDsakM1lP5FQMIsEk1/p1MMuyy0Nf1jRwN4S7JX9DcUIPEFooHBL8uQZEfvPuXQmL+xAPBqi2g0dqDiGebpW6ZO49Zai6FysQ3AOxu3alUrPNsODxsnyUBKdjQJQzP4Hj+3zDfKHdle3u9vJOgfIMDeo9ItY6fM7MgYOhlRcZhrPu6+WQEhMmlI4oU19r4lIvg/d20RkOI0kpjMkhvXKVg2gRbDys/MdfJTGQvVIskdZGU5UTZTPCCrtznwpvqDtxdgZsQSxobvlR
+X-Microsoft-Antispam-Message-Info: iZoUhS2tiQxA9VRRZHcAZN1wmyFWQV8/G0peyW3Et4GwI04BFXa81QR6f/TqorDVsovwZnhJVJS1ywknJ4rlDXhUY60J4yIEVPuoB5XCO3FCilN13L9hm5pe7PF2iZomyKVwGmc7q8vb6z8JE7QJWHSMtIIpWDw8CIk+38L1yhNyEmSjGPNEEGn/m63MRnAwYiATqRVqPW5pJ3aBBX8YWge/Of3z0CpY80qRg+mm4BrOqvhopN80Eurjt/v8vIN/qYovBgnI4+xWHCcWzokQfWieo0FPahN/6IHtIheC30TzEbZ+VPf2C9om3whH/zzUz5X14dFH/dj6L5Ia36kmgWvJSGJqcqZJ98u+l7Qelrs3/cdhBSwa/WUhucmEHCr+
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(396003)(136003)(346002)(366004)(39840400004)(376002)(478600001)(53546011)(6506007)(83380400001)(5660300002)(186003)(8676002)(16526019)(2906002)(31686004)(8936002)(26005)(36756003)(31696002)(86362001)(44832011)(6486002)(2616005)(956004)(52116002)(54906003)(66476007)(4326008)(66556008)(316002)(6512007)(66946007)(43740500002);
+ SFS:(4636009)(346002)(396003)(366004)(376002)(136003)(39840400004)(8676002)(16526019)(956004)(316002)(6512007)(2616005)(8936002)(54906003)(26005)(186003)(44832011)(31686004)(2906002)(53546011)(478600001)(4326008)(5660300002)(66556008)(52116002)(6486002)(83380400001)(86362001)(66476007)(66946007)(6506007)(31696002)(6666004)(36756003)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: cvHfYkZ6bqusq9tG+6E+qlrLuK+fPLTJ2ioPU5H81txXb2NaBfn2ESv9migp8hwm+wqgnEfqhgD193PHOFqyySCGjTY9xYwyQuswMsIPKnuGA7DXY3Lj+fC/abaNbIzRw1+AaIbflS4i2aw+FSvc5Cg/uPIle7TKi598ZtGt+7gmNhqpZuZluXK+a9v6PnDrfILviuYHb61yADFkEch6nOaallaaX/6Wp7swltTGAssbkSbe4er7WFNHRHsW2BWCm87y9vzWBuVS2AhYia4LHBQugmsYUOD8AYzsrQ1qVTaIdCTgkv3KjeQ1O4ukbWg9Uxsqr375ACUUZu8JRNIFMLP9k8LF+qXVPHwgJaJVyEkKocmHcTyy0HVAKsac7iZxGxRG4Af1DMN7NC3XxNpuGMehF0dRJP4lT7P3THg1En+ew/Oqc4rMvfn9C+5Hto4jQFGv7UIRJMrZBpcwLQLyXK7nuCKCgCVSmRHMpF+swO1r+/+cm4G0GUrvhD6jOBcj
+X-MS-Exchange-AntiSpam-MessageData: 1GLUd/jeNFO7mSD1Zkd1cfQzl1HmqJlCAcCfLjcxB7ufWhA5VciIj4ZW6SomHo5r8giqRbMLz8CqNap5XHFjIaoj3/aZASR/E6jaBTV2vax0WNgdmBcBzz74/hSpiESTzFR6eKzw3p2ZajTeXtn2qFm8Q4Vxbjk0FznJ+/ghBRBbs7G8NYB1D7f9hMyiWpvxq0Rki3qSkJyDxbsrU/C1gofKRT4rQv9j0EUpvQC1TW56BO60SHf/V5vvY0tnukazzde1duQD/ZBKDG3h7uM6cX+I5syQlcr35i9DiWAYbJJRpGciILVblTFQFq/D0c986NVyV916acGqfKwDEA3AZ/rbXwfiVHstD4A8OAtlbzYStWkYswzEuB6oOwUyCwnWAV7iw60/cXN/1T948oW8gKzsnnriDGGxz14APOjBQfBmRFH+AlgcdJU0oq9WtOREkBFqsKaGdtDqyO34wpy7K1R10gHoakEfN7Tq1Gs/3zVPqvUMYh1SC1XvD8BnZ7r4
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98180d13-403d-4df5-a12d-08d823633f1d
+X-MS-Exchange-CrossTenant-Network-Message-Id: ffd54d07-c918-4d92-0d29-08d823638db6
 X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2020 17:20:44.2345 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2020 17:22:56.3485 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NeHV+naRFP1XTYnkJ0KzL+ox6xI7tfNPzqKRxxWmk3Yyjfj+vDaQKl0JQqeBIdQdaD0YqXscET2mPswlu/0ez8z27IL51vlotHJ1THICU10=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4215
-Received-SPF: pass client-ip=40.107.22.104;
+X-MS-Exchange-CrossTenant-UserPrincipalName: qDrDbA8bv+8mz8awJxvph4dVseNqcAP5J/lv8JmkS++quYN2yYbyUuk5yeQRZAtH82RNjtb5XU5pSyKi/ee0qXwO4dkak0wdbMA44S5rF0A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2984
+Received-SPF: pass client-ip=40.107.20.103;
  envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 13:20:44
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 13:22:57
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -138,60 +137,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+
 On 25.06.2020 18:21, Max Reitz wrote:
-> Add some helper functions for skipping filters in a chain of block
-> nodes.
+> There are BDS children that the general block layer code can access,
+> namely bs->file and bs->backing.  Since the introduction of filters and
+> external data files, their meaning is not quite clear.  bs->backing can
+> be a COW source, or it can be a filtered child; bs->file can be a
+> filtered child, it can be data and metadata storage, or it can be just
+> metadata storage.
+>
+> This overloading really is not helpful.  This patch adds functions that
+> retrieve the correct child for each exact purpose.  Later patches in
+> this series will make use of them.  Doing so will allow us to handle
+> filter nodes in a meaningful way.
 >
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->   include/block/block_int.h |  3 +++
->   block.c                   | 55 +++++++++++++++++++++++++++++++++++++++
->   2 files changed, 58 insertions(+)
+>   include/block/block_int.h | 44 +++++++++++++++++--
+>   block.c                   | 90 +++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 131 insertions(+), 3 deletions(-)
 >
 > diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index bb3457c5e8..5da793bfc3 100644
+> index 1b86b59af1..bb3457c5e8 100644
 > --- a/include/block/block_int.h
 > +++ b/include/block/block_int.h
-> @@ -1382,6 +1382,9 @@ BdrvChild *bdrv_cow_child(BlockDriverState *bs);
->   BdrvChild *bdrv_filter_child(BlockDriverState *bs);
->   BdrvChild *bdrv_filter_or_cow_child(BlockDriverState *bs);
->   BdrvChild *bdrv_primary_child(BlockDriverState *bs);
-> +BlockDriverState *bdrv_skip_implicit_filters(BlockDriverState *bs);
-> +BlockDriverState *bdrv_skip_filters(BlockDriverState *bs);
-> +BlockDriverState *bdrv_backing_chain_next(BlockDriverState *bs);
+> @@ -90,9 +90,17 @@ struct BlockDriver {
+>       int instance_size;
 >   
->   static inline BlockDriverState *child_bs(BdrvChild *child)
->   {
-> diff --git a/block.c b/block.c
-> index 5a42ef49fd..0a0b855261 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -7008,3 +7008,58 @@ BdrvChild *bdrv_primary_child(BlockDriverState *bs)
->   
->       return NULL;
->   }
-> +
-> +static BlockDriverState *bdrv_do_skip_filters(BlockDriverState *bs,
-> +                                              bool stop_on_explicit_filter)
-> +{
-> +    BdrvChild *c;
-> +
-> +    if (!bs) {
-> +        return NULL;
-> +    }
-> +
-> +    while (!(stop_on_explicit_filter && !bs->implicit)) {
-> +        c = bdrv_filter_child(bs);
-> +        if (!c) {
-> +            break;
-> +        }
-> +        bs = c->bs;
+> ...
 
-Could it be child_bs(bs) ?
 
-Andrey
-
-> +    }
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
 
