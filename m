@@ -8,77 +8,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 042CEC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6744CC433E1
 	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1D75206F6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:49:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20500206F6
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:49:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G9KyAQMW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1D75206F6
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B1cy7Y/W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20500206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIsQ-0007Qi-Ua
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:49:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49046)
+	id 1jtIsR-0007Q3-93
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:49:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtISE-000368-L5
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:14 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:42297)
+ id 1jtIS9-0002ws-NF
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:09 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45672)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtISB-00019q-U1
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:14 -0400
-Received: by mail-pf1-x431.google.com with SMTP id 1so87930pfn.9
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:11 -0700 (PDT)
+ id 1jtIS7-00018e-AX
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:09 -0400
+Received: by mail-pl1-x644.google.com with SMTP id k4so4599106pld.12
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xYpaV1GaTiVYZ9sz0Ztnms68+FSNRF9gxImePs/wc/0=;
- b=G9KyAQMWpfYGaFyM8lcyQImOvFJKbza23TFMDJMo8XwDnc1rvwYNDICfBJ8nf10BMk
- y0WR98k/9FExOn/6uldvzZ/zQ/KTmSC71ITozBl16hia6guX5bTbVGhxA5QYsyeI9sZY
- pah/eRu27m9KToQgT4G/CpHQRrxXR93mEfu2Wk9/23EECeL9zVZKPq124L3pZez+VL4M
- BtJBzDP1Lh/l7qmls0yjGU6tqqOW1SaTouYp+FH7mZhnW7SiYxLpIc+BUMV1J6nZaqUS
- QJPPcAWqPYjHvaFVtbHWZ8gAhzxIIkNCxHbkKZWpFH2FEWgnO7uALFPf6C8JHAjX0nNg
- PLNA==
+ bh=643YbMqUe3cU9Y3BkZ4lZoPyP5SXzuFH+wHJ5r5v8mE=;
+ b=B1cy7Y/Wu/HIaNwXnjH7OjAmK3ySO8cISSbOwGlTFMGRDb4h22bB+3N7C/o3YlptqP
+ l5gV+X37kogB+QQkJ5CmzW+4RC4OVsG3vkKJ+jmkzUOWgGmUmdxrICDljdT9E54FZMYu
+ r4lJ6pJkH7wO9OviPt9pjHyewoHEIvBUA5RC/t+O5LqbUeliejWxvDNLm26Mhx3Hrl+K
+ JWJt52UBNA3iJZRR3ABnKxyANW9Pk2jdm8quhn9pj52J1plDeTDGADJ/L1dec9nPMFCo
+ y+6ghnv3oYCmSGtfb3pYE9+QHm+TEjnVDusan/M/8PQNxEGbfi2moZVtU+1Uu2HcUxXH
+ 6ScQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xYpaV1GaTiVYZ9sz0Ztnms68+FSNRF9gxImePs/wc/0=;
- b=bvkXksfOkZRcB0BcERDGdC4a5S5HjxjNWfDc0Ze2YwKMYRxEbTPmdhb3YxYrIrCBhy
- UYjQBbUm5nq0TVVpbwmpSTmaVzgEUttYciCmzIJaWCmGW2vVUtb9laOiqF2A9T9UfCB6
- ehbU96vw6fzBf5Rl5IBPrQ7OrREqVYEpo1lfcWfntVkBPzUsxhu2G+vuEIaSdxlnz5D2
- Fmotcq3X5S9bvCm9kY3IPBIEnRQ/7XdjK1DmzUbxX8na52FCWWtPcps/L9kOxvNK/6us
- LvYg+exQ/k8XouYhamNg9oH4y3P918Mc0yKiHcip7+7IkvygmTwegHQcJlhX2XUh9jCy
- UYwA==
-X-Gm-Message-State: AOAM531yz9hLm5yFIrdT52FZk1tiRFoCBdLfqhM/kAhZV+5rf+Z3UNmD
- qW+KSxYh2cNcGagA/SCanTv0uiM2
-X-Google-Smtp-Source: ABdhPJxTbwYcUCLpdfZj6w/69IP7SVCenPTQ+koCzjQoTO3UCxI+q1fekR55PODLnTBYYJRi2kYuuQ==
-X-Received: by 2002:a62:8045:: with SMTP id j66mr54312393pfd.162.1594246930377; 
- Wed, 08 Jul 2020 15:22:10 -0700 (PDT)
+ bh=643YbMqUe3cU9Y3BkZ4lZoPyP5SXzuFH+wHJ5r5v8mE=;
+ b=a9q5Q/irSr5mLrkaoAsOQMSZDyolVfWFom6IwYiqc54ty2gVXJKf17cuHrgFWLgFA7
+ qF5D0aIK4VoWeKTpaEdl7sUPBPgKd0i7argfloQ8AyiKrgF7t6jNkchauqlVJql0ktnL
+ nxP+TmiFfCLAWSywy9eVbsj48YgESLA/RyBM8qrpJH57tovPiJhZB88H5x0IvaOWU5ue
+ 9fCWpqvMAImjRi5HvzHlfNeNB0GpRE3HvfiIsnCMtW+ZwuRJH89z56/87e6GOGkXp409
+ d0qav8Uk466liw9XnVlSS2ATesPQ6i0Ok/iZPVTJ6+5XQSkGTf8zWMMg72waH0q+0sFQ
+ teNw==
+X-Gm-Message-State: AOAM531s+uieB9sGE95y77+X1OBzKk3NugcuPy6BnU7S+zlEkNgfMBPC
+ wiI2O5ODqrpIHYA8sPOwfF7Wbb0Q
+X-Google-Smtp-Source: ABdhPJyvYo2dA/dkKRG9iTls/WjVyWogsy6FY/9aglaa0+RXHbWtsH6KjX0x6r2Nulm3SyfTIwo4Cw==
+X-Received: by 2002:a17:902:8d98:: with SMTP id
+ v24mr47908851plo.276.1594246925645; 
+ Wed, 08 Jul 2020 15:22:05 -0700 (PDT)
 Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.09
+ by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jul 2020 15:22:09 -0700 (PDT)
+ Wed, 08 Jul 2020 15:22:05 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 19/21] tests/tcg/xtensa: add DFP0 arithmetic tests
-Date: Wed,  8 Jul 2020 15:20:59 -0700
-Message-Id: <20200708222101.24568-20-jcmvbkbc@gmail.com>
+Subject: [PATCH v3 14/21] tests/tcg/xtensa: update test_fp0_conv for DFPU
+Date: Wed,  8 Jul 2020 15:20:54 -0700
+Message-Id: <20200708222101.24568-15-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
 References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x431.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -5
@@ -106,186 +107,469 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add test for basic double precision opcode properties.
+DFPU conversion opcodes update FSR flags. Add FSR parameters and
+expected FSR register values for the conversion tests.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
-Changes v2->v3:
-- add more infzero tests for DFPU
-- fix test names in test_dfp0_arith.S
+ tests/tcg/xtensa/test_fp0_conv.S | 299 ++++++++++++++++---------------
+ 1 file changed, 155 insertions(+), 144 deletions(-)
 
- tests/tcg/xtensa/test_dfp0_arith.S | 162 +++++++++++++++++++++++++++++
- 1 file changed, 162 insertions(+)
- create mode 100644 tests/tcg/xtensa/test_dfp0_arith.S
-
-diff --git a/tests/tcg/xtensa/test_dfp0_arith.S b/tests/tcg/xtensa/test_dfp0_arith.S
-new file mode 100644
-index 000000000000..53bf8122d082
---- /dev/null
-+++ b/tests/tcg/xtensa/test_dfp0_arith.S
-@@ -0,0 +1,162 @@
-+#include "macros.inc"
+diff --git a/tests/tcg/xtensa/test_fp0_conv.S b/tests/tcg/xtensa/test_fp0_conv.S
+index 147e3d5062df..cfee6e51790c 100644
+--- a/tests/tcg/xtensa/test_fp0_conv.S
++++ b/tests/tcg/xtensa/test_fp0_conv.S
+@@ -1,4 +1,5 @@
+ #include "macros.inc"
 +#include "fpu.h"
-+
-+test_suite fp0_arith
-+
-+#if XCHAL_HAVE_DFP
-+
-+.macro movfp fr, v
-+    movi    a2, ((\v) >> 32) & 0xffffffff
-+    movi    a3, ((\v) & 0xffffffff)
-+    wfrd    \fr, a2, a3
-+.endm
-+
-+.macro check_res fr, r, sr
-+    rfrd    a2, \fr
-+    dump    a2
-+    movi    a3, ((\r) >> 32) & 0xffffffff
-+    assert  eq, a2, a3
-+    rfr    a2, \fr
-+    dump    a2
-+    movi    a3, ((\r) & 0xffffffff)
-+    assert  eq, a2, a3
-+    rur     a2, fsr
+ 
+ test_suite fp0_conv
+ 
+@@ -9,7 +10,7 @@ test_suite fp0_conv
+     wfr     \fr, a2
+ .endm
+ 
+-.macro test_ftoi_ex op, r0, fr0, v, c, r
++.macro test_ftoi_ex op, r0, fr0, v, c, r, sr
+     movi    a2, 0
+     wur     a2, fsr
+     movfp   \fr0, \v
+@@ -18,20 +19,25 @@ test_suite fp0_conv
+     movi    a3, \r
+     assert  eq, \r0, a3
+     rur     a2, fsr
++#if DFPU
 +    movi    a3, \sr
 +    assert  eq, a2, a3
-+.endm
-+
-+test add_d
-+    movi    a2, 1
-+    wsr     a2, cpenable
-+
-+    /* MAX_FLOAT + MAX_FLOAT = +inf/MAX_FLOAT  */
-+    test_op2 add.d, f6, f7, f8, F64_MAX, F64_MAX, \
-+        F64_PINF, F64_MAX, F64_PINF, F64_MAX, \
-+          FSR_OI,  FSR_OI,   FSR_OI,  FSR_OI
-+test_end
-+
-+test add_d_inf
-+    /* 1 + +inf = +inf  */
-+    test_op2 add.d, f6, f7, f8, F64_1, F64_PINF, \
-+        F64_PINF, F64_PINF, F64_PINF, F64_PINF, \
-+           FSR__,    FSR__,    FSR__,    FSR__
-+
-+    /* +inf + -inf = default NaN */
-+    test_op2 add.d, f0, f1, f2, F64_PINF, F64_NINF, \
-+        F64_DNAN, F64_DNAN, F64_DNAN, F64_DNAN, \
-+           FSR_V,    FSR_V,    FSR_V,    FSR_V
-+test_end
-+
-+test add_d_nan_dfpu
-+    /* 1 + QNaN = QNaN  */
-+    test_op2 add.d, f9, f10, f11, F64_1, F64_QNAN(1), \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+    /* 1 + SNaN = QNaN  */
-+    test_op2 add.d, f12, f13, f14, F64_1, F64_SNAN(1), \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+
-+    /* SNaN1 + SNaN2 = QNaN2 */
-+    test_op2 add.d, f15, f0, f1, F64_SNAN(1), F64_SNAN(2), \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+    /* QNaN1 + SNaN2 = QNaN2 */
-+    test_op2 add.d, f5, f6, f7, F64_QNAN(1), F64_SNAN(2), \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+    /* SNaN1 + QNaN2 = QNaN2 */
-+    test_op2 add.d, f8, f9, f10, F64_SNAN(1), F64_QNAN(2), \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+test_end
-+
-+test sub_d
-+    /* norm - norm = denorm */
-+    test_op2 sub.d, f6, f7, f8, F64_MIN_NORM | 1, F64_MIN_NORM, \
-+        0x00000001, 0x00000001, 0x00000001, 0x00000001, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-+test_end
-+
-+test mul_d
-+    test_op2 mul.d, f0, f1, f2, F64_1 | 1, F64_1 | 1, \
-+        F64_1 | 2, F64_1 | 2, F64_1 | 3, F64_1 | 2, \
-+            FSR_I,     FSR_I,     FSR_I,     FSR_I
-+    /* MAX_FLOAT/2 * MAX_FLOAT/2 = +inf/MAX_FLOAT  */
-+    test_op2 mul.d, f6, f7, f8, F64_MAX_2, F64_MAX_2, \
-+        F64_PINF, F64_MAX, F64_PINF, F64_MAX, \
-+          FSR_OI,  FSR_OI,   FSR_OI,  FSR_OI
-+    /* min norm * min norm = 0/denorm */
-+    test_op2 mul.d, f6, f7, f8, F64_MIN_NORM, F64_MIN_NORM, \
-+         F64_0,  F64_0, 0x00000001,  F64_0, \
-+        FSR_UI, FSR_UI,     FSR_UI, FSR_UI
-+    /* inf * 0 = default NaN */
-+    test_op2 mul.d, f6, f7, f8, F64_PINF, F64_0, \
-+        F64_DNAN, F64_DNAN, F64_DNAN, F64_DNAN, \
-+           FSR_V,    FSR_V,    FSR_V,    FSR_V
-+test_end
-+
-+test madd_d
-+    test_op3 madd.d, f0, f1, f2, f0, F64_0, F64_1 | 1, F64_1 | 1, \
-+        F64_1 | 2, F64_1 | 2, F64_1 | 3, F64_1 | 2, \
-+            FSR_I,     FSR_I,     FSR_I,     FSR_I
-+test_end
-+
-+test madd_d_precision
-+    test_op3 madd.d, f0, f1, f2, f0, \
-+        F64_MINUS | F64_1 | 2, F64_1 | 1, F64_1 | 1, \
-+        0x3970000000000000, 0x3970000000000000, 0x3970000000000000, 0x3970000000000000, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-+test_end
-+
-+test madd_d_nan_dfpu
-+    /* DFPU madd/msub NaN1, NaN2, NaN3 priority: NaN1, NaN3, NaN2 */
-+    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_1, F64_1, \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_QNAN(2), F64_1, \
-+        F64_QNAN(2), F64_QNAN(2), F64_QNAN(2), F64_QNAN(2), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_1, F64_QNAN(3), \
-+        F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+
-+    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_QNAN(2), F64_1, \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_1, F64_QNAN(3), \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_QNAN(2), F64_QNAN(3), \
-+        F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+
-+    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_QNAN(2), F64_QNAN(3), \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR__,       FSR__,       FSR__,       FSR__
-+
-+    /* inf * 0 = default NaN */
-+    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_PINF, F64_0, \
-+        F64_DNAN, F64_DNAN, F64_DNAN, F64_DNAN, \
-+           FSR_V,    FSR_V,    FSR_V,    FSR_V
-+    /* inf * 0 + SNaN1 = QNaN1 */
-+    test_op3 madd.d, f0, f1, f2, f0, F64_SNAN(1), F64_PINF, F64_0, \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+    /* inf * 0 + QNaN1 = QNaN1 */
-+    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_PINF, F64_0, \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+
-+    /* madd/msub SNaN turns to QNaN and sets Invalid flag */
-+    test_op3 madd.d, f0, f1, f2, f0, F64_SNAN(1), F64_1, F64_1, \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_SNAN(2), F64_1, \
-+        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
-+              FSR_V,       FSR_V,       FSR_V,       FSR_V
-+test_end
-+
++#else
+     assert  eqi, a2, 0
 +#endif
-+
-+test_suite_end
+ .endm
+ 
+-.macro test_ftoi op, r0, fr0, v, c, r
++.macro test_ftoi op, r0, fr0, v, c, r, sr
+     movi    a2, 0
+     wur     a2, fcr
+-    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r
++    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r, \sr
+     movi    a2, 0x7c
+     wur     a2, fcr
+-    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r
++    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r, \sr
+ .endm
+ 
+ 
+-.macro test_itof_ex op, fr0, ar0, v, c, r
++.macro test_itof_ex op, fr0, ar0, v, c, r, sr
+     movi    a2, 0
+     wur     a2, fsr
+     movi    \ar0, \v
+@@ -42,23 +48,28 @@ test_suite fp0_conv
+     movi    a3, \r
+     assert  eq, a2, a3
+     rur     a2, fsr
++#if DFPU
++    movi    a3, \sr
++    assert  eq, a2, a3
++#else
+     assert  eqi, a2, 0
++#endif
+ .endm
+ 
+-.macro test_itof_rm op, fr0, ar0, v, c, rm, r
++.macro test_itof_rm op, fr0, ar0, v, c, rm, r, sr
+     movi    a2, \rm
+     wur     a2, fcr
+-    test_itof_ex \op, \fr0, \ar0, \v, \c, \r
++    test_itof_ex \op, \fr0, \ar0, \v, \c, \r, \sr
+     movi    a2, (\rm) | 0x7c
+     wur     a2, fcr
+-    test_itof_ex \op, \fr0, \ar0, \v, \c, \r
++    test_itof_ex \op, \fr0, \ar0, \v, \c, \r, \sr
+ .endm
+ 
+-.macro test_itof op, fr0, ar0, v, c, r0, r1, r2, r3
+-    test_itof_rm \op, \fr0, \ar0, \v, \c, 0, \r0
+-    test_itof_rm \op, \fr0, \ar0, \v, \c, 1, \r1
+-    test_itof_rm \op, \fr0, \ar0, \v, \c, 2, \r2
+-    test_itof_rm \op, \fr0, \ar0, \v, \c, 3, \r3
++.macro test_itof op, fr0, ar0, v, c, r0, r1, r2, r3, sr
++    test_itof_rm \op, \fr0, \ar0, \v, \c, 0, \r0, \sr
++    test_itof_rm \op, \fr0, \ar0, \v, \c, 1, \r1, \sr
++    test_itof_rm \op, \fr0, \ar0, \v, \c, 2, \r2, \sr
++    test_itof_rm \op, \fr0, \ar0, \v, \c, 3, \r3, \sr
+ .endm
+ 
+ test round_s
+@@ -66,237 +77,237 @@ test round_s
+     wsr     a2, cpenable
+ 
+     /* NaN */
+-    test_ftoi round.s, a2, f0, 0xffc00001, 0, 0x7fffffff
+-    test_ftoi round.s, a2, f0, 0xff800001, 0, 0x7fffffff
++    test_ftoi round.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
++    test_ftoi round.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
+ 
+     /* -inf */
+-    test_ftoi round.s, a2, f0, 0xff800000, 0, 0x80000000
++    test_ftoi round.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
+ 
+     /* negative overflow */
+-    test_ftoi round.s, a2, f0, 0xceffffff, 1, 0x80000000
+-    test_ftoi round.s, a2, f0, 0xcf000000, 0, 0x80000000
+-    test_ftoi round.s, a2, f0, 0xceffffff, 0, 0x80000080
++    test_ftoi round.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
++    test_ftoi round.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
++    test_ftoi round.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
+ 
+     /* negative */
+-    test_ftoi round.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
+-    test_ftoi round.s, a2, f0, 0xbfc00000, 0, -2 /* -1.5 */
+-    test_ftoi round.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
+-    test_ftoi round.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
+-    test_ftoi round.s, a2, f0, 0xbf400000, 0, -1 /* -0.75 */
+-    test_ftoi round.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
++    test_ftoi round.s, a2, f0, 0xbfa00000, 1, -2, FSR_I  /* -1.25 * 2 */
++    test_ftoi round.s, a2, f0, 0xbfc00000, 0, -2, FSR_I  /* -1.5 */
++    test_ftoi round.s, a2, f0, 0xbf800000, 1, -2, FSR__  /* -1 * 2 */
++    test_ftoi round.s, a2, f0, 0xbf800000, 0, -1, FSR__  /* -1 */
++    test_ftoi round.s, a2, f0, 0xbf400000, 0, -1, FSR_I  /* -0.75 */
++    test_ftoi round.s, a2, f0, 0xbf000000, 0,  0, FSR_I  /* -0.5 */
+ 
+     /* positive */
+-    test_ftoi round.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
+-    test_ftoi round.s, a2, f0, 0x3f400000, 0, 1 /* 0.75 */
+-    test_ftoi round.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
+-    test_ftoi round.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
+-    test_ftoi round.s, a2, f0, 0x3fc00000, 0, 2 /* 1.5 */
+-    test_ftoi round.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
++    test_ftoi round.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
++    test_ftoi round.s, a2, f0, 0x3f400000, 0, 1, FSR_I /* 0.75 */
++    test_ftoi round.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
++    test_ftoi round.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
++    test_ftoi round.s, a2, f0, 0x3fc00000, 0, 2, FSR_I /* 1.5 */
++    test_ftoi round.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
+ 
+     /* positive overflow */
+-    test_ftoi round.s, a2, f0, 0x4effffff, 0, 0x7fffff80
+-    test_ftoi round.s, a2, f0, 0x4f000000, 0, 0x7fffffff
+-    test_ftoi round.s, a2, f0, 0x4effffff, 1, 0x7fffffff
++    test_ftoi round.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
++    test_ftoi round.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
++    test_ftoi round.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
+ 
+     /* +inf */
+-    test_ftoi round.s, a2, f0, 0x7f800000, 0, 0x7fffffff
++    test_ftoi round.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
+ 
+     /* NaN */
+-    test_ftoi round.s, a2, f0, 0x7f800001, 0, 0x7fffffff
+-    test_ftoi round.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
++    test_ftoi round.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
++    test_ftoi round.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
+ test_end
+ 
+ test trunc_s
+     /* NaN */
+-    test_ftoi trunc.s, a2, f0, 0xffc00001, 0, 0x7fffffff
+-    test_ftoi trunc.s, a2, f0, 0xff800001, 0, 0x7fffffff
++    test_ftoi trunc.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
++    test_ftoi trunc.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
+ 
+     /* -inf */
+-    test_ftoi trunc.s, a2, f0, 0xff800000, 0, 0x80000000
++    test_ftoi trunc.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
+ 
+     /* negative overflow */
+-    test_ftoi trunc.s, a2, f0, 0xceffffff, 1, 0x80000000
+-    test_ftoi trunc.s, a2, f0, 0xcf000000, 0, 0x80000000
+-    test_ftoi trunc.s, a2, f0, 0xceffffff, 0, 0x80000080
++    test_ftoi trunc.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
++    test_ftoi trunc.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
++    test_ftoi trunc.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
+ 
+     /* negative */
+-    test_ftoi trunc.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
+-    test_ftoi trunc.s, a2, f0, 0xbfc00000, 0, -1 /* -1.5 */
+-    test_ftoi trunc.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
+-    test_ftoi trunc.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
+-    test_ftoi trunc.s, a2, f0, 0xbf400000, 0, 0  /* -0.75 */
+-    test_ftoi trunc.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
++    test_ftoi trunc.s, a2, f0, 0xbfa00000, 1, -2, FSR_I /* -1.25 * 2 */
++    test_ftoi trunc.s, a2, f0, 0xbfc00000, 0, -1, FSR_I /* -1.5 */
++    test_ftoi trunc.s, a2, f0, 0xbf800000, 1, -2, FSR__ /* -1 * 2 */
++    test_ftoi trunc.s, a2, f0, 0xbf800000, 0, -1, FSR__ /* -1 */
++    test_ftoi trunc.s, a2, f0, 0xbf400000, 0,  0, FSR_I /* -0.75 */
++    test_ftoi trunc.s, a2, f0, 0xbf000000, 0,  0, FSR_I /* -0.5 */
+ 
+     /* positive */
+-    test_ftoi trunc.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
+-    test_ftoi trunc.s, a2, f0, 0x3f400000, 0, 0 /* 0.75 */
+-    test_ftoi trunc.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
+-    test_ftoi trunc.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
+-    test_ftoi trunc.s, a2, f0, 0x3fc00000, 0, 1 /* 1.5 */
+-    test_ftoi trunc.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
++    test_ftoi trunc.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
++    test_ftoi trunc.s, a2, f0, 0x3f400000, 0, 0, FSR_I /* 0.75 */
++    test_ftoi trunc.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
++    test_ftoi trunc.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
++    test_ftoi trunc.s, a2, f0, 0x3fc00000, 0, 1, FSR_I /* 1.5 */
++    test_ftoi trunc.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
+ 
+     /* positive overflow */
+-    test_ftoi trunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80
+-    test_ftoi trunc.s, a2, f0, 0x4f000000, 0, 0x7fffffff
+-    test_ftoi trunc.s, a2, f0, 0x4effffff, 1, 0x7fffffff
++    test_ftoi trunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
++    test_ftoi trunc.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
++    test_ftoi trunc.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
+ 
+     /* +inf */
+-    test_ftoi trunc.s, a2, f0, 0x7f800000, 0, 0x7fffffff
++    test_ftoi trunc.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
+ 
+     /* NaN */
+-    test_ftoi trunc.s, a2, f0, 0x7f800001, 0, 0x7fffffff
+-    test_ftoi trunc.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
++    test_ftoi trunc.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
++    test_ftoi trunc.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
+ test_end
+ 
+ test floor_s
+     /* NaN */
+-    test_ftoi floor.s, a2, f0, 0xffc00001, 0, 0x7fffffff
+-    test_ftoi floor.s, a2, f0, 0xff800001, 0, 0x7fffffff
++    test_ftoi floor.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
++    test_ftoi floor.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
+ 
+     /* -inf */
+-    test_ftoi floor.s, a2, f0, 0xff800000, 0, 0x80000000
++    test_ftoi floor.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
+ 
+     /* negative overflow */
+-    test_ftoi floor.s, a2, f0, 0xceffffff, 1, 0x80000000
+-    test_ftoi floor.s, a2, f0, 0xcf000000, 0, 0x80000000
+-    test_ftoi floor.s, a2, f0, 0xceffffff, 0, 0x80000080
++    test_ftoi floor.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
++    test_ftoi floor.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
++    test_ftoi floor.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
+ 
+     /* negative */
+-    test_ftoi floor.s, a2, f0, 0xbfa00000, 1, -3 /* -1.25 * 2 */
+-    test_ftoi floor.s, a2, f0, 0xbfc00000, 0, -2 /* -1.5 */
+-    test_ftoi floor.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
+-    test_ftoi floor.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
+-    test_ftoi floor.s, a2, f0, 0xbf400000, 0, -1 /* -0.75 */
+-    test_ftoi floor.s, a2, f0, 0xbf000000, 0, -1 /* -0.5 */
++    test_ftoi floor.s, a2, f0, 0xbfa00000, 1, -3, FSR_I /* -1.25 * 2 */
++    test_ftoi floor.s, a2, f0, 0xbfc00000, 0, -2, FSR_I /* -1.5 */
++    test_ftoi floor.s, a2, f0, 0xbf800000, 1, -2, FSR__ /* -1 * 2 */
++    test_ftoi floor.s, a2, f0, 0xbf800000, 0, -1, FSR__ /* -1 */
++    test_ftoi floor.s, a2, f0, 0xbf400000, 0, -1, FSR_I /* -0.75 */
++    test_ftoi floor.s, a2, f0, 0xbf000000, 0, -1, FSR_I /* -0.5 */
+ 
+     /* positive */
+-    test_ftoi floor.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
+-    test_ftoi floor.s, a2, f0, 0x3f400000, 0, 0 /* 0.75 */
+-    test_ftoi floor.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
+-    test_ftoi floor.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
+-    test_ftoi floor.s, a2, f0, 0x3fc00000, 0, 1 /* 1.5 */
+-    test_ftoi floor.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
++    test_ftoi floor.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
++    test_ftoi floor.s, a2, f0, 0x3f400000, 0, 0, FSR_I /* 0.75 */
++    test_ftoi floor.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
++    test_ftoi floor.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
++    test_ftoi floor.s, a2, f0, 0x3fc00000, 0, 1, FSR_I /* 1.5 */
++    test_ftoi floor.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
+ 
+     /* positive overflow */
+-    test_ftoi floor.s, a2, f0, 0x4effffff, 0, 0x7fffff80
+-    test_ftoi floor.s, a2, f0, 0x4f000000, 0, 0x7fffffff
+-    test_ftoi floor.s, a2, f0, 0x4effffff, 1, 0x7fffffff
++    test_ftoi floor.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
++    test_ftoi floor.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
++    test_ftoi floor.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
+ 
+     /* +inf */
+-    test_ftoi floor.s, a2, f0, 0x7f800000, 0, 0x7fffffff
++    test_ftoi floor.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
+ 
+     /* NaN */
+-    test_ftoi floor.s, a2, f0, 0x7f800001, 0, 0x7fffffff
+-    test_ftoi floor.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
++    test_ftoi floor.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
++    test_ftoi floor.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
+ test_end
+ 
+ test ceil_s
+     /* NaN */
+-    test_ftoi ceil.s, a2, f0, 0xffc00001, 0, 0x7fffffff
+-    test_ftoi ceil.s, a2, f0, 0xff800001, 0, 0x7fffffff
++    test_ftoi ceil.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
++    test_ftoi ceil.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
+ 
+     /* -inf */
+-    test_ftoi ceil.s, a2, f0, 0xff800000, 0, 0x80000000
++    test_ftoi ceil.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
+ 
+     /* negative overflow */
+-    test_ftoi ceil.s, a2, f0, 0xceffffff, 1, 0x80000000
+-    test_ftoi ceil.s, a2, f0, 0xcf000000, 0, 0x80000000
+-    test_ftoi ceil.s, a2, f0, 0xceffffff, 0, 0x80000080
++    test_ftoi ceil.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
++    test_ftoi ceil.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
++    test_ftoi ceil.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
+ 
+     /* negative */
+-    test_ftoi ceil.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
+-    test_ftoi ceil.s, a2, f0, 0xbfc00000, 0, -1 /* -1.5 */
+-    test_ftoi ceil.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
+-    test_ftoi ceil.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
+-    test_ftoi ceil.s, a2, f0, 0xbf400000, 0, 0  /* -0.75 */
+-    test_ftoi ceil.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
++    test_ftoi ceil.s, a2, f0, 0xbfa00000, 1, -2, FSR_I /* -1.25 * 2 */
++    test_ftoi ceil.s, a2, f0, 0xbfc00000, 0, -1, FSR_I /* -1.5 */
++    test_ftoi ceil.s, a2, f0, 0xbf800000, 1, -2, FSR__ /* -1 * 2 */
++    test_ftoi ceil.s, a2, f0, 0xbf800000, 0, -1, FSR__ /* -1 */
++    test_ftoi ceil.s, a2, f0, 0xbf400000, 0,  0, FSR_I /* -0.75 */
++    test_ftoi ceil.s, a2, f0, 0xbf000000, 0,  0, FSR_I /* -0.5 */
+ 
+     /* positive */
+-    test_ftoi ceil.s, a2, f0, 0x3f000000, 0, 1 /* 0.5 */
+-    test_ftoi ceil.s, a2, f0, 0x3f400000, 0, 1 /* 0.75 */
+-    test_ftoi ceil.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
+-    test_ftoi ceil.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
+-    test_ftoi ceil.s, a2, f0, 0x3fc00000, 0, 2 /* 1.5 */
+-    test_ftoi ceil.s, a2, f0, 0x3fa00000, 1, 3 /* 1.25 * 2 */
++    test_ftoi ceil.s, a2, f0, 0x3f000000, 0, 1, FSR_I /* 0.5 */
++    test_ftoi ceil.s, a2, f0, 0x3f400000, 0, 1, FSR_I /* 0.75 */
++    test_ftoi ceil.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
++    test_ftoi ceil.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
++    test_ftoi ceil.s, a2, f0, 0x3fc00000, 0, 2, FSR_I /* 1.5 */
++    test_ftoi ceil.s, a2, f0, 0x3fa00000, 1, 3, FSR_I /* 1.25 * 2 */
+ 
+     /* positive overflow */
+-    test_ftoi ceil.s, a2, f0, 0x4effffff, 0, 0x7fffff80
+-    test_ftoi ceil.s, a2, f0, 0x4f000000, 0, 0x7fffffff
+-    test_ftoi ceil.s, a2, f0, 0x4effffff, 1, 0x7fffffff
++    test_ftoi ceil.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
++    test_ftoi ceil.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
++    test_ftoi ceil.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
+ 
+     /* +inf */
+-    test_ftoi ceil.s, a2, f0, 0x7f800000, 0, 0x7fffffff
++    test_ftoi ceil.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
+ 
+     /* NaN */
+-    test_ftoi ceil.s, a2, f0, 0x7f800001, 0, 0x7fffffff
+-    test_ftoi ceil.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
++    test_ftoi ceil.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
++    test_ftoi ceil.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
+ test_end
+ 
+ test utrunc_s
+     /* NaN */
+-    test_ftoi utrunc.s, a2, f0, 0xffc00001, 0, 0xffffffff
+-    test_ftoi utrunc.s, a2, f0, 0xff800001, 0, 0xffffffff
++    test_ftoi utrunc.s, a2, f0, 0xffc00001, 0, 0xffffffff, FSR_V
++    test_ftoi utrunc.s, a2, f0, 0xff800001, 0, 0xffffffff, FSR_V
+ 
+     /* -inf */
+-    test_ftoi utrunc.s, a2, f0, 0xff800000, 0, 0x80000000
++    test_ftoi utrunc.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
+ 
+     /* negative overflow */
+-    test_ftoi utrunc.s, a2, f0, 0xceffffff, 1, 0x80000000
+-    test_ftoi utrunc.s, a2, f0, 0xcf000000, 0, 0x80000000
+-    test_ftoi utrunc.s, a2, f0, 0xceffffff, 0, 0x80000080
++    test_ftoi utrunc.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
++    test_ftoi utrunc.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR_V
++    test_ftoi utrunc.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR_V
+ 
+     /* negative */
+-    test_ftoi utrunc.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
+-    test_ftoi utrunc.s, a2, f0, 0xbfc00000, 0, -1 /* -1.5 */
+-    test_ftoi utrunc.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
+-    test_ftoi utrunc.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
+-    test_ftoi utrunc.s, a2, f0, 0xbf400000, 0, 0  /* -0.75 */
+-    test_ftoi utrunc.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
++    test_ftoi utrunc.s, a2, f0, 0xbfa00000, 1, -2, FSR_V /* -1.25 * 2 */
++    test_ftoi utrunc.s, a2, f0, 0xbfc00000, 0, -1, FSR_V /* -1.5 */
++    test_ftoi utrunc.s, a2, f0, 0xbf800000, 1, -2, FSR_V /* -1 * 2 */
++    test_ftoi utrunc.s, a2, f0, 0xbf800000, 0, -1, FSR_V /* -1 */
++    test_ftoi utrunc.s, a2, f0, 0xbf400000, 0,  0, FSR_I /* -0.75 */
++    test_ftoi utrunc.s, a2, f0, 0xbf000000, 0,  0, FSR_I /* -0.5 */
+ 
+     /* positive */
+-    test_ftoi utrunc.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
+-    test_ftoi utrunc.s, a2, f0, 0x3f400000, 0, 0 /* 0.75 */
+-    test_ftoi utrunc.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
+-    test_ftoi utrunc.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
+-    test_ftoi utrunc.s, a2, f0, 0x3fc00000, 0, 1 /* 1.5 */
+-    test_ftoi utrunc.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
++    test_ftoi utrunc.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
++    test_ftoi utrunc.s, a2, f0, 0x3f400000, 0, 0, FSR_I /* 0.75 */
++    test_ftoi utrunc.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
++    test_ftoi utrunc.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
++    test_ftoi utrunc.s, a2, f0, 0x3fc00000, 0, 1, FSR_I /* 1.5 */
++    test_ftoi utrunc.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
+ 
+     /* positive overflow */
+-    test_ftoi utrunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80
+-    test_ftoi utrunc.s, a2, f0, 0x4f000000, 0, 0x80000000
+-    test_ftoi utrunc.s, a2, f0, 0x4effffff, 1, 0xffffff00
+-    test_ftoi utrunc.s, a2, f0, 0x4f800000, 1, 0xffffffff
++    test_ftoi utrunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
++    test_ftoi utrunc.s, a2, f0, 0x4f000000, 0, 0x80000000, FSR__
++    test_ftoi utrunc.s, a2, f0, 0x4effffff, 1, 0xffffff00, FSR__
++    test_ftoi utrunc.s, a2, f0, 0x4f800000, 1, 0xffffffff, FSR_V
+ 
+     /* +inf */
+-    test_ftoi utrunc.s, a2, f0, 0x7f800000, 0, 0xffffffff
++    test_ftoi utrunc.s, a2, f0, 0x7f800000, 0, 0xffffffff, FSR_V
+ 
+     /* NaN */
+-    test_ftoi utrunc.s, a2, f0, 0x7f800001, 0, 0xffffffff
+-    test_ftoi utrunc.s, a2, f0, 0x7fc00000, 0, 0xffffffff
++    test_ftoi utrunc.s, a2, f0, 0x7f800001, 0, 0xffffffff, FSR_V
++    test_ftoi utrunc.s, a2, f0, 0x7fc00000, 0, 0xffffffff, FSR_V
+ test_end
+ 
+ test float_s
+     test_itof float.s, f0, a2, -1, 0, \
+-        0xbf800000, 0xbf800000, 0xbf800000, 0xbf800000
+-    test_itof float.s, f0, a2, 0, 0, 0, 0, 0, 0
++        0xbf800000, 0xbf800000, 0xbf800000, 0xbf800000, FSR__
++    test_itof float.s, f0, a2, 0, 0, 0, 0, 0, 0, FSR__
+     test_itof float.s, f0, a2, 1, 1, \
+-        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000
++        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000, FSR__
+     test_itof float.s, f0, a2, 1, 0, \
+-        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000
++        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000, FSR__
+     test_itof float.s, f0, a2, 0x7fffffff, 0, \
+-        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff
++        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff, FSR_I
+ test_end
+ 
+ test ufloat_s
+-    test_itof ufloat.s, f0, a2, 0, 0, 0, 0, 0, 0
++    test_itof ufloat.s, f0, a2, 0, 0, 0, 0, 0, 0, FSR__
+     test_itof ufloat.s, f0, a2, 1, 1, \
+-        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000
++        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000, FSR__
+     test_itof ufloat.s, f0, a2, 1, 0, \
+-        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000
++        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000, FSR__
+     test_itof ufloat.s, f0, a2, 0x7fffffff, 0, \
+-        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff
++        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff, FSR_I
+     test_itof ufloat.s, f0, a2, 0xffffffff, 0, \
+-        0x4f800000, 0x4f7fffff, 0x4f800000, 0x4f7fffff
++        0x4f800000, 0x4f7fffff, 0x4f800000, 0x4f7fffff, FSR_I
+ test_end
+ 
+ #endif
 -- 
 2.20.1
 
