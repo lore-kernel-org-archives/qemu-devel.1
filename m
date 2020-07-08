@@ -2,67 +2,90 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D948C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 12:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 794E2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 13:23:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 179DC20656
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 12:55:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 433C920720
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 13:23:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f7uuQW87"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179DC20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g0yY+tN8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 433C920720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jt9bY-0001Rc-8m
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 08:55:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43172)
+	id 1jtA2o-00053n-CG
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 09:23:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jt9ac-0000r5-6X; Wed, 08 Jul 2020 08:54:19 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:60451)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jt9aY-0006bn-9h; Wed, 08 Jul 2020 08:54:17 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B1zlN3Rfxz9sRK; Wed,  8 Jul 2020 22:54:06 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1594212848;
- bh=iYQmoCWDIVnJDYsb3hVPQMlqmB9cMM7lbOgmj5jH4cI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=f7uuQW87WaHMX6Wb/WmerWkvtEiD9Ch/X7+ThTrYekCVGG5gG1bPt3Bi7DCMN6Vqr
- 4VkswRIcqMKa3eQl6noI9TuG/aNibWYFPWJZ5Eon/iki8PZy8tFaHVTtx2aGt5kDpe
- MCNfJiKZH/1jhOXaqmH0pGaicZZpuFvTJ1xl2cW8=
-Date: Wed, 8 Jul 2020 22:22:12 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Lijun Pan <ljp@linux.ibm.com>
-Subject: Re: [PATCH v4 04/11] target/ppc: convert vmuluwm to tcg_gen_gvec_mul
-Message-ID: <20200708122212.GK18595@umbus.fritz.box>
-References: <20200701234344.91843-1-ljp@linux.ibm.com>
- <20200701234344.91843-5-ljp@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtA25-0004cT-OZ
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 09:22:41 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41050)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtA23-000213-NL
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 09:22:41 -0400
+Received: by mail-ot1-x342.google.com with SMTP id a21so13606614otq.8
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 06:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Ks75FQFIRbrY/7yJa5tU6NrAZ/T4RM6/Tmcv0Dmy75c=;
+ b=g0yY+tN86yDuY5rJfhy9T9ON362XAVeb/1UY5WRN3fn9tlW3A9KgzcqpScTg52Cfbt
+ wWpIplaQcqJrI9hbNjafXKx19KlwLk1DAR//ahOx3krhRwHXnKvEZBl94tnFdpNvi++i
+ 3TNYHbMoKrZoJAzaa8ks1DBDymnBRseF9rkrdpm7ULRl7HJ2r4bnvPc3XaagNi+xE43b
+ 8xneSLGsmxbjMAmI4PyhycQou+p5pTeSg3f5IKdbFcUlsfTsqp2MKZYMas+F3B45DMu9
+ VsdMpx5rBoBZUak6W8JD/Y2rLN+NCsbN4TaLJvB2tdA2K2CeIM2KWjdf6RUoiKSK0t88
+ uBcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ks75FQFIRbrY/7yJa5tU6NrAZ/T4RM6/Tmcv0Dmy75c=;
+ b=r0h8/vg23IbiCYztiI/d6gO/pQF6A1C2Az7uU7Ac/HE4/6dvFb/VOSDb1HbKrP9GSk
+ tP2tmubrzeUa5GjgCsvomcYp2ygxu7gHbrTVN4gCy2/8Q9+Qh+kGLhrGN1tVq+sJj4OC
+ qNnQVLPWQqAGOt7X6RePpDja4yWj3mgxq37Go7b3kcoLts/krmpHY1QwKZZ0qX1OZ6PP
+ RcVrRlQwWiRTtv3HMLB5TJpv/J/mHf+qqcCjjFyT9EbEiZBKyWWmkSg739F2jiv5IWxc
+ A9GeMun9S5leTlMiw+fFADSadNn9NIBE3vw0K6njBfVhcPhuZXiYYTj3iDiZ70s+ga4W
+ dr1A==
+X-Gm-Message-State: AOAM532AKG+A8n+I5NUy2XASshQOE1a9TFx1oMU0dttc/Z1ZgX5QktV5
+ rbKU1zLlQh5PEMxl85yz0NFkIKElauJKWJiZaVbCMlonEZM=
+X-Google-Smtp-Source: ABdhPJwHOTOx0gnJJGKRqGUubVGr2uoFtgaFtnJLDLKbe0HJnbAGAbnruweNA1LkYZjcT7zs0iz2DNzPs0ONcl2vpEg=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr47104570ota.91.1594214054780; 
+ Wed, 08 Jul 2020 06:14:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6CXocAQn8Xbegyxo"
-Content-Disposition: inline
-In-Reply-To: <20200701234344.91843-5-ljp@linux.ibm.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
+References: <20200707204333.261506-1-bauerman@linux.ibm.com>
+ <20200707214917.GX7276@habkost.net> <87y2nu3nxq.fsf@morokweng.localdomain>
+ <c53b36b7-ee7b-bb66-8220-cce788fd631d@redhat.com>
+ <20200708100038.GG18595@umbus.fritz.box>
+In-Reply-To: <20200708100038.GG18595@umbus.fritz.box>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 8 Jul 2020 14:14:03 +0100
+Message-ID: <CAFEAcA9V7Uha9-rz+JY-5HkazCWuTk1vkLnw1m9Lw-bXXKbkvw@mail.gmail.com>
+Subject: Re: [PATCH] cpu: Add starts_halted() method
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,112 +98,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Thiago Jung Bauermann <bauerman@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 8 Jul 2020 at 12:12, David Gibson <david@gibson.dropbear.id.au> wro=
+te:
+> On Wed, Jul 08, 2020 at 10:38:29AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> > Class boolean field certainly sounds better, but I am not sure this
+> > is a property of the machine. Rather the arch? So move the field
+> > to CPUClass? Maybe not, let's discuss :)
+>
+> It is absolutely a property of the machine.  e.g. I don't think we
+> want this for powernv.  pseries is a bit of a special case since it is
+> explicitly a paravirt platform.  But even for emulated hardware, the
+> board can absolutely strap things so that cpus do or don't start
+> immediately.
 
---6CXocAQn8Xbegyxo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It's a property of the individual CPU, I think. One common setup
+for Arm systems is that the primary CPU starts powered up but
+the secondaries all start powered down.
 
-On Wed, Jul 01, 2020 at 06:43:39PM -0500, Lijun Pan wrote:
-> Convert the original implementation of vmuluwm to the more generic
-> tcg_gen_gvec_mul.
->=20
-> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+The original bug as described in the commit message sounds
+to me like something we should look to fix in the implementation
+of async_run_on_cpu() -- it shouldn't cause a CPU that's halfway
+through reset to do a KVM_RUN or otherwise run guest code,
+whether that CPU is going to start powered-up or powered-down.
 
-Applied to ppc-for-5.2.
-
-> ---
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> v3: newly introduced
->=20
->  target/ppc/helper.h                 |  1 -
->  target/ppc/int_helper.c             | 13 -------------
->  target/ppc/translate/vmx-impl.inc.c |  2 +-
->  3 files changed, 1 insertion(+), 15 deletions(-)
->=20
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index 2dfa1c6942..69416b6d7c 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -184,7 +184,6 @@ DEF_HELPER_3(vmulosw, void, avr, avr, avr)
->  DEF_HELPER_3(vmuloub, void, avr, avr, avr)
->  DEF_HELPER_3(vmulouh, void, avr, avr, avr)
->  DEF_HELPER_3(vmulouw, void, avr, avr, avr)
-> -DEF_HELPER_3(vmuluwm, void, avr, avr, avr)
->  DEF_HELPER_3(vslo, void, avr, avr, avr)
->  DEF_HELPER_3(vsro, void, avr, avr, avr)
->  DEF_HELPER_3(vsrv, void, avr, avr, avr)
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index be53cd6f68..bd3e6d7cc7 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -523,19 +523,6 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
->      r->VsrD(0) =3D 0;
->  }
-> =20
-> -#define VARITH_DO(name, op, element)                                    \
-> -    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
-> -    {                                                                   \
-> -        int i;                                                          \
-> -                                                                        \
-> -        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
-  \
-> -            r->element[i] =3D a->element[i] op b->element[i];           =
-  \
-> -        }                                                               \
-> -    }
-> -VARITH_DO(muluwm, *, u32)
-> -#undef VARITH_DO
-> -#undef VARITH
-> -
->  #define VARITHFP(suffix, func)                                          \
->      void helper_v##suffix(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, \
->                            ppc_avr_t *b)                                 \
-> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
-mx-impl.inc.c
-> index 403ed3a01c..6e79ffa650 100644
-> --- a/target/ppc/translate/vmx-impl.inc.c
-> +++ b/target/ppc/translate/vmx-impl.inc.c
-> @@ -801,7 +801,7 @@ static void trans_vclzd(DisasContext *ctx)
->  GEN_VXFORM(vmuloub, 4, 0);
->  GEN_VXFORM(vmulouh, 4, 1);
->  GEN_VXFORM(vmulouw, 4, 2);
-> -GEN_VXFORM(vmuluwm, 4, 2);
-> +GEN_VXFORM_V(vmuluwm, MO_32, tcg_gen_gvec_mul, 4, 2);
->  GEN_VXFORM_DUAL(vmulouw, PPC_ALTIVEC, PPC_NONE,
->                  vmuluwm, PPC_NONE, PPC2_ALTIVEC_207)
->  GEN_VXFORM(vmulosb, 4, 4);
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---6CXocAQn8Xbegyxo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8FunEACgkQbDjKyiDZ
-s5K9zBAAvXoc40jg6/hkqMyhL7k2gk7fvjH88f6/VmRkOoRxsYRKaw6RVhdGiOpD
-kuo5sDUYcCVcG7FZFtLNaU8h9di/zRKk4kfin+A5iFUErrbXwOMBioTpykVv75r9
-OdQzVfNzi7N+omb0atlB/05Fn/R8k8N889FpWa1s7TeqFeLZHaoWIUTD/cJlZx8L
-2DRROtmBHboYt2LGSjZGc4a3Y4EZMW9CDcdCdShwXUptFOutzWAqSyLJBlhbgVta
-Uv30BjJxjB2t2bZ7BdAZxpKn0rE8oigCEzFGuEBBY//dm3cvGbZdM8FPpOBy6Bpm
-qggQA09LDlvwYXG6brKCNSeUCpTJZN6kdW1QbiIfYrtjXRqu04xSn6hHIhoQuziz
-F9tVnsEagFFVhH2WEU9EhoRKnde6nj665K/HEP3bPyygdAXqJKPcv2F8jOfHOdwI
-FRXx8PIwWmuB6AiMSplzudDozz4uvMoOoe/W0CeRpz+aMgS1CQmVooOc6kElHTW+
-4W4/249qZS3YCprkOWENYd/T82wCHdosOC4Lc8e1DlvMd8Jox+4pT7Jjv33TgTj5
-EU5/uZiHZJFLvpaX0O+kAgKs+Vww/fV6vRg74JFFdZcVCWpydzzRMyApTrBwqOaH
-rGy/nu9yFAHKyG54GnEGlMDBrje2XK2xQMWfxj+4vzn8josYgm0=
-=C+Jn
------END PGP SIGNATURE-----
-
---6CXocAQn8Xbegyxo--
+thanks
+-- PMM
 
