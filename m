@@ -2,89 +2,93 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FA49C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 042CEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06A3F206F6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:48:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1D75206F6
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:49:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bx1EsXn6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A3F206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G9KyAQMW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1D75206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIry-0006Ig-51
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:48:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49032)
+	id 1jtIsQ-0007Qi-Ua
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jtISE-00034a-1B
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1jtISE-000368-L5
  for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42319
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jtISB-00019U-5P
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594246930;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=f2g+B7IYS/q8kC2gq1xewuZ82Q1wxCicLVrYYCMiePk=;
- b=bx1EsXn6HtAXeVQNtcdTlJAt69qRQK84JE20ZOE9vnQWkQgn9O3A1khdDC/WvUPD2vSWFZ
- 6HXFko3akjPNvo5BkEWtriIwWdtLq79d0MkNoUdPIOWbjErjY/vk3gsDUlHzf/In8totpq
- eItioF5CgFF6OUNJ5CZw8pvjJSvyJOU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-ZgPrnBcmMBOQYshNCabp9w-1; Wed, 08 Jul 2020 10:20:00 -0400
-X-MC-Unique: ZgPrnBcmMBOQYshNCabp9w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80DC8107ACCA;
- Wed,  8 Jul 2020 14:19:58 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-113-241.ams2.redhat.com [10.36.113.241])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BADEB5BAC3;
- Wed,  8 Jul 2020 14:19:55 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
-Subject: [PATCH v3 09/11] hw/arm/smmuv3: Let AIDR advertise SMMUv3.0 support
-Date: Wed,  8 Jul 2020 16:18:54 +0200
-Message-Id: <20200708141856.15776-10-eric.auger@redhat.com>
-In-Reply-To: <20200708141856.15776-1-eric.auger@redhat.com>
-References: <20200708141856.15776-1-eric.auger@redhat.com>
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:42297)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1jtISB-00019q-U1
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:14 -0400
+Received: by mail-pf1-x431.google.com with SMTP id 1so87930pfn.9
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xYpaV1GaTiVYZ9sz0Ztnms68+FSNRF9gxImePs/wc/0=;
+ b=G9KyAQMWpfYGaFyM8lcyQImOvFJKbza23TFMDJMo8XwDnc1rvwYNDICfBJ8nf10BMk
+ y0WR98k/9FExOn/6uldvzZ/zQ/KTmSC71ITozBl16hia6guX5bTbVGhxA5QYsyeI9sZY
+ pah/eRu27m9KToQgT4G/CpHQRrxXR93mEfu2Wk9/23EECeL9zVZKPq124L3pZez+VL4M
+ BtJBzDP1Lh/l7qmls0yjGU6tqqOW1SaTouYp+FH7mZhnW7SiYxLpIc+BUMV1J6nZaqUS
+ QJPPcAWqPYjHvaFVtbHWZ8gAhzxIIkNCxHbkKZWpFH2FEWgnO7uALFPf6C8JHAjX0nNg
+ PLNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xYpaV1GaTiVYZ9sz0Ztnms68+FSNRF9gxImePs/wc/0=;
+ b=bvkXksfOkZRcB0BcERDGdC4a5S5HjxjNWfDc0Ze2YwKMYRxEbTPmdhb3YxYrIrCBhy
+ UYjQBbUm5nq0TVVpbwmpSTmaVzgEUttYciCmzIJaWCmGW2vVUtb9laOiqF2A9T9UfCB6
+ ehbU96vw6fzBf5Rl5IBPrQ7OrREqVYEpo1lfcWfntVkBPzUsxhu2G+vuEIaSdxlnz5D2
+ Fmotcq3X5S9bvCm9kY3IPBIEnRQ/7XdjK1DmzUbxX8na52FCWWtPcps/L9kOxvNK/6us
+ LvYg+exQ/k8XouYhamNg9oH4y3P918Mc0yKiHcip7+7IkvygmTwegHQcJlhX2XUh9jCy
+ UYwA==
+X-Gm-Message-State: AOAM531yz9hLm5yFIrdT52FZk1tiRFoCBdLfqhM/kAhZV+5rf+Z3UNmD
+ qW+KSxYh2cNcGagA/SCanTv0uiM2
+X-Google-Smtp-Source: ABdhPJxTbwYcUCLpdfZj6w/69IP7SVCenPTQ+koCzjQoTO3UCxI+q1fekR55PODLnTBYYJRi2kYuuQ==
+X-Received: by 2002:a62:8045:: with SMTP id j66mr54312393pfd.162.1594246930377; 
+ Wed, 08 Jul 2020 15:22:10 -0700 (PDT)
+Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
+ by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jul 2020 15:22:09 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 19/21] tests/tcg/xtensa: add DFP0 arithmetic tests
+Date: Wed,  8 Jul 2020 15:20:59 -0700
+Message-Id: <20200708222101.24568-20-jcmvbkbc@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
+References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,64 +101,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
- mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
- will@kernel.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the support for AIDR register. It currently advertises
-SMMU V3.0 spec.
+Add test for basic double precision opcode properties.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
----
- hw/arm/smmuv3-internal.h | 1 +
- include/hw/arm/smmuv3.h  | 1 +
- hw/arm/smmuv3.c          | 3 +++
- 3 files changed, 5 insertions(+)
+Changes v2->v3:
+- add more infzero tests for DFPU
+- fix test names in test_dfp0_arith.S
 
-diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index ef093eaff5..6296235020 100644
---- a/hw/arm/smmuv3-internal.h
-+++ b/hw/arm/smmuv3-internal.h
-@@ -64,6 +64,7 @@ REG32(IDR5,                0x14)
- #define SMMU_IDR5_OAS 4
- 
- REG32(IIDR,                0x18)
-+REG32(AIDR,                0x1C)
- REG32(CR0,                 0x20)
-     FIELD(CR0, SMMU_ENABLE,   0, 1)
-     FIELD(CR0, EVENTQEN,      2, 1)
-diff --git a/include/hw/arm/smmuv3.h b/include/hw/arm/smmuv3.h
-index 36b2f45253..68d7a963e0 100644
---- a/include/hw/arm/smmuv3.h
-+++ b/include/hw/arm/smmuv3.h
-@@ -41,6 +41,7 @@ typedef struct SMMUv3State {
- 
-     uint32_t idr[6];
-     uint32_t iidr;
-+    uint32_t aidr;
-     uint32_t cr[3];
-     uint32_t cr0ack;
-     uint32_t statusr;
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 89ab11fc36..718f28462e 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -1251,6 +1251,9 @@ static MemTxResult smmu_readl(SMMUv3State *s, hwaddr offset,
-     case A_IIDR:
-         *data = s->iidr;
-         return MEMTX_OK;
-+    case A_AIDR:
-+        *data = s->aidr;
-+        return MEMTX_OK;
-     case A_CR0:
-         *data = s->cr[0];
-         return MEMTX_OK;
+ tests/tcg/xtensa/test_dfp0_arith.S | 162 +++++++++++++++++++++++++++++
+ 1 file changed, 162 insertions(+)
+ create mode 100644 tests/tcg/xtensa/test_dfp0_arith.S
+
+diff --git a/tests/tcg/xtensa/test_dfp0_arith.S b/tests/tcg/xtensa/test_dfp0_arith.S
+new file mode 100644
+index 000000000000..53bf8122d082
+--- /dev/null
++++ b/tests/tcg/xtensa/test_dfp0_arith.S
+@@ -0,0 +1,162 @@
++#include "macros.inc"
++#include "fpu.h"
++
++test_suite fp0_arith
++
++#if XCHAL_HAVE_DFP
++
++.macro movfp fr, v
++    movi    a2, ((\v) >> 32) & 0xffffffff
++    movi    a3, ((\v) & 0xffffffff)
++    wfrd    \fr, a2, a3
++.endm
++
++.macro check_res fr, r, sr
++    rfrd    a2, \fr
++    dump    a2
++    movi    a3, ((\r) >> 32) & 0xffffffff
++    assert  eq, a2, a3
++    rfr    a2, \fr
++    dump    a2
++    movi    a3, ((\r) & 0xffffffff)
++    assert  eq, a2, a3
++    rur     a2, fsr
++    movi    a3, \sr
++    assert  eq, a2, a3
++.endm
++
++test add_d
++    movi    a2, 1
++    wsr     a2, cpenable
++
++    /* MAX_FLOAT + MAX_FLOAT = +inf/MAX_FLOAT  */
++    test_op2 add.d, f6, f7, f8, F64_MAX, F64_MAX, \
++        F64_PINF, F64_MAX, F64_PINF, F64_MAX, \
++          FSR_OI,  FSR_OI,   FSR_OI,  FSR_OI
++test_end
++
++test add_d_inf
++    /* 1 + +inf = +inf  */
++    test_op2 add.d, f6, f7, f8, F64_1, F64_PINF, \
++        F64_PINF, F64_PINF, F64_PINF, F64_PINF, \
++           FSR__,    FSR__,    FSR__,    FSR__
++
++    /* +inf + -inf = default NaN */
++    test_op2 add.d, f0, f1, f2, F64_PINF, F64_NINF, \
++        F64_DNAN, F64_DNAN, F64_DNAN, F64_DNAN, \
++           FSR_V,    FSR_V,    FSR_V,    FSR_V
++test_end
++
++test add_d_nan_dfpu
++    /* 1 + QNaN = QNaN  */
++    test_op2 add.d, f9, f10, f11, F64_1, F64_QNAN(1), \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR__,       FSR__,       FSR__,       FSR__
++    /* 1 + SNaN = QNaN  */
++    test_op2 add.d, f12, f13, f14, F64_1, F64_SNAN(1), \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++
++    /* SNaN1 + SNaN2 = QNaN2 */
++    test_op2 add.d, f15, f0, f1, F64_SNAN(1), F64_SNAN(2), \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++    /* QNaN1 + SNaN2 = QNaN2 */
++    test_op2 add.d, f5, f6, f7, F64_QNAN(1), F64_SNAN(2), \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++    /* SNaN1 + QNaN2 = QNaN2 */
++    test_op2 add.d, f8, f9, f10, F64_SNAN(1), F64_QNAN(2), \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++test_end
++
++test sub_d
++    /* norm - norm = denorm */
++    test_op2 sub.d, f6, f7, f8, F64_MIN_NORM | 1, F64_MIN_NORM, \
++        0x00000001, 0x00000001, 0x00000001, 0x00000001, \
++             FSR__,      FSR__,      FSR__,      FSR__
++test_end
++
++test mul_d
++    test_op2 mul.d, f0, f1, f2, F64_1 | 1, F64_1 | 1, \
++        F64_1 | 2, F64_1 | 2, F64_1 | 3, F64_1 | 2, \
++            FSR_I,     FSR_I,     FSR_I,     FSR_I
++    /* MAX_FLOAT/2 * MAX_FLOAT/2 = +inf/MAX_FLOAT  */
++    test_op2 mul.d, f6, f7, f8, F64_MAX_2, F64_MAX_2, \
++        F64_PINF, F64_MAX, F64_PINF, F64_MAX, \
++          FSR_OI,  FSR_OI,   FSR_OI,  FSR_OI
++    /* min norm * min norm = 0/denorm */
++    test_op2 mul.d, f6, f7, f8, F64_MIN_NORM, F64_MIN_NORM, \
++         F64_0,  F64_0, 0x00000001,  F64_0, \
++        FSR_UI, FSR_UI,     FSR_UI, FSR_UI
++    /* inf * 0 = default NaN */
++    test_op2 mul.d, f6, f7, f8, F64_PINF, F64_0, \
++        F64_DNAN, F64_DNAN, F64_DNAN, F64_DNAN, \
++           FSR_V,    FSR_V,    FSR_V,    FSR_V
++test_end
++
++test madd_d
++    test_op3 madd.d, f0, f1, f2, f0, F64_0, F64_1 | 1, F64_1 | 1, \
++        F64_1 | 2, F64_1 | 2, F64_1 | 3, F64_1 | 2, \
++            FSR_I,     FSR_I,     FSR_I,     FSR_I
++test_end
++
++test madd_d_precision
++    test_op3 madd.d, f0, f1, f2, f0, \
++        F64_MINUS | F64_1 | 2, F64_1 | 1, F64_1 | 1, \
++        0x3970000000000000, 0x3970000000000000, 0x3970000000000000, 0x3970000000000000, \
++             FSR__,      FSR__,      FSR__,      FSR__
++test_end
++
++test madd_d_nan_dfpu
++    /* DFPU madd/msub NaN1, NaN2, NaN3 priority: NaN1, NaN3, NaN2 */
++    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_1, F64_1, \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR__,       FSR__,       FSR__,       FSR__
++    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_QNAN(2), F64_1, \
++        F64_QNAN(2), F64_QNAN(2), F64_QNAN(2), F64_QNAN(2), \
++              FSR__,       FSR__,       FSR__,       FSR__
++    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_1, F64_QNAN(3), \
++        F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), \
++              FSR__,       FSR__,       FSR__,       FSR__
++
++    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_QNAN(2), F64_1, \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR__,       FSR__,       FSR__,       FSR__
++    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_1, F64_QNAN(3), \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR__,       FSR__,       FSR__,       FSR__
++    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_QNAN(2), F64_QNAN(3), \
++        F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), F64_QNAN(3), \
++              FSR__,       FSR__,       FSR__,       FSR__
++
++    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_QNAN(2), F64_QNAN(3), \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR__,       FSR__,       FSR__,       FSR__
++
++    /* inf * 0 = default NaN */
++    test_op3 madd.d, f0, f1, f2, f0, F64_1, F64_PINF, F64_0, \
++        F64_DNAN, F64_DNAN, F64_DNAN, F64_DNAN, \
++           FSR_V,    FSR_V,    FSR_V,    FSR_V
++    /* inf * 0 + SNaN1 = QNaN1 */
++    test_op3 madd.d, f0, f1, f2, f0, F64_SNAN(1), F64_PINF, F64_0, \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++    /* inf * 0 + QNaN1 = QNaN1 */
++    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_PINF, F64_0, \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++
++    /* madd/msub SNaN turns to QNaN and sets Invalid flag */
++    test_op3 madd.d, f0, f1, f2, f0, F64_SNAN(1), F64_1, F64_1, \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++    test_op3 madd.d, f0, f1, f2, f0, F64_QNAN(1), F64_SNAN(2), F64_1, \
++        F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), F64_QNAN(1), \
++              FSR_V,       FSR_V,       FSR_V,       FSR_V
++test_end
++
++#endif
++
++test_suite_end
 -- 
-2.21.3
+2.20.1
 
 
