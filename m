@@ -2,95 +2,95 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55BE3C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA276C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:17:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 216DF20708
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:16:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A348206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:17:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vh7JwQQL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216DF20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RIuKFq3V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A348206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIMv-00082i-7j
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:16:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37370)
+	id 1jtINu-00022h-J9
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:17:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jtHmV-000848-4o
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:39:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45501
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jtHmT-0003UV-Ck
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:39:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594244344;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z3+fq5ijgR0VamgvH7ma7Z99lWeh8Y3IhzT0JgAf4JY=;
- b=Vh7JwQQLcEqZaOuiH5Crf7lzQeo/xHbNuC3u6v0qIkctdvvnREI42DTWvNBD7K8KV8GRPB
- 2NCBQT3QjPIlHuWnS5astE0t/Z3D4D4O2vwHNrkL3D5wzUjDdJ/HdCbLSp7KgYOCd3d6cS
- PwL2GwFyqpjvrABsI/SwhvEiAZA2aV4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-pFN4I6LvPzSDYKhK3-lsGw-1; Wed, 08 Jul 2020 17:39:03 -0400
-X-MC-Unique: pFN4I6LvPzSDYKhK3-lsGw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C93F5800C64;
- Wed,  8 Jul 2020 21:39:01 +0000 (UTC)
-Received: from localhost (ovpn-116-140.rdu2.redhat.com [10.10.116.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 935745D9DD;
- Wed,  8 Jul 2020 21:39:01 +0000 (UTC)
-Date: Wed, 8 Jul 2020 17:39:00 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] cpu: Add starts_halted() method
-Message-ID: <20200708213900.GD780932@habkost.net>
-References: <20200707204333.261506-1-bauerman@linux.ibm.com>
- <20200707214917.GX7276@habkost.net>
- <87y2nu3nxq.fsf@morokweng.localdomain>
- <c53b36b7-ee7b-bb66-8220-cce788fd631d@redhat.com>
- <20200708100038.GG18595@umbus.fritz.box>
- <CAFEAcA9V7Uha9-rz+JY-5HkazCWuTk1vkLnw1m9Lw-bXXKbkvw@mail.gmail.com>
- <20200708152540.GZ7276@habkost.net>
- <da4b5a4c-7a72-6e07-b423-1487ad358c31@redhat.com>
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jtHvL-0006D6-1C
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:48:15 -0400
+Received: from mail-vk1-xa41.google.com ([2607:f8b0:4864:20::a41]:45747)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jtHvH-0004i5-SE
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:48:14 -0400
+Received: by mail-vk1-xa41.google.com with SMTP id h1so10525275vkn.12
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 14:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=CW3w8aXpYiNtlEq+t02GsBy4W29Z+h3Ij5vo0Nr7eGY=;
+ b=RIuKFq3VYiB07h4YmCvRG4I2anaJCjb7HeHEiuCQ17ZexjR0w1NItMqi4FTh4TALcy
+ 5nVW7IxxZmQka8OrMmZ69z7d8eFGa+B6tC4GpwQBW544pXuB5LWRe/cYkASj01NusQHI
+ kze1P8CJuaSFcT4m0I4mtDw3L48jHWVswsu/ZI0nHAiGhENr4QENEJMMOS096Bo3RgbF
+ /vc7BDW0FQe+3/aFefHPQATDsETYGTm6IPtmL94HBiWkDejcKdS38inABwJCs1aaApHx
+ kQHIS0BD2wIU8zs+nt679vLmDHek4xkOFcRYHTdVzTVujXz/W1AX2DT19C2J1T3CZGG3
+ R21w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=CW3w8aXpYiNtlEq+t02GsBy4W29Z+h3Ij5vo0Nr7eGY=;
+ b=K0B5MabdclSvNNSiN1GD0vuYN9rFwlppPjrHixrCPD4lzB/ZhE8/TA4j0c6ON1zxtU
+ hsLFEeQxYSAQ06GAm2maF+WBgk9CE03MoAzWqMznga9k7PyMAOV1BBpw6joQbi4HUHx3
+ M3aB6JRXbwgylp+wINzT9sU3HhZip/hWohbN/iLWZrb9Lq9EirvJThmbBklESbwFjAjA
+ B5SBxCbBbvxJe9KX7cblzE+ds+NqBmTM9iQwbUc7RSKToxgEm7mPr36YXbwL9RZkRtZM
+ V3b5GT7EwZhtUXYMahkO9YRRzHrMXFvukPw6jqGI6HCBuoVeeLlhfqwiuhmrUU3uPxdA
+ HqYQ==
+X-Gm-Message-State: AOAM533L4412+zJlRE8AiHzFeQ6DH/uWbjwhM1VBq61h8wdTsNiIBAuK
+ T8V9w7rLtDFoC/HgFLGNl47408YMy46s4QtI9ulGHA==
+X-Google-Smtp-Source: ABdhPJzSf9/srYfLG9Rh1B+5+0QBH9y/CKIw4oMCK3ve9e4nn9q/YlasiQ86uRlxKnJJrUViy4uWhHCbOImUntEXut8=
+X-Received: by 2002:a1f:9144:: with SMTP id t65mr35070332vkd.50.1594244890268; 
+ Wed, 08 Jul 2020 14:48:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <da4b5a4c-7a72-6e07-b423-1487ad358c31@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+References: <20200707184730.3047754-1-hskinnemoen@google.com>
+ <20200707184730.3047754-6-hskinnemoen@google.com>
+ <4b7130f2-032c-3067-b2b6-876a2b17b707@amsat.org>
+ <CAFQmdRYi5QFHbcWQH-bWqAsSCidzYMedC8n+mib1DPpJuEy-Rw@mail.gmail.com>
+In-Reply-To: <CAFQmdRYi5QFHbcWQH-bWqAsSCidzYMedC8n+mib1DPpJuEy-Rw@mail.gmail.com>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Wed, 8 Jul 2020 14:47:58 -0700
+Message-ID: <CAFQmdRbF_tM4RaphCG1cgnEJ1z6YMdYv3fVjuu6crXKeAaS9Zg@mail.gmail.com>
+Subject: Re: [PATCH v4 05/12] hw/arm: Add NPCM730 and NPCM750 SoC models
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>, Joel Stanley <joel@jms.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::a41;
+ envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,88 +103,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Thiago Jung Bauermann <bauerman@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 08, 2020 at 06:45:57PM +0200, Philippe Mathieu-Daudé wrote:
-> On 7/8/20 5:25 PM, Eduardo Habkost wrote:
-> > On Wed, Jul 08, 2020 at 02:14:03PM +0100, Peter Maydell wrote:
-> >> On Wed, 8 Jul 2020 at 12:12, David Gibson <david@gibson.dropbear.id.au> wrote:
-> >>> On Wed, Jul 08, 2020 at 10:38:29AM +0200, Philippe Mathieu-DaudÃ© wrote:
-> >>>> Class boolean field certainly sounds better, but I am not sure this
-> >>>> is a property of the machine. Rather the arch? So move the field
-> >>>> to CPUClass? Maybe not, let's discuss :)
-> >>>
-> >>> It is absolutely a property of the machine.  e.g. I don't think we
-> >>> want this for powernv.  pseries is a bit of a special case since it is
-> >>> explicitly a paravirt platform.  But even for emulated hardware, the
-> >>> board can absolutely strap things so that cpus do or don't start
-> >>> immediately.
-> >>
-> >> It's a property of the individual CPU, I think. One common setup
-> >> for Arm systems is that the primary CPU starts powered up but
-> >> the secondaries all start powered down.
-> > 
-> > Both statements can be true.  It can be a property of the
-> > individual CPU (although I'm not convinced it has to), but it
-> > still needs to be controlled by the machine.
-> 
-> From what said Peter, I understand this is a property of the
-> chipset. Chipsets are modelled unevenly.
-> 
-> IIUC QEMU started with single-core CPUs.
-> CPUState had same meaning for 'core' or 'cpu', 1-1 mapping.
-> 
-> Then multicore CPUs could be easily modelled using multiple
-> single-core CPUs, usually created in the machine code.
-> 
-> Then we moved to SoC models, creating the cores in the SoC.
-> Some SoCs have array of cores, eventually heterogeneous
-> (see the ZynqMP). We have containers of CPUState.
-> 
-> On an ARM-based SoC, you might have the first core started
-> (as said Peter) or not.
-> 
-> BCM2836 / BCM2837 and ZynqMP start will all ARM cores off.
-> On the BCM chipsets, a DSP core will boot the ARM cores.
-> On the ZynqMP, a MicroBlaze core boots them.
-> As QEMU doesn't models heterogeneous architectures, we start
-> modelling after the unmodelled cores booted us, so either one
-> or all cores on.
-> 
-> In this case, we narrowed down the 'start-powered-off' field
-> to the SoC, which happens to be how ARM SoCs are modelled.
+On Wed, Jul 8, 2020 at 11:13 AM Havard Skinnemoen
+<hskinnemoen@google.com> wrote:
+>
+> On Wed, Jul 8, 2020 at 10:31 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org> wrote:
+> >
+> > On 7/7/20 8:47 PM, Havard Skinnemoen wrote:
+> > > +    /* System Global Control Registers (GCR) */
+> > > +    object_property_set_int(OBJECT(&s->gcr), nc->disabled_modules,
+> > > +                            "disabled-modules", &error_abort);
+> > > +    object_property_set_link(OBJECT(&s->gcr), OBJECT(s->dram), "dram=
+",
+> > > +                             &error_abort);
+> >
+> > I guess you can simplify using in npcm7xx_init():
+> >
+> >       object_property_add_const_link(obj, "dram-mr", OBJECT(&s->gcr));
+> >
+> > And in npcm7xx_gcr_realize()
+> >
+> >     obj =3D object_property_get_link(OBJECT(dev), "dram-mr", &err);
+> >     if (obj =3D=3D NULL) {
+> >         error_setg(errp, "%s: required dram-mr link not found: %s",
+> >                    __func__, error_get_pretty(err));
+> >         return;
+> >     }
+> >     s->dram =3D MEMORY_REGION(obj);
+>
+> OK, I'll try that, thanks!
 
-I was not aware of the start-powered-off property.  If we make it
-generic, we can just let spapr use it.
+Hmm, I ended up doing
 
-> 
-> 
-> Chipsets providing a JTAG interface can have a SRST signal,
-> the "system reset". When a JTAG probe is attached, it can
-> keeps the whole chipset in a reset state. This is equivalent
-> to QEMU '-S' mode (single step mode).
-> 
-> 
-> I don't know about pseries hardware, but if this is 'explicit
-> to paravirt platform', then I expect this to be the same with
-> other accelerators/architectures.
-> 
-> If paravirtualized -> cores start off by default. Let the
-> hypervisor start them. So still a property of the CPUState
-> depending on the accelerator used?
+-    object_property_set_link(OBJECT(&s->gcr), OBJECT(s->dram), "dram",
+-                             &error_abort);
++    object_property_add_const_link(OBJECT(&s->gcr), "dram-mr",
+OBJECT(s->dram));
 
-I don't understand this part.  Why would this depend on the
-accelerator?
+in realize() because s->dram isn't initialized yet in npcm7xx_init().
+Is this what you had in mind?
 
--- 
-Eduardo
+Here's the diff from all the dram-related changes:
 
+diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
+index 39a1f28d8e..30e00a514d 100644
+--- a/include/hw/arm/npcm7xx.h
++++ b/include/hw/arm/npcm7xx.h
+@@ -28,6 +28,10 @@
+
+ #define NPCM7XX_MAX_NUM_CPUS    (2)
+
++/* The first half of the address space is reserved for DDR4 DRAM. */
++#define NPCM7XX_DRAM_BA         (0x00000000)
++#define NPCM7XX_DRAM_SZ         (2 * GiB)
++
+ /* Magic addresses for setting up direct kernel booting and SMP boot stubs=
+. */
+ #define NPCM7XX_LOADER_START            (0x00000000)  /* Start of SDRAM */
+ #define NPCM7XX_SMP_LOADER_START        (0xffff0000)  /* Boot ROM */
+diff --git a/include/hw/misc/npcm7xx_gcr.h b/include/hw/misc/npcm7xx_gcr.h
+index 49d699410f..4884676be2 100644
+--- a/include/hw/misc/npcm7xx_gcr.h
++++ b/include/hw/misc/npcm7xx_gcr.h
+@@ -68,7 +68,6 @@ typedef struct NPCM7xxGCRState {
+     uint32_t reset_pwron;
+     uint32_t reset_mdlr;
+     uint32_t reset_intcr3;
+-    MemoryRegion *dram;
+ } NPCM7xxGCRState;
+
+ #define TYPE_NPCM7XX_GCR "npcm7xx-gcr"
+diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+index e64cf6a84c..a05a900197 100644
+--- a/hw/arm/npcm7xx.c
++++ b/hw/arm/npcm7xx.c
+@@ -26,10 +26,6 @@
+ #include "qemu/units.h"
+ #include "sysemu/sysemu.h"
+
+-/* The first half of the address space is reserved for DDR4 DRAM. */
+-#define NPCM7XX_DRAM_BA         (0x00000000)
+-#define NPCM7XX_DRAM_SZ         (2 * GiB)
+-
+ /*
+  * This covers the whole MMIO space. We'll use this to catch any MMIO acce=
+sses
+  * that aren't handled by any device.
+@@ -257,8 +253,7 @@ static void npcm7xx_realize(DeviceState *dev, Error **e=
+rrp)
+     /* System Global Control Registers (GCR) */
+     object_property_set_int(OBJECT(&s->gcr), nc->disabled_modules,
+                             "disabled-modules", &error_abort);
+-    object_property_set_link(OBJECT(&s->gcr), OBJECT(s->dram), "dram",
+-                             &error_abort);
++    object_property_add_const_link(OBJECT(&s->gcr), "dram-mr",
+OBJECT(s->dram));
+     sysbus_realize(SYS_BUS_DEVICE(&s->gcr), &error_abort);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gcr), 0, NPCM7XX_GCR_BA);
+
+@@ -326,13 +321,10 @@ static void npcm7xx_realize(DeviceState *dev,
+Error **errp)
+     memory_region_init_rom(&s->irom, OBJECT(dev), "irom", NPCM7XX_ROM_SZ,
+                            &error_abort);
+     memory_region_add_subregion(get_system_memory(), NPCM7XX_ROM_BA, &s->i=
+rom);
+-
+-    /* External DDR4 SDRAM */
+-    memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, s->d=
+ram);
+ }
+
+ static Property npcm7xx_properties[] =3D {
+-    DEFINE_PROP_LINK("dram", NPCM7xxState, dram, TYPE_MEMORY_REGION,
++    DEFINE_PROP_LINK("dram-mr", NPCM7xxState, dram, TYPE_MEMORY_REGION,
+                      MemoryRegion *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
+index 2f66e699b1..cfb31ce6f5 100644
+--- a/hw/arm/npcm7xx_boards.c
++++ b/hw/arm/npcm7xx_boards.c
+@@ -83,21 +83,25 @@ static void npcm7xx_connect_flash(NPCM7xxFIUState
+*fiu, int cs_no,
+     sysbus_connect_irq(SYS_BUS_DEVICE(fiu), cs_no, flash_cs);
+ }
+
++static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
++{
++    memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram=
+);
++
++    object_property_set_link(OBJECT(soc), OBJECT(dram), "dram-mr",
++                             &error_abort);
++}
++
+ static NPCM7xxState *npcm7xx_create_soc(MachineState *machine,
+                                         uint32_t hw_straps)
+ {
+     NPCM7xxMachineClass *nmc =3D NPCM7XX_MACHINE_GET_CLASS(machine);
+-    NPCM7xxState *soc;
++    Object *obj;
+
+-    soc =3D NPCM7XX(object_new_with_props(nmc->soc_type, OBJECT(machine), =
+"soc",
+-                                        &error_abort, NULL));
+-    object_property_set_link(OBJECT(soc), OBJECT(machine->ram), "dram",
+-                             &error_abort);
+-    object_property_set_uint(OBJECT(soc), hw_straps, "power-on-straps",
+-                             &error_abort);
+-    qdev_realize(DEVICE(soc), NULL, &error_abort);
++    obj =3D object_new_with_props(nmc->soc_type, OBJECT(machine), "soc",
++                                &error_abort, NULL);
++    object_property_set_uint(obj, hw_straps, "power-on-straps", &error_abo=
+rt);
+
+-    return soc;
++    return NPCM7XX(obj);
+ }
+
+ static void npcm750_evb_init(MachineState *machine)
+@@ -105,6 +109,9 @@ static void npcm750_evb_init(MachineState *machine)
+     NPCM7xxState *soc;
+
+     soc =3D npcm7xx_create_soc(machine, NPCM750_EVB_POWER_ON_STRAPS);
++    npcm7xx_connect_dram(soc, machine->ram);
++    qdev_realize(DEVICE(soc), NULL, &error_abort);
++
+     npcm7xx_load_bootrom(soc);
+     npcm7xx_connect_flash(&soc->fiu[0], 0, "w25q256", drive_get(IF_MTD, 0,=
+ 0));
+     npcm7xx_load_kernel(machine, soc);
+@@ -115,6 +122,9 @@ static void quanta_gsj_init(MachineState *machine)
+     NPCM7xxState *soc;
+
+     soc =3D npcm7xx_create_soc(machine, QUANTA_GSJ_POWER_ON_STRAPS);
++    npcm7xx_connect_dram(soc, machine->ram);
++    qdev_realize(DEVICE(soc), NULL, &error_abort);
++
+     npcm7xx_load_bootrom(soc);
+     npcm7xx_connect_flash(&soc->fiu[0], 0, "mx25l25635e",
+                           drive_get(IF_MTD, 0, 0));
+diff --git a/hw/misc/npcm7xx_gcr.c b/hw/misc/npcm7xx_gcr.c
+index 78a885e265..9934cd238d 100644
+--- a/hw/misc/npcm7xx_gcr.c
++++ b/hw/misc/npcm7xx_gcr.c
+@@ -127,11 +127,16 @@ static void npcm7xx_gcr_realize(DeviceState
+*dev, Error **errp)
+ {
+     NPCM7xxGCRState *s =3D NPCM7XX_GCR(dev);
+     uint64_t dram_size;
++    Error *err =3D NULL;
++    Object *obj;
+
+-    if (!s->dram) {
+-        error_setg(errp, "npcm7xx_gcr: 'dram' link not set");
++    obj =3D object_property_get_link(OBJECT(dev), "dram-mr", &err);
++    if (!obj) {
++        error_setg(errp, "%s: required dram-mr link not found: %s",
++                   __func__, error_get_pretty(err));
+         return;
+     }
++    dram_size =3D memory_region_size(MEMORY_REGION(obj));
+
+     /* Power-on reset value */
+     s->reset_intcr3 =3D 0x00001002;
+@@ -149,7 +154,6 @@ static void npcm7xx_gcr_realize(DeviceState *dev,
+Error **errp)
+      *
+      * https://github.com/Nuvoton-Israel/u-boot/blob/2aef993bd2aafeb5408db=
+aad0f3ce099ee40c4aa/board/nuvoton/poleg/poleg.c#L244
+      */
+-    dram_size =3D int128_get64(s->dram->size);
+     if (dram_size >=3D 2 * GiB) {
+         s->reset_intcr3 |=3D 4 << 8;
+     } else if (dram_size >=3D 1 * GiB) {
+@@ -191,8 +195,6 @@ static const VMStateDescription vmstate_npcm7xx_gcr =3D=
+ {
+ static Property npcm7xx_gcr_properties[] =3D {
+     DEFINE_PROP_UINT32("disabled-modules", NPCM7xxGCRState, reset_mdlr, 0)=
+,
+     DEFINE_PROP_UINT32("power-on-straps", NPCM7xxGCRState, reset_pwron, 0)=
+,
+-    DEFINE_PROP_LINK("dram", NPCM7xxGCRState, dram, TYPE_MEMORY_REGION,
+-                     MemoryRegion *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 
