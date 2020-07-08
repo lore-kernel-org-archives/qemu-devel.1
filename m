@@ -2,80 +2,85 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A678C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF12C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:30:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E622A206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:29:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B0DC20674
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:30:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WlBhawCW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E622A206DF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAp0S1mW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0DC20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtHck-0001GD-4p
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:29:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33812)
+	id 1jtHe0-0003AC-Kq
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:30:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHb1-0007LI-I7
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:27:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26069
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jtHaG-0006Gr-MF
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:26:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50201
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHax-0001tz-9g
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:27:15 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jtHaE-0001q2-VA
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:26:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594243630;
+ s=mimecast20190719; t=1594243585;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BjTg3TYDvdYubEwxieaVivSeO+RKPrnPp3dzxX5R0A8=;
- b=WlBhawCWwvrLn+fW+PwLdIGN6A8WT5r/L1mOPMNW0/EAu8EjThHPiMovBSn8olAhG9DIfW
- l5XlL+R0jqv7Pgz3t97fUc+8wZiEmF+8lpUtV0Kx9A+BRiIozYn4J5ly9JCZ0KA1+ldBJ4
- KxQSYZx5QwNucXGRnOsrYq7yMmc4EgY=
+ bh=LrW3ISu0KT6KfnFR7UAWObZg8Y6b4dfrBXbmannj/eU=;
+ b=SAp0S1mW1CUbvbaCrF93kwo8xidgEvzBKME7vufod2mC8iPGUfRRCAxAmKG2hdq/2i/M7a
+ H/PY/PU+S2w+TjRRVAWjBHTWJL+BvPn1TP0m/nwYLZgTBxm5t71A/ryboEk9LuNY5DXs2f
+ tsFgfFx2KGB2OdA/PotdzRbjI36+lzo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-EP-ACS0fOG-j34OrZwhnZw-1; Tue, 07 Jul 2020 17:25:07 -0400
-X-MC-Unique: EP-ACS0fOG-j34OrZwhnZw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-27-JCA3oVQVOPi1V7yB-82Haw-1; Wed, 08 Jul 2020 11:25:43 -0400
+X-MC-Unique: JCA3oVQVOPi1V7yB-82Haw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EDBA18FE861;
- Tue,  7 Jul 2020 21:25:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DC9B60CC0;
- Tue,  7 Jul 2020 21:25:06 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BEF2C1132922; Tue,  7 Jul 2020 23:25:03 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 02/53] error: Improve error.h's big comment
-Date: Tue,  7 Jul 2020 23:24:12 +0200
-Message-Id: <20200707212503.1495927-3-armbru@redhat.com>
-In-Reply-To: <20200707212503.1495927-1-armbru@redhat.com>
-References: <20200707212503.1495927-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68ED7800401;
+ Wed,  8 Jul 2020 15:25:42 +0000 (UTC)
+Received: from localhost (ovpn-116-140.rdu2.redhat.com [10.10.116.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4123E1A8EC;
+ Wed,  8 Jul 2020 15:25:41 +0000 (UTC)
+Date: Wed, 8 Jul 2020 11:25:40 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] cpu: Add starts_halted() method
+Message-ID: <20200708152540.GZ7276@habkost.net>
+References: <20200707204333.261506-1-bauerman@linux.ibm.com>
+ <20200707214917.GX7276@habkost.net>
+ <87y2nu3nxq.fsf@morokweng.localdomain>
+ <c53b36b7-ee7b-bb66-8220-cce788fd631d@redhat.com>
+ <20200708100038.GG18595@umbus.fritz.box>
+ <CAFEAcA9V7Uha9-rz+JY-5HkazCWuTk1vkLnw1m9Lw-bXXKbkvw@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <CAFEAcA9V7Uha9-rz+JY-5HkazCWuTk1vkLnw1m9Lw-bXXKbkvw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -96,132 +101,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add headlines to the big comment.
+On Wed, Jul 08, 2020 at 02:14:03PM +0100, Peter Maydell wrote:
+> On Wed, 8 Jul 2020 at 12:12, David Gibson <david@gibson.dropbear.id.au> wrote:
+> > On Wed, Jul 08, 2020 at 10:38:29AM +0200, Philippe Mathieu-Daudé wrote:
+> > > Class boolean field certainly sounds better, but I am not sure this
+> > > is a property of the machine. Rather the arch? So move the field
+> > > to CPUClass? Maybe not, let's discuss :)
+> >
+> > It is absolutely a property of the machine.  e.g. I don't think we
+> > want this for powernv.  pseries is a bit of a special case since it is
+> > explicitly a paravirt platform.  But even for emulated hardware, the
+> > board can absolutely strap things so that cpus do or don't start
+> > immediately.
+> 
+> It's a property of the individual CPU, I think. One common setup
+> for Arm systems is that the primary CPU starts powered up but
+> the secondaries all start powered down.
 
-Explain examples for NULL, &error_abort and &error_fatal argument
-better.
+Both statements can be true.  It can be a property of the
+individual CPU (although I'm not convinced it has to), but it
+still needs to be controlled by the machine.
 
-Tweak rationale for error_propagate_prepend().
+> 
+> The original bug as described in the commit message sounds
+> to me like something we should look to fix in the implementation
+> of async_run_on_cpu() -- it shouldn't cause a CPU that's halfway
+> through reset to do a KVM_RUN or otherwise run guest code,
+> whether that CPU is going to start powered-up or powered-down.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200707160613.848843-3-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- include/qapi/error.h | 51 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 36 insertions(+), 15 deletions(-)
+What "halfway through reset" means, exactly?  Isn't halted==1
+enough to indicate the CPU is in that state?
 
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index e8960eaad5..6d079c58b7 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -15,6 +15,8 @@
- /*
-  * Error reporting system loosely patterned after Glib's GError.
-  *
-+ * = Creating errors =
-+ *
-  * Create an error:
-  *     error_setg(&err, "situation normal, all fouled up");
-  *
-@@ -27,6 +29,8 @@
-  *     error_setg(&err, "invalid quark\n" // WRONG!
-  *                "Valid quarks are up, down, strange, charm, top, bottom.");
-  *
-+ * = Reporting and destroying errors =
-+ *
-  * Report an error to the current monitor if we have one, else stderr:
-  *     error_report_err(err);
-  * This frees the error object.
-@@ -40,6 +44,30 @@
-  *     error_free(err);
-  * Note that this loses hints added with error_append_hint().
-  *
-+ * Call a function ignoring errors:
-+ *     foo(arg, NULL);
-+ * This is more concise than
-+ *     Error *err = NULL;
-+ *     foo(arg, &err);
-+ *     error_free(err); // don't do this
-+ *
-+ * Call a function aborting on errors:
-+ *     foo(arg, &error_abort);
-+ * This is more concise and fails more nicely than
-+ *     Error *err = NULL;
-+ *     foo(arg, &err);
-+ *     assert(!err); // don't do this
-+ *
-+ * Call a function treating errors as fatal:
-+ *     foo(arg, &error_fatal);
-+ * This is more concise than
-+ *     Error *err = NULL;
-+ *     foo(arg, &err);
-+ *     if (err) { // don't do this
-+ *         error_report_err(err);
-+ *         exit(1);
-+ *     }
-+ *
-  * Handle an error without reporting it (just for completeness):
-  *     error_free(err);
-  *
-@@ -47,6 +75,11 @@
-  * reporting it (primarily useful in testsuites):
-  *     error_free_or_abort(&err);
-  *
-+ * = Passing errors around =
-+ *
-+ * Errors get passed to the caller through the conventional @errp
-+ * parameter.
-+ *
-  * Pass an existing error to the caller:
-  *     error_propagate(errp, err);
-  * where Error **errp is a parameter, by convention the last one.
-@@ -54,11 +87,10 @@
-  * Pass an existing error to the caller with the message modified:
-  *     error_propagate_prepend(errp, err,
-  *                             "Could not frobnicate '%s': ", name);
-- *
-- * Avoid
-- *     error_propagate(errp, err);
-+ * This is more concise than
-+ *     error_propagate(errp, err); // don't do this
-  *     error_prepend(errp, "Could not frobnicate '%s': ", name);
-- * because this fails to prepend when @errp is &error_fatal.
-+ * and works even when @errp is &error_fatal.
-  *
-  * Create a new error and pass it to the caller:
-  *     error_setg(errp, "situation normal, all fouled up");
-@@ -70,15 +102,6 @@
-  *         handle the error...
-  *     }
-  *
-- * Call a function ignoring errors:
-- *     foo(arg, NULL);
-- *
-- * Call a function aborting on errors:
-- *     foo(arg, &error_abort);
-- *
-- * Call a function treating errors as fatal:
-- *     foo(arg, &error_fatal);
-- *
-  * Receive an error and pass it on to the caller:
-  *     Error *err = NULL;
-  *     foo(arg, &err);
-@@ -86,8 +109,6 @@
-  *         handle the error...
-  *         error_propagate(errp, err);
-  *     }
-- * where Error **errp is a parameter, by convention the last one.
-- *
-  * Do *not* "optimize" this to
-  *     foo(arg, errp);
-  *     if (*errp) { // WRONG!
 -- 
-2.26.2
+Eduardo
 
 
