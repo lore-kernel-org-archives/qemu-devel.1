@@ -6,83 +6,84 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F8BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF368C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:41:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D269720720
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:40:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8772720720
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:41:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TfBf3Qgh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D269720720
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lb7+FHUo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8772720720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtJg3-0001Hh-Vk
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:40:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37830)
+	id 1jtJhH-0002PY-SF
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:41:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtJfJ-0000dy-J5
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:39:49 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44562)
+ id 1jtJgZ-0001pM-Db
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:41:07 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42611)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtJfH-0002XX-SF
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:39:49 -0400
-Received: by mail-pg1-x543.google.com with SMTP id j19so93885pgm.11
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 16:39:46 -0700 (PDT)
+ id 1jtJgW-0002q5-33
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:41:07 -0400
+Received: by mail-pf1-x442.google.com with SMTP id 1so165081pfn.9
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 16:41:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=7ZboWJxS0N+CSgusXstPnnIsHtDyEy1TBuACGgOpANE=;
- b=TfBf3QghA0TOAOM5XlIVksakdzaFQ7DNg9LwTsScpdrUxBweLHIBLtPTilFSLsjeB/
- 7Vk4vjneQVx5RVlz2Cj+iuGp6auslX8DSLVLMBuUEJir0cnsHHDQLI4XdzHHXNZpGksf
- f6R46QoiZhOpwoseINZBsWvFP4LacUWJ4z0OdifEBzBXOPlXGmv/KZtRJeIXwYxmlECM
- G9Nab5pak4NjAKOvPDFdejjr/P6ovtRLROSahYEdzgIbD+0xSBHq4KdZSkujlj9Jk/ey
- pglZkaRT2XY0v+G17pdwRoW4fCiDxZgBpPuKi8Hh/2c0TLr74NdMmEr9m7JogES+8Neg
- XBtg==
+ bh=1UkOWbeQctjkd0+Ogbpvj1L/TqjRumxU2EBvZJQeXG8=;
+ b=lb7+FHUobW5Qq1NHHtLjA7ApGrLtrv1NcfGvuz5vU5bYN8X0vVpr3c/e4fhBXSOIpt
+ 2LxZPTqSIp0UXbRM3EisPeeiZriowVWNMaai+PDH1F044Z7eFKTco6hEmPUspARhgdT3
+ LpHQvfPRLD6HDW+oQLDkYrqAOQNyMLxCly5Tm/MrOb2lop6W6g3In1HqTGjXNk8DAJvH
+ 9zj3OOD1FqUVkBOrmgcK1kBinbADFkuRYbn/ISEDi6iJ7lfHcUy0XK6WMtzFKmWG3qml
+ vX+39Vi7bpxQ9fGb261Tbt5W4NZ9nRYS5UO82lqTQ0vxYE6ukRVsTM/6Z9Ci2acOGaQ9
+ NyqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=7ZboWJxS0N+CSgusXstPnnIsHtDyEy1TBuACGgOpANE=;
- b=ESMN8BNInkbvgVJsOdLRdxreMA2vX/Me26Qfx/0oSSPXWcze1Vz6d8A9HjjdDfQGbO
- d/zPaR+cCt4aqXO/Oq/udgG5WbRRuQ/sM2SyQUtAo49NS/Ctdbbf2dIplZhEzB2Ul4dr
- 6D8yCkxWLsmXRQ6/gJ9zAWPo882/xKyTHPt/nd+qavfsmzmVYvmbuXWsG05S8BPyRgV1
- EyHGeWbIuNpEpD02RX+woWgcGQyfA4rCncJSHACbE8arRDSupi0SYRxxakH2j6GVNW6G
- PtsZ1RbKrLpVLuWcBunqXUIy5zAORzCsltqG97g9RTI+pq0AOHdtbHQwbKHw61C64SM9
- Wzxg==
-X-Gm-Message-State: AOAM533to+2LWYmOqvjJOO8y4ZHdhR6RkktB4TKtVAMroBrNosYF9qYs
- k4Su1f8e3Lh8AisZ1uyheSidQw==
-X-Google-Smtp-Source: ABdhPJxHccbXTQfbHPGUXxsSf9KrWLvY/a2lCxoBZ4/A1lXwwIvmpM/+X0Je0zYauppKJI/OLBWc1g==
-X-Received: by 2002:a62:f241:: with SMTP id y1mr45405909pfl.136.1594251585367; 
- Wed, 08 Jul 2020 16:39:45 -0700 (PDT)
+ bh=1UkOWbeQctjkd0+Ogbpvj1L/TqjRumxU2EBvZJQeXG8=;
+ b=AcsIVMWHcx99fVncLhyQBYdXC+dmYwnx4OwsHbp2uzkHdBr1X0iHAZ/S9NaNn6Gcyj
+ n2T6/d8/bcxcVCFm53PwaHzd0KaAOHSY8lRnraIyl9nciGKdcjfypOEooErXQkxHJI2h
+ 3ZmGbwln2p4iISKZdilk26DsjqCk/QO7NCjA+f+HUnN6+AqhYzaFoui1LVcaHwMErc2e
+ gIzwkmykbbb50WIxu8yu/OgXWhGrM55vpF9EGaeHIqhMox3R/3eWMJ8TL/3XnwxzMn7I
+ LgXDWiFF9RCTyimez414YFbVgpe8N5DNrLgb9X9oZhCJfNQkMeJxWkSS84qd73LVy0pL
+ PeDA==
+X-Gm-Message-State: AOAM532GADTtCUk8Jad/uuuQoBm6fBxL2+5NlAYO3q+/+QhSprcEjufD
+ slJzn2zn41B3r1RtOHqV8VrwHw==
+X-Google-Smtp-Source: ABdhPJyT6WV2j8t4QJIFL7zC60t7dV21LOuVF3hy4Rh+au7xYoasDhNuHeFGWcREqVZPI7t4+p3M4g==
+X-Received: by 2002:a63:7c4d:: with SMTP id l13mr51986513pgn.12.1594251662283; 
+ Wed, 08 Jul 2020 16:41:02 -0700 (PDT)
 Received: from [192.168.7.121] (24-113-145-216.wavecable.com. [24.113.145.216])
- by smtp.gmail.com with ESMTPSA id d22sm755810pfd.105.2020.07.08.16.39.43
+ by smtp.gmail.com with ESMTPSA id k189sm762822pfd.175.2020.07.08.16.41.00
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 16:39:44 -0700 (PDT)
-Subject: Re: [PATCH 5/7] hw/rtc/m48t59: Reduce timer precision to milli-second
+ Wed, 08 Jul 2020 16:41:01 -0700 (PDT)
+Subject: Re: [PATCH 7/7] hw/watchdog/wdt_aspeed: Reduce timer precision to
+ micro-second
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200616075121.12837-1-f4bug@amsat.org>
- <20200616075121.12837-6-f4bug@amsat.org>
+ <20200616075121.12837-8-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2f2811c2-eeea-f6ef-a889-2efe7fa475ba@linaro.org>
-Date: Wed, 8 Jul 2020 16:39:41 -0700
+Message-ID: <9a5a9f82-8646-6a11-6633-ca714b76a482@linaro.org>
+Date: Wed, 8 Jul 2020 16:40:58 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200616075121.12837-6-f4bug@amsat.org>
+In-Reply-To: <20200616075121.12837-8-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -117,14 +118,13 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/16/20 12:51 AM, Philippe Mathieu-Daudé wrote:
-> +    timer_mod(NVRAM->alrm_timer_ms,
-> +              qemu_clock_get_ms(rtc_clock) + next_time_s *
-> +                                             NANOSECONDS_PER_SECOND / SCALE_MS);
+> -        reload = muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_SECOND,
+> +        reload = muldiv64(s->regs[WDT_RELOAD_VALUE],
+> +                          NANOSECONDS_PER_SECOND / SCALE_US,
+>                            s->pclk_freq);
 
-I'm not keen on this last.
-
-I would much prefer a MILLISECONDS_PER_SECOND define.  Should we in fact change
-the units of the input...
+Similarly, I would prefer MICROSECONDS_PER_SECOND.  Though again, I don't see
+what we gain from changing units.
 
 
 r~
