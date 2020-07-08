@@ -2,93 +2,88 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDB3C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83BF5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:48:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2640D206F6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48DE3206F6
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:48:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rbrcsSof"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2640D206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DcbeDSYx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48DE3206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIr1-0003y3-Cv
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:47:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48792)
+	id 1jtIrt-00065l-Dt
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:48:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48474)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIS2-0002dm-0j
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:02 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40560)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIRz-00017G-WE
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:01 -0400
-Received: by mail-pf1-x443.google.com with SMTP id u5so91242pfn.7
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:21:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=40QD+uLXYWVx6bn2yCaxKFXN5y6qp5sHYryZzSPuYNU=;
- b=rbrcsSofEuaPmcwjhXrWSmwHOZ95+jB5LzNQ8/MGlKNY2mmeWUwWBgBIEEuehDkzfp
- rxBY9MAkoDRXMuHCMQX/XGI0LcKOQmTmv0aVnZwTGefWzlhwKfeAdaj4UHUfBcKCEBhx
- 9qubn+L4VAbRXVS6eBTzrLx6ITa4KwGkyCcb88lKJWYy0H37KrnAW+17jqGtmqqFTNkH
- hAmGWACWaITkauCb4LgOl8gzA6chQ3q4L/78ronNBKprf+PDcC636lByTEUhmnb1YHyB
- EeV3qroDZ8M4HUP9CgaffwJcLt/mHffygaqPpCP344xUpFVHBudhsLsIN+HP47XThuvn
- p85Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=40QD+uLXYWVx6bn2yCaxKFXN5y6qp5sHYryZzSPuYNU=;
- b=J5VW5/kMV65Wa48FY5RYR71oVU35RHrre6xhutAdP/q1kH9zQA4LovEdKZo0Qqx1qJ
- iiOZWpJMayWK5e64ME+IHK3NLvY48lKd4H2HHtbvKthkPQid8NAnkbT5yfZnAq71PA37
- MRXpgda2PSQyPsPslTAxTkL7b/Nn3tZztrSKakWPuwk5w83+goU9R+EjDR/kJWquZI1v
- cYeO6f7bIr5E/nrz7b7Jog+XXPBbt5Zk64tfSCegLBvophLLwIyv+FgUYe0Snn3I97Ym
- 4HpB6d2Vbv+sHUR2Xq0cJ+tewbHoM6HmsAqoGiEiBAC2nGVeaSjT1WnhFu/PHrlwkbvr
- rhjA==
-X-Gm-Message-State: AOAM532Qisj5Kf4R4DuqVs3UqG4LMuYj9Mw7qQfX74SDnbReaLTlJTcV
- gVlO4sy0SgjZXBLAgunAEJnQsccA
-X-Google-Smtp-Source: ABdhPJyUcXyzLVyPQ8YtAd2ViDMQNx77TIzAZzNZh/40ILzeWvSFFRDKlop6/5UbTFTlFxEmQbgHSA==
-X-Received: by 2002:a63:dc50:: with SMTP id f16mr48665377pgj.19.1594246918520; 
- Wed, 08 Jul 2020 15:21:58 -0700 (PDT)
-Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.21.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jul 2020 15:21:57 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/21] target/xtensa: rename FPU2000 translators and helpers
-Date: Wed,  8 Jul 2020 15:20:46 -0700
-Message-Id: <20200708222101.24568-7-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
-References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRJ-0001K3-Bn
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33289
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRF-00011E-SE
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594246873;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WuZ2FwmRJiypa21uDwerc5RiK2LDWiVltIu8BgP89UA=;
+ b=DcbeDSYxNOBj5E7Wv8YTsxLTCEQa1cHSygb1fK8PH/ddgUzUcjX5xqdjrC1gKFqk78lsmK
+ 8RVVjhL28O+OHfb/BC5HyICKHkeMrgz8VoMIEjzaxXT0BR5GPu0E5bcJrQZMR9APPRMReD
+ gSyPSSVPb/Ld15JHHqYOhxjhr+jLRl8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-372-F2Meady6NV2eRAmzFTP_GA-1; Wed, 08 Jul 2020 10:19:19 -0400
+X-MC-Unique: F2Meady6NV2eRAmzFTP_GA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA0511084;
+ Wed,  8 Jul 2020 14:19:17 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EFAD85BAC3;
+ Wed,  8 Jul 2020 14:19:14 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH v3 02/11] hw/arm/smmu-common: Add IOTLB helpers
+Date: Wed,  8 Jul 2020 16:18:47 +0200
+Message-Id: <20200708141856.15776-3-eric.auger@redhat.com>
+In-Reply-To: <20200708141856.15776-1-eric.auger@redhat.com>
+References: <20200708141856.15776-1-eric.auger@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,156 +96,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add _s suffix to all FPU2000 opcode translators and helpers that also
-have double-precision variant to unify naming and allow adding DFPU
-implementations. Add _fpu2k_ to the name of wur_fcr helper to make space
-for the DFPU wur_fcr helper.
+Add two helpers: one to lookup for a given IOTLB entry and
+one to insert a new entry. We also move the tracing there.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/xtensa/fpu_helper.c | 10 +++++-----
- target/xtensa/helper.h     | 10 +++++-----
- target/xtensa/translate.c  | 20 ++++++++++----------
- 3 files changed, 20 insertions(+), 20 deletions(-)
+ include/hw/arm/smmu-common.h |  2 ++
+ hw/arm/smmu-common.c         | 36 ++++++++++++++++++++++++++++++++++++
+ hw/arm/smmuv3.c              | 26 ++------------------------
+ hw/arm/trace-events          |  5 +++--
+ 4 files changed, 43 insertions(+), 26 deletions(-)
 
-diff --git a/target/xtensa/fpu_helper.c b/target/xtensa/fpu_helper.c
-index 87487293f9a1..57a284924045 100644
---- a/target/xtensa/fpu_helper.c
-+++ b/target/xtensa/fpu_helper.c
-@@ -33,7 +33,7 @@
- #include "exec/exec-all.h"
- #include "fpu/softfloat.h"
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index ca4a4b1ad1..1dceec5cb1 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -153,6 +153,8 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
  
--void HELPER(wur_fcr)(CPUXtensaState *env, uint32_t v)
-+void HELPER(wur_fpu2k_fcr)(CPUXtensaState *env, uint32_t v)
+ #define SMMU_IOTLB_MAX_SIZE 256
+ 
++IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
+ void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index a3f9e47398..f3aa581f80 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -32,6 +32,42 @@
+ 
+ /* IOTLB Management */
+ 
++IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
++                                 hwaddr iova)
++{
++    SMMUIOTLBKey key = {.asid = cfg->asid, .iova = iova};
++    IOMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
++
++    if (entry) {
++        cfg->iotlb_hits++;
++        trace_smmu_iotlb_lookup_hit(cfg->asid, iova,
++                                    cfg->iotlb_hits, cfg->iotlb_misses,
++                                    100 * cfg->iotlb_hits /
++                                    (cfg->iotlb_hits + cfg->iotlb_misses));
++    } else {
++        cfg->iotlb_misses++;
++        trace_smmu_iotlb_lookup_miss(cfg->asid, iova,
++                                     cfg->iotlb_hits, cfg->iotlb_misses,
++                                     100 * cfg->iotlb_hits /
++                                     (cfg->iotlb_hits + cfg->iotlb_misses));
++    }
++    return entry;
++}
++
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
++{
++    SMMUIOTLBKey *key = g_new0(SMMUIOTLBKey, 1);
++
++    if (g_hash_table_size(bs->iotlb) >= SMMU_IOTLB_MAX_SIZE) {
++        smmu_iotlb_inv_all(bs);
++    }
++
++    key->asid = cfg->asid;
++    key->iova = entry->iova;
++    trace_smmu_iotlb_insert(cfg->asid, entry->iova);
++    g_hash_table_insert(bs->iotlb, key, entry);
++}
++
+ inline void smmu_iotlb_inv_all(SMMUState *s)
  {
-     static const int rounding_mode[] = {
-         float_round_nearest_even,
-@@ -82,7 +82,7 @@ float32 HELPER(msub_s)(CPUXtensaState *env, float32 a, float32 b, float32 c)
-                           &env->fp_status);
- }
+     trace_smmu_iotlb_inv_all();
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 57a79df55b..cd2a2e7e14 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -636,7 +636,6 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         .addr_mask = ~(hwaddr)0,
+         .perm = IOMMU_NONE,
+     };
+-    SMMUIOTLBKey key, *new_key;
  
--uint32_t HELPER(ftoi)(float32 v, uint32_t rounding_mode, uint32_t scale)
-+uint32_t HELPER(ftoi_s)(float32 v, uint32_t rounding_mode, uint32_t scale)
- {
-     float_status fp_status = {0};
+     qemu_mutex_lock(&s->mutex);
  
-@@ -90,7 +90,7 @@ uint32_t HELPER(ftoi)(float32 v, uint32_t rounding_mode, uint32_t scale)
-     return float32_to_int32(float32_scalbn(v, scale, &fp_status), &fp_status);
- }
+@@ -675,16 +674,8 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     page_mask = (1ULL << (tt->granule_sz)) - 1;
+     aligned_addr = addr & ~page_mask;
  
--uint32_t HELPER(ftoui)(float32 v, uint32_t rounding_mode, uint32_t scale)
-+uint32_t HELPER(ftoui_s)(float32 v, uint32_t rounding_mode, uint32_t scale)
- {
-     float_status fp_status = {0};
-     float32 res;
-@@ -106,13 +106,13 @@ uint32_t HELPER(ftoui)(float32 v, uint32_t rounding_mode, uint32_t scale)
+-    key.asid = cfg->asid;
+-    key.iova = aligned_addr;
+-
+-    cached_entry = g_hash_table_lookup(bs->iotlb, &key);
++    cached_entry = smmu_iotlb_lookup(bs, cfg, aligned_addr);
+     if (cached_entry) {
+-        cfg->iotlb_hits++;
+-        trace_smmu_iotlb_cache_hit(cfg->asid, aligned_addr,
+-                                   cfg->iotlb_hits, cfg->iotlb_misses,
+-                                   100 * cfg->iotlb_hits /
+-                                   (cfg->iotlb_hits + cfg->iotlb_misses));
+         if ((flag & IOMMU_WO) && !(cached_entry->perm & IOMMU_WO)) {
+             status = SMMU_TRANS_ERROR;
+             if (event.record_trans_faults) {
+@@ -698,16 +689,6 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         goto epilogue;
      }
- }
  
--float32 HELPER(itof)(CPUXtensaState *env, uint32_t v, uint32_t scale)
-+float32 HELPER(itof_s)(CPUXtensaState *env, uint32_t v, uint32_t scale)
- {
-     return float32_scalbn(int32_to_float32(v, &env->fp_status),
-                           (int32_t)scale, &env->fp_status);
- }
+-    cfg->iotlb_misses++;
+-    trace_smmu_iotlb_cache_miss(cfg->asid, addr & ~page_mask,
+-                                cfg->iotlb_hits, cfg->iotlb_misses,
+-                                100 * cfg->iotlb_hits /
+-                                (cfg->iotlb_hits + cfg->iotlb_misses));
+-
+-    if (g_hash_table_size(bs->iotlb) >= SMMU_IOTLB_MAX_SIZE) {
+-        smmu_iotlb_inv_all(bs);
+-    }
+-
+     cached_entry = g_new0(IOMMUTLBEntry, 1);
  
--float32 HELPER(uitof)(CPUXtensaState *env, uint32_t v, uint32_t scale)
-+float32 HELPER(uitof_s)(CPUXtensaState *env, uint32_t v, uint32_t scale)
- {
-     return float32_scalbn(uint32_to_float32(v, &env->fp_status),
-                           (int32_t)scale, &env->fp_status);
-diff --git a/target/xtensa/helper.h b/target/xtensa/helper.h
-index 8532de0b35f5..a692254fe10a 100644
---- a/target/xtensa/helper.h
-+++ b/target/xtensa/helper.h
-@@ -46,7 +46,7 @@ DEF_HELPER_3(wsr_dbreaka, void, env, i32, i32)
- DEF_HELPER_3(wsr_dbreakc, void, env, i32, i32)
- #endif
- 
--DEF_HELPER_2(wur_fcr, void, env, i32)
-+DEF_HELPER_2(wur_fpu2k_fcr, void, env, i32)
- DEF_HELPER_FLAGS_1(abs_s, TCG_CALL_NO_RWG_SE, f32, f32)
- DEF_HELPER_FLAGS_1(neg_s, TCG_CALL_NO_RWG_SE, f32, f32)
- DEF_HELPER_3(add_s, f32, env, f32, f32)
-@@ -54,10 +54,10 @@ DEF_HELPER_3(sub_s, f32, env, f32, f32)
- DEF_HELPER_3(mul_s, f32, env, f32, f32)
- DEF_HELPER_4(madd_s, f32, env, f32, f32, f32)
- DEF_HELPER_4(msub_s, f32, env, f32, f32, f32)
--DEF_HELPER_FLAGS_3(ftoi, TCG_CALL_NO_RWG_SE, i32, f32, i32, i32)
--DEF_HELPER_FLAGS_3(ftoui, TCG_CALL_NO_RWG_SE, i32, f32, i32, i32)
--DEF_HELPER_3(itof, f32, env, i32, i32)
--DEF_HELPER_3(uitof, f32, env, i32, i32)
-+DEF_HELPER_FLAGS_3(ftoi_s, TCG_CALL_NO_RWG_SE, i32, f32, i32, i32)
-+DEF_HELPER_FLAGS_3(ftoui_s, TCG_CALL_NO_RWG_SE, i32, f32, i32, i32)
-+DEF_HELPER_3(itof_s, f32, env, i32, i32)
-+DEF_HELPER_3(uitof_s, f32, env, i32, i32)
- 
- DEF_HELPER_4(un_s, void, env, i32, f32, f32)
- DEF_HELPER_4(oeq_s, void, env, i32, f32, f32)
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index bc01a720719d..0deaeef6b5fa 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -2813,10 +2813,10 @@ static void translate_wur(DisasContext *dc, const OpcodeArg arg[],
-     tcg_gen_mov_i32(cpu_UR[par[0]], arg[0].in);
- }
- 
--static void translate_wur_fcr(DisasContext *dc, const OpcodeArg arg[],
--                              const uint32_t par[])
-+static void translate_wur_fpu2k_fcr(DisasContext *dc, const OpcodeArg arg[],
-+                                    const uint32_t par[])
- {
--    gen_helper_wur_fcr(cpu_env, arg[0].in);
-+    gen_helper_wur_fpu2k_fcr(cpu_env, arg[0].in);
- }
- 
- static void translate_wur_fsr(DisasContext *dc, const OpcodeArg arg[],
-@@ -5583,7 +5583,7 @@ static const XtensaOpcodeOps core_ops[] = {
-         .par = (const uint32_t[]){EXPSTATE},
-     }, {
-         .name = "wur.fcr",
--        .translate = translate_wur_fcr,
-+        .translate = translate_wur_fpu2k_fcr,
-         .par = (const uint32_t[]){FCR},
-         .coprocessor = 0x1,
-     }, {
-@@ -6373,9 +6373,9 @@ static void translate_float_s(DisasContext *dc, const OpcodeArg arg[],
-     TCGv_i32 scale = tcg_const_i32(-arg[2].imm);
- 
-     if (par[0]) {
--        gen_helper_uitof(arg[0].out, cpu_env, arg[1].in, scale);
-+        gen_helper_uitof_s(arg[0].out, cpu_env, arg[1].in, scale);
+     if (smmu_ptw(cfg, aligned_addr, flag, cached_entry, &ptw_info)) {
+@@ -753,10 +734,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         }
+         status = SMMU_TRANS_ERROR;
      } else {
--        gen_helper_itof(arg[0].out, cpu_env, arg[1].in, scale);
-+        gen_helper_itof_s(arg[0].out, cpu_env, arg[1].in, scale);
+-        new_key = g_new0(SMMUIOTLBKey, 1);
+-        new_key->asid = cfg->asid;
+-        new_key->iova = aligned_addr;
+-        g_hash_table_insert(bs->iotlb, new_key, cached_entry);
++        smmu_iotlb_insert(bs, cfg, cached_entry);
+         status = SMMU_TRANS_SUCCESS;
      }
-     tcg_temp_free(scale);
- }
-@@ -6387,11 +6387,11 @@ static void translate_ftoi_s(DisasContext *dc, const OpcodeArg arg[],
-     TCGv_i32 scale = tcg_const_i32(arg[2].imm);
  
-     if (par[1]) {
--        gen_helper_ftoui(arg[0].out, arg[1].in,
--                         rounding_mode, scale);
-+        gen_helper_ftoui_s(arg[0].out, arg[1].in,
-+                           rounding_mode, scale);
-     } else {
--        gen_helper_ftoi(arg[0].out, arg[1].in,
--                        rounding_mode, scale);
-+        gen_helper_ftoi_s(arg[0].out, arg[1].in,
-+                          rounding_mode, scale);
-     }
-     tcg_temp_free(rounding_mode);
-     tcg_temp_free(scale);
+diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+index 0acedcedc6..b808a1bfc1 100644
+--- a/hw/arm/trace-events
++++ b/hw/arm/trace-events
+@@ -14,6 +14,9 @@ smmu_iotlb_inv_all(void) "IOTLB invalidate all"
+ smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
+ smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
+ smmu_inv_notifiers_mr(const char *name) "iommu mr=%s"
++smmu_iotlb_lookup_hit(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache HIT asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
++smmu_iotlb_lookup_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache MISS asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
++smmu_iotlb_insert(uint16_t asid, uint64_t addr) "IOTLB ++ asid=%d addr=0x%"PRIx64
+ 
+ # smmuv3.c
+ smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
+@@ -46,8 +49,6 @@ smmuv3_cmdq_tlbi_nh_va(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d a
+ smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
+ smmuv3_cmdq_tlbi_nh(void) ""
+ smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
+-smmu_iotlb_cache_hit(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache HIT asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
+-smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache MISS asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
+ smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
+ smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
+ smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
 -- 
-2.20.1
+2.21.3
 
 
