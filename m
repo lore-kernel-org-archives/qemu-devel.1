@@ -2,81 +2,86 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 898EEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA6FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:55:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52F902065D
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC9DB20708
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 21:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H91TtOn2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F902065D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LLi2r3dy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9DB20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtI2B-0008RH-H0
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:55:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35642)
+	id 1jtI2T-0000fG-R3
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 17:55:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHgh-0006pX-H4
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:33:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30223
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jtHf2-0004WD-H3
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:31:24 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28754
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtHgg-0002mb-3J
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:33:07 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jtHew-0002av-KH
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:31:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594243984;
+ s=mimecast20190719; t=1594243876;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YiLPYp1sEs9XnIGPixoR+PI+DF0cIKbikqe4x2SJFVs=;
- b=H91TtOn254V9hIsgUk4cIBzWU5oNQHRl0bo8REH81l7CfLUzfrh+I1KYOHRhyJYerqV4M+
- /5bfY1TvYlRqfSZye0bw9ADovBQgN/RXdi2lGWCh95cQgrqMSbReDizdjsCjLdJNjb19T6
- S1uOawyb56V5CTDdi6n2Ob28XFpX340=
+ bh=iOZc+sS6pLV2kd9pJ6dA58VvTf6atoy7FM4jtPqtdMQ=;
+ b=LLi2r3dyjOzCX613JKtDDJ0iAFN61HQr3vOWbls/nEtPPp2/8dfjqVUOipJHqbGqULe2sY
+ oFpv9yFadRw/L9dKBvh5Z9Pn0GqADiqpHGtYTKSrp1N5B1W0zHiz1Vw9cADoXLUk+rAQau
+ rY9v/kut60GpNubn4ByzrBkunACCfY8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-313-16pv9xpEPzOAWHAlwKlJDw-1; Tue, 07 Jul 2020 17:25:15 -0400
-X-MC-Unique: 16pv9xpEPzOAWHAlwKlJDw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-469--qaPJYYLNM2MhsxDtzCpEg-1; Wed, 08 Jul 2020 06:30:01 -0400
+X-MC-Unique: -qaPJYYLNM2MhsxDtzCpEg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A71D87950B;
- Tue,  7 Jul 2020 21:25:14 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AEEA5C1D0;
- Tue,  7 Jul 2020 21:25:14 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E6D2B112FB79; Tue,  7 Jul 2020 23:25:03 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 10/53] qemu-option: Simplify around find_default_by_name()
-Date: Tue,  7 Jul 2020 23:24:20 +0200
-Message-Id: <20200707212503.1495927-11-armbru@redhat.com>
-In-Reply-To: <20200707212503.1495927-1-armbru@redhat.com>
-References: <20200707212503.1495927-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EEB11800D42;
+ Wed,  8 Jul 2020 10:30:00 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com
+ [10.36.112.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BAAC52DE70;
+ Wed,  8 Jul 2020 10:29:59 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id DC8E616E18; Wed,  8 Jul 2020 12:29:58 +0200 (CEST)
+Date: Wed, 8 Jul 2020 12:29:58 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Paul Zimmerman <pauldzim@gmail.com>
+Subject: Re: Failure prints during format or mounting a usb storage device
+Message-ID: <20200708102958.kxnlr5outhsufxv5@sirius.home.kraxel.org>
+References: <BY5PR02MB677298C4D2C2B63EF409AA5CCA6B0@BY5PR02MB6772.namprd02.prod.outlook.com>
+ <CADBGO7-hp4Pyfn+rq9d=ZxHmpMwitv-oLjYPJmCKSH6cLHVx=w@mail.gmail.com>
+ <CADBGO78-mqwapj+mdpFUO-puL0OZ_1QeBc+4yo4S9g1O4deNjg@mail.gmail.com>
+ <2d312ec0-d280-c0e3-2b1e-ff9c70c3168f@gmail.com>
+ <20200707075740.dkc76ceb7wytdoem@sirius.home.kraxel.org>
+ <CADBGO79KSm3KV7=otOg=u7WjwBV=j3T7iU0fcTF-nGgtZvy+Aw@mail.gmail.com>
+ <20200708072947.7hynrm53622tp3ha@sirius.home.kraxel.org>
+ <CADBGO7-38Q3MS-G5rCbW1i_1rvq7NRf2J+bMErXr=7xhZ=jEWg@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <CADBGO7-38Q3MS-G5rCbW1i_1rvq7NRf2J+bMErXr=7xhZ=jEWg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -84,7 +89,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,73 +102,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Greg Kurz <groug@kaod.org>
+Cc: Sai Pavan Boddu <saipava@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Vikram Garhwal <fnuv@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20200707160613.848843-11-armbru@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- util/qemu-option.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+  Hi,
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 14e211ddd8..e7b540a21b 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -277,7 +277,6 @@ static void qemu_opt_del_all(QemuOpts *opts, const char *name)
- const char *qemu_opt_get(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
--    const char *def_val;
- 
-     if (opts == NULL) {
-         return NULL;
-@@ -285,12 +284,10 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
- 
-     opt = qemu_opt_find(opts, name);
-     if (!opt) {
--        def_val = find_default_by_name(opts, name);
--        if (def_val) {
--            return def_val;
--        }
-+        return find_default_by_name(opts, name);
-     }
--    return opt ? opt->str : NULL;
-+
-+    return opt->str;
- }
- 
- void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts, const char *name)
-@@ -319,8 +316,7 @@ const char *qemu_opt_iter_next(QemuOptsIter *iter)
- char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- {
-     QemuOpt *opt;
--    const char *def_val;
--    char *str = NULL;
-+    char *str;
- 
-     if (opts == NULL) {
-         return NULL;
-@@ -328,11 +324,7 @@ char *qemu_opt_get_del(QemuOpts *opts, const char *name)
- 
-     opt = qemu_opt_find(opts, name);
-     if (!opt) {
--        def_val = find_default_by_name(opts, name);
--        if (def_val) {
--            str = g_strdup(def_val);
--        }
--        return str;
-+        return g_strdup(find_default_by_name(opts, name));
-     }
-     str = opt->str;
-     opt->str = NULL;
--- 
-2.26.2
+> IIRC, without the dev-storage patch, the very first SCSI command
+> would get stuck waiting for the CSW, because the CSW is not a
+> multiple of MPS. I will have to work on getting a debug trace for
+> you, I'll get back to you with that.
+
+Hmm, dev-storage should be fine with the packet being larger than
+needed.  It'll actually do a short transfer then.  So I suspect the
+patch just papers over the underlying issue.
+
+Can you post a trace of this?
+
+(dev-storage has no trace support, so I think tracing usb_dwc2* to
+ stderr and enable DEBUG_MSD in dev-storage.c works best)
+
+take care,
+  Gerd
 
 
