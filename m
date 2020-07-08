@@ -2,95 +2,117 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E40C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C15E4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:57:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74FA1206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E28A206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:57:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hXKU6uzb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74FA1206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PA+MpYRu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E28A206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIzh-0005Rt-JF
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48772)
+	id 1jtJ0G-0006jA-RL
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:57:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIS0-0002ZL-81
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:00 -0400
-Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:55654)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIRy-00015m-FD
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:59 -0400
-Received: by mail-pj1-x1036.google.com with SMTP id ch3so174566pjb.5
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:21:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=WZrxDgWWXXP9PmlZyyBGjdv9eqT/iSmUhBtmo9zxmiE=;
- b=hXKU6uzbmAKa0jzH/GHbpPu0+0451mgMRLslUytZctQfez1GgL1kxjJ7f6m1tFtAgM
- fMS+Ce1ETj5pJNWFceBZ8XJukAIS3/4Mo/ie6i1XwxQQFI5t/K1nFJ3Ga87QWJrjtgUh
- FF4hnf/3KoQDKs3yRLzJ+cHVFCJut0fqBxGVXF0iD9HzH2LMbL1eT357tVChKQwbL1DH
- /KC+5PMZO+/gAGhqWpfEwSJKBDUgJA0mq3BeZ6gcce5Y1fvWXIPFQd/j5UJgZpDAhGCD
- VoKK+fHLhmufk0jVvsf1NJO3IvYmzlLzal+nXACC/cSfvphBS0YTrOU21Wv6/MKWcu12
- gcAA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jtIVC-0000qR-Fz
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:25:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26425
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jtIV5-0001OG-HV
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:25:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594247110;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CHGAEaesgAPitP8JdS597nS94aQyRssWojXDYB54AS4=;
+ b=PA+MpYRuBZgK+CpKUsR0bA5sGsGUOaR4FF7hpMp9VNxvB/h96v5vjoFSKWi+2NG9KlMcpY
+ D645pzHnPOOMqLc5mp9eYzXtL76MNzbZ8urU4JEISQQNpHf2VM09sRLsL6d6bS7Pm20TM5
+ st++tFQ/Hwb4Hc6mJEEwXxucgkdirBQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-SXetMSfXNG-n_IMihJLG2A-1; Wed, 08 Jul 2020 11:23:22 -0400
+X-MC-Unique: SXetMSfXNG-n_IMihJLG2A-1
+Received: by mail-wr1-f71.google.com with SMTP id y18so32821479wrq.4
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 08:23:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=WZrxDgWWXXP9PmlZyyBGjdv9eqT/iSmUhBtmo9zxmiE=;
- b=NCB2eBfAhYSIciLRzsvjGcFiW4T3cCzV0nqeSo+27tuXCwIJbiyX5bxF0mzbYARpL5
- nkfoxrX4PxhEJlzBia/Qz/45ooSuV2+mJsbdI5lhWjBvdBb8FaryVcxmhL9Ulb487EJx
- 8zrrZX9x7UETWh7SSecTy2SyjFeJzW7zfVNLNrjjfqH5/fFEIi+ol/GbjvsPfhGrcLgl
- aYSM8zBFgVSMCzJG5To/yseCLezJSf7S+UFFcJYmL5jVfCP+97zNHM+v1Gte67rJ9tQp
- kUnLl8lbPJu5gDPSq8i07hR6DMXxAy4o6EGSdas7jmucG0nSq/kLNoi1HyKwy+GrxPiv
- c4Rg==
-X-Gm-Message-State: AOAM531WtL5TU1ygHebQ6vcQ1sb2DIVmD0lax8T3TWuA4j9JMKjwdkop
- /faQB/GTehzDeu/5UsRbtYsa0i+R
-X-Google-Smtp-Source: ABdhPJyTtUD8lIPY94BQemoCKiObFwmrDaAo4pcDSSaW7xKEfskCXuefiU2e1e/VapYe1m9apqziWg==
-X-Received: by 2002:a17:90a:2a02:: with SMTP id
- i2mr11727588pjd.157.1594246916846; 
- Wed, 08 Jul 2020 15:21:56 -0700 (PDT)
-Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.21.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jul 2020 15:21:56 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/21] target/xtensa: add geometry to
- xtensa_get_regfile_by_name
-Date: Wed,  8 Jul 2020 15:20:44 -0700
-Message-Id: <20200708222101.24568-5-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
-References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CHGAEaesgAPitP8JdS597nS94aQyRssWojXDYB54AS4=;
+ b=WxAhRLLsvdLrdYO0TUbG2dErRSJZfnbHZYjLJo/IQgdM7Hdi1zT+FAXEXs+TYYqIZM
+ mEfOl56XH09Fq55EYsxB46+rX5lN+N7vZB1snh/XjOvvjf2p47sTiydgljjrGnc7Uhmt
+ zdGbLsv1j5ML3EmJQXTTh5m9pa6EDsEbg6f9rqBXF97aJ5Tnuk2CJJ3aIGTdYjQKvw/I
+ nCf+L6K0PlBLGA8FAtWQku6eP1bxwGBioQPqRSvlfWh9H9aiHvKLforZUkC4JPR6kyyT
+ PY3nJPN+bSZgcCzKg7IzJ6PY+ZXGetR2vP+NfrU2GxLivjlwNd91UK71+ge7bsIKOHRR
+ 8mdg==
+X-Gm-Message-State: AOAM530od8lqTxSjbT+uFYNYawT/KNJHeIvprz9qgooafkpHyKIg/+xE
+ NQxyQkCODs1fFR6nXAlv9+PR05oDG6QXOtVljcC70kqfd28NCVH6bnuNGHW81emTvhZGdgtmTrR
+ XVJAq5tDUlv1mJxc=
+X-Received: by 2002:a5d:628b:: with SMTP id k11mr59658653wru.107.1594221801326; 
+ Wed, 08 Jul 2020 08:23:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz9QXoNdqhFKHAj89SR91jKlnAFP2kQ+YJ++EPkH9loBWINnn5lztNWMrwMhkE834fNMADN3g==
+X-Received: by 2002:a5d:628b:: with SMTP id k11mr59658632wru.107.1594221801098; 
+ Wed, 08 Jul 2020 08:23:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c?
+ ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+ by smtp.gmail.com with ESMTPSA id j16sm484430wrt.7.2020.07.08.08.23.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jul 2020 08:23:20 -0700 (PDT)
+Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
+To: Claudio Fontana <cfontana@suse.de>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200629093504.3228-1-cfontana@suse.de>
+ <20200629093504.3228-4-cfontana@suse.de>
+ <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
+ <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
+ <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
+ <46322ba4-8aff-e8d6-8a1c-ea1043098624@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bc76504a-0d81-7f81-42fd-c70d8cc13bc5@redhat.com>
+Date: Wed, 8 Jul 2020 17:23:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1036;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pj1-x1036.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <46322ba4-8aff-e8d6-8a1c-ea1043098624@suse.de>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,109 +125,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Register file name may not uniquely identify a register file in the set
-of configurations. E.g. floating point registers may have different size
-in different configurations. Use register file geometry as additional
-identifier.
+On 08/07/20 17:17, Claudio Fontana wrote:
+> On 7/8/20 5:05 PM, Paolo Bonzini wrote:
+>> On 08/07/20 17:00, Claudio Fontana wrote:
+>>>> Bisectable, 100% failure rate, etc. :(  Can you split the patch in
+>>>> multiple parts, specifically separating any rename or introducing of
+>>>> includes from the final file move?
+>>> Hi Paolo,
+>>>
+>>> will take a look!
+>>>
+>>> Is this captured by some travis / cirrus-ci / anything I can easily see the result of?
+>>>
+>>>
+>>
+>> Nope, unfortunately we don't have an s390 CI.  But if you can get your
+>> hands on one, just "./configure --target-list=s390x-softmmu && make &&
+>> make check-block" will show it.
+>>
+>>>>
+>>>> 	#if defined CONFIG_TCG || !defined NEED_CPU_H
+>>>> 	extern bool icount_enabled(void);
+>>>> 	#else
+>>>> 	#define icount_enabled() 0
+>>>> 	#endif
+>>>>
+>>>> (This way, more TCG-only code in cpus.c gets elided).  You can integrate
+>>>> this change in the next version.
+>>>>
+>>>> Paolo
+>>>>
+>>>
+>>> Weird, I tested with --disable-tcg explicitly (but may be some time ago now, as I constantly rebased).
+>>>
+>>> Will take a look at the introduction of this #defines in place of variables,
+>>> as this mechanisms will not work in the future for target-specific modules.
+>>
+>> This is only done for per-target files so it should not be a problem.
+>>
+>> Paolo
+>>
+> 
+> K, I tried with latest master, disable-tcg build still works for me on x86, so it is something in queue I guess?
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- target/xtensa/cpu.h       |  2 +-
- target/xtensa/helper.c    |  4 +++-
- target/xtensa/translate.c | 35 +++++++++++++++++++++++++++--------
- 3 files changed, 31 insertions(+), 10 deletions(-)
+Peter reported the issue in the v1 pull request; there were two
+different breakages but the cpus.c one was yours.
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 0c96181212a5..0409aa6189cf 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -598,7 +598,7 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
- 
- void xtensa_collect_sr_names(const XtensaConfig *config);
- void xtensa_translate_init(void);
--void **xtensa_get_regfile_by_name(const char *name);
-+void **xtensa_get_regfile_by_name(const char *name, int entries, int bits);
- void xtensa_breakpoint_handler(CPUState *cs);
- void xtensa_register_core(XtensaConfigList *node);
- void xtensa_sim_open_console(Chardev *chr);
-diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index 7073381f03b2..05e2b7f70a1e 100644
---- a/target/xtensa/helper.c
-+++ b/target/xtensa/helper.c
-@@ -133,8 +133,10 @@ static void init_libisa(XtensaConfig *config)
-     config->regfile = g_new(void **, regfiles);
-     for (i = 0; i < regfiles; ++i) {
-         const char *name = xtensa_regfile_name(config->isa, i);
-+        int entries = xtensa_regfile_num_entries(config->isa, i);
-+        int bits = xtensa_regfile_num_bits(config->isa, i);
- 
--        config->regfile[i] = xtensa_get_regfile_by_name(name);
-+        config->regfile[i] = xtensa_get_regfile_by_name(name, entries, bits);
- #ifdef DEBUG
-         if (config->regfile[i] == NULL) {
-             fprintf(stderr, "regfile '%s' not found for %s\n",
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 03d796d7a1ed..9838bf6b3ec5 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -227,24 +227,43 @@ void xtensa_translate_init(void)
-                                "exclusive_val");
- }
- 
--void **xtensa_get_regfile_by_name(const char *name)
-+void **xtensa_get_regfile_by_name(const char *name, int entries, int bits)
- {
-+    char *geometry_name;
-+    void **res;
-+
-     if (xtensa_regfile_table == NULL) {
-         xtensa_regfile_table = g_hash_table_new(g_str_hash, g_str_equal);
-+        /*
-+         * AR is special. Xtensa translator uses it as a current register
-+         * window, but configuration overlays represent it as a complete
-+         * physical register file.
-+         */
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"AR", (void *)cpu_R);
-+                            (void *)"AR 16x32", (void *)cpu_R);
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"MR", (void *)cpu_MR);
-+                            (void *)"AR 32x32", (void *)cpu_R);
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"FR", (void *)cpu_FR);
-+                            (void *)"AR 64x32", (void *)cpu_R);
-+
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"BR", (void *)cpu_BR);
-+                            (void *)"MR 4x32", (void *)cpu_MR);
-+
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"BR4", (void *)cpu_BR4);
-+                            (void *)"FR 16x32", (void *)cpu_FR);
-+
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"BR8", (void *)cpu_BR8);
-+                            (void *)"BR 16x1", (void *)cpu_BR);
-+        g_hash_table_insert(xtensa_regfile_table,
-+                            (void *)"BR4 4x4", (void *)cpu_BR4);
-+        g_hash_table_insert(xtensa_regfile_table,
-+                            (void *)"BR8 2x8", (void *)cpu_BR8);
-     }
--    return (void **)g_hash_table_lookup(xtensa_regfile_table, (void *)name);
-+
-+    geometry_name = g_strdup_printf("%s %dx%d", name, entries, bits);
-+    res = (void **)g_hash_table_lookup(xtensa_regfile_table, geometry_name);
-+    g_free(geometry_name);
-+    return res;
- }
- 
- static inline bool option_enabled(DisasContext *dc, int opt)
--- 
-2.20.1
+Paolo
 
 
