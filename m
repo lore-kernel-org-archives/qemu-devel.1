@@ -1,86 +1,122 @@
 Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_TONAME_EQ_TOLOCAL_SHORT,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF509C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D72C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:14:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8877B20672
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:10:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VUZy0M5t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8877B20672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC94C20786
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:14:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC94C20786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtCeW-00053B-Pv
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 12:10:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41670)
+	id 1jtCiC-0006Ry-4w
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 12:14:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jtCda-00048I-Ja
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:09:35 -0400
-Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:36915)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jtCdZ-0002wM-8P
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:09:34 -0400
-Received: by mail-pf1-x433.google.com with SMTP id s26so6530829pfm.4
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 09:09:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cSfW7swPtf9W5qYNFaxoQbgmanbiHWZP73CaWNGOiKI=;
- b=VUZy0M5tjGWs0Q6vyeYnt/njF8MCNpU+ecYz1z2ZwSZw46HxhF2X+Jnj2VH6U1a54f
- uzMJjMwJuDxGhx8rvuX1b7SM8nFR09cwMTNip6O5PqEub8rq1+Sb71h2qoHdK7yk4OX6
- /Qfi20eljYNfjI85I4t8mLMdyBFVVlPBvJN2xBbVJRB8m8F8RpvRPYXet0KYtqwgYkZ1
- RzHhJM3EDYDgiTBK+QSRx+WjIg5en15cNZHWqUFbyBmUkq9TjZWr0KIPZ3dRjR9hdMFo
- +y/3gE4aPVf4uBkl1qpPYiJPy4HbJYtStMmltA047oBR3mUoT4tcsHz4iM0V6CRldKfy
- AWHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=cSfW7swPtf9W5qYNFaxoQbgmanbiHWZP73CaWNGOiKI=;
- b=AT8YFAjhQQ2/KYR6NzJ1eE3tUm9bUhxz6kjGpEQCfizJ34x42EsMbw4nDi/sM58/1S
- f4oD/xFIfNAgFukwzrOZnPzzX8fkJG8p18Sg20tbnoNjRPOm30hPO4jmiglbJwVMbLtg
- B4Myl4EBASQ59WN6zdmIKQUQ8tYukm5frOp9K3r33ABzjaIUzODO+BvT3iOq6OQRDwA/
- hNjR8AN4+cMn0agu3eDt24RF0hVkTzt9YIXP75fuaQok0eNuPvJTcKiG/yNokNi4AIoz
- LJjQrdtLZNuOsfHMiYWWqRLOnTpFQG3scvNtF67/PPJ0LzuU6S3itf0U9+Saeetak7mm
- qALg==
-X-Gm-Message-State: AOAM531rGNtFi3AbdGTNTJAfaVLfiqaBH29Rl7QKh9GYb8DldZ2j0gFA
- 70Kx5N2wo5xI0kzJDavQdIXowgVuVJUFRNat54Al0QSiivg=
-X-Google-Smtp-Source: ABdhPJw/fNWJHKXX2gq2HTmyopyUJ+9I3BPvAfsUHtFwQ5IX5a0ylk30dfJGF/CBbrDOcxyiDEkkL3SYZiOmLZwFyFA=
-X-Received: by 2002:a63:2b91:: with SMTP id r139mr52803339pgr.61.1594224571432; 
- Wed, 08 Jul 2020 09:09:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtChF-0005s0-Ca
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:13:21 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:47853)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtChD-0003Pv-F1
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:13:21 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MMnru-1k9deR3B4u-00IiCU; Wed, 08 Jul 2020 18:13:15 +0200
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200708152435.706070-1-laurent@vivier.eu>
+ <20200708152435.706070-3-laurent@vivier.eu>
+ <91f28ac2-c3be-7088-db8a-6bad60fc2c1f@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH v2 2/2] linux-user: fix print_syscall_err() when syscall
+ returned value is negative
+Message-ID: <a9b2795a-9e2f-92ba-2f76-b783b64cd8aa@vivier.eu>
+Date: Wed, 8 Jul 2020 18:13:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
-In-Reply-To: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 8 Jul 2020 17:09:19 +0100
-Message-ID: <CAJSP0QXeOCG+7dQjm38gXrbPZaiyfMKzHFhaaG5s+Ya7_0n7yg@mail.gmail.com>
-Subject: Re: Migrating custom qemu.org infrastructure to GitLab
-To: qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::433;
- envelope-from=stefanha@gmail.com; helo=mail-pf1-x433.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- PDS_TONAME_EQ_TOLOCAL_SHORT=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <91f28ac2-c3be-7088-db8a-6bad60fc2c1f@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:0v7RImuYTzpdskbKeJmqMmnkM/d7weZoMof83nQrDk4lGI2pGVW
+ MBpnWT4sK/h4RliXFfslGIKbolzFIgZKJ88RKtStG8C13n939d77yqQK/uzhGGJ2fLYAi4p
+ KBR8HxaBGCofnMwobfeQMTo1Ug6dH6x09Wae1JiLi3tV0G1A2csnj9WGiVNKUaJn+1pY1kF
+ +diCNkWNORYDNDNZ/USCA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CAwDTRJRy5s=:5t2yb2Rwzoo4fbXuRzbsKV
+ Kv5vVHT08YKQQDLyyqPEj2V4RecfR6CRhgjVG98WJqErjh2eaR3UPloJ37PuicHn6WV5x5hSN
+ BsunAvbtcONc9yCc+YVQXFLMWhv+vbATWfA82tohkKmm4GVaAzMuKctC4ISDemGfe96HGp3Kh
+ qR+iUdxCGtmkgh19VVNzJ4dlzBaTVgot/Ogx795iEpta8PRfEco1MV8shZGWCd58oq9T3nv/q
+ VXkslfPHde7k9XQZXFm9Qcbb04YN+eeotmH/fJTQKCHXmnn1Vo70/FV+tN3aIdpQyhEBCipBc
+ FOlIiTlPugrcTEMuEnfQJRwSK6Qw6qwYwfR7LO94TeLQvOqdKuYsUCLls+iszex3pFk90g6cR
+ 4d51ytog93bmI7qEM76PakY5kh7HqEEeGPg6gu1qeWQ9ltVZY9kp2DtjiutObk8aMO323aeo+
+ OVe683iPVOgRBMmoBghk8DVv4NnnJcDSDZeNnBugoRWhYyAWfQ6mA8rjNXFgI6f/lKiMMUamR
+ SB3b8P/oP1p3e+gqO/l50J4o4nYpzwwwBDLxMeWerNpSVRI/FrQx2TBsuQv964z0yqiVJgHYK
+ M/EfRypF1HaJE9pFQ+ScDNEhrCq0z+QHaIAOeYT/QH6ZRhZyXTB25Ewc1xHVtp2WNqBGxFgYT
+ blMQMkvEYsgQKgjC5fpBxo3J8GTjwN+rhhVWBXaydITPsikE6Ip0t0QY8lFHf6N94GZxaqn5n
+ swJjvRlQdI+vpB1J0OMgQaEdCmP0mSsCUb+/6LWejRuHA0S8qYezDbzFMtdqkElAbocty0jt6
+ qdJrS6hBDH9RW1dT0nlViTayxtl8ructPvAWmM+IfaNo8Pnskd066nsrHp0VFk78mVdZ4AN
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 12:13:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,26 +129,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <cleber@redhat.com>,
- Jeff Cody <codyprime@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 8, 2020 at 10:52 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+Le 08/07/2020 à 17:52, Richard Henderson a écrit :
+> On 7/8/20 8:24 AM, Laurent Vivier wrote:
+>> -static void
+>> +static bool
+>>  print_syscall_err(abi_long ret)
+>>  {
+>> -    const char *errstr = NULL;
+>> +    const char *errstr;
+>>  
+>>      qemu_log(" = ");
+>>      if (ret < 0) {
+> 
+> This should be a target-specific test.
+> 
+> E.g. on most asm-generic I'm pretty sure this should be
+> 
+>     if ((abi_ulong)ret > -(abi_ulong)512)
 
-Great, thanks for all the responses!
+I think the test in target_strerror() gives the same result:
 
-Since others are interested in qemu-web.git, the wiki, and the bug
-tracker, I will investigate git repo hosting (mirrors).
+    if ((err >= ERRNO_TABLE_SIZE) || (err < 0)) {
+        return NULL;
+    }
 
-I'll send an update once I have more experience with GitLab and a
-proposal for how to perform the switch. If anyone objects we can
-discuss their concerns.
+and it also ensures we don't overflow when we will access
+target_to_host_errno_table[].
 
-Stefan
+It's why we rely on errstr to know if the errno is valid or not
+(we might also remove the "if (ret < 0)" in print_syscall_err).
+
+> whereas for Alpha it should be
+> 
+>     /*
+>      * Syscall writes 0 to V0 to bypass error check, similar
+>      * to how this is handled internal to Linux kernel.
+>      */
+>     if (ret < 0 && env->ir[IR_V0] != 0)
+
+We don't have access to "env" in strace.c.
+
+it's an improvement regarding the code that has been modified.
+If we want it I think it should be added in a separate patch.
+
+Thanks,
+Laurent
+
 
