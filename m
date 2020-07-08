@@ -2,118 +2,115 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7D8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 18:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A6C9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 19:15:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF6E3206F6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 18:40:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C666206E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 19:15:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZH4wFCzf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF6E3206F6
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="aWwA2oqR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C666206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtEzE-0004Ec-G1
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 14:40:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48514)
+	id 1jtFX6-0000yy-8G
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 15:15:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jtEy9-0003Os-BI; Wed, 08 Jul 2020 14:38:57 -0400
-Received: from mail-eopbgr150134.outbound.protection.outlook.com
- ([40.107.15.134]:45798 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jtFWD-0000Tb-2a; Wed, 08 Jul 2020 15:14:09 -0400
+Received: from mail-am6eur05on2096.outbound.protection.outlook.com
+ ([40.107.22.96]:64449 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jtEy5-0005H2-JR; Wed, 08 Jul 2020 14:38:56 -0400
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jtFW9-0001Ec-FU; Wed, 08 Jul 2020 15:14:07 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R67BU3MGjVeZuFE+kduesZ2DSbyGceF8tOjahlYt3zF0rLsS1JBtpQv26L00oMmXcOv0G6Hc3eYnstlwBB5v3S3gi7axaFAFgRxB8o1Hwdu6mw113/KJnCSrb6cY9ULFwP2ySk0pZZRYJuZK7/zL5qHvRKjegQD/ulOVmutCYvrXbolp3FiEhcMFbl/92g3wZm/S6N0c5802bqGCeGnE18c5BMF83R4vE0++pHe9o+fQ7aRNzJu+EKkwZwcrPZXYrvEzxY9RVZn4x9vsMAU4IQO/JWHDtjWc5Yj5FOFFcg/6CzF+3q7hen+ZKnEkraVLYo74vyFqXmUL7a1Q/iiIng==
+ b=EgseWSdieI7wFrfCLH7+iV31nlzIVfLU93MaiQRVuWzDyPqaBovV0wgAQ810a/1Fuf5f4QMrWWWWDLcf3njR1hKAKEQL0fmLSGxEJkS02Erxz6MWV5ovdchEG51SXWX7ifKFfGfZ8BwOmJ8Tr3bSDvfucnod1agbH9huN2sRn/ZLG/o6jtx+LWXyVq6K/mlyL1gXqUDOIp24Uuf/b8Im9cUv7vvCupJFqVlgRKnDjO/4rg0TeHXC75RA19BkAR4MvSS2j+o0bZ2n450okyxtgGt423+Wr6n4DbojW4Jpn2CQ0u1Tmkq0zs0rtvpC7HCifu0v66ceH/+jHDrTU0vR6g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q9rfAYADReJAHUJOCbHm+NoEoqFoCUqdmmpFOheZGy0=;
- b=dSH7PGF5PtpAKusMIDwVrlfxGjLva35X++Rc2VfOTCZwJuwOxUDXpbsDnImNJh/JAjVS24PiuZqTxoxDq0kWI47aIM7WYstBwM8DTAdJWDLdwZ8KkmmuHRII5hm/PheKW+IHHVe7RilS1Ghc/IVTNvLZz+suFftpGpxgfM/LOkhdRWNbunwYZnQnTdeMWKec+f5DwGIQYYCL8CfH8YUlUSpzPPGT+Jso7PntyNa/XXrIsU9jZKDgJ8FDYfIzz2jS56SkrbGMTO4RAQCvV+blAyDSaCrL52u5LFN3v+Bx/XMHRS+/7Sa22Ri1m3qnFlR1mGBOHF12GwRxjHIjjXiEsQ==
+ bh=RkK2nqYhvmfRVg4FbFE6YlY0mmETbH5nmqmbQkAS6JE=;
+ b=fWTYjnG90LjQvYJp6OVFMFr8gwnMyOSe3zVr4ehh6lVeB1rAXIETrh/UkLC+MrBIlNQqaaEdhLsXafP3aGd5QL6Bq0gNSDxzm+8/xkTjNbo2cNMaVJ7MVg8hDqTywXKV+fgmJUmcpsIDsZkVpTiM8EuVbEwBgMEerJvOproXqUbCWwB7QlSv6B8JRXSTPP7oiwmbgLXyE7EoxLReGz0cPoPK+e5elTuhBH/Uw9NMQYVi8f1LqHCeoaQnJwdPmXyimHcBxabMBw3MvtbALwOBw/uaCBtVcxkabLmUH45Jcy8pCPDjaU+YNJqFtA/S04GtwtaAnQeXzPq5WhPRI7pZtw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q9rfAYADReJAHUJOCbHm+NoEoqFoCUqdmmpFOheZGy0=;
- b=ZH4wFCzf7siqccS+x4gCbS4QkkP2+GLZ0HyTtpYJIow1X8AazqoviQGMAgROwLjY+UMYtnMGfGA/9vZoM0XjQud2tZ3lgy+FCibKDC4rVPcKPW6uqp33I9qQEU9RhVLnHci0xt9X+kXDjhFiExagum2drS9gc5qkHcJwPMcEUvc=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4342.eurprd08.prod.outlook.com (2603:10a6:20b:b4::22)
+ bh=RkK2nqYhvmfRVg4FbFE6YlY0mmETbH5nmqmbQkAS6JE=;
+ b=aWwA2oqRho9XXbHbcS+pT9d+rLA1Jo2WT1AzhoVNQeyDqq3LTeWC/zI5RdiLhFpEvZ6XzDk+En3k9ulAygz3J1Jf+1qGnXPNj33mki3QcaVKIXKtx5QTSih++BquSzVQz9otK1PRKfrNsj1o+0M7u2+ydRahmLhKxpRJjMWRfgo=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM7PR08MB5496.eurprd08.prod.outlook.com (2603:10a6:20b:de::20)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23; Wed, 8 Jul
- 2020 18:38:50 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3174.021; Wed, 8 Jul 2020
- 18:38:50 +0000
-Subject: Re: [PATCH 7/7] block/io: improve loadvm performance
-To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200703173538.29296-1-den@openvz.org>
- <20200703173538.29296-8-den@openvz.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c5265d26-0f52-2c6b-673d-5add7d4b49be@virtuozzo.com>
-Date: Wed, 8 Jul 2020 21:38:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200703173538.29296-8-den@openvz.org>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Wed, 8 Jul
+ 2020 19:14:00 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.021; Wed, 8 Jul 2020
+ 19:14:00 +0000
+Subject: Re: [PATCH v7 13/47] block: Use CAFs in block status functions
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-14-mreitz@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <0b441000-d33b-e833-1ecd-dc343e7afe00@virtuozzo.com>
+Date: Wed, 8 Jul 2020 22:13:57 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <20200625152215.941773-14-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR03CA0068.eurprd03.prod.outlook.com
- (2603:10a6:207:5::26) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+Content-Language: en-GB
+X-ClientProxiedBy: AM0PR06CA0137.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::42) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.17) by
- AM3PR03CA0068.eurprd03.prod.outlook.com (2603:10a6:207:5::26) with Microsoft
+Received: from Admins-MacBook-Pro.local (109.252.114.191) by
+ AM0PR06CA0137.eurprd06.prod.outlook.com (2603:10a6:208:ab::42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.21 via Frontend Transport; Wed, 8 Jul 2020 18:38:49 +0000
-X-Originating-IP: [185.215.60.17]
+ 15.20.3174.22 via Frontend Transport; Wed, 8 Jul 2020 19:13:59 +0000
+X-Originating-IP: [109.252.114.191]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cc0811e1-d1ba-4a2e-7443-08d8236e284d
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4342:
+X-MS-Office365-Filtering-Correlation-Id: 4292c001-1f43-45d6-b664-08d8237311c5
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5496:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4342567FBB1202D436D8E883C1670@AM6PR08MB4342.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 04583CED1A
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54966820E9F636CB8737DF8FF4670@AM7PR08MB5496.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:854;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oiSL1wkCTifxF5hVQqQ7Lvfej/HACyUTcRM+P+whDiMxPJjMNfM8eC8fsdFELd3087FKNGu6wlN89T7IRTQ1miWSZq33CiCYBF029o82LJ3WHqef8CHuCDgG6qkUadgYjQId7O0XP1OOeAdYwFpOPovfwVt/vEN3T6L1o4TK9pDVbtLg4swN7/aCYsxV32ieC++RHHJakrZ7qn2KJE5DhZyo0xe5Icf7m3iZoeAKwn9yw6X/txKOdaA1cwCbgbKfEOIzUuxXe3EccKq1bkHpcDWZAcPLrOmmCuxXCDNffhzR8MqrwCbq9/ZgjLqjmHN0PehcU5thNEmdVG03ZPU9RdzLDZa6P7ezq/nCIoYYv3mLkCjqUKcgpZ9fy7LBlpt3
+X-Microsoft-Antispam-Message-Info: j60rA12HQ7vNbMd8iEm+5fihT1i4wygarAGpUMfevuJiERecyo54ewaOS1mcNYE1I1pYS/rU5anUQWqTgzBLHQzW1MIdpZ6tK9HD+ehg15l88y+yR2fjXgJ95Os2PTcRAFADCRal1EZPayWmvnXOvd5hyrvHLnrgiJQdSHF9gdrafn/nJI6Xg/OAdh/VWB1a8MkD68pcNxpSiL61MJNk8WsQMZf7FEwWBpPhCsRpkGw2XfxgjC3NzdCc47oT/kmjlNfwEv8T+KNG6T8b9gkYigB4w6jEf2sHCrhqnnNOiW+fp4qRFV39USxulrdKUK3ozFLHVdJisDPUH2kUKFBg2XMnJyL3g+jSpt2PZuluLI8R0vOf2wHtlDBewBTimnUt
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(346002)(366004)(376002)(396003)(39840400004)(136003)(31696002)(6486002)(86362001)(2616005)(26005)(5660300002)(83380400001)(478600001)(956004)(31686004)(36756003)(8936002)(8676002)(16576012)(54906003)(316002)(66946007)(186003)(66476007)(107886003)(52116002)(16526019)(4326008)(66556008)(2906002)(43740500002);
+ SFS:(4636009)(396003)(346002)(376002)(136003)(366004)(39850400004)(53546011)(6506007)(5660300002)(26005)(186003)(16526019)(44832011)(54906003)(66476007)(66556008)(956004)(2616005)(316002)(6486002)(66946007)(8936002)(2906002)(8676002)(31696002)(36756003)(86362001)(52116002)(4326008)(31686004)(6512007)(83380400001)(478600001)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: vGGL57biQH9idpzLEXFXp2qEZANmcr1hgrYh9ahbytJvK7dZ4+r06mwQGywAXmIQHj4/Y3oTuR6Xm9UtALZMzSmbxwz+rA9B5D5Ip7IicfP609DTu8CA/Tf5TJnQBgP4zwpTjFKkHSauasS9oIiitRxnjXJS81wquRYKeuQ2Al32EcDqM+5ymL2KxXOOChyQKPB3t188qlo8kP59u/dl7sT0ix1ew1tllYEYcp2eQIMt/KKZObRk+fI1Zout1VBvkUr5B8gQIoHMeevWoEUlbVkUdzaHPM/jCgc2gvrhUM5V5KQ9DDpF+GFXGkTeu1/4snuSqalURqX4I89Y+euYjG6tF/Qrle7FTgcBubPVcyT1aiByOZuIu+451NpQU2xyQe1X9F3Qo+niR03cKn4RNqvjMqmQw+g0/6W1u4iM92I3p/tiNEFqmsThB9N6465zWQsz8uNWKW6hddECykVpaND7OknuYpLq0ugZqj02f8Q=
+X-MS-Exchange-AntiSpam-MessageData: /fkWkpmKkyWvOJiOPXuJ0QAd6sZUdOZGQCtB8bh+QZwnoe4++SDL/NNhn/tpbL084Gy1B4ScqJfoCMyLAwz6jHvSN2Ut/isw3lmuGC/KT4SGvJTms6M5MknDkYi/Bg5K59XJvPKKBlLmltcuICp8J8AOekKngp6W3vQJ4wVFJlIF8km7RrSfgYdDHGDrdFPhVbRdIN3ijjQSCzl3pISJ0jkgR1GyB7B2mK8A1vZAeCT8MWTIqtktaZbvapzD7t/S8Q6IDv5hfFF9Yy1cX+BN7BApNDkbNBVqzpDhvNgbjpGM14ShHYDZUsN5pwn4QEboh2laGXJqmZRTXani3axgrhFthX39XfQrgFfmOus0Umruppy8REv3s6pSwr9ytEXuDWQ/FwN/lGerchCVk3tAfU7HQS08Xv2JGMBB7JPJ6HxRFMrclM8QoSG11tNgtV0JCEpJ+BPfh60VqvgVCYRDs4iHgn6cP8Up3rjow8A+0nxCWd5On+Tif3PhX0B8wxNC
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc0811e1-d1ba-4a2e-7443-08d8236e284d
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4292c001-1f43-45d6-b664-08d8237311c5
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2020 18:38:50.3808 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2020 19:14:00.2034 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kihBjQX3CaJTpmPZyj01opNXY1ZWkAGaKAzHFA1k4aiPcndaK49+MI/dE1W/IHGjr/GnrE14jbSBj25a1xIFSDNhkSTEACgjXBTAjoUE43Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4342
-Received-SPF: pass client-ip=40.107.15.134;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 14:38:51
+X-MS-Exchange-CrossTenant-UserPrincipalName: RFqg8FxzCdLgAAYSQdCgniH/R8v2ehi0puhwYhFKYZkkoTJhm2+BeBonPbBmmiIoUi+C8U4S7v8JVBxxH8lgwnBw6sFa91EVZye8z849Uuc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5496
+Received-SPF: pass client-ip=40.107.22.96;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 15:14:02
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -134,267 +131,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-03.07.2020 20:35, Denis V. Lunev wrote:
-> This patch creates intermediate buffer for reading from block driver
-> state and performs read-ahead to this buffer. Snapshot code performs
-> reads sequentially and thus we know what offsets will be required
-> and when they will become not needed.
-> 
-> Results are fantastic. Switch to snapshot times of 2GB Fedora 31 VM
-> over NVME storage are the following:
->                  original     fixed
-> cached:          1.84s       1.16s
-> non-cached:     12.74s       1.27s
-> 
-> The difference over HDD would be more significant :)
-> 
-
-[..]
-
-> +static coroutine_fn int bdrv_co_vmstate_load_task_entry(AioTask *task)
-> +{
-> +    int err = 0;
-> +    BdrvLoadVMStateTask *t = container_of(task, BdrvLoadVMStateTask, task);
-> +    BdrvLoadVMChunk *c = t->chunk;
-> +    BdrvLoadVMState *state = t->bs->loadvm_state;
-> +    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, c->buf, c->bytes);
+On 25.06.2020 18:21, Max Reitz wrote:
+> Use the child access functions in the block status inquiry functions as
+> appropriate.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block/io.c | 19 ++++++++++---------
+>   1 file changed, 10 insertions(+), 9 deletions(-)
+>
+> diff --git a/block/io.c b/block/io.c
+> index 385176b331..dc9891d6ce 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2407,11 +2407,12 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+>       if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+>           ret |= BDRV_BLOCK_ALLOCATED;
+>       } else if (want_zero) {
+> +        BlockDriverState *cow_bs = bdrv_cow_bs(bs);
 > +
-> +    bdrv_inc_in_flight(t->bs);
-> +    err = t->bs->drv->bdrv_load_vmstate(t->bs, &qiov, c->offset);
-> +    bdrv_dec_in_flight(t->bs);
-> +
-> +    qemu_co_mutex_lock(&state->lock);
-
-In my understanding, we don't need this mutex. We need coroutine mutex, when there
-is a critical section with an yield inside, like accessing metadata in qcow2 code.
-
-If all the critical sections doesn't have an yield inside they should not intersect
-anyway, as all these functions should be executed in coroutines in the aio context
-of this bs, i.e. not in parallel iothreads simultaneously.
-
-> +    QLIST_REMOVE(c, list);
-> +    if (err == 0) {
-> +        QLIST_INSERT_HEAD(&state->chunks, c, list);
-> +    } else {
-> +        bdrv_free_loadvm_chunk(c);
-> +    }
-> +    qemu_co_mutex_unlock(&state->lock);
-> +    qemu_co_queue_restart_all(&state->waiters);
-> +
-> +    return err;
-> +}
-
-[..]
-
-> +static int bdrv_co_do_load_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
-> +                                   int64_t pos)
-> +{
-> +    BdrvLoadVMState *state = bs->loadvm_state;
-> +    BdrvLoadVMChunk *c;
-> +    size_t off;
-> +    int64_t start_pos = pos;
-> +
-> +    if (state == NULL) {
-> +        if (pos != 0) {
-> +            goto slow_path;
-> +        }
-> +
-> +        state = g_new(BdrvLoadVMState, 1);
-> +        *state = (BdrvLoadVMState) {
-> +            .pool = aio_task_pool_new(BDRV_VMSTATE_WORKERS_MAX),
-> +            .chunks = QLIST_HEAD_INITIALIZER(state->chunks),
-> +            .loading = QLIST_HEAD_INITIALIZER(state->loading),
-> +        };
-> +        qemu_co_mutex_init(&state->lock);
-> +        qemu_co_queue_init(&state->waiters);
-> +
-> +        bs->loadvm_state = state;
-> +
-> +        bdrv_co_loadvmstate_start(bs);
-> +    }
-> +
-> +    if (state->offset != pos) {
-> +        goto slow_path;
-> +    }
-> +
-> +    off = 0;
-> +
-> +    qemu_co_mutex_lock(&state->lock);
-> +    while (off < qiov->size && aio_task_pool_status(state->pool) == 0) {
-> +        c = bdrv_co_find_loadvmstate_chunk(pos, QLIST_FIRST(&state->chunks));
-> +        if (c != NULL) {
-> +            ssize_t chunk_off = pos - c->offset;
-> +            ssize_t to_copy = MIN(qiov->size - off, c->bytes - chunk_off);
-> +
-> +            qemu_iovec_from_buf(qiov, off, c->buf + chunk_off, to_copy);
-> +
-> +            off += to_copy;
-> +            pos += to_copy;
-> +
-> +            if (pos == c->offset + c->bytes) {
-> +                state->chunk_count--;
-> +                /* End of buffer, discard it from the list */
-> +                QLIST_REMOVE(c, list);
-> +
-> +                /*
-> +                 * Start loading next chunk. The slot in the pool should
-> +                 * always be free for this purpose at the moment.
-> +                 *
-> +                 * There is a problem with the end of the stream. This code
-> +                 * starts to read the data beyond the end of the saved state.
-> +                 * The code in low level should be ready to such behavior but
-> +                 * we will have unnecessary BDRV_VMSTATE_WORKERS_MAX chunks
-> +                 * fully zeroed. This is not good, but acceptable.
-
-As I understand, we don't know where is the end of state, yes? So, we can't avoid it anyway. Should not be a problem.
-
-> +                 */
-> +                bdrv_co_loadvmstate_next(bs, c);
-> +            }
-> +
-> +            state->offset += to_copy;
-> +            continue;
-> +        }
-> +
-> +        c = bdrv_co_find_loadvmstate_chunk(pos, QLIST_FIRST(&state->loading));
-> +        if (c != NULL) {
-> +            qemu_co_queue_wait(&state->waiters, &state->lock);
-> +            continue;
-> +        }
-> +
-> +        /*
-> +         * This should not happen normally. This point could be reached only
-> +         * if we have had some parallel requests. Fallback to slow load.
-> +         */
-> +        qemu_co_mutex_unlock(&state->lock);
-> +
-> +slow_path:
-
-A kind of taste, but I'd prefer to keep it in the end of the function, avoiding gotos leading to loop body.
-
-> +        return bs->drv->bdrv_load_vmstate(bs, qiov, start_pos);
-> +    }
-> +    qemu_co_mutex_unlock(&state->lock);
-> +
-> +    return aio_task_pool_status(state->pool);
-> +}
-> +
->   static int coroutine_fn
->   bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
->                      bool is_read)
-> @@ -2752,7 +2955,7 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
->           ret = -ENOMEDIUM;
->       } else if (drv->bdrv_load_vmstate) {
->           if (is_read) {
-> -            ret = drv->bdrv_load_vmstate(bs, qiov, pos);
-> +            ret = bdrv_co_do_load_vmstate(bs, qiov, pos);
->           } else {
->               ret = bdrv_co_do_save_vmstate(bs, qiov, pos);
->           }
-> @@ -2823,13 +3026,13 @@ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
->       return bdrv_rw_vmstate(bs, qiov, pos, true);
+>           if (bdrv_unallocated_blocks_are_zero(bs)) {
+>               ret |= BDRV_BLOCK_ZERO;
+> -        } else if (bs->backing) {
+> -            BlockDriverState *bs2 = bs->backing->bs;
+> -            int64_t size2 = bdrv_getlength(bs2);
+> +        } else if (cow_bs) {
+> +            int64_t size2 = bdrv_getlength(cow_bs);
+>   
+>               if (size2 >= 0 && offset >= size2) {
+>                   ret |= BDRV_BLOCK_ZERO;
+> @@ -2477,7 +2478,7 @@ static int coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
+>       bool first = true;
+>   
+>       assert(bs != base);
+> -    for (p = bs; p != base; p = backing_bs(p)) {
+> +    for (p = bs; p != base; p = bdrv_filter_or_cow_bs(p)) {
+>           ret = bdrv_co_block_status(p, want_zero, offset, bytes, pnum, map,
+>                                      file);
+>           if (ret < 0) {
+> @@ -2551,7 +2552,7 @@ int bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
+>   int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
+>                         int64_t *pnum, int64_t *map, BlockDriverState **file)
+>   {
+> -    return bdrv_block_status_above(bs, backing_bs(bs),
+> +    return bdrv_block_status_above(bs, bdrv_filter_or_cow_bs(bs),
+>                                      offset, bytes, pnum, map, file);
 >   }
 >   
-> -static int coroutine_fn bdrv_co_finalize_vmstate(BlockDriverState *bs)
-> +static int coroutine_fn bdrv_co_finalize_save_vmstate(BlockDriverState *bs)
->   {
->       int err;
->       BdrvSaveVMState *state = bs->savevm_state;
+> @@ -2561,9 +2562,9 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
+>       int ret;
+>       int64_t dummy;
 >   
->       if (bs->drv->bdrv_save_vmstate == NULL && bs->file != NULL) {
-> -        return bdrv_co_finalize_vmstate(bs->file->bs);
-> +        return bdrv_co_finalize_save_vmstate(bs->file->bs);
+> -    ret = bdrv_common_block_status_above(bs, backing_bs(bs), false, offset,
+> -                                         bytes, pnum ? pnum : &dummy, NULL,
+> -                                         NULL);
+> +    ret = bdrv_common_block_status_above(bs, bdrv_filter_or_cow_bs(bs), false,
+> +                                         offset, bytes, pnum ? pnum : &dummy,
+> +                                         NULL, NULL);
+>       if (ret < 0) {
+>           return ret;
 >       }
->       if (state == NULL) {
->           return 0;
-> @@ -2851,6 +3054,51 @@ static int coroutine_fn bdrv_co_finalize_vmstate(BlockDriverState *bs)
->       return err;
->   }
+> @@ -2626,7 +2627,7 @@ int bdrv_is_allocated_above(BlockDriverState *top,
+>               break;
+>           }
 >   
-> +static int coroutine_fn bdrv_co_finalize_load_vmstate(BlockDriverState *bs)
-> +{
-> +    int err;
-> +    BdrvLoadVMState *state = bs->loadvm_state;
-> +    BdrvLoadVMChunk *c, *tmp;
-> +
-> +    if (bs->drv->bdrv_load_vmstate == NULL && bs->file != NULL) {
-> +        return bdrv_co_finalize_load_vmstate(bs->file->bs);
-> +    }
-> +    if (state == NULL) {
-> +        return 0;
-> +    }
-> +
-> +    aio_task_pool_wait_all(state->pool);
-> +    err = aio_task_pool_status(state->pool);
-> +    aio_task_pool_free(state->pool);
-> +
-> +    QLIST_FOREACH(c, &state->loading, list) {
-> +        assert(1);  /* this list must be empty as all tasks are committed */
-> +    }
-
-assert(QLIST_EMPTY(&state->loading));
-
-> +    QLIST_FOREACH_SAFE(c, &state->chunks, list, tmp) {
-> +        QLIST_REMOVE(c, list);
-> +        bdrv_free_loadvm_chunk(c);
-> +    }
-> +
-> +    g_free(state);
-> +
-> +    bs->loadvm_state = NULL;
-> +
-> +    return err;
-> +}
-> +
-> +static int coroutine_fn bdrv_co_finalize_vmstate(BlockDriverState *bs)
-> +{
-> +    int err1 = bdrv_co_finalize_save_vmstate(bs);
-> +    int err2 = bdrv_co_finalize_load_vmstate(bs);
-> +    if (err1 < 0) {
-> +        return err1;
-> +    }
-> +    if (err2 < 0) {
-> +        return err2;
-> +    }
-> +    return 0;
-> +}
-> +
->   static int coroutine_fn bdrv_finalize_vmstate_co_entry(void *opaque)
->   {
->       return bdrv_co_finalize_vmstate(opaque);
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index f90f0e8b6a..0942578a74 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -788,6 +788,7 @@ struct BdrvChild {
+> -        intermediate = backing_bs(intermediate);
+> +        intermediate = bdrv_filter_or_cow_bs(intermediate);
+>       }
 >   
->   
->   typedef struct BdrvSaveVMState BdrvSaveVMState;
-> +typedef struct BdrvLoadVMState BdrvLoadVMState;
->   
->   /*
->    * Note: the function bdrv_append() copies and swaps contents of
-> @@ -955,6 +956,8 @@ struct BlockDriverState {
->   
->       /* Intermediate buffer for VM state saving from snapshot creation code */
->       BdrvSaveVMState *savevm_state;
-> +    /* Intermediate buffer for VM state loading */
-> +    BdrvLoadVMState *loadvm_state;
->   };
->   
->   struct BlockBackendRootState {
-> 
+>       *pnum = n;
 
 
--- 
-Best regards,
-Vladimir
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
 
