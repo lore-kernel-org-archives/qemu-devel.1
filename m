@@ -2,86 +2,112 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00AAEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01675C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:26:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC37820772
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B922C20772
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:26:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDBDlMkp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC37820772
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hL5Ph0Lw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B922C20772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIWQ-0002cz-Ts
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:26:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40642)
+	id 1jtIWX-0002re-0o
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:26:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtHzK-00041g-6j
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:52:22 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21043
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jtI43-0003O7-Uk
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:57:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27948)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtHzI-0005G8-CK
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:52:21 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jtI42-0005pu-4b
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:57:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594245139;
+ s=mimecast20190719; t=1594245433;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ibC8VBxKDigT75V4r6cBk01+W7vG9M45onQMHCdIq18=;
- b=ZDBDlMkpTPavJ51JXUkMzoDcqksIBQsVEJe8jwxyVN3F/hHWUM+4wy79q5u90cHzfT13lG
- NnwvbeVnJagCs9+0LzRAkHGN9XkMiiVsJeO+xkXk/QjIJz7LOqOG93xUYtCE3XKkud4y5z
- 64s6SJmNfD+t4Zc/0ynPQUHBXVt70/8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-TTI4SnaMMM6CVVsPbzBsLg-1; Wed, 08 Jul 2020 14:51:56 -0400
-X-MC-Unique: TTI4SnaMMM6CVVsPbzBsLg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B32918015F5;
- Wed,  8 Jul 2020 18:51:52 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-117.ams2.redhat.com [10.36.113.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C49EA7554B;
- Wed,  8 Jul 2020 18:51:47 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH RFC 1/5] s390x: move setting of maximum ram size to machine
- init
-Date: Wed,  8 Jul 2020 20:51:31 +0200
-Message-Id: <20200708185135.46694-2-david@redhat.com>
-In-Reply-To: <20200708185135.46694-1-david@redhat.com>
-References: <20200708185135.46694-1-david@redhat.com>
+ bh=krOrMaNDViBLAdn2O1gActk6oXSacNNMPEImh2PMkH4=;
+ b=hL5Ph0Lw5XcDJ9tUQd9FyZnqNuqS6OKU5ms+6SlVYDWWuhcUBiZ4Wp1upNEWYIW0VvTzF0
+ /O+EZpKIpi66Gh8/rfgcCvsmMvj2AnckUdL/hIhQMma3tUjfA9UBFo0nMzJH1HmUBIttGb
+ uAJYn5Hcr7wZtxUO2QI+wDVkYifp7QI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-NpCPDnwyMRudtPcMcZJP1A-1; Wed, 08 Jul 2020 12:55:49 -0400
+X-MC-Unique: NpCPDnwyMRudtPcMcZJP1A-1
+Received: by mail-wr1-f70.google.com with SMTP id s16so39475652wrv.1
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 09:55:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=krOrMaNDViBLAdn2O1gActk6oXSacNNMPEImh2PMkH4=;
+ b=fTl4/q4ygxX34MGE84g4Imum9C2Mt/c4hjKZ0MZnNQKi38LJ32r4oE4XGEzyr9gBMj
+ skRL8/04eCzPvzP1yc6sSF7lqU9Z9w7+2CITdeYULQvIm56x7/YulgfLLAo+K0a5GpAn
+ 12Kroj3XrQ/n3b/mFnGoMhAZ90l7vH0PnGF+2K7P/ZLeYANF28iWqyKzPkXDIaPLXOoF
+ p5QrRvli9uCVFuEfWpc1CoFutiK+3qY6dk6MrRmbynZtJlWdVX/kUYseubAFE9XI9Wza
+ iLXhfMevB8Si90U9PJO/lNofZrfeuSNEdQrboeTQkyvufeYXqnWxwuwqIAqCP50NElQN
+ HCLQ==
+X-Gm-Message-State: AOAM533SYEnsf0AjrI/NhJERuIzoLnEy8GANs365Lbtr5Rhqnji0kVpb
+ oi3mdONHQLaqJVj7PTdRLzutL3ipUFV0gu17N//R4h3RICKMSe/wA6Fau2/CKsH5m/CIGP+sgmk
+ fZEMpMP/GLD7fIr0=
+X-Received: by 2002:a5d:4a45:: with SMTP id v5mr59919270wrs.228.1594227347773; 
+ Wed, 08 Jul 2020 09:55:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyouR+rGf3f8tM0Fl2jmqjUBefaOjD5gA37Wrcj2S4NQpNIVrbm93YcG3dEH4Jdcuhj+s6dvw==
+X-Received: by 2002:a5d:4a45:: with SMTP id v5mr59919257wrs.228.1594227347544; 
+ Wed, 08 Jul 2020 09:55:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c?
+ ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+ by smtp.gmail.com with ESMTPSA id u65sm567385wmg.5.2020.07.08.09.55.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jul 2020 09:55:47 -0700 (PDT)
+Subject: Re: [PULL 00/53] Misc patches for QEMU 5.1 soft freeze
+To: Claudio Fontana <cfontana@suse.de>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200706164155.24696-1-pbonzini@redhat.com>
+ <CAFEAcA-F1FGde+=c3iS3wcRWG+i0RgYj5-jwafn0sX6EEYEsWA@mail.gmail.com>
+ <1a9ad36f-f4ae-2ea5-3d69-03aa5580b60e@suse.de>
+ <de27589f-6afb-b8cf-05a0-f5d34f9d2a58@redhat.com>
+ <f17ca47d-f5e9-e710-5edb-9d92839ee7c1@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <56c7e153-e47b-aa5c-80c0-ab4f5c3d85e8@redhat.com>
+Date: Wed, 8 Jul 2020 18:55:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <f17ca47d-f5e9-e710-5edb-9d92839ee7c1@suse.de>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,107 +120,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Heiko Carstens <heiko.carstens@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- David Hildenbrand <david@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we no longer fixup the maximum ram size in sclp code, let's move
-setting the maximum ram size to ccw_init()->s390_memory_init(), which
-now looks like a better fit.
+On 08/07/20 18:45, Claudio Fontana wrote:
+> C++ is used to link the final qemu-system binary and on my system c++ has LTO:
+> 
+> c++ -v
+> Using built-in specs.
+> COLLECT_GCC=c++
+> COLLECT_LTO_WRAPPER=/usr/lib64/gcc/x86_64-suse-linux/7/lto-wrapper
+> OFFLOAD_TARGET_NAMES=hsa:nvptx-none
+> Target: x86_64-suse-linux
+> Configured with: ../configure --prefix=/usr --infodir=/usr/share/info
+> --mandir=/usr/share/man --libdir=/usr/lib64 --libexecdir=/usr/lib64
+> --enable-languages=c,c++,objc,fortran,obj-c++,ada,go
+> --enable-offload-targets=hsa,nvptx-none=/usr/nvptx-none,
+> --without-cuda-driver --enable-checking=release --disable-werror
+> --with-gxx-include-dir=/usr/include/c++/7 --enable-ssp --disable-libssp
+> --disable-libvtv --disable-libcc1 --disable-plugin
+> --with-bugurl=https://bugs.opensuse.org/ --with-pkgversion='SUSE Linux' --with-slibdir=/lib64 --with-system-zlib --enable-libstdcxx-allocator=new --disable-libstdcxx-pch --enable-version-specific-runtime-libs --with-gcc-major-version-only --enable-linker-build-id --enable-linux-futex --enable-gnu-indirect-function --program-suffix=-7 --without-system-libunwind --enable-multilib --with-arch-32=x86-64 --with-tune=generic --build=x86_64-suse-linux --host=x86_64-suse-linux
+> Thread model: posix
+> gcc version 7.5.0 (SUSE Linux) 
+> 
+> 
+> I checked cc but did not think to check c++ . I will find a way to disable this thing and will correct the patch accordingly.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c | 19 ++++++++++++++++---
- hw/s390x/sclp.c            | 20 +-------------------
- 2 files changed, 17 insertions(+), 22 deletions(-)
+Having LTO support is not the same thing as having it enabled.  Are you
+compiling and linking with "-flto"?
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 023fd25f2b..2e6d292c23 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -160,13 +160,26 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
- 
--static void s390_memory_init(MemoryRegion *ram)
-+static void s390_memory_init(MachineState *machine)
- {
-     MemoryRegion *sysmem = get_system_memory();
-     Error *local_err = NULL;
-+    uint64_t hw_limit;
-+    int ret;
-+
-+    /* We have to set the memory limit before adding any regions to sysmem. */
-+    ret = s390_set_memory_limit(machine->maxram_size, &hw_limit);
-+    if (ret == -E2BIG) {
-+        error_report("host supports a maximum of %" PRIu64 " GB",
-+                     hw_limit / GiB);
-+        exit(EXIT_FAILURE);
-+    } else if (ret) {
-+        error_report("setting the guest size failed");
-+        exit(EXIT_FAILURE);
-+    }
- 
-     /* allocate RAM for core */
--    memory_region_add_subregion(sysmem, 0, ram);
-+    memory_region_add_subregion(sysmem, 0, machine->ram);
- 
-     /*
-      * Configure the maximum page size. As no memory devices were created
-@@ -249,7 +262,7 @@ static void ccw_init(MachineState *machine)
- 
-     s390_sclp_init();
-     /* init memory + setup max page size. Required for the CPU model */
--    s390_memory_init(machine->ram);
-+    s390_memory_init(machine);
- 
-     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
-     s390_init_cpus(machine);
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index d39f6d7785..f59195e15a 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -327,32 +327,14 @@ void s390_sclp_init(void)
- 
- static void sclp_realize(DeviceState *dev, Error **errp)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
-     SCLPDevice *sclp = SCLP(dev);
--    Error *err = NULL;
--    uint64_t hw_limit;
--    int ret;
- 
-     /*
-      * qdev_device_add searches the sysbus for TYPE_SCLP_EVENTS_BUS. As long
-      * as we can't find a fitting bus via the qom tree, we have to add the
-      * event facility to the sysbus, so e.g. a sclp console can be created.
-      */
--    sysbus_realize(SYS_BUS_DEVICE(sclp->event_facility), &err);
--    if (err) {
--        goto out;
--    }
--
--    ret = s390_set_memory_limit(machine->maxram_size, &hw_limit);
--    if (ret == -E2BIG) {
--        error_setg(&err, "host supports a maximum of %" PRIu64 " GB",
--                   hw_limit / GiB);
--    } else if (ret) {
--        error_setg(&err, "setting the guest size failed");
--    }
--
--out:
--    error_propagate(errp, err);
-+    sysbus_realize(SYS_BUS_DEVICE(sclp->event_facility), errp);
- }
- 
- static void sclp_memory_init(SCLPDevice *sclp)
--- 
-2.26.2
+Paolo
 
 
