@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D715FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF4EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:21:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB228206E9
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:21:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB228206E9
+	by mail.kernel.org (Postfix) with ESMTPS id 488D5206E9
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:21:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 488D5206E9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtDlO-0002Xr-Vs
+	id 1jtDlP-0002XY-HS
 	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 13:21:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59664)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtDkP-0001GA-TD
+ id 1jtDkP-0001Fu-Bg
  for qemu-devel@nongnu.org; Wed, 08 Jul 2020 13:20:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53898)
+Received: from indium.canonical.com ([91.189.90.7]:53862)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtDkN-0004Vp-8s
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 13:20:41 -0400
+ id 1jtDkN-0004Vl-6Z
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 13:20:40 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jtDkL-0000AO-T7
+ id 1jtDkK-0000AK-WB
  for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 17:20:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DA2DD2E80BA
- for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 17:20:37 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id C7A602E80F0
+ for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 17:20:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Jul 2020 17:13:38 -0000
-From: Ryutaroh Matsumoto <1886811@bugs.launchpad.net>
+Date: Wed, 08 Jul 2020 17:12:30 -0000
+From: Laurent Vivier <1886811@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -54,9 +54,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: emojifreak laurent-vivier
 X-Launchpad-Bug-Reporter: Ryutaroh Matsumoto (emojifreak)
-X-Launchpad-Bug-Modifier: Ryutaroh Matsumoto (emojifreak)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
 References: <159420830935.32230.13858618076699173558.malonedeb@gac.canonical.com>
-Message-Id: <159422841854.26831.16684194736511179659.launchpad@wampee.canonical.com>
+Message-Id: <159422835063.26722.15104358349628207854.malone@wampee.canonical.com>
 Subject: [Bug 1886811] Re: systemd complains Failed to enqueue loopback
  interface start request: Operation not supported
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b24753402d6321ed1b9083e580f5f014a46bab00";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6afafe28b51c70682c2b29d507858c72e153e18a
+X-Launchpad-Hash: 7f70c89b796bc28603b5e4ec5b3136e1b961caca
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 13:20:37
@@ -92,13 +92,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Bug watch added: Debian Bug tracker #964289
-   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D964289
+It would help to know which operation is not supported.
 
-** Also affects: qemu (Debian) via
-   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D964289
-   Importance: Unknown
-       Status: Unknown
+Could you get the coredump?
+Is it possible to run the operation with "QEMU_STRACE" set in the environme=
+nt?
+Normally loop ioctls are supported.
+
+But it seems the following ones are not implemented in QEMU:
+LOOP_SET_CAPACITY, LOOP_SET_DIRECT_IO, LOOP_SET_BLOCK_SIZE.
+
+** Tags added: linux-user
 
 -- =
 
