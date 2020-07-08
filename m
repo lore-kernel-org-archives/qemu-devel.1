@@ -2,74 +2,71 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A5FC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 15:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF263C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 15:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7314206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 15:26:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7314206DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id B42AB206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 15:31:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B42AB206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtBxT-00028x-VY
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 11:26:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57830)
+	id 1jtC2T-0005EF-Vu
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 11:31:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtBwJ-0000k3-SD
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 11:24:51 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:33413)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtC1U-0004Z5-A4
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 11:30:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55298)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtBwG-0003rj-Hd
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 11:24:51 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MryCb-1ke3Oi2Y9F-00nyk5; Wed, 08 Jul 2020 17:24:45 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] linux-user: fix print_syscall_err() when syscall
- returned value is negative
-Date: Wed,  8 Jul 2020 17:24:35 +0200
-Message-Id: <20200708152435.706070-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200708152435.706070-1-laurent@vivier.eu>
-References: <20200708152435.706070-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtC1S-0004bS-E5
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 11:30:11 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 7B159AEC1;
+ Wed,  8 Jul 2020 15:30:09 +0000 (UTC)
+Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200629093504.3228-1-cfontana@suse.de>
+ <20200629093504.3228-4-cfontana@suse.de>
+ <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
+ <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
+ <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
+ <46322ba4-8aff-e8d6-8a1c-ea1043098624@suse.de>
+ <bc76504a-0d81-7f81-42fd-c70d8cc13bc5@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <db4b0418-9b60-f456-08be-8f20472dbbb3@suse.de>
+Date: Wed, 8 Jul 2020 17:30:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SlgJvoPbMIPRGZqKxi52xr+quYCcDCXIErC0wCyf+Ir2Yr29VYo
- ZB3s7qqyzN5pgoXhvH+NvxR0KyVa/c2aKvYdUycjOEJ1DfeAMLAoFlpelJRuivwG1xElZW6
- RaMVWCw6DcaupVESJBY3EKA+Squ5xOEhlUY6hbDh8Ij8kqKJdXRCbMzi0bWKedXpgNwiaw/
- l4Oq+X95ZGoOzOxI1s7Vw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:1yZvhYdCusY=:vgX2h1pxeyx/F85cGtE2on
- weLOe4HuP4FB1X+1OhsWitn/xUXABCOYWIOW8g6nc/2kW2D4do1fP0CUP7b2ClcztoV39ZJM7
- VL0zHBlSRfT73dchhfUBwNgcrvYV9oaT/8OH3/j9u4Tzi5an83RrtiHEcEe47wegLovIbVNPT
- I0AeRpQe9VA1PrLsZVrze5LOGleMy8oAiz3sLCJTMxZITzVUdtkf+Q64UmXYU0UGuQp8gLw3k
- WjzLzY3Be9VdkRS4f6ILN6aGTsvHtbOioQYjqi94PXi2GbB+4UlqWwUdBz+UIUnpZmYc0vUHU
- jIK0DZp+yeXIeUnWbvbsZWCn9LFutucDyimWwvdAx2nSgCz7vKGWlIcJjYThO5jRyzD6ZoDl9
- 9J9eiKuNNXqJcIEne2XY5+2LjpgumuXS9wVOopyljU7/DYeYvTdxg/gmJUbDDlcyh0ucwA0f2
- LCC8AfUGwUOhVbLchv8nz/xVdGmaJz6rUd0ud2OHP5qq4/qycXJ8m9NhIcAabCvSApQnxBHy2
- FhGTsCP2gSXUM0xx7+ET1JYqXb/PPaOfbndG1lXJflsb69+9DUbmkpmtCvHQdwN5EzAwuccwR
- j+EWZizMRdKXAgM/Pu/r8affTjgWBPqfsBJdymTErmqs1UEwWEV87ydZAMVvvQRRIRwc1GRWi
- LM8/hG2UOYpiSLufbp1ESPfleAUn1YoKffCtv/S1EfOrd6kIMBPKgDTA5hxV9jCm8gMyEZ4Nf
- FgmGY6QZlGjHLTMFPmQDn1ygqojrztG/nrLH2MPu+RKWsO9IK3RBBYYJeJEAZmpy2UyAj0Rbm
- OxnWPVczpMnyWFWzihE+bqWYwqzeGN+iZG5J59yqzSv5SW2ckbYhNuTaI9bBV7xDgKspoJt
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 11:24:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <bc76504a-0d81-7f81-42fd-c70d8cc13bc5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:20:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,138 +79,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-print_syscall_err() relies on the sign of the returned value to know
-if it is an errno value or not.
+On 7/8/20 5:23 PM, Paolo Bonzini wrote:
+> On 08/07/20 17:17, Claudio Fontana wrote:
+>> On 7/8/20 5:05 PM, Paolo Bonzini wrote:
+>>> On 08/07/20 17:00, Claudio Fontana wrote:
+>>>>> Bisectable, 100% failure rate, etc. :(  Can you split the patch in
+>>>>> multiple parts, specifically separating any rename or introducing of
+>>>>> includes from the final file move?
+>>>> Hi Paolo,
+>>>>
+>>>> will take a look!
+>>>>
+>>>> Is this captured by some travis / cirrus-ci / anything I can easily see the result of?
+>>>>
+>>>>
+>>>
+>>> Nope, unfortunately we don't have an s390 CI.  But if you can get your
+>>> hands on one, just "./configure --target-list=s390x-softmmu && make &&
+>>> make check-block" will show it.
+>>>
+>>>>>
+>>>>> 	#if defined CONFIG_TCG || !defined NEED_CPU_H
+>>>>> 	extern bool icount_enabled(void);
+>>>>> 	#else
+>>>>> 	#define icount_enabled() 0
+>>>>> 	#endif
+>>>>>
+>>>>> (This way, more TCG-only code in cpus.c gets elided).  You can integrate
+>>>>> this change in the next version.
+>>>>>
+>>>>> Paolo
+>>>>>
+>>>>
+>>>> Weird, I tested with --disable-tcg explicitly (but may be some time ago now, as I constantly rebased).
+>>>>
+>>>> Will take a look at the introduction of this #defines in place of variables,
+>>>> as this mechanisms will not work in the future for target-specific modules.
+>>>
+>>> This is only done for per-target files so it should not be a problem.
+>>>
+>>> Paolo
+>>>
+>>
+>> K, I tried with latest master, disable-tcg build still works for me on x86, so it is something in queue I guess?
+> 
+> Peter reported the issue in the v1 pull request; there were two
+> different breakages but the cpus.c one was yours.
+> 
+> Paolo
+> 
 
-But in some cases the returned value can have the most signicant bit
-set without being an errno.
+I see, since I don't manage to reproduce the problem at the moment, I will wait for master to be updated, after which I expect the issue to become apparent.
 
-This patch restores previous behaviour that was also checking if
-we can decode the errno to validate it.
+As of now, I do
 
-This patch fixes this kind of problem (qemu-m68k):
+configure --disable-tcg
+make -j120
 
-  root@sid:/# QEMU_STRACE= ls
-  3 brk(NULL) = -1 errno=21473607683 uname(0x407fff8a) = 0
+which works for me, based on latest master.
 
-to become:
+Ciao,
 
-  root@sid:/# QEMU_STRACE= ls
-  3 brk(NULL) = 0x8001e000
-  3 uname(0xffffdf8a) = 0
-
-Fixes: c84be71f6854 ("linux-user: Extend strace support to enable argument printing after syscall execution")
-Cc: Filip.Bozuta@syrmia.com
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/strace.c | 36 +++++++++++++-----------------------
- 1 file changed, 13 insertions(+), 23 deletions(-)
-
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index b42664bbd180..17f2554643f0 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -724,19 +724,20 @@ print_ipc(const struct syscallname *name,
-  * Variants for the return value output function
-  */
- 
--static void
-+static bool
- print_syscall_err(abi_long ret)
- {
--    const char *errstr = NULL;
-+    const char *errstr;
- 
-     qemu_log(" = ");
-     if (ret < 0) {
--        qemu_log("-1 errno=%d", (int)-ret);
-         errstr = target_strerror(-ret);
-         if (errstr) {
--            qemu_log(" (%s)", errstr);
-+            qemu_log("-1 errno=%d (%s)", (int)-ret, errstr);
-+            return true;
-         }
-     }
-+    return false;
- }
- 
- static void
-@@ -744,11 +745,10 @@ print_syscall_ret_addr(const struct syscallname *name, abi_long ret,
-                        abi_long arg0, abi_long arg1, abi_long arg2,
-                        abi_long arg3, abi_long arg4, abi_long arg5)
- {
--    print_syscall_err(ret);
--
--    if (ret >= 0) {
--        qemu_log("0x" TARGET_ABI_FMT_lx "\n", ret);
-+    if (!print_syscall_err(ret)) {
-+        qemu_log("0x" TARGET_ABI_FMT_lx, ret);
-     }
-+    qemu_log("\n");
- }
- 
- #if 0 /* currently unused */
-@@ -765,9 +765,7 @@ print_syscall_ret_newselect(const struct syscallname *name, abi_long ret,
-                             abi_long arg0, abi_long arg1, abi_long arg2,
-                             abi_long arg3, abi_long arg4, abi_long arg5)
- {
--    print_syscall_err(ret);
--
--    if (ret >= 0) {
-+    if (!print_syscall_err(ret)) {
-         qemu_log(" = 0x" TARGET_ABI_FMT_lx " (", ret);
-         print_fdset(arg0, arg1);
-         qemu_log(",");
-@@ -796,9 +794,7 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret,
-                            abi_long arg0, abi_long arg1, abi_long arg2,
-                            abi_long arg3, abi_long arg4, abi_long arg5)
- {
--    print_syscall_err(ret);
--
--    if (ret >= 0) {
-+    if (!print_syscall_err(ret)) {
-         qemu_log(TARGET_ABI_FMT_ld, ret);
-         switch (ret) {
-         case TARGET_TIME_OK:
-@@ -833,9 +829,7 @@ print_syscall_ret_listxattr(const struct syscallname *name, abi_long ret,
-                             abi_long arg0, abi_long arg1, abi_long arg2,
-                             abi_long arg3, abi_long arg4, abi_long arg5)
- {
--    print_syscall_err(ret);
--
--    if (ret >= 0) {
-+    if (!print_syscall_err(ret)) {
-         qemu_log(TARGET_ABI_FMT_ld, ret);
-         qemu_log(" (list = ");
-         if (arg1 != 0) {
-@@ -866,9 +860,7 @@ print_syscall_ret_ioctl(const struct syscallname *name, abi_long ret,
-                         abi_long arg0, abi_long arg1, abi_long arg2,
-                         abi_long arg3, abi_long arg4, abi_long arg5)
- {
--    print_syscall_err(ret);
--
--    if (ret >= 0) {
-+    if (!print_syscall_err(ret)) {
-         qemu_log(TARGET_ABI_FMT_ld, ret);
- 
-         const IOCTLEntry *ie;
-@@ -3189,9 +3181,7 @@ print_syscall_ret(int num, abi_long ret,
-                                   arg1, arg2, arg3,
-                                   arg4, arg5, arg6);
-             } else {
--                print_syscall_err(ret);
--
--                if (ret >= 0) {
-+                if (!print_syscall_err(ret)) {
-                     qemu_log(TARGET_ABI_FMT_ld, ret);
-                 }
-                 qemu_log("\n");
--- 
-2.26.2
-
+C
 
