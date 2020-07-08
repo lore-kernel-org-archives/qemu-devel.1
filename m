@@ -2,93 +2,91 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B46C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 145F6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:55:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4EED20708
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:46:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3C3F20772
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dC4x0L5k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4EED20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NrNAYuSH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3C3F20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtKiA-0002Qh-49
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:46:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48272)
+	id 1jtKqD-0004Dl-6S
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:55:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3nWYGXwsKCoInyqottksuktmuumrk.iuswks0-jk1krtutmt0.uxm@flex--hskinnemoen.bounces.google.com>)
- id 1jtKYT-0006qO-4u
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:36:49 -0400
-Received: from mail-yb1-xb49.google.com ([2607:f8b0:4864:20::b49]:33639)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3nWYGXwsKCoInyqottksuktmuumrk.iuswks0-jk1krtutmt0.uxm@flex--hskinnemoen.bounces.google.com>)
- id 1jtKYQ-00013l-Kd
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:36:48 -0400
-Received: by mail-yb1-xb49.google.com with SMTP id g10so807729ybd.0
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 17:36:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=66PpJSiQbPbYGb1w141zWioPCpD9KVyXHJd+V0/BDS8=;
- b=dC4x0L5klf8D6cz5MiMhEuSUB/vbqCDRLLInigXUckzFEnx0OV0TZDtPSglPFtKVlw
- 8rboMOmC9GnQcb727mV7UZ8944KMV0JVE3IR2Xbhvc5hNnudGqLEZEpQbiPvxY8+S7da
- W0mIK51vKGBublsdPtkAnsxVlrDgyeWohSJKiMw4Q+s0A53D2TNVFa2tPpWtgPr0+4/R
- 5B5K8HIxpAFG8PHApTKxEDqXk49ag8if/aU0NoTC/S3JoKkuz8KcBd6anoAFo1XRogHC
- q0ja3zIdR/1pmpFv9R+pC/vXGL47NHNXokr2oNxSlrX73Nk9p//FiBdlTBfQYWG+m3mI
- Wo0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=66PpJSiQbPbYGb1w141zWioPCpD9KVyXHJd+V0/BDS8=;
- b=CMu73cnA25y17bxCSncmciwYmZ+P8WVrHqcwJnwSY7DS0PmpjH18VsCK7KrALlsbvh
- hPUPri9qRLT0qp06Umy2nONhP4LAziLX47lXBvBB7645+47r4oBKkFdnkHzM/CV3fClB
- ay3uwEdQQXM4nAF46GLlPj9eP/r07C11L2SX4skMLhByrAownaw0z8Q2F2sWQ814VkJo
- q8xRUzsk7bZJR8lSn12LdcCZ6gloGKiivl3Mv1oW7mQcNMQOLEPwaPZTh/mqSsBEt/Ln
- vIF4yTMpvaR7sCnfER9pDHSIvtnaG8t/M71bL642Tn6EWIjicb0Gr9n6gg4aITtkjv37
- UDNw==
-X-Gm-Message-State: AOAM530+Mv2uRn53k4aL8a5g0KnFSr3rMRfWbiV9wzxc5nB6FVQcxG3V
- unIZaqFJAUZS48OwIE2QGPsTZl3aBI/IkKue5g==
-X-Google-Smtp-Source: ABdhPJzUTg0UAbKZ7UExzEGdP8KfFvZwgGQ6NWLEFrO2yrFYxn15CQoDdnDDEB19Vs516jdxj6tNVQbGjf8FJRYSew==
-X-Received: by 2002:a25:a301:: with SMTP id d1mr5259997ybi.449.1594255005229; 
- Wed, 08 Jul 2020 17:36:45 -0700 (PDT)
-Date: Wed,  8 Jul 2020 17:36:07 -0700
-In-Reply-To: <20200709003608.3834629-1-hskinnemoen@google.com>
-Message-Id: <20200709003608.3834629-11-hskinnemoen@google.com>
-Mime-Version: 1.0
-References: <20200709003608.3834629-1-hskinnemoen@google.com>
-X-Mailer: git-send-email 2.27.0.383.g050319c2ae-goog
-Subject: [PATCH v5 10/11] hw/arm: Wire up BMC boot flash for npcm750-evb and
- quanta-gsj
-From: Havard Skinnemoen <hskinnemoen@google.com>
-To: peter.maydell@linaro.org, f4bug@amsat.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
- kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b49;
- envelope-from=3nWYGXwsKCoInyqottksuktmuumrk.iuswks0-jk1krtutmt0.uxm@flex--hskinnemoen.bounces.google.com;
- helo=mail-yb1-xb49.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtKpS-0003mu-2R
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:54:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29693
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtKpQ-0002wz-Jx
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:54:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594256059;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QEAewR6DMBSdUpuDdRQ5n7oV+Y/XYxQ3xW5tKWXBnDw=;
+ b=NrNAYuSHJR0o/bH2WOYI/iBdVjN3Zl2GMFfUhgcJRLFQyo0GseLSvG9EvWbfMXvX67EQDv
+ llvb65cT52BataA7JUtihBmx2DVGW8TnJ4XWBYiZHaf8BZugoFJEUBUfqXTBuP6SlcktAj
+ VrWcYPNAqEynMd/dJrHuOPEUKDUmSX4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-EdVxt1oYPmuBe6xsp1aRgw-1; Wed, 08 Jul 2020 00:51:56 -0400
+X-MC-Unique: EdVxt1oYPmuBe6xsp1aRgw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC69A800D5C
+ for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 04:51:55 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C9EC5D9C9;
+ Wed,  8 Jul 2020 04:51:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 057FB1132FD2; Wed,  8 Jul 2020 06:51:46 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH] chardev: don't abort on attempt to add duplicated chardev
+References: <20200706182156.334207-1-marcandre.lureau@redhat.com>
+Date: Wed, 08 Jul 2020 06:51:45 +0200
+In-Reply-To: <20200706182156.334207-1-marcandre.lureau@redhat.com>
+ (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 6 Jul 2020
+ 22:21:56 +0400")
+Message-ID: <87eepm4nj2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,77 +99,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: eric.auger@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows these NPCM7xx-based boards to boot from a flash image, e.g.
-one built with OpenBMC. For example like this:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-IMAGE=${OPENBMC}/build/tmp/deploy/images/gsj/image-bmc
-qemu-system-arm -machine quanta-gsj -nographic \
-	-bios ~/qemu/bootrom/npcm7xx_bootrom.bin \
-	-drive file=${IMAGE},if=mtd,bus=0,unit=0,format=raw,snapshot=on
+> This is a regression from commit
+> d2623129a7dec1d3041ad1221dda1ca49c667532 ("qom: Drop parameter @errp of
+> object_property_add() & friends").
+>
+> (qemu) chardev-add id=3Dnull,backend=3Dnull
+> (qemu) chardev-add id=3Dnull,backend=3Dnull
+> Unexpected error in object_property_try_add() at /home/elmarco/src/qemu/q=
+om/object.c:1166:
+> attempt to add duplicate property 'null' to object (type 'container')
+>
+> That case is currently not covered in the test suite, but will be with
+> the queued patch "char: fix use-after-free with dup chardev &
+> reconnect".
+>
 
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
----
- hw/arm/npcm7xx_boards.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+Please add
 
-diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
-index 80cf1535f1..cfb31ce6f5 100644
---- a/hw/arm/npcm7xx_boards.c
-+++ b/hw/arm/npcm7xx_boards.c
-@@ -20,6 +20,7 @@
- #include "hw/arm/npcm7xx.h"
- #include "hw/core/cpu.h"
- #include "hw/loader.h"
-+#include "hw/qdev-properties.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/units.h"
-@@ -66,6 +67,22 @@ static void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
-     arm_load_kernel(&soc->cpu[0], machine, &npcm7xx_binfo);
- }
- 
-+static void npcm7xx_connect_flash(NPCM7xxFIUState *fiu, int cs_no,
-+                                  const char *flash_type, DriveInfo *dinfo)
-+{
-+    DeviceState *flash;
-+    qemu_irq flash_cs;
-+
-+    flash = qdev_new(flash_type);
-+    if (dinfo) {
-+        qdev_prop_set_drive(flash, "drive", blk_by_legacy_dinfo(dinfo));
-+    }
-+    qdev_realize_and_unref(flash, BUS(fiu->spi), &error_fatal);
-+
-+    flash_cs = qdev_get_gpio_in_named(flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(fiu), cs_no, flash_cs);
-+}
-+
- static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
- {
-     memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram);
-@@ -96,6 +113,7 @@ static void npcm750_evb_init(MachineState *machine)
-     qdev_realize(DEVICE(soc), NULL, &error_abort);
- 
-     npcm7xx_load_bootrom(soc);
-+    npcm7xx_connect_flash(&soc->fiu[0], 0, "w25q256", drive_get(IF_MTD, 0, 0));
-     npcm7xx_load_kernel(machine, soc);
- }
- 
-@@ -108,6 +126,8 @@ static void quanta_gsj_init(MachineState *machine)
-     qdev_realize(DEVICE(soc), NULL, &error_abort);
- 
-     npcm7xx_load_bootrom(soc);
-+    npcm7xx_connect_flash(&soc->fiu[0], 0, "mx25l25635e",
-+                          drive_get(IF_MTD, 0, 0));
-     npcm7xx_load_kernel(machine, soc);
- }
- 
--- 
-2.27.0.383.g050319c2ae-goog
+  Fixes: d2623129a7dec1d3041ad1221dda1ca49c667532
+
+Bonus: you can then shorten the hash above for readability.
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  chardev/char.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/chardev/char.c b/chardev/char.c
+> index e3051295ac3..876e41bb592 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -998,7 +998,10 @@ static Chardev *chardev_new(const char *id, const ch=
+ar *typename,
+>      }
+> =20
+>      if (id) {
+> -        object_property_add_child(get_chardevs_root(), id, obj);
+> +        object_property_try_add_child(get_chardevs_root(), id, obj, &loc=
+al_err);
+
+Suggest to break this line before &local_err.
+
+> +        if (local_err) {
+> +            goto end;
+> +        }
+>          object_unref(obj);
+>      }
+
+Sorry for breaking this.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
