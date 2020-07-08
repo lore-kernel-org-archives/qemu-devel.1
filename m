@@ -2,95 +2,93 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA276C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3409C433E1
 	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:17:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A348206DF
+	by mail.kernel.org (Postfix) with ESMTPS id A752F20708
 	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:17:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RIuKFq3V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A348206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hwsIxPaS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A752F20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtINu-00022h-J9
+	id 1jtINu-00024V-Q3
 	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:17:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39658)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jtHvL-0006D6-1C
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:48:15 -0400
-Received: from mail-vk1-xa41.google.com ([2607:f8b0:4864:20::a41]:45747)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jtHvH-0004i5-SE
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:48:14 -0400
-Received: by mail-vk1-xa41.google.com with SMTP id h1so10525275vkn.12
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 14:48:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=CW3w8aXpYiNtlEq+t02GsBy4W29Z+h3Ij5vo0Nr7eGY=;
- b=RIuKFq3VYiB07h4YmCvRG4I2anaJCjb7HeHEiuCQ17ZexjR0w1NItMqi4FTh4TALcy
- 5nVW7IxxZmQka8OrMmZ69z7d8eFGa+B6tC4GpwQBW544pXuB5LWRe/cYkASj01NusQHI
- kze1P8CJuaSFcT4m0I4mtDw3L48jHWVswsu/ZI0nHAiGhENr4QENEJMMOS096Bo3RgbF
- /vc7BDW0FQe+3/aFefHPQATDsETYGTm6IPtmL94HBiWkDejcKdS38inABwJCs1aaApHx
- kQHIS0BD2wIU8zs+nt679vLmDHek4xkOFcRYHTdVzTVujXz/W1AX2DT19C2J1T3CZGG3
- R21w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=CW3w8aXpYiNtlEq+t02GsBy4W29Z+h3Ij5vo0Nr7eGY=;
- b=K0B5MabdclSvNNSiN1GD0vuYN9rFwlppPjrHixrCPD4lzB/ZhE8/TA4j0c6ON1zxtU
- hsLFEeQxYSAQ06GAm2maF+WBgk9CE03MoAzWqMznga9k7PyMAOV1BBpw6joQbi4HUHx3
- M3aB6JRXbwgylp+wINzT9sU3HhZip/hWohbN/iLWZrb9Lq9EirvJThmbBklESbwFjAjA
- B5SBxCbBbvxJe9KX7cblzE+ds+NqBmTM9iQwbUc7RSKToxgEm7mPr36YXbwL9RZkRtZM
- V3b5GT7EwZhtUXYMahkO9YRRzHrMXFvukPw6jqGI6HCBuoVeeLlhfqwiuhmrUU3uPxdA
- HqYQ==
-X-Gm-Message-State: AOAM533L4412+zJlRE8AiHzFeQ6DH/uWbjwhM1VBq61h8wdTsNiIBAuK
- T8V9w7rLtDFoC/HgFLGNl47408YMy46s4QtI9ulGHA==
-X-Google-Smtp-Source: ABdhPJzSf9/srYfLG9Rh1B+5+0QBH9y/CKIw4oMCK3ve9e4nn9q/YlasiQ86uRlxKnJJrUViy4uWhHCbOImUntEXut8=
-X-Received: by 2002:a1f:9144:: with SMTP id t65mr35070332vkd.50.1594244890268; 
- Wed, 08 Jul 2020 14:48:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jtHvH-000664-Sj
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:48:11 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36291
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jtHvE-0004hV-EM
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:48:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594244887;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AtJIuodvOZsJY6nobRtCiFIt5fJ3W1ul7TsOQcB7KbA=;
+ b=hwsIxPaSMvk7DQG4+8bBar5rr/7BKSRJ7UvlDbC1a7MLMjCp5lOPGxndxpiIGbCP4uOMPm
+ lvQ83I1K1bArCwp74cobKxHWK+JHomZOfR2+8aSWrqPt63PA06/8rBQOC1Q+zPFSrQy9WA
+ fRR1+/aGKg7q2dzzdNFhB9jtvHBWHZc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-U1cRDlirNjSkkjSYbaNWaw-1; Wed, 08 Jul 2020 09:47:09 -0400
+X-MC-Unique: U1cRDlirNjSkkjSYbaNWaw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A25D107ACCA;
+ Wed,  8 Jul 2020 13:47:08 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com
+ [10.36.112.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF7AE7FEA6;
+ Wed,  8 Jul 2020 13:47:07 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id D27A031F5C; Wed,  8 Jul 2020 15:47:06 +0200 (CEST)
+Date: Wed, 8 Jul 2020 15:47:06 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v8 11/14] block/core: add generic infrastructure for
+ x-blockdev-amend qmp command
+Message-ID: <20200708134706.7au7gdfuy6t6xjml@sirius.home.kraxel.org>
+References: <20200608094030.670121-1-mlevitsk@redhat.com>
+ <20200608094030.670121-12-mlevitsk@redhat.com>
+ <20200708123329.udy3k7ewtbcztjin@sirius.home.kraxel.org>
+ <71ce9ceb32e5bd8f18cd26621e380df364f25cb7.camel@redhat.com>
 MIME-Version: 1.0
-References: <20200707184730.3047754-1-hskinnemoen@google.com>
- <20200707184730.3047754-6-hskinnemoen@google.com>
- <4b7130f2-032c-3067-b2b6-876a2b17b707@amsat.org>
- <CAFQmdRYi5QFHbcWQH-bWqAsSCidzYMedC8n+mib1DPpJuEy-Rw@mail.gmail.com>
-In-Reply-To: <CAFQmdRYi5QFHbcWQH-bWqAsSCidzYMedC8n+mib1DPpJuEy-Rw@mail.gmail.com>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Wed, 8 Jul 2020 14:47:58 -0700
-Message-ID: <CAFQmdRbF_tM4RaphCG1cgnEJ1z6YMdYv3fVjuu6crXKeAaS9Zg@mail.gmail.com>
-Subject: Re: [PATCH v4 05/12] hw/arm: Add NPCM730 and NPCM750 SoC models
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
- QEMU Developers <qemu-devel@nongnu.org>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
- CS20 KFTing <kfting@nuvoton.com>, Joel Stanley <joel@jms.id.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::a41;
- envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+In-Reply-To: <71ce9ceb32e5bd8f18cd26621e380df364f25cb7.camel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,233 +101,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 8, 2020 at 11:13 AM Havard Skinnemoen
-<hskinnemoen@google.com> wrote:
->
-> On Wed, Jul 8, 2020 at 10:31 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org> wrote:
-> >
-> > On 7/7/20 8:47 PM, Havard Skinnemoen wrote:
-> > > +    /* System Global Control Registers (GCR) */
-> > > +    object_property_set_int(OBJECT(&s->gcr), nc->disabled_modules,
-> > > +                            "disabled-modules", &error_abort);
-> > > +    object_property_set_link(OBJECT(&s->gcr), OBJECT(s->dram), "dram=
-",
-> > > +                             &error_abort);
-> >
-> > I guess you can simplify using in npcm7xx_init():
-> >
-> >       object_property_add_const_link(obj, "dram-mr", OBJECT(&s->gcr));
-> >
-> > And in npcm7xx_gcr_realize()
-> >
-> >     obj =3D object_property_get_link(OBJECT(dev), "dram-mr", &err);
-> >     if (obj =3D=3D NULL) {
-> >         error_setg(errp, "%s: required dram-mr link not found: %s",
-> >                    __func__, error_get_pretty(err));
-> >         return;
-> >     }
-> >     s->dram =3D MEMORY_REGION(obj);
->
-> OK, I'll try that, thanks!
+On Wed, Jul 08, 2020 at 04:06:45PM +0300, Maxim Levitsky wrote:
+> On Wed, 2020-07-08 at 14:33 +0200, Gerd Hoffmann wrote:
+> > On Mon, Jun 08, 2020 at 12:40:27PM +0300, Maxim Levitsky wrote:
+> > > blockdev-amend will be used similiar to blockdev-create
+> > > to allow on the fly changes of the structure of the format based block devices.
+> > 
+> > This one breaks the build:
+> > 
+> > In file included from /home/kraxel/projects/qemu/include/block/throttle-groups.h:29,
+> >                  from /home/kraxel/projects/qemu/include/sysemu/block-backend.h:17,
+> >                  from /home/kraxel/projects/qemu/qemu-img.c:46:
+> > /home/kraxel/projects/qemu/include/block/block_int.h:154:39: error: unknown type name ‘BlockdevAmendOptions’; did you mean ‘BlockdevAioOptions’?
+> >                                        BlockdevAmendOptions *opts,
+> >                                        ^~~~~~~~~~~~~~~~~~~~
+> >                                        BlockdevAioOptions
+> > make: *** [/home/kraxel/projects/qemu/rules.mak:69: qemu-img.o] Error 1
+> > 
+> > take care,
+> >   Gerd
+> > 
+> 
+> Apparently I didn't add #include of qapi-types-block-core.h in block_int.h (I'll fix this in a patch soon),
+> but it looks like throttle-groups.h includes "qemu/throttle.h" which includes "qapi/qapi-types-block-core.h",
+> so it should be included explicitly here.
+> 
+> Could you share your configure.sh options?
+> 
+> Best regards,
+> 	Maxim Levitsky
 
-Hmm, I ended up doing
+---------- config.status ----------
+#!/bin/sh
+# Generated by configure.
+# Run this file to recreate the current configuration.
+# Compiler output produced by configure, useful for debugging
+# configure, is in config.log if it exists.
+unset AR
+unset AS
+unset CC
+unset CPP
+unset CXX
+unset INSTALL
+unset LD
+LD_LIBRARY_PATH='/opt/rh/devtoolset-8/root/usr/lib64:/opt/rh/devtoolset-8/root/usr/lib:/opt/rh/devtoolset-8/root/usr/lib64/dyninst:/opt/rh/devtoolset-8/root/usr/lib/dyninst:/opt/rh/devtoolset-8/root/usr/lib64:/opt/rh/devtoolset-8/root/usr/lib:/opt/rh/rh-ruby25/root/usr/local/lib64:/opt/rh/rh-ruby25/root/usr/lib64:/opt/rh/httpd24/root/usr/lib64'
+export LD_LIBRARY_PATH
+unset LIBTOOL
+unset MAKE
+unset NM
+unset OBJCOPY
+PATH='/opt/rh/devtoolset-8/root/usr/bin:/usr/lib64/qt-3.3/bin:/usr/lib64/ccache:/opt/rh/rh-ruby25/root/usr/local/bin:/opt/rh/rh-ruby25/root/usr/bin:/opt/rh/rh-git218/root/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin/bz:/home/kraxel/bin:/home/kraxel/bin/bz:/home/kraxel/.local/bin'
+export PATH
+unset PKG_CONFIG
+unset PKG_CONFIG_LIBDIR
+PKG_CONFIG_PATH='/opt/rh/devtoolset-8/root/usr/lib64/pkgconfig:/usr/local/lib/pkgconfig'
+export PKG_CONFIG_PATH
+unset PYTHON
+unset SDL2_CONFIG
+unset SMBD
+unset STRIP
+unset WINDRES
+exec '/home/kraxel/projects/qemu/build/default/../../configure' '--prefix=/home/kraxel' '--target-list= x86_64-softmmu aarch64-softmmu ppc64-softmmu sparc64-softmmu s390x-softmmu riscv64-softmmu ppc-softmmu arm-softmmu mips-softmmu x86_64-linux-user ppc64-linux-user' '--enable-debug' '--enable-modules' '--enable-sanitizers' "$@"
+---------- config-host.h ----------
+/* Automatically generated by create_config - do not modify */
+#define CONFIG_QEMU_CONFDIR "/home/kraxel/etc/qemu"
+#define CONFIG_QEMU_DATADIR "/home/kraxel/share/qemu"
+#define CONFIG_QEMU_FIRMWAREPATH "/home/kraxel/share/qemu-firmware"
+#define CONFIG_QEMU_DOCDIR "/home/kraxel/share/doc/qemu"
+#define CONFIG_QEMU_MODDIR "/home/kraxel/lib/qemu"
+#define CONFIG_QEMU_LOCALSTATEDIR "/home/kraxel/var"
+#define CONFIG_QEMU_HELPERDIR "/home/kraxel/libexec"
+#define CONFIG_QEMU_LOCALEDIR "/home/kraxel/share/locale"
+#define CONFIG_QEMU_ICONDIR "/home/kraxel/share/icons"
+#define CONFIG_QEMU_DESKTOPDIR "/home/kraxel/share/applications"
+#define HOST_X86_64 1
+#define CONFIG_MINIKCONF_MODE --defconfig
+#define CONFIG_DEBUG_TCG 1
+#define CONFIG_POSIX 1
+#define CONFIG_LINUX 1
+#define CONFIG_TOOLS 1
+#define CONFIG_SLIRP 1
+#define CONFIG_SMBD_COMMAND "/usr/sbin/smbd"
+#define CONFIG_L2TPV3 1
+#define CONFIG_LIBCAP_NG 1
+#define CONFIG_AUDIO_DRIVERS \
+    "pa",\
+    "oss",\
 
--    object_property_set_link(OBJECT(&s->gcr), OBJECT(s->dram), "dram",
--                             &error_abort);
-+    object_property_add_const_link(OBJECT(&s->gcr), "dram-mr",
-OBJECT(s->dram));
+#define CONFIG_AUDIO_PA m
+#define CONFIG_AUDIO_OSS m
+#define CONFIG_BDRV_RW_WHITELIST\
+    NULL
+#define CONFIG_BDRV_RO_WHITELIST\
+    NULL
+#define CONFIG_VNC 1
+#define CONFIG_VNC_SASL 1
+#define CONFIG_VNC_JPEG 1
+#define CONFIG_VNC_PNG 1
+#define QEMU_VERSION "5.0.50"
+#define QEMU_VERSION_MAJOR 5
+#define QEMU_VERSION_MINOR 0
+#define QEMU_VERSION_MICRO 50
+#define CONFIG_STAMP _85ffce29f2848aafe2dd62142dd02ea2af85190f
+#define CONFIG_MODULES 1
+#define CONFIG_X11 1
+#define CONFIG_SDL m
+#define CONFIG_ICONV 1
+#define CONFIG_CURSES m
+#define CONFIG_PIPE2 1
+#define CONFIG_ACCEPT4 1
+#define CONFIG_SPLICE 1
+#define CONFIG_EVENTFD 1
+#define CONFIG_USBFS 1
+#define CONFIG_FALLOCATE 1
+#define CONFIG_FALLOCATE_PUNCH_HOLE 1
+#define CONFIG_FALLOCATE_ZERO_RANGE 1
+#define CONFIG_POSIX_FALLOCATE 1
+#define CONFIG_SYNC_FILE_RANGE 1
+#define CONFIG_FIEMAP 1
+#define CONFIG_DUP3 1
+#define CONFIG_PPOLL 1
+#define CONFIG_PRCTL_PR_SET_TIMERSLACK 1
+#define CONFIG_EPOLL 1
+#define CONFIG_EPOLL_CREATE1 1
+#define CONFIG_SENDFILE 1
+#define CONFIG_TIMERFD 1
+#define CONFIG_SETNS 1
+#define CONFIG_CLOCK_ADJTIME 1
+#define CONFIG_SYNCFS 1
+#define CONFIG_INOTIFY 1
+#define CONFIG_INOTIFY1 1
+#define CONFIG_SEM_TIMEDWAIT 1
+#define HAVE_STRCHRNUL 1
+#define HAVE_STRUCT_STAT_ST_ATIM 1
+#define CONFIG_BYTESWAP_H 1
+#define CONFIG_CURL m
+#define CONFIG_BRLAPI 1
+#define CONFIG_GTK m
+#define CONFIG_GTK_GL 1
+#define CONFIG_GIO 1
+#define CONFIG_TLS_PRIORITY "NORMAL"
+#define CONFIG_GNUTLS 1
+#define CONFIG_NETTLE 1
+#define CONFIG_NETTLE_VERSION_MAJOR 2
+#define CONFIG_QEMU_PRIVATE_XTS 1
+#define CONFIG_TASN1 1
+#define HAVE_IFADDRS_H 1
+#define CONFIG_VTE 1
+#define CONFIG_VIRGL 1
+#define CONFIG_LINUX_AIO 1
+#define CONFIG_ATTR 1
+#define CONFIG_VIRTFS 1
+#define CONFIG_MPATH 1
+#define CONFIG_VHOST_SCSI 1
+#define CONFIG_VHOST_NET 1
+#define CONFIG_VHOST_NET_USER 1
+#define CONFIG_VHOST_CRYPTO 1
+#define CONFIG_VHOST_VSOCK 1
+#define CONFIG_VHOST_USER_VSOCK 1
+#define CONFIG_VHOST_KERNEL 1
+#define CONFIG_VHOST_USER 1
+#define CONFIG_VHOST_USER_FS 1
+#define CONFIG_IOVEC 1
+#define CONFIG_PREADV 1
+#define CONFIG_FDT 1
+#define CONFIG_SIGNALFD 1
+#define CONFIG_TCG 1
+#define CONFIG_FDATASYNC 1
+#define CONFIG_MADVISE 1
+#define CONFIG_POSIX_MADVISE 1
+#define CONFIG_POSIX_MEMALIGN 1
+#define CONFIG_SPICE 1
+#define CONFIG_SMARTCARD 1
+#define CONFIG_USB_LIBUSB 1
+#define CONFIG_USB_REDIR 1
+#define CONFIG_OPENGL 1
+#define CONFIG_OPENGL_DMABUF 1
+#define CONFIG_GBM 1
+#define CONFIG_MALLOC_TRIM 1
+#define CONFIG_AVX2_OPT 1
+#define CONFIG_LZO 1
+#define CONFIG_SNAPPY 1
+#define CONFIG_BZIP2 1
+#define CONFIG_LIBISCSI m
+#define CONFIG_SECCOMP 1
+#define CONFIG_QOM_CAST_DEBUG 1
+#define CONFIG_RBD m
+#define CONFIG_COROUTINE_BACKEND ucontext
+#define CONFIG_COROUTINE_POOL 1
+#define CONFIG_OPEN_BY_HANDLE 1
+#define CONFIG_LINUX_MAGIC_H 1
+#define CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE 1
+#define CONFIG_HAS_ENVIRON 1
+#define CONFIG_CPUID_H 1
+#define CONFIG_INT128 1
+#define CONFIG_CMPXCHG128 1
+#define CONFIG_ATOMIC64 1
+#define CONFIG_ATTRIBUTE_ALIAS 1
+#define CONFIG_GETAUXVAL 1
+#define CONFIG_GLUSTERFS m
+#define CONFIG_GLUSTERFS_XLATOR_OPT 1
+#define CONFIG_GLUSTERFS_DISCARD 1
+#define CONFIG_GLUSTERFS_FALLOCATE 1
+#define CONFIG_GLUSTERFS_ZEROFILL 1
+#define CONFIG_GLUSTERFS_FTRUNCATE_HAS_STAT 1
+#define CONFIG_GLUSTERFS_IOCB_HAS_STAT 1
+#define CONFIG_LIVE_BLOCK_MIGRATION 1
+#define CONFIG_TPM 1
+#define CONFIG_TRACE_LOG 1
+#define CONFIG_TRACE_FILE trace
+#define CONFIG_RDMA 1
+#define CONFIG_PVRDMA 1
+#define CONFIG_RTNETLINK 1
+#define CONFIG_LIBXML2 1
+#define CONFIG_REPLICATION 1
+#define CONFIG_AF_VSOCK 1
+#define CONFIG_SYSMACROS 1
+#define CONFIG_STATIC_ASSERT 1
+#define HAVE_UTMPX 1
+#define CONFIG_IVSHMEM 1
+#define CONFIG_CAPSTONE 1
+#define CONFIG_DEBUG_MUTEX 1
+#define CONFIG_THREAD_SETNAME_BYTHREAD 1
+#define CONFIG_PTHREAD_SETNAME_NP_W_TID 1
+#define CONFIG_BOCHS 1
+#define CONFIG_CLOOP 1
+#define CONFIG_DMG 1
+#define CONFIG_QCOW1 1
+#define CONFIG_VDI 1
+#define CONFIG_VVFAT 1
+#define CONFIG_QED 1
+#define CONFIG_PARALLELS 1
+#define CONFIG_SHEEPDOG 1
+#define HAVE_GDB_BIN /opt/rh/devtoolset-8/root/usr/bin/gdb
+#define CONFIG_SECRET_KEYRING 1
+#define CONFIG_TEST_SECRET_KEYRING 1
+#define CONFIG_IASL iasl
+#define HOST_DSOSUF ".so"
+#define CONFIG_LIBUDEV 1
+#define CONFIG_NUMA 1
 
-in realize() because s->dram isn't initialized yet in npcm7xx_init().
-Is this what you had in mind?
-
-Here's the diff from all the dram-related changes:
-
-diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
-index 39a1f28d8e..30e00a514d 100644
---- a/include/hw/arm/npcm7xx.h
-+++ b/include/hw/arm/npcm7xx.h
-@@ -28,6 +28,10 @@
-
- #define NPCM7XX_MAX_NUM_CPUS    (2)
-
-+/* The first half of the address space is reserved for DDR4 DRAM. */
-+#define NPCM7XX_DRAM_BA         (0x00000000)
-+#define NPCM7XX_DRAM_SZ         (2 * GiB)
-+
- /* Magic addresses for setting up direct kernel booting and SMP boot stubs=
-. */
- #define NPCM7XX_LOADER_START            (0x00000000)  /* Start of SDRAM */
- #define NPCM7XX_SMP_LOADER_START        (0xffff0000)  /* Boot ROM */
-diff --git a/include/hw/misc/npcm7xx_gcr.h b/include/hw/misc/npcm7xx_gcr.h
-index 49d699410f..4884676be2 100644
---- a/include/hw/misc/npcm7xx_gcr.h
-+++ b/include/hw/misc/npcm7xx_gcr.h
-@@ -68,7 +68,6 @@ typedef struct NPCM7xxGCRState {
-     uint32_t reset_pwron;
-     uint32_t reset_mdlr;
-     uint32_t reset_intcr3;
--    MemoryRegion *dram;
- } NPCM7xxGCRState;
-
- #define TYPE_NPCM7XX_GCR "npcm7xx-gcr"
-diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
-index e64cf6a84c..a05a900197 100644
---- a/hw/arm/npcm7xx.c
-+++ b/hw/arm/npcm7xx.c
-@@ -26,10 +26,6 @@
- #include "qemu/units.h"
- #include "sysemu/sysemu.h"
-
--/* The first half of the address space is reserved for DDR4 DRAM. */
--#define NPCM7XX_DRAM_BA         (0x00000000)
--#define NPCM7XX_DRAM_SZ         (2 * GiB)
--
- /*
-  * This covers the whole MMIO space. We'll use this to catch any MMIO acce=
-sses
-  * that aren't handled by any device.
-@@ -257,8 +253,7 @@ static void npcm7xx_realize(DeviceState *dev, Error **e=
-rrp)
-     /* System Global Control Registers (GCR) */
-     object_property_set_int(OBJECT(&s->gcr), nc->disabled_modules,
-                             "disabled-modules", &error_abort);
--    object_property_set_link(OBJECT(&s->gcr), OBJECT(s->dram), "dram",
--                             &error_abort);
-+    object_property_add_const_link(OBJECT(&s->gcr), "dram-mr",
-OBJECT(s->dram));
-     sysbus_realize(SYS_BUS_DEVICE(&s->gcr), &error_abort);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gcr), 0, NPCM7XX_GCR_BA);
-
-@@ -326,13 +321,10 @@ static void npcm7xx_realize(DeviceState *dev,
-Error **errp)
-     memory_region_init_rom(&s->irom, OBJECT(dev), "irom", NPCM7XX_ROM_SZ,
-                            &error_abort);
-     memory_region_add_subregion(get_system_memory(), NPCM7XX_ROM_BA, &s->i=
-rom);
--
--    /* External DDR4 SDRAM */
--    memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, s->d=
-ram);
- }
-
- static Property npcm7xx_properties[] =3D {
--    DEFINE_PROP_LINK("dram", NPCM7xxState, dram, TYPE_MEMORY_REGION,
-+    DEFINE_PROP_LINK("dram-mr", NPCM7xxState, dram, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
- };
-diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
-index 2f66e699b1..cfb31ce6f5 100644
---- a/hw/arm/npcm7xx_boards.c
-+++ b/hw/arm/npcm7xx_boards.c
-@@ -83,21 +83,25 @@ static void npcm7xx_connect_flash(NPCM7xxFIUState
-*fiu, int cs_no,
-     sysbus_connect_irq(SYS_BUS_DEVICE(fiu), cs_no, flash_cs);
- }
-
-+static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
-+{
-+    memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram=
-);
-+
-+    object_property_set_link(OBJECT(soc), OBJECT(dram), "dram-mr",
-+                             &error_abort);
-+}
-+
- static NPCM7xxState *npcm7xx_create_soc(MachineState *machine,
-                                         uint32_t hw_straps)
- {
-     NPCM7xxMachineClass *nmc =3D NPCM7XX_MACHINE_GET_CLASS(machine);
--    NPCM7xxState *soc;
-+    Object *obj;
-
--    soc =3D NPCM7XX(object_new_with_props(nmc->soc_type, OBJECT(machine), =
-"soc",
--                                        &error_abort, NULL));
--    object_property_set_link(OBJECT(soc), OBJECT(machine->ram), "dram",
--                             &error_abort);
--    object_property_set_uint(OBJECT(soc), hw_straps, "power-on-straps",
--                             &error_abort);
--    qdev_realize(DEVICE(soc), NULL, &error_abort);
-+    obj =3D object_new_with_props(nmc->soc_type, OBJECT(machine), "soc",
-+                                &error_abort, NULL);
-+    object_property_set_uint(obj, hw_straps, "power-on-straps", &error_abo=
-rt);
-
--    return soc;
-+    return NPCM7XX(obj);
- }
-
- static void npcm750_evb_init(MachineState *machine)
-@@ -105,6 +109,9 @@ static void npcm750_evb_init(MachineState *machine)
-     NPCM7xxState *soc;
-
-     soc =3D npcm7xx_create_soc(machine, NPCM750_EVB_POWER_ON_STRAPS);
-+    npcm7xx_connect_dram(soc, machine->ram);
-+    qdev_realize(DEVICE(soc), NULL, &error_abort);
-+
-     npcm7xx_load_bootrom(soc);
-     npcm7xx_connect_flash(&soc->fiu[0], 0, "w25q256", drive_get(IF_MTD, 0,=
- 0));
-     npcm7xx_load_kernel(machine, soc);
-@@ -115,6 +122,9 @@ static void quanta_gsj_init(MachineState *machine)
-     NPCM7xxState *soc;
-
-     soc =3D npcm7xx_create_soc(machine, QUANTA_GSJ_POWER_ON_STRAPS);
-+    npcm7xx_connect_dram(soc, machine->ram);
-+    qdev_realize(DEVICE(soc), NULL, &error_abort);
-+
-     npcm7xx_load_bootrom(soc);
-     npcm7xx_connect_flash(&soc->fiu[0], 0, "mx25l25635e",
-                           drive_get(IF_MTD, 0, 0));
-diff --git a/hw/misc/npcm7xx_gcr.c b/hw/misc/npcm7xx_gcr.c
-index 78a885e265..9934cd238d 100644
---- a/hw/misc/npcm7xx_gcr.c
-+++ b/hw/misc/npcm7xx_gcr.c
-@@ -127,11 +127,16 @@ static void npcm7xx_gcr_realize(DeviceState
-*dev, Error **errp)
- {
-     NPCM7xxGCRState *s =3D NPCM7XX_GCR(dev);
-     uint64_t dram_size;
-+    Error *err =3D NULL;
-+    Object *obj;
-
--    if (!s->dram) {
--        error_setg(errp, "npcm7xx_gcr: 'dram' link not set");
-+    obj =3D object_property_get_link(OBJECT(dev), "dram-mr", &err);
-+    if (!obj) {
-+        error_setg(errp, "%s: required dram-mr link not found: %s",
-+                   __func__, error_get_pretty(err));
-         return;
-     }
-+    dram_size =3D memory_region_size(MEMORY_REGION(obj));
-
-     /* Power-on reset value */
-     s->reset_intcr3 =3D 0x00001002;
-@@ -149,7 +154,6 @@ static void npcm7xx_gcr_realize(DeviceState *dev,
-Error **errp)
-      *
-      * https://github.com/Nuvoton-Israel/u-boot/blob/2aef993bd2aafeb5408db=
-aad0f3ce099ee40c4aa/board/nuvoton/poleg/poleg.c#L244
-      */
--    dram_size =3D int128_get64(s->dram->size);
-     if (dram_size >=3D 2 * GiB) {
-         s->reset_intcr3 |=3D 4 << 8;
-     } else if (dram_size >=3D 1 * GiB) {
-@@ -191,8 +195,6 @@ static const VMStateDescription vmstate_npcm7xx_gcr =3D=
- {
- static Property npcm7xx_gcr_properties[] =3D {
-     DEFINE_PROP_UINT32("disabled-modules", NPCM7xxGCRState, reset_mdlr, 0)=
-,
-     DEFINE_PROP_UINT32("power-on-straps", NPCM7xxGCRState, reset_pwron, 0)=
-,
--    DEFINE_PROP_LINK("dram", NPCM7xxGCRState, dram, TYPE_MEMORY_REGION,
--                     MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
- };
 
