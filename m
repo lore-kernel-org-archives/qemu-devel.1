@@ -2,93 +2,94 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B36DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C6CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:53:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 450DC206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B799206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:53:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JXqk9/aq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450DC206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j8JwMwF5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B799206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIwG-0006ka-H9
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:53:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54910)
+	id 1jtIwg-0007j5-Pt
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:53:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtIqq-00044A-3A
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:47:40 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60987
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtIqo-0004YC-6Y
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:47:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594248457;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gRS51GNeRZLLA2FQkzIg8MqmmQnHjzAGDOBl64s6HFU=;
- b=JXqk9/aqrE/PBO3tfgInhVF5ytGF4ue6dHXmVz5hFcVN3naQOWr+Lm7RlzrMrqJ6Ri/k93
- b03hnZmo4EeZwMQvSd5hDM+JUbhbkARLUktYsEguUG7taf/XTcl4WAJiwjXvOBBqptANZV
- NsbNeFSAUm/X7qoTLQRy14/5Fapf1uk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-fWMd7FskMcCDua8gzJL4yQ-1; Wed, 08 Jul 2020 02:45:49 -0400
-X-MC-Unique: fWMd7FskMcCDua8gzJL4yQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6B76A0BD7;
- Wed,  8 Jul 2020 06:45:48 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7332C1A914;
- Wed,  8 Jul 2020 06:45:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F05101132FD2; Wed,  8 Jul 2020 08:45:46 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH v2 1/3] util: validate whether O_DIRECT is supported after
- failure
-References: <20200702125612.2176194-1-berrange@redhat.com>
- <20200702125612.2176194-2-berrange@redhat.com>
-Date: Wed, 08 Jul 2020 08:45:46 +0200
-In-Reply-To: <20200702125612.2176194-2-berrange@redhat.com> ("Daniel
- P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Thu, 2 Jul 2020 13:56:10
- +0100")
-Message-ID: <878sfu4i91.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1jtIRy-0002VX-MT
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:58 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:39843)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1jtIRw-000155-Al
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:58 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id z5so24901pgb.6
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=m5mwiR1uGzS0Rpkrb6/VXRgvstz8vbC2nhHqzg+v2Y0=;
+ b=j8JwMwF5XTDLl55Y31s7+7Jcm2ghyFdiAqg9Qc+UyWJj78NzxO2dyNRXLF6wzor2Ef
+ 6kjiIJJt+QGC6ipbJP0dSWUHaHiISS5IgFWeMOv38XcMeXLcSZ4B51F+D7C/TOEwheo6
+ JDuBcV0HW1vMtxUa+HCeMG077AM9Z6gtBXyko85HRtFJtCsBmVVBGtanny9sJ0xfzQmm
+ KlBmLumDS2VYdregMVuzIDYY2KbfWlfV0Y8qkvPMFBT2CuqtgNZuOMgHGr4Q+uU9/cM6
+ GWtdHqwTHruCReoH417/TFmHUze7nXY+hNZegcXdWaPDVQV3sZWqIM8W9RlYUWc2hVXj
+ XWaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=m5mwiR1uGzS0Rpkrb6/VXRgvstz8vbC2nhHqzg+v2Y0=;
+ b=qizbahllLDO41egL5BS2ybWtTIoQojAhrR4vIr/mavGFernHOTH4tpfeGPxOiLgtlq
+ v+AG2aERcFtTee2+AoAoYDfOCxmSnSicuZet7zhbo8aDwd0IYj7Ji4Pj77eXtS3UxDM7
+ GQSkKIK4x7oG9HxKg1G/+AgamJ3VYdMj+gjiw87vrL49peebNhO0Q6XltB1JmnkaVRu9
+ b7qiz8V51fm7HLh2M+CpOQIGW16f1TNHlZjDt6tu1qgKn7AWsfO9s3ZsSjBwJg6VpjoE
+ 7EhIENrXJvDLe4e1PKWBhzcQUcfdCIziy2i7cmHS6UibkKblvLwHpHvFxqFiiVVxmFen
+ Mxlw==
+X-Gm-Message-State: AOAM532uAVvEtk1mT2T2wr1EzQrBvjW77ZXi132IVsRNvOO+/KFKymdE
+ KO+apReV6Jcu57Xj557vII8QwYLD
+X-Google-Smtp-Source: ABdhPJz9TB/B92TIGijeZiWnqNhSfC8vUlL2yQT+sGf4in6dUKXKaD82TsiT3cfMsu4AnIob8qdVBg==
+X-Received: by 2002:a63:cb05:: with SMTP id p5mr26638286pgg.120.1594246914526; 
+ Wed, 08 Jul 2020 15:21:54 -0700 (PDT)
+Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
+ by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.21.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jul 2020 15:21:53 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 02/21] softfloat: pass float_status pointer to pickNaN
+Date: Wed,  8 Jul 2020 15:20:42 -0700
+Message-Id: <20200708222101.24568-3-jcmvbkbc@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
+References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pg1-x52c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,82 +102,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- P J P <ppandit@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+Pass float_status structure pointer to the pickNaN so that
+machine-specific settings are available to NaN selection code.
+Add use_first_nan property to float_status and use it in Xtensa-specific
+pickNaN.
 
-> Currently we suggest that a filesystem may not support O_DIRECT after
-> seeing an EINVAL. Other things can cause EINVAL though, so it is better
-> to do an explicit check, and then report a definitive error message.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  util/osdep.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
->
-> diff --git a/util/osdep.c b/util/osdep.c
-> index 4829c07ff6..e2b7507ee2 100644
-> --- a/util/osdep.c
-> +++ b/util/osdep.c
-> @@ -332,9 +332,11 @@ int qemu_open(const char *name, int flags, ...)
->      }
-> =20
->  #ifdef O_CLOEXEC
-> -    ret =3D open(name, flags | O_CLOEXEC, mode);
-> -#else
-> +    flags |=3D O_CLOEXEC;
-> +#endif
->      ret =3D open(name, flags, mode);
-> +
-> +#ifndef O_CLOEXEC
->      if (ret >=3D 0) {
->          qemu_set_cloexec(ret);
->      }
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Alex Bennée" <alex.bennee@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ fpu/softfloat-specialize.inc.c  | 30 ++++++++++++++++++++++++------
+ fpu/softfloat.c                 |  2 +-
+ include/fpu/softfloat-helpers.h |  5 +++++
+ include/fpu/softfloat-types.h   |  1 +
+ 4 files changed, 31 insertions(+), 7 deletions(-)
 
-I'd prefer something like
-
-   #ifdef O_CLOEXEC
-       flags |=3D O_CLOEXEC;
-       ret =3D open(name, flags, mode);
-   #else
-       ret =3D open(name, flags, mode);
-       if (ret >=3D 0) {
-           qemu_set_cloexec(ret);
-       }
-   #endif
-
-Continues to duplicate open(), but spares me the effort to fuse two
-#ifdef sections in my head to understand what is being done in each
-case.
-
-> @@ -342,8 +344,13 @@ int qemu_open(const char *name, int flags, ...)
-> =20
->  #ifdef O_DIRECT
->      if (ret =3D=3D -1 && errno =3D=3D EINVAL && (flags & O_DIRECT)) {
-> -        error_report("file system may not support O_DIRECT");
-> -        errno =3D EINVAL; /* in case it was clobbered */
-> +        int newflags =3D flags & ~O_DIRECT;
-> +        ret =3D open(name, newflags, mode);
-
-I'd prefer the more concise
-
-           ret =3D open(name, flags & ~O_DIRECT, mode);
-
-> +        if (ret !=3D -1) {
-> +            close(ret);
-> +            error_report("file system does not support O_DIRECT");
-> +            errno =3D EINVAL;
-> +        }
->      }
->  #endif /* O_DIRECT */
-
-The function now reports to stderr in just one of many failure modes.
-That's wrong.  Looks like the next patch fixes this defect.  I'd swap
-the two.
+diff --git a/fpu/softfloat-specialize.inc.c b/fpu/softfloat-specialize.inc.c
+index 9d919ee2d993..f519beca1b74 100644
+--- a/fpu/softfloat-specialize.inc.c
++++ b/fpu/softfloat-specialize.inc.c
+@@ -379,7 +379,7 @@ static float32 commonNaNToFloat32(commonNaNT a, float_status *status)
+ *----------------------------------------------------------------------------*/
+ 
+ static int pickNaN(FloatClass a_cls, FloatClass b_cls,
+-                   bool aIsLargerSignificand)
++                   bool aIsLargerSignificand, float_status *status)
+ {
+ #if defined(TARGET_ARM) || defined(TARGET_MIPS) || defined(TARGET_HPPA)
+     /* ARM mandated NaN propagation rules (see FPProcessNaNs()), take
+@@ -412,7 +412,7 @@ static int pickNaN(FloatClass a_cls, FloatClass b_cls,
+     } else {
+         return 1;
+     }
+-#elif defined(TARGET_PPC) || defined(TARGET_XTENSA) || defined(TARGET_M68K)
++#elif defined(TARGET_PPC) || defined(TARGET_M68K)
+     /* PowerPC propagation rules:
+      *  1. A if it sNaN or qNaN
+      *  2. B if it sNaN or qNaN
+@@ -437,6 +437,24 @@ static int pickNaN(FloatClass a_cls, FloatClass b_cls,
+     } else {
+         return 1;
+     }
++#elif defined(TARGET_XTENSA)
++    /*
++     * Xtensa has two NaN propagation modes.
++     * Which one is active is controlled by float_status::use_first_nan.
++     */
++    if (status->use_first_nan) {
++        if (is_nan(a_cls)) {
++            return 0;
++        } else {
++            return 1;
++        }
++    } else {
++        if (is_nan(b_cls)) {
++            return 1;
++        } else {
++            return 0;
++        }
++    }
+ #else
+     /* This implements x87 NaN propagation rules:
+      * SNaN + QNaN => return the QNaN
+@@ -624,7 +642,7 @@ static float32 propagateFloat32NaN(float32 a, float32 b, float_status *status)
+         aIsLargerSignificand = (av < bv) ? 1 : 0;
+     }
+ 
+-    if (pickNaN(a_cls, b_cls, aIsLargerSignificand)) {
++    if (pickNaN(a_cls, b_cls, aIsLargerSignificand, status)) {
+         if (is_snan(b_cls)) {
+             return float32_silence_nan(b, status);
+         }
+@@ -762,7 +780,7 @@ static float64 propagateFloat64NaN(float64 a, float64 b, float_status *status)
+         aIsLargerSignificand = (av < bv) ? 1 : 0;
+     }
+ 
+-    if (pickNaN(a_cls, b_cls, aIsLargerSignificand)) {
++    if (pickNaN(a_cls, b_cls, aIsLargerSignificand, status)) {
+         if (is_snan(b_cls)) {
+             return float64_silence_nan(b, status);
+         }
+@@ -926,7 +944,7 @@ floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status)
+         aIsLargerSignificand = (a.high < b.high) ? 1 : 0;
+     }
+ 
+-    if (pickNaN(a_cls, b_cls, aIsLargerSignificand)) {
++    if (pickNaN(a_cls, b_cls, aIsLargerSignificand, status)) {
+         if (is_snan(b_cls)) {
+             return floatx80_silence_nan(b, status);
+         }
+@@ -1074,7 +1092,7 @@ static float128 propagateFloat128NaN(float128 a, float128 b,
+         aIsLargerSignificand = (a.high < b.high) ? 1 : 0;
+     }
+ 
+-    if (pickNaN(a_cls, b_cls, aIsLargerSignificand)) {
++    if (pickNaN(a_cls, b_cls, aIsLargerSignificand, status)) {
+         if (is_snan(b_cls)) {
+             return float128_silence_nan(b, status);
+         }
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 5e9746c2876f..a89056a1816e 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -881,7 +881,7 @@ static FloatParts pick_nan(FloatParts a, FloatParts b, float_status *s)
+     } else {
+         if (pickNaN(a.cls, b.cls,
+                     a.frac > b.frac ||
+-                    (a.frac == b.frac && a.sign < b.sign))) {
++                    (a.frac == b.frac && a.sign < b.sign), s)) {
+             a = b;
+         }
+         if (is_snan(a.cls)) {
+diff --git a/include/fpu/softfloat-helpers.h b/include/fpu/softfloat-helpers.h
+index e842f83a1285..2f0674fbddec 100644
+--- a/include/fpu/softfloat-helpers.h
++++ b/include/fpu/softfloat-helpers.h
+@@ -95,6 +95,11 @@ static inline void set_snan_bit_is_one(bool val, float_status *status)
+     status->snan_bit_is_one = val;
+ }
+ 
++static inline void set_use_first_nan(bool val, float_status *status)
++{
++    status->use_first_nan = val;
++}
++
+ static inline void set_no_signaling_nans(bool val, float_status *status)
+ {
+     status->no_signaling_nans = val;
+diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+index d6f167c1b0c4..c7ddcab8caee 100644
+--- a/include/fpu/softfloat-types.h
++++ b/include/fpu/softfloat-types.h
+@@ -171,6 +171,7 @@ typedef struct float_status {
+      * softfloat-specialize.inc.c)
+      */
+     bool snan_bit_is_one;
++    bool use_first_nan;
+     bool no_signaling_nans;
+ } float_status;
+ 
+-- 
+2.20.1
 
 
