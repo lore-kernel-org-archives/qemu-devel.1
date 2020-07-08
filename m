@@ -2,81 +2,84 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1348AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CC4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:13:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB994206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:13:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3A8420708
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:13:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XuF87C7I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB994206DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdOgXVHF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3A8420708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIJa-0000OA-25
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:13:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40414)
+	id 1jtIJd-0000WQ-5b
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:13:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtHyK-0002Lr-7f
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:51:20 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24873
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jtHlK-0005v7-P7
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:37:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57150
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtHyH-00059X-ED
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:51:19 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jtHlI-0003Ls-QE
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:37:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594245076;
+ s=mimecast20190719; t=1594244272;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=dn1/czU0/UCzLCJP4IVHGUJj7uEUr9UlMCmqkkAV4wM=;
- b=XuF87C7IGpDrM2u+UMRzISoRlj+LjfQB5xBOiLjHVCvB00gmPuws0zHLZgTMYKpohgHv2/
- fzp5vVosDKDuNEXLXgixHMuSxDSyiepARMfnuzl9OGlynfodX1amZk7jWVbBoScevJ2IE6
- y1d2lB9TwPK+Cy+wC/ui+7FxAvpAOOc=
+ in-reply-to:in-reply-to:references:references;
+ bh=Yt7m2kqSaXPvwE8XugjXNjsKEjPT/tiPJCT5i+NZ8Qk=;
+ b=MdOgXVHF2STBrwHEuOPT7bHd0DkBMzBA+iKNtp7Vi9SCDjlZoy56mIPmFCDEWzC+C1GjQt
+ EFFCnQLtfp86ImQIvFRkYs194B5nQ2ZfPHAGG2GZ2qwnVnhLAy35SvtcM3Y71k6agSXTbA
+ 3vv97HhvGjETpBsTHg+wtHpNOqhMQ0w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-dwsQfr9jOz25ED7QdfVuZw-1; Wed, 08 Jul 2020 07:48:45 -0400
-X-MC-Unique: dwsQfr9jOz25ED7QdfVuZw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-481--ao7au6vM2ea7ZB5gBjcSA-1; Wed, 08 Jul 2020 16:37:10 -0400
+X-MC-Unique: -ao7au6vM2ea7ZB5gBjcSA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D48A380183C;
- Wed,  8 Jul 2020 11:48:43 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-90.ams2.redhat.com [10.36.114.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AFC3960C80;
- Wed,  8 Jul 2020 11:48:38 +0000 (UTC)
-Subject: Re: Migrating custom qemu.org infrastructure to GitLab
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>
-References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
- <20200708105353.GE3229307@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <477ce8e8-283e-6f3e-d3ed-c7f758eaebdb@redhat.com>
-Date: Wed, 8 Jul 2020 13:48:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 041788014D7;
+ Wed,  8 Jul 2020 20:37:09 +0000 (UTC)
+Received: from [10.3.115.46] (ovpn-115-46.phx2.redhat.com [10.3.115.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 54E8B1001B0B;
+ Wed,  8 Jul 2020 20:37:08 +0000 (UTC)
+Subject: Re: [PATCH v7 00/47] block: Deal with filters
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <4d7fa326-ef87-5753-cc2a-bb26fc555864@virtuozzo.com>
+ <e51d9c26-bd94-bf8e-cfed-82db15243188@redhat.com>
+ <54c4b18b-b6ee-b506-b153-b44eb3879da2@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d866ace7-09c9-430e-53f8-ecf12d08b0a4@redhat.com>
+Date: Wed, 8 Jul 2020 15:37:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200708105353.GE3229307@redhat.com>
+In-Reply-To: <54c4b18b-b6ee-b506-b153-b44eb3879da2@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -99,89 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <cleber@redhat.com>,
- Jeff Cody <codyprime@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/07/2020 12.53, Daniel P. Berrangé wrote:
-> On Wed, Jul 08, 2020 at 10:52:38AM +0100, Stefan Hajnoczi wrote:
-[...]
->> With this in mind I propose moving qemu.org infrastructure to GitLab
->> incrementally. [...]
-
-FWIW, I think moving the QEMU infrastructure zoo to GitLab is a very
-good idea!
-
-Daniel already mentioned most of the things that I had in mind after
-reading your mail (well, actually he mentioned way more things that I
-had in mind), but let me add some sentences below anyway...
-
->> 2. wiki.qemu.org is a MediaWiki instance. Account creation is a hurdle
->> to one-time or new contributors. It is unclear whether GitLab's wiki
->> is expressive enough for a lossless conversion of the existing QEMU
->> wiki. Any volunteers interested in evaluating the wiki migration would
->> be appreciated.
+On 7/8/20 2:46 PM, Andrey Shinkevich wrote:
 > 
-> Yeah, this is a potentially big piece of work. We didn't finish this
-> in libvirt either. Looking at the libvirt mediawiki though, I decided
-> not todo a straight export/import of all content.
-> A bunch of content was horribly out of date and needed deleting as
-> it was irrelevant to anyone, or outright misleading wrt current state
-> of the world.
-
-Having done some clean-up work in the QEMU wiki in the past already, I
-can only agree with Daniel. I don't think that we want a 1:1 conversion
-of the existing Wiki, we should rather start from scratch and only
-convert the important pages. Or should we really keep stuff like
-https://wiki.qemu.org/Documentation/KQemu around?
-
-Maybe we should also rather convert the important content into parts of
-the main website instead, just like Daniel mentioned it.
-
-Whichever way we choose, I volunteer to help here if my spare time permits.
-
->> 5. Issue tracking. Launchpad more or less works, but the login always
->> bothers me. If we move git repo hosting then it makes sense to do
->> issue tracking on GitLab too.
+> On 08.07.2020 20:32, Eric Blake wrote:
+>> On 7/8/20 12:20 PM, Andrey Shinkevich wrote:
+>>> On 25.06.2020 18:21, Max Reitz wrote:
+>>>> v6: 
+>>>> https://lists.nongnu.org/archive/html/qemu-devel/2019-08/msg01715.html
+>>>>
+>>>> Branch: https://github.com/XanClic/qemu.git child-access-functions-v7
+>>>> Branch: https://git.xanclic.moe/XanClic/qemu.git 
+>>>> child-access-functions-v7
+>>>>
+>>>>
+>>> I cloned the branch from the github and built successfully.
+>>>
+>>> Running the iotests reports multiple errors of such a kind:
+>>>
+>>> 128: readarray -td '' formatting_line < <(sed -e 's/, fmt=/\x0/')
+>>>
+>>> "./common.filter: line 128: readarray: -d: invalid option"
+>>>
+>>
+>> Arrgh. If I'm reading bash's changelog correctly, readarray -d was 
+>> introduced in bash 4.4, so I'm guessing you're still on 4.3 or 
+>> earlier? What bash version and platform are you using?
+>>
+> My bash version is 4.2.46.
 > 
-> The big thing that always bothers me about launchpad is how easy it
-> is to get confused between issues for QEMU upstream and issues for
-> legacy releases in Ubuntu distro.
+> It is the latest in the virtuozzolinux-base repository. I should install 
+> the 4.4 package manually.
 
-+1000 !
+Well, if bash 4.2 is the default installed version on any of our 
+platforms that meet our supported criteria, then we should instead fix 
+the patch in question to avoid non-portable use of readarray.
 
-I was already thinking of suggesting to move the bug tracker to either
-gitlab or github or anywhere else during next KVM forum, since it is
-IMHO a real pain.
+Per https://repology.org/project/bash/versions (hinted from 
+docs/system/build-platforms.rst), at least CentOS 7 still ships bash 
+4.2, and per 'make docker', centos7 is still a viable build target.  So 
+we do indeed need to fix our regression.
 
-I've seen so many bugs that users tried to open against the downstream
-Ubuntu QEMU package but ended up in the upstream tracker instead. Apart
-from that, the Launchpad UI is partly really horrible in my eyes (for
-example you never know which action will trigger an immediate change and
-which needs to be confirmed by pressing a button). Additional many
-developers don't have a Launchpad account, so bugs can not be assigned
-properly and you just have to pray that people see the notification
-e-mails on the mailing list.
-
-> There is a question of what todo with existing bugs in launchpad.
-> 
-> Essentially three choices
-> 
->  1. Move all the open bugs to gitlab
->  2. Move some relevant bugs to gitlab, but close outdated ones
->  3. Leave existing launchpad bugs but don't allow new ones filed
-
-I think we could set most (outdated) bugs simply to "incomplete" with a
-message saying that the reporter should open a new bug on Gitlab if
-necessary. Then after 60 days, the "incomplete" bugs will expire (i.e.
-auto-close).
-
- Thomas
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
