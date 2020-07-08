@@ -2,86 +2,86 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E8F6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48008C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:20:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 169B72065F
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:20:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C52502065F
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:20:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0Dku7J8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 169B72065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UTVazGw5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52502065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIQw-0008Mm-98
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:20:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40412)
+	id 1jtIR0-00005m-1C
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:20:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtHyJ-0002KC-DM
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:51:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44379
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtHuS-0004dp-RC
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:47:20 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53478
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtHyG-00059T-Qv
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:51:19 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtHuR-0004cb-3J
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:47:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594245076;
+ s=mimecast20190719; t=1594244838;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=EFAURhhEZjwOIthRplw96ApWbu7HPwfzmrhPNCfhLdE=;
- b=W0Dku7J88jergdduzIcW/P5eF1vKMJ0n2U52G4ROo5Z5TNMCwO7rSgDdiNr6dVr6olp75J
- J4C8XuvLAW/JeKwczhG4fmAyB2sQGyH/9/Suytj8CU3uaKUuZRm1FVMmXPwbukXaDJkNL4
- gQzTIaQhoqCqlZKhqpuP9umMB30LrU8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-VwI-fXaHPUKkLTq4nXPyjQ-1; Wed, 08 Jul 2020 12:50:33 -0400
-X-MC-Unique: VwI-fXaHPUKkLTq4nXPyjQ-1
-Received: by mail-wr1-f69.google.com with SMTP id o25so52490655wro.16
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 09:50:32 -0700 (PDT)
+ bh=HpsZJqnmIq/VxcM7U7OUI9Ufp4/qy81hRLaJm1qUoFk=;
+ b=UTVazGw5EsuTgIWesZSv+cObLXcxnj02KPQQKLRuHyzrzb7GF42hQ1LnITrPDbk1p9IA/T
+ tld/FIllDwkfc8IvMPkZZKtXEuapXkbSXHEzxmH6MmENmMEIMvXpn/OWWyRyJ6uQeH1y6J
+ WssyJjCy45St/QCnrHacdq8hwizQTR0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-SDNpNPtZPTOeJGj-3kxjIw-1; Wed, 08 Jul 2020 12:46:01 -0400
+X-MC-Unique: SDNpNPtZPTOeJGj-3kxjIw-1
+Received: by mail-wm1-f72.google.com with SMTP id f68so4743567wmf.1
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 09:46:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EFAURhhEZjwOIthRplw96ApWbu7HPwfzmrhPNCfhLdE=;
- b=fDNlINzCCsqYR4s5akPkFli2/lq63fgj8e/m1WQE9InqIZLCxPp5qtrYa5J2HL18C3
- bh9mEICa0COJUyhae37eFoxF5OP7iJ44Q2/RHyiHS4baqcvE5Le0qd+K9uK9JmpiR7OG
- 9rW2ny7W0Gthnxjz6nPwsLW6UZ2sNGlCedia50KZ0r8i/sbYv+PfKnBWyQpPBAJwOiJa
- wpEs7JOvifW+zTwmx436jLIGm7zAGFf2wCbLvPgoE0wxYUg70I5qlSKMtWZ9KICTYdut
- YZUcZJGG0BlNsfw3sG6v/jIUZt71s5HD9QltDR4yNXJQJp7reMuav9xP31M11L76qEwZ
- Z6zQ==
-X-Gm-Message-State: AOAM533b2AjJ3I1mf+AVS7DaEFn73C1dqre0lWqj69cW7leH5Nes3cUK
- kGgvdggf5QIditi9zQnodqvunfwW42S1EjCe6den2JfP04XYwbnHfTXojekjSTcudCjpKYqtOz5
- 5O9GXA+npj9/xGwo=
-X-Received: by 2002:adf:ef46:: with SMTP id c6mr59450010wrp.34.1594227031574; 
- Wed, 08 Jul 2020 09:50:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy8FO8YN+A4TMFeUTdPVcQABFgUzQsaOABrMZVj3IkafJK1UxJlbU6MyADXKkcZTIrAC9t2Gw==
-X-Received: by 2002:adf:ef46:: with SMTP id c6mr59449990wrp.34.1594227031322; 
- Wed, 08 Jul 2020 09:50:31 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=HpsZJqnmIq/VxcM7U7OUI9Ufp4/qy81hRLaJm1qUoFk=;
+ b=PiAUND9CNbUMOaJQd75RU4bvC5B58LZVw670U0uyWJQ1Cq7u2v3Da47ZjFoR+rICuq
+ kwH+SP/wSYzcs/qoNTMfzExxd2eDuxlDmhq7BYU0PCJbBUQrQ1E+OH3xx9RWCe2hvWXS
+ bSYbIeU01oY69jYqdribqumZLii1fTgGvgStlKi4+d9YUOqjEVu8Qxj7LtCK4HZAxKMG
+ 5+dV02rUF4xLPp87Al4kW8KCUCMKbLO3TmS5M3D0q2FcRbi9rjHiZji+34UabmzWkrrN
+ vmomq8q15sfNcxKwKLVWFdm2B0PseBFxjNC6yt/oifBqJ+q9tSAhkHjCWmj/+lAuu36S
+ 1jHQ==
+X-Gm-Message-State: AOAM533p0tiMwqHmEYikp1ruzsFLSaM7i0lnmLL4t5rln/CvEHHPtnH+
+ 6XjcyJJl+Vo0Jw+Q1AM69uw7l9vgbJvTc6vFnjAYz4uxtcTDfOQYXy52Mlv7/WLQJA7G8tjPP8x
+ 1yI8MK8LDZV0DpBg=
+X-Received: by 2002:a5d:4603:: with SMTP id t3mr63924706wrq.38.1594226759862; 
+ Wed, 08 Jul 2020 09:45:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz8NAtJo0zNfdSi1Y40mIlVb8e0Q0cR/XcvyoXEXcOR2ggP/w4RsINwR11GDOjbsfFkGC1Pjw==
+X-Received: by 2002:a5d:4603:: with SMTP id t3mr63924679wrq.38.1594226759557; 
+ Wed, 08 Jul 2020 09:45:59 -0700 (PDT)
 Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id n16sm912288wra.19.2020.07.08.09.50.29
+ by smtp.gmail.com with ESMTPSA id k126sm570421wmf.3.2020.07.08.09.45.58
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 09:50:30 -0700 (PDT)
-Subject: Re: build error of unused function as MACRO
- G_DEFINE_AUTOPTR_CLEANUP_FUNC expand
-To: Li Qiang <liq3ea@163.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>,
- "liq3ea@gmail.com" <liq3ea@gmail.com>, Alexander Bulekov <alxndr@bu.edu>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Bandan Das <bsd@redhat.com>
-References: <5F05E942.FB9110.20278@mail-m971.mail.163.com>
+ Wed, 08 Jul 2020 09:45:59 -0700 (PDT)
+Subject: Re: [PATCH] cpu: Add starts_halted() method
+To: Eduardo Habkost <ehabkost@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200707204333.261506-1-bauerman@linux.ibm.com>
+ <20200707214917.GX7276@habkost.net> <87y2nu3nxq.fsf@morokweng.localdomain>
+ <c53b36b7-ee7b-bb66-8220-cce788fd631d@redhat.com>
+ <20200708100038.GG18595@umbus.fritz.box>
+ <CAFEAcA9V7Uha9-rz+JY-5HkazCWuTk1vkLnw1m9Lw-bXXKbkvw@mail.gmail.com>
+ <20200708152540.GZ7276@habkost.net>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -106,12 +106,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <b02161d0-a027-5018-af05-8ccbc5c90cc9@redhat.com>
-Date: Wed, 8 Jul 2020 18:50:29 +0200
+Message-ID: <da4b5a4c-7a72-6e07-b423-1487ad358c31@redhat.com>
+Date: Wed, 8 Jul 2020 18:45:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <5F05E942.FB9110.20278@mail-m971.mail.163.com>
+In-Reply-To: <20200708152540.GZ7276@habkost.net>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -119,17 +119,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,152 +142,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing the fuzzing maintainers.
+On 7/8/20 5:25 PM, Eduardo Habkost wrote:
+> On Wed, Jul 08, 2020 at 02:14:03PM +0100, Peter Maydell wrote:
+>> On Wed, 8 Jul 2020 at 12:12, David Gibson <david@gibson.dropbear.id.au> wrote:
+>>> On Wed, Jul 08, 2020 at 10:38:29AM +0200, Philippe Mathieu-DaudÃ© wrote:
+>>>> Class boolean field certainly sounds better, but I am not sure this
+>>>> is a property of the machine. Rather the arch? So move the field
+>>>> to CPUClass? Maybe not, let's discuss :)
+>>>
+>>> It is absolutely a property of the machine.  e.g. I don't think we
+>>> want this for powernv.  pseries is a bit of a special case since it is
+>>> explicitly a paravirt platform.  But even for emulated hardware, the
+>>> board can absolutely strap things so that cpus do or don't start
+>>> immediately.
+>>
+>> It's a property of the individual CPU, I think. One common setup
+>> for Arm systems is that the primary CPU starts powered up but
+>> the secondaries all start powered down.
+> 
+> Both statements can be true.  It can be a property of the
+> individual CPU (although I'm not convinced it has to), but it
+> still needs to be controlled by the machine.
 
-On 7/8/20 5:41 PM, Li Qiang wrote:
-> Hello all,
-> 
->  
-> 
-> I build qemu with fuzzing enabled using clang and following error come.
-> 
->  
-> 
-> nbd/server.c:1937:1: error: unused function
-> 'glib_listautoptr_cleanup_NBDExtentArray' [-Werror,-Wunused-function]
-> 
-> G_DEFINE_AUTOPTR_CLEANUP_FUNC(NBDExtentArray, nbd_extent_array_free);
-> 
-> ^
-> 
-> /usr/include/glib-2.0/glib/gmacros.h:462:22: note: expanded from macro
-> 'G_DEFINE_AUTOPTR_CLEANUP_FUNC'
-> 
->   static inline void _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) (GList **_l)
-> { g_list_free_full (*_l, (GDestroyNotify) func); } \
-> 
->                      ^
-> 
-> /usr/include/glib-2.0/glib/gmacros.h:443:48: note: expanded from macro
-> '_GLIB_AUTOPTR_LIST_FUNC_NAME'
-> 
-> #define _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName)
-> glib_listautoptr_cleanup_##TypeName
-> 
->                                                ^
-> 
-> <scratch space>:170:1: note:   CC      crypto/hash-glib.o
-> 
-> expanded from here
-> 
-> glib_listautoptr_cleanup_NBDExtentArray
-> 
-> ^
-> 
-> nbd/server.c:1937:1: error: unused function
-> 'glib_slistautoptr_cleanup_NBDExtentArray' [-Werror,-Wunused-function]
-> 
-> /usr/include/glib-2.0/glib/gmacros.h:463:22: note: expanded from macro
-> 'G_DEFINE_AUTOPTR_CLEANUP_FUNC'
-> 
->   static inline void _GLIB_AUTOPTR_SLIST_FUNC_NAME(TypeName) (GSList
-> **_l) { g_slist_free_full (*_l, (GDestroyNotify) func); } \
-> 
->                      ^
-> 
-> /usr/include/glib-2.0/glib/gmacros.h:445:49: note: expanded from macro
-> '_GLIB_AUTOPTR_SLIST_FUNC_NAME'
-> 
-> #define _GLIB_AUTOPTR_SLIST_FUNC_NAME(TypeName)
-> glib_slistautoptr_cleanup_##TypeName
-> 
->                                                 ^
-> 
-> <scratch space>:171:1: note: expanded from here
-> 
-> glib_slistautoptr_cleanup_NBDExtentArray
-> 
->  
-> 
->  
-> 
-> I see Eric’s patch 9bda600b083(“build: Silence clang warning on older
-> glib autoptr usage”)
-> 
-> So I know there should be a ‘-Wno-unused-function’ in CFLAGS. It is
-> after ./configure:
-> 
->  
-> 
-> CFLAGS            -g  -Wno-unused-function
-> 
-> QEMU_CFLAGS       -I/usr/include/pixman-1  -Werror  -pthread
-> -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
-> -fPIE -DPIE -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
-> -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef
-> -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common
-> -fwrapv -std=gnu99  -Wno-string-plus-int -Wno-typedef-redefinition
-> -Wno-initializer-overrides -Wexpansion-to-defined -Wendif-labels
-> -Wno-shift-negative-value -Wno-missing-include-dirs -Wempty-body
-> -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self
-> -Wignored-qualifiers -Wold-style-definition -Wtype-limits
-> -fstack-protector-strong -I$(SRC_PATH)/capstone/include
-> 
->  
-> 
-> However while I ‘make V=1’ I see the build nbd/serer.c using following
-> command:
-> 
-> clang-8 -iquote /home/test/qemu/nbd -iquote nbd -iquote
-> /home/test/qemu/tcg/i386 -isystem /home/test/qemu/linux-headers -isystem
-> /home/test/qemu/linux-headers -iquote . -iquote /home/test/qemu -iquote
-> /home/test/qemu/accel/tcg -iquote /home/test/qemu/include -iquote
-> /home/test/qemu/disas/libvixl -I/usr/include/pixman-1  -Werror  -pthread
-> -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
-> -fPIE -DPIE -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
-> -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef
-> -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common
-> -fwrapv -std=gnu99  -Wno-string-plus-int -Wno-typedef-redefinition
-> -Wno-initializer-overrides -Wexpansion-to-defined -Wendif-labels
-> -Wno-shift-negative-value -Wno-missing-include-dirs -Wempty-body
-> -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self
-> -Wignored-qualifiers -Wold-style-definition -Wtype-limits
-> -fstack-protector-strong -I/home/test/qemu/capstone/include
-> -I/home/test/qemu/tests -I/home/test/qemu/tests/qtest -MMD -MP -MT
-> nbd/server.o -MF nbd/server.d -fsanitize=address,fuzzer-no-link  -c -o
-> nbd/server.o nbd/server.c
-> 
->  
-> 
-> There’s no CFLAGS ‘-Wno-unused-function’.
-> 
->  
-> 
-> So I want to know:
-> 
-> 1.    Wha’t the relation of CFLAGS and QEMU_CFLAGS, it seems the CFLAGS
-> doesn’t work in this.
-> 
-> 2.    Any hits to solve this? My env error or needs a patch?
-> 
->  
-> 
-> I use following command in Ubuntu 18.04.1.
-> 
-> CC=clang-8 CXX=clang++-8  ./configure  --target-list="i386-softmmu" 
-> --enable-debug --enable-debug  --enable-kvm --enable-fuzzing
-> 
->  
-> 
->  
-> 
-> Thanks,
-> 
-> Li Qiang
-> 
+From what said Peter, I understand this is a property of the
+chipset. Chipsets are modelled unevenly.
+
+IIUC QEMU started with single-core CPUs.
+CPUState had same meaning for 'core' or 'cpu', 1-1 mapping.
+
+Then multicore CPUs could be easily modelled using multiple
+single-core CPUs, usually created in the machine code.
+
+Then we moved to SoC models, creating the cores in the SoC.
+Some SoCs have array of cores, eventually heterogeneous
+(see the ZynqMP). We have containers of CPUState.
+
+On an ARM-based SoC, you might have the first core started
+(as said Peter) or not.
+
+BCM2836 / BCM2837 and ZynqMP start will all ARM cores off.
+On the BCM chipsets, a DSP core will boot the ARM cores.
+On the ZynqMP, a MicroBlaze core boots them.
+As QEMU doesn't models heterogeneous architectures, we start
+modelling after the unmodelled cores booted us, so either one
+or all cores on.
+
+In this case, we narrowed down the 'start-powered-off' field
+to the SoC, which happens to be how ARM SoCs are modelled.
+
+
+Chipsets providing a JTAG interface can have a SRST signal,
+the "system reset". When a JTAG probe is attached, it can
+keeps the whole chipset in a reset state. This is equivalent
+to QEMU '-S' mode (single step mode).
+
+
+I don't know about pseries hardware, but if this is 'explicit
+to paravirt platform', then I expect this to be the same with
+other accelerators/architectures.
+
+If paravirtualized -> cores start off by default. Let the
+hypervisor start them. So still a property of the CPUState
+depending on the accelerator used?
+
+
+Regards,
+
+Phil.
 
 
