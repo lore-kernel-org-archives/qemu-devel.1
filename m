@@ -2,123 +2,120 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A6DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7714AC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:57:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 078CD206E9
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:55:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BA4C206E9
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 17:57:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DK8Yx3Yv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 078CD206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r2Z4Wr7X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA4C206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtEHp-0004S8-80
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 13:55:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38740)
+	id 1jtEJz-0005lp-Jx
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 13:57:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtEGr-0003VN-B3; Wed, 08 Jul 2020 13:54:13 -0400
-Received: from mail-eopbgr130104.outbound.protection.outlook.com
- ([40.107.13.104]:49892 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtEGp-0008Mf-QQ; Wed, 08 Jul 2020 13:54:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gWrijCeIESlXk+tv7C+aOeZaKx9t3ATMLAnw4CEI1N8BY9F+jVc01We7Qo3g9IYHasZxLfY1qU8MEWn6WOyhZo1pGaa6JOAlVBIJHAnlEuraBo9vh6WWB3MZutRg5sri/h0O1TzJ/mG6YZVc4VvfaD8cIhVUcd3TBpWh+NiPBIFrfynNrfc1U7Gh6HFqLckQW5zTAdk15s4Lw3sfDcQDytr1Jq6mel2hONvltYv+3fdltmAAFuYkaVcu6rZoizdU9JaEua1yIsVTtKx/24/gyz1lc2/mDo6gz25OgNE6MjE3yVlPUU1MpZuJOub3FLEgrlCWsevg5w5g2dZdqm1vlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aGPnjBXzPITzCFYKxGVvsxz/ivHBJ7xofArNVdz1tGY=;
- b=U/Qs5p1dT5eEc3baOAA+ZGBmF36PoPy/TJ/h7halUk2RWC50w8QFGhq3ZFSszTZljY6Ef4aGdxVQLVNgk7lcRA4dKKsiN/tePnoB4OxDOj3P9/GJsPs7K6eJJJiQeXNZeAxxI/sYwcAqQakAycrdRhUpYWVE5gFae/fkSDxhM5kNW3UKR4v/OlKiGQXRWEnTb46iNlLK1W9H2JmImv7FJdMPA7oso8w6gLTF6Jr1M8VVlMcJkBDY3GQk9X/AuAGcMXxCA9BJ8BamL0eqjjSYZBNImk321kfdTvm12qN7eTssVvoZ9C1tBvDZeSr9FTFyqt59zpXB+YMluOWy416VyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aGPnjBXzPITzCFYKxGVvsxz/ivHBJ7xofArNVdz1tGY=;
- b=DK8Yx3YvkivwT97tYkU0Jt7s5wLg683fDS3kNnUAxcsYqDLPS0WsyX/s/qXRTFe10x3/ighpu4vKo+HpREfybQg0A5+dgRo1gcFnk8NLfKpJhpVUAXS071WwY5rfk6cisV9I37+Ppn8CN90I/La6BcUzxQfUnsPj9Dolk2k4G/A=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM7PR08MB5384.eurprd08.prod.outlook.com (2603:10a6:20b:10c::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Wed, 8 Jul
- 2020 17:54:08 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.021; Wed, 8 Jul 2020
- 17:54:08 +0000
-Subject: Re: [PATCH v7 09/47] copy-on-read: Support compressed writes
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-10-mreitz@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <4475d114-0042-ff02-b368-6820b03f7950@virtuozzo.com>
-Date: Wed, 8 Jul 2020 20:54:06 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-10-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-X-ClientProxiedBy: FR2P281CA0033.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::20) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtEJA-0005EH-Jt; Wed, 08 Jul 2020 13:56:36 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37666)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtEJ7-0000ES-84; Wed, 08 Jul 2020 13:56:36 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a6so49932164wrm.4;
+ Wed, 08 Jul 2020 10:56:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=U22wiPzF5RU+s2ekAx6AOl4uGlWcRAb453GfD82ZKhI=;
+ b=r2Z4Wr7X8gfFC1/cRRJAelXMyipOkpKqLZiiPdq4DJxeBAZxVywTm/rk8P7mmV+QYd
+ SQL8Tuqmao2lS40+2ET+boBL2Uy7okY3h+HX5g3HlL23X+/ZXbLD7mONnXsuabOdqkGt
+ R+AA8/kP7sXzue5BxIie3Tf/tOCWtWsF6QWrP/y152QxtZIkkpZ3XwFtU6Z8RXEM+noy
+ 496zBLMD4eI+AuaFIlba0EM6KcROZsFYeIsRD4eJVlqCuCPo9O4Npf4V1kUjAld8NRlu
+ GrMHQiG5U8yiEX2DLQglR4eFW+oQpQKMtR+wCBF9/CSem5IffF+xvVnYWsjkUkFbFVMl
+ ounw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=U22wiPzF5RU+s2ekAx6AOl4uGlWcRAb453GfD82ZKhI=;
+ b=AdmiFTPeJ242DLFA1/g8Sf76Bh6xPDcCY3iNm8MSpG1s0Dw1P9HVwicOAMQx8bzH5F
+ MBnjKmtKKji797k6H9Nf1ZssAkzDhhszTxsEKlpKlshp/5FjN2Ij9dXnW1cZ2iM/VA6Q
+ DdpqNc3Py0qADx7Kjk6eXvDlJkwG67m8WPN/Ka9eM5HI5IE5yj3Qt982VnIcwsPKsL3J
+ LFCJ5Q6Eac4s5UfHbaAvXKJgJtEiSYRS0xoGPy7jcJMqdTByI6p9rU/aqLydLmnatpak
+ pEljlxnGZwXX5giUsJ4udbz8omAUs6syCsfGTSJMJghsbyZA1XXDAV9IX222KUjhY+Nr
+ Nsog==
+X-Gm-Message-State: AOAM533I/2mYsQSoXBYYJ1o/QPvfo0CTUDmMk++clktOmzlL1pM/5+zQ
+ OHV2ntxbN7oUV8OvdN9GKWM=
+X-Google-Smtp-Source: ABdhPJw0Bx7oZO8GPqre+725wRTsIGfUTag+9Go3qpoW6lfyZnxvXDgbWnL0dGk/Wix71MgQAaNPnw==
+X-Received: by 2002:a5d:4903:: with SMTP id x3mr63261187wrq.351.1594230991418; 
+ Wed, 08 Jul 2020 10:56:31 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id w16sm1303673wrg.95.2020.07.08.10.56.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jul 2020 10:56:30 -0700 (PDT)
+Subject: Re: [PATCH v4 05/12] hw/arm: Add NPCM730 and NPCM750 SoC models
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org
+References: <20200707184730.3047754-1-hskinnemoen@google.com>
+ <20200707184730.3047754-6-hskinnemoen@google.com>
+ <4b7130f2-032c-3067-b2b6-876a2b17b707@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <2d1e272b-6575-30df-22ff-5d720973951d@amsat.org>
+Date: Wed, 8 Jul 2020 19:56:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.191) by
- FR2P281CA0033.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.14 via Frontend Transport; Wed, 8 Jul 2020 17:54:07 +0000
-X-Originating-IP: [109.252.114.191]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 42943b9d-c90a-481f-79df-08d82367e9cd
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5384:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5384EBAA61806E389A18D158F4670@AM7PR08MB5384.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:252;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zZ2nF4FL1h0Wclrqx/NmEmgUIObVog7W54Ubnw0DDNVdOsPBn42nvWTwUqn3GAuYxIBN1OsG3TFzRCEzzJFJp89HvREAjqPWZrG4pIH0RLJXcywFR/NcC1uofRUa2FQDANXmUyB5oeNz+8hJt4uBkM5sb3BK3iCQP+HgdEvjMNk2KRJZaTmI4XkIs5XUaQVl3dvGln9/uCjYOxlkhYJsoZQp2SYqgy6ANjOpVKRD9lON2sAv8u8kvWH1+esDpL6HIxp99NSHVfFyuvnYstTYYKQOUDhXAro7x3ommqGfgOHJQ/QvaKnlG6egwFY7TZdziMNogOfKuiz1fqc4yhq+mX0s/oQX7DiasejH1oYyb51rX09uGz995GA+Xu93QLTB
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(39840400004)(136003)(396003)(376002)(346002)(316002)(8676002)(956004)(6486002)(2616005)(44832011)(8936002)(478600001)(66556008)(66476007)(5660300002)(66946007)(31696002)(16526019)(186003)(36756003)(52116002)(4326008)(26005)(6512007)(54906003)(31686004)(83380400001)(2906002)(53546011)(86362001)(6506007)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: wdXE1pCYvUdKGjqxDXRWikSD3LU2E9JQxZziaCMi+p5e9uk5WEBUSJNNt2xRrS0FjkWr+ma4YXDDbET1rkU9Bz98bskXv00rHH2oCJYDoDRU5uPpRRPbXOZ8HMpOOu+UgGAhlJsXBaeRdX9H0AnW0+bBwag6Kg0KYgPVf6ZD8e3sTXIarE5fyX37ObS+cFMQLVcOtGx1SSwQ+o01O1fvN/RbEdf96c9M9t6IPCC3jgyBzjl7z/MqmgxGk9ARqyyYZryhLf5pBVP6Ha/LhAnq5LCsbSdd3CQcm5jVR9FjP7SshZWO97gWzAlJ31OtToBNYtfTS4u+vHhcBzReGTi4hH5nH3Y4afCTLDi6+LYxscr3JQcwqikdeCWAzffBosVWythznyjWf1r6xeo/nYj9zpBfgwsPmIKaVBWFSGRsnabw/xj5JImEI9TD9sqymnBsk3w45qOW/mvOzT2jqTnnlDf+qqt7gQbKcPzVVzDNb2rMiy7lg0puPPyUbPx5Smlb
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42943b9d-c90a-481f-79df-08d82367e9cd
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2020 17:54:08.7264 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xoj/6eYkRcZHIVdDO+4ok0zZriUy6rbjXILcXTXk+GRxMI3JX/FcwAUxsXEf9ZG5e7b3aDUplmrshKEE/YLqNIDQAKlJ40GwtrfkmLpSLoQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5384
-Received-SPF: pass client-ip=40.107.13.104;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR01-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 13:54:09
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <4b7130f2-032c-3067-b2b6-876a2b17b707@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,49 +128,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Avi.Fishman@nuvoton.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.06.2020 18:21, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   block/copy-on-read.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
->
-> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-> index a6e3c74a68..a6a864f147 100644
-> --- a/block/copy-on-read.c
-> +++ b/block/copy-on-read.c
-> @@ -107,6 +107,16 @@ static int coroutine_fn cor_co_pdiscard(BlockDriverState *bs,
->   }
->   
->   
-> +static int coroutine_fn cor_co_pwritev_compressed(BlockDriverState *bs,
-> +                                                  uint64_t offset,
-> +                                                  uint64_t bytes,
-> +                                                  QEMUIOVector *qiov)
-> +{
-> +    return bdrv_co_pwritev(bs->file, offset, bytes, qiov,
-> +                           BDRV_REQ_WRITE_COMPRESSED);
-> +}
-> +
-> +
->   static void cor_eject(BlockDriverState *bs, bool eject_flag)
->   {
->       bdrv_eject(bs->file->bs, eject_flag);
-> @@ -131,6 +141,7 @@ static BlockDriver bdrv_copy_on_read = {
->       .bdrv_co_pwritev                    = cor_co_pwritev,
->       .bdrv_co_pwrite_zeroes              = cor_co_pwrite_zeroes,
->       .bdrv_co_pdiscard                   = cor_co_pdiscard,
-> +    .bdrv_co_pwritev_compressed         = cor_co_pwritev_compressed,
->   
->       .bdrv_eject                         = cor_eject,
->       .bdrv_lock_medium                   = cor_lock_medium,
+On 7/8/20 7:31 PM, Philippe Mathieu-Daudé wrote:
+> Hi Havard,
+> 
+> On 7/7/20 8:47 PM, Havard Skinnemoen wrote:
+>> The Nuvoton NPCM7xx SoC family are used to implement Baseboard
+>> Management Controllers in servers. While the family includes four SoCs,
+>> this patch implements limited support for two of them: NPCM730 (targeted
+>> for Data Center applications) and NPCM750 (targeted for Enterprise
+>> applications).
+>>
+>> This patch includes little more than the bare minimum needed to boot a
+>> Linux kernel built with NPCM7xx support in direct-kernel mode:
+>>
+>>   - Two Cortex-A9 CPU cores with built-in periperhals.
+>>   - Global Configuration Registers.
+>>   - Clock Management.
+>>   - 3 Timer Modules with 5 timers each.
+>>   - 4 serial ports.
+>>
+>> The chips themselves have a lot more features, some of which will be
+>> added to the model at a later stage.
+[...]
 
+>> +static void npcm7xx_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    NPCM7xxState *s = NPCM7XX(dev);
+>> +    NPCM7xxClass *nc = NPCM7XX_GET_CLASS(s);
+>> +    Error *err = NULL;
+>> +    int i;
+>> +
+>> +    /* I/O space -- unimplemented unless overridden below. */
+>> +    create_unimplemented_device("npcm7xx.io", NPCM7XX_MMIO_BA, NPCM7XX_MMIO_SZ);
+> 
+> I still insist this is not the best, but as "The data sheet for these
+> SoCs is not generally available" there is not much I can suggest to
+> improve.
 
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+From your other comment I found:
 
+https://github.com/Nuvoton-Israel/bootblock/blob/master/SWC_HAL/Chips/npcm750/npcm750.h
+
+In particular:
+
+#define AHB1_BASE_ADDR                  0xF0000000      /* AHB1
+allocation (Including APB allocations)  */
+#define AHB18_BASE_ADDR                 0x80000000      /* AHB18
+allocation  */
+#define AHB3_BASE_ADDR                  0xA0000000      /* AHB3
+allocation  */
+#define XBUSR_BASE_ADDR                 0xC0002000      /* XBUS
+registers  */
+#define AHB14_BASE_ADDR                 0xE0000000      /* AHB14
+Allocation  */
+#define APB14_BASE_ADDR                 0xE0000000      /* APB14
+Allocation  */
+#define VDMX_BASE_ADDR                  0xE0800000      /* VDMX  */
+
+XBUS doesn't seem important.
+
+If SPI flashes aren't connected, returning bus transaction sounds
+correct:
+
+#define SPI0CS0_BASE_ADDR               0x80000000      /* SPI0 direct
+access CS0  */
+#define SPI0CS1_BASE_ADDR               0x88000000      /* SPI0 direct
+access CS1  */
+#define SPI0CS2_BASE_ADDR               0x90000000      /* SPI0 direct
+access CS2  */
+#define SPI0CS3_BASE_ADDR               0x98000000      /* SPI0 direct
+access CS3  */
+
+#define SPI3CS0_BASE_ADDR               0xA0000000      /* SPI3 direct
+access CS0  */
+#define SPI3CS1_BASE_ADDR               0xA8000000      /* SPI3 direct
+access CS1  */
+#define SPI3CS2_BASE_ADDR               0xB0000000      /* SPI3 direct
+access CS2  */
+#define SPI3CS3_BASE_ADDR               0xB8000000      /* SPI3 direct
+access CS3  */
+
+So I'd prefer you use:
+
+  create_unimplemented_device("npcm7xx.AHB1",  0xf0000000, 256 * MiB);
+
+Maybe for the PCI root complex:
+
+  create_unimplemented_device("npcm7xx.AHB14", 0xe0000000, 256 * MiB);
+
+What do you think?
+
+Regards,
+
+Phil.
 
