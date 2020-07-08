@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89962C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 10:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FEEC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 10:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E44C20739
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 10:11:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E44C20739
+	by mail.kernel.org (Postfix) with ESMTPS id 78F9D20739
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 10:11:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78F9D20739
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jt73J-0005wG-Iz
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 06:11:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35124)
+	id 1jt73K-0005xr-Ox
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 06:11:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jt72X-00058z-Px
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 06:10:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43538)
+ id 1jt72Y-000595-D1
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 06:10:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43520)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jt72U-0002I4-TB
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 06:10:57 -0400
+ id 1jt72U-0002I2-T6
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 06:10:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jt72T-0007sN-61
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 10:10:53 +0000
+ id 1jt72R-0007tq-UJ
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 10:10:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 292DC2E80EC
- for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 10:10:53 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id DEE532E80EC
+ for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 10:10:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Jul 2020 10:00:38 -0000
+Date: Wed, 08 Jul 2020 09:55:50 -0000
 From: Nirman Narang <1886793@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,9 +52,8 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: nirmannarang
 X-Launchpad-Bug-Reporter: Nirman Narang (nirmannarang)
 X-Launchpad-Bug-Modifier: Nirman Narang (nirmannarang)
-References: <159420215057.30952.7191975282964377029.malonedeb@wampee.canonical.com>
-Message-Id: <159420243889.2941.16102047886908762554.malone@chaenomeles.canonical.com>
-Subject: [Bug 1886793] Re: "go install" command fails while running inside
+Message-Id: <159420215057.30952.7191975282964377029.malonedeb@wampee.canonical.com>
+Subject: [Bug 1886793] [NEW] "go install" command fails while running inside
  s390x docker container on x86_64 host using qemu
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -62,7 +61,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="ffd32ad7291fe66b5578d7c1407aaae58d1e0170";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7e47c086208bf037987fe51a672911bc630887a6
+X-Launchpad-Hash: 4d30877b67bb0cba58445fff56e7b83a5c96c79a
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 06:10:52
@@ -90,22 +89,443 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-One more thing which I tried:
-I installed qemu on x86 Ubuntu host with apt-get install.
-Extracted s390x go 1.14.2 binaries on the same. Ran the following commands:
+Public bug reported:
 
-root:~ wget -q https://storage.googleapis.com/golang/go1.14.2.linux-s390x.t=
-ar.gz
-root@:~# chmod ugo+r go1.14.2.linux-s390x.tar.gz
-root@:~# rm -rf /usr/local/go /usr/bin/go
-root@:~#  tar -C /usr/local -xzf go1.14.2.linux-s390x.tar.gz
-root@:~# ln -sf /usr/local/go/bin/go /usr/bin/
-root@:~# ln -sf /usr/local/go/bin/gofmt /usr/bin/
-root@:~# ln -sf /usr/bin/gcc /usr/bin/s390x-linux-gnu-gcc
-root@:~# go version
-/lib/ld64.so.1: No such file or directory
-root@:~# qemu-s390x /usr/bin/go version
-/lib/ld64.so.1: No such file or directory
+Steps to reproduce the issue:
+
+Register x86_64 host with the latest qemu-user-static.
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+Build the following Docker Image using following Dockerfile.s390x using
+command docker build -t test/crossbuild:latest-s390x -f Dockerfile.s390x
+.
+
+Dockerfile.s390x
+
+##############################################
+FROM alpine:3.11 as qemu
+ARG QEMU_VERSION=3D5.0.0-2
+ARG QEMU_ARCHS=3D"s390x"
+RUN apk --update add curl
+#Enable non-native runs on amd64 architecture hosts
+RUN for i in ${QEMU_ARCHS}; do curl -L https://github.com/multiarch/qemu-us=
+er-static/releases/download/v${QEMU_VERSION}/qemu-${i}-static.tar.gz | tar =
+zxvf - -C /usr/bin; done
+RUN chmod +x /usr/bin/qemu-*
+
+FROM s390x/golang:1.14.2-alpine3.11
+MAINTAINER LoZ Open Source Ecosystem (https://www.ibm.com/developerworks/co=
+mmunity/groups/community/lozopensource)
+
+ARG MANIFEST_TOOL_VERSION=3Dv1.0.2
+
+#Enable non-native builds of this image on an amd64 hosts.
+#This must be the first RUN command in this file!
+COPY --from=3Dqemu /usr/bin/qemu-*-static /usr/bin/
+
+#Install su-exec for use in the entrypoint.sh (so processes run as the righ=
+t user)
+#Install bash for the entry script (and because it's generally useful)
+#Install curl to download glide
+#Install git for fetching Go dependencies
+#Install ssh for fetching Go dependencies
+#Install mercurial for fetching go dependencies
+#Install wget since it's useful for fetching
+#Install make for building things
+#Install util-linux for column command (used for output formatting).
+#Install grep and sed for use in some Makefiles (e.g. pulling versions out =
+of glide.yaml)
+#Install shadow for useradd (it allows to use big UID)
+RUN apk update && apk add --no-cache su-exec curl bash git openssh mercuria=
+l make wget util-linux tini file grep sed shadow
+RUN apk upgrade --no-cache
+
+#Disable ssh host key checking
+RUN echo 'Host *' >> /etc/ssh/ssh_config \
+=C2=A0=C2=A0&& echo '    StrictHostKeyChecking no' >> /etc/ssh/ssh_config
+
+#Disable cgo so that binaries we build will be fully static.
+ENV CGO_ENABLED=3D0
+
+#Recompile the standard library with cgo disabled.  This prevents the stand=
+ard library from being
+#marked stale, causing full rebuilds every time.
+RUN go install -v std
+
+#Install glide
+RUN go get github.com/Masterminds/glide
+ENV GLIDE_HOME /home/user/.glide
+
+#Install dep
+RUN go get github.com/golang/dep/cmd/dep
+
+#Install ginkgo CLI tool for running tests
+RUN go get github.com/onsi/ginkgo/ginkgo
+
+#Install linting tools.
+RUN wget -O - -q https://install.goreleaser.com/github.com/golangci/golangc=
+i-lint.sh | sh -s v1.20.0
+RUN golangci-lint --version
+
+#Install license checking tool.
+RUN go get github.com/pmezard/licenses
+
+#Install tool to merge coverage reports.
+RUN go get github.com/wadey/gocovmerge
+
+#Install CLI tool for working with yaml files
+RUN go get github.com/mikefarah/yaml
+
+#Delete all the Go sources that were downloaded, we only rely on the binari=
+es
+RUN rm -rf /go/src/*
+
+#Install vgo (should be removed once we take Go 1.11)
+RUN go get -u golang.org/x/vgo
+
+#Ensure that everything under the GOPATH is writable by everyone
+RUN chmod -R 777 $GOPATH
+
+RUN curl -sSL https://github.com/estesp/manifest-tool/releases/download/${M=
+ANIFEST_TOOL_VERSION}/manifest-tool-linux-s390x > manifest-tool && \
+=C2=A0=C2=A0=C2=A0=C2=A0chmod +x manifest-tool && \
+=C2=A0=C2=A0=C2=A0=C2=A0mv manifest-tool /usr/bin/
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+##################################################################
+
+
+The build just hangs at RUN go install -v std
+
+
+Also, while running the same command inside s390x container on x86_64
+host, error Illegal instruction (core dumped) is thrown.
+
+Register x86_64 host with the latest qemu-user-static.
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+docker run -it -v /home/test/qemu-s390x-static:/usr/bin/qemu-s390x-
+static s390x/golang:1.14.2-alpine3.11
+
+Inside s390x container:
+
+apk update && apk add --no-cache su-exec curl bash git openssh mercurial ma=
+ke wget util-linux tini file grep sed shadow
+apk upgrade --no-cache
+
+#Disable cgo so that binaries we build will be fully static.
+export CGO_ENABLED=3D0
+go install -v std
+
+
+This gives the following error:
+Illegal instruction (core dumped)
+
+
+Environment:
+x86_64 Ub18.04 4.15.0-101-generic Ubuntu SMP x86_64 GNU/Linux
+
+QEMU user static version: 5.0.0-2
+
+Container application: Docker
+
+Client: Docker Engine - Community
+=C2=A0Version:           19.03.11
+=C2=A0API version:       1.40
+=C2=A0Go version:        go1.13.10
+=C2=A0Git commit:        42e35e61f3
+=C2=A0Built:             Mon Jun  1 09:12:22 2020
+=C2=A0OS/Arch:           linux/amd64
+=C2=A0Experimental:      false
+
+Server: Docker Engine - Community
+=C2=A0Engine:
+=C2=A0=C2=A0Version:          19.03.11
+=C2=A0=C2=A0API version:      1.40 (minimum version 1.12)
+=C2=A0=C2=A0Go version:       go1.13.10
+=C2=A0=C2=A0Git commit:       42e35e61f3
+=C2=A0=C2=A0Built:            Mon Jun  1 09:10:54 2020
+=C2=A0=C2=A0OS/Arch:          linux/amd64
+=C2=A0=C2=A0Experimental:     false
+=C2=A0containerd:
+=C2=A0=C2=A0Version:          1.2.13
+=C2=A0=C2=A0GitCommit:        7ad184331fa3e55e52b890ea95e65ba581ae3429
+=C2=A0runc:
+=C2=A0=C2=A0Version:          1.0.0-rc10
+=C2=A0=C2=A0GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
+=C2=A0docker-init:
+=C2=A0=C2=A0Version:          0.18.0
+=C2=A0=C2=A0GitCommit:        fec3683
+
+Additional information optionally:
+When I build the same Dockerfile.s390x on an s390x machine, it is built suc=
+cessfully.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Description changed:
+
+  Steps to reproduce the issue:
+  =
+
+  Register x86_64 host with the latest qemu-user-static.
+  docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  =
+
+  Build the following Docker Image using following Dockerfile.s390x using
+  command docker build -t test/crossbuild:latest-s390x -f Dockerfile.s390x
+  .
+  =
+
+  Dockerfile.s390x
+  =
+
++ ##############################################
+  FROM alpine:3.11 as qemu
+- =
+
+  ARG QEMU_VERSION=3D5.0.0-2
+  ARG QEMU_ARCHS=3D"s390x"
+- =
+
+  RUN apk --update add curl
+- =
+
+  #Enable non-native runs on amd64 architecture hosts
+  RUN for i in ${QEMU_ARCHS}; do curl -L https://github.com/multiarch/qemu-=
+user-static/releases/download/v${QEMU_VERSION}/qemu-${i}-static.tar.gz | ta=
+r zxvf - -C /usr/bin; done
+  RUN chmod +x /usr/bin/qemu-*
+  =
+
+  FROM s390x/golang:1.14.2-alpine3.11
+  MAINTAINER LoZ Open Source Ecosystem (https://www.ibm.com/developerworks/=
+community/groups/community/lozopensource)
+  =
+
+  ARG MANIFEST_TOOL_VERSION=3Dv1.0.2
+  =
+
+  #Enable non-native builds of this image on an amd64 hosts.
+  #This must be the first RUN command in this file!
+  COPY --from=3Dqemu /usr/bin/qemu-*-static /usr/bin/
+  =
+
+  #Install su-exec for use in the entrypoint.sh (so processes run as the ri=
+ght user)
+  #Install bash for the entry script (and because it's generally useful)
+  #Install curl to download glide
+  #Install git for fetching Go dependencies
+  #Install ssh for fetching Go dependencies
+  #Install mercurial for fetching go dependencies
+  #Install wget since it's useful for fetching
+  #Install make for building things
+  #Install util-linux for column command (used for output formatting).
+  #Install grep and sed for use in some Makefiles (e.g. pulling versions ou=
+t of glide.yaml)
+  #Install shadow for useradd (it allows to use big UID)
+  RUN apk update && apk add --no-cache su-exec curl bash git openssh mercur=
+ial make wget util-linux tini file grep sed shadow
+  RUN apk upgrade --no-cache
+  =
+
+  #Disable ssh host key checking
+  RUN echo 'Host *' >> /etc/ssh/ssh_config \
+-   && echo '    StrictHostKeyChecking no' >> /etc/ssh/ssh_config
++ =C2=A0=C2=A0&& echo '    StrictHostKeyChecking no' >> /etc/ssh/ssh_config
+  =
+
+  #Disable cgo so that binaries we build will be fully static.
+  ENV CGO_ENABLED=3D0
+  =
+
+  #Recompile the standard library with cgo disabled.  This prevents the sta=
+ndard library from being
+  #marked stale, causing full rebuilds every time.
+  RUN go install -v std
+  =
+
+  #Install glide
+  RUN go get github.com/Masterminds/glide
+  ENV GLIDE_HOME /home/user/.glide
+  =
+
+  #Install dep
+  RUN go get github.com/golang/dep/cmd/dep
+  =
+
+  #Install ginkgo CLI tool for running tests
+  RUN go get github.com/onsi/ginkgo/ginkgo
+  =
+
+  #Install linting tools.
+  RUN wget -O - -q https://install.goreleaser.com/github.com/golangci/golan=
+gci-lint.sh | sh -s v1.20.0
+  RUN golangci-lint --version
+  =
+
+  #Install license checking tool.
+  RUN go get github.com/pmezard/licenses
+  =
+
+  #Install tool to merge coverage reports.
+  RUN go get github.com/wadey/gocovmerge
+  =
+
+  #Install CLI tool for working with yaml files
+  RUN go get github.com/mikefarah/yaml
+  =
+
+  #Delete all the Go sources that were downloaded, we only rely on the bina=
+ries
+  RUN rm -rf /go/src/*
+  =
+
+  #Install vgo (should be removed once we take Go 1.11)
+  RUN go get -u golang.org/x/vgo
+  =
+
+  #Ensure that everything under the GOPATH is writable by everyone
+  RUN chmod -R 777 $GOPATH
+  =
+
+  RUN curl -sSL https://github.com/estesp/manifest-tool/releases/download/$=
+{MANIFEST_TOOL_VERSION}/manifest-tool-linux-s390x > manifest-tool && \
+-     chmod +x manifest-tool && \
+-     mv manifest-tool /usr/bin/
++ =C2=A0=C2=A0=C2=A0=C2=A0chmod +x manifest-tool && \
++ =C2=A0=C2=A0=C2=A0=C2=A0mv manifest-tool /usr/bin/
+  =
+
+  COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+  ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+- =
+
++ ##################################################################
+  =
+
+  =
+
+  The build just hangs at RUN go install -v std
+  =
+
+  =
+
+- Also, while running the same command inside s390x container on x86_64 hos=
+t, error Illegal instruction (core dumped) is thrown.
++ Also, while running the same command inside s390x container on x86_64
++ host, error Illegal instruction (core dumped) is thrown.
++ =
+
+  Register x86_64 host with the latest qemu-user-static.
+  docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  =
+
+  docker run -it -v /home/test/qemu-s390x-static:/usr/bin/qemu-s390x-
+  static s390x/golang:1.14.2-alpine3.11
+  =
+
+  Inside s390x container:
+  =
+
+  apk update && apk add --no-cache su-exec curl bash git openssh mercurial =
+make wget util-linux tini file grep sed shadow
+  apk upgrade --no-cache
+  =
+
+- #Disable ssh host key checking
+- echo 'Host *' >> /etc/ssh/ssh_config
+- echo '    StrictHostKeyChecking no' >> /etc/ssh/ssh_config
+- =
+
+  #Disable cgo so that binaries we build will be fully static.
+  export CGO_ENABLED=3D0
++ go install -v std
+  =
+
+- #Recompile the standard library with cgo disabled.  This prevents the sta=
+ndard library from being
+- #marked stale, causing full rebuilds every time.
+- go install -v std
+- Describe the results you re
++ =
+
+  This gives the following error:
+  Illegal instruction (core dumped)
+  =
+
+  =
+
+  Environment:
+  x86_64 Ub18.04 4.15.0-101-generic Ubuntu SMP x86_64 GNU/Linux
+  =
+
+  QEMU user static version: 5.0.0-2
+  =
+
+  Container application: Docker
+  =
+
+  Client: Docker Engine - Community
+-  Version:           19.03.11
+-  API version:       1.40
+-  Go version:        go1.13.10
+-  Git commit:        42e35e61f3
+-  Built:             Mon Jun  1 09:12:22 2020
+-  OS/Arch:           linux/amd64
+-  Experimental:      false
++ =C2=A0Version:           19.03.11
++ =C2=A0API version:       1.40
++ =C2=A0Go version:        go1.13.10
++ =C2=A0Git commit:        42e35e61f3
++ =C2=A0Built:             Mon Jun  1 09:12:22 2020
++ =C2=A0OS/Arch:           linux/amd64
++ =C2=A0Experimental:      false
+  =
+
+  Server: Docker Engine - Community
+-  Engine:
+-   Version:          19.03.11
+-   API version:      1.40 (minimum version 1.12)
+-   Go version:       go1.13.10
+-   Git commit:       42e35e61f3
+-   Built:            Mon Jun  1 09:10:54 2020
+-   OS/Arch:          linux/amd64
+-   Experimental:     false
+-  containerd:
+-   Version:          1.2.13
+-   GitCommit:        7ad184331fa3e55e52b890ea95e65ba581ae3429
+-  runc:
+-   Version:          1.0.0-rc10
+-   GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
+-  docker-init:
+-   Version:          0.18.0
+-   GitCommit:        fec3683
++ =C2=A0Engine:
++ =C2=A0=C2=A0Version:          19.03.11
++ =C2=A0=C2=A0API version:      1.40 (minimum version 1.12)
++ =C2=A0=C2=A0Go version:       go1.13.10
++ =C2=A0=C2=A0Git commit:       42e35e61f3
++ =C2=A0=C2=A0Built:            Mon Jun  1 09:10:54 2020
++ =C2=A0=C2=A0OS/Arch:          linux/amd64
++ =C2=A0=C2=A0Experimental:     false
++ =C2=A0containerd:
++ =C2=A0=C2=A0Version:          1.2.13
++ =C2=A0=C2=A0GitCommit:        7ad184331fa3e55e52b890ea95e65ba581ae3429
++ =C2=A0runc:
++ =C2=A0=C2=A0Version:          1.0.0-rc10
++ =C2=A0=C2=A0GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
++ =C2=A0docker-init:
++ =C2=A0=C2=A0Version:          0.18.0
++ =C2=A0=C2=A0GitCommit:        fec3683
+  =
+
+  Additional information optionally:
+  When I build the same Dockerfile.s390x on an s390x machine, it is built s=
+uccessfully.
 
 -- =
 
