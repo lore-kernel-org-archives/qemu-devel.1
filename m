@@ -2,119 +2,82 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEE8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 08:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1C9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 09:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 095BB2065D
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 08:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 062A420771
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 09:53:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jy0+DhEs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 095BB2065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WuWS/cMW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062A420771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jt5rL-0001Fk-BP
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 04:55:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49584)
+	id 1jt6ld-0001Mz-6A
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 05:53:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jt5qk-0000iL-5I; Wed, 08 Jul 2020 04:54:42 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36705)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jt6l3-0000x8-Ci
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 05:52:53 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40894)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jt5qi-00028Y-Fw; Wed, 08 Jul 2020 04:54:41 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 17so2087148wmo.1;
- Wed, 08 Jul 2020 01:54:39 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jt6l1-0000O9-I2
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 05:52:53 -0400
+Received: by mail-pl1-x642.google.com with SMTP id x11so17960156plo.7
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 02:52:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=S1rP8Ms+mBDrZ41IF5ukoxx4o/JG7cf/l3a9EZXKYLc=;
- b=jy0+DhEsGh0xIkYABoe+Yns5+MLNAa9k7wRJ39U3Eth7+d0BAJ7P8Q7aHV0y+8xOqS
- D839IW5qrdLEclqQC7zqIWFFFdnkBUUTUvIHePz5rYhV9ZThcFeOjx3NPtfbso1fyDgU
- PUqFtzsw06BGfga0LWF46TReevRVmgSNDOJNDoHEg7tvQlH0JEsvVymWKvax88qEIUQc
- 19L4ioggnU4X7Vne4QKS+gAr9BWRwuhenXNBi+QFhSx6p//XNn7ziXUx9Y5Z4ZzycEES
- 7upBlSMovRYVxpY0dJwt6SmMljyNgd9T979ZD4DTWj9Wc1Fn8F+oJJAAEYMZHg2u6cWh
- +d1w==
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=E/vH64psmFMJWYBsEAn53ZFue8gToH0f0gdSBWaVr+Y=;
+ b=WuWS/cMWWVViRfOuIVs3KdsFInVxMP8cQ3Syl3hBJytD0imFlIQQsMcZOVawcElLdz
+ d7sw77e6ekKObJ4fjKTXH2aVpPwY884z6hgkcJjS/iYyrPnQg83lC3AHWr3z9gFDZ+5V
+ iR0/TQuJrv3wWscWo0s/eNnwI02SfKDliQKp9nJpOPvMfx8xVb1hThh+254OGxHowdG8
+ Li+rFqCC7+j8pyKwFxrZ5+ApkfOfnVl2CGsGEf9BsdaOwkAJrGGZDu7Xb9YGMixtU5zA
+ ZE0fve0E++K5enX4vAMz9XGyTDJOQF9h6vKCEK+X8NZ4bpb+QtwWo0jGpp3rz9uN3JkY
+ eKHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=S1rP8Ms+mBDrZ41IF5ukoxx4o/JG7cf/l3a9EZXKYLc=;
- b=UP3Dje4sj2wvvs/csSOToVPBswELF7tRX+2TsaYXicZsFgjKFxWzmFmk8k2+QBrrsZ
- ZNMKmChoOvXMqcNLybomUb3bAuD+s0TpwdPUGlCHDIr/p7jYYdBx6dwfcEhVGid1UGNc
- Z2+H2IK1E+RZ1p8Uc/uFl8y/pINh4RDHNeIiG5IMG7wXTngU0cUcAlOifH8x2lHLI2wQ
- o8DNmjBbjDgFr9/jte4dHBIagvKGylvETU8Ijr7sLWZvUs8UVUG9FKP6mWi7iiJDt475
- gsDvma2aeY0dhCUika2ztPXKEYiUckVG32ZcDd6ULURihULt3WmmekJRmpssrXMT6FWY
- QWCw==
-X-Gm-Message-State: AOAM530zScRlrgfZ9ogGn/7loiingfVP+Vm6FTLxykOC5t284yJyBvdB
- 9TMN3ckbJoMhsauV4o0bgY0=
-X-Google-Smtp-Source: ABdhPJyH0tJClY6LRePfXKJRswLprUtJ8WDlXD51bAW3oKfm5RyGO+E/R2PbGFS3MLuhntUtalK35Q==
-X-Received: by 2002:a1c:5f41:: with SMTP id t62mr8076444wmb.53.1594198478606; 
- Wed, 08 Jul 2020 01:54:38 -0700 (PDT)
-Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id a15sm5437328wrh.54.2020.07.08.01.54.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 01:54:37 -0700 (PDT)
-Subject: Re: [PATCH v4 08/12] hw/nvram: NPCM7xx OTP device model
-To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org
-References: <20200707184730.3047754-1-hskinnemoen@google.com>
- <20200707184730.3047754-9-hskinnemoen@google.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f303f648-91a3-b59b-390f-8f25ec7b4ff1@amsat.org>
-Date: Wed, 8 Jul 2020 10:54:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=E/vH64psmFMJWYBsEAn53ZFue8gToH0f0gdSBWaVr+Y=;
+ b=HpYxfKmz+FTkP8VZNTg1SEKxYjWWGFMF9NxhaXoqODO1sGzI779BDKZkIIBXCbnayl
+ Tw6cNz0RbGC1eXkPNCVKep7CsGNyi0ADgkZiWatEXt/WQhBRecVquxA9KBrLSMWFCOPB
+ U/B7/ByyY+8UbvFJt34/gPMLLUr8sSKSLSgAuKBZn5VJ+ZSn6dSjmP6ylvaUEEil9wkJ
+ Rq1jpGCBDHHdpAphzFqupFNyrVgYKovJZfD0JxHGFHbc1lXUI/CE0WVXrMuZo0mG5D+Q
+ DCrTYp3T/PN9P0CZxGZEoZsQ5xTmy49MQuD3yeGbKoAACLCPvr75FesdjM3WCAiEY9Pm
+ VI+g==
+X-Gm-Message-State: AOAM530CPnZKJJCj7SoGjSW7y/5d8D2MJ/Vo5cEAw+ay7tkhwGao+keF
+ iQpbC6asP6bdppqzKVQhaShMWv2KjEPH4Uya4QXmm0Wa
+X-Google-Smtp-Source: ABdhPJzthUY+qoPrBeEVO55JQiPw8UYokdupR6y0lcA5JkAO1ImTTMBY/nOXxWbNRbgV7E9b7F/D1RnNuMjBhBHddp8=
+X-Received: by 2002:a17:902:6b45:: with SMTP id g5mr706461plt.42.1594201969652; 
+ Wed, 08 Jul 2020 02:52:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200707184730.3047754-9-hskinnemoen@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 8 Jul 2020 10:52:38 +0100
+Message-ID: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
+Subject: Migrating custom qemu.org infrastructure to GitLab
+To: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=stefanha@gmail.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,243 +90,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- Avi.Fishman@nuvoton.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <cleber@redhat.com>,
+ Jeff Cody <codyprime@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/7/20 8:47 PM, Havard Skinnemoen wrote:
-> This supports reading and writing OTP fuses and keys. Only fuse reading
-> has been tested. Protection is not implemented.
-> 
-> Reviewed-by: Avi Fishman <avi.fishman@nuvoton.com>
-> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
-> ---
->  hw/arm/npcm7xx.c               |  32 +++
->  hw/nvram/Makefile.objs         |   1 +
->  hw/nvram/npcm7xx_otp.c         | 405 +++++++++++++++++++++++++++++++++
->  include/hw/arm/npcm7xx.h       |   3 +
->  include/hw/nvram/npcm7xx_otp.h |  94 ++++++++
->  5 files changed, 535 insertions(+)
->  create mode 100644 hw/nvram/npcm7xx_otp.c
->  create mode 100644 include/hw/nvram/npcm7xx_otp.h
-> 
-...
-> +static void npcm7xx_init_fuses(NPCM7xxState *s)
-> +{
-> +    NPCM7xxClass *nc = NPCM7XX_GET_CLASS(s);
-> +    uint32_t value;
-> +
-> +    value = tswap32(nc->disabled_modules);
-> +    npcm7xx_otp_array_write(&s->fuse_array, &value, 64, sizeof(value));
+Dear QEMU community,
+QEMU currently has a static website, wiki, git repo hosting, and
+special-purpose cronjobs/containers running in VMs. There is currently
+no system administrator looking after our infrastructure so the most
+urgent tasks fall onto me, the remainder are ignored/postponed. The
+current situation exposes qemu.org to the risk of downtime and
+security issues.
 
-What is magic offset 64 for?
+Another limitation is that each piece of infrastructure is managed
+separately and one-time contributors cannot easily propose changes
+because they do not have access. It would be much better to use our
+existing code review process so that anyone can make changes to
+infrastructure by sending a patch.
 
-...
-> diff --git a/hw/nvram/npcm7xx_otp.c b/hw/nvram/npcm7xx_otp.c
-> new file mode 100644
-> index 0000000000..18908bc839
-> --- /dev/null
-> +++ b/hw/nvram/npcm7xx_otp.c
-...
-> +/* Common register write handler for both OTP classes. */
-> +static void npcm7xx_otp_write(NPCM7xxOTPState *s, NPCM7xxOTPRegister reg,
-> +                              uint32_t value)
-> +{
-> +    switch (reg) {
-> +    case NPCM7XX_OTP_FST:
-> +        /* RDST is cleared by writing 1 to it. */
-> +        if (value & FST_RDST) {
-> +            s->regs[NPCM7XX_OTP_FST] &= ~FST_RDST;
-> +        }
-> +        /* Preserve read-only and write-one-to-clear bits */
-> +        value =
-> +            (value & ~FST_RO_MASK) | (s->regs[NPCM7XX_OTP_FST] & FST_RO_MASK);
+GitLab's Continuous Integration (CI) system provides a powerful way to
+perform actions defined in yaml files in qemu.git. This includes
+running scripts, builds, publishing build artifacts, etc. We have
+already begun using it for automated builds and tests:
+https://gitlab.com/qemu-project/qemu/-/blob/master/.gitlab-ci.yml
 
-Trivial to review as:
+GitLab also offers git repo hosting, wikis, issue tracking, and other
+features. It is possible to log in using GitHub, Google, or Twitter
+single sign-on if you do not want to create another account. As more
+open source projects use GitLab it becomes easier for one-time
+contributors who will already be familiar with the tools from other
+projects.
 
-           value &= ~FST_RO_MASK;
-           value |= s->regs[NPCM7XX_OTP_FST] & FST_RO_MASK;
+Here is a full list of GitLab's features:
+https://about.gitlab.com/features/
 
-> +        break;
-> +
-> +    case NPCM7XX_OTP_FADDR:
-> +        break;
-> +
-> +    case NPCM7XX_OTP_FDATA:
-> +        /*
-> +         * This register is cleared by writing a magic value to it; no other
-> +         * values can be written.
-> +         */
-> +        if (value == FDATA_CLEAR) {
-> +            value = 0;
-> +        } else {
-> +            value = s->regs[NPCM7XX_OTP_FDATA];
-> +        }
-> +        break;
-> +
-> +    case NPCM7XX_OTP_FCFG:
-> +        value = npcm7xx_otp_compute_fcfg(s->regs[NPCM7XX_OTP_FCFG], value);
-> +        break;
-> +
-> +    case NPCM7XX_OTP_FCTL:
-> +        switch (value) {
-> +        case FCTL_READ_CMD:
-> +            npcm7xx_otp_read_array(s);
-> +            break;
-> +
-> +        case FCTL_PROG_CMD1:
-> +            /*
-> +             * Programming requires writing two separate magic values to this
-> +             * register; this is the first one. Just store it so it can be
-> +             * verified later when the second magic value is received.
-> +             */
-> +            break;
-> +
-> +        case FCTL_PROG_CMD2:
-> +            /*
-> +             * Only initiate programming if we received the first half of the
-> +             * command immediately before this one.
-> +             */
-> +            if (s->regs[NPCM7XX_OTP_FCTL] == FCTL_PROG_CMD1) {
-> +                npcm7xx_otp_program_array(s);
-> +            }
-> +            break;
-> +
-> +        default:
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          "%s: unrecognized FCNTL value 0x%" PRIx32 "\n",
-> +                          DEVICE(s)->canonical_path, value);
-> +            break;
-> +        }
-> +        if (value != FCTL_PROG_CMD1) {
-> +            value = 0;
-> +        }
-> +        break;
-> +
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: write to invalid offset 0x%zx\n",
-> +                      DEVICE(s)->canonical_path, reg * sizeof(uint32_t));
-> +        return;
-> +    }
-> +
-> +    s->regs[reg] = value;
-> +}
-...
-> diff --git a/include/hw/nvram/npcm7xx_otp.h b/include/hw/nvram/npcm7xx_otp.h
-> new file mode 100644
-> index 0000000000..b52330dadc
-> --- /dev/null
-> +++ b/include/hw/nvram/npcm7xx_otp.h
-> @@ -0,0 +1,94 @@
-> +/*
-> + * Nuvoton NPCM7xx OTP (Fuse Array) Interface
-> + *
-> + * Copyright 2020 Google LLC
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License as published by the
-> + * Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-> + * for more details.
-> + */
-> +#ifndef NPCM7XX_OTP_H
-> +#define NPCM7XX_OTP_H
-> +
-> +#include "exec/memory.h"
-> +#include "hw/sysbus.h"
-> +
-> +/* Each OTP module holds 8192 bits of one-time programmable storage */
-> +#define NPCM7XX_OTP_ARRAY_BITS (8192)
-> +#define NPCM7XX_OTP_ARRAY_BYTES (NPCM7XX_OTP_ARRAY_BITS / 8)
+GitLab offers the gold/ultimate tier for free to open source projects:
+https://about.gitlab.com/solutions/open-source/
 
-You could replace 8 by BITS_PER_BYTE.
+GitLab itself is open source and can be self-hosted if we decide to
+leave in the future.
 
-> +
-> +/**
-> + * enum NPCM7xxOTPRegister - 32-bit register indices.
-> + */
-> +typedef enum NPCM7xxOTPRegister {
-> +    NPCM7XX_OTP_FST,
-> +    NPCM7XX_OTP_FADDR,
-> +    NPCM7XX_OTP_FDATA,
-> +    NPCM7XX_OTP_FCFG,
-> +    /* Offset 0x10 is FKEYIND in OTP1, FUSTRAP in OTP2 */
-> +    NPCM7XX_OTP_FKEYIND = 0x0010 / sizeof(uint32_t),
-> +    NPCM7XX_OTP_FUSTRAP = 0x0010 / sizeof(uint32_t),
-> +    NPCM7XX_OTP_FCTL,
-> +    NPCM7XX_OTP_NR_REGS,
-> +} NPCM7xxOTPRegister;
-> +
-> +/**
-> + * struct NPCM7xxOTPState - Device state for one OTP module.
-> + * @parent: System bus device.
-> + * @mmio: Memory region through which registers are accessed.
-> + * @regs: Register contents.
-> + * @array: OTP storage array.
-> + */
-> +typedef struct NPCM7xxOTPState {
-> +    SysBusDevice parent;
-> +
-> +    MemoryRegion mmio;
-> +    uint32_t regs[NPCM7XX_OTP_NR_REGS];
-> +    uint8_t array[NPCM7XX_OTP_ARRAY_BYTES];
-> +} NPCM7xxOTPState;
-> +
-> +#define TYPE_NPCM7XX_OTP "npcm7xx-otp"
-> +#define NPCM7XX_OTP(obj) OBJECT_CHECK(NPCM7xxOTPState, (obj), TYPE_NPCM7XX_OTP)
-> +
-> +#define TYPE_NPCM7XX_KEY_STORAGE "npcm7xx-key-storage"
-> +#define TYPE_NPCM7XX_FUSE_ARRAY "npcm7xx-fuse-array"
-> +
-> +/**
-> + * struct NPCM7xxOTPClass - OTP module class.
-> + * @parent: System bus device class.
-> + * @mmio_ops: MMIO register operations for this type of module.
-> + *
-> + * The two OTP modules (key-storage and fuse-array) have slightly different
-> + * behavior, so we give them different MMIO register operations.
-> + */
-> +typedef struct NPCM7xxOTPClass {
-> +    SysBusDeviceClass parent;
-> +
-> +    const MemoryRegionOps *mmio_ops;
-> +} NPCM7xxOTPClass;
-> +
-> +#define NPCM7XX_OTP_CLASS(klass) \
-> +    OBJECT_CLASS_CHECK(NPCM7xxOTPClass, (klass), TYPE_NPCM7XX_OTP)
-> +#define NPCM7XX_OTP_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(NPCM7xxOTPClass, (obj), TYPE_NPCM7XX_OTP)
+With this in mind I propose moving qemu.org infrastructure to GitLab
+incrementally. This needs to be done carefully to avoid disruption and
+only where GitLab meets the requirements. The QEMU project will
+continue to have access to cloud hosting for running custom
+infrastructure or adding runners to GitLab CI to improve CI
+performance.
 
-If nothing outside of the model implementation requires accessing
-the class fields (which is certainly the case here, no code out of
-npcm7xx_otp.c should access mmio_ops directly), then I recommend
-to keep the class definitions local to the single source file where
-it is used. This also makes this header simpler to look at.
+The following infrastructure components can be considered for GitLab migration:
 
-Very high code quality, so I just made nitpicking comments.
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+1. qemu-web.git static site generation. GitLab CI/CD can build the
+static website on each qemu-web.git commit and publish the HTML
+artifacts.
 
-> +
-> +/**
-> + * npcm7xx_otp_array_write - ECC encode and write data to OTP array.
-> + * @s: OTP module.
-> + * @data: Data to be encoded and written.
-> + * @offset: Offset of first byte to be written in the OTP array.
-> + * @len: Number of bytes before ECC encoding.
-> + *
-> + * Each nibble of data is encoded into a byte, so the number of bytes written
-> + * to the array will be @len * 2.
-> + */
-> +extern void npcm7xx_otp_array_write(NPCM7xxOTPState *s, const void *data,
-> +                                    unsigned int offset, unsigned int len);
-> +
-> +#endif /* NPCM7XX_OTP_H */
-> 
+2. wiki.qemu.org is a MediaWiki instance. Account creation is a hurdle
+to one-time or new contributors. It is unclear whether GitLab's wiki
+is expressive enough for a lossless conversion of the existing QEMU
+wiki. Any volunteers interested in evaluating the wiki migration would
+be appreciated.
 
+3. Git repo hosting is a core feature of GitLab and we already have a
+qemu.git mirror. Hosting the repos on GitLab reduces the need for
+qemu.org ssh access.
+
+4. The QEMU release process can be moved to CI/CD so that publishing
+stable releases and release candidates is less dependent on one
+committer's machine or scripts.
+
+5. Issue tracking. Launchpad more or less works, but the login always
+bothers me. If we move git repo hosting then it makes sense to do
+issue tracking on GitLab too.
+
+There is a snowball effect where the experience is improved the more
+GitLab features we use, so I hope that most of these migrations will
+be possible.
+
+Next steps:
+ * If you have an interest in one or more of these infrastructure
+components, please join the discussion.
+ * If there are no volunteers for an infrastructure component I'll
+slowly work my way through evaluating GitLab and propose migrations
+
+Stefan
 
