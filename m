@@ -2,83 +2,91 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	RCVD_FAKE_HELO_DOTCOM,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 882A8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9A7C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:06:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5865920708
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:06:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5865920708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D5F2C20708
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:06:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHGMwQhl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F2C20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtJ92-0004ps-LT
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:06:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58994)
+	id 1jtJ9H-0005Dn-3n
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:06:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtJ8G-0003sP-JP
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:05:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58866)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtJ8E-0006ys-FL
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:05:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jtJ8C-0004eI-Jq
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 23:05:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 708972E80E7
- for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 23:05:36 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Jul 2020 22:56:23 -0000
-From: Ryutaroh Matsumoto <1886811@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1jtIq8-0002L2-Ch
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:46:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39196
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1jtIq6-0004U9-M7
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:46:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594248414;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Hhu+zH8X4HUA+JMrot/iszoZ9L+zfO2C5fzjCaCqXKw=;
+ b=XHGMwQhlUFSr3xBjvv1Pup1y73hCpJYcei6FO7kaZqRiH5y4lDq4z2zwA+88QEA9sULZyD
+ VJUZBGBO37fYhGqWNPm9rIbdv1Z6z54eaZGjQf+rplBjT6kMR260fEMMlPKUf9sfKv+fd1
+ aPRVQqZKUWcIfSuiuSIkdDg+spbhSYc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-335-5WgR941zMV656tZbu5xCIA-1; Wed, 08 Jul 2020 18:46:49 -0400
+X-MC-Unique: 5WgR941zMV656tZbu5xCIA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7105D1940926;
+ Wed,  8 Jul 2020 22:46:48 +0000 (UTC)
+Received: from localhost.com (unknown [10.40.192.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A8FC410016E8;
+ Wed,  8 Jul 2020 22:46:46 +0000 (UTC)
+From: Julia Suvorova <jusual@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
- status=Unknown; importance=Unknown; assignee=None; 
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: emojifreak laurent-vivier
-X-Launchpad-Bug-Reporter: Ryutaroh Matsumoto (emojifreak)
-X-Launchpad-Bug-Modifier: Ryutaroh Matsumoto (emojifreak)
-References: <159420830935.32230.13858618076699173558.malonedeb@gac.canonical.com>
-Message-Id: <159424898368.30442.16792043650193366696.malone@soybean.canonical.com>
-Subject: [Bug 1886811] Re: systemd complains Failed to enqueue loopback
- interface start request: Operation not supported
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b24753402d6321ed1b9083e580f5f014a46bab00";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 09902232d8d9ce13844b36d22b3d7b1262c9ac15
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 15:50:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [RFC PATCH 3/5] hw/i386/acpi-build: Add ACPI PCI hot-plug methods to
+ q35
+Date: Thu,  9 Jul 2020 00:46:13 +0200
+Message-Id: <20200708224615.114077-4-jusual@redhat.com>
+In-Reply-To: <20200708224615.114077-1-jusual@redhat.com>
+References: <20200708224615.114077-1-jusual@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jusual@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jusual@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_FAKE_HELO_DOTCOM=1.189, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,65 +95,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1886811 <1886811@bugs.launchpad.net>
+Cc: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> It seems systemd is trying to use RTM_SETLINK.
-> Could you try this patch:
+Implement notifications and gpe to support q35 ACPI PCI hot-plug.
+The addresses specified in [1] remain the same to make fewer changes.
 
-Yes, you are right!
-With the patch, I am able to boot containers of
-Debian Bullseye of armhf and armel architectures!!
+[1] docs/spec/acpi_pci_hotplug.txt
 
--- =
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
+---
+ hw/i386/acpi-build.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1886811
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 11c598f955..5c5ad88ad6 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -201,10 +201,6 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+         /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+         pm->fadt.rev = 1;
+         pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+-        pm->pcihp_io_base =
+-            object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+-        pm->pcihp_io_len =
+-            object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+     }
+     if (lpc) {
+         struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
+@@ -214,6 +210,10 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+         pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
+         pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
+     }
++    pm->pcihp_io_base =
++        object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
++    pm->pcihp_io_len =
++        object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+ 
+     /* The above need not be conditional on machine type because the reset port
+      * happens to be the same on PIIX (pc) and ICH9 (q35). */
+@@ -472,7 +472,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+         QLIST_FOREACH(sec, &bus->child, sibling) {
+             int32_t devfn = sec->parent_dev->devfn;
+ 
+-            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
++            if (pci_bus_is_root(sec)) {
+                 continue;
+             }
+ 
+@@ -1586,7 +1586,12 @@ static void build_piix4_pci_hotplug(Aml *table)
+     aml_append(table, scope);
+ }
+ 
+-static Aml *build_q35_osc_method(void)
++static void build_q35_pci_hotplug(Aml *table)
++{
++    build_piix4_pci_hotplug(table);
++}
++
++static Aml *build_q35_osc_method(AcpiPmInfo *pm)
+ {
+     Aml *if_ctx;
+     Aml *if_ctx2;
+@@ -1698,6 +1703,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_hpet_aml(dsdt);
+         build_q35_isa_bridge(dsdt);
+         build_isa_devices_aml(dsdt);
++        build_q35_pci_hotplug(dsdt);
+         build_q35_pci0_int(dsdt);
+         if (pcms->smbus && !pcmc->do_not_add_smb_acpi) {
+             build_smb0(dsdt, pcms->smbus, ICH9_SMB_DEV, ICH9_SMB_FUNC);
+@@ -1724,7 +1730,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+     {
+         aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+ 
+-        if (misc->is_piix4) {
++        if (misc->is_piix4 || pm->pcihp_bridge_en) {
+             method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+             aml_append(method,
+                 aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+-- 
+2.25.4
 
-Title:
-  systemd complains Failed to enqueue loopback interface start request:
-  Operation not supported
-
-Status in QEMU:
-  New
-Status in qemu package in Debian:
-  Unknown
-
-Bug description:
-  This symptom seems similar to
-  https://bugs.launchpad.net/qemu/+bug/1823790
-
-  Host Linux: Debian 11 Bullseye (testing) on x84-64 architecture
-  qemu version: latest git of git commit hash eb2c66b10efd2b914b56b20ae9065=
-5914310c925
-  compiled with "./configure --static --disable-system" =
-
-
-  Down stream bug report at https://bugs.debian.org/cgi-bin/bugreport.cgi?b=
-ug=3D964289
-  Bug report (closed) to systemd: https://github.com/systemd/systemd/issues=
-/16359
-
-  systemd in armhf and armel (both little endian 32-bit) containers fail to=
- start with
-  Failed to enqueue loopback interface start request: Operation not support=
-ed
-
-  How to reproduce on Debian (and probably Ubuntu):
-  mmdebstrap --components=3D"main contrib non-free" --architectures=3Darmhf=
- --variant=3Dimportant bullseye /var/lib/machines/armhf-bullseye
-  systemd-nspawn -D /var/lib/machines/armhf-bullseye -b
-
-  When "armhf" architecture is replaced with "mips" (32-bit big endian) or =
-"ppc64"
-  (64-bit big endian), the container starts up fine.
-
-  The same symptom is also observed with "powerpc" (32-bit big endian)
-  architecture.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1886811/+subscriptions
 
