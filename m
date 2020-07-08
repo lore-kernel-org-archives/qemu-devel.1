@@ -2,94 +2,89 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6744CC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E71C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20500206F6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:49:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21AD2206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B1cy7Y/W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20500206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DWXytScK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21AD2206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIsR-0007Q3-93
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:49:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48904)
+	id 1jtItX-0001J4-BN
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:50:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIS9-0002ws-NF
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:09 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45672)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIS7-00018e-AX
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:09 -0400
-Received: by mail-pl1-x644.google.com with SMTP id k4so4599106pld.12
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=643YbMqUe3cU9Y3BkZ4lZoPyP5SXzuFH+wHJ5r5v8mE=;
- b=B1cy7Y/Wu/HIaNwXnjH7OjAmK3ySO8cISSbOwGlTFMGRDb4h22bB+3N7C/o3YlptqP
- l5gV+X37kogB+QQkJ5CmzW+4RC4OVsG3vkKJ+jmkzUOWgGmUmdxrICDljdT9E54FZMYu
- r4lJ6pJkH7wO9OviPt9pjHyewoHEIvBUA5RC/t+O5LqbUeliejWxvDNLm26Mhx3Hrl+K
- JWJt52UBNA3iJZRR3ABnKxyANW9Pk2jdm8quhn9pj52J1plDeTDGADJ/L1dec9nPMFCo
- y+6ghnv3oYCmSGtfb3pYE9+QHm+TEjnVDusan/M/8PQNxEGbfi2moZVtU+1Uu2HcUxXH
- 6ScQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=643YbMqUe3cU9Y3BkZ4lZoPyP5SXzuFH+wHJ5r5v8mE=;
- b=a9q5Q/irSr5mLrkaoAsOQMSZDyolVfWFom6IwYiqc54ty2gVXJKf17cuHrgFWLgFA7
- qF5D0aIK4VoWeKTpaEdl7sUPBPgKd0i7argfloQ8AyiKrgF7t6jNkchauqlVJql0ktnL
- nxP+TmiFfCLAWSywy9eVbsj48YgESLA/RyBM8qrpJH57tovPiJhZB88H5x0IvaOWU5ue
- 9fCWpqvMAImjRi5HvzHlfNeNB0GpRE3HvfiIsnCMtW+ZwuRJH89z56/87e6GOGkXp409
- d0qav8Uk466liw9XnVlSS2ATesPQ6i0Ok/iZPVTJ6+5XQSkGTf8zWMMg72waH0q+0sFQ
- teNw==
-X-Gm-Message-State: AOAM531s+uieB9sGE95y77+X1OBzKk3NugcuPy6BnU7S+zlEkNgfMBPC
- wiI2O5ODqrpIHYA8sPOwfF7Wbb0Q
-X-Google-Smtp-Source: ABdhPJyvYo2dA/dkKRG9iTls/WjVyWogsy6FY/9aglaa0+RXHbWtsH6KjX0x6r2Nulm3SyfTIwo4Cw==
-X-Received: by 2002:a17:902:8d98:: with SMTP id
- v24mr47908851plo.276.1594246925645; 
- Wed, 08 Jul 2020 15:22:05 -0700 (PDT)
-Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jul 2020 15:22:05 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/21] tests/tcg/xtensa: update test_fp0_conv for DFPU
-Date: Wed,  8 Jul 2020 15:20:54 -0700
-Message-Id: <20200708222101.24568-15-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
-References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRW-0001bt-HJ
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33382
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRU-00013F-Im
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594246887;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ORtXaORAZvQ0FiGFQY6UNSXnMhzRO3u0ST4KF1uT+ig=;
+ b=DWXytScKbF+OYhJcxJg6p9tEY3oGBwT0eCDQLKdTm4HVc8NsGeoF7O0fxwOCFY1zyqhYQK
+ qf73MZHZysT3qHXcMrNaU3o0gfrsfcSjxyLcLmwanCpUHkedtWMsyu8zx9HTYOdEGPd8L+
+ ikZi2sRhvdh7HPQ1rIIVDnewlgmiVJ0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-tzR9GnK1M5ituDVEzAwFsA-1; Wed, 08 Jul 2020 10:19:36 -0400
+X-MC-Unique: tzR9GnK1M5ituDVEzAwFsA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 876C719057A0;
+ Wed,  8 Jul 2020 14:19:34 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1C5B75BAC3;
+ Wed,  8 Jul 2020 14:19:30 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH v3 04/11] hw/arm/smmu: Introduce SMMUTLBEntry for PTW and
+ IOTLB value
+Date: Wed,  8 Jul 2020 16:18:49 +0200
+Message-Id: <20200708141856.15776-5-eric.auger@redhat.com>
+In-Reply-To: <20200708141856.15776-1-eric.auger@redhat.com>
+References: <20200708141856.15776-1-eric.auger@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,475 +97,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DFPU conversion opcodes update FSR flags. Add FSR parameters and
-expected FSR register values for the conversion tests.
+Introduce a specialized SMMUTLBEntry to store the result of
+the PTW and cache in the IOTLB. This structure extends the
+generic IOMMUTLBEntry struct with the level of the entry and
+the granule size.
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+Those latter will be useful when implementing range invalidation.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
 ---
- tests/tcg/xtensa/test_fp0_conv.S | 299 ++++++++++++++++---------------
- 1 file changed, 155 insertions(+), 144 deletions(-)
 
-diff --git a/tests/tcg/xtensa/test_fp0_conv.S b/tests/tcg/xtensa/test_fp0_conv.S
-index 147e3d5062df..cfee6e51790c 100644
---- a/tests/tcg/xtensa/test_fp0_conv.S
-+++ b/tests/tcg/xtensa/test_fp0_conv.S
-@@ -1,4 +1,5 @@
- #include "macros.inc"
-+#include "fpu.h"
+v1 -> v2:
+- fix 2 indents and typdef
+- added Peter's R-b
+---
+ include/hw/arm/smmu-common.h | 12 +++++++++---
+ hw/arm/smmu-common.c         | 32 +++++++++++++++++---------------
+ hw/arm/smmuv3.c              | 10 +++++-----
+ 3 files changed, 31 insertions(+), 23 deletions(-)
+
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 5f9f3535d2..79c2c6486a 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -52,6 +52,12 @@ typedef struct SMMUTransTableInfo {
+     uint8_t granule_sz;        /* granule page shift */
+ } SMMUTransTableInfo;
  
- test_suite fp0_conv
++typedef struct SMMUTLBEntry {
++    IOMMUTLBEntry entry;
++    uint8_t level;
++    uint8_t granule;
++} SMMUTLBEntry;
++
+ /*
+  * Generic structure populated by derived SMMU devices
+  * after decoding the configuration information and used as
+@@ -140,7 +146,7 @@ static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
+  * pair, according to @cfg translation config
+  */
+ int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
+-             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info);
++             SMMUTLBEntry *tlbe, SMMUPTWEventInfo *info);
  
-@@ -9,7 +10,7 @@ test_suite fp0_conv
-     wfr     \fr, a2
- .endm
+ /**
+  * select_tt - compute which translation table shall be used according to
+@@ -153,8 +159,8 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
  
--.macro test_ftoi_ex op, r0, fr0, v, c, r
-+.macro test_ftoi_ex op, r0, fr0, v, c, r, sr
-     movi    a2, 0
-     wur     a2, fsr
-     movfp   \fr0, \v
-@@ -18,20 +19,25 @@ test_suite fp0_conv
-     movi    a3, \r
-     assert  eq, \r0, a3
-     rur     a2, fsr
-+#if DFPU
-+    movi    a3, \sr
-+    assert  eq, a2, a3
-+#else
-     assert  eqi, a2, 0
-+#endif
- .endm
+ #define SMMU_IOTLB_MAX_SIZE 256
  
--.macro test_ftoi op, r0, fr0, v, c, r
-+.macro test_ftoi op, r0, fr0, v, c, r, sr
-     movi    a2, 0
-     wur     a2, fcr
--    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r
-+    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r, \sr
-     movi    a2, 0x7c
-     wur     a2, fcr
--    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r
-+    test_ftoi_ex \op, \r0, \fr0, \v, \c, \r, \sr
- .endm
+-IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
+-void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry);
++SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, SMMUTLBEntry *entry);
+ SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index 7dc8541e8b..398e958bb4 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -64,11 +64,11 @@ SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
+     return key;
+ }
  
+-IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+-                                 hwaddr iova)
++SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
++                                hwaddr iova)
+ {
+     SMMUIOTLBKey key = smmu_get_iotlb_key(cfg->asid, iova);
+-    IOMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
++    SMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
  
--.macro test_itof_ex op, fr0, ar0, v, c, r
-+.macro test_itof_ex op, fr0, ar0, v, c, r, sr
-     movi    a2, 0
-     wur     a2, fsr
-     movi    \ar0, \v
-@@ -42,23 +48,28 @@ test_suite fp0_conv
-     movi    a3, \r
-     assert  eq, a2, a3
-     rur     a2, fsr
-+#if DFPU
-+    movi    a3, \sr
-+    assert  eq, a2, a3
-+#else
-     assert  eqi, a2, 0
-+#endif
- .endm
+     if (entry) {
+         cfg->iotlb_hits++;
+@@ -86,7 +86,7 @@ IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+     return entry;
+ }
  
--.macro test_itof_rm op, fr0, ar0, v, c, rm, r
-+.macro test_itof_rm op, fr0, ar0, v, c, rm, r, sr
-     movi    a2, \rm
-     wur     a2, fcr
--    test_itof_ex \op, \fr0, \ar0, \v, \c, \r
-+    test_itof_ex \op, \fr0, \ar0, \v, \c, \r, \sr
-     movi    a2, (\rm) | 0x7c
-     wur     a2, fcr
--    test_itof_ex \op, \fr0, \ar0, \v, \c, \r
-+    test_itof_ex \op, \fr0, \ar0, \v, \c, \r, \sr
- .endm
+-void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, SMMUTLBEntry *new)
+ {
+     SMMUIOTLBKey *key = g_new0(SMMUIOTLBKey, 1);
  
--.macro test_itof op, fr0, ar0, v, c, r0, r1, r2, r3
--    test_itof_rm \op, \fr0, \ar0, \v, \c, 0, \r0
--    test_itof_rm \op, \fr0, \ar0, \v, \c, 1, \r1
--    test_itof_rm \op, \fr0, \ar0, \v, \c, 2, \r2
--    test_itof_rm \op, \fr0, \ar0, \v, \c, 3, \r3
-+.macro test_itof op, fr0, ar0, v, c, r0, r1, r2, r3, sr
-+    test_itof_rm \op, \fr0, \ar0, \v, \c, 0, \r0, \sr
-+    test_itof_rm \op, \fr0, \ar0, \v, \c, 1, \r1, \sr
-+    test_itof_rm \op, \fr0, \ar0, \v, \c, 2, \r2, \sr
-+    test_itof_rm \op, \fr0, \ar0, \v, \c, 3, \r3, \sr
- .endm
+@@ -94,9 +94,9 @@ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
+         smmu_iotlb_inv_all(bs);
+     }
  
- test round_s
-@@ -66,237 +77,237 @@ test round_s
-     wsr     a2, cpenable
+-    *key = smmu_get_iotlb_key(cfg->asid, entry->iova);
+-    trace_smmu_iotlb_insert(cfg->asid, entry->iova);
+-    g_hash_table_insert(bs->iotlb, key, entry);
++    *key = smmu_get_iotlb_key(cfg->asid, new->entry.iova);
++    trace_smmu_iotlb_insert(cfg->asid, new->entry.iova);
++    g_hash_table_insert(bs->iotlb, key, new);
+ }
  
-     /* NaN */
--    test_ftoi round.s, a2, f0, 0xffc00001, 0, 0x7fffffff
--    test_ftoi round.s, a2, f0, 0xff800001, 0, 0x7fffffff
-+    test_ftoi round.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
-+    test_ftoi round.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
+ inline void smmu_iotlb_inv_all(SMMUState *s)
+@@ -216,7 +216,7 @@ SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova)
+  * @cfg: translation config
+  * @iova: iova to translate
+  * @perm: access type
+- * @tlbe: IOMMUTLBEntry (out)
++ * @tlbe: SMMUTLBEntry (out)
+  * @info: handle to an error info
+  *
+  * Return 0 on success, < 0 on error. In case of error, @info is filled
+@@ -226,7 +226,7 @@ SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova)
+  */
+ static int smmu_ptw_64(SMMUTransCfg *cfg,
+                        dma_addr_t iova, IOMMUAccessFlags perm,
+-                       IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
++                       SMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
+ {
+     dma_addr_t baseaddr, indexmask;
+     int stage = cfg->stage;
+@@ -246,8 +246,8 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+     baseaddr = extract64(tt->ttb, 0, 48);
+     baseaddr &= ~indexmask;
  
-     /* -inf */
--    test_ftoi round.s, a2, f0, 0xff800000, 0, 0x80000000
-+    test_ftoi round.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
+-    tlbe->iova = iova;
+-    tlbe->addr_mask = (1 << granule_sz) - 1;
++    tlbe->entry.iova = iova;
++    tlbe->entry.addr_mask = (1 << granule_sz) - 1;
  
-     /* negative overflow */
--    test_ftoi round.s, a2, f0, 0xceffffff, 1, 0x80000000
--    test_ftoi round.s, a2, f0, 0xcf000000, 0, 0x80000000
--    test_ftoi round.s, a2, f0, 0xceffffff, 0, 0x80000080
-+    test_ftoi round.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
-+    test_ftoi round.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
-+    test_ftoi round.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
+     while (level <= 3) {
+         uint64_t subpage_size = 1ULL << level_shift(level, granule_sz);
+@@ -298,14 +298,16 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+             goto error;
+         }
  
-     /* negative */
--    test_ftoi round.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
--    test_ftoi round.s, a2, f0, 0xbfc00000, 0, -2 /* -1.5 */
--    test_ftoi round.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
--    test_ftoi round.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
--    test_ftoi round.s, a2, f0, 0xbf400000, 0, -1 /* -0.75 */
--    test_ftoi round.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
-+    test_ftoi round.s, a2, f0, 0xbfa00000, 1, -2, FSR_I  /* -1.25 * 2 */
-+    test_ftoi round.s, a2, f0, 0xbfc00000, 0, -2, FSR_I  /* -1.5 */
-+    test_ftoi round.s, a2, f0, 0xbf800000, 1, -2, FSR__  /* -1 * 2 */
-+    test_ftoi round.s, a2, f0, 0xbf800000, 0, -1, FSR__  /* -1 */
-+    test_ftoi round.s, a2, f0, 0xbf400000, 0, -1, FSR_I  /* -0.75 */
-+    test_ftoi round.s, a2, f0, 0xbf000000, 0,  0, FSR_I  /* -0.5 */
+-        tlbe->translated_addr = gpa + (iova & mask);
+-        tlbe->perm = PTE_AP_TO_PERM(ap);
++        tlbe->entry.translated_addr = gpa + (iova & mask);
++        tlbe->entry.perm = PTE_AP_TO_PERM(ap);
++        tlbe->level = level;
++        tlbe->granule = granule_sz;
+         return 0;
+     }
+     info->type = SMMU_PTW_ERR_TRANSLATION;
  
-     /* positive */
--    test_ftoi round.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
--    test_ftoi round.s, a2, f0, 0x3f400000, 0, 1 /* 0.75 */
--    test_ftoi round.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
--    test_ftoi round.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
--    test_ftoi round.s, a2, f0, 0x3fc00000, 0, 2 /* 1.5 */
--    test_ftoi round.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
-+    test_ftoi round.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
-+    test_ftoi round.s, a2, f0, 0x3f400000, 0, 1, FSR_I /* 0.75 */
-+    test_ftoi round.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
-+    test_ftoi round.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
-+    test_ftoi round.s, a2, f0, 0x3fc00000, 0, 2, FSR_I /* 1.5 */
-+    test_ftoi round.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
+ error:
+-    tlbe->perm = IOMMU_NONE;
++    tlbe->entry.perm = IOMMU_NONE;
+     return -EINVAL;
+ }
  
-     /* positive overflow */
--    test_ftoi round.s, a2, f0, 0x4effffff, 0, 0x7fffff80
--    test_ftoi round.s, a2, f0, 0x4f000000, 0, 0x7fffffff
--    test_ftoi round.s, a2, f0, 0x4effffff, 1, 0x7fffffff
-+    test_ftoi round.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
-+    test_ftoi round.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
-+    test_ftoi round.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
+@@ -321,7 +323,7 @@ error:
+  * return 0 on success
+  */
+ inline int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
+-             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
++                    SMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
+ {
+     if (!cfg->aa64) {
+         /*
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index cd2a2e7e14..db74d27add 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -626,7 +626,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     SMMUTranslationStatus status;
+     SMMUState *bs = ARM_SMMU(s);
+     uint64_t page_mask, aligned_addr;
+-    IOMMUTLBEntry *cached_entry = NULL;
++    SMMUTLBEntry *cached_entry = NULL;
+     SMMUTransTableInfo *tt;
+     SMMUTransCfg *cfg = NULL;
+     IOMMUTLBEntry entry = {
+@@ -676,7 +676,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
  
-     /* +inf */
--    test_ftoi round.s, a2, f0, 0x7f800000, 0, 0x7fffffff
-+    test_ftoi round.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
+     cached_entry = smmu_iotlb_lookup(bs, cfg, aligned_addr);
+     if (cached_entry) {
+-        if ((flag & IOMMU_WO) && !(cached_entry->perm & IOMMU_WO)) {
++        if ((flag & IOMMU_WO) && !(cached_entry->entry.perm & IOMMU_WO)) {
+             status = SMMU_TRANS_ERROR;
+             if (event.record_trans_faults) {
+                 event.type = SMMU_EVT_F_PERMISSION;
+@@ -689,7 +689,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         goto epilogue;
+     }
  
-     /* NaN */
--    test_ftoi round.s, a2, f0, 0x7f800001, 0, 0x7fffffff
--    test_ftoi round.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
-+    test_ftoi round.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
-+    test_ftoi round.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
- test_end
+-    cached_entry = g_new0(IOMMUTLBEntry, 1);
++    cached_entry = g_new0(SMMUTLBEntry, 1);
  
- test trunc_s
-     /* NaN */
--    test_ftoi trunc.s, a2, f0, 0xffc00001, 0, 0x7fffffff
--    test_ftoi trunc.s, a2, f0, 0xff800001, 0, 0x7fffffff
-+    test_ftoi trunc.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
-+    test_ftoi trunc.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
- 
-     /* -inf */
--    test_ftoi trunc.s, a2, f0, 0xff800000, 0, 0x80000000
-+    test_ftoi trunc.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
- 
-     /* negative overflow */
--    test_ftoi trunc.s, a2, f0, 0xceffffff, 1, 0x80000000
--    test_ftoi trunc.s, a2, f0, 0xcf000000, 0, 0x80000000
--    test_ftoi trunc.s, a2, f0, 0xceffffff, 0, 0x80000080
-+    test_ftoi trunc.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
-+    test_ftoi trunc.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
-+    test_ftoi trunc.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
- 
-     /* negative */
--    test_ftoi trunc.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
--    test_ftoi trunc.s, a2, f0, 0xbfc00000, 0, -1 /* -1.5 */
--    test_ftoi trunc.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
--    test_ftoi trunc.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
--    test_ftoi trunc.s, a2, f0, 0xbf400000, 0, 0  /* -0.75 */
--    test_ftoi trunc.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
-+    test_ftoi trunc.s, a2, f0, 0xbfa00000, 1, -2, FSR_I /* -1.25 * 2 */
-+    test_ftoi trunc.s, a2, f0, 0xbfc00000, 0, -1, FSR_I /* -1.5 */
-+    test_ftoi trunc.s, a2, f0, 0xbf800000, 1, -2, FSR__ /* -1 * 2 */
-+    test_ftoi trunc.s, a2, f0, 0xbf800000, 0, -1, FSR__ /* -1 */
-+    test_ftoi trunc.s, a2, f0, 0xbf400000, 0,  0, FSR_I /* -0.75 */
-+    test_ftoi trunc.s, a2, f0, 0xbf000000, 0,  0, FSR_I /* -0.5 */
- 
-     /* positive */
--    test_ftoi trunc.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
--    test_ftoi trunc.s, a2, f0, 0x3f400000, 0, 0 /* 0.75 */
--    test_ftoi trunc.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
--    test_ftoi trunc.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
--    test_ftoi trunc.s, a2, f0, 0x3fc00000, 0, 1 /* 1.5 */
--    test_ftoi trunc.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
-+    test_ftoi trunc.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
-+    test_ftoi trunc.s, a2, f0, 0x3f400000, 0, 0, FSR_I /* 0.75 */
-+    test_ftoi trunc.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
-+    test_ftoi trunc.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
-+    test_ftoi trunc.s, a2, f0, 0x3fc00000, 0, 1, FSR_I /* 1.5 */
-+    test_ftoi trunc.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
- 
-     /* positive overflow */
--    test_ftoi trunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80
--    test_ftoi trunc.s, a2, f0, 0x4f000000, 0, 0x7fffffff
--    test_ftoi trunc.s, a2, f0, 0x4effffff, 1, 0x7fffffff
-+    test_ftoi trunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
-+    test_ftoi trunc.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
-+    test_ftoi trunc.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
- 
-     /* +inf */
--    test_ftoi trunc.s, a2, f0, 0x7f800000, 0, 0x7fffffff
-+    test_ftoi trunc.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
- 
-     /* NaN */
--    test_ftoi trunc.s, a2, f0, 0x7f800001, 0, 0x7fffffff
--    test_ftoi trunc.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
-+    test_ftoi trunc.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
-+    test_ftoi trunc.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
- test_end
- 
- test floor_s
-     /* NaN */
--    test_ftoi floor.s, a2, f0, 0xffc00001, 0, 0x7fffffff
--    test_ftoi floor.s, a2, f0, 0xff800001, 0, 0x7fffffff
-+    test_ftoi floor.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
-+    test_ftoi floor.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
- 
-     /* -inf */
--    test_ftoi floor.s, a2, f0, 0xff800000, 0, 0x80000000
-+    test_ftoi floor.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
- 
-     /* negative overflow */
--    test_ftoi floor.s, a2, f0, 0xceffffff, 1, 0x80000000
--    test_ftoi floor.s, a2, f0, 0xcf000000, 0, 0x80000000
--    test_ftoi floor.s, a2, f0, 0xceffffff, 0, 0x80000080
-+    test_ftoi floor.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
-+    test_ftoi floor.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
-+    test_ftoi floor.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
- 
-     /* negative */
--    test_ftoi floor.s, a2, f0, 0xbfa00000, 1, -3 /* -1.25 * 2 */
--    test_ftoi floor.s, a2, f0, 0xbfc00000, 0, -2 /* -1.5 */
--    test_ftoi floor.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
--    test_ftoi floor.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
--    test_ftoi floor.s, a2, f0, 0xbf400000, 0, -1 /* -0.75 */
--    test_ftoi floor.s, a2, f0, 0xbf000000, 0, -1 /* -0.5 */
-+    test_ftoi floor.s, a2, f0, 0xbfa00000, 1, -3, FSR_I /* -1.25 * 2 */
-+    test_ftoi floor.s, a2, f0, 0xbfc00000, 0, -2, FSR_I /* -1.5 */
-+    test_ftoi floor.s, a2, f0, 0xbf800000, 1, -2, FSR__ /* -1 * 2 */
-+    test_ftoi floor.s, a2, f0, 0xbf800000, 0, -1, FSR__ /* -1 */
-+    test_ftoi floor.s, a2, f0, 0xbf400000, 0, -1, FSR_I /* -0.75 */
-+    test_ftoi floor.s, a2, f0, 0xbf000000, 0, -1, FSR_I /* -0.5 */
- 
-     /* positive */
--    test_ftoi floor.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
--    test_ftoi floor.s, a2, f0, 0x3f400000, 0, 0 /* 0.75 */
--    test_ftoi floor.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
--    test_ftoi floor.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
--    test_ftoi floor.s, a2, f0, 0x3fc00000, 0, 1 /* 1.5 */
--    test_ftoi floor.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
-+    test_ftoi floor.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
-+    test_ftoi floor.s, a2, f0, 0x3f400000, 0, 0, FSR_I /* 0.75 */
-+    test_ftoi floor.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
-+    test_ftoi floor.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
-+    test_ftoi floor.s, a2, f0, 0x3fc00000, 0, 1, FSR_I /* 1.5 */
-+    test_ftoi floor.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
- 
-     /* positive overflow */
--    test_ftoi floor.s, a2, f0, 0x4effffff, 0, 0x7fffff80
--    test_ftoi floor.s, a2, f0, 0x4f000000, 0, 0x7fffffff
--    test_ftoi floor.s, a2, f0, 0x4effffff, 1, 0x7fffffff
-+    test_ftoi floor.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
-+    test_ftoi floor.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
-+    test_ftoi floor.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
- 
-     /* +inf */
--    test_ftoi floor.s, a2, f0, 0x7f800000, 0, 0x7fffffff
-+    test_ftoi floor.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
- 
-     /* NaN */
--    test_ftoi floor.s, a2, f0, 0x7f800001, 0, 0x7fffffff
--    test_ftoi floor.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
-+    test_ftoi floor.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
-+    test_ftoi floor.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
- test_end
- 
- test ceil_s
-     /* NaN */
--    test_ftoi ceil.s, a2, f0, 0xffc00001, 0, 0x7fffffff
--    test_ftoi ceil.s, a2, f0, 0xff800001, 0, 0x7fffffff
-+    test_ftoi ceil.s, a2, f0, 0xffc00001, 0, 0x7fffffff, FSR_V
-+    test_ftoi ceil.s, a2, f0, 0xff800001, 0, 0x7fffffff, FSR_V
- 
-     /* -inf */
--    test_ftoi ceil.s, a2, f0, 0xff800000, 0, 0x80000000
-+    test_ftoi ceil.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
- 
-     /* negative overflow */
--    test_ftoi ceil.s, a2, f0, 0xceffffff, 1, 0x80000000
--    test_ftoi ceil.s, a2, f0, 0xcf000000, 0, 0x80000000
--    test_ftoi ceil.s, a2, f0, 0xceffffff, 0, 0x80000080
-+    test_ftoi ceil.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
-+    test_ftoi ceil.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR__
-+    test_ftoi ceil.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR__
- 
-     /* negative */
--    test_ftoi ceil.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
--    test_ftoi ceil.s, a2, f0, 0xbfc00000, 0, -1 /* -1.5 */
--    test_ftoi ceil.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
--    test_ftoi ceil.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
--    test_ftoi ceil.s, a2, f0, 0xbf400000, 0, 0  /* -0.75 */
--    test_ftoi ceil.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
-+    test_ftoi ceil.s, a2, f0, 0xbfa00000, 1, -2, FSR_I /* -1.25 * 2 */
-+    test_ftoi ceil.s, a2, f0, 0xbfc00000, 0, -1, FSR_I /* -1.5 */
-+    test_ftoi ceil.s, a2, f0, 0xbf800000, 1, -2, FSR__ /* -1 * 2 */
-+    test_ftoi ceil.s, a2, f0, 0xbf800000, 0, -1, FSR__ /* -1 */
-+    test_ftoi ceil.s, a2, f0, 0xbf400000, 0,  0, FSR_I /* -0.75 */
-+    test_ftoi ceil.s, a2, f0, 0xbf000000, 0,  0, FSR_I /* -0.5 */
- 
-     /* positive */
--    test_ftoi ceil.s, a2, f0, 0x3f000000, 0, 1 /* 0.5 */
--    test_ftoi ceil.s, a2, f0, 0x3f400000, 0, 1 /* 0.75 */
--    test_ftoi ceil.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
--    test_ftoi ceil.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
--    test_ftoi ceil.s, a2, f0, 0x3fc00000, 0, 2 /* 1.5 */
--    test_ftoi ceil.s, a2, f0, 0x3fa00000, 1, 3 /* 1.25 * 2 */
-+    test_ftoi ceil.s, a2, f0, 0x3f000000, 0, 1, FSR_I /* 0.5 */
-+    test_ftoi ceil.s, a2, f0, 0x3f400000, 0, 1, FSR_I /* 0.75 */
-+    test_ftoi ceil.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
-+    test_ftoi ceil.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
-+    test_ftoi ceil.s, a2, f0, 0x3fc00000, 0, 2, FSR_I /* 1.5 */
-+    test_ftoi ceil.s, a2, f0, 0x3fa00000, 1, 3, FSR_I /* 1.25 * 2 */
- 
-     /* positive overflow */
--    test_ftoi ceil.s, a2, f0, 0x4effffff, 0, 0x7fffff80
--    test_ftoi ceil.s, a2, f0, 0x4f000000, 0, 0x7fffffff
--    test_ftoi ceil.s, a2, f0, 0x4effffff, 1, 0x7fffffff
-+    test_ftoi ceil.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
-+    test_ftoi ceil.s, a2, f0, 0x4f000000, 0, 0x7fffffff, FSR_V
-+    test_ftoi ceil.s, a2, f0, 0x4effffff, 1, 0x7fffffff, FSR_V
- 
-     /* +inf */
--    test_ftoi ceil.s, a2, f0, 0x7f800000, 0, 0x7fffffff
-+    test_ftoi ceil.s, a2, f0, 0x7f800000, 0, 0x7fffffff, FSR_V
- 
-     /* NaN */
--    test_ftoi ceil.s, a2, f0, 0x7f800001, 0, 0x7fffffff
--    test_ftoi ceil.s, a2, f0, 0x7fc00000, 0, 0x7fffffff
-+    test_ftoi ceil.s, a2, f0, 0x7f800001, 0, 0x7fffffff, FSR_V
-+    test_ftoi ceil.s, a2, f0, 0x7fc00000, 0, 0x7fffffff, FSR_V
- test_end
- 
- test utrunc_s
-     /* NaN */
--    test_ftoi utrunc.s, a2, f0, 0xffc00001, 0, 0xffffffff
--    test_ftoi utrunc.s, a2, f0, 0xff800001, 0, 0xffffffff
-+    test_ftoi utrunc.s, a2, f0, 0xffc00001, 0, 0xffffffff, FSR_V
-+    test_ftoi utrunc.s, a2, f0, 0xff800001, 0, 0xffffffff, FSR_V
- 
-     /* -inf */
--    test_ftoi utrunc.s, a2, f0, 0xff800000, 0, 0x80000000
-+    test_ftoi utrunc.s, a2, f0, 0xff800000, 0, 0x80000000, FSR_V
- 
-     /* negative overflow */
--    test_ftoi utrunc.s, a2, f0, 0xceffffff, 1, 0x80000000
--    test_ftoi utrunc.s, a2, f0, 0xcf000000, 0, 0x80000000
--    test_ftoi utrunc.s, a2, f0, 0xceffffff, 0, 0x80000080
-+    test_ftoi utrunc.s, a2, f0, 0xceffffff, 1, 0x80000000, FSR_V
-+    test_ftoi utrunc.s, a2, f0, 0xcf000000, 0, 0x80000000, FSR_V
-+    test_ftoi utrunc.s, a2, f0, 0xceffffff, 0, 0x80000080, FSR_V
- 
-     /* negative */
--    test_ftoi utrunc.s, a2, f0, 0xbfa00000, 1, -2 /* -1.25 * 2 */
--    test_ftoi utrunc.s, a2, f0, 0xbfc00000, 0, -1 /* -1.5 */
--    test_ftoi utrunc.s, a2, f0, 0xbf800000, 1, -2 /* -1 * 2 */
--    test_ftoi utrunc.s, a2, f0, 0xbf800000, 0, -1 /* -1 */
--    test_ftoi utrunc.s, a2, f0, 0xbf400000, 0, 0  /* -0.75 */
--    test_ftoi utrunc.s, a2, f0, 0xbf000000, 0, 0  /* -0.5 */
-+    test_ftoi utrunc.s, a2, f0, 0xbfa00000, 1, -2, FSR_V /* -1.25 * 2 */
-+    test_ftoi utrunc.s, a2, f0, 0xbfc00000, 0, -1, FSR_V /* -1.5 */
-+    test_ftoi utrunc.s, a2, f0, 0xbf800000, 1, -2, FSR_V /* -1 * 2 */
-+    test_ftoi utrunc.s, a2, f0, 0xbf800000, 0, -1, FSR_V /* -1 */
-+    test_ftoi utrunc.s, a2, f0, 0xbf400000, 0,  0, FSR_I /* -0.75 */
-+    test_ftoi utrunc.s, a2, f0, 0xbf000000, 0,  0, FSR_I /* -0.5 */
- 
-     /* positive */
--    test_ftoi utrunc.s, a2, f0, 0x3f000000, 0, 0 /* 0.5 */
--    test_ftoi utrunc.s, a2, f0, 0x3f400000, 0, 0 /* 0.75 */
--    test_ftoi utrunc.s, a2, f0, 0x3f800000, 0, 1 /* 1 */
--    test_ftoi utrunc.s, a2, f0, 0x3f800000, 1, 2 /* 1 * 2 */
--    test_ftoi utrunc.s, a2, f0, 0x3fc00000, 0, 1 /* 1.5 */
--    test_ftoi utrunc.s, a2, f0, 0x3fa00000, 1, 2 /* 1.25 * 2 */
-+    test_ftoi utrunc.s, a2, f0, 0x3f000000, 0, 0, FSR_I /* 0.5 */
-+    test_ftoi utrunc.s, a2, f0, 0x3f400000, 0, 0, FSR_I /* 0.75 */
-+    test_ftoi utrunc.s, a2, f0, 0x3f800000, 0, 1, FSR__ /* 1 */
-+    test_ftoi utrunc.s, a2, f0, 0x3f800000, 1, 2, FSR__ /* 1 * 2 */
-+    test_ftoi utrunc.s, a2, f0, 0x3fc00000, 0, 1, FSR_I /* 1.5 */
-+    test_ftoi utrunc.s, a2, f0, 0x3fa00000, 1, 2, FSR_I /* 1.25 * 2 */
- 
-     /* positive overflow */
--    test_ftoi utrunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80
--    test_ftoi utrunc.s, a2, f0, 0x4f000000, 0, 0x80000000
--    test_ftoi utrunc.s, a2, f0, 0x4effffff, 1, 0xffffff00
--    test_ftoi utrunc.s, a2, f0, 0x4f800000, 1, 0xffffffff
-+    test_ftoi utrunc.s, a2, f0, 0x4effffff, 0, 0x7fffff80, FSR__
-+    test_ftoi utrunc.s, a2, f0, 0x4f000000, 0, 0x80000000, FSR__
-+    test_ftoi utrunc.s, a2, f0, 0x4effffff, 1, 0xffffff00, FSR__
-+    test_ftoi utrunc.s, a2, f0, 0x4f800000, 1, 0xffffffff, FSR_V
- 
-     /* +inf */
--    test_ftoi utrunc.s, a2, f0, 0x7f800000, 0, 0xffffffff
-+    test_ftoi utrunc.s, a2, f0, 0x7f800000, 0, 0xffffffff, FSR_V
- 
-     /* NaN */
--    test_ftoi utrunc.s, a2, f0, 0x7f800001, 0, 0xffffffff
--    test_ftoi utrunc.s, a2, f0, 0x7fc00000, 0, 0xffffffff
-+    test_ftoi utrunc.s, a2, f0, 0x7f800001, 0, 0xffffffff, FSR_V
-+    test_ftoi utrunc.s, a2, f0, 0x7fc00000, 0, 0xffffffff, FSR_V
- test_end
- 
- test float_s
-     test_itof float.s, f0, a2, -1, 0, \
--        0xbf800000, 0xbf800000, 0xbf800000, 0xbf800000
--    test_itof float.s, f0, a2, 0, 0, 0, 0, 0, 0
-+        0xbf800000, 0xbf800000, 0xbf800000, 0xbf800000, FSR__
-+    test_itof float.s, f0, a2, 0, 0, 0, 0, 0, 0, FSR__
-     test_itof float.s, f0, a2, 1, 1, \
--        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000
-+        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000, FSR__
-     test_itof float.s, f0, a2, 1, 0, \
--        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000
-+        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000, FSR__
-     test_itof float.s, f0, a2, 0x7fffffff, 0, \
--        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff
-+        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff, FSR_I
- test_end
- 
- test ufloat_s
--    test_itof ufloat.s, f0, a2, 0, 0, 0, 0, 0, 0
-+    test_itof ufloat.s, f0, a2, 0, 0, 0, 0, 0, 0, FSR__
-     test_itof ufloat.s, f0, a2, 1, 1, \
--        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000
-+        0x3f000000, 0x3f000000, 0x3f000000, 0x3f000000, FSR__
-     test_itof ufloat.s, f0, a2, 1, 0, \
--        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000
-+        0x3f800000, 0x3f800000, 0x3f800000, 0x3f800000, FSR__
-     test_itof ufloat.s, f0, a2, 0x7fffffff, 0, \
--        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff
-+        0x4f000000, 0x4effffff, 0x4f000000, 0x4effffff, FSR_I
-     test_itof ufloat.s, f0, a2, 0xffffffff, 0, \
--        0x4f800000, 0x4f7fffff, 0x4f800000, 0x4f7fffff
-+        0x4f800000, 0x4f7fffff, 0x4f800000, 0x4f7fffff, FSR_I
- test_end
- 
- #endif
+     if (smmu_ptw(cfg, aligned_addr, flag, cached_entry, &ptw_info)) {
+         g_free(cached_entry);
+@@ -743,9 +743,9 @@ epilogue:
+     switch (status) {
+     case SMMU_TRANS_SUCCESS:
+         entry.perm = flag;
+-        entry.translated_addr = cached_entry->translated_addr +
++        entry.translated_addr = cached_entry->entry.translated_addr +
+                                     (addr & page_mask);
+-        entry.addr_mask = cached_entry->addr_mask;
++        entry.addr_mask = cached_entry->entry.addr_mask;
+         trace_smmuv3_translate_success(mr->parent_obj.name, sid, addr,
+                                        entry.translated_addr, entry.perm);
+         break;
 -- 
-2.20.1
+2.21.3
 
 
