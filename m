@@ -2,109 +2,89 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4315C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BCBFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:41:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD02120674
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:40:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 345DC20775
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:41:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gC64K18t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD02120674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZtTw5Dmz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345DC20775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIk3-0007k9-NL
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:40:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46512)
+	id 1jtIkN-000893-CQ
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:40:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jtIKa-0003BM-G6
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:14:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49599
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRa-0001e8-NV
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42266
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jtIKX-0008Hn-Ku
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:14:20 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtIRV-00013T-Gu
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:21:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594246456;
+ s=mimecast20190719; t=1594246888;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=foKCPCHuOWEo6TsYfm8Oz8Dioah9AubWatTSQdaIZYM=;
- b=gC64K18tylWFqXLrEtPJ36pHr1kj8AnJxdU/ZUdMzzEdM1d35JMhPD8IH6+bIJAqfTQ5bx
- 1IH6xn2RGBqpmQAu1AGgIZ50P6Vtf3RbxU5uv3TefyrO/+asg5q9Lu1zv4gTJ3LBNMjN+R
- sENgtMVniEaZTfjqWYQCaHYqerDaj5E=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-Yg9OZbQZMkyP-PlzKBgvqw-1; Wed, 08 Jul 2020 11:11:49 -0400
-X-MC-Unique: Yg9OZbQZMkyP-PlzKBgvqw-1
-Received: by mail-wm1-f71.google.com with SMTP id e15so3271490wme.8
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 08:11:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=foKCPCHuOWEo6TsYfm8Oz8Dioah9AubWatTSQdaIZYM=;
- b=BQxBLwXxnO26M32T/KnKDGWVygTcb4gfZ62We0BuKxxsJ3oKzgtxny1+R61H8PZ18m
- V+2ysNAjey9JFEJTyIfQ50k27ErB9yut2WOUg2R24ElGNK4qb8snW1yIdWiAEywDvEZm
- XSInS7Q5mBpvLB/sETolDFDthzChdGYgusYn8cI+OkhYaxEq64PefwH3WjxtEqi+Vz5D
- zTiQxu4PGqMvJncNkkpdEzarQ3rzidk1f2tqP/E0ZUTTs/BCpmX9ANDyxJTgeMg6hX/X
- CK88qZHC2rkPtS6FePPGyr7OnNR3X81iSQDs1uAL7rXC0pXwL0jdee597KvSr7H692qK
- Y39w==
-X-Gm-Message-State: AOAM531vLiDClcN+z2c+/mEH5Ru/TcO9PGRvRUl0LseCDD83geMm+UKe
- 9JctdZCJ1CIYm6CA9sScQsoK7R8C9qt/+9ykKg1IkJrR34wY859dmQDidGMr5LE7KxySc438SS8
- s6a3eKJMNRdXp/34=
-X-Received: by 2002:a5d:4607:: with SMTP id t7mr63362033wrq.251.1594221107960; 
- Wed, 08 Jul 2020 08:11:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw8epqkGG0hPzjwi7fsacmxpcpyLFUFaJEdIjJI6eQTHRExlT67/ceBGD3fYNPHuf8qNhmKUQ==
-X-Received: by 2002:a5d:4607:: with SMTP id t7mr63362019wrq.251.1594221107760; 
- Wed, 08 Jul 2020 08:11:47 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c?
- ([2001:b07:6468:f312:9541:9439:cb0f:89c])
- by smtp.gmail.com with ESMTPSA id v6sm318194wrr.85.2020.07.08.08.11.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 08:11:47 -0700 (PDT)
-Subject: Re: Questions about online resizing a lun passthrough disk with
- virtio-scsi
-To: lma <lma@suse.de>, qemu-devel@nongnu.org
-References: <af3e33e4a5bb15d9f0b30c8de4941a37@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a1d96da7-444e-d3b0-abd5-63cdab92e869@redhat.com>
-Date: Wed, 8 Jul 2020 17:11:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ bh=Cg8x3NGA9brdyAqact/5mp5LM5qmsQCFqU/JbN1X2VY=;
+ b=ZtTw5Dmz3UJ/GIqwpPexR5zA/7oat+c1R7D8b7w/4TRc8i2akHdGC6K2zo8f7n46TulAQf
+ MWIglvEUwKH9c6bYrwsfAkkh4OkJy7TU3akcxPSXpMaMHMfy1EksZoV5LHAixrRsTUBAf6
+ DaVUzlsVkhV0V/JGcbT+xcGZnsMthas=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-umn-EqhuNpCsqYDFscHI6A-1; Wed, 08 Jul 2020 10:20:13 -0400
+X-MC-Unique: umn-EqhuNpCsqYDFscHI6A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF8EC80040A;
+ Wed,  8 Jul 2020 14:20:11 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D63C9C0069;
+ Wed,  8 Jul 2020 14:19:58 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH v3 10/11] hw/arm/smmuv3: Support HAD and advertise SMMUv3.1
+ support
+Date: Wed,  8 Jul 2020 16:18:55 +0200
+Message-Id: <20200708141856.15776-11-eric.auger@redhat.com>
+In-Reply-To: <20200708141856.15776-1-eric.auger@redhat.com>
+References: <20200708141856.15776-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <af3e33e4a5bb15d9f0b30c8de4941a37@suse.de>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,39 +97,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/07/20 16:44, lma wrote:
-> 
-> Is the 'block_resize' mandatory to notify guest os after online resizing
-> a lun passed through disk? I'm curious it because I found there're couple
-> of ways can make guest os realize the disk capacity change.
-> e.g:
-> * run 'block_resize' via qmp to let virtio-scsi notify the frontend about
->   capacity change.
-> * run 'rescan-scsi-bus.sh -s' inside guest.
-> * run 'sg_readcap --16 /dev/sda' inside guest.
-> 
-> I knew that the purpose of 'block_resize' is not only to notify guest os,
-> but also to update some internal structure's member, say bs->total_sectors.
-> What if I forgot to run 'block_resize', but run 'rescan-scsi-bus.sh -s'
-> in guest?
+HAD is a mandatory features with SMMUv3.1 if S1P is set, which is
+our case. Other 3.1 mandatory features come with S2P which we don't
+have.
 
-Request start and length are checked even for passthrough disks (see
-scsi_disk_dma_command in hw/scsi/scsi-disk.c, called by
-scsi_block_dma_command), but the maximum LBA is snooped from READ
-CAPACITY commands (see scsi_read_complete in hw/scsi/scsi-generic.c).
-So as long as rescan-scsi-bus.sh results in a READ CAPACITY command, it
-should work.
+So let's support HAD and advertise SMMUv3.1 support in AIDR.
 
-It's not recommended however, because block_resize will report the
-change to the guest directly with a CAPACITY HAS CHANGED unit attention
-condition.
+HAD support allows the CD to disable hierarchical attributes, ie.
+if the HAD0/1 bit is set, the APTable field of table descriptors
+walked through TTB0/1 is ignored.
 
-Thanks,
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ hw/arm/smmuv3-internal.h     | 2 ++
+ include/hw/arm/smmu-common.h | 1 +
+ hw/arm/smmu-common.c         | 2 +-
+ hw/arm/smmuv3.c              | 6 +++++-
+ hw/arm/trace-events          | 2 +-
+ 5 files changed, 10 insertions(+), 3 deletions(-)
 
-Paolo
+diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+index 6296235020..4bc1548dff 100644
+--- a/hw/arm/smmuv3-internal.h
++++ b/hw/arm/smmuv3-internal.h
+@@ -54,6 +54,7 @@ REG32(IDR1,                0x4)
+ 
+ REG32(IDR2,                0x8)
+ REG32(IDR3,                0xc)
++     FIELD(IDR3, HAD,         2, 1);
+ REG32(IDR4,                0x10)
+ REG32(IDR5,                0x14)
+      FIELD(IDR5, OAS,         0, 3);
+@@ -578,6 +579,7 @@ static inline int pa_range(STE *ste)
+         lo = (x)->word[(sel) * 2 + 2] & ~0xfULL;            \
+         hi | lo;                                            \
+     })
++#define CD_HAD(x, sel)   extract32((x)->word[(sel) * 2 + 2], 1, 1)
+ 
+ #define CD_TSZ(x, sel)   extract32((x)->word[0], (16 * (sel)) + 0, 6)
+ #define CD_TG(x, sel)    extract32((x)->word[0], (16 * (sel)) + 6, 2)
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 192e8455aa..759e59daa2 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -50,6 +50,7 @@ typedef struct SMMUTransTableInfo {
+     uint64_t ttb;              /* TT base address */
+     uint8_t tsz;               /* input range, ie. 2^(64 -tsz)*/
+     uint8_t granule_sz;        /* granule page shift */
++    bool had;                  /* hierarchical attribute disable */
+ } SMMUTransTableInfo;
+ 
+ typedef struct SMMUTLBEntry {
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index aa2c5d76da..f626b8d25e 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -313,7 +313,7 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+         if (is_table_pte(pte, level)) {
+             ap = PTE_APTABLE(pte);
+ 
+-            if (is_permission_fault(ap, perm)) {
++            if (is_permission_fault(ap, perm) && !tt->had) {
+                 info->type = SMMU_PTW_ERR_PERMISSION;
+                 goto error;
+             }
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 718f28462e..b262f0e4a7 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -254,6 +254,8 @@ static void smmuv3_init_regs(SMMUv3State *s)
+     s->idr[1] = FIELD_DP32(s->idr[1], IDR1, EVENTQS, SMMU_EVENTQS);
+     s->idr[1] = FIELD_DP32(s->idr[1], IDR1, CMDQS,   SMMU_CMDQS);
+ 
++    s->idr[3] = FIELD_DP32(s->idr[3], IDR3, HAD, 1);
++
+    /* 4K and 64K granule support */
+     s->idr[5] = FIELD_DP32(s->idr[5], IDR5, GRAN4K, 1);
+     s->idr[5] = FIELD_DP32(s->idr[5], IDR5, GRAN64K, 1);
+@@ -270,6 +272,7 @@ static void smmuv3_init_regs(SMMUv3State *s)
+ 
+     s->features = 0;
+     s->sid_split = 0;
++    s->aidr = 0x1;
+ }
+ 
+ static int smmu_get_ste(SMMUv3State *s, dma_addr_t addr, STE *buf,
+@@ -506,7 +509,8 @@ static int decode_cd(SMMUTransCfg *cfg, CD *cd, SMMUEventInfo *event)
+         if (tt->ttb & ~(MAKE_64BIT_MASK(0, cfg->oas))) {
+             goto bad_cd;
+         }
+-        trace_smmuv3_decode_cd_tt(i, tt->tsz, tt->ttb, tt->granule_sz);
++        tt->had = CD_HAD(cd, i);
++        trace_smmuv3_decode_cd_tt(i, tt->tsz, tt->ttb, tt->granule_sz, tt->had);
+     }
+ 
+     event->record_trans_faults = CD_R(cd);
+diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+index 3d905e0f7d..c8a4d80f6b 100644
+--- a/hw/arm/trace-events
++++ b/hw/arm/trace-events
+@@ -39,7 +39,7 @@ smmuv3_translate_abort(const char *n, uint16_t sid, uint64_t addr, bool is_write
+ smmuv3_translate_success(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
+ smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
+ smmuv3_decode_cd(uint32_t oas) "oas=%d"
+-smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
++smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz, bool had) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d had:%d"
+ smmuv3_cmdq_cfgi_ste(int streamid) "streamid =%d"
+ smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
+ smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
+-- 
+2.21.3
 
 
