@@ -2,91 +2,134 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EFFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E8F6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:20:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56BAD206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:19:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 169B72065F
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:20:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORyP20i0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56BAD206DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0Dku7J8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 169B72065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIPm-0006N9-K4
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:19:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41368)
+	id 1jtIQw-0008Mm-98
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:20:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtI2c-0001Nc-25
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:55:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29760
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtHyJ-0002KC-DM
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:51:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44379
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtI2Z-0005cY-Mg
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:55:45 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtHyG-00059T-Qv
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 17:51:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594245343;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1594245076;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=b9YJ5mlmZ6yzT0b1ld8553tjQVL+K1ONjOdx34H2D2M=;
- b=ORyP20i0okdM8O5/IOnnL6GKTo4WC3MVtpyAcHvcbz3ypoiBDpDPiXEU7I44hObdWHFqdo
- yvyS9nmpzg/02jezqcXz9iZOuYYI/5AdmxxwlnnUcejgkSZ/ClBwddITZ2o5L+diLb/z8Q
- L4xbyZUqVPAuFw51uKCvQvopQAUDt/w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-QjF7WcrtMvawwj1dfChnjQ-1; Wed, 08 Jul 2020 06:54:08 -0400
-X-MC-Unique: QjF7WcrtMvawwj1dfChnjQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDD781902EB0;
- Wed,  8 Jul 2020 10:54:06 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.36])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 257FD1001268;
- Wed,  8 Jul 2020 10:53:55 +0000 (UTC)
-Date: Wed, 8 Jul 2020 11:53:53 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: Migrating custom qemu.org infrastructure to GitLab
-Message-ID: <20200708105353.GE3229307@redhat.com>
-References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=EFAURhhEZjwOIthRplw96ApWbu7HPwfzmrhPNCfhLdE=;
+ b=W0Dku7J88jergdduzIcW/P5eF1vKMJ0n2U52G4ROo5Z5TNMCwO7rSgDdiNr6dVr6olp75J
+ J4C8XuvLAW/JeKwczhG4fmAyB2sQGyH/9/Suytj8CU3uaKUuZRm1FVMmXPwbukXaDJkNL4
+ gQzTIaQhoqCqlZKhqpuP9umMB30LrU8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-VwI-fXaHPUKkLTq4nXPyjQ-1; Wed, 08 Jul 2020 12:50:33 -0400
+X-MC-Unique: VwI-fXaHPUKkLTq4nXPyjQ-1
+Received: by mail-wr1-f69.google.com with SMTP id o25so52490655wro.16
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 09:50:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EFAURhhEZjwOIthRplw96ApWbu7HPwfzmrhPNCfhLdE=;
+ b=fDNlINzCCsqYR4s5akPkFli2/lq63fgj8e/m1WQE9InqIZLCxPp5qtrYa5J2HL18C3
+ bh9mEICa0COJUyhae37eFoxF5OP7iJ44Q2/RHyiHS4baqcvE5Le0qd+K9uK9JmpiR7OG
+ 9rW2ny7W0Gthnxjz6nPwsLW6UZ2sNGlCedia50KZ0r8i/sbYv+PfKnBWyQpPBAJwOiJa
+ wpEs7JOvifW+zTwmx436jLIGm7zAGFf2wCbLvPgoE0wxYUg70I5qlSKMtWZ9KICTYdut
+ YZUcZJGG0BlNsfw3sG6v/jIUZt71s5HD9QltDR4yNXJQJp7reMuav9xP31M11L76qEwZ
+ Z6zQ==
+X-Gm-Message-State: AOAM533b2AjJ3I1mf+AVS7DaEFn73C1dqre0lWqj69cW7leH5Nes3cUK
+ kGgvdggf5QIditi9zQnodqvunfwW42S1EjCe6den2JfP04XYwbnHfTXojekjSTcudCjpKYqtOz5
+ 5O9GXA+npj9/xGwo=
+X-Received: by 2002:adf:ef46:: with SMTP id c6mr59450010wrp.34.1594227031574; 
+ Wed, 08 Jul 2020 09:50:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy8FO8YN+A4TMFeUTdPVcQABFgUzQsaOABrMZVj3IkafJK1UxJlbU6MyADXKkcZTIrAC9t2Gw==
+X-Received: by 2002:adf:ef46:: with SMTP id c6mr59449990wrp.34.1594227031322; 
+ Wed, 08 Jul 2020 09:50:31 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id n16sm912288wra.19.2020.07.08.09.50.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jul 2020 09:50:30 -0700 (PDT)
+Subject: Re: build error of unused function as MACRO
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC expand
+To: Li Qiang <liq3ea@163.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>,
+ "liq3ea@gmail.com" <liq3ea@gmail.com>, Alexander Bulekov <alxndr@bu.edu>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Bandan Das <bsd@redhat.com>
+References: <5F05E942.FB9110.20278@mail-m971.mail.163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <b02161d0-a027-5018-af05-8ccbc5c90cc9@redhat.com>
+Date: Wed, 8 Jul 2020 18:50:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <5F05E942.FB9110.20278@mail-m971.mail.163.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:09
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,251 +142,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Cleber Rosa <cleber@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 08, 2020 at 10:52:38AM +0100, Stefan Hajnoczi wrote:
-> Dear QEMU community,
-> QEMU currently has a static website, wiki, git repo hosting, and
-> special-purpose cronjobs/containers running in VMs. There is currently
-> no system administrator looking after our infrastructure so the most
-> urgent tasks fall onto me, the remainder are ignored/postponed. The
-> current situation exposes qemu.org to the risk of downtime and
-> security issues.
+Cc'ing the fuzzing maintainers.
 
-I would further say that maintaining infrastructure is not a good use
-of our contributors' time. It is better to have our contributors spend
-time delivering features that are beneficial to our users, rather than
-playing at sysadmin.
-
-> Another limitation is that each piece of infrastructure is managed
-> separately and one-time contributors cannot easily propose changes
-> because they do not have access. It would be much better to use our
-> existing code review process so that anyone can make changes to
-> infrastructure by sending a patch.
-
-When I was thinking about this for libvirt I came to better understand
-the appeal of the gitforge for project infrastructure. I've written
-about it in detail for libvirt:
-
-   https://www.redhat.com/archives/libvir-list/2020-March/msg00009.html
-
-The distributed SCM model of git democratized access to source control
-features across contributors. Drive-by contributors have the same level
-of SCM features as the main project contributors, instead of being
-second class citizens as they are with a non-distributed SCM.
-
-With the hosted Git forges, this concept covers all aspects of project
-infrastructure. If your project is using GitLab for all its infra
-needs, then when a user forks the repo they get access to all the
-same features as the main project. The fork is no longer a second
-class citizen lacking access to certain parts of the infra. I find
-this is especially compelling in the area of CI, containers and web
-hosting.
-
-Consider if qemu-web.git is hosted on gitlab, using GitLab CI to
-generate the static site content, and GitLab pages to host the
-website. If a user wants to contribute to qemu-web, they can fork
-the repo and be confident that the CI jobs in their fork are going
-to work in the exact same way as in the master repo. They can use
-GitLab Pages to browse the generated content for their fork to
-see exactly how it will look.
-
-This eliminates the big pain point in qemu-web contribution. Many
-times I was tripped up with the problem of qemu-web.git requiring
-a version of Jekyll that is incompatible with the version that
-ships on my distro.
-
-> GitLab's Continuous Integration (CI) system provides a powerful way to
-> perform actions defined in yaml files in qemu.git. This includes
-> running scripts, builds, publishing build artifacts, etc. We have
-> already begun using it for automated builds and tests:
-> https://gitlab.com/qemu-project/qemu/-/blob/master/.gitlab-ci.yml
-
-The CI integration has probably been the single best thing about
-libvirt's switch to GitLab.
-
-> GitLab also offers git repo hosting, wikis, issue tracking, and other
-> features. It is possible to log in using GitHub, Google, or Twitter
-> single sign-on if you do not want to create another account. As more
-> open source projects use GitLab it becomes easier for one-time
-> contributors who will already be familiar with the tools from other
-> projects.
-
-> Here is a full list of GitLab's features:
-> https://about.gitlab.com/features/
->=20
-> GitLab offers the gold/ultimate tier for free to open source projects:
-> https://about.gitlab.com/solutions/open-source/
->=20
-> GitLab itself is open source and can be self-hosted if we decide to
-> leave in the future.
-
-NB self-hosting would reduce features compared to gitlab.com unless
-you paid for the enterprise edition. You'd also have to bring your
-own infra for running CI jobs which quickly gets very expensive
-as freedesktop.org admins have learnt the hard way. The CI resources
-provided by gitlab.com are incredibly generous.
-
-> With this in mind I propose moving qemu.org infrastructure to GitLab
-> incrementally. This needs to be done carefully to avoid disruption and
-> only where GitLab meets the requirements. The QEMU project will
-> continue to have access to cloud hosting for running custom
-> infrastructure or adding runners to GitLab CI to improve CI
-> performance.
->=20
-> The following infrastructure components can be considered for GitLab migr=
-ation:
->=20
-> 1. qemu-web.git static site generation. GitLab CI/CD can build the
-> static website on each qemu-web.git commit and publish the HTML
-> artifacts.
-
-This is an easy win. it should be especially simple for qemu, compared to
-libvirt, since qemu.org already used separate sub-domains for other content
-like git & downloads.
-
-> 2. wiki.qemu.org is a MediaWiki instance. Account creation is a hurdle
-> to one-time or new contributors. It is unclear whether GitLab's wiki
-> is expressive enough for a lossless conversion of the existing QEMU
-> wiki. Any volunteers interested in evaluating the wiki migration would
-> be appreciated.
-
-Yeah, this is a potentially big piece of work. We didn't finish this
-in libvirt either. Looking at the libvirt mediawiki though, I decided
-not todo a straight export/import of all content.
-
-A bunch of content was horribly out of date and needed deleting as
-it was irrelevant to anyone, or outright misleading wrt current state
-of the world.
-
-A lot of content on the wiki really only existed in the wiki, because
-contributing to our libvirt.org website was harder than it needed to
-be. We switched the main website over to use RST instead of HTML so
-authoring content is much closer to what you'd experience with the
-wiki markup. The wiki became a burden for contributors as due to
-spam attacks we can't allow anonymous access, and need manual account
-creation as with QEMU wiki.
-
-Every page on the main website now has a link "edit this page"
-that takes you straight to the source file in the gitlab.com UI,
-where you can interactively edit the text in your fork and then
-submit a merge request with the result.
-
-The wiki also suffered from the content not having any level of review.
-While the intentions of many contributors were good, the results often
-left alot to be desired.=20
-
-So overall we decided that while GitLab does offer a wiki, we are not
-intending to use it. Instead we're going to aim to turn the subset of
-wiki content that is genuinely useful into pages on the main website.
-
-IOW, I'd encourage whoever tackles the wiki to look at the content
-with a critical eye and decide whether it really belongs in the wiki
-at all. Considering:
-
-  https://wiki.qemu.org/index.php?title=3DSpecial:AllPages
-
-The Planning / Changes pages for each release are probably reasonable
-as wiki pages.
-
-The Interships/ProjectIdeas pages would possibly be better off as
-GitLab Issue tickets, tagged with a "interships" label. That way
-when a project starts you can have the issue to track the work
-right from the start.
-
-The Documentation/Platforms content arguably should be part of
-the main qemu.git docs.
-
-Many of the feature pages are probably better as part of the formal
-QEMU documentation too.
-
-> 3. Git repo hosting is a core feature of GitLab and we already have a
-> qemu.git mirror. Hosting the repos on GitLab reduces the need for
-> qemu.org ssh access.
-
-With libvirt we had long used both gitlab.com/libvirt and github.com/libvir=
-t
-as read-only mirrors of the master libvirt.org/git/ repos.  When we formall=
-y
-adopted gitlab as primary infrastructure, we simply flipped the mirroring
-processes around. So now libvirt.org/git is a read-only mirror, and gitlab
-is the master.  Gitlab has built-in support to push to github.com as a
-mirror which is useful.
-
-So turning git.qemu.org into a readonly mirror would ease the transition
-to avoid breaking any scripts / workflows relying on that URL in the short
-term.
-
-> 4. The QEMU release process can be moved to CI/CD so that publishing
-> stable releases and release candidates is less dependent on one
-> committer's machine or scripts.
->=20
-> 5. Issue tracking. Launchpad more or less works, but the login always
-> bothers me. If we move git repo hosting then it makes sense to do
-> issue tracking on GitLab too.
-
-The big thing that always bothers me about launchpad is how easy it
-is to get confused between issues for QEMU upstream and issues for
-legacy releases in Ubuntu distro. This is the curse of using a distro
-issue tracker - libvirt had the same problem with its use of Red Hat
-bugzilla.
-
-Integrated issue tracking alongside the primary git repo makes a lot
-of sense. Once you declare gitlab.com the primary repo, contributors
-will immediately look to gitlab for the issue tracking too whether
-you tell them to or not.=20
-
-The gitlab issue tracker is fairly simple especially compared to the
-complexity horror of red hat bugzilla, so it was a massive win for
-libvirt to switch away from bugzilla for issues. Probably not such
-a big difference compared to launchpad in terms of complexity. The
-little things though like magic git commit messages to close issues
-are nice though.
-
-There is a question of what todo with existing bugs in launchpad.
-
-Essentially three choices
-
- 1. Move all the open bugs to gitlab
- 2. Move some relevant bugs to gitlab, but close outdated ones
- 3. Leave existing launchpad bugs but don't allow new ones filed
-
-So far for libvirt we did option 3 there, with a little bit of
-option 2.
-
-> There is a snowball effect where the experience is improved the more
-> GitLab features we use, so I hope that most of these migrations will
-> be possible.
->=20
-> Next steps:
->  * If you have an interest in one or more of these infrastructure
-> components, please join the discussion.
->  * If there are no volunteers for an infrastructure component I'll
-> slowly work my way through evaluating GitLab and propose migrations
-
-The experiance of moving infra to gitlab.com has been quite positive
-for libvirt, and me in particular as the single point of failure for
-much of libvirt's old infrastructure. I think it will be beneficial
-for QEMU too, for many of the reasons I mention above and in the
-email link I quoted.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+On 7/8/20 5:41 PM, Li Qiang wrote:
+> Hello all,
+> 
+>  
+> 
+> I build qemu with fuzzing enabled using clang and following error come.
+> 
+>  
+> 
+> nbd/server.c:1937:1: error: unused function
+> 'glib_listautoptr_cleanup_NBDExtentArray' [-Werror,-Wunused-function]
+> 
+> G_DEFINE_AUTOPTR_CLEANUP_FUNC(NBDExtentArray, nbd_extent_array_free);
+> 
+> ^
+> 
+> /usr/include/glib-2.0/glib/gmacros.h:462:22: note: expanded from macro
+> 'G_DEFINE_AUTOPTR_CLEANUP_FUNC'
+> 
+>   static inline void _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) (GList **_l)
+> { g_list_free_full (*_l, (GDestroyNotify) func); } \
+> 
+>                      ^
+> 
+> /usr/include/glib-2.0/glib/gmacros.h:443:48: note: expanded from macro
+> '_GLIB_AUTOPTR_LIST_FUNC_NAME'
+> 
+> #define _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName)
+> glib_listautoptr_cleanup_##TypeName
+> 
+>                                                ^
+> 
+> <scratch space>:170:1: note:   CC      crypto/hash-glib.o
+> 
+> expanded from here
+> 
+> glib_listautoptr_cleanup_NBDExtentArray
+> 
+> ^
+> 
+> nbd/server.c:1937:1: error: unused function
+> 'glib_slistautoptr_cleanup_NBDExtentArray' [-Werror,-Wunused-function]
+> 
+> /usr/include/glib-2.0/glib/gmacros.h:463:22: note: expanded from macro
+> 'G_DEFINE_AUTOPTR_CLEANUP_FUNC'
+> 
+>   static inline void _GLIB_AUTOPTR_SLIST_FUNC_NAME(TypeName) (GSList
+> **_l) { g_slist_free_full (*_l, (GDestroyNotify) func); } \
+> 
+>                      ^
+> 
+> /usr/include/glib-2.0/glib/gmacros.h:445:49: note: expanded from macro
+> '_GLIB_AUTOPTR_SLIST_FUNC_NAME'
+> 
+> #define _GLIB_AUTOPTR_SLIST_FUNC_NAME(TypeName)
+> glib_slistautoptr_cleanup_##TypeName
+> 
+>                                                 ^
+> 
+> <scratch space>:171:1: note: expanded from here
+> 
+> glib_slistautoptr_cleanup_NBDExtentArray
+> 
+>  
+> 
+>  
+> 
+> I see Eric’s patch 9bda600b083(“build: Silence clang warning on older
+> glib autoptr usage”)
+> 
+> So I know there should be a ‘-Wno-unused-function’ in CFLAGS. It is
+> after ./configure:
+> 
+>  
+> 
+> CFLAGS            -g  -Wno-unused-function
+> 
+> QEMU_CFLAGS       -I/usr/include/pixman-1  -Werror  -pthread
+> -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+> -fPIE -DPIE -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
+> -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef
+> -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common
+> -fwrapv -std=gnu99  -Wno-string-plus-int -Wno-typedef-redefinition
+> -Wno-initializer-overrides -Wexpansion-to-defined -Wendif-labels
+> -Wno-shift-negative-value -Wno-missing-include-dirs -Wempty-body
+> -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self
+> -Wignored-qualifiers -Wold-style-definition -Wtype-limits
+> -fstack-protector-strong -I$(SRC_PATH)/capstone/include
+> 
+>  
+> 
+> However while I ‘make V=1’ I see the build nbd/serer.c using following
+> command:
+> 
+> clang-8 -iquote /home/test/qemu/nbd -iquote nbd -iquote
+> /home/test/qemu/tcg/i386 -isystem /home/test/qemu/linux-headers -isystem
+> /home/test/qemu/linux-headers -iquote . -iquote /home/test/qemu -iquote
+> /home/test/qemu/accel/tcg -iquote /home/test/qemu/include -iquote
+> /home/test/qemu/disas/libvixl -I/usr/include/pixman-1  -Werror  -pthread
+> -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+> -fPIE -DPIE -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
+> -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef
+> -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common
+> -fwrapv -std=gnu99  -Wno-string-plus-int -Wno-typedef-redefinition
+> -Wno-initializer-overrides -Wexpansion-to-defined -Wendif-labels
+> -Wno-shift-negative-value -Wno-missing-include-dirs -Wempty-body
+> -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self
+> -Wignored-qualifiers -Wold-style-definition -Wtype-limits
+> -fstack-protector-strong -I/home/test/qemu/capstone/include
+> -I/home/test/qemu/tests -I/home/test/qemu/tests/qtest -MMD -MP -MT
+> nbd/server.o -MF nbd/server.d -fsanitize=address,fuzzer-no-link  -c -o
+> nbd/server.o nbd/server.c
+> 
+>  
+> 
+> There’s no CFLAGS ‘-Wno-unused-function’.
+> 
+>  
+> 
+> So I want to know:
+> 
+> 1.    Wha’t the relation of CFLAGS and QEMU_CFLAGS, it seems the CFLAGS
+> doesn’t work in this.
+> 
+> 2.    Any hits to solve this? My env error or needs a patch?
+> 
+>  
+> 
+> I use following command in Ubuntu 18.04.1.
+> 
+> CC=clang-8 CXX=clang++-8  ./configure  --target-list="i386-softmmu" 
+> --enable-debug --enable-debug  --enable-kvm --enable-fuzzing
+> 
+>  
+> 
+>  
+> 
+> Thanks,
+> 
+> Li Qiang
+> 
 
 
