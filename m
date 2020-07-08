@@ -2,95 +2,131 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB49AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98062C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2878206DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:44:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 620C9206DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:45:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s1uUcltS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2878206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VcR6KXCW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620C9206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtKfZ-00081g-V6
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:44:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48214)
+	id 1jtKge-0000ge-Lx
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:45:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3mWYGXwsKCn4jumkppgoqgpiqqing.eqosgow-fgxgnpqpipw.qti@flex--hskinnemoen.bounces.google.com>)
- id 1jtKYQ-0006kx-Nu
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:36:46 -0400
-Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:41897)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3mWYGXwsKCn4jumkppgoqgpiqqing.eqosgow-fgxgnpqpipw.qti@flex--hskinnemoen.bounces.google.com>)
- id 1jtKYN-00013A-DD
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:36:46 -0400
-Received: by mail-yb1-xb4a.google.com with SMTP id 132so781767ybg.8
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 17:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc:content-transfer-encoding;
- bh=GbsHhbU+MBRirlIqPaGRSzfQ2oFvTqZhm+nXLxBNqhs=;
- b=s1uUcltScFoKONI14mjDEQiY1Pg6pY3+ElN2rIbUodurYUsG/rek0i2hH1QlQ06lP4
- gGTJlIterzu0Nv+dpqCFdGbx+pjKHNVH5596XWijsSE6bZgY11HV4VILSB0RmpPTZt9V
- IgBhJStzq5IuCsOlP3d5OH15BahQ/asIMsdwvhNUdit9zxYfu+I1oCBdQArO37uOO9Ax
- M9WX2H0Of6PUujcxRuM25g0gv9ap5x/seuWKhRfw7JH6qWgA1S+ZJEx9xtuIdgIMzBqQ
- Mls5V8Ar5KHDCKsDen3m00DtWek5jmYEI8HMaYUk6wNZ72eUzMc2TEPjpkVHpZ6S/PnT
- mijA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtKeX-00070i-SO
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:43:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58418
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtKeV-0001mf-PU
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:43:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594255383;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=HC4ZhD5xH1OoGbJtx9xSSEoRAmbLPFa1Dv6pfKxMs7E=;
+ b=VcR6KXCWH2f4wmUqPxqpEHVIZyQtvFkZgmfQRkCZSX/w9TwVJBDq58+y89MtUDnMUTibmi
+ X8MdNxFo/76/4PEMzeddXvEOhWfNdL9BOhWboTbdfcv+ZxqwiabR4UmVMvE/Koly2seFKF
+ SWfPa6BZh/b5/8dln5oXK7AVXFWfwE4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-4vEQpbxYO8up8krntD8wpA-1; Wed, 08 Jul 2020 04:38:32 -0400
+X-MC-Unique: 4vEQpbxYO8up8krntD8wpA-1
+Received: by mail-wr1-f71.google.com with SMTP id c6so32126156wru.7
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 01:38:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc:content-transfer-encoding;
- bh=GbsHhbU+MBRirlIqPaGRSzfQ2oFvTqZhm+nXLxBNqhs=;
- b=njVG8ffHzpFK5QYvs4MCoW0hmX7f7qMNxeiHHBXQHI88yscjP/v1CJyP7YUMaS39QH
- SOrAs0PhQ0y45hwLqPjBdAU89gKbdEXPpa8G4r1S/7Ptb/k9VgM9d8l1C6Fa04u1aBVh
- sF2ImuBjU1J0qZvAij0hZJUStp6y8qSFJLkbv3r20SEHYO05tZrLdDMsYljoxPbb1otd
- 1Lw07XLtL4WP0mISXPiCW3UxyU4TOCHuVIswQPzx7k2AYpzZqrNmNT5Uy+mpxmRttWWo
- mpW6/4aH0QxTYfpEtzBv4Ob8l1pmVTeHTQ/90cE7/WI/tAyrdZksv3EUE1ZKmxNEYYn1
- iTdg==
-X-Gm-Message-State: AOAM532179DZwnTkrI4k6iYp2KMIKdWjDFP6uEIe9qqE0meLbGAlqLDY
- hpVLRd4vmiMyVVjd2AXFLS+VIFBT1BWv+zrcDA==
-X-Google-Smtp-Source: ABdhPJzlZzKXn96+GCQvzVf8G4Ve1FY/cZDrGMIWQxiBhQWAsNLnrtmM6Qs9bQSWhPd5ZVqX1OUra91IhXmmgoCkUA==
-X-Received: by 2002:a25:d4d6:: with SMTP id m205mr14968369ybf.7.1594255001399; 
- Wed, 08 Jul 2020 17:36:41 -0700 (PDT)
-Date: Wed,  8 Jul 2020 17:36:05 -0700
-In-Reply-To: <20200709003608.3834629-1-hskinnemoen@google.com>
-Message-Id: <20200709003608.3834629-9-hskinnemoen@google.com>
-Mime-Version: 1.0
-References: <20200709003608.3834629-1-hskinnemoen@google.com>
-X-Mailer: git-send-email 2.27.0.383.g050319c2ae-goog
-Subject: [PATCH v5 08/11] hw/mem: Stubbed out NPCM7xx Memory Controller model
-From: Havard Skinnemoen <hskinnemoen@google.com>
-To: peter.maydell@linaro.org, f4bug@amsat.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
- kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>, 
- "=?UTF-8?q?C=C3=A9dric=20Le=20Goater?=" <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
- envelope-from=3mWYGXwsKCn4jumkppgoqgpiqqing.eqosgow-fgxgnpqpipw.qti@flex--hskinnemoen.bounces.google.com;
- helo=mail-yb1-xb4a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=HC4ZhD5xH1OoGbJtx9xSSEoRAmbLPFa1Dv6pfKxMs7E=;
+ b=ultzke/EeHsPmmKTTpolHPeXiI5AT36Ip5jx++0QGJmm7cOQGUYZOSyvP+kVon16/X
+ 2kA5BNG/t4mqdhQ4G8qvZQ+TbtAN4c3o/2zVJWsjqZazfPl03JHQEaJOt9/Kw16ehof8
+ Ro0TcCoU9oNKIQ6MI6FRWELV/kIX8Rr7Bf6z98U+MjQK2luRqfArGew6CoKzxKw5hfZI
+ fzDVHFOAjHYghyD1JV/dQ4cEPGOt1WNoJbhuppqmOVKVlcyGy77VeT+n+xufETiKGbzY
+ Mx2d26vsx5K13TEMn8Cnk0HoB6T307F9XxI51mWKmepndzd5/uD/ykHWMe/NgWC8WZcz
+ S7/Q==
+X-Gm-Message-State: AOAM532zi2bBLIEochZtyZpfJOjok938ATa01kk6CDuZ+Id6o81UYMe7
+ EfKoQ/9XmxDlAS+j2nEQk4jHwk8H/g+C+mBvHVIvIfir7hcC0Aw4hW+e695eDdttoddnLAJhjiD
+ 1qvlPSEmCo1nXFJE=
+X-Received: by 2002:a1c:e18a:: with SMTP id y132mr8035542wmg.27.1594197511500; 
+ Wed, 08 Jul 2020 01:38:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxgUDDk10LCrh+Y+igZ17IJ1fnWT3avve9iqKvPNaZY3A5qAZVgU8OG8wYe236fvIjIUYbiXg==
+X-Received: by 2002:a1c:e18a:: with SMTP id y132mr8035511wmg.27.1594197511237; 
+ Wed, 08 Jul 2020 01:38:31 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id k18sm4678752wrx.34.2020.07.08.01.38.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jul 2020 01:38:30 -0700 (PDT)
+Subject: Re: [PATCH] cpu: Add starts_halted() method
+To: Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20200707204333.261506-1-bauerman@linux.ibm.com>
+ <20200707214917.GX7276@habkost.net> <87y2nu3nxq.fsf@morokweng.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <c53b36b7-ee7b-bb66-8220-cce788fd631d@redhat.com>
+Date: Wed, 8 Jul 2020 10:38:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <87y2nu3nxq.fsf@morokweng.localdomain>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,227 +139,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This just implements the bare minimum to cause the boot block to skip
-memory initialization.
+Hi Thiago,
 
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
----
- include/hw/arm/npcm7xx.h    |  2 +
- include/hw/mem/npcm7xx_mc.h | 36 ++++++++++++++++
- hw/arm/npcm7xx.c            |  6 +++
- hw/mem/npcm7xx_mc.c         | 84 +++++++++++++++++++++++++++++++++++++
- hw/mem/Makefile.objs        |  1 +
- 5 files changed, 129 insertions(+)
- create mode 100644 include/hw/mem/npcm7xx_mc.h
- create mode 100644 hw/mem/npcm7xx_mc.c
+On 7/8/20 1:28 AM, Thiago Jung Bauermann wrote:
+> 
+> Hello Eduardo,
+> 
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+>> On Tue, Jul 07, 2020 at 05:43:33PM -0300, Thiago Jung Bauermann wrote:
+>>> PowerPC sPAPRs CPUs start in the halted state, but generic QEMU code
+>>> assumes that CPUs start in the non-halted state. spapr_reset_vcpu()
+>>> attempts to rectify this by setting CPUState::halted to 1. But that's too
+>>> late for hotplugged CPUs in a machine configured with 2 or mor threads per
+>>> core.
+>>>
+>>> By then, other parts of QEMU have already caused the vCPU to run in an
+>>> unitialized state a couple of times. For example, ppc_cpu_reset() calls
+>>> ppc_tlb_invalidate_all(), which ends up calling async_run_on_cpu(). This
+>>> kicks the new vCPU while it has CPUState::halted = 0, causing QEMU to issue
+>>> a KVM_RUN ioctl on the new vCPU before the guest is able to make the
+>>> start-cpu RTAS call to initialize its register state.
+>>>
+>>> This doesn't seem to cause visible issues for regular guests, but on a
+>>> secure guest running under the Ultravisor it does. The Ultravisor relies on
+>>> being able to snoop on the start-cpu RTAS call to map vCPUs to guests, and
+>>> this issue causes it to see a stray vCPU that doesn't belong to any guest.
+>>>
+>>> Fix by adding a starts_halted() method to the CPUState class, and making it
+>>> return 1 if the machine is an sPAPR guest.
+>>>
+>>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>> [...]
+>>> +static uint32_t ppc_cpu_starts_halted(void)
+>>> +{
+>>> +    SpaprMachineState *spapr =
+>>> +        (SpaprMachineState *) object_dynamic_cast(qdev_get_machine(),
+>>> +                                                  TYPE_SPAPR_MACHINE);
+>>
+>> Wouldn't it be simpler to just implement this as a MachineClass
+>> boolean field?  e.g.:
 
-diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
-index 0fd4ae4133..3ae9e5dca2 100644
---- a/include/hw/arm/npcm7xx.h
-+++ b/include/hw/arm/npcm7xx.h
-@@ -18,6 +18,7 @@
-=20
- #include "hw/boards.h"
- #include "hw/cpu/a9mpcore.h"
-+#include "hw/mem/npcm7xx_mc.h"
- #include "hw/misc/npcm7xx_clk.h"
- #include "hw/misc/npcm7xx_gcr.h"
- #include "hw/nvram/npcm7xx_otp.h"
-@@ -71,6 +72,7 @@ typedef struct NPCM7xxState {
-     NPCM7xxTimerCtrlState tim[3];
-     NPCM7xxOTPState     key_storage;
-     NPCM7xxOTPState     fuse_array;
-+    NPCM7xxMCState      mc;
- } NPCM7xxState;
-=20
- #define TYPE_NPCM7XX    "npcm7xx"
-diff --git a/include/hw/mem/npcm7xx_mc.h b/include/hw/mem/npcm7xx_mc.h
-new file mode 100644
-index 0000000000..7ed38be243
---- /dev/null
-+++ b/include/hw/mem/npcm7xx_mc.h
-@@ -0,0 +1,36 @@
-+/*
-+ * Nuvoton NPCM7xx Memory Controller stub
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
-+#ifndef NPCM7XX_MC_H
-+#define NPCM7XX_MC_H
-+
-+#include "exec/memory.h"
-+#include "hw/sysbus.h"
-+
-+/**
-+ * struct NPCM7xxMCState - Device state for the memory controller.
-+ * @parent: System bus device.
-+ * @mmio: Memory region through which registers are accessed.
-+ */
-+typedef struct NPCM7xxMCState {
-+    SysBusDevice parent;
-+
-+    MemoryRegion mmio;
-+} NPCM7xxMCState;
-+
-+#define TYPE_NPCM7XX_MC "npcm7xx-mc"
-+#define NPCM7XX_MC(obj) OBJECT_CHECK(NPCM7xxMCState, (obj), TYPE_NPCM7XX_M=
-C)
-+
-+#endif /* NPCM7XX_MC_H */
-diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
-index 70eaa2347f..4d227bb74b 100644
---- a/hw/arm/npcm7xx.c
-+++ b/hw/arm/npcm7xx.c
-@@ -42,6 +42,7 @@
- #define NPCM7XX_CPUP_BA         (0xf03fe000)
- #define NPCM7XX_GCR_BA          (0xf0800000)
- #define NPCM7XX_CLK_BA          (0xf0801000)
-+#define NPCM7XX_MC_BA           (0xf0824000)
-=20
- /* Internal AHB SRAM */
- #define NPCM7XX_RAM3_BA         (0xc0008000)
-@@ -165,6 +166,7 @@ static void npcm7xx_init(Object *obj)
-                             TYPE_NPCM7XX_KEY_STORAGE);
-     object_initialize_child(obj, "otp2", &s->fuse_array,
-                             TYPE_NPCM7XX_FUSE_ARRAY);
-+    object_initialize_child(obj, "mc", &s->mc, TYPE_NPCM7XX_MC);
-=20
-     for (i =3D 0; i < ARRAY_SIZE(s->tim); i++) {
-         object_initialize_child(obj, "tim[*]", &s->tim[i], TYPE_NPCM7XX_TI=
-MER);
-@@ -230,6 +232,10 @@ static void npcm7xx_realize(DeviceState *dev, Error **=
-errp)
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->fuse_array), 0, NPCM7XX_OTP2_BA);
-     npcm7xx_init_fuses(s);
-=20
-+    /* Fake Memory Controller (MC) */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->mc), &error_abort);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->mc), 0, NPCM7XX_MC_BA);
-+
-     /* Timer Modules (TIM) */
-     QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) !=3D ARRAY_SIZE(s->tim)=
-);
-     for (i =3D 0; i < ARRAY_SIZE(s->tim); i++) {
-diff --git a/hw/mem/npcm7xx_mc.c b/hw/mem/npcm7xx_mc.c
-new file mode 100644
-index 0000000000..0435d06ab4
---- /dev/null
-+++ b/hw/mem/npcm7xx_mc.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Nuvoton NPCM7xx Memory Controller stub
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WIT=
-HOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "hw/mem/npcm7xx_mc.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "qemu/units.h"
-+
-+#define NPCM7XX_MC_REGS_SIZE (4 * KiB)
-+
-+static uint64_t npcm7xx_mc_read(void *opaque, hwaddr addr, unsigned int si=
-ze)
-+{
-+    /*
-+     * If bits 8..11 @ offset 0 are not zero, the boot block thinks the me=
-mory
-+     * controller has already been initialized and will skip DDR training.
-+     */
-+    if (addr =3D=3D 0) {
-+        return 0x100;
-+    }
-+
-+    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
-+
-+    return 0;
-+}
-+
-+static void npcm7xx_mc_write(void *opaque, hwaddr addr, uint64_t v,
-+                             unsigned int size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
-+}
-+
-+static const MemoryRegionOps npcm7xx_mc_ops =3D {
-+    .read =3D npcm7xx_mc_read,
-+    .write =3D npcm7xx_mc_write,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 4,
-+        .max_access_size =3D 4,
-+        .unaligned =3D false,
-+    },
-+};
-+
-+static void npcm7xx_mc_realize(DeviceState *dev, Error **errp)
-+{
-+    NPCM7xxMCState *s =3D NPCM7XX_MC(dev);
-+
-+    memory_region_init_io(&s->mmio, OBJECT(s), &npcm7xx_mc_ops, s, "regs",
-+                          NPCM7XX_MC_REGS_SIZE);
-+    sysbus_init_mmio(&s->parent, &s->mmio);
-+}
-+
-+static void npcm7xx_mc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->desc =3D "NPCM7xx Memory Controller stub";
-+    dc->realize =3D npcm7xx_mc_realize;
-+}
-+
-+static const TypeInfo npcm7xx_mc_types[] =3D {
-+    {
-+        .name =3D TYPE_NPCM7XX_MC,
-+        .parent =3D TYPE_SYS_BUS_DEVICE,
-+        .instance_size =3D sizeof(NPCM7xxMCState),
-+        .class_init =3D npcm7xx_mc_class_init,
-+    },
-+};
-+DEFINE_TYPES(npcm7xx_mc_types);
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-index 56345befd0..9a33ef7b35 100644
---- a/hw/mem/Makefile.objs
-+++ b/hw/mem/Makefile.objs
-@@ -1,3 +1,4 @@
- common-obj-$(CONFIG_DIMM) +=3D pc-dimm.o
- common-obj-y +=3D memory-device.o
-+common-obj-$(CONFIG_NPCM7XX) +=3D npcm7xx_mc.o
- common-obj-$(CONFIG_NVDIMM) +=3D nvdimm.o
---=20
-2.27.0.383.g050319c2ae-goog
+Class boolean field certainly sounds better, but I am not sure this
+is a property of the machine. Rather the arch? So move the field
+to CPUClass? Maybe not, let's discuss :)
+
+>>
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> Yes, indeed it would. Thanks for this patch. I just tested and it
+> also solves the problem (except for the nit mentioned below).
+> 
+> Tested-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> 
+> Should I submit a proper patch with these changes (with you as the
+> author)?
+> 
+>> ---
+>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>> index 426ce5f625..ffadc7a17d 100644
+>> --- a/include/hw/boards.h
+>> +++ b/include/hw/boards.h
+>> @@ -215,6 +215,7 @@ struct MachineClass {
+>>      bool nvdimm_supported;
+>>      bool numa_mem_supported;
+>>      bool auto_enable_numa;
+>> +    bool cpu_starts_halted;
+>>      const char *default_ram_id;
+>>
+>>      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+>> index 0f23409f1d..08dd504034 100644
+>> --- a/hw/core/cpu.c
+>> +++ b/hw/core/cpu.c
+>> @@ -252,6 +252,7 @@ static void cpu_common_reset(DeviceState *dev)
+>>  {
+>>      CPUState *cpu = CPU(dev);
+>>      CPUClass *cc = CPU_GET_CLASS(cpu);
+>> +    MachineState *machine = object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE);
+> 
+> I had to add a (MachineState *) cast here to get the code to compile.
+
+Btw why not use MACHINE(qdev_get_machine()) ?
+
+> 
+>>
+>>      if (qemu_loglevel_mask(CPU_LOG_RESET)) {
+>>          qemu_log("CPU Reset (CPU %d)\n", cpu->cpu_index);
+>> @@ -259,7 +260,7 @@ static void cpu_common_reset(DeviceState *dev)
+>>      }
+>>
+>>      cpu->interrupt_request = 0;
+>> -    cpu->halted = 0;
+>> +    cpu->halted = machine ? MACHINE_GET_CLASS(machine)->cpu_starts_halted : 0;
+>>      cpu->mem_io_pc = 0;
+>>      cpu->icount_extra = 0;
+>>      atomic_set(&cpu->icount_decr_ptr->u32, 0);
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index f6f034d039..d16ec33033 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -4487,6 +4487,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>>      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power9_v2.0");
+>>      mc->has_hotpluggable_cpus = true;
+>>      mc->nvdimm_supported = true;
+>> +    mc->cpu_starts_halted = true;
+>>      smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
+>>      fwc->get_dev_path = spapr_get_fw_dev_path;
+>>      nc->nmi_monitor_handler = spapr_nmi;
+>>
+>>> +
+>>> +    /*
+>>> +     * In sPAPR, all CPUs start halted. CPU0 is unhalted from the machine level
+>>> +     * reset code and the rest are explicitly started up by the guest using an
+>>> +     * RTAS call.
+>>> +     */
+>>> +    return spapr != NULL;
+>>> +}
+>>> +
+> 
+> 
+> --
+> Thiago Jung Bauermann
+> IBM Linux Technology Center
+> 
 
 
