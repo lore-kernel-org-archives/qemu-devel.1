@@ -2,91 +2,73 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A04A4C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF5DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:30:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 613B820708
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:19:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMPt4SPi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 613B820708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C5E020656
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 23:30:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C5E020656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtJM5-0002K1-DY
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:19:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34062)
+	id 1jtJW4-00049w-GK
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 19:30:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtJLT-0001jb-LG
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:19:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28749
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jtJVV-0003ik-O6
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:29:41 -0400
+Resent-Date: Wed, 08 Jul 2020 19:29:41 -0400
+Resent-Message-Id: <E1jtJVV-0003ik-O6@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21318)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtJLR-0000La-R8
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:19:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594250356;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZeSrzCq4Zce4phCOzRZH2iPhewQJmXNvjO7z7ums5M8=;
- b=fMPt4SPihhsjSzplq5Asa1A2WyRztji3U8HB5x3HNLMjt2H8pgQVaEtNxddcisi/W8ar2x
- bgljHlQdbXin9pNZzSli2B2zvYaWm3xnxx0x53a5cGtSAwqDCBvWM6UUWVhS+kCA0mYWfX
- 9MxpVNfwIsNIZCBlTy0oTwW+mxbAE9s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-z0hxMTV1PQiL6zJN_PSZRw-1; Wed, 08 Jul 2020 03:16:23 -0400
-X-MC-Unique: z0hxMTV1PQiL6zJN_PSZRw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29C2C800C64;
- Wed,  8 Jul 2020 07:16:21 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D37B7846C;
- Wed,  8 Jul 2020 07:16:20 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CECAB1132FD2; Wed,  8 Jul 2020 09:16:18 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH] hw/ppc/ppc4xx: Only accept (combination of) pow2 DDR sizes
-References: <20200629200256.2240-1-f4bug@amsat.org>
- <alpine.BSF.2.22.395.2006300250390.32453@zero.eik.bme.hu>
-Date: Wed, 08 Jul 2020 09:16:18 +0200
-In-Reply-To: <alpine.BSF.2.22.395.2006300250390.32453@zero.eik.bme.hu>
- (BALATON Zoltan's message of "Tue, 30 Jun 2020 03:03:38 +0200 (CEST)")
-Message-ID: <87mu4a329p.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jtJVT-0001UF-5v
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 19:29:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1594250971; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ne/445VNrvB2z1PuXzPyw1ltYBb3hCf3t9uko1dh2Ly19aYhzAxBHUAy8PFBYSZh795wI7wdJjVwR0KHWRovnXsKkET+XL0BMqjTDAwQDijyk26eOqF15FOIInzCCEBviRU9MkpqhivUnARPHdL9vWXdbvDTLowFb4EiBLUSp18=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1594250971;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=w88cSucSp6PBtRMTNk4lt+o3GmTG1KUF0nN0JH0ZMlo=; 
+ b=bI12ht06fd0Ow+KWuO10TVxJtAP2Dfau+NdX3AIkjXCkHH0Wn6NoDmyi0V0hIdGpx3S/4SYhzm5Zu7QSDfLm0wRM/ECBcgWqqp9Mjf2zEQQqfuGOnu9Y8gE6k7TECTknK1SmRq5CBmGx7ycfvP1gdPx4CRdErV4g6xsN5Gq4dMQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1594250967962232.4471542345333;
+ Wed, 8 Jul 2020 16:29:27 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/5] Use ACPI PCI hot-plug for q35
+Message-ID: <159425096672.14243.10361764063550366178@07a7f0d89f7d>
+In-Reply-To: <20200708224615.114077-1-jusual@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jusual@redhat.com
+Date: Wed, 8 Jul 2020 16:29:27 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 19:29:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,90 +81,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-ppc@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, jusual@redhat.com, qemu-devel@nongnu.org,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
-
-> On Mon, 29 Jun 2020, Philippe Mathieu-Daud=C3=A9 wrote:
->> Use popcount instruction to count the number of bits set in
->> the RAM size. Allow at most 1 bit for each bank. This avoid
->> using invalid hardware configurations.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->> hw/ppc/ppc4xx_devs.c | 9 +++++++++
->> 1 file changed, 9 insertions(+)
->>
->> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
->> index f1651e04d9..c2484a5695 100644
->> --- a/hw/ppc/ppc4xx_devs.c
->> +++ b/hw/ppc/ppc4xx_devs.c
->> @@ -687,6 +687,15 @@ void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_b=
-anks,
->>     int i;
->>     int j;
->>
->> +    if (ctpop64(size_left) > nr_banks) {
->> +        if (nr_banks) {
->> +            error_report("RAM size must be a power of 2");
->> +        } else {
->> +            error_report("RAM size must be the combination of %d powers=
- of 2",
->> +                         nr_banks);
->> +        }
->> +        exit(1);
->
-> What is this supposed to fix?
-
-The commit message doesn't really tell.  It should.
-
-I suspect this new check is redundant.  What am I missing?
-
-The loop that follows it finds a split of @ram's size guided by
-@nr_banks and sdram_bank_sizes[].  The conditional after the loop fails
-the function when no such split can be found.
-
-In other words, the function fails unless @ram's size is the sum of
-@nr_banks elements of sdram_bank_sizes[].
-
-The actual sdram_bank_sizes[] contain only powers of two.  Anything else
-would be deeply weird.
-
-ctpop64(size_left) > nr_banks is weaker than that, isn't it?
-
-To prove me wrong, show me a scenario where the new check fails, and the
-existing check doesn't.
-
->                               Is it a good idea to exit() from a
-> helper?
-
-Depends on what exactly is being helped.
-
->         I don't think so because the board code should be in control
-> in my opinion to decide what it can work with or what it cannot handle
-> and wants to abort. So maybe it's better to return error in some way
-> and let board code handle it. (We already exit from this function but
-> that was added in commit a0258e4afa1 when the size fix up was removed
-> due to memdev.
-
-Complicate your helper when you genuinely need to.  But YAGNI.
-
->                That exit uses EXIT_FAILURE constant.)
-
-I consider exit(EXIT_FAILURE) a case of portability virtue signalling ;)
-
-But yes, local consistency should be maintained.
-
->> +    }
->>     for (i =3D 0; i < nr_banks; i++) {
->>         for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
->>             bank_size =3D sdram_bank_sizes[j];
->>
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcwODIyNDYxNS4xMTQw
+NzctMS1qdXN1YWxAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5F
+VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9
+MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgaHcvYWNwaS90
+cG0ubwogIENDICAgICAgaHcvYWNwaS9pcG1pLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkv
+aWNoOS5jOiBJbiBmdW5jdGlvbiAnaWNoOV9wbV9pbml0JzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3
+L2FjcGkvaWNoOS5jOjMxNTozNDogZXJyb3I6IHRvbyBtYW55IGFyZ3VtZW50cyB0byBmdW5jdGlv
+biAncWJ1c19zZXRfaG90cGx1Z19oYW5kbGVyJwogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgJmVycm9yX2Fib3J0KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
+SW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2h3L2lzYS9p
+c2EuaDo4OjAsCi0tLQogdm9pZCBxYnVzX3NldF9ob3RwbHVnX2hhbmRsZXIoQnVzU3RhdGUgKmJ1
+cywgT2JqZWN0ICpoYW5kbGVyKTsKICAgICAgXgogIENDICAgICAgaHcvYWNwaS9hY3BpLXN0dWIu
+bwptYWtlOiAqKiogW2h3L2FjcGkvaWNoOS5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZv
+ciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgQ0MgICAgICBody9hY3BpL2FtbC1idWlsZC1zdHViLm8K
+VHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgotLS0KICAgIHJhaXNlIENhbGxlZFBy
+b2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBD
+b21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5x
+ZW11Lmluc3RhbmNlLnV1aWQ9ZThkYWQzYWYwN2YwNDZlNmFjYzA3ZDVhYWIxODU0YjknLCAnLXUn
+LCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScs
+ICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
+JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEn
+LCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hl
+dy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1fajNrOHNmaS9zcmMvZG9ja2VyLXNyYy4yMDIwLTA3
+LTA4LTE5LjI3LjAyLjExMjUyOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAn
+L3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0
+IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1l
+OGRhZDNhZjA3ZjA0NmU2YWNjMDdkNWFhYjE4NTRiOQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5d
+IEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVz
+dGVyLXRtcC1fajNrOHNmaS9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNl
+bnRvczddIEVycm9yIDIKCnJlYWwgICAgMm0yNS4zNTBzCnVzZXIgICAgMG04LjY4NnMKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNzA4
+MjI0NjE1LjExNDA3Ny0xLWp1c3VhbEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNl
+bnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
