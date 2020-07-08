@@ -6,79 +6,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145F6C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D37EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:56:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3C3F20772
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:55:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5668320772
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:56:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NrNAYuSH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3C3F20772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRdPvRS3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5668320772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtKqD-0004Dl-6S
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:55:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50704)
+	id 1jtKrt-0005KM-LI
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:56:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtKpS-0003mu-2R
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:54:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29693
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jtKrH-0004qL-QM
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:56:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30003
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jtKpQ-0002wz-Jx
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:54:21 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jtKrG-0003Ev-Az
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:56:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594256059;
+ s=mimecast20190719; t=1594256173;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QEAewR6DMBSdUpuDdRQ5n7oV+Y/XYxQ3xW5tKWXBnDw=;
- b=NrNAYuSHJR0o/bH2WOYI/iBdVjN3Zl2GMFfUhgcJRLFQyo0GseLSvG9EvWbfMXvX67EQDv
- llvb65cT52BataA7JUtihBmx2DVGW8TnJ4XWBYiZHaf8BZugoFJEUBUfqXTBuP6SlcktAj
- VrWcYPNAqEynMd/dJrHuOPEUKDUmSX4=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=5nlw2UAlHcdrHXURHIkdHsw4gVdADye+G12wvGM82aE=;
+ b=DRdPvRS3R28o7Ptl3Nn7uvo+hFq29DxyCJKdsauODXgKHPjOZCWvHV6xgMDwuz/J5KJRrI
+ GNmecZOHunvUnOF0eamkWUiBjayHQ7x5umJF+v+W6J9YHrmF+myg5BQ0O8ZH00Zlw9kASg
+ xBp6wLCrm4yWFw+94uM5vBjMl5RyDb0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-EdVxt1oYPmuBe6xsp1aRgw-1; Wed, 08 Jul 2020 00:51:56 -0400
-X-MC-Unique: EdVxt1oYPmuBe6xsp1aRgw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-494-4TLuGxQRNsG9EBGnAT8ymw-1; Wed, 08 Jul 2020 04:52:00 -0400
+X-MC-Unique: 4TLuGxQRNsG9EBGnAT8ymw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC69A800D5C
- for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 04:51:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C9EC5D9C9;
- Wed,  8 Jul 2020 04:51:47 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 057FB1132FD2; Wed,  8 Jul 2020 06:51:46 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Subject: Re: [PATCH] chardev: don't abort on attempt to add duplicated chardev
-References: <20200706182156.334207-1-marcandre.lureau@redhat.com>
-Date: Wed, 08 Jul 2020 06:51:45 +0200
-In-Reply-To: <20200706182156.334207-1-marcandre.lureau@redhat.com>
- (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 6 Jul 2020
- 22:21:56 +0400")
-Message-ID: <87eepm4nj2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4497210059A4;
+ Wed,  8 Jul 2020 08:51:58 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-13-151.pek2.redhat.com [10.72.13.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F0A5F5C1D6;
+ Wed,  8 Jul 2020 08:51:39 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [PATCH] vhost-vdpa: fix the compile issue without kvm
+Date: Wed,  8 Jul 2020 16:49:22 +0800
+Message-Id: <20200708084922.21904-1-lulu@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:11
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -99,62 +92,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: eric.auger@redhat.com, qemu-devel@nongnu.org
+Cc: mhabets@solarflare.com, rob.miller@broadcom.com, saugatm@xilinx.com,
+ lulu@redhat.com, hanand@xilinx.com, hch@infradead.org, eperezma@redhat.com,
+ jgg@mellanox.com, shahafs@mellanox.com, kevin.tian@intel.com,
+ parav@mellanox.com, vmireyno@marvell.com, cunming.liang@intel.com,
+ gdawar@xilinx.com, jiri@mellanox.com, xiao.w.wang@intel.com,
+ stefanha@redhat.com, zhihong.wang@intel.com, aadam@redhat.com,
+ rdunlap@infradead.org, maxime.coquelin@redhat.com, lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Fix the compile issue in the system without the kvm support
 
-> This is a regression from commit
-> d2623129a7dec1d3041ad1221dda1ca49c667532 ("qom: Drop parameter @errp of
-> object_property_add() & friends").
->
-> (qemu) chardev-add id=3Dnull,backend=3Dnull
-> (qemu) chardev-add id=3Dnull,backend=3Dnull
-> Unexpected error in object_property_try_add() at /home/elmarco/src/qemu/q=
-om/object.c:1166:
-> attempt to add duplicate property 'null' to object (type 'container')
->
-> That case is currently not covered in the test suite, but will be with
-> the queued patch "char: fix use-after-free with dup chardev &
-> reconnect".
->
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ hw/virtio/vhost-vdpa.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Please add
-
-  Fixes: d2623129a7dec1d3041ad1221dda1ca49c667532
-
-Bonus: you can then shorten the hash above for readability.
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  chardev/char.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/chardev/char.c b/chardev/char.c
-> index e3051295ac3..876e41bb592 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -998,7 +998,10 @@ static Chardev *chardev_new(const char *id, const ch=
-ar *typename,
->      }
-> =20
->      if (id) {
-> -        object_property_add_child(get_chardevs_root(), id, obj);
-> +        object_property_try_add_child(get_chardevs_root(), id, obj, &loc=
-al_err);
-
-Suggest to break this line before &local_err.
-
-> +        if (local_err) {
-> +            goto end;
-> +        }
->          object_unref(obj);
->      }
-
-Sorry for breaking this.
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+index a3d17fe0f9..65d5aaf08a 100644
+--- a/hw/virtio/vhost-vdpa.c
++++ b/hw/virtio/vhost-vdpa.c
+@@ -19,8 +19,7 @@
+ #include "hw/virtio/virtio-net.h"
+ #include "hw/virtio/vhost-vdpa.h"
+ #include "qemu/main-loop.h"
+-#include <linux/kvm.h>
+-#include "sysemu/kvm.h"
++#include "cpu.h"
+ 
+ static bool vhost_vdpa_listener_skipped_section(MemoryRegionSection *section)
+ {
+-- 
+2.21.1
 
 
