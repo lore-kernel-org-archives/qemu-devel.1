@@ -2,95 +2,62 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 541B6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84075C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:15:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C56720786
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:15:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u9laT7XM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C56720786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 56C0620786
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 16:15:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C0620786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtCix-0007QA-7t
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 12:15:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42948)
+	id 1jtCja-0008EI-KW
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 12:15:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtChz-0006Tk-NF
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:14:07 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:43821)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtChx-0003Um-O7
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:14:07 -0400
-Received: by mail-pf1-x441.google.com with SMTP id u18so4862086pfk.10
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 09:14:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=yRszIO+asOdMN81y4SKo72hakbQ2LURyUSdgABBh96Q=;
- b=u9laT7XMXQXFhXpvDTVrfVM1XEq0x5acrq5l32VbZAKts0J2dBFwe2wW1tsiphKhl4
- hxa6uW9XiJQZdVz3/KoMoIjLYk1tMuqJhDtjnzhPrnzKl+pzOEDodIppd5V8kNL+1LVa
- SLSz85BYKJfFA9QBQSCW0dw/3bMvVjEku/pGGQUhOwug2dlLUhW3LbqsWB6pxjobXqNy
- jhIEnCLA2SU0NjIS26/TNE5I8iuSMbHgXPI7dlYNrAmaAKgzLGRxdDFojPZuHlMNCb9c
- 98fV1yXXrjpkmxa2ciaDOjp8M4gTXeHjfqtsvTVNTHuANIYn9grr+60msWnJWN9dhG0k
- WzEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yRszIO+asOdMN81y4SKo72hakbQ2LURyUSdgABBh96Q=;
- b=QWJQJvJWyjKQDIORInYTnKlty+hxQRe1fbYVrwFQ0DDkCHN050ni3dU32Qkm47ztQv
- HZTwN2/X7/YHv52vsV8SU7OgMEifQPYRl99o+N6Ys8YV4Wn5xVDYOhsYZ2TNTYq2RkmN
- UMwRwe06JtT2yoa9Xi9i0WGNLaorbgzzi5RvjM4IQa15hDb0W2LEhDTPhuNJ86P6VQmA
- 8879Sz09iLhUUIvJ6za7XwBXYuBiCZcMCRPODJ9vUf73/DxxRJ40ffxDHwTvosll2cHr
- D8WAAO9WgFiBtKURpn9cl+d0HyuAn6ICURuYgfzvkFyyU7mXGVJAz9GxdB7dYdVAGtRy
- f2dg==
-X-Gm-Message-State: AOAM532v7ZYJJpxYaxKw9ASjzVBIkmyc1VNWV/SBy9Lu0j92g+EYsNnf
- jBoaC4VbX5a3ng4JUOW1zdm4i6XKZGc=
-X-Google-Smtp-Source: ABdhPJzcqdlEqRnXEobD/djKbPVKGZmxcfNyHhnahmqABZvAbKW7Pl/GyMob8silVYrzLN6HNiteXQ==
-X-Received: by 2002:a65:5682:: with SMTP id v2mr49794309pgs.231.1594224843644; 
- Wed, 08 Jul 2020 09:14:03 -0700 (PDT)
-Received: from [192.168.7.121] (24-113-145-216.wavecable.com. [24.113.145.216])
- by smtp.gmail.com with ESMTPSA id a19sm273046pfn.136.2020.07.08.09.14.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 09:14:02 -0700 (PDT)
-Subject: Re: [PATCH 05/21] target/xtensa: support copying registers up to 64
- bits wide
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-References: <20200706234737.32378-1-jcmvbkbc@gmail.com>
- <20200706234737.32378-6-jcmvbkbc@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2f591058-a694-81a6-ee1b-a426b7402ae9@linaro.org>
-Date: Wed, 8 Jul 2020 09:14:00 -0700
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtChO-00060h-HF
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:13:30 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46414)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtChM-0003R6-7J
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 12:13:30 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 60869AE8C;
+ Wed,  8 Jul 2020 16:13:26 +0000 (UTC)
+Subject: Re: [PULL 00/53] Misc patches for QEMU 5.1 soft freeze
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20200706164155.24696-1-pbonzini@redhat.com>
+ <CAFEAcA-F1FGde+=c3iS3wcRWG+i0RgYj5-jwafn0sX6EEYEsWA@mail.gmail.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <1a9ad36f-f4ae-2ea5-3d69-03aa5580b60e@suse.de>
+Date: Wed, 8 Jul 2020 18:13:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200706234737.32378-6-jcmvbkbc@gmail.com>
+In-Reply-To: <CAFEAcA-F1FGde+=c3iS3wcRWG+i0RgYj5-jwafn0sX6EEYEsWA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:20:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,24 +71,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/6/20 4:47 PM, Max Filippov wrote:
-> +                if (arg_copy[i].arg->num_bits <= 32) {
-> +                    temp = tcg_temp_local_new_i32();
-> +                    tcg_gen_mov_i32(temp, arg_copy[i].arg->in);
-> +                } else if (arg_copy[i].arg->num_bits <= 64) {
-> +                    temp = tcg_temp_local_new_i64();
-> +                    tcg_gen_mov_i64(temp, arg_copy[i].arg->in);
+On 7/7/20 8:37 PM, Peter Maydell wrote:
+> On Mon, 6 Jul 2020 at 17:48, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The following changes since commit fc1bff958998910ec8d25db86cd2f53ff125f7ab:
+>>
+>>   hw/misc/pca9552: Add missing TypeInfo::class_size field (2020-06-29 21:16:10 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://github.com/bonzini/qemu.git tags/for-upstream
+>>
+>> for you to fetch changes up to 80270507070ec73ea82741ce24cb7909a9258ea3:
+>>
+>>   scripts: improve message when TAP based tests fail (2020-07-06 12:14:25 -0400)
+>>
+>> ----------------------------------------------------------------
+>> * Make checkpatch say 'qemu' instead of 'kernel' (Aleksandar)
+>> * Fix PSE guests with emulated NPT (Alexander B. #1)
+>> * Fix leak (Alexander B. #2)
+>> * HVF fixes (Roman, Cameron)
+>> * New Sapphire Rapids CPUID bits (Cathy)
+>> * cpus.c and softmmu/ cleanups (Claudio)
+>> * TAP driver tweaks (Daniel, Havard)
+>> * object-add bugfix and testcases (Eric A.)
+>> * Fix Coverity MIN_CONST and MAX_CONST (Eric B.)
+>> * SSE fixes (Joseph)
+>> * "-msg guest-name" option (Mario)
+>> * support for AMD nested live migration (myself)
+>> * Small i386 TCG fixes (myself)
+>> * improved error reporting for Xen (myself)
+>> * fix "-cpu host -overcommit cpu-pm=on" (myself)
+>> * Add accel/Kconfig (Philippe)
+>> * KVM API cleanup (Philippe)
+>> * iscsi sense handling fixes (Yongji)
+>> * Misc bugfixes
+> 
+> Hi; various build or test failures (5 total):
+> 
+> 1) OSX:
+> 
+> /Users/pm215/src/qemu-for-merges/ui/cocoa.m:1478:9: error: implicit
+> declaration of function 'cpu_throttle_set' is invalid in C99 [-
+> Werror,-Wimplicit-function-declaration]
+>         cpu_throttle_set(throttle_pct);
+>         ^
+> 
+> 2) aarch64 and aarch32 linux:
+> 
+> /home/pm/qemu/target/arm/kvm.c: In function ‘kvm_arch_init’:
+> /home/pm/qemu/target/arm/kvm.c:248:29: error: passing argument 1 of
+> ‘kvm_check_extension’ makes integer from pointer without a cast
+>  [-Werror=int-conversion]
+>   248 |     if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER)) {
+>       |                             ^
+>       |                             |
+>       |                             KVMState * {aka struct KVMState *}
+> In file included from /home/pm/qemu/target/arm/kvm.c:23:
+> /home/pm/qemu/include/sysemu/kvm.h:439:38: note: expected ‘unsigned
+> int’ but argument is of type ‘KVMState *’ {aka ‘struct KVMState
+>  *’}
+>   439 | int kvm_check_extension(unsigned int extension);
+>       |                         ~~~~~~~~~~~~~^~~~~~~~~
+> /home/pm/qemu/target/arm/kvm.c:248:9: error: too many arguments to
+> function ‘kvm_check_extension’
+>   248 |     if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER)) {
+>       |         ^~~~~~~~~~~~~~~~~~~
+> In file included from /home/pm/qemu/target/arm/kvm.c:23:
+> /home/pm/qemu/include/sysemu/kvm.h:439:5: note: declared here
+>   439 | int kvm_check_extension(unsigned int extension);
+>       |     ^~~~~~~~~~~~~~~~~~~
+> /home/pm/qemu/target/arm/kvm.c:253:59: error: passing argument 1 of
+> ‘kvm_check_extension’ makes integer from pointer without a cast
+>  [-Werror=int-conversion]
+>   253 |             cap_has_inject_ext_dabt = kvm_check_extension(s,
+>       |                                                           ^
+>       |                                                           |
+>       |
+> KVMState * {aka struct KVMState *}
+> In file included from /home/pm/qemu/target/arm/kvm.c:23:
+> /home/pm/qemu/include/sysemu/kvm.h:439:38: note: expected ‘unsigned
+> int’ but argument is of type ‘KVMState *’ {aka ‘struct KVMState
+>  *’}
+>   439 | int kvm_check_extension(unsigned int extension);
+>       |                         ~~~~~~~~~~~~~^~~~~~~~~
+> /home/pm/qemu/target/arm/kvm.c:253:39: error: too many arguments to
+> function ‘kvm_check_extension’
+>   253 |             cap_has_inject_ext_dabt = kvm_check_extension(s,
+>       |                                       ^~~~~~~~~~~~~~~~~~~
+> In file included from /home/pm/qemu/target/arm/kvm.c:23:
+> /home/pm/qemu/include/sysemu/kvm.h:439:5: note: declared here
+>   439 | int kvm_check_extension(unsigned int extension);
+>       |     ^~~~~~~~~~~~~~~~~~~
+> 
+> 3) PPC64 had a failure on iotest 030 (though I think this may
+> be an intermittent in master):
+> 
+>   TEST    iotest-qcow2: 030 [fail]
+> QEMU          --
+> "/home/pm215/qemu/build/all/tests/qemu-iotests/../../ppc64-softmmu/qemu-system-ppc64"
+> -nodefaults -display none -accel qtest
+> QEMU_IMG      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-img"
+> QEMU_IO       --
+> "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-io"  --cache
+> writeback --aio threads -f qcow2
+> QEMU_NBD      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
+> IMGFMT        -- qcow2 (compat=1.1)
+> IMGPROTO      -- file
+> PLATFORM      -- Linux/ppc64 gcc1-power7 3.10.0-862.14.4.el7.ppc64
+> TEST_DIR      -- /home/pm215/qemu/build/all/tests/qemu-iotests/scratch
+> SOCK_DIR      -- /tmp/tmp.icAW30swbG
+> SOCKET_SCM_HELPER --
+> /home/pm215/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+> 
+> --- /home/pm215/qemu/tests/qemu-iotests/030.out 2019-07-15
+> 15:12:04.941863802 +0000
+> +++ /home/pm215/qemu/build/all/tests/qemu-iotests/030.out.bad
+> 2020-07-07 18:01:06.975652394 +0000
+> @@ -1,5 +1,17 @@
+> -...........................
+> +.............F.............
+> +======================================================================
+> +FAIL: test_stream_parallel (__main__.TestParallelOps)
+> +----------------------------------------------------------------------
+> +Traceback (most recent call last):
+> +  File "030", line 246, in test_stream_parallel
+> +    self.assert_qmp(result, 'return', {})
+> +  File "/home/pm215/qemu/tests/qemu-iotests/iotests.py", line 848, in
+> assert_qmp
+> +    result = self.dictpath(d, path)
+> +  File "/home/pm215/qemu/tests/qemu-iotests/iotests.py", line 822, in dictpath
+> +    self.fail(f'failed path traversal for "{path}" in "{d}"')
+> +AssertionError: failed path traversal for "return" in "{'error':
+> {'class': 'DeviceNotActive', 'desc': "Block job 'stream-node8' not
+> found"}}"
+> +
+>  ----------------------------------------------------------------------
+>  Ran 27 tests
+> 
+> -OK
+> +FAILED (failures=1)
+> 
+> 4) s390x failed on iotest 267:
+> 
+>   TEST    iotest-qcow2: 267 [fail]
+> QEMU          --
+> "/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../s390x-softmmu/qemu-system-s390x"
+> -nodefaults -display none -accel qtest
+> QEMU_IMG      -- "/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../qemu-img"
+> QEMU_IO       --
+> "/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../qemu-io"
+> --cache writeback --aio threads -f qcow2
+> QEMU_NBD      -- "/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
+> IMGFMT        -- qcow2 (compat=1.1)
+> IMGPROTO      -- file
+> PLATFORM      -- Linux/s390x qemu01 4.15.0-72-generic
+> TEST_DIR      -- /home/ubuntu/qemu/build/all/tests/qemu-iotests/scratch
+> SOCK_DIR      -- /tmp/tmp.REW8Sy64t9
+> SOCKET_SCM_HELPER --
+> /home/ubuntu/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+> 
+> --- /home/ubuntu/qemu/tests/qemu-iotests/267.out        2019-12-19
+> 08:32:33.382319918 -0500
+> +++ /home/ubuntu/qemu/build/all/tests/qemu-iotests/267.out.bad
+> 2020-07-07 14:15:44.173300793 -0400
+> @@ -137,6 +137,9 @@
+>  ID        TAG                 VM SIZE                DATE       VM CLOCK
+>  --        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>  (qemu) loadvm snap0
+> +Unexpected storage key flag data: 0
+> +error while loading state for instance 0x0 of device 's390-skeys'
+> +Error: Error -22 while loading VM state
+>  (qemu) quit
+> 
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+> backing_file=TEST_DIR/t.IMGFMT.base
+> 
+> 5) And a link error on x86-64 Linux:
+> 
+>   LINK    x86_64-softmmu/qemu-system-x86_64
+> softmmu/cpus.o: In function `tcg_get_icount_limit':
+> /home/petmay01/linaro/qemu-for-merges/softmmu/cpus.c:563: undefined
+> reference to `icount_round'
+> softmmu/cpus.o: In function `process_icount_data':
+> /home/petmay01/linaro/qemu-for-merges/softmmu/cpus.c:618: undefined
+> reference to `icount_update'
+> target/i386/helper.o: In function `x86_cpu_dump_state':
+> /home/petmay01/linaro/qemu-for-merges/target/i386/helper.c:547:
+> undefined reference to `update_mxcsr_from_sse_status'
+> target/i386/gdbstub.o: In function `x86_cpu_gdb_read_register':
+> /home/petmay01/linaro/qemu-for-merges/target/i386/gdbstub.c:187:
+> undefined reference to `update_mxcsr_from_sse_status'
+> collect2: error: ld returned 1 exit status
+> Makefile:205: recipe for target 'qemu-system-x86_64' failed
+> 
+> thanks
+> -- PMM
+> 
 
-This shouldn't compile.
+Hi Peter, Paolo,
 
-You can't assign both TCGv_i32 and TCGv_i64 to the same variable.
+I am trying to understand this failure (5), which is triggered by one of my patches,
+containing clearly an issue that does not trigger here, although it is apparent to me (I did not provide all necessary stubs).
 
-What's going on here?
+Could you provide the ./configure command line, config.status, compiler version?
+
+Clearly it is something I have to fix, but would help to be able not to be "blind".
+
+The patch introducing icount_round and icount_update is
+
+"cpu-timers, icount: new modules",
+
+and the issue stems I think from the fact that cpus.c references
+
+icount_round() and icount_update() in code that is conditional on icount_enabled().
+
+If the code is configured with --disable-tcg, in stubs/icount.c , icount_enabled is defined as always returning 0,
+and my compiler takes that clue and elides all static functions conditional on that return value,
+
+so I don't get any tcg_get_icount_limit() compiled in, and no errors.
+
+I think that having comparable configure command line and compiler version/flags would help me pin down any related issue.
+
+Thanks,
+
+Claudio
 
 
-r~
+
+
+
+
 
