@@ -2,82 +2,68 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 09:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B8FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 09:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 062A420771
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 09:53:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WuWS/cMW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062A420771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5782520720
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 09:58:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5782520720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jt6ld-0001Mz-6A
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 05:53:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60494)
+	id 1jt6q8-0002u1-GG
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 05:58:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jt6l3-0000x8-Ci
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 05:52:53 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40894)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jt6l1-0000O9-I2
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 05:52:53 -0400
-Received: by mail-pl1-x642.google.com with SMTP id x11so17960156plo.7
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 02:52:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=E/vH64psmFMJWYBsEAn53ZFue8gToH0f0gdSBWaVr+Y=;
- b=WuWS/cMWWVViRfOuIVs3KdsFInVxMP8cQ3Syl3hBJytD0imFlIQQsMcZOVawcElLdz
- d7sw77e6ekKObJ4fjKTXH2aVpPwY884z6hgkcJjS/iYyrPnQg83lC3AHWr3z9gFDZ+5V
- iR0/TQuJrv3wWscWo0s/eNnwI02SfKDliQKp9nJpOPvMfx8xVb1hThh+254OGxHowdG8
- Li+rFqCC7+j8pyKwFxrZ5+ApkfOfnVl2CGsGEf9BsdaOwkAJrGGZDu7Xb9YGMixtU5zA
- ZE0fve0E++K5enX4vAMz9XGyTDJOQF9h6vKCEK+X8NZ4bpb+QtwWo0jGpp3rz9uN3JkY
- eKHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=E/vH64psmFMJWYBsEAn53ZFue8gToH0f0gdSBWaVr+Y=;
- b=HpYxfKmz+FTkP8VZNTg1SEKxYjWWGFMF9NxhaXoqODO1sGzI779BDKZkIIBXCbnayl
- Tw6cNz0RbGC1eXkPNCVKep7CsGNyi0ADgkZiWatEXt/WQhBRecVquxA9KBrLSMWFCOPB
- U/B7/ByyY+8UbvFJt34/gPMLLUr8sSKSLSgAuKBZn5VJ+ZSn6dSjmP6ylvaUEEil9wkJ
- Rq1jpGCBDHHdpAphzFqupFNyrVgYKovJZfD0JxHGFHbc1lXUI/CE0WVXrMuZo0mG5D+Q
- DCrTYp3T/PN9P0CZxGZEoZsQ5xTmy49MQuD3yeGbKoAACLCPvr75FesdjM3WCAiEY9Pm
- VI+g==
-X-Gm-Message-State: AOAM530CPnZKJJCj7SoGjSW7y/5d8D2MJ/Vo5cEAw+ay7tkhwGao+keF
- iQpbC6asP6bdppqzKVQhaShMWv2KjEPH4Uya4QXmm0Wa
-X-Google-Smtp-Source: ABdhPJzthUY+qoPrBeEVO55JQiPw8UYokdupR6y0lcA5JkAO1ImTTMBY/nOXxWbNRbgV7E9b7F/D1RnNuMjBhBHddp8=
-X-Received: by 2002:a17:902:6b45:: with SMTP id g5mr706461plt.42.1594201969652; 
- Wed, 08 Jul 2020 02:52:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jt6pT-0002KB-KX
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 05:57:27 -0400
+Received: from 8.mo6.mail-out.ovh.net ([178.33.42.204]:55232)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jt6pQ-0000rJ-LN
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 05:57:27 -0400
+Received: from player691.ha.ovh.net (unknown [10.108.57.43])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 9364E21DD22
+ for <qemu-devel@nongnu.org>; Wed,  8 Jul 2020 11:57:14 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player691.ha.ovh.net (Postfix) with ESMTPSA id B26B4143F7C04;
+ Wed,  8 Jul 2020 09:57:07 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-104R005f0d96140-8318-41ac-8bea-8f9268244146,0BF91703714D46BDA1F6A43CC116E83107949C6A)
+ smtp.auth=groug@kaod.org
+Date: Wed, 8 Jul 2020 11:57:03 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: qemu-system-ppc64 abort()s with pcie bridges
+Message-ID: <20200708115703.7926205a@bahia.lan>
+In-Reply-To: <211dfb13-64cc-850b-4936-0f20f0157d7c@redhat.com>
+References: <211dfb13-64cc-850b-4936-0f20f0157d7c@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 8 Jul 2020 10:52:38 +0100
-Message-ID: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
-Subject: Migrating custom qemu.org infrastructure to GitLab
-To: qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=stefanha@gmail.com; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 10987094242469189938
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudejgddvvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeukeejkeeiffeftdevueekvdetjeegieevhffgjefgtdeluddvgfefleekueevueenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeluddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=178.33.42.204; envelope-from=groug@kaod.org;
+ helo=8.mo6.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 05:57:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,92 +76,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <cleber@redhat.com>,
- Jeff Cody <codyprime@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ =?UTF-8?B?Q8Op?= =?UTF-8?B?ZHJpYw==?= Le Goater <clg@kaod.org>,
+ David Gibson <dgibson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Dear QEMU community,
-QEMU currently has a static website, wiki, git repo hosting, and
-special-purpose cronjobs/containers running in VMs. There is currently
-no system administrator looking after our infrastructure so the most
-urgent tasks fall onto me, the remainder are ignored/postponed. The
-current situation exposes qemu.org to the risk of downtime and
-security issues.
+On Wed, 8 Jul 2020 10:03:47 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Another limitation is that each piece of infrastructure is managed
-separately and one-time contributors cannot easily propose changes
-because they do not have access. It would be much better to use our
-existing code review process so that anyone can make changes to
-infrastructure by sending a patch.
+>=20
+>  Hi,
+>=20
+> qemu-system-ppc64 currently abort()s when it is started with a pcie
+> bridge device:
+>=20
+> $ qemu-system-ppc64 -M pseries-5.1 -device pcie-pci-bridge
+> Unexpected error in object_property_find() at qom/object.c:1240:
+> qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not fo=
+und
+> Aborted (core dumped)
+>=20
+> or:
+>=20
+> $ qemu-system-ppc64 -M pseries -device dec-21154-p2p-bridge
+> Unexpected error in object_property_find() at qom/object.c:1240:
+> qemu-system-ppc64: -device dec-21154-p2p-bridge: Property '.chassis_nr'
+> not found
+> Aborted (core dumped)
+>=20
+> That's kind of ugly, and it shows up as error when running
+> scripts/device-crash-test. Is there an easy way to avoid the abort() and
+> fail more gracefully here?
+>=20
 
-GitLab's Continuous Integration (CI) system provides a powerful way to
-perform actions defined in yaml files in qemu.git. This includes
-running scripts, builds, publishing build artifacts, etc. We have
-already begun using it for automated builds and tests:
-https://gitlab.com/qemu-project/qemu/-/blob/master/.gitlab-ci.yml
+And even worse, this can tear down a running guest with hotplug :\
 
-GitLab also offers git repo hosting, wikis, issue tracking, and other
-features. It is possible to log in using GitHub, Google, or Twitter
-single sign-on if you do not want to create another account. As more
-open source projects use GitLab it becomes easier for one-time
-contributors who will already be familiar with the tools from other
-projects.
+(qemu) device_add pcie-pci-bridge=20
+Unexpected error in object_property_find() at /home/greg/Work/qemu/qemu-ppc=
+/qom/object.c:1240:
+Property '.chassis_nr' not found
+Aborted (core dumped)
 
-Here is a full list of GitLab's features:
-https://about.gitlab.com/features/
+This is caused by recent commit:
 
-GitLab offers the gold/ultimate tier for free to open source projects:
-https://about.gitlab.com/solutions/open-source/
+commit 7ef1553dac8ef8dbe547b58d7420461a16be0eeb
+Author: Markus Armbruster <armbru@redhat.com>
+Date:   Tue May 5 17:29:25 2020 +0200
 
-GitLab itself is open source and can be self-hosted if we decide to
-leave in the future.
+    spapr_pci: Drop some dead error handling
+   =20
+    chassis_from_bus() uses object_property_get_uint() to get property
+    "chassis_nr" of the bridge device.  Failure would be a programming
+    error.  Pass &error_abort, and simplify its callers.
+   =20
+    Cc: David Gibson <david@gibson.dropbear.id.au>
+    Cc: qemu-ppc@nongnu.org
+    Signed-off-by: Markus Armbruster <armbru@redhat.com>
+    Acked-by: David Gibson <david@gibson.dropbear.id.au>
+    Reviewed-by: Greg Kurz <groug@kaod.org>
+    Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+    Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+    Message-Id: <20200505152926.18877-18-armbru@redhat.com>
 
-With this in mind I propose moving qemu.org infrastructure to GitLab
-incrementally. This needs to be done carefully to avoid disruption and
-only where GitLab meets the requirements. The QEMU project will
-continue to have access to cloud hosting for running custom
-infrastructure or adding runners to GitLab CI to improve CI
-performance.
+Before that, we would simply print the "chassir_nr not found" error,
+and in case of a cold plugged device exit.
 
-The following infrastructure components can be considered for GitLab migration:
+The root cause is that the sPAPR PCI code assumes that a PCI bridge
+has a "chassir_nr" property, ie. it is a standard PCI bridge. Other
+PCI bridge types don't have that. Not sure yet why this information
+is required, I'll check LoPAPR.
 
-1. qemu-web.git static site generation. GitLab CI/CD can build the
-static website on each qemu-web.git commit and publish the HTML
-artifacts.
+In the meantime, since we're in soft freeze, I guess we should
+revert Markus's patch and add a big fat comment to explain
+what's going on and maybe change the error message to something
+more informative, eg. "PCIE-to-PCI bridges are not supported".
 
-2. wiki.qemu.org is a MediaWiki instance. Account creation is a hurdle
-to one-time or new contributors. It is unclear whether GitLab's wiki
-is expressive enough for a lossless conversion of the existing QEMU
-wiki. Any volunteers interested in evaluating the wiki migration would
-be appreciated.
+Thoughts ?
 
-3. Git repo hosting is a core feature of GitLab and we already have a
-qemu.git mirror. Hosting the repos on GitLab reduces the need for
-qemu.org ssh access.
+>  Thomas
+>=20
 
-4. The QEMU release process can be moved to CI/CD so that publishing
-stable releases and release candidates is less dependent on one
-committer's machine or scripts.
-
-5. Issue tracking. Launchpad more or less works, but the login always
-bothers me. If we move git repo hosting then it makes sense to do
-issue tracking on GitLab too.
-
-There is a snowball effect where the experience is improved the more
-GitLab features we use, so I hope that most of these migrations will
-be possible.
-
-Next steps:
- * If you have an interest in one or more of these infrastructure
-components, please join the discussion.
- * If there are no volunteers for an infrastructure component I'll
-slowly work my way through evaluating GitLab and propose migrations
-
-Stefan
 
