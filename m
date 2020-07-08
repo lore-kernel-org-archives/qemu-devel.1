@@ -2,119 +2,67 @@ Return-Path: <SRS0=/TnL=AT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD5E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 12:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D948C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 12:55:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C9420720
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 12:43:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C9420720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 179DC20656
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 12:55:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f7uuQW87"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179DC20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jt9QQ-0007hN-Rq
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 08:43:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40574)
+	id 1jt9bY-0001Rc-8m
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 08:55:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jt9Pp-0007AZ-QT; Wed, 08 Jul 2020 08:43:09 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:36749)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jt9ac-0000r5-6X; Wed, 08 Jul 2020 08:54:19 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:60451)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jt9Pn-0005EU-Vn; Wed, 08 Jul 2020 08:43:09 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MvaO8-1kjK3m41iw-00siQT; Wed, 08 Jul 2020 14:43:01 +0200
-Subject: Re: [PATCH] hw/register: Document register_init_block @memory_size
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200707062308.4531-1-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <772cb98e-865c-0c75-ffa2-60773a6df2dd@vivier.eu>
-Date: Wed, 8 Jul 2020 14:42:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jt9aY-0006bn-9h; Wed, 08 Jul 2020 08:54:17 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4B1zlN3Rfxz9sRK; Wed,  8 Jul 2020 22:54:06 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1594212848;
+ bh=iYQmoCWDIVnJDYsb3hVPQMlqmB9cMM7lbOgmj5jH4cI=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=f7uuQW87WaHMX6Wb/WmerWkvtEiD9Ch/X7+ThTrYekCVGG5gG1bPt3Bi7DCMN6Vqr
+ 4VkswRIcqMKa3eQl6noI9TuG/aNibWYFPWJZ5Eon/iki8PZy8tFaHVTtx2aGt5kDpe
+ MCNfJiKZH/1jhOXaqmH0pGaicZZpuFvTJ1xl2cW8=
+Date: Wed, 8 Jul 2020 22:22:12 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Lijun Pan <ljp@linux.ibm.com>
+Subject: Re: [PATCH v4 04/11] target/ppc: convert vmuluwm to tcg_gen_gvec_mul
+Message-ID: <20200708122212.GK18595@umbus.fritz.box>
+References: <20200701234344.91843-1-ljp@linux.ibm.com>
+ <20200701234344.91843-5-ljp@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200707062308.4531-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:IfZAtAc11ej266cR3KWmjsyP4QnPBM70ycpsZXIfSoqC33/6kUi
- Uzcj+CrixDC79aJSJZAjjjpcB0MAO8bfVDph5YWL/BfySfEZ2gck5TsUmMjvEnVifW/ORn0
- cj90AH5tIQP8Zlubi93F47fLqzJPyBCzBo5g3FmLim1G29KARqEBldFR/GCA7HLpmOZ0x6s
- 4td+AoM8EnGsetc3OPLNA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9EXITp7fbZE=:6QBuzm4B3jdlDgw2qDeHLK
- jcOfZTaVHsCNWU5CHvIco/n8q6rpw7k4bSj8+DwO55rUbtf57GbWXOuXF5xWZMDuDa9nOykBE
- 2/aDdjQb99n1P804RZj3Zc68VsXs4qSssBXQt2EAX3ruxJ7J+Q10n1CoK/4egUybQXmutExT3
- SX1F9v2iFRfOi+NlBduY6u+/VUFUPzNJCXmjsjTW8oHW3QpHMI0sKPYw7NYYdFeYIcRueFuDB
- VF0B5BwLmD9meki/Id1HzvxFH6lhx9jWhUR5SmHRebfiYYIGwUMnDKvLeHgOYZhRk1jmlULJJ
- uFK8A7her3mhtV887YllyevQgLj4i7bPgKtFtvnaEYqels/R/vLR6V/yhQeXA6YV4kS23ZXRh
- eOkL6sLkivLxzLSmQ4qzVSq8o9RcAyQAe9Frx8wMZKNNZE9III+rsyVj5g8+REQMWJJ2gPmwj
- JftHeVQ1u8DdON1zn9gSQE4lcP/xb9W9qq4qC/X7kwqnr9aE8AZjuthaPddVjon1SrxlaiNZs
- w5BaGotlL7HIdIWgugbrCwzC5ULYXZYmArF9Mf9RzjM+Cdb2PNKmOkRNhS88nIqCnNMRBtghX
- J6jrV3P99wE/VAQZ92VGbE0x2C/Qi26+NrW3CMYx9d2okJ6n9R6ruy/LjJ1Al4HF/wx+L5HH0
- JZehJnZvEU/fj7BQkRbwQws7jCtFtg3A/XAp2Iy0jeK1ioZcckQv9q3yN/0Tj/OOLykezfdYi
- 6FbC45RIv94a8FaSq5b0xQGurD4fhkzrt2j0ic8O4cRn0PP+adofuhzniqLJ4lsQ2AMco9Qb0
- bijcQCh57OpR6hdHFHDHxpkHTaiCNfCVCHsyWc6NjrZqVs/f2n8QFzCcORpAXl56+hP5yjs
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/08 08:43:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="6CXocAQn8Xbegyxo"
+Content-Disposition: inline
+In-Reply-To: <20200701234344.91843-5-ljp@linux.ibm.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,33 +75,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 07/07/2020 à 08:23, Philippe Mathieu-Daudé a écrit :
-> Document the 'memory_size' argument of register_init_block().
-> 
-> Fixes: a74229597e ("register: Add block initialise helper")
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  include/hw/register.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/hw/register.h b/include/hw/register.h
-> index 5d2c565ae0..fdac5e69b5 100644
-> --- a/include/hw/register.h
-> +++ b/include/hw/register.h
-> @@ -181,6 +181,7 @@ uint64_t register_read_memory(void *opaque, hwaddr addr, unsigned size);
->   * @data: Array to use for register data, must already be allocated
->   * @ops: Memory region ops to access registers.
->   * @debug enabled: turn on/off verbose debug information
-> + * @memory_size: Size of the memory region
->   * returns: A structure containing all of the registers and an initialized
->   *          memory region (r_array->mem) the caller should add to a container.
->   */
-> 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+--6CXocAQn8Xbegyxo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jul 01, 2020 at 06:43:39PM -0500, Lijun Pan wrote:
+> Convert the original implementation of vmuluwm to the more generic
+> tcg_gen_gvec_mul.
+>=20
+> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+
+Applied to ppc-for-5.2.
+
+> ---
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> v3: newly introduced
+>=20
+>  target/ppc/helper.h                 |  1 -
+>  target/ppc/int_helper.c             | 13 -------------
+>  target/ppc/translate/vmx-impl.inc.c |  2 +-
+>  3 files changed, 1 insertion(+), 15 deletions(-)
+>=20
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index 2dfa1c6942..69416b6d7c 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -184,7 +184,6 @@ DEF_HELPER_3(vmulosw, void, avr, avr, avr)
+>  DEF_HELPER_3(vmuloub, void, avr, avr, avr)
+>  DEF_HELPER_3(vmulouh, void, avr, avr, avr)
+>  DEF_HELPER_3(vmulouw, void, avr, avr, avr)
+> -DEF_HELPER_3(vmuluwm, void, avr, avr, avr)
+>  DEF_HELPER_3(vslo, void, avr, avr, avr)
+>  DEF_HELPER_3(vsro, void, avr, avr, avr)
+>  DEF_HELPER_3(vsrv, void, avr, avr, avr)
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index be53cd6f68..bd3e6d7cc7 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -523,19 +523,6 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
+>      r->VsrD(0) =3D 0;
+>  }
+> =20
+> -#define VARITH_DO(name, op, element)                                    \
+> -    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
+> -    {                                                                   \
+> -        int i;                                                          \
+> -                                                                        \
+> -        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
+  \
+> -            r->element[i] =3D a->element[i] op b->element[i];           =
+  \
+> -        }                                                               \
+> -    }
+> -VARITH_DO(muluwm, *, u32)
+> -#undef VARITH_DO
+> -#undef VARITH
+> -
+>  #define VARITHFP(suffix, func)                                          \
+>      void helper_v##suffix(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, \
+>                            ppc_avr_t *b)                                 \
+> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+> index 403ed3a01c..6e79ffa650 100644
+> --- a/target/ppc/translate/vmx-impl.inc.c
+> +++ b/target/ppc/translate/vmx-impl.inc.c
+> @@ -801,7 +801,7 @@ static void trans_vclzd(DisasContext *ctx)
+>  GEN_VXFORM(vmuloub, 4, 0);
+>  GEN_VXFORM(vmulouh, 4, 1);
+>  GEN_VXFORM(vmulouw, 4, 2);
+> -GEN_VXFORM(vmuluwm, 4, 2);
+> +GEN_VXFORM_V(vmuluwm, MO_32, tcg_gen_gvec_mul, 4, 2);
+>  GEN_VXFORM_DUAL(vmulouw, PPC_ALTIVEC, PPC_NONE,
+>                  vmuluwm, PPC_NONE, PPC2_ALTIVEC_207)
+>  GEN_VXFORM(vmulosb, 4, 4);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--6CXocAQn8Xbegyxo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8FunEACgkQbDjKyiDZ
+s5K9zBAAvXoc40jg6/hkqMyhL7k2gk7fvjH88f6/VmRkOoRxsYRKaw6RVhdGiOpD
+kuo5sDUYcCVcG7FZFtLNaU8h9di/zRKk4kfin+A5iFUErrbXwOMBioTpykVv75r9
+OdQzVfNzi7N+omb0atlB/05Fn/R8k8N889FpWa1s7TeqFeLZHaoWIUTD/cJlZx8L
+2DRROtmBHboYt2LGSjZGc4a3Y4EZMW9CDcdCdShwXUptFOutzWAqSyLJBlhbgVta
+Uv30BjJxjB2t2bZ7BdAZxpKn0rE8oigCEzFGuEBBY//dm3cvGbZdM8FPpOBy6Bpm
+qggQA09LDlvwYXG6brKCNSeUCpTJZN6kdW1QbiIfYrtjXRqu04xSn6hHIhoQuziz
+F9tVnsEagFFVhH2WEU9EhoRKnde6nj665K/HEP3bPyygdAXqJKPcv2F8jOfHOdwI
+FRXx8PIwWmuB6AiMSplzudDozz4uvMoOoe/W0CeRpz+aMgS1CQmVooOc6kElHTW+
+4W4/249qZS3YCprkOWENYd/T82wCHdosOC4Lc8e1DlvMd8Jox+4pT7Jjv33TgTj5
+EU5/uZiHZJFLvpaX0O+kAgKs+Vww/fV6vRg74JFFdZcVCWpydzzRMyApTrBwqOaH
+rGy/nu9yFAHKyG54GnEGlMDBrje2XK2xQMWfxj+4vzn8josYgm0=
+=C+Jn
+-----END PGP SIGNATURE-----
+
+--6CXocAQn8Xbegyxo--
 
