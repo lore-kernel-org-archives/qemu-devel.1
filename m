@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E8FC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 455C8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C62B8206F6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:45:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D09B206F6
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jul 2020 22:47:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnnHCErK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C62B8206F6
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pr+htFYi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D09B206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtIpC-0008MZ-0P
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:45:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48826)
+	id 1jtIqO-0002PB-91
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 18:47:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIS5-0002kh-7H
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:05 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36852)
+ id 1jtISB-00032E-Pe
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:11 -0400
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:35051)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jtIS3-00017q-G2
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:04 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 207so100658pfu.3
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:03 -0700 (PDT)
+ id 1jtISA-000196-3I
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 18:22:11 -0400
+Received: by mail-pl1-x636.google.com with SMTP id x9so5107458plr.2
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 15:22:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=eUiNODQ/7a2hmywnzx9VN+sLDGZQNqSwzW1+Xp1VjYg=;
- b=EnnHCErK4nItfevXE35vgpXrB/4gJJmrTmhW0SkKN7T5LyZTrEOPthoSyp05MfKun6
- S3FDkSS+KRz6hVa4g5qBDPDYI//Kskm5hS2zE7G9CU25CGZAmRJRMHNE9/iAyuCF2xAn
- T3VRgaxwp7IsR93U/DFKzT3pchUyRXC+GJ8jmN62+mbVvF6M9u7W1hz21s9a8JvNxDyF
- rEEX13KOw9DCjw/ezpnJuPnYekQq9rOYDaSnXbncqJ0VZgHKFX4BtwJRDikbEAylv1I0
- 4e5W0kK5K/6SacBDLr1YafjvppuVp0SHTgmbYcXBl3GFyjvdTno4EfZtRspnUi4FATPY
- AxyQ==
+ bh=wa+AHpqfEWhhgAfAEPD77aSGzH6coLYk43PBINkaick=;
+ b=pr+htFYiDbjQeJ/ARKfk6IVACEOTAI4y+LphXq0+uyJzmgdKyi8nvcCMAui0S5v98y
+ 6zWtB6Hci3/uSLYhjDCXisfAZ7RssXwOBkF0va/zldcVS3+anVUYlJb/QKGXtSyG1w/q
+ B2v/50toC9Qg/+Ur1+qbaq9PfbN4oo0CO+yXiKF8JqPRsWXQu1PeiTLhSt9/98pouMpa
+ NvPQ6Kd3HU3kwdXyRFGs7b3w/CsQ9Cb7n8PVOYlE1T2Zmwpi8Y5q/3SR5Mv7m/z+nJcv
+ b9UutvQjbH3OUJ8c6exg5pn6BUzKqITcKgqvu5s3BKSfvFc6ou+K5vZuJqchqvnwN8iu
+ qopQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=eUiNODQ/7a2hmywnzx9VN+sLDGZQNqSwzW1+Xp1VjYg=;
- b=T+E8SmKmSeyWz7BcFolBBdAZcjEtIX3q7w/ZIFD/wZlikUnIDUEsMYOizxsR7KuLfB
- Oz4s1ON/dGNmANNI2YM0wjRX4tDYcCAtZkz6DABAciYZlL1VYaxUawWdvmMTGxf3QBkm
- 0OMi5f4Tq7+5qZLOv4MPckBjQaqIEnelSdvjhN/33iV1Llw7vrPVe+6ssnLoxCPZgq9W
- KIS1XCXtUaH57gC3crXrZQMpNmVCByA96KHMGPdt7rbkV+MQwe5JuhrSGN/KPcchk+t6
- hohJlWFT68P56gmdISqpiOYtaUC4lihZPw5pvIPNe6PaqpiBCjcKZz20kaC1KkQziHa7
- ucMA==
-X-Gm-Message-State: AOAM531wvYriZ443dkL7nFGg4g2Rnlc1Z9fuM+J6FsHKpawgVDHFfp32
- ZPMaEMtFHIvRprpr4PyFOEzpSrnm
-X-Google-Smtp-Source: ABdhPJzUtABdnFbmZFAKhTb8CWOkNZwFa8F9h3YhcyTEwcIvBUSm0eQHifqlzMKhFd9XnnqWMQhKbw==
-X-Received: by 2002:a62:2ad0:: with SMTP id
- q199mr45304096pfq.229.1594246922000; 
- Wed, 08 Jul 2020 15:22:02 -0700 (PDT)
+ bh=wa+AHpqfEWhhgAfAEPD77aSGzH6coLYk43PBINkaick=;
+ b=oXSRxmgp7J00vAj+KmspenwL8KDfkZ6c3t/XMd775BabqicdMrlrpN8tpd0I1suCHb
+ x/XtOrftfJs1G+qQE6K3xjr5ok4qiBB7sGGFRKLYVAuAIsWAfRaoVEH5P9jMjQTt3hXc
+ qr3/TmVsHLE/w/YsVXPFcLoSkXFGq+hZtzgxzPeZFGba0KbI51zS+Ri4ZQQ56Ecsi5J5
+ g4rdZnDJAHD8tJlfBv928zL1YuJR4nMbNPG053V6apVZBwjM5hai454hC6PU2fVCS29R
+ Oj2h/iD7kgkE+HsNNftqKCQhHL0s+OTlw1IRAqxR0wJwV8vEVw94ng4oau+eC24xwM7L
+ zUFg==
+X-Gm-Message-State: AOAM5326uGnLYwNGQbih2FTs6OkJad00y6u5ywF1FDCqB5MeYRshwBvw
+ 1G3cutvd9/jTPoPMs6LaW2VciodD
+X-Google-Smtp-Source: ABdhPJyJvfbYgusB3GZIBvjg2CjRs24TujouXE2u8HiPE+KLHeNFiz9D6l2m2n3soz/U6t+RzBUgxg==
+X-Received: by 2002:a17:90a:ec13:: with SMTP id
+ l19mr10350801pjy.81.1594246928634; 
+ Wed, 08 Jul 2020 15:22:08 -0700 (PDT)
 Received: from octofox.cadence.com ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.01
+ by smtp.gmail.com with ESMTPSA id t73sm693517pfc.78.2020.07.08.15.22.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jul 2020 15:22:01 -0700 (PDT)
+ Wed, 08 Jul 2020 15:22:08 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 10/21] target/xtensa: implement FPU division and square root
-Date: Wed,  8 Jul 2020 15:20:50 -0700
-Message-Id: <20200708222101.24568-11-jcmvbkbc@gmail.com>
+Subject: [PATCH v3 17/21] tests/tcg/xtensa: add fp0 div and sqrt tests
+Date: Wed,  8 Jul 2020 15:20:57 -0700
+Message-Id: <20200708222101.24568-18-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200708222101.24568-1-jcmvbkbc@gmail.com>
 References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x441.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::636;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pl1-x636.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -5
@@ -107,227 +107,186 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This does not implement all opcodes related to div/sqrt as specified in
-the xtensa ISA, partly because the official specification is not
-complete and partly because precise implementation is unnecessarily
-complex. Instead instructions specific to the div/sqrt sequences are
-implemented differently, most of them as nops, but the results of
-div/sqrt sequences is preserved.
+Test exact division/sqrt DFPU sequences.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- target/xtensa/fpu_helper.c |  24 +++++++++
- target/xtensa/helper.h     |   4 ++
- target/xtensa/translate.c  | 104 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 132 insertions(+)
+ tests/tcg/xtensa/test_fp0_div.S  | 82 ++++++++++++++++++++++++++++++++
+ tests/tcg/xtensa/test_fp0_sqrt.S | 76 +++++++++++++++++++++++++++++
+ 2 files changed, 158 insertions(+)
+ create mode 100644 tests/tcg/xtensa/test_fp0_div.S
+ create mode 100644 tests/tcg/xtensa/test_fp0_sqrt.S
 
-diff --git a/target/xtensa/fpu_helper.c b/target/xtensa/fpu_helper.c
-index 514b888b3d9a..f03a6b000460 100644
---- a/target/xtensa/fpu_helper.c
-+++ b/target/xtensa/fpu_helper.c
-@@ -203,6 +203,30 @@ float32 HELPER(msub_s)(CPUXtensaState *env, float32 a, float32 b, float32 c)
-                           &env->fp_status);
- }
- 
-+float64 HELPER(mkdadj_d)(CPUXtensaState *env, float64 a, float64 b)
-+{
-+    set_use_first_nan(true, &env->fp_status);
-+    return float64_div(b, a, &env->fp_status);
-+}
+diff --git a/tests/tcg/xtensa/test_fp0_div.S b/tests/tcg/xtensa/test_fp0_div.S
+new file mode 100644
+index 000000000000..c3e7ad7bb5b3
+--- /dev/null
++++ b/tests/tcg/xtensa/test_fp0_div.S
+@@ -0,0 +1,82 @@
++#include "macros.inc"
++#include "fpu.h"
 +
-+float32 HELPER(mkdadj_s)(CPUXtensaState *env, float32 a, float32 b)
-+{
-+    set_use_first_nan(env->config->use_first_nan, &env->fp_status);
-+    return float32_div(b, a, &env->fp_status);
-+}
++test_suite fp0_div
 +
-+float64 HELPER(mksadj_d)(CPUXtensaState *env, float64 v)
-+{
-+    set_use_first_nan(true, &env->fp_status);
-+    return float64_sqrt(v, &env->fp_status);
-+}
++#if XCHAL_HAVE_FP_DIV
 +
-+float32 HELPER(mksadj_s)(CPUXtensaState *env, float32 v)
-+{
-+    set_use_first_nan(env->config->use_first_nan, &env->fp_status);
-+    return float32_sqrt(v, &env->fp_status);
-+}
++.macro  divs_seq q, a, b, r, y, y0, an, bn, e, ex
++    div0.s      \y0, \b
++    nexp01.s    \bn, \b
++    const.s     \e, 1
++    maddn.s     \e, \bn, \y0
++    mov.s       \y, \y0
++    mov.s       \ex, \b
++    nexp01.s    \an, \a
++    maddn.s     \y, \e, \y0
++    const.s     \e, 1
++    const.s     \q, 0
++    neg.s       \r, \an
++    maddn.s     \e, \bn, \y
++    maddn.s     \q, \r, \y0
++    mkdadj.s    \ex, \a
++    maddn.s     \y, \e, \y
++    maddn.s     \r, \bn, \q
++    const.s     \e, 1
++    maddn.s     \e, \bn, \y
++    maddn.s     \q, \r, \y
++    neg.s       \r, \an
++    maddn.s     \y, \e, \y
++    maddn.s     \r, \bn, \q
++    addexpm.s   \q, \ex
++    addexp.s    \y, \ex
++    divn.s      \q, \r, \y
++.endm
 +
- uint32_t HELPER(ftoi_d)(CPUXtensaState *env, float64 v,
-                         uint32_t rounding_mode, uint32_t scale)
- {
-diff --git a/target/xtensa/helper.h b/target/xtensa/helper.h
-index a328af47cd31..d38432bab2a0 100644
---- a/target/xtensa/helper.h
-+++ b/target/xtensa/helper.h
-@@ -54,6 +54,8 @@ DEF_HELPER_3(sub_s, f32, env, f32, f32)
- DEF_HELPER_3(mul_s, f32, env, f32, f32)
- DEF_HELPER_4(madd_s, f32, env, f32, f32, f32)
- DEF_HELPER_4(msub_s, f32, env, f32, f32, f32)
-+DEF_HELPER_3(mkdadj_s, f32, env, f32, f32)
-+DEF_HELPER_2(mksadj_s, f32, env, f32)
- DEF_HELPER_4(ftoi_s, i32, env, f32, i32, i32)
- DEF_HELPER_4(ftoui_s, i32, env, f32, i32, i32)
- DEF_HELPER_3(itof_s, f32, env, i32, i32)
-@@ -78,6 +80,8 @@ DEF_HELPER_3(sub_d, f64, env, f64, f64)
- DEF_HELPER_3(mul_d, f64, env, f64, f64)
- DEF_HELPER_4(madd_d, f64, env, f64, f64, f64)
- DEF_HELPER_4(msub_d, f64, env, f64, f64, f64)
-+DEF_HELPER_3(mkdadj_d, f64, env, f64, f64)
-+DEF_HELPER_2(mksadj_d, f64, env, f64)
- DEF_HELPER_4(ftoi_d, i32, env, f64, i32, i32)
- DEF_HELPER_4(ftoui_d, i32, env, f64, i32, i32)
- DEF_HELPER_3(itof_d, f64, env, i32, i32)
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index ab83e259917a..ea8bac29831f 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -7254,6 +7254,38 @@ static void translate_ldstx_s(DisasContext *dc, const OpcodeArg arg[],
-     }
- }
- 
-+static void translate_mkdadj_d(DisasContext *dc, const OpcodeArg arg[],
-+                               const uint32_t par[])
-+{
-+    gen_helper_mkdadj_d(arg[0].out, cpu_env, arg[0].in, arg[1].in);
-+}
++.macro div_s fr0, fr1, fr2
++    divs_seq    \fr0, \fr1, \fr2, f9, f10, f11, f12, f13, f14, f15
++.endm
 +
-+static void translate_mkdadj_s(DisasContext *dc, const OpcodeArg arg[],
-+                               const uint32_t par[])
-+{
-+    OpcodeArg arg32[2];
++.macro movfp fr, v
++    movi        a2, \v
++    wfr         \fr, a2
++.endm
 +
-+    get_f32_o1_i2(arg, arg32, 0, 0, 1);
-+    gen_helper_mkdadj_s(arg32[0].out, cpu_env, arg32[0].in, arg32[1].in);
-+    put_f32_o1_i2(arg, arg32, 0, 0, 1);
-+}
++.macro check_res fr, r, sr
++    rfr         a2, \fr
++    dump        a2
++    movi        a3, \r
++    assert      eq, a2, a3
++    rur         a2, fsr
++    movi        a3, \sr
++    assert      eq, a2, a3
++.endm
 +
-+static void translate_mksadj_d(DisasContext *dc, const OpcodeArg arg[],
-+                               const uint32_t par[])
-+{
-+    gen_helper_mksadj_d(arg[0].out, cpu_env, arg[1].in);
-+}
++test div_s
++    movi        a2, 1
++    wsr         a2, cpenable
 +
-+static void translate_mksadj_s(DisasContext *dc, const OpcodeArg arg[],
-+                               const uint32_t par[])
-+{
-+    OpcodeArg arg32[2];
++    test_op2    div_s, f0, f1, f2, 0x40000000, 0x40400000, \
++        0x3f2aaaab, 0x3f2aaaaa, 0x3f2aaaab, 0x3f2aaaaa, \
++             FSR_I,      FSR_I,      FSR_I,      FSR_I
++    test_op2    div_s, f3, f4, f5, F32_1, F32_0, \
++        F32_PINF, F32_PINF, F32_PINF, F32_PINF, \
++           FSR_Z,    FSR_Z,    FSR_Z,    FSR_Z
++    test_op2    div_s, f6, f7, f8, F32_0, F32_0, \
++        F32_DNAN, F32_DNAN, F32_DNAN, F32_DNAN, \
++           FSR_V,    FSR_V,    FSR_V,    FSR_V
 +
-+    get_f32_o1_i1(arg, arg32, 0, 1);
-+    gen_helper_mksadj_s(arg32[0].out, cpu_env, arg32[1].in);
-+    put_f32_o1_i1(arg, arg32, 0, 1);
-+}
++    /* MAX_FLOAT / 0.5 = +inf/MAX_FLOAT  */
++    test_op2    div_s, f0, f1, f2, F32_MAX, F32_0_5, \
++        F32_PINF, F32_MAX, F32_PINF, F32_MAX, \
++          FSR_OI,  FSR_OI,   FSR_OI,  FSR_OI
 +
- static void translate_wur_fpu_fcr(DisasContext *dc, const OpcodeArg arg[],
-                                   const uint32_t par[])
- {
-@@ -7289,6 +7321,22 @@ static const XtensaOpcodeOps fpu_ops[] = {
-         .name = "add.s",
-         .translate = translate_add_s,
-         .coprocessor = 0x1,
-+    }, {
-+        .name = "addexp.d",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "addexp.s",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "addexpm.d",
-+        .translate = translate_mov_s,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "addexpm.s",
-+        .translate = translate_mov_s,
-+        .coprocessor = 0x1,
-     }, {
-         .name = "ceil.d",
-         .translate = translate_ftoi_d,
-@@ -7315,6 +7363,22 @@ static const XtensaOpcodeOps fpu_ops[] = {
-         .name = "cvts.d",
-         .translate = translate_cvts_d,
-         .coprocessor = 0x1,
-+    }, {
-+        .name = "div0.d",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "div0.s",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "divn.d",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "divn.s",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-     }, {
-         .name = "float.d",
-         .translate = translate_float_d,
-@@ -7415,6 +7479,30 @@ static const XtensaOpcodeOps fpu_ops[] = {
-         .name = "madd.s",
-         .translate = translate_madd_s,
-         .coprocessor = 0x1,
-+    }, {
-+        .name = "maddn.d",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "maddn.s",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "mkdadj.d",
-+        .translate = translate_mkdadj_d,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "mkdadj.s",
-+        .translate = translate_mkdadj_s,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "mksadj.d",
-+        .translate = translate_mksadj_d,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "mksadj.s",
-+        .translate = translate_mksadj_s,
-+        .coprocessor = 0x1,
-     }, {
-         .name = "mov.d",
-         .translate = translate_mov_d,
-@@ -7507,6 +7595,14 @@ static const XtensaOpcodeOps fpu_ops[] = {
-         .name = "neg.s",
-         .translate = translate_neg_s,
-         .coprocessor = 0x1,
-+    }, {
-+        .name = "nexp01.d",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "nexp01.s",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-     }, {
-         .name = "oeq.d",
-         .translate = translate_compare_d,
-@@ -7600,6 +7696,14 @@ static const XtensaOpcodeOps fpu_ops[] = {
-         .par = (const uint32_t[]){true, true, true},
-         .op_flags = XTENSA_OP_STORE,
-         .coprocessor = 0x1,
-+    }, {
-+        .name = "sqrt0.d",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-+    }, {
-+        .name = "sqrt0.s",
-+        .translate = translate_nop,
-+        .coprocessor = 0x1,
-     }, {
-         .name = "ssi",
-         .translate = translate_ldsti_s,
++    /* 0.5 / MAX_FLOAT = denorm  */
++    test_op2    div_s, f0, f1, f2, F32_0_5, F32_MAX, \
++        0x00100000, 0x00100000, 0x00100001, 0x00100000, \
++            FSR_UI,     FSR_UI,     FSR_UI,     FSR_UI
++test_end
++
++#endif
++
++test_suite_end
+diff --git a/tests/tcg/xtensa/test_fp0_sqrt.S b/tests/tcg/xtensa/test_fp0_sqrt.S
+new file mode 100644
+index 000000000000..585973dce6bc
+--- /dev/null
++++ b/tests/tcg/xtensa/test_fp0_sqrt.S
+@@ -0,0 +1,76 @@
++#include "macros.inc"
++#include "fpu.h"
++
++test_suite fp0_sqrt
++
++#if XCHAL_HAVE_FP_SQRT
++
++.macro  sqrt_seq r, a, y, t1, hn, h2, t5, h
++    sqrt0.s     \y, \a
++    const.s     \t1, 0
++    maddn.s     \t1, \y, \y
++    nexp01.s    \hn, \a
++    const.s     \r, 3
++    addexp.s    \hn, \r
++    maddn.s     \r, \t1, \hn
++    nexp01.s    \t1, \a
++    neg.s       \h2, \t1
++    maddn.s     \y, \r, \y
++    const.s     \r, 0
++    const.s     \t5, 0
++    const.s     \h, 0
++    maddn.s     \r, \h2, \y
++    maddn.s     \t5, \y, \hn
++    const.s     \hn, 3
++    maddn.s     \h, \hn, \y
++    maddn.s     \t1, \r, \r
++    maddn.s     \hn, \t5, \y
++    neg.s       \y, \h
++    maddn.s     \r, \t1, \y
++    maddn.s     \h, \hn, \h
++    mksadj.s    \y, \a
++    nexp01.s    \a, \a
++    maddn.s     \a, \r, \r
++    neg.s       \t1, \h
++    addexpm.s   \r, \y
++    addexp.s    \t1, \y
++    divn.s      \r, \a, \t1
++.endm
++
++.macro sqrt_s fr0, fr1
++    sqrt_seq    \fr0, \fr1, f10, f11, f12, f13, f14, f15
++.endm
++
++.macro movfp fr, v
++    movi        a2, \v
++    wfr         \fr, a2
++.endm
++
++.macro check_res fr, r, sr
++    rfr         a2, \fr
++    dump        a2
++    movi        a3, \r
++    assert      eq, a2, a3
++    rur         a2, fsr
++    movi        a3, \sr
++    assert      eq, a2, a3
++.endm
++
++test sqrt_s
++    movi        a2, 1
++    wsr         a2, cpenable
++
++    test_op1    sqrt_s, f0, f1, 0x40000000, \
++        0x3fb504f3, 0x3fb504f3, 0x3fb504f4, 0x3fb504f3, \
++             FSR_I,      FSR_I,      FSR_I,      FSR_I
++    test_op1    sqrt_s, f3, f4, F32_1, \
++        F32_1, F32_1, F32_1, F32_1, \
++        FSR__, FSR__, FSR__, FSR__
++    test_op1    sqrt_s, f6, f7, F32_MINUS | F32_1, \
++        F32_DNAN, F32_DNAN, F32_DNAN, F32_DNAN, \
++           FSR_V,    FSR_V,    FSR_V,    FSR_V
++test_end
++
++#endif
++
++test_suite_end
 -- 
 2.20.1
 
