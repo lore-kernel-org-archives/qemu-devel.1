@@ -6,58 +6,60 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E6E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE15DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E72DE2070E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:24:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E72DE2070E
+	by mail.kernel.org (Postfix) with ESMTPS id 8473720720
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:25:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8473720720
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtQvL-0002SM-7r
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 03:24:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38828)
+	id 1jtQwG-0003sE-Qn
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 03:25:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtQuG-0001Me-4c
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 03:23:44 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:40743)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtQuH-0001O2-0G
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 03:23:45 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:46025)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtQuE-0007Sa-Cs
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 03:23:43 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtQuE-0007Sb-CF
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 03:23:44 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Miqvq-1kVnzS1jeu-00etj7; Thu, 09 Jul 2020 09:23:38 +0200
+ id 1MpDeD-1kgZcL3IEh-00qfyM; Thu, 09 Jul 2020 09:23:38 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] linux-user: add new netlink types
-Date: Thu,  9 Jul 2020 09:23:31 +0200
-Message-Id: <20200709072332.890440-1-laurent@vivier.eu>
+Subject: [PATCH 2/2] linux-user: add netlink RTM_SETLINK command
+Date: Thu,  9 Jul 2020 09:23:32 +0200
+Message-Id: <20200709072332.890440-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200709072332.890440-1-laurent@vivier.eu>
+References: <20200709072332.890440-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:1C9UKERMMOFA60EbsBAd1ZZSImyfPXgsTXtdMtBwpr3UaIvdhtT
- atmV9mVjSBfPhZ0gsiF7cHE7BZ714ZAM0DX7+dwf1w3rVXTFiwUEqwpiI0XuUzYkKZip6xf
- EGOSSAW786yYOM8aKnvdJAGZMgBNlXpy5DZ5Fgq2M3a/8cCmOhc91BAmUcmC1TFUXS7pd0J
- M+0Wx87JAG3xMIgxoMXUA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:eeekCbeyoro=:MFwzgeHV9EiTsMbTCQdO5t
- Gg4l46Q+YS1heSc+AINuU9LzUYibf72eeolEoY+m0izuHBxPQx85B0Ri7XBoWBiq48NFI8cW3
- bS+Z0B509KkMOmHOw58kJjL4/iewd7Zj6je/CeL9bNQJzeO/Z3C1w16pusI2lgTWImP5cWeMx
- KgkHuP7W+73wWMSPy8JLnWHY1YJpaU+wn63ekBR5krGL89+vPsyCN6CRpilNvCHiNmetpYFdk
- HU2vgzPfApkP4qrUFWRwQJ34hxA6ZQ0Yvlbs2pyu55zpz/1xMlPqvSgpopPcunS5yqyAl9SyD
- 1xG68DAbfgNS9QhMNMs6olknYyZBs10pYVfbloyZK4iML8mXgHwaD84TcJJwbaqmZx4IE1Sbp
- PKhhYcAlmM/X2vT3A3Lbil+GqprSoJkzqB0cZwwd9Yldk4twAgzoIAudsYiOyjjntgCNYRDEh
- Hp+bFhQ+s+NqjqNWcP/WAxFbcbsvKfQQ89i7NNnSal/ceGwAdtVJ5gDwbRCnSA2Rl6RDRDzo6
- 6l+jtbldV55Uo4XNF/tO6O2waWmGibi+qwLOyiLfFyL+lBJp5DQ6M138giA132/MDtxvGwgQm
- ydMRxOwIX2Ak3ATi0Y5/TBO6itb/HzYIUL1OnR761wcgXfy6OrPZ5WEKQNT6dxdFlLB0irMwP
- bTblu9Lmuv3qb8vCbIAs2FqqBwi4j31NuhEPJBkPci3T4hczSAGuEJmRv9rNAxE7Wxpiturat
- Jujsuzf7IaYBzDxH/NJbrWe4SxqENC2atzxdILmYXxJR4f548/4lExF0GHRFaiBCjpu8fdlLF
- 5HoXsv6Lo41AElNR4KvceT2eukpm2xT9fslaDNvJTHLiL/oi+X+Vcqnis8NOkO8hLLT243i
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:qOB31VRaLnwEruVW8Ul/85VH1ppc07o7n8m9A/smcZkFZxtwpeB
+ 2tJpU1VGPObsx7Xlk/yarj6uqahxvEBOlKwUZhLHPHVh7eMpdMJQKoJc9CoUebNxBVv46wN
+ IuXGEX2G3wM+ifE28Ava+OmM2sdoYWeKw2XMCptAURWnLDewUxlIm/ljFHJKEfDELiBq5+O
+ q63HuFcjjMeyImTStR4Ig==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3XwvyZxmtbw=:5jtDbwHjk44ClR6VJ9YMj4
+ Mod3qXDqhKNtvV4ghWyUDBvk0CZtB5kpJtO3uTqjtaGr07DMuRQwQbzqTsmwE5A3gd3uIdqCG
+ IbyyG5BhF2QgOwX6gRLw6svzHYaTeLCpcVBu80Ov2YKo9BLr1F+C+rZukbNvFlWGkuYf/3fqL
+ dQP6AsW95LDwTngZwMt/yJrAkDIyvxRwnYa02NpGrgsfyQg0stw6W5bbZv90Mmhw/VS3JF9s6
+ RM4VGO3MmQoANN1qc0fHBpjMlynIvKZcFmLyv6sxbqxQ6c8x2+QDu8BE/AhwPwwj8oZiN5+7I
+ cGKfBGH+9RVA9WwOCDmFcki0oDz6lPMZbarevIujOdPielxjm31QV0nv3M5hIEmD/njfVO3X/
+ TA+iUhmRLpgfVdgPI1ZGllpkrTe67+2bKdT0vN99VaP6CBdEmxRK4BiTIkx56+Fm1nQzZ1IWI
+ NRS8tQm9GZfXw5KIuQCkWwULKZ0v88815OPbgsEXVYW0odK/jLiim0vRLxi6oNQO2uTD3AlBM
+ CYclJaSE86BP6nqW4rOAKjHJuzXB8ZyKv9vU7QMx/zhQkjjf0lEyK/Rg5rUVFYrUqnbPRXHjH
+ WiPatKd99I7mtD8keAKSU0OStz1t4QlC3MxZJOCr9eDfmLzB9aqCTDnZY5sdryK2eyDzsuTKT
+ heYE0ZfwQRoE7Y6QzaPvYhdOAHqTqi/83s3Xu4vdkmdwSr+n0UfRKHNLEjhvXNIqo6kScXXTk
+ TAnYKNTHy1+fPsrwUJdK7M9eeZqcb81zmlFmuIo8L1g3c6TwZ7ITQz1HfHB/QU6XnZKcHx7HX
+ jzYwMYMhiw0yInasMIspXSwRXIWdZzBGn6ntJTCV+Id02YxAHV1IPkwHpip1Huks6w0fq3N
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 03:23:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -84,41 +86,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Only implement IFLA_PERM_ADDRESS to fix the following error:
+This command is needed to be able to boot systemd in a container.
 
-  Unknown host QEMU_IFLA type: 54
+  $ sudo systemd-nspawn -D /chroot/armhf/sid/ -b
+  Spawning container sid on /chroot/armhf/sid.
+  Press ^] three times within 1s to kill container.
+  systemd 245.6-2 running in system mode.
+  Detected virtualization systemd-nspawn.
+  Detected architecture arm.
 
-The couple of other ones, IFLA_PROP_LIST and IFLA_ALT_IFNAME, have
-been introduced to be used with RTM_NEWLINKPROP, RTM_DELLINKPROP and
-RTM_GETLINKPROP that are not implemented by QEMU.
+  Welcome to Debian GNU/Linux bullseye/sid!
+
+  Set hostname to <virt-arm>.
+  Failed to enqueue loopback interface start request: Operation not supported
+  Caught <SEGV>, dumped core as pid 3.
+  Exiting PID 1...
+  Container sid failed with error code 255.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/fd-trans.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ linux-user/fd-trans.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
-index c0687c52e62b..5d49a53552b2 100644
+index 5d49a53552b2..1486c81aaa27 100644
 --- a/linux-user/fd-trans.c
 +++ b/linux-user/fd-trans.c
-@@ -133,6 +133,9 @@ enum {
-     QEMU_IFLA_NEW_IFINDEX,
-     QEMU_IFLA_MIN_MTU,
-     QEMU_IFLA_MAX_MTU,
-+    QEMU_IFLA_PROP_LIST,
-+    QEMU_IFLA_ALT_IFNAME,
-+    QEMU_IFLA_PERM_ADDRESS,
-     QEMU___IFLA_MAX
- };
- 
-@@ -807,6 +810,7 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
-     /* binary stream */
-     case QEMU_IFLA_ADDRESS:
-     case QEMU_IFLA_BROADCAST:
-+    case QEMU_IFLA_PERM_ADDRESS:
-     /* string */
-     case QEMU_IFLA_IFNAME:
-     case QEMU_IFLA_QDISC:
+@@ -1204,6 +1204,7 @@ static abi_long target_to_host_data_route(struct nlmsghdr *nlh)
+         break;
+     case RTM_NEWLINK:
+     case RTM_DELLINK:
++    case RTM_SETLINK:
+         if (nlh->nlmsg_len >= NLMSG_LENGTH(sizeof(*ifi))) {
+             ifi = NLMSG_DATA(nlh);
+             ifi->ifi_type = tswap16(ifi->ifi_type);
 -- 
 2.26.2
 
