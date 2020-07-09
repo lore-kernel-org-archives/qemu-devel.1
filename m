@@ -2,81 +2,107 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F5DBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF1CEC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:00:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58ADE2067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7766C2067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:00:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dsU2BdZN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58ADE2067D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6R8p+mx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7766C2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtSO2-0001Ub-Jw
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 04:58:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34098)
+	id 1jtSPv-0003Hc-QX
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 05:00:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eskultet@redhat.com>)
- id 1jtSMc-0000Ex-St
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:57:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26100
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtSOp-0002c4-G1
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:59:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23267
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eskultet@redhat.com>)
- id 1jtSMZ-000470-EN
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:57:06 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtSOn-0004Yp-DG
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:59:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594285022;
+ s=mimecast20190719; t=1594285160;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/w5wR71YgwwW4dH9RZH8Z6KS2DNSgxvn4Inq5j87hY8=;
- b=dsU2BdZN4iq/1uLUX7TVndqYpVcMgCLPl9Gm09rK+hUgkssFO+h0CPPGjbFRkx08BoSJWp
- RDD+Exfdz5AlziaMO7KD9yF2uI4y9rEkDMX1DynBcmPqv2FE2OQ/l3aa6QsN4/V4nmNkpX
- XcPmd6aPtm638DnkI3r1dwO/oWbg79I=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Egi2GSTnQuoy/T94xySzGSGiKGKRwMCpOTWvMPr9qcQ=;
+ b=h6R8p+mxSMidAl8bcpLxdEw/17cVErXiT0NHzlloDwL8NbXpnM+r3fTWnm8VAUznQKakor
+ OGFCcbZ5L0DRJ5O/d0Jkbly+lrO7Q0m0/1BDSe8oyF9M+KE6nQ0XcWs7TFX22CLbhv1IfN
+ fT9v2HcOiCjKib3BdTPZoLRaGnBhzuI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-VKrhM3EHPrabluHr0wDevQ-1; Thu, 09 Jul 2020 04:55:31 -0400
-X-MC-Unique: VKrhM3EHPrabluHr0wDevQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-436-Nw_q60HPPleFEOs5feTcJQ-1; Thu, 09 Jul 2020 04:59:18 -0400
+X-MC-Unique: Nw_q60HPPleFEOs5feTcJQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F61019253CE;
- Thu,  9 Jul 2020 08:55:30 +0000 (UTC)
-Received: from nautilus.usersys.redhat.com (unknown [10.40.193.117])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 720875D9C9;
- Thu,  9 Jul 2020 08:55:22 +0000 (UTC)
-Date: Thu, 9 Jul 2020 10:55:19 +0200
-From: Erik Skultety <eskultet@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [PATCH v2 1/2] GitLab Gating CI: introduce pipeline-status
- contrib script
-Message-ID: <20200709085519.GB536480@nautilus.usersys.redhat.com>
-References: <20200709024657.2500558-1-crosa@redhat.com>
- <20200709024657.2500558-2-crosa@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B1AD193248C;
+ Thu,  9 Jul 2020 08:59:17 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
+ [10.36.113.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 674AF872EE;
+ Thu,  9 Jul 2020 08:59:15 +0000 (UTC)
+Subject: Re: [PATCH v7 12/47] block: Use bdrv_filter_(bs|child) where obvious
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-13-mreitz@redhat.com>
+ <82792291-86a1-34cc-98e8-6d585755c79b@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <898d0f61-8994-4750-98bd-d6870335d223@redhat.com>
+Date: Thu, 9 Jul 2020 10:59:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200709024657.2500558-2-crosa@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <82792291-86a1-34cc-98e8-6d585755c79b@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eskultet@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eskultet@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mdoKsrtirAlCdNADZCrMCRRcHZwin1H9s"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 01:47:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -97,161 +123,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Beraldo Leal <bleal@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 08, 2020 at 10:46:56PM -0400, Cleber Rosa wrote:
-> This script is intended to be used right after a push to a branch.
->
-> By default, it will look for the pipeline associated with the commit
-> that is the HEAD of the *local* staging branch.  It can be used as a
-> one time check, or with the `--wait` option to wait until the pipeline
-> completes.
->
-> If the pipeline is successful, then a merge of the staging branch into
-> the master branch should be the next step.
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  scripts/ci/gitlab-pipeline-status | 156 ++++++++++++++++++++++++++++++
->  1 file changed, 156 insertions(+)
->  create mode 100755 scripts/ci/gitlab-pipeline-status
->
-> diff --git a/scripts/ci/gitlab-pipeline-status b/scripts/ci/gitlab-pipeline-status
-> new file mode 100755
-> index 0000000000..4a9de39872
-> --- /dev/null
-> +++ b/scripts/ci/gitlab-pipeline-status
-> @@ -0,0 +1,156 @@
-> +#!/usr/bin/env python3
-> +#
-> +# Copyright (c) 2019-2020 Red Hat, Inc.
-> +#
-> +# Author:
-> +#  Cleber Rosa <crosa@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
-> +
-> +"""
-> +Checks the GitLab pipeline status for a given commit commit
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mdoKsrtirAlCdNADZCrMCRRcHZwin1H9s
+Content-Type: multipart/mixed; boundary="fa3uYMvzPAovFWUgMg6J4qjXpkXUDa4v8"
 
-s/commit$/(hash|sha|ID|)
+--fa3uYMvzPAovFWUgMg6J4qjXpkXUDa4v8
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> +"""
-> +
-> +# pylint: disable=C0103
-> +
-> +import argparse
-> +import http.client
-> +import json
-> +import os
-> +import subprocess
-> +import time
-> +import sys
-> +
-> +
-> +def get_local_staging_branch_commit():
-> +    """
-> +    Returns the commit sha1 for the *local* branch named "staging"
-> +    """
-> +    result = subprocess.run(['git', 'rev-parse', 'staging'],
+On 08.07.20 20:24, Andrey Shinkevich wrote:
+> On 25.06.2020 18:21, Max Reitz wrote:
+>> Places that use patterns like
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0 if (bs->drv->is_filter && bs->file) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ... something about bs-=
+>file->bs ...
+>> =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>> should be
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *filtered =3D bdrv_filter_bs(b=
+s);
+>> =C2=A0=C2=A0=C2=A0=C2=A0 if (filtered) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ... something about @fi=
+ltered ...
+>> =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>> instead.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 31 ++++++++++++++++++++-----------
+>> =C2=A0 block/io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 =
+7 +++++--
+>> =C2=A0 migration/block-dirty-bitmap.c |=C2=A0 8 +-------
+>> =C2=A0 3 files changed, 26 insertions(+), 20 deletions(-)
+>>
+> ...
+>> diff --git a/block/io.c b/block/io.c
+>> index df8f2a98d4..385176b331 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -3307,6 +3307,7 @@ int coroutine_fn bdrv_co_truncate(BdrvChild
+>> *child, int64_t offset, bool exact,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **err=
+p)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *bs =3D child->bs;
+>> +=C2=A0=C2=A0=C2=A0 BdrvChild *filtered;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriver *drv =3D bs->drv;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BdrvTrackedRequest req;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t old_size, new_bytes;
+>> @@ -3358,6 +3359,8 @@ int coroutine_fn bdrv_co_truncate(BdrvChild
+>> *child, int64_t offset, bool exact,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 +=C2=A0=C2=A0=C2=A0 filtered =3D bdrv_filter_child(bs);
+>> +
+>=20
+> Isn't better to have this initialization right before the relevant
+> if/else block?
 
-If one day Peter decides that "staging" is not a cool name anymore and use a
-different name for the branch :) we should account for that and make it a
-variable, possibly even parametrize this function with it.
+Hm, well, yes.  In this case, though, maybe not.  Patch 16 will add
+another BdrvChild to be initialized here (@backing), and we need to
+initialize that one here.  So I felt it made sense to group them together.
 
-> +                            stdin=subprocess.DEVNULL,
-> +                            stdout=subprocess.PIPE,
-> +                            stderr=subprocess.DEVNULL,
-> +                            cwd=os.path.dirname(__file__),
-> +                            universal_newlines=True).stdout.strip()
-> +    if result == 'staging':
-> +        raise ValueError("There's no local staging branch")
+They got split up when I decided to put @filtered into this patch and
+@backing into its own.  So now it may look a bit weird, but I feel like
+after patch 16 it makes sense.
 
-"There's no local branch named 'staging'" would IMO be more descriptive, so as
-not to confuse it with staging in git.
+(I=E2=80=99m indifferent, basically.)
 
-> +    if len(result) != 40:
-> +        raise ValueError("Branch staging HEAD doesn't look like a sha1")
-> +    return result
-> +
-> +
-> +def get_pipeline_status(project_id, commit_sha1):
-> +    """
-> +    Returns the JSON content of the pipeline status API response
-> +    """
-> +    url = '/api/v4/projects/{}/pipelines?sha={}'.format(project_id,
-> +                                                        commit_sha1)
-> +    connection = http.client.HTTPSConnection('gitlab.com')
-> +    connection.request('GET', url=url)
-> +    response = connection.getresponse()
-> +    if response.code != http.HTTPStatus.OK:
-> +        raise ValueError("Failed to receive a successful response")
-> +    json_response = json.loads(response.read())
+Max
 
-a blank line separating the commentary block would slightly help readability
 
-> +    # afaict, there should one one pipeline for the same project + commit
+--fa3uYMvzPAovFWUgMg6J4qjXpkXUDa4v8--
 
-s/one one/be only one/
+--mdoKsrtirAlCdNADZCrMCRRcHZwin1H9s
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> +    # if this assumption is false, we can add further filters to the
-> +    # url, such as username, and order_by.
-> +    if not json_response:
-> +        raise ValueError("No pipeline found")
-> +    return json_response[0]
-> +
-> +
-> +def wait_on_pipeline_success(timeout, interval,
-> +                             project_id, commit_sha):
-> +    """
-> +    Waits for the pipeline to end up to the timeout given
+-----BEGIN PGP SIGNATURE-----
 
-"Waits for the pipeline to finish within the given timeout"
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8G3GEACgkQ9AfbAGHV
+z0CwCQf/bJiwGqn7lmOdQDEy0Ed6nI1ShQLc6WcVq595vUOY2fKYlXWL8d0KmymH
+ouGpHbk63CAX8sXFSUDHANefFP8CJBNtWuITAJn9MAU1eb9XpW8m44EFeP/oHbig
+Y7tZFXmySj4lQYEv8THqdlYLdJuc79f1VhihYFh5iBlgfBH+ZOPd42vs7jBXtfAi
+5s7XsG38+VUBm+tfT1itRcUZmoVYVPevPGEkgrF6RmJC9/hGrfhQvHvPVWc6HaHd
+crI6qkXaMCqBN1WYF8P8rOfHVchhvMyHe8nB5cA+IFf3QWhcIpjhwXDP0K0pJVnT
+t8eH65pIaRaX2phfzgswKKIeuOTiOA==
+=qNbc
+-----END PGP SIGNATURE-----
 
-> +    """
-> +    start = time.time()
-> +    while True:
-> +        if time.time() >= (start + timeout):
-> +            print("Waiting on the pipeline success timed out")
-
-s/success//
-(the pipeline doesn't always have to finish with success)
-
-> +            return False
-> +
-> +        status = get_pipeline_status(project_id, commit_sha)
-> +        if status['status'] == 'running':
-> +            time.sleep(interval)
-> +            print('running...')
-> +            continue
-> +
-> +        if status['status'] == 'success':
-> +            return True
-> +
-> +        msg = "Pipeline ended unsuccessfully, check: %s" % status['web_url']
-
-I think more common expression is "Pipeline failed"
-
-> +        print(msg)
-> +        return False
-> +
-...
-
-Code-wise looks OK to me, but since I don't know what Peter's requirements
-on/expectations of this script are, I can't do a more thorough review.
-
-Regards,
-Erik
+--mdoKsrtirAlCdNADZCrMCRRcHZwin1H9s--
 
 
