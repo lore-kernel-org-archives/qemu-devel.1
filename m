@@ -2,70 +2,95 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F5AC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD5BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FD642074B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:51:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD642074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7C29720708
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:52:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oQOsBkn9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C29720708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtWxU-0005wQ-NF
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:51:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43094)
+	id 1jtWyY-0006pA-MN
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:52:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jtWww-0005SW-2S
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:50:54 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25135
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jtWwu-0005w1-92
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:50:53 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-dnqXqXiNN4-hcsZT5mNiJg-1; Thu, 09 Jul 2020 09:50:48 -0400
-X-MC-Unique: dnqXqXiNN4-hcsZT5mNiJg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1695AE919;
- Thu,  9 Jul 2020 13:50:47 +0000 (UTC)
-Received: from bahia.lan (ovpn-112-37.ams2.redhat.com [10.36.112.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2BFF31001901;
- Thu,  9 Jul 2020 13:50:46 +0000 (UTC)
-Subject: [PATCH] block: Avoid stale pointer dereference in
- blk_get_aio_context()
-From: Greg Kurz <groug@kaod.org>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Date: Thu, 09 Jul 2020 15:50:45 +0200
-Message-ID: <159430264541.389456.11925072456012783045.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jtWxd-0006Dg-At
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:51:37 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:40087)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jtWxb-000620-Bk
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:51:36 -0400
+Received: by mail-wr1-x434.google.com with SMTP id f2so2438524wrp.7
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 06:51:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=y+bVLnS6oBhp/NEDTw2sL3QeOkr612rrOy3X55FoDaw=;
+ b=oQOsBkn9wQQXxBy0hvZzkiMDUUe+4tKsgJNc5+w+VXoMBFaihr/GzYYnuUEWMXiEnF
+ jRhD2/CXMfZtZfsLdHcro40/leqoDW8oX36XznTtnBo1bSRUSptfRTh7pQqqnaRiPTZK
+ 3XZN+fqrinfsWkGnd/JwS0Y7iZCta2awnwfAeLMItqwTjA+2GZSjp7LcPRjfkqRvV8WG
+ kfbAdD7bvG0fW4YdruR9rhOzdNCg11CoPRNxlTne4s32ZYC+pJm9/DLvZ6fW/JKGJ3r6
+ RaWP3KRsXLaMmr14UKBX5l230z185TyGIc+OxeZnx9Oqz5M0DN/b8/4WPIYf0fXK77X0
+ /liA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=y+bVLnS6oBhp/NEDTw2sL3QeOkr612rrOy3X55FoDaw=;
+ b=kK7RiDQoRJs3ynqg0BYmSHac02kWX51zLN0zXvXOt7g3lkdv9OOu7DMWi3p4VgX4G9
+ fy5t+yr7yUPTchk4OmETvbIc5FUJ8lwWmRE97odmiHhYYgbAK2r8QKr5cJLPl9Gq+iF1
+ cDxG4hcglJu0Ou4aHL2lAYAK8mcwPYWw2iEU1T0pSTe3VOjIDt24WGklhy+aVl5Q/4nd
+ 80TctRKzzymSkPs60wUZiDMYjiwOxI4DUFwz0e/Q8HHnNlA/H1wyNbqjoFsmqjpdFO1O
+ J195tEkCRdmJU6ZQV1zPpi44/3BiNm1umXh047lHd3y//Q/8PlpEHs/5XD5/GQ2TmQpG
+ V6PQ==
+X-Gm-Message-State: AOAM531IxAAeDg47BCjtmIOxgZsz+rNyf4np3r/3dkROLZDii9DRqOOg
+ RoMYRRTKC0a1R///fKI9GjhjRg==
+X-Google-Smtp-Source: ABdhPJyxur4OKWBzO1LV4UsrweH2lNAWxzmpW9uWenZLNgI9RM+bhr6bkH5l5PZYb2hef3zjN44TUg==
+X-Received: by 2002:adf:8462:: with SMTP id 89mr62380946wrf.420.1594302693492; 
+ Thu, 09 Jul 2020 06:51:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n16sm4844096wmc.40.2020.07.09.06.51.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 09 Jul 2020 06:51:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5C8601FF7E;
+ Thu,  9 Jul 2020 14:51:31 +0100 (BST)
+References: <159357217483.1717.4076077243388027502.malonedeb@chaenomeles.canonical.com>
+ <159426310588.27029.9451813776430828516.malone@gac.canonical.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bug 1885827 <1885827@bugs.launchpad.net>
+Subject: Re: [Bug 1885827] Re: building plugin failed on Windows with mingw
+In-reply-to: <159426310588.27029.9451813776430828516.malone@gac.canonical.com>
+Date: Thu, 09 Jul 2020 14:51:31 +0100
+Message-ID: <87h7ugn6e4.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.110.61; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:20:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x434.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,76 +103,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is possible for blk_remove_bs() to race with blk_drain_all(), causing
-the latter to dereference a stale blk->root pointer:
 
+Emilio G. Cota <1885827@bugs.launchpad.net> writes:
 
-  blk_remove_bs(blk)
-   bdrv_root_unref_child(blk->root)
-    child_bs =3D blk->root->bs
-    bdrv_detach_child(blk->root)
-     ...
-     g_free(blk->root) <=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D blk->roo=
-t becomes stale
-    bdrv_unref(child_bs) <=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D yield at som=
-e point
+> You should then find out why libqemu_plugin.dll.a is not working. It is
+> possible though that your linked is calling the import library something
+> else, for instance adding a .dll extension to it.
+>
+> You will have to run a few tests with your linker (I'd just use the
+> examples from the stackoverflow links I posted above) to see the name of
+> the import library that gets created. My assumption is that some library
+> gets created, otherwise the linked should give you an error and AFAICT
+> it does not.
+>
+> Once you find what the import library us, you should be in good shape to
+> adapt the above for QEMU. Let us know how it goes!
 
-A blk_drain_all() can be triggered by some guest action in the
-meantime, eg. on POWER, SLOF might disable bus mastering on
-a virtio-scsi-pci device:
+I did have a go but couldn't get far with the mingw docker images. I got
+somewhat distracted yesterday solving the mysterious regenerating
+syscall_nr.h problem so I've run out of bandwidth to look at this any
+longer. If the two of you find an eventual solution please send me a
+patch.
 
-  virtio_write_config()
-   virtio_pci_stop_ioeventfd()
-    virtio_bus_stop_ioeventfd()
-     virtio_scsi_dataplane_stop()
-      blk_drain_all()
-       blk_get_aio_context()
-       bs =3D blk->root ? blk->root->bs : NULL
-            ^^^^^^^^^
-              stale
+Thanks.
 
-Then, depending on one's luck, QEMU either crashes with SEGV or
-hits the assertion in blk_get_aio_context().
-
-blk->root is set by blk_insert_bs() which calls bdrv_root_attach_child()
-first. The blk_remove_bs() function should rollback the changes made
-by blk_insert_bs() in the opposite order (or it should be documented
-somewhere why this isn't the case). Clear blk->root before calling
-bdrv_root_unref_child() in blk_remove_bs().
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- block/block-backend.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 6936b25c836c..0bf0188133e3 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -808,6 +808,7 @@ void blk_remove_bs(BlockBackend *blk)
- {
-     ThrottleGroupMember *tgm =3D &blk->public.throttle_group_member;
-     BlockDriverState *bs;
-+    BdrvChild *root;
-=20
-     notifier_list_notify(&blk->remove_bs_notifiers, blk);
-     if (tgm->throttle_state) {
-@@ -825,8 +826,9 @@ void blk_remove_bs(BlockBackend *blk)
-      * to avoid that and a potential QEMU crash.
-      */
-     blk_drain(blk);
--    bdrv_root_unref_child(blk->root);
-+    root =3D blk->root;
-     blk->root =3D NULL;
-+    bdrv_root_unref_child(root);
- }
-=20
- /*
-
-
+--=20
+Alex Benn=C3=A9e
 
