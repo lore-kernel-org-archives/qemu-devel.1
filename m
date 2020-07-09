@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B714AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C03C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:14:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 828E32073A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 255572073A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:14:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XCyk0Ovi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 828E32073A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wx4Q8ApL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 255572073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtXK3-0001rg-O6
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 10:14:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50808)
+	id 1jtXK4-0001v5-EU
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 10:14:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jtXIt-0000BX-2g
+ id 1jtXIt-0000CS-L1
  for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:13:35 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36838)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52862)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jtXIq-0001K2-LJ
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:13:34 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k6so2561898wrn.3
+ id 1jtXIr-0001K6-3c
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:13:35 -0400
+Received: by mail-wm1-x344.google.com with SMTP id q15so1987979wmj.2
  for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 07:13:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Nm8CLC7O4HQxtuuQtcA9m1t+foBk/FQkRZdS8Q7AlJQ=;
- b=XCyk0Ovif5U0sSesiyXMl1+eA0ZbZS39glLQJjh267Iuri8ehd7gVhH8+ExUvE05TL
- 32Q8SA6KIQmDfpeWIJABWGRe9IJCDOyI2a7VkGYApWSqgb6y/1VBwgSAiHb94VFxmS0i
- +XHyKrM7j8m4PhWmpalHtSH6BdDMIbJwdFQ+d6RdRZja74DxZICkA0e2N6Moeevmwo7p
- hYRLXu0qkOXv9H4RNXi8fGn+Nin4KBBC0+UBfS832n1w/I6iVOqZnSAEzagoban++liB
- 2e400zC3XK7Rx9UUs3guwxLCnqquZ5hp1NSb80TgKU/rVC6OjXnlmAu2CC0i1U1oL8PW
- FtTw==
+ bh=mziYoPJMSKM1jWfzpm/IJS+/PwzoS5VrAh2yuJs4L08=;
+ b=Wx4Q8ApLdOhGKHMMsOwxI5oQI2isap65v/PDZoSWpAKWJMIjygOHcVXkndbmNR4DHh
+ FKPIxCszkTq+Vu14+NX/AIzK2pxHxSgapj46374SF9xhKglS3H3nTeI7sjD7CqwhWkkf
+ SqMH7U+eyLHhs4Dn6P11MzRnGWi14n0wVwQGmzgGS0Gc9lYVb1ls3veqkwcHOZt9PmMR
+ dRhEyiyQlWpHr9Vkgg6GGJjt1TyNYO2e2i3jOyyPJWL4U9s7uzvXxe021TWKuKLpw1ZI
+ lqBrcxBUe7Qeqt3re+D8tNMDgYRsIzx+famleELpXhoIZEpKrCL96cf/aBDIIplVszeH
+ da5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Nm8CLC7O4HQxtuuQtcA9m1t+foBk/FQkRZdS8Q7AlJQ=;
- b=dYJ6m+UxpzXPrliQFhHZ/mg4KwLs9zEtCCBOraOmN56zqxxIa6NWvW/vY7CIJeHjEp
- rxhe2juQzqpmCnkSOjmK/aJMFf/yFjL+LpRwZKCsPydreVSDw2tRFz1+lt/fsKBuApW3
- UGOgdHWT1luV6QoT+xRD/Zv2M1Ik86EPN+Q+0DLWs9i95syRynZHCkxDK2jPn8wCaANb
- pCOWqd8AtXxrMa/Al2WRb8ZtL8+YenueXTMx0910v3L0mxo0POGd42WTMx9/MG4Xa1FO
- jS1bdB6ssvpH5AKX3MmqRzHBrHPwRtibUAi7nXlP+BbdSHQHjPO3k9TDeXjQmZD/Xe+T
- qZTg==
-X-Gm-Message-State: AOAM5303hwJzrF2wUu7rS5QRbEhoTrKQbmGNniNEQ2hNDVoG8mhjdapy
- ecsxAelI+U5L/XUod7d0Fj+RQA==
-X-Google-Smtp-Source: ABdhPJzT86jamrUsoFV5j8Z4D8rTkhzJEagXTM8ldtTEbzkZCAfmQZ+1pMUGrT9IvPB+Raydc0qfRw==
-X-Received: by 2002:adf:dd81:: with SMTP id x1mr63116515wrl.7.1594304010865;
- Thu, 09 Jul 2020 07:13:30 -0700 (PDT)
+ bh=mziYoPJMSKM1jWfzpm/IJS+/PwzoS5VrAh2yuJs4L08=;
+ b=IF1/oBWg0GDpVsO67JeTI0lXKb9fexxX/eGQbb0hLw7p7m6BGs0qI9HljVIi8ts4gH
+ tBOFcTy7k943QM4eU8VHeoFAMbeMoWwb4+voZx/MQ5yXtErgllMEanUPE7YLExbsRrR6
+ VXYMElO2xAPdRNWlRkKDyAEGkzvaC3Fb8Mxl7rUyFmDpklHsWAhuXm9LO3qb3bMpfCr4
+ XR4E/45P9nbl2N/qKrQk20bTzxBJ237HFigNSMcPnIM3mD6DeNeqejxsqQRoYha3J1cH
+ xqC9VG5KHha1PAdOAg5hNlsVm2nYv5RVriBDqNHEhlLEOkO1pHI1UuagbR6R+xVoJ/a8
+ AgpQ==
+X-Gm-Message-State: AOAM532vVqebKiob0W7LtKteM4tMiLIj/8DmI7pBfJvduS57HQKHHN6u
+ aJAOsC9Js161TQZkbPZyr507Hw==
+X-Google-Smtp-Source: ABdhPJwjPdFvZyJl910qg2vn9X7ofcuOSXqfDYLM/yL3UvDCpUTaZT2OxHPIR7eLizMARxNvSMB02A==
+X-Received: by 2002:a1c:1bc6:: with SMTP id b189mr214566wmb.166.1594304011717; 
+ Thu, 09 Jul 2020 07:13:31 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f12sm5629079wrw.53.2020.07.09.07.13.28
+ by smtp.gmail.com with ESMTPSA id k185sm5002369wmk.47.2020.07.09.07.13.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Thu, 09 Jul 2020 07:13:28 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8E10B1FF8C;
+ by zen.linaroharston (Postfix) with ESMTP id A3B981FF8F;
  Thu,  9 Jul 2020 15:13:27 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 02/13] docs/devel: add some notes on tcg-icount for
- developers
-Date: Thu,  9 Jul 2020 15:13:16 +0100
-Message-Id: <20200709141327.14631-3-alex.bennee@linaro.org>
+Subject: [PATCH  v1 03/13] docs: Add to gdbstub documentation the PhyMemMode
+Date: Thu,  9 Jul 2020 15:13:17 +0100
+Message-Id: <20200709141327.14631-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200709141327.14631-1-alex.bennee@linaro.org>
 References: <20200709141327.14631-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,161 +103,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Peter Maydell <peter.maydell@linaro.org>,
- berrange@redhat.com, robert.foley@linaro.org,
- Paolo Bonzini <pbonzini@redhat.com>,
+Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  richard.henderson@linaro.org, f4bug@amsat.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org, aurelien@aurel32.net
+ aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
+ peter.puhov@linaro.org, aurelien@aurel32.net, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This attempts to bring together my understanding of the requirements
-for icount behaviour into one reference document for our developer
-notes.
+From: Jon Doron <arilou@gmail.com>
 
+The PhyMemMode gdb extension command was missing from the gdb.rst
+document.
+
+Signed-off-by: Jon Doron <arilou@gmail.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20200619135844.23307-1-alex.bennee@linaro.org>
-
+Message-Id: <20200601171609.1665397-1-arilou@gmail.com>
 ---
-v2
-  - fix copyright date
-  - it's -> its
-  - drop mentioned of gen_io_end()
-  - remove and correct original conjecture
-v3
-  - include link in index
-v4
-  - Grammar fixes from Peter
-  - re-worded final section
----
- docs/devel/index.rst      |  1 +
- docs/devel/tcg-icount.rst | 97 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 98 insertions(+)
- create mode 100644 docs/devel/tcg-icount.rst
+ docs/system/gdb.rst | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/docs/devel/index.rst b/docs/devel/index.rst
-index 4ecaea3643fb..ae6eac7c9c66 100644
---- a/docs/devel/index.rst
-+++ b/docs/devel/index.rst
-@@ -23,6 +23,7 @@ Contents:
-    decodetree
-    secure-coding-practices
-    tcg
-+   tcg-icount
-    multi-thread-tcg
-    tcg-plugins
-    bitops
-diff --git a/docs/devel/tcg-icount.rst b/docs/devel/tcg-icount.rst
-new file mode 100644
-index 000000000000..8d67b6c076a7
---- /dev/null
-+++ b/docs/devel/tcg-icount.rst
-@@ -0,0 +1,97 @@
-+..
-+   Copyright (c) 2020, Linaro Limited
-+   Written by Alex Bennée
+diff --git a/docs/system/gdb.rst b/docs/system/gdb.rst
+index a40145fcf849..abda961e2b49 100644
+--- a/docs/system/gdb.rst
++++ b/docs/system/gdb.rst
+@@ -87,3 +87,23 @@ three commands you can query and set the single step behavior:
+       (gdb) maintenance packet Qqemu.sstep=0x5
+       sending: "qemu.sstep=0x5"
+       received: "OK"
 +
 +
-+========================
-+TCG Instruction Counting
-+========================
++Another feature that QEMU gdbstub provides is to toggle the memory GDB
++works with, by default GDB will show the current process memory respecting
++the virtual address translation.
 +
-+TCG has long supported a feature known as icount which allows for
-+instruction counting during execution. This should not be confused
-+with cycle accurate emulation - QEMU does not attempt to emulate how
-+long an instruction would take on real hardware. That is a job for
-+other more detailed (and slower) tools that simulate the rest of a
-+micro-architecture.
++If you want to examine/change the physical memory you can set the gdbstub
++to work with the physical memory rather with the virtual one.
 +
-+This feature is only available for system emulation and is
-+incompatible with multi-threaded TCG. It can be used to better align
-+execution time with wall-clock time so a "slow" device doesn't run too
-+fast on modern hardware. It can also provides for a degree of
-+deterministic execution and is an essential part of the record/replay
-+support in QEMU.
++The memory mode can be checked by sending the following command:
 +
-+Core Concepts
-+=============
++``maintenance packet qqemu.PhyMemMode``
++    This will return either 0 or 1, 1 indicates you are currently in the
++    physical memory mode.
 +
-+At its heart icount is simply a count of executed instructions which
-+is stored in the TimersState of QEMU's timer sub-system. The number of
-+executed instructions can then be used to calculate QEMU_CLOCK_VIRTUAL
-+which represents the amount of elapsed time in the system since
-+execution started. Depending on the icount mode this may either be a
-+fixed number of ns per instruction or adjusted as execution continues
-+to keep wall clock time and virtual time in sync.
++``maintenance packet Qqemu.PhyMemMode:1``
++    This will change the memory mode to physical memory.
 +
-+To be able to calculate the number of executed instructions the
-+translator starts by allocating a budget of instructions to be
-+executed. The budget of instructions is limited by how long it will be
-+until the next timer will expire. We store this budget as part of a
-+vCPU icount_decr field which shared with the machinery for handling
-+cpu_exit(). The whole field is checked at the start of every
-+translated block and will cause a return to the outer loop to deal
-+with whatever caused the exit.
-+
-+In the case of icount, before the flag is checked we subtract the
-+number of instructions the translation block would execute. If this
-+would cause the instruction budget to go negative we exit the main
-+loop and regenerate a new translation block with exactly the right
-+number of instructions to take the budget to 0 meaning whatever timer
-+was due to expire will expire exactly when we exit the main run loop.
-+
-+Dealing with MMIO
-+-----------------
-+
-+While we can adjust the instruction budget for known events like timer
-+expiry we cannot do the same for MMIO. Every load/store we execute
-+might potentially trigger an I/O event, at which point we will need an
-+up to date and accurate reading of the icount number.
-+
-+To deal with this case, when an I/O access is made we:
-+
-+  - restore un-executed instructions to the icount budget
-+  - re-compile a single [1]_ instruction block for the current PC
-+  - exit the cpu loop and execute the re-compiled block
-+
-+The new block is created with the CF_LAST_IO compile flag which
-+ensures the final instruction translation starts with a call to
-+gen_io_start() so we don't enter a perpetual loop constantly
-+recompiling a single instruction block. For translators using the
-+common translator_loop this is done automatically.
-+  
-+.. [1] sometimes two instructions if dealing with delay slots  
-+
-+Other I/O operations
-+--------------------
-+
-+MMIO isn't the only type of operation for which we might need a
-+correct and accurate clock. IO port instructions and accesses to
-+system registers are the common examples here. These instructions have
-+to be handled by the individual translators which have the knowledge
-+of which operations are I/O operations.
-+
-+When the translator is handling an instruction of this kind:
-+
-+* it must call gen_io_start() if icount is enabled, at some
-+   point before the generation of the code which actually does
-+   the I/O, using a code fragment similar to:
-+
-+.. code:: c
-+
-+    if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-+
-+* it must end the TB immediately after this instruction
-+
-+Note that some older front-ends call a "gen_io_end()" function:
-+this is obsolete and should not be used.
++``maintenance packet Qqemu.PhyMemMode:0``
++    This will change it back to normal memory mode.
 -- 
 2.20.1
 
