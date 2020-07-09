@@ -2,124 +2,88 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12149C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF1FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:55:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC6F22077D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:53:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E74452077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:55:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="sWiDEFe4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC6F22077D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWmJ1qj3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E74452077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtYrk-0003hq-0f
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 11:53:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52822)
+	id 1jtYt2-0004uV-52
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 11:55:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jtYqa-0001e2-1e
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 11:52:28 -0400
-Received: from mail-eopbgr70095.outbound.protection.outlook.com
- ([40.107.7.95]:49322 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jtYqY-0006aw-5h
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 11:52:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i48qROxDvrl6MBf842Gc0viLqky3jODukBOYiOfnZzGMEJQfLVu8z0V6yQ3Dyz5GCvi7bkWvcqBqi9vO2JYY9ZppJxUR1KgnxChg5/49vsnqrAODK2kUmVXHmgkg1JNHqJ0lPRMR9p0nhNJ18GPkOWx8vNbqk2SCn8ryGZuegwaPxsl2bWSbS0K4atlHWu29tZULlB3Fguht52NA5My9/u1+wIOrKd5pC/fwERxdTlcO84zKVI87oULSMQxNcIuAzNHrEJJUr+jECmJNLsZbReDLhawHiQUpKU/cm84ZYed8RFfst/+c+CtEMw+QwqU3UmN10PCJ9uf5Kkzkm10uRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Sb94QBlIVCBKjgw/zGthkYgnaVjsH6UnNivcR6gcdCo=;
- b=InmiJA92saqzsM7TRysWYfXmVCFAXyyz0LGkADXADY8ahzMnLsjAIkjGLDHBWcpYMVNZhcO/usRtsF1Kv/TUn/vVq2e5tmnP0V553TaIcdssV1lYbi4YdfZX72/o6CBlHtdC3kJ+FZOJU/FDMmGrtiHBhKbQzDQUgx+nj+W8FDK5y1YtfY8E69IMtl4omDfHkoXniQ/9dmrrQIPAteL2xvhm9dKrXK7jmCAp2H1DHvNgwp7WTduBk8AbFDM2qOyVoi8Ab3rT6KT0UuvN4kr6u1rVi5CaLlSvgOhVYfAaOQpt/yrT37JCgDY/UC7D6Ox1lpocRrTUbNblowembW0CXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Sb94QBlIVCBKjgw/zGthkYgnaVjsH6UnNivcR6gcdCo=;
- b=sWiDEFe4wTYvxAkMFG990q8jXRq5kxaW9yn9jrws943AHBrserltRqtYcJHl0b++cvmTHjN7LovmGoCatq3c1MQ/2Q6AwQoHoizFav24qH7Y3zgY4XnKz3Z6VY3J6DklNbWz3eQ5pHrmrm+kpGCCVUIl/VIRtrAJ3ZVIf9pyRe8=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
- by AM7PR03MB6675.eurprd03.prod.outlook.com (2603:10a6:20b:1b9::6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Thu, 9 Jul
- 2020 15:52:22 +0000
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3174.021; Thu, 9 Jul 2020
- 15:52:22 +0000
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] linux-user: Add support for a group of btrfs ioctls used
- for snapshots
-Date: Thu,  9 Jul 2020 17:52:01 +0200
-Message-Id: <20200709155203.21106-3-Filip.Bozuta@syrmia.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200709155203.21106-1-Filip.Bozuta@syrmia.com>
-References: <20200709155203.21106-1-Filip.Bozuta@syrmia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM3PR07CA0147.eurprd07.prod.outlook.com
- (2603:10a6:207:8::33) To AM6PR03MB5233.eurprd03.prod.outlook.com
- (2603:10a6:20b:d1::19)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jtYq6-0000Y8-RT
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 11:51:58 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37695)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jtYq4-0006Xq-BI
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 11:51:58 -0400
+Received: by mail-ot1-x341.google.com with SMTP id w17so2029309otl.4
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 08:51:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=XHwMvtYcnPMDQZFU+/0OEm73P/eIA9qBy4Qh8oglNkQ=;
+ b=CWmJ1qj3m12S9qMJmfo0HxI58tW9jWsp4VH++wgueeb5OBGv6iibkrdmJGS89to5qM
+ c2Hb+5o/uWdUcyLamLx/bVpnaEiiRyW2MZcew3o3NsCGX9/RBk9n2RGIqXcUx1XwXwgZ
+ 31BtLMyJaU66i6I0d4+ID788GLabuf9LAv/GKCUXHrQ50gAAFhmUFBUeD3/p/ds/1Zos
+ 4naNtSnZWw1FX1uVzOUjUbdBu0itibI2PLbkFQUziVC6BWxHtZHDNijfuVOUeymbHIWQ
+ NcnKRbqLF/PbBD9TQMq5wmeDc1xpBnlbiPQGoSXOBg+XOvUBDdns/UWec8sWQvtfkeme
+ iVKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=XHwMvtYcnPMDQZFU+/0OEm73P/eIA9qBy4Qh8oglNkQ=;
+ b=DcaPFMtYW1sQKNnEgCGe1s5pu/1oWtd/PbTSgvRR4yP4hXQQ6/KyKb/XSdNbYF5gdA
+ ztx0i9XqzwlBQZ5to4ig3JOnwlc1WX5DEKmDoxxLf17CTZInScJIJtuzWd/VhTlCpetM
+ o5Foi2RltXO3DnRkizOwci3iXJ1hCjCanfzcAS/JF3ft1Sj8KoRbeq71sShyLn665HuF
+ CMf8beE48vlChwnIRjTqyv3TxIjFfIls5CAyxlWPNkxizo3Do86/ZWptjwsMD4ci+4j4
+ iSh90JamkWAQqvD0nO48GvswrJMERGe9XlobRuLwUcGK/Efg0k3vo1vmuD1S6pmlKsBm
+ kx3w==
+X-Gm-Message-State: AOAM530lrF8tk+nsBb1Q+9LhZ7NQfQ4U5MId7ZSZkOYCbeuP5wjYsfiK
+ 2SpaFXiQRp/+B0iwVWyYsQf5CL4i6B0IyEmy/aoGOA+V4S8=
+X-Google-Smtp-Source: ABdhPJwhTJNlAsHCq442y1KtfCUus/fJZjjcZOetzXeyf7K66sNPRelH36SMjYeOwZdq2RbW9QbhGX1dUCsgF4DRIwE=
+X-Received: by 2002:a05:6830:15c3:: with SMTP id
+ j3mr50699773otr.353.1594309915074; 
+ Thu, 09 Jul 2020 08:51:55 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (109.245.225.24) by
- AM3PR07CA0147.eurprd07.prod.outlook.com (2603:10a6:207:8::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.8 via Frontend Transport; Thu, 9 Jul 2020 15:52:21 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [109.245.225.24]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c2f654af-679c-4d96-7839-08d82420113d
-X-MS-TrafficTypeDiagnostic: AM7PR03MB6675:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR03MB6675EA3C7247AF7AE22F895DEB640@AM7PR03MB6675.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XXXtM5zLOvDk9AGckLehke5+kpZ/NKC0EW6gD7erllc2Z5eSNE6ZTlT5bNa/GsLOre3utj9iTTjD95qGJh7y3+x6O3ltW3MaTr2HhfmF2KP8wS2GNznMXcrM7WekubVYqoYaVvFT9XRYRVPmtUint280JZifGXfrS2H94ySXhHHx8quIg9rU6bF7dYe2+2dAp7Wdk7Xi3On5sUcqBSNK10iegS4+E3v/WrTLahfw5mo7/RyppqdKcb1BJVmF7wDJ5GQgG+XhstBbHbeEzlWF47tejwJFVLdfeQHOzA1pEAdIPhlloAeVZy35juVTxHudEBFC+FmfZCZ15Pd0aZJLwnmbdiS0IxdKSNhgEOEV6/bEhJtuCPvbrl2qg+uWDHuW
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(346002)(39830400003)(376002)(396003)(136003)(366004)(66476007)(2906002)(107886003)(956004)(2616005)(52116002)(6666004)(6512007)(4326008)(6486002)(5660300002)(26005)(66556008)(16526019)(66946007)(186003)(1076003)(6506007)(36756003)(6916009)(54906003)(83380400001)(86362001)(69590400007)(316002)(8936002)(8676002)(508600001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: H+q9poCZRKiDV2dXWN6vcS1mP9G2f/jf7oKiVpll4VgtlS+G5r80LV1jB+iDRl+5zQEJM72bpV8vYZUQ4YI1ggXLgi3r3UvAuZ7mjSKzxuzaVObgzKOkfYCS6cBtdeaqcJuVOND+7jfpV+/4wbPZ3WZSnLl+j3hHHnErzl3VzyDyGGhRSEqxg0t/GflgrZsENzNXist84eM4BYBLERFc86OPQ0R08UttnT+/9yvFCLFVo02zGnbGzMDI4TBMtPK9NL4Bryb69++ll6ZattlMpLj9k+SoduJD0H4/V00qV0jWreU6Sd6imrNOf2Sot/V2XMA0Nseo8di79aynAr0BrCwjQOTsbnXPVWkjdSGjIEJxScRB/D1mCG1IbNwEM1fln4W6vR7/lcbPMzs22rxvH8I7NoGCNPRThyW8Jk0Oty/Bn9xwq45BbYyIIrWEJjrs+SkxY2wGaFLVf7kP27OzW4JaW3cFz76832sSEK9Wiz4=
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2f654af-679c-4d96-7839-08d82420113d
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2020 15:52:22.1728 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LQwVSWIAP7R6RRqLRfFxH4rLxJoAUo08DwWpoZFrOUllSJmFDZCheMGihRwH6nbe8AUSLvGQACOZGzawHI9VYg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR03MB6675
-Received-SPF: pass client-ip=40.107.7.95; envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 11:52:23
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -4
-X-Spam_score: -0.5
-X-Spam_bar: /
-X-Spam_report: (-0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- RCVD_IN_SBL_CSS=3.335, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+References: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
+In-Reply-To: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 9 Jul 2020 23:51:18 +0800
+Message-ID: <CAKXe6S+J3nARveToQjECbwV224gs66WkqGHybUhfw35t1+V8og@mail.gmail.com>
+Subject: Re: [Bug 1886362] [NEW] Heap use-after-free in lduw_he_p through
+ e1000e_write_to_rx_buffers
+To: Bug 1886362 <1886362@bugs.launchpad.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,84 +96,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionality for following ioctls:
+Alexander Bulekov <1886362@bugs.launchpad.net> =E4=BA=8E2020=E5=B9=B47=E6=
+=9C=886=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8A=E5=8D=8810:51=E5=86=99=E9=81=
+=93=EF=BC=9A
+>
+> Public bug reported:
+>
+> Hello,
+> This reproducer causes a heap-use-after free. QEMU Built with --enable-sa=
+nitizers:
+> cat << EOF | ./i386-softmmu/qemu-system-i386 -M q35,accel=3Dqtest \
+> -qtest stdio -nographic -monitor none -serial none
+> outl 0xcf8 0x80001010
+> outl 0xcfc 0xe1020000
+> outl 0xcf8 0x80001014
+> outl 0xcf8 0x80001004
+> outw 0xcfc 0x7
+> outl 0xcf8 0x800010a2
+> write 0xe102003b 0x1 0xff
+> write 0xe1020103 0x1e 0xffffff055c5e5c30be4511d084fffffffffffffffffffffff=
+fffffffffff
+> write 0xe1020420 0x4 0xffffffff
+> write 0xe1020424 0x4 0xffffffff
+> write 0xe102042b 0x1 0xff
+> write 0xe1020430 0x4 0x055c5e5c
+> write 0x5c041 0x1 0x04
+> write 0x5c042 0x1 0x02
+> write 0x5c043 0x1 0xe1
+> write 0x5c048 0x1 0x8a
+> write 0x5c04a 0x1 0x31
+> write 0x5c04b 0x1 0xff
+> write 0xe1020403 0x1 0xff
+> EOF
+>
 
-BTRFS_IOC_SNAP_CREATE - Creating a subvolume snapshot
 
-    Create a snapshot of a btrfs subvolume. The snapshot is created using the
-    ioctl's third argument that is a pointer to a 'struct btrfs_ioctl_vol_args'
-    (which was mentioned in the previous patch). Before calling this ioctl,
-    the fields of the structure should be filled with aproppriate values for
-    the file descriptor and path of the subvolume for which the snapshot is to
-    be created.
+This bug is interesting.
 
-BTRFS_IOC_SNAP_DESTROY - Removing a subvolume snapshot
+We first set the e1000e BAR0 to '0xe1020000'.
+Then we trigger a path:
+e1000e_mmio_write->...e1000e_process_tx_desc->net_tx_pkt_add_raw_fragment.
+In the last function we allocate an io vector 'ventry->iov_base'.
 
-    Delete a snapshot of a btrfs subvolume. The snapshot is deleted using the
-    ioctl's third argument that is a pointer to a 'struct btrfs_ioctl_vol_args'
-    (which was mentioned in the previous patch). Before calling this ioctl,
-    the fields of the structure should be filled with aproppriate values for
-    the file descriptor and path of the subvolume for which the snapshot is to
-    be deleted.
+Then we continue:
+e1000e_tx_pkt_send->net_tx_pkt_send_loopback...->e1000e_nc_receive_iov-->
+e1000e_write_packet_to_guest->e1000e_write_to_rx_buffers.
 
-Implementation notes:
+Here comes the interesting part.  e1000e_write_to_rx_buffers write to
+the e1000e's MMIO!
+Not a RAM. So another round address dispatch is begin. This time we
+also goes to the
+ e1000e_mmio_write->...e1000e_process_tx_desc, However this time we goes to
+'net_tx_pkt_reset' so the io vector allocated in
+'net_tx_pkt_add_raw_fragment' was freed.
 
-    Since the thunk type 'struct btrfs_ioctl_vol_args' is defined in the
-    previous patch, the implementation for these ioctls was straightforward.
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
----
- linux-user/ioctls.h       | 8 ++++++++
- linux-user/syscall_defs.h | 4 ++++
- 2 files changed, 12 insertions(+)
+Then in 'e1000e_write_to_rx_buffers' while loop. It will access the
+freed io vector.
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 544184ff95..2422675dd0 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -174,10 +174,18 @@
-      IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
- 
-+#ifdef BTRFS_IOC_SNAP_CREATE
-+     IOCTL(BTRFS_IOC_SNAP_CREATE, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-+#endif
- #ifdef BTRFS_IOC_SUBVOL_CREATE
-      IOCTL(BTRFS_IOC_SUBVOL_CREATE, IOC_W,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
- #endif
-+#ifdef BTRFS_IOC_SNAP_DESTROY
-+     IOCTL(BTRFS_IOC_SNAP_DESTROY, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-+#endif
- #ifdef BTRFS_IOC_SUBVOL_GETFLAGS
-      IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
- #endif
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index c11bcc6ba9..21d8909fd6 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -968,8 +968,12 @@ struct target_rtc_pll_info {
- #define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
- 
- /* btrfs ioctls */
-+#define TARGET_BTRFS_IOC_SNAP_CREATE            TARGET_IOW(BTRFS_IOCTL_MAGIC, \
-+                                                1, struct btrfs_ioctl_vol_args)
- #define TARGET_BTRFS_IOC_SUBVOL_CREATE          TARGET_IOW(BTRFS_IOCTL_MAGIC, \
-                                                14, struct btrfs_ioctl_vol_args)
-+#define TARGET_BTRFS_IOC_SNAP_DESTROY           TARGET_IOW(BTRFS_IOCTL_MAGIC, \
-+                                               15, struct btrfs_ioctl_vol_args)
- #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, \
-                                                            25, abi_ullong)
- #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, \
--- 
-2.25.1
+Summar as this:
+The guest trigger a e1000e packet send and set the data's address to
+the e1000e's MMIO address
+so this trigger another MMIO write and causes this UAF.
 
+Maybe we should check whether the address is a RAM address in 'dma_memory_r=
+w'?
+But it is a hot path. I'm not sure it is right. Hope more discussion.
+
+Add Paolo and Jason.
+
+Thanks,
+Li Qiang
+
+
+> The Output:
+> =3D=3D22689=3D=3DERROR: AddressSanitizer: heap-use-after-free on address =
+0x62500026800e at pc 0x55b93bb18bfa bp 0x7fffdbe844f0 sp 0x7fffdbe83cb8
+> READ of size 2 at 0x62500026800e thread T0
+>     #0  in __asan_memcpy (/build/i386-softmmu/qemu-system-i386+)
+>     #1  in lduw_he_p /include/qemu/bswap.h:332:5
+>     #2  in ldn_he_p /include/qemu/bswap.h:550:1
+>     #3  in flatview_write_continue /exec.c:3145:19
+>     #4  in flatview_write /exec.c:3186:14
+>     #5  in address_space_write /exec.c:3280:18
+>     #6  in address_space_rw /exec.c:3290:16
+>     #7  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+>     #8  in dma_memory_rw /include/sysemu/dma.h:113:12
+>     #9  in pci_dma_rw /include/hw/pci/pci.h:789:5
+>     #10  in pci_dma_write /include/hw/pci/pci.h:802:12
+>     #11  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+>     #12  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+>     #13  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+>     #14  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+>     #15  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+>     #16  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+>     #17  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+>     #18  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+>     #19  in e1000e_process_tx_desc /hw/net/e1000e_core.c:743:17
+>     #20  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+>     #21  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+>     #22  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+>     #23  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+>     #24  in memory_region_write_accessor /memory.c:483:5
+>     #25  in access_with_adjusted_size /memory.c:544:18
+>     #26  in memory_region_dispatch_write /memory.c:1476:16
+>     #27  in flatview_write_continue /exec.c:3146:23
+>     #28  in flatview_write /exec.c:3186:14
+>     #29  in address_space_write /exec.c:3280:18
+>     #30  in qtest_process_command /qtest.c:567:9
+>     #31  in qtest_process_inbuf /qtest.c:710:9
+>     #32  in qtest_read /qtest.c:722:5
+>     #33  in qemu_chr_be_write_impl /chardev/char.c:188:9
+>     #34  in qemu_chr_be_write /chardev/char.c:200:9
+>     #35  in fd_chr_read /chardev/char-fd.c:68:9
+>     #36  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+>     #37  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.=
+0.so.0+)
+>     #38  in glib_pollfds_poll /util/main-loop.c:219:9
+>     #39  in os_host_main_loop_wait /util/main-loop.c:242:5
+>     #40  in main_loop_wait /util/main-loop.c:518:11
+>     #41  in qemu_main_loop /softmmu/vl.c:1664:9
+>     #42  in main /softmmu/main.c:52:5
+>     #43  in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+)
+>     #44  in _start (/build/i386-softmmu/qemu-system-i386+)
+>
+> 0x62500026800e is located 14 bytes inside of 138-byte region [0x625000268=
+000,0x62500026808a)
+> freed by thread T0 here:
+>     #0  in free (/build/i386-softmmu/qemu-system-i386+)
+>     #1  in qemu_vfree /util/oslib-posix.c:238:5
+>     #2  in address_space_unmap /exec.c:3616:5
+>     #3  in dma_memory_unmap /include/sysemu/dma.h:148:5
+>     #4  in pci_dma_unmap /include/hw/pci/pci.h:839:5
+>     #5  in net_tx_pkt_reset /hw/net/net_tx_pkt.c:453:9
+>     #6  in e1000e_process_tx_desc /hw/net/e1000e_core.c:749:9
+>     #7  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+>     #8  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+>     #9  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+>     #10  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+>     #11  in memory_region_write_accessor /memory.c:483:5
+>     #12  in access_with_adjusted_size /memory.c:544:18
+>     #13  in memory_region_dispatch_write /memory.c:1476:16
+>     #14  in flatview_write_continue /exec.c:3146:23
+>     #15  in flatview_write /exec.c:3186:14
+>     #16  in address_space_write /exec.c:3280:18
+>     #17  in address_space_rw /exec.c:3290:16
+>     #18  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+>     #19  in dma_memory_rw /include/sysemu/dma.h:113:12
+>     #20  in pci_dma_rw /include/hw/pci/pci.h:789:5
+>     #21  in pci_dma_write /include/hw/pci/pci.h:802:12
+>     #22  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+>     #23  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+>     #24  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+>     #25  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+>     #26  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+>     #27  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+>     #28  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+>     #29  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+>
+> previously allocated by thread T0 here:
+>     #0  in posix_memalign (/build/i386-softmmu/qemu-system-i386+)
+>     #1  in qemu_try_memalign /util/oslib-posix.c:198:11
+>     #2  in qemu_memalign /util/oslib-posix.c:214:27
+>     #3  in address_space_map /exec.c:3558:25
+>     #4  in dma_memory_map /include/sysemu/dma.h:138:9
+>     #5  in pci_dma_map /include/hw/pci/pci.h:832:11
+>     #6  in net_tx_pkt_add_raw_fragment /hw/net/net_tx_pkt.c:391:24
+>     #7  in e1000e_process_tx_desc /hw/net/e1000e_core.c:731:14
+>     #8  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+>     #9  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+>     #10  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+>     #11  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+>     #12  in memory_region_write_accessor /memory.c:483:5
+>     #13  in access_with_adjusted_size /memory.c:544:18
+>     #14  in memory_region_dispatch_write /memory.c:1476:16
+>     #15  in flatview_write_continue /exec.c:3146:23
+>     #16  in flatview_write /exec.c:3186:14
+>     #17  in address_space_write /exec.c:3280:18
+>     #18  in qtest_process_command /qtest.c:567:9
+>     #19  in qtest_process_inbuf /qtest.c:710:9
+>     #20  in qtest_read /qtest.c:722:5
+>     #21  in qemu_chr_be_write_impl /chardev/char.c:188:9
+>     #22  in qemu_chr_be_write /chardev/char.c:200:9
+>     #23  in fd_chr_read /chardev/char-fd.c:68:9
+>     #24  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+>     #25  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.=
+0.so.0+)
+>
+> -Alex
+>
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>
+> --
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1886362
+>
+> Title:
+>   Heap use-after-free in lduw_he_p through e1000e_write_to_rx_buffers
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   Hello,
+>   This reproducer causes a heap-use-after free. QEMU Built with --enable-=
+sanitizers:
+>   cat << EOF | ./i386-softmmu/qemu-system-i386 -M q35,accel=3Dqtest \
+>   -qtest stdio -nographic -monitor none -serial none
+>   outl 0xcf8 0x80001010
+>   outl 0xcfc 0xe1020000
+>   outl 0xcf8 0x80001014
+>   outl 0xcf8 0x80001004
+>   outw 0xcfc 0x7
+>   outl 0xcf8 0x800010a2
+>   write 0xe102003b 0x1 0xff
+>   write 0xe1020103 0x1e 0xffffff055c5e5c30be4511d084fffffffffffffffffffff=
+fffffffffffff
+>   write 0xe1020420 0x4 0xffffffff
+>   write 0xe1020424 0x4 0xffffffff
+>   write 0xe102042b 0x1 0xff
+>   write 0xe1020430 0x4 0x055c5e5c
+>   write 0x5c041 0x1 0x04
+>   write 0x5c042 0x1 0x02
+>   write 0x5c043 0x1 0xe1
+>   write 0x5c048 0x1 0x8a
+>   write 0x5c04a 0x1 0x31
+>   write 0x5c04b 0x1 0xff
+>   write 0xe1020403 0x1 0xff
+>   EOF
+>
+>   The Output:
+>   =3D=3D22689=3D=3DERROR: AddressSanitizer: heap-use-after-free on addres=
+s 0x62500026800e at pc 0x55b93bb18bfa bp 0x7fffdbe844f0 sp 0x7fffdbe83cb8
+>   READ of size 2 at 0x62500026800e thread T0
+>       #0  in __asan_memcpy (/build/i386-softmmu/qemu-system-i386+)
+>       #1  in lduw_he_p /include/qemu/bswap.h:332:5
+>       #2  in ldn_he_p /include/qemu/bswap.h:550:1
+>       #3  in flatview_write_continue /exec.c:3145:19
+>       #4  in flatview_write /exec.c:3186:14
+>       #5  in address_space_write /exec.c:3280:18
+>       #6  in address_space_rw /exec.c:3290:16
+>       #7  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+>       #8  in dma_memory_rw /include/sysemu/dma.h:113:12
+>       #9  in pci_dma_rw /include/hw/pci/pci.h:789:5
+>       #10  in pci_dma_write /include/hw/pci/pci.h:802:12
+>       #11  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+>       #12  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+>       #13  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+>       #14  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+>       #15  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+>       #16  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+>       #17  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+>       #18  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+>       #19  in e1000e_process_tx_desc /hw/net/e1000e_core.c:743:17
+>       #20  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+>       #21  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+>       #22  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+>       #23  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+>       #24  in memory_region_write_accessor /memory.c:483:5
+>       #25  in access_with_adjusted_size /memory.c:544:18
+>       #26  in memory_region_dispatch_write /memory.c:1476:16
+>       #27  in flatview_write_continue /exec.c:3146:23
+>       #28  in flatview_write /exec.c:3186:14
+>       #29  in address_space_write /exec.c:3280:18
+>       #30  in qtest_process_command /qtest.c:567:9
+>       #31  in qtest_process_inbuf /qtest.c:710:9
+>       #32  in qtest_read /qtest.c:722:5
+>       #33  in qemu_chr_be_write_impl /chardev/char.c:188:9
+>       #34  in qemu_chr_be_write /chardev/char.c:200:9
+>       #35  in fd_chr_read /chardev/char-fd.c:68:9
+>       #36  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+>       #37  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-=
+2.0.so.0+)
+>       #38  in glib_pollfds_poll /util/main-loop.c:219:9
+>       #39  in os_host_main_loop_wait /util/main-loop.c:242:5
+>       #40  in main_loop_wait /util/main-loop.c:518:11
+>       #41  in qemu_main_loop /softmmu/vl.c:1664:9
+>       #42  in main /softmmu/main.c:52:5
+>       #43  in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+)
+>       #44  in _start (/build/i386-softmmu/qemu-system-i386+)
+>
+>   0x62500026800e is located 14 bytes inside of 138-byte region [0x6250002=
+68000,0x62500026808a)
+>   freed by thread T0 here:
+>       #0  in free (/build/i386-softmmu/qemu-system-i386+)
+>       #1  in qemu_vfree /util/oslib-posix.c:238:5
+>       #2  in address_space_unmap /exec.c:3616:5
+>       #3  in dma_memory_unmap /include/sysemu/dma.h:148:5
+>       #4  in pci_dma_unmap /include/hw/pci/pci.h:839:5
+>       #5  in net_tx_pkt_reset /hw/net/net_tx_pkt.c:453:9
+>       #6  in e1000e_process_tx_desc /hw/net/e1000e_core.c:749:9
+>       #7  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+>       #8  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+>       #9  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+>       #10  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+>       #11  in memory_region_write_accessor /memory.c:483:5
+>       #12  in access_with_adjusted_size /memory.c:544:18
+>       #13  in memory_region_dispatch_write /memory.c:1476:16
+>       #14  in flatview_write_continue /exec.c:3146:23
+>       #15  in flatview_write /exec.c:3186:14
+>       #16  in address_space_write /exec.c:3280:18
+>       #17  in address_space_rw /exec.c:3290:16
+>       #18  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+>       #19  in dma_memory_rw /include/sysemu/dma.h:113:12
+>       #20  in pci_dma_rw /include/hw/pci/pci.h:789:5
+>       #21  in pci_dma_write /include/hw/pci/pci.h:802:12
+>       #22  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+>       #23  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+>       #24  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+>       #25  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+>       #26  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+>       #27  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+>       #28  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+>       #29  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+>
+>   previously allocated by thread T0 here:
+>       #0  in posix_memalign (/build/i386-softmmu/qemu-system-i386+)
+>       #1  in qemu_try_memalign /util/oslib-posix.c:198:11
+>       #2  in qemu_memalign /util/oslib-posix.c:214:27
+>       #3  in address_space_map /exec.c:3558:25
+>       #4  in dma_memory_map /include/sysemu/dma.h:138:9
+>       #5  in pci_dma_map /include/hw/pci/pci.h:832:11
+>       #6  in net_tx_pkt_add_raw_fragment /hw/net/net_tx_pkt.c:391:24
+>       #7  in e1000e_process_tx_desc /hw/net/e1000e_core.c:731:14
+>       #8  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+>       #9  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+>       #10  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+>       #11  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+>       #12  in memory_region_write_accessor /memory.c:483:5
+>       #13  in access_with_adjusted_size /memory.c:544:18
+>       #14  in memory_region_dispatch_write /memory.c:1476:16
+>       #15  in flatview_write_continue /exec.c:3146:23
+>       #16  in flatview_write /exec.c:3186:14
+>       #17  in address_space_write /exec.c:3280:18
+>       #18  in qtest_process_command /qtest.c:567:9
+>       #19  in qtest_process_inbuf /qtest.c:710:9
+>       #20  in qtest_read /qtest.c:722:5
+>       #21  in qemu_chr_be_write_impl /chardev/char.c:188:9
+>       #22  in qemu_chr_be_write /chardev/char.c:200:9
+>       #23  in fd_chr_read /chardev/char-fd.c:68:9
+>       #24  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+>       #25  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-=
+2.0.so.0+)
+>
+>   -Alex
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1886362/+subscriptions
+>
 
