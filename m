@@ -2,61 +2,118 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F77C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB2FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFFB92070E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:17:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFFB92070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5206F2073A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:21:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gyRXd5Y3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5206F2073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtRkF-0007JH-7m
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 04:17:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51222)
+	id 1jtRo7-0000Yf-Ju
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 04:21:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1jtRjQ-0006rT-Ig
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:16:36 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3717 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1jtRiy-0006Os-8G
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:16:36 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 55EF5BA132FCBD106A22;
- Thu,  9 Jul 2020 16:16:02 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 9 Jul 2020
- 16:15:53 +0800
-From: Chuan Zheng <zhengchuan@huawei.com>
-To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH] migration: fix memory leak in qmp_migrate_set_parameters
-Date: Thu, 9 Jul 2020 16:28:25 +0800
-Message-ID: <1594283305-105724-1-git-send-email-zhengchuan@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtRmx-00087a-0V
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:20:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56477
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtRmt-0006o9-OJ
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:20:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594282809;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=JTidOwynI+vP4x9pUqGa9OoYUwqFACJw3ILv9THAIT0=;
+ b=gyRXd5Y35JfY3NovqilCEQ7hXVt5Bs+Q0w2KziWJmrMSAcJTNo+v+dn67ccSytgUn3Gdk7
+ BmNiD/mEiKiJa1WHj/bnM5PO55oFGraaz+bMvQFwvIyYDHpo1hUfsCV6MP3RPCeSvxnqB7
+ F188hAEUvAU1FEDopHNVoF4sXPCwqas=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-iEeql080OvSqqGgr0s6W7A-1; Thu, 09 Jul 2020 04:19:49 -0400
+X-MC-Unique: iEeql080OvSqqGgr0s6W7A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B3B588C79C;
+ Thu,  9 Jul 2020 08:19:48 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
+ [10.36.113.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 351B81002388;
+ Thu,  9 Jul 2020 08:19:44 +0000 (UTC)
+Subject: Re: [PATCH v7 00/47] block: Deal with filters
+To: Eric Blake <eblake@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <4d7fa326-ef87-5753-cc2a-bb26fc555864@virtuozzo.com>
+ <e51d9c26-bd94-bf8e-cfed-82db15243188@redhat.com>
+ <54c4b18b-b6ee-b506-b153-b44eb3879da2@virtuozzo.com>
+ <d866ace7-09c9-430e-53f8-ecf12d08b0a4@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <cc37e07b-e350-faeb-e2b0-75dde7e98a96@redhat.com>
+Date: Thu, 9 Jul 2020 10:19:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:16:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+In-Reply-To: <d866ace7-09c9-430e-53f8-ecf12d08b0a4@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="m7MJ6UcOKGWXFmEij9lqQpsSjMHIrZXn4"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:20:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,83 +126,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, linyilu@huawei.com, qemu-devel@nongnu.org,
- alex.chen@huawei.com, fangying1@huawei.com, zhukeqian1@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Zheng Chuan <zhengchuan@huawei.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--m7MJ6UcOKGWXFmEij9lqQpsSjMHIrZXn4
+Content-Type: multipart/mixed; boundary="ceQYSWe2Epe1EE1T7ehX1mmMhcWt4dJta"
 
-"tmp.tls_hostname" and "tmp.tls_creds" allocated by migrate_params_test_apply()
-is forgot to free at the end of qmp_migrate_set_parameters(). Fix that.
+--ceQYSWe2Epe1EE1T7ehX1mmMhcWt4dJta
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-The leak stack:
-Direct leak of 2 byte(s) in 2 object(s) allocated from:
-   #0 0xffffb597c20b in __interceptor_malloc (/usr/lib64/libasan.so.4+0xd320b)
-   #1 0xffffb52dcb1b in g_malloc (/usr/lib64/libglib-2.0.so.0+0x58b1b)
-   #2 0xffffb52f8143 in g_strdup (/usr/lib64/libglib-2.0.so.0+0x74143)
-   #3 0xaaaac52447fb in migrate_params_test_apply (/usr/src/debug/qemu-4.1.0/migration/migration.c:1377)
-   #4 0xaaaac52fdca7 in qmp_migrate_set_parameters (/usr/src/debug/qemu-4.1.0/qapi/qapi-commands-migration.c:192)
-   #5 0xaaaac551d543 in qmp_dispatch (/usr/src/debug/qemu-4.1.0/qapi/qmp-dispatch.c:165)
-   #6 0xaaaac52a0a8f in qmp_dispatch (/usr/src/debug/qemu-4.1.0/monitor/qmp.c:125)
-   #7 0xaaaac52a1c7f in monitor_qmp_dispatch (/usr/src/debug/qemu-4.1.0/monitor/qmp.c:214)
-   #8 0xaaaac55cb0cf in aio_bh_call (/usr/src/debug/qemu-4.1.0/util/async.c:117)
-   #9 0xaaaac55d4543 in aio_bh_poll (/usr/src/debug/qemu-4.1.0/util/aio-posix.c:459)
-   #10 0xaaaac55cae0f in aio_dispatch (/usr/src/debug/qemu-4.1.0/util/async.c:268)
-   #11 0xffffb52d6a7b in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x52a7b)
-   #12 0xaaaac55d1e3b(/usr/bin/qemu-kvm-4.1.0+0x1622e3b)
-   #13 0xaaaac4e314bb(/usr/bin/qemu-kvm-4.1.0+0xe824bb)
-   #14 0xaaaac47f45ef(/usr/bin/qemu-kvm-4.1.0+0x8455ef)
-   #15 0xffffb4bfef3f in __libc_start_main (/usr/lib64/libc.so.6+0x23f3f)
-   #16 0xaaaac47ffacb(/usr/bin/qemu-kvm-4.1.0+0x850acb)
+On 08.07.20 22:37, Eric Blake wrote:
+> On 7/8/20 2:46 PM, Andrey Shinkevich wrote:
+>>
+>> On 08.07.2020 20:32, Eric Blake wrote:
+>>> On 7/8/20 12:20 PM, Andrey Shinkevich wrote:
+>>>> On 25.06.2020 18:21, Max Reitz wrote:
+>>>>> v6:
+>>>>> https://lists.nongnu.org/archive/html/qemu-devel/2019-08/msg01715.htm=
+l
+>>>>>
+>>>>> Branch: https://github.com/XanClic/qemu.git child-access-functions-v7
+>>>>> Branch: https://git.xanclic.moe/XanClic/qemu.git
+>>>>> child-access-functions-v7
+>>>>>
+>>>>>
+>>>> I cloned the branch from the github and built successfully.
+>>>>
+>>>> Running the iotests reports multiple errors of such a kind:
+>>>>
+>>>> 128: readarray -td '' formatting_line < <(sed -e 's/, fmt=3D/\x0/')
+>>>>
+>>>> "./common.filter: line 128: readarray: -d: invalid option"
+>>>>
+>>>
+>>> Arrgh. If I'm reading bash's changelog correctly, readarray -d was
+>>> introduced in bash 4.4, so I'm guessing you're still on 4.3 or
+>>> earlier? What bash version and platform are you using?
+>>>
+>> My bash version is 4.2.46.
+>>
+>> It is the latest in the virtuozzolinux-base repository. I should
+>> install the 4.4 package manually.
+>=20
+> Well, if bash 4.2 is the default installed version on any of our
+> platforms that meet our supported criteria, then we should instead fix
+> the patch in question to avoid non-portable use of readarray.
+>=20
+> Per https://repology.org/project/bash/versions (hinted from
+> docs/system/build-platforms.rst), at least CentOS 7 still ships bash
+> 4.2, and per 'make docker', centos7 is still a viable build target.=C2=A0=
+ So
+> we do indeed need to fix our regression.
 
-Direct leak of 2 byte(s) in 2 object(s) allocated from:
-   #0 0xffffb597c20b in __interceptor_malloc (/usr/lib64/libasan.so.4+0xd320b)
-   #1 0xffffb52dcb1b in g_malloc (/usr/lib64/libglib-2.0.so.0+0x58b1b)
-   #2 0xffffb52f8143 in g_strdup (/usr/lib64/libglib-2.0.so.0+0x74143)
-   #3 0xaaaac5244893 in migrate_params_test_apply (/usr/src/debug/qemu-4.1.0/migration/migration.c:1382)
-   #4 0xaaaac52fdca7 in qmp_migrate_set_parameters (/usr/src/debug/qemu-4.1.0/qapi/qapi-commands-migration.c:192)
-   #5 0xaaaac551d543 in qmp_dispatch (/usr/src/debug/qemu-4.1.0/qapi/qmp-dispatch.c)
-   #6 0xaaaac52a0a8f in qmp_dispatch (/usr/src/debug/qemu-4.1.0/monitor/qmp.c:125)
-   #7 0xaaaac52a1c7f in monitor_qmp_dispatch (/usr/src/debug/qemu-4.1.0/monitor/qmp.c:214)
-   #8 0xaaaac55cb0cf in aio_bh_call (/usr/src/debug/qemu-4.1.0/util/async.c:117)
-   #9 0xaaaac55d4543 in aio_bh_poll (/usr/src/debug/qemu-4.1.0/util/aio-posix.c:459)
-   #10 0xaaaac55cae0f in in aio_dispatch (/usr/src/debug/qemu-4.1.0/util/async.c:268)
-   #11 0xffffb52d6a7b in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x52a7b)
-   #12 0xaaaac55d1e3b(/usr/bin/qemu-kvm-4.1.0+0x1622e3b)
-   #13 0xaaaac4e314bb(/usr/bin/qemu-kvm-4.1.0+0xe824bb)
-   #14 0xaaaac47f45ef (/usr/bin/qemu-kvm-4.1.0+0x8455ef)
-   #15 0xffffb4bfef3f in __libc_start_main (/usr/lib64/libc.so.6+0x23f3f)
-   #16 0xaaaac47ffacb(/usr/bin/qemu-kvm-4.1.0+0x850acb)
+There is no regression.  It=E2=80=99s just that I based this series on an
+earlier version of =E2=80=9CMake _filter_img_create more active=E2=80=9D =
+=E2=80=93 when I sent a
+pull request for that version, Peter already reported to me that it
+failed on some test environments, so I revised it.
 
-Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Reviewed-by: KeQian Zhu <zhukeqian1@huawei.com>
-Reviewed-by: HaiLiang <zhang.zhanghailiang@huawei.com@huawei.com>
----
- migration/migration.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+You=E2=80=99ll find there is no a7399eb in master; it=E2=80=99s 57ee95ed4ee=
+ there and
+doesn=E2=80=99t use -d.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 92e44e0..045180c 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1342,12 +1342,12 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
- 
-     if (params->has_tls_creds) {
-         assert(params->tls_creds->type == QTYPE_QSTRING);
--        dest->tls_creds = g_strdup(params->tls_creds->u.s);
-+        dest->tls_creds = params->tls_creds->u.s;
-     }
- 
-     if (params->has_tls_hostname) {
-         assert(params->tls_hostname->type == QTYPE_QSTRING);
--        dest->tls_hostname = g_strdup(params->tls_hostname->u.s);
-+        dest->tls_hostname = params->tls_hostname->u.s;
-     }
- 
-     if (params->has_max_bandwidth) {
--- 
-1.8.3.1
+(My branch on github/gitea is still based on that older version, though,
+because that=E2=80=99s what I wrote it on.)
+
+Max
+
+
+--ceQYSWe2Epe1EE1T7ehX1mmMhcWt4dJta--
+
+--m7MJ6UcOKGWXFmEij9lqQpsSjMHIrZXn4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8G0x4ACgkQ9AfbAGHV
+z0B2LwgAg73D3u8x9WhvsDQIYCuj9kDtE5/4WrytQZ9SMRN4p0mB5gpV3BiIXo73
+ZR28da5HnoviXfQiAgSQDrIPclVbr7F1rgO89tVWpqFaYJ9XsCaEqkRynGyl9vQb
+/gar0N0MkBDFZGFThIiVkXcSmPIpM7/9wJv0rIhCO+byV22S+Ve/E0PkR88mYX16
+jVSVh6uSbgxz4paCeF2Luq0BVl/zR+uUXx+hMaXSU2vEF1FrrgV95bg/uhWpdGAu
++NWSvv8ru77+pKT31zG5G6CXaQSGOVjw3nsl+NSUXy2+5shrsnc2W4XvqmfuKVBl
+weo9aWvwGhDW/7IsgFGO3Uk6bgDBFw==
+=lPAV
+-----END PGP SIGNATURE-----
+
+--m7MJ6UcOKGWXFmEij9lqQpsSjMHIrZXn4--
 
 
