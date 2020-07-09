@@ -2,83 +2,84 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF14C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 05:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 511B2C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 05:04:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC5A020708
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 05:02:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19CE520708
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 05:04:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BgWml7Q2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC5A020708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EgxUelMR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CE520708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtOhH-0004KY-3L
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 01:02:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38628)
+	id 1jtOjf-0005KB-Br
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 01:04:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtOgW-0003uB-Qj
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 01:01:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37337
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtOig-0004rl-4l
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 01:03:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34962
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtOgT-0006vM-4E
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 01:01:23 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtOie-0007BL-H2
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 01:03:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594270880;
+ s=mimecast20190719; t=1594271015;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=t39HbuJlwrLWEj5xeLiNgwhfhJLhKFLesAfbSD+qgdI=;
- b=BgWml7Q2NUXPg9ETJLX2a1c/tAx1wV91XMVAgs9knUKydCugAXZUe07ZigRY2aE32S3yZy
- KovqvL74j6B9NVSLWrLwhnpgXmz8zC56aIkmodUtcTELZfSmdeOND42Ge85nb7oTYvzz76
- 3YVxVuw2WQytM/5vOJQeNJaBWw+uJHM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-kXIB6b8XNkOY8_oi9YQGGA-1; Thu, 09 Jul 2020 01:01:18 -0400
-X-MC-Unique: kXIB6b8XNkOY8_oi9YQGGA-1
-Received: by mail-wr1-f71.google.com with SMTP id o25so1018977wro.16
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 22:01:17 -0700 (PDT)
+ bh=OzowdzJjytkvrL3V3R/gUib9z4LX4H7qJGOJWoOMqbY=;
+ b=EgxUelMR7yWfLC8JdR6WXWEXVToiNIwQLKouI1xkO7QXQuWeI3sN6kLfzEjHBJsuYswi3Y
+ GREaAiY9Va9tocJHsIlj8Jv2WMB8OZUfHsCxGfis/LArGtwJ30ZIyV6Pil28XEP1vFg3RA
+ 4BaLtY5NyiPwMwSqfGzRXlacuJ5KLt4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-IGRLgwL2O_OngPFLQ-XvrQ-1; Thu, 09 Jul 2020 01:03:33 -0400
+X-MC-Unique: IGRLgwL2O_OngPFLQ-XvrQ-1
+Received: by mail-wr1-f69.google.com with SMTP id y16so1014607wrr.20
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 22:03:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=t39HbuJlwrLWEj5xeLiNgwhfhJLhKFLesAfbSD+qgdI=;
- b=ZWNSjQH/xqRKhxvqypDHE17CUwheLBc/w27lsWigg3GtnXElaGFsCXtSPOZY2p7B8d
- Vj+U4/ndTA9ohFCmM4+DJynp2R8LeTvnakuQrwDHbAkUqsEGCiKzLstdNAKgfAF0F/xM
- 7lm1XUxsZTDdDXP+j1IlDMvwgtbFm+7SWhGJeX+zGlGUx2vnGPv2BGNTzQMSmLX0vQCD
- 3TEqkLLQ/bjlXlovVRrfNcj4JrN19Z7cBkmq9cza90SM7Zmv+3ih/cX7B+6K+oo98Rct
- vZZmgtPATMA8W86o70owCRzjB9c3Dql81AQPLptDDttyLzrgZCIMmi2rSaxOM6m/+TnU
- dtCg==
-X-Gm-Message-State: AOAM531OhbKBJUmxDBr27MQhZSo0NEH9DWnaXvbsJXdGE9rclzvEq26S
- 1rdKhM0Ih2vFQ4oPXJ5wfq0XWuK+dPVj7fNED2UXew40hjruuETl7nVSat6hAjRV+xDhgNJxFLy
- 9ausJCvdWHYLMEp0=
-X-Received: by 2002:a5d:4991:: with SMTP id r17mr33663606wrq.1.1594270876503; 
- Wed, 08 Jul 2020 22:01:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxEH1pZ2yWfYxhCcX2RmpcjNBL0aX54X5dSPeje47XVtl/MyBp1Z0PlcqSVy8I+EoZ4cFODbg==
-X-Received: by 2002:a5d:4991:: with SMTP id r17mr33663587wrq.1.1594270876308; 
- Wed, 08 Jul 2020 22:01:16 -0700 (PDT)
+ bh=OzowdzJjytkvrL3V3R/gUib9z4LX4H7qJGOJWoOMqbY=;
+ b=ZJYPMIDlgJiRL7WCfUilOZRdMbh3mZubPgiCzdOyWYTeITI3bVDLU59eU/ntgt+2DN
+ 7QAA6dwIvA6360Cv9Va2xPHrmL6iP0FQYClfTTYPck+iRNuOB3OCmTsqN4NzbMiUyarb
+ 2iROBj0nHdtQwKKz8Z2X3r68uxkfw5+uYXj4M3+/hubRSCTVm9gUxLHIqSZDn+UIXBbN
+ IkaTuxU3SpJy1Wdav47B3uHfE9ckYPox98+dBHlI3a0gGV/DjcsCP+HSWC052VZAqQ2H
+ /Br7nzkejRL9hynAkl12b+N4ga7Pexr3OMcRbL54LBe9LhhfHWuSwqxTWR9RroWoZae2
+ EjgQ==
+X-Gm-Message-State: AOAM533u7CqHaz+fbP6iLT/RN73TAghIfsFsYrIos2dQz2YuEckqf3A4
+ h3SmvfGmRYY7CIobyyeHRL8gchKpOV+lE4yfVvH4xy01iKMvBe7Lx3Z8dRz4QNJ2L0746vMa+sL
+ DKu9Oia1NkC+whRE=
+X-Received: by 2002:a05:600c:2dc1:: with SMTP id
+ e1mr11643741wmh.108.1594271012181; 
+ Wed, 08 Jul 2020 22:03:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyURnh0+2rku1ggCn4zB6DpA7hAI6gQlWROCCNb/QGl8i05Zb3tYaeSD6Pv6Ej/LuzFybqFiw==
+X-Received: by 2002:a05:600c:2dc1:: with SMTP id
+ e1mr11643724wmh.108.1594271011975; 
+ Wed, 08 Jul 2020 22:03:31 -0700 (PDT)
 Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id p29sm2919477wmi.43.2020.07.08.22.01.15
+ by smtp.gmail.com with ESMTPSA id s8sm3297152wru.38.2020.07.08.22.03.30
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 22:01:15 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1 1/2] configure: do not clobber CFLAGS with
- --enable-fuzzing
+ Wed, 08 Jul 2020 22:03:31 -0700 (PDT)
+Subject: Re: [PATCH-for-5.1 2/2] fuzz: add missing header for rcu_enable_atfork
 To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
 References: <20200708200104.21978-1-alxndr@bu.edu>
- <20200708200104.21978-2-alxndr@bu.edu>
+ <20200708200104.21978-3-alxndr@bu.edu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,12 +104,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <e74e6719-c9cd-7004-cfc6-13a392cd803f@redhat.com>
-Date: Thu, 9 Jul 2020 07:01:14 +0200
+Message-ID: <96f1c98a-982b-c146-80af-8f83e8117ac5@redhat.com>
+Date: Thu, 9 Jul 2020 07:03:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200708200104.21978-2-alxndr@bu.edu>
+In-Reply-To: <20200708200104.21978-3-alxndr@bu.edu>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -116,8 +117,8 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
@@ -139,36 +140,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@163.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ liq3ea@163.com, Bandan Das <bsd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/8/20 10:01 PM, Alexander Bulekov wrote:
-> When configuring with --enable-fuzzing, we overwrote the CFLAGS
-> added by all the preceding checks. Instead of overwriting CFLAGS, append
-> the ones we need.
+> In 45222b9a90, I fixed a broken check for rcu_enable_atfork introduced
+> in d6919e4cb6. I added a call to rcu_enable_atfork after the
+> call to qemu_init in fuzz.c, but forgot to include the corresponding
+> header, breaking --enable-fuzzing --enable-werror builds.
 > 
-> Fixes: adc28027ff ("fuzz: add configure flag --enable-fuzzing")
-> Reported-by: Li Qiang <liq3ea@163.com>
+> Fixes: 45222b9a90 ("fuzz: fix broken qtest check at rcu_disable_atfork")
 > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 > ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tests/qtest/fuzz/fuzz.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/configure b/configure
-> index ee6c3c6792..078ebaa9f3 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7898,7 +7898,7 @@ if test "$fuzzing" = "yes" ; then
->    if test "$have_fuzzer" = "yes"; then
->      FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
->      FUZZ_CFLAGS=" -fsanitize=address,fuzzer"
-> -    CFLAGS=" -fsanitize=address,fuzzer-no-link"
-> +    CFLAGS="$CFLAGS -fsanitize=address,fuzzer-no-link"
->    else
->      error_exit "Your compiler doesn't support -fsanitize=address,fuzzer"
->      exit 1
+> diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+> index a36d9038e0..0b66e43409 100644
+> --- a/tests/qtest/fuzz/fuzz.c
+> +++ b/tests/qtest/fuzz/fuzz.c
+> @@ -19,6 +19,7 @@
+>  #include "sysemu/runstate.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/main-loop.h"
+> +#include "qemu/rcu.h"
+>  #include "tests/qtest/libqtest.h"
+>  #include "tests/qtest/libqos/qgraph.h"
+>  #include "fuzz.h"
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
