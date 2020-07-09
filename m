@@ -2,86 +2,83 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 326EBC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DA6C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:21:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B24E920720
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:21:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95F2E2074A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:21:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S3iVwUZj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B24E920720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uWxs7Vte"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F2E2074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtXQx-0004R6-Jc
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 10:21:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50994)
+	id 1jtXR0-0004Yx-PD
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 10:21:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jtXJ6-0000YO-Kr
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:13:48 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:36065)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtXKh-0003io-I7
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:15:27 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41239)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jtXJ4-0001Lc-7s
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:13:48 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id k6so2562595wrn.3
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 07:13:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtXKf-0001db-W8
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:15:27 -0400
+Received: by mail-oi1-x243.google.com with SMTP id y22so1965706oie.8
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 07:15:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ijru7vfuo0rF0FQiZmJ4xzr85Qw/JDmcUhGplkCDPx8=;
- b=S3iVwUZjHDJZDZuyhj+yTgH4bbYUQr9euBhlOv9yMhNuK22V43NImYbZjebxqI2hd3
- fYaHQgt05+FYw2DBZ3QLoRkMlFOwXAJ3xbA3gusj/zZx3vCsCULV+3xWtXca2KSWaqEl
- noyDJ1BSMzffHSHHDgj0uOeZXiBX2/Kl9+4TfwY9Y/cio+9JP15+5HUYHDCFhYljgjqY
- JuRMEDsBa6W6K/4wU1v8YfiaWkkboxI3nH4FOhKH7qYgFm3iNnuwgx6j24qGlNhA2HLB
- Q5cyGV85wbCVJwaI1lIjLZRiFf6l/YVkijeFGXscxxNU/JfahBts78jVih+4+IDHprqL
- dHjw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=lNNjQi8b+t/1qYv7bRluAnLmEcCT/Chis9UZJWOYFX8=;
+ b=uWxs7Vte4OkImDsgBeKOHyi52hKkCtZkfFsqs51U7einmtgmNsZ9XeoRLE4BW7EXSb
+ hiDS8uTdTNA0RAyVquNzJUFatISVlnFAuXSMqVGWBWgQ9Rns95MooPBEJwGit4724z2a
+ 8BPeCYVoJ19SKKTOp9t9vxX7N0n4cO6xWMnok1syiSHdIiVqwzyIPxkrf0cSxvbTUAPs
+ hGouMIqj7Z/WUj8wgHvoTGM1McxMLXLeGjKA95eLK1oQjvzY8uGtVxcEu2gVOcg8FYSx
+ 7Pn3p0EGn8fZXmCp+ChUKPbs6+5fW6xBsAo0nHiXzJaEkY1Xv4hY0hwbC2tfdIUrRP/9
+ wgAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ijru7vfuo0rF0FQiZmJ4xzr85Qw/JDmcUhGplkCDPx8=;
- b=lW0ge80xQ0EUGG2Omk6Sj/3Acu65I8bHGmYFPcICi5/4rSw5NA+uLzmDBbMMMVAMHp
- g0v6JCcqiTmFOb/gJjA5Bto98BLNfMQnB7JUJbnF8oz7F4ijPC40yZSq98mU0uVCGUhU
- CQ4Tlqbiv+7X/3aBtRvnDZWrFaVNyiYx98kPTe7AQb9KI2//ISHtVH7EenTy0ThGqQkK
- RojATaGzkadWzQburCgJvhAS2xEqZGUm4AEazzhkFiXWxNBId5l2KuantgCHMV2Ntl4o
- OM4JccjLF/us27hjpvYrsYi/lX/8mXPuFFJXsAFg0v6Yw7kMdDxn65l652YFzhdFwgEw
- /+Hw==
-X-Gm-Message-State: AOAM531q/vLNEjcsMk+QkYluQCYDPeGIGBMlouvpYI0W+JdcLwrHaaxZ
- 8c5QLxQMzOZ7rqMg+sD2PAtDcg==
-X-Google-Smtp-Source: ABdhPJyB8ORKLyn515CJfkZxcOC4EYU+1zLfqHUHCdChoyMjfapu5pTbVm/sIFN4B8CE02T4+p34Qg==
-X-Received: by 2002:a5d:5686:: with SMTP id f6mr62620207wrv.15.1594304020957; 
- Thu, 09 Jul 2020 07:13:40 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u8sm5431717wrt.28.2020.07.09.07.13.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Jul 2020 07:13:34 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 107A11FF93;
- Thu,  9 Jul 2020 15:13:28 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 07/13] plugins: new hwprofile plugin
-Date: Thu,  9 Jul 2020 15:13:21 +0100
-Message-Id: <20200709141327.14631-8-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200709141327.14631-1-alex.bennee@linaro.org>
-References: <20200709141327.14631-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=lNNjQi8b+t/1qYv7bRluAnLmEcCT/Chis9UZJWOYFX8=;
+ b=ponjY/tFMJmk4yOeCqn7h95ets6dWc5IP1PqbskvVkmCgLtUMFWA7wqNXz9vh8HiDR
+ 1KWFIfwoE0Ee86g7rIYKn1213WpPqlTA8b1pQK1/oY3rxaK0jo+hVAxGtWj5TBMUXiVZ
+ 6eN2tb78yUGIw6Lco30f/rM5X1ryRL8U4v1kn+fKpmYj7ZIL57aSunEUg8wM+wa8crmv
+ 7Ubd47fWnmGFapNQvptn0B/v8s7MhPbNaw5yrgewLVCjBlpTGrYPYrxPJ3EvPjBotMGm
+ c4SSKsxDAnWQN2+mqEmr76yIR2UKJ+l5OIhZ3osn/VdE5mJ96a15UjnGNwhNSCvlntvA
+ 1a2g==
+X-Gm-Message-State: AOAM530YQDQlfoo91ybgIRFqqNbWPw/Pdb9GRqn7UAj/rOGZE0ta/r2M
+ 7GBq5HYmXCwbSwiANh2KzTOMa0ttGlCh/ClMJJEzww==
+X-Google-Smtp-Source: ABdhPJzunFtHfvk67GEEnuqTBu8yTB5v6but9+Rajnh0I2FwwV7930mGdeNm07BPDDWROeVdOGphTrU9T+gzPTWN9hI=
+X-Received: by 2002:aca:54c9:: with SMTP id i192mr150802oib.163.1594304123770; 
+ Thu, 09 Jul 2020 07:15:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
+References: <20200707132116.26207-1-f4bug@amsat.org>
+ <20200707132116.26207-3-f4bug@amsat.org>
+ <CAKmqyKNY+7tE9tcZm7_Th9qapo1CH0AwNwBf7vaf+7vSqBNtVA@mail.gmail.com>
+ <CAFEAcA_ZXgNHMAhBVmjvstyG=PpaHOtcmo=VgvfBQ3Z9VJTk_g@mail.gmail.com>
+ <3f1bf3ba-d6c3-a148-9850-076b2caa64d0@amsat.org>
+ <CAPan3Wr09ZbbHWO-dhGeK3zhZQv3smrzLpUGMj71NWh0hToZDg@mail.gmail.com>
+ <e87550d9-e1cc-cc15-2674-755249e9a965@amsat.org>
+In-Reply-To: <e87550d9-e1cc-cc15-2674-755249e9a965@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 Jul 2020 15:15:12 +0100
+Message-ID: <CAFEAcA8em-bgU2xd8OG+bPLDCSZCF8Y2ay9U57D8p9m1SWO=9g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/sd/sdcard: Do not allow invalid SD card sizes
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -89,8 +86,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,427 +100,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, robhenry@microsoft.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org, aurelien@aurel32.net
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Alistair Francis <alistair23@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a plugin intended to help with profiling access to various
-bits of system hardware. It only really makes sense for system
-emulation.
+On Thu, 9 Jul 2020 at 14:56, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> On 7/7/20 10:29 PM, Niek Linnenbank wrote:
+> > So I manually copy & pasted the change into hw/sd/sd.c to test it.
+> > It looks like the check works, but my concern is that with this change,
+> > we will be getting this error on 'off-the-shelf' images as well.
+> > For example, the latest Raspbian image size also isn't a power of two:
+> >
+> > $ ./arm-softmmu/qemu-system-arm -M raspi2 -sd
+> > ~/Downloads/2020-05-27-raspios-buster-lite-armhf.img -nographic
+> > WARNING: Image format was not specified for
+> > '/home/me/Downloads/2020-05-27-raspios-buster-lite-armhf.img' and
+> > probing guessed raw.
+> >          Automatically detecting the format is dangerous for raw images=
+,
+> > write operations on block 0 will be restricted.
+> >          Specify the 'raw' format explicitly to remove the restrictions=
+.
+> > qemu-system-arm: Invalid SD card size: 1.73 GiB (expecting at least 2 G=
+iB)
+> >
+> > If we do decide that the change is needed, I would like to propose that
+> > we also give the user some instructions
+> > on how to fix it, maybe some 'dd' command?
+>
+> On POSIX we can suggest to use 'truncate -s 2G' from coreutils.
+> This is not in the default Darwin packages.
+> On Windows I have no clue.
 
-It takes advantage of the recently exposed helper API that allows us
-to see the device name (memory region name) associated with a device.
+dd/truncate etc won't work if the image file is not raw (eg if
+it's qcow2). The only chance you have of something that's actually
+generic would probably involve "qemu-img resize". But I'm a bit
+wary of having an error message that recommends that, because
+what if we got it wrong?
 
-You can specify arg=read or arg=write to limit the tracking to just
-reads or writes (by default it does both).
-
-The pattern option:
-
-  -plugin ./tests/plugin/libhwprofile.so,arg=pattern
-
-will allow you to see the access pattern to devices, eg:
-
-  gic_cpu @ 0xffffffc010040000
-    off:00000000, 8, 1, 8, 1
-    off:00000000, 4, 1, 4, 1
-    off:00000000, 2, 1, 2, 1
-    off:00000000, 1, 1, 1, 1
-
-The source option:
-
-  -plugin ./tests/plugin/libhwprofile.so,arg=source
-
-will track the virtual source address of the instruction making the
-access:
-
-  pl011 @ 0xffffffc010031000
-    pc:ffffffc0104c785c, 1, 4, 0, 0
-    pc:ffffffc0104c7898, 1, 4, 0, 0
-    pc:ffffffc010512bcc, 2, 1867, 0, 0
-
-You cannot mix source and pattern.
-
-Finally the match option allow you to limit the tracking to just the
-devices you care about.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Robert Foley <robert.foley@linaro.org>
-Tested-by: Robert Foley <robert.foley@linaro.org>
-
----
-v2
-  - use 64 bit cpu masks
-  - warn if we will exceed cpu mask capability
-  - don't run in linux-user mode
-  - skip in check-tcg for linux-user test
-v3
-  - update device name API
-  - re-factor and clean-up
-  - add source tracking
-  - use direct hash for source/pattern
-  - add match function
-  - expand the commit message
-  - checkpatch cleanups
----
- tests/plugin/hwprofile.c  | 305 ++++++++++++++++++++++++++++++++++++++
- tests/plugin/Makefile     |   1 +
- tests/tcg/Makefile.target |  12 +-
- 3 files changed, 316 insertions(+), 2 deletions(-)
- create mode 100644 tests/plugin/hwprofile.c
-
-diff --git a/tests/plugin/hwprofile.c b/tests/plugin/hwprofile.c
-new file mode 100644
-index 000000000000..6dac1d5f8541
---- /dev/null
-+++ b/tests/plugin/hwprofile.c
-@@ -0,0 +1,305 @@
-+/*
-+ * Copyright (C) 2020, Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ * HW Profile - breakdown access patterns for IO to devices
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <stdlib.h>
-+#include <inttypes.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+#include <glib.h>
-+
-+#include <qemu-plugin.h>
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
-+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-+
-+typedef struct {
-+    uint64_t cpu_read;
-+    uint64_t cpu_write;
-+    uint64_t reads;
-+    uint64_t writes;
-+} IOCounts;
-+
-+typedef struct {
-+    uint64_t off_or_pc;
-+    IOCounts counts;
-+} IOLocationCounts;
-+
-+typedef struct {
-+    const char *name;
-+    uint64_t   base;
-+    IOCounts   totals;
-+    GHashTable *detail;
-+} DeviceCounts;
-+
-+static GMutex lock;
-+static GHashTable *devices;
-+
-+/* track the access pattern to a piece of HW */
-+static bool pattern;
-+/* track the source address of access to HW */
-+static bool source;
-+/* track only matched regions of HW */
-+static bool check_match;
-+static gchar **matches;
-+
-+static enum qemu_plugin_mem_rw rw = QEMU_PLUGIN_MEM_RW;
-+
-+static inline bool track_reads(void)
-+{
-+    return rw == QEMU_PLUGIN_MEM_RW || rw == QEMU_PLUGIN_MEM_R;
-+}
-+
-+static inline bool track_writes(void)
-+{
-+    return rw == QEMU_PLUGIN_MEM_RW || rw == QEMU_PLUGIN_MEM_W;
-+}
-+
-+static void plugin_init(void)
-+{
-+    devices = g_hash_table_new(NULL, NULL);
-+}
-+
-+static gint sort_cmp(gconstpointer a, gconstpointer b)
-+{
-+    DeviceCounts *ea = (DeviceCounts *) a;
-+    DeviceCounts *eb = (DeviceCounts *) b;
-+    return ea->totals.reads + ea->totals.writes >
-+           eb->totals.reads + eb->totals.writes ? -1 : 1;
-+}
-+
-+static gint sort_loc(gconstpointer a, gconstpointer b)
-+{
-+    IOLocationCounts *ea = (IOLocationCounts *) a;
-+    IOLocationCounts *eb = (IOLocationCounts *) b;
-+    return ea->off_or_pc > eb->off_or_pc;
-+}
-+
-+static void fmt_iocount_record(GString *s, IOCounts *rec)
-+{
-+    if (track_reads()) {
-+        g_string_append_printf(s, ", %"PRIx64", %"PRId64,
-+                               rec->cpu_read, rec->reads);
-+    }
-+    if (track_writes()) {
-+        g_string_append_printf(s, ", %"PRIx64", %"PRId64,
-+                               rec->cpu_write, rec->writes);
-+    }
-+}
-+
-+static void fmt_dev_record(GString *s, DeviceCounts *rec)
-+{
-+    g_string_append_printf(s, "%s, 0x%"PRIx64,
-+                           rec->name, rec->base);
-+    fmt_iocount_record(s, &rec->totals);
-+    g_string_append_c(s, '\n');
-+}
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    g_autoptr(GString) report = g_string_new("");
-+    GList *counts;
-+
-+    if (!(pattern || source)) {
-+        g_string_printf(report, "Device, Address");
-+        if (track_reads()) {
-+            g_string_append_printf(report, ", RCPUs, Reads");
-+        }
-+        if (track_writes()) {
-+            g_string_append_printf(report, ",  WCPUs, Writes");
-+        }
-+        g_string_append_c(report, '\n');
-+    }
-+
-+    counts = g_hash_table_get_values(devices);
-+    if (counts && g_list_next(counts)) {
-+        GList *it;
-+
-+        it = g_list_sort(counts, sort_cmp);
-+
-+        while (it) {
-+            DeviceCounts *rec = (DeviceCounts *) it->data;
-+            if (rec->detail) {
-+                GList *accesses = g_hash_table_get_values(rec->detail);
-+                GList *io_it = g_list_sort(accesses, sort_loc);
-+                const char *prefix = pattern ? "off" : "pc";
-+                g_string_append_printf(report, "%s @ 0x%"PRIx64"\n",
-+                                       rec->name, rec->base);
-+                while (io_it) {
-+                    IOLocationCounts *loc = (IOLocationCounts *) io_it->data;
-+                    g_string_append_printf(report, "  %s:%08"PRIx64,
-+                                           prefix, loc->off_or_pc);
-+                    fmt_iocount_record(report, &loc->counts);
-+                    g_string_append_c(report, '\n');
-+                    io_it = io_it->next;
-+                }
-+            } else {
-+                fmt_dev_record(report, rec);
-+            }
-+            it = it->next;
-+        };
-+        g_list_free(it);
-+    }
-+
-+    qemu_plugin_outs(report->str);
-+}
-+
-+static DeviceCounts *new_count(const char *name, uint64_t base)
-+{
-+    DeviceCounts *count = g_new0(DeviceCounts, 1);
-+    count->name = name;
-+    count->base = base;
-+    if (pattern || source) {
-+        count->detail = g_hash_table_new(NULL, NULL);
-+    }
-+    g_hash_table_insert(devices, (gpointer) name, count);
-+    return count;
-+}
-+
-+static IOLocationCounts *new_location(GHashTable *table, uint64_t off_or_pc)
-+{
-+    IOLocationCounts *loc = g_new0(IOLocationCounts, 1);
-+    loc->off_or_pc = off_or_pc;
-+    g_hash_table_insert(table, (gpointer) off_or_pc, loc);
-+    return loc;
-+}
-+
-+static void hwprofile_match_hit(DeviceCounts *rec, uint64_t off)
-+{
-+    g_autoptr(GString) report = g_string_new("hwprofile: match @ offset");
-+    g_string_append_printf(report, "%"PRIx64", previous hits\n", off);
-+    fmt_dev_record(report, rec);
-+    qemu_plugin_outs(report->str);
-+}
-+
-+static void inc_count(IOCounts *count, bool is_write, unsigned int cpu_index)
-+{
-+    if (is_write) {
-+        count->writes++;
-+        count->cpu_write |= (1 << cpu_index);
-+    } else {
-+        count->reads++;
-+        count->cpu_read |= (1 << cpu_index);
-+    }
-+}
-+
-+static void vcpu_haddr(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
-+                       uint64_t vaddr, void *udata)
-+{
-+    struct qemu_plugin_hwaddr *hwaddr = qemu_plugin_get_hwaddr(meminfo, vaddr);
-+
-+    if (!hwaddr || !qemu_plugin_hwaddr_is_io(hwaddr)) {
-+        return;
-+    } else {
-+        const char *name = qemu_plugin_hwaddr_device_name(hwaddr);
-+        uint64_t off = qemu_plugin_hwaddr_device_offset(hwaddr);
-+        bool is_write = qemu_plugin_mem_is_store(meminfo);
-+        DeviceCounts *counts;
-+
-+        g_mutex_lock(&lock);
-+        counts = (DeviceCounts *) g_hash_table_lookup(devices, name);
-+
-+        if (!counts) {
-+            uint64_t base = vaddr - off;
-+            counts = new_count(name, base);
-+        }
-+
-+        if (check_match) {
-+            if (g_strv_contains((const char * const *)matches, counts->name)) {
-+                hwprofile_match_hit(counts, off);
-+                inc_count(&counts->totals, is_write, cpu_index);
-+            }
-+        } else {
-+            inc_count(&counts->totals, is_write, cpu_index);
-+        }
-+
-+        /* either track offsets or source of access */
-+        if (source) {
-+            off = (uint64_t) udata;
-+        }
-+
-+        if (pattern || source) {
-+            IOLocationCounts *io_count = g_hash_table_lookup(counts->detail,
-+                                                             (gpointer) off);
-+            if (!io_count) {
-+                io_count = new_location(counts->detail, off);
-+            }
-+            inc_count(&io_count->counts, is_write, cpu_index);
-+        }
-+
-+        g_mutex_unlock(&lock);
-+    }
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-+{
-+    size_t n = qemu_plugin_tb_n_insns(tb);
-+    size_t i;
-+
-+    for (i = 0; i < n; i++) {
-+        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-+        gpointer udata = (gpointer) (source ? qemu_plugin_insn_vaddr(insn) : 0);
-+        qemu_plugin_register_vcpu_mem_cb(insn, vcpu_haddr,
-+                                         QEMU_PLUGIN_CB_NO_REGS,
-+                                         rw, udata);
-+    }
-+}
-+
-+QEMU_PLUGIN_EXPORT
-+int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
-+                        int argc, char **argv)
-+{
-+    int i;
-+
-+    for (i = 0; i < argc; i++) {
-+        char *opt = argv[i];
-+        if (g_strcmp0(opt, "read") == 0) {
-+            rw = QEMU_PLUGIN_MEM_R;
-+        } else if (g_strcmp0(opt, "write") == 0) {
-+            rw = QEMU_PLUGIN_MEM_W;
-+        } else if (g_strcmp0(opt, "pattern") == 0) {
-+            pattern = true;
-+        } else if (g_strcmp0(opt, "source") == 0) {
-+            source = true;
-+        } else if (g_str_has_prefix(opt, "match")) {
-+            gchar **parts = g_strsplit(opt, "=", 2);
-+            check_match = true;
-+            matches = g_strsplit(parts[1], ",", -1);
-+            g_strfreev(parts);
-+        } else {
-+            fprintf(stderr, "option parsing failed: %s\n", opt);
-+            return -1;
-+        }
-+    }
-+
-+    if (source && pattern) {
-+        fprintf(stderr, "can only currently track either source or pattern.\n");
-+        return -1;
-+    }
-+
-+    if (!info->system_emulation) {
-+        fprintf(stderr, "hwprofile: plugin only useful for system emulation\n");
-+        return -1;
-+    }
-+
-+    /* Just warn about overflow */
-+    if (info->system.smp_vcpus > 64 ||
-+        info->system.max_vcpus > 64) {
-+        fprintf(stderr, "hwprofile: can only track up to 64 CPUs\n");
-+    }
-+
-+    plugin_init();
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
-diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
-index 3a50451428b4..0cb8e35ae407 100644
---- a/tests/plugin/Makefile
-+++ b/tests/plugin/Makefile
-@@ -14,6 +14,7 @@ NAMES += hotblocks
- NAMES += howvec
- NAMES += hotpages
- NAMES += lockstep
-+NAMES += hwprofile
- 
- SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
- 
-diff --git a/tests/tcg/Makefile.target b/tests/tcg/Makefile.target
-index 4b2b696fcee3..bc595b058845 100644
---- a/tests/tcg/Makefile.target
-+++ b/tests/tcg/Makefile.target
-@@ -129,8 +129,16 @@ ifeq ($(CONFIG_PLUGIN),y)
- PLUGIN_SRC=$(SRC_PATH)/tests/plugin
- PLUGIN_LIB=../../plugin
- VPATH+=$(PLUGIN_LIB)
--PLUGINS=$(filter-out liblockstep.so,\
--		$(patsubst %.c, lib%.so, $(notdir $(wildcard $(PLUGIN_SRC)/*.c))))
-+
-+# Some plugins aren't testable automatically
-+SKIP_PLUGINS=liblockstep.so
-+ifdef CONFIG_USER_ONLY
-+SKIP_PLUGINS+=libhwprofile.so
-+endif
-+
-+PLUGINS=$(filter-out $(SKIP_PLUGINS),\
-+		$(patsubst %.c, lib%.so, \
-+			$(notdir $(wildcard $(PLUGIN_SRC)/*.c))))
- 
- # We need to ensure expand the run-plugin-TEST-with-PLUGIN
- # pre-requistes manually here as we can't use stems to handle it. We
--- 
-2.20.1
-
+thanks
+-- PMM
 
