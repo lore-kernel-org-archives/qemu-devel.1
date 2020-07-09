@@ -2,95 +2,82 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D2AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBED2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E11542074B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:58:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WqWTNSxH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E11542074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C3FCC20708
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:01:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3FCC20708
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtX4O-0001D9-7b
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:58:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45042)
+	id 1jtX7Z-0002Uc-1m
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 10:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtX3m-0000ay-AY
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:57:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21844
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtX3k-0006sF-0k
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:57:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594303074;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=qVA5PpTtAOVaYGIT+Z13yYBrcMSbKSY5FrbiyxXR2ms=;
- b=WqWTNSxHyOp4hzrLQrDXsahCqRjgs6LtLqKmkiWRIC2JQ7Mfv4UJ0q/bcxlDBFHFLCM/Hu
- hxgpNltv/m1reA12ZsBh8wuwL1x6tRjc95rO01X5hfCSIp3dpOE5NT6rObx2LQPRf8fknK
- DkJPgC87b+KqLoMK8eJcbDennf+jvWg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-zBPVNUU_MbKSoWykkCrPzg-1; Thu, 09 Jul 2020 09:57:52 -0400
-X-MC-Unique: zBPVNUU_MbKSoWykkCrPzg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B825E10059B0;
- Thu,  9 Jul 2020 13:57:51 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-106.ams2.redhat.com [10.36.112.106])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 027B21A888;
- Thu,  9 Jul 2020 13:57:43 +0000 (UTC)
-Subject: Re: [PATCH-for-5.1 2/2] fuzz: add missing header for rcu_enable_atfork
-To: Alexander Bulekov <alxndr@bu.edu>
-References: <20200708200104.21978-1-alxndr@bu.edu>
- <20200708200104.21978-3-alxndr@bu.edu>
- <75c61011-3be4-a450-3188-4b875703df07@redhat.com>
- <20200709133841.olbpg7jwaeklc6v6@mozz.bu.edu>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <1b914b76-3842-af13-c70a-ced8d3d30a29@redhat.com>
-Date: Thu, 9 Jul 2020 15:57:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jtX6h-00024b-Vz
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:01:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34490)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jtX6f-0007SZ-DN
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:00:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jtX6d-0003Hu-7L
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 14:00:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1CF892E8105
+ for <qemu-devel@nongnu.org>; Thu,  9 Jul 2020 14:00:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200709133841.olbpg7jwaeklc6v6@mozz.bu.edu>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:33:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Jul 2020 13:51:31 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1885827@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: plugins windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee casmac cota
+X-Launchpad-Bug-Reporter: Xiaolei (casmac)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <159357217483.1717.4076077243388027502.malonedeb@chaenomeles.canonical.com>
+ <159426310588.27029.9451813776430828516.malone@gac.canonical.com>
+Message-ID: <87h7ugn6e4.fsf@linaro.org>
+Subject: Re: [Bug 1885827] Re: building plugin failed on Windows with mingw
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8ca8a4bb8b07805750d7de1d47e07b880291fc72
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 09:41:12
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,87 +86,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, liq3ea@163.com,
- qemu-devel@nongnu.org, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- philmd@redhat.com
+Reply-To: Bug 1885827 <1885827@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200709135131.e4f5KY_VwauKHk0TkndTEF3RtkarESyA3YsIjNWnl30@z>
 
-On 09/07/2020 15.38, Alexander Bulekov wrote:
-> On 200709 0718, Thomas Huth wrote:
->> On 08/07/2020 22.01, Alexander Bulekov wrote:
->>> In 45222b9a90, I fixed a broken check for rcu_enable_atfork introduced
->>> in d6919e4cb6. I added a call to rcu_enable_atfork after the
->>> call to qemu_init in fuzz.c, but forgot to include the corresponding
->>> header, breaking --enable-fuzzing --enable-werror builds.
->>>
->>> Fixes: 45222b9a90 ("fuzz: fix broken qtest check at rcu_disable_atfork")
->>> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
->>> ---
->>>  tests/qtest/fuzz/fuzz.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
->>> index a36d9038e0..0b66e43409 100644
->>> --- a/tests/qtest/fuzz/fuzz.c
->>> +++ b/tests/qtest/fuzz/fuzz.c
->>> @@ -19,6 +19,7 @@
->>>  #include "sysemu/runstate.h"
->>>  #include "sysemu/sysemu.h"
->>>  #include "qemu/main-loop.h"
->>> +#include "qemu/rcu.h"
->>>  #include "tests/qtest/libqtest.h"
->>>  #include "tests/qtest/libqos/qgraph.h"
->>>  #include "fuzz.h"
->>
->> D'oh, mea culpa, I also apparently did not properly compile test that
->> patch :-( I think we need a CI job that at least compile tests the
->> fuzzing code - I can look into that once Alex Bennée's current testing
->> pull request has been merged.
-> 
-> My bad - I should have done a clean build with a version of clang
-> that doesn't require me to -disable-werror
-> 
->> Alexander, is there also a way to run a fuzzer just for some few
->> minutes? E.g. a fuzzing test that finishes quickly, or an option to
->> limit the time that a test is running? If so, we could also add that
->> quick test to the CI pipeline, to make sure that the fuzzer code does
->> not only compile, but is also able to run (at least a little bit).
-> 
-> Yes. I think the sequence could look something like:
-> CC=clang CXX=clang++ ../configure --enable-fuzzing --enable-sanitizers \
->              --enable-werror
-> make i386-softmmu/fuzz
-> ./i386-softmmu/qemu-fuzz-i386 --fuzz-target=i440fx-qtest-reboot-fuzz -runs=5000
-> 
-> This will run the i440fx fuzzer over 5000 inputs which should finish in
-> a second or so. I don't expect it to actually find any crashes in the
-> i440fx in such a short period, so, ideally, all errors would be
-> fuzzer-related.
-> 
-> Where can I get started with building out a CI job for this?
+Emilio G. Cota <1885827@bugs.launchpad.net> writes:
 
-I'd suggest to use gitlab, since we're currently focusing on that for
-our CI. So get an account on gitlab, clone the qemu repository there
-(https://gitlab.com/qemu-project/qemu) to your account, and then you
-should almost be ready to go: Edit the .gitlab-ci.yml file in the
-repository, and once you push your local branch to the gitlab server,
-you should see the jobs running in the "CI / CD" section. (Not sure
-anymore whether you have to enable the CI manually for your project,
-though, but it should not be too hard to find that setting if that's the
-case)
+> You should then find out why libqemu_plugin.dll.a is not working. It is
+> possible though that your linked is calling the import library something
+> else, for instance adding a .dll extension to it.
+>
+> You will have to run a few tests with your linker (I'd just use the
+> examples from the stackoverflow links I posted above) to see the name of
+> the import library that gets created. My assumption is that some library
+> gets created, otherwise the linked should give you an error and AFAICT
+> it does not.
+>
+> Once you find what the import library us, you should be in good shape to
+> adapt the above for QEMU. Let us know how it goes!
 
-> One aside: running this right now, QEMU exits and AddressSanitizer
-> complains about some leaks. There is a patch in Paolo's PR that should
-> fix this, but I was surprised that existing CI tests didn't catch it. Is
-> leak detection usually disabled in CI?
+I did have a go but couldn't get far with the mingw docker images. I got
+somewhat distracted yesterday solving the mysterious regenerating
+syscall_nr.h problem so I've run out of bandwidth to look at this any
+longer. If the two of you find an eventual solution please send me a
+patch.
 
-I'm not aware of any CI tests that is currently using leak detection ...
-so it's certainly welcome if we get more test coverage here!
+Thanks.
 
- Thomas
+-- =
 
+Alex Benn=C3=A9e
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885827
+
+Title:
+  building plugin failed on Windows with mingw
+
+Status in QEMU:
+  New
+
+Bug description:
+  I want to build QEMU 4.2.0's plugin module on Windows 7/10 with Mingw, bu=
+t the building process faild.
+   =
+
+  The step I follow is listed below:
+  1. create "dsp_build" diretory under source file folder
+
+  2.  change directory to dsp_build , and run ../configure --target-list=3D=
+dsp-softmmu --cross-prefix=3Dx86_64-w64-mingw32- --enable-gtk --enable-sdl =
+--enable-debug --enable-plugins
+  3. build qemu project
+  4. switch dir to /dsp_build, make -C tests/plugin, yeilds error: =
+
+     CC      bb.o
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:17:2=
+4: error: variable 'qemu_plugin_version' definition is marked dllimport
+     17 | QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSIO=
+N;
+        |                        ^~~~~~~~~~~~~~~~~~~
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:17:2=
+4: warning: 'qemu_plugin_version' redeclared without dllimport attribute: p=
+revious dllimport ignored [-Wattributes]
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c: In =
+function 'vcpu_tb_exec':
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:33:2=
+9: warning: cast from pointer to integer of different size [-Wpointer-to-in=
+t-cast]
+     33 |     unsigned long n_insns =3D (unsigned long)udata;
+        |                             ^
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c: In =
+function 'vcpu_tb_trans':
+   D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:51:4=
+6: warning: cast to pointer from integer of different size [-Wint-to-pointe=
+r-cast]
+     51 |                                              (void *)n_insns);
+
+  5.  Then , I modified the QEMU_flags and the compilation command
+  arguments($(CC) ..) in  the  makefile :
+
+                  BUILD_DIR :=3D $(CURDIR)/../..
+
+  		include $(BUILD_DIR)/config-host.mak
+  		include $(SRC_PATH)/rules.mak
+
+                  $(call set-vpath, $(SRC_PATH)/tests/plugin)
+
+  		NAMES :=3D
+  		NAMES +=3D bb
+  		NAMES +=3D empty
+  		NAMES +=3D insn
+  		NAMES +=3D mem
+  		NAMES +=3D hotblocks
+  		NAMES +=3D howvec
+  		NAMES +=3D hotpages
+
+                  SONAMES :=3D $(addsuffix .so,$(addprefix lib,$(NAMES)))
+
+  		QEMU_CFLAGS +=3D -fPIC	-DBUILDING_DLL  		#added  -DBUILDING_DLL
+  		QEMU_CFLAGS +=3D -I$(SRC_PATH)/include/qemu
+
+                  all: $(SONAMES)
+
+  		lib%.so: %.o
+  			$(CC) -fPIC -shared -o $@ $^ $(LDLIBS) -L /c/msys64/mingw64/lib/ -lgli=
+b-2.0
+  			# original cmd: $(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
+
+  		clean:
+  			rm -f *.o *.so *.d
+  			rm -Rf .libs
+
+                  .PHONY: all clean
+
+  6.  Executing make yeilds:
+
+  make: enter   =E2=80=9C/d/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/=
+build_dsp/tests/plugin=E2=80=9D
+    CC      bb.o
+  x86_64-w64-mingw32-gcc -fPIC -shared -o libbb.so bb.o  -L /c/msys64/mingw=
+64/lib/ -lglib-2.0
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o: in function `plugin_exit':
+  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:28: u=
+ndefined reference to `qemu_plugin_outs'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:29: undefined reference to `__stack_chk_fail'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o: in function `vcpu_tb_trans':
+  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:41: u=
+ndefined reference to `qemu_plugin_tb_n_insns'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:44: undefined reference to `qemu_plugin_register_vcpu=
+_tb_exec_inline'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:46: undefined reference to `qemu_plugin_register_vcpu=
+_tb_exec_inline'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:49: undefined reference to `qemu_plugin_register_vcpu=
+_tb_exec_cb'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o: in function `qemu_plugin_install':
+  D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_c3x/tests/plugin/bb.c:63: u=
+ndefined reference to `qemu_plugin_register_vcpu_tb_trans_cb'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: D:/emu_devl/qemu_src/qemu-sr-dsp-a/qemu_tidsp_=
+c3x/tests/plugin/bb.c:64: undefined reference to `qemu_plugin_register_atex=
+it_cb'
+  C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.1.0/../../../../x8=
+6_64-w64-mingw32/bin/ld.exe: bb.o:bb.c:(.rdata$.refptr.__stack_chk_guard[.r=
+efptr.__stack_chk_guard]+0x0): undefined reference to `__stack_chk_guard'
+  collect2.exe: error: ld returned 1 exit status
+
+     It looks like linking problem(fail to link functions defined in api.c,=
+ core.c...), but I have no idea what goes wrong. If I mannualy add api.o, c=
+ore.o in the compilation command, still get error like undefined reference =
+to '__stack_chk_guard'. =
+
+     My collegue can build 4.2.0  plugins on Ubuntu Linux without any probl=
+em.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885827/+subscriptions
 
