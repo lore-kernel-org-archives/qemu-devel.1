@@ -2,92 +2,84 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E6AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02914C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:19:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0B9120708
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:18:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C437420708
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:19:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfG9WPmG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B9120708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jFiVpB4b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C437420708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtWRa-0000U2-Va
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:18:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33016)
+	id 1jtWSC-0001Lx-44
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:19:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtWR3-0008VZ-B8
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:17:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21213
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtWR1-0001Sl-DD
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:17:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594300674;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=byb2mh+FEdYMkDhhhZKOIM1g2Wn9p6gHz4ykOohnFZc=;
- b=hfG9WPmGq5B+huKJ6wkBiLOpK/F+poFzYNxOCy5Kjc/+rQsWV1L9BDzL3xezScL49m5Aof
- 5Aw4ZiYZEty0BeMGQVCgZdYI+2P0vYcE1ysC6LkFuAMoGjhUP4H2tpnzIUcbEMJDZKyQAx
- ToHKiOYIwWYf155kYvAJys9YUPiTo8w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-qpzflvTgOZWZ1dVSKHOS-Q-1; Thu, 09 Jul 2020 09:17:40 -0400
-X-MC-Unique: qpzflvTgOZWZ1dVSKHOS-Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06E1A8015FB;
- Thu,  9 Jul 2020 13:17:39 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8035060BE2;
- Thu,  9 Jul 2020 13:17:29 +0000 (UTC)
-Date: Thu, 9 Jul 2020 14:17:26 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: Delete some Wiki pages (was: Migrating custom qemu.org
- infrastructure to GitLab)
-Message-ID: <20200709131726.GP3753300@redhat.com>
-References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
- <20200708105353.GE3229307@redhat.com>
- <20200709101602.lc2uipjlxobjvjn3@sirius.home.kraxel.org>
- <3dacddaa-c739-445b-a24a-02f9e51b9b0e@redhat.com>
- <8e1276e2-8957-49db-0409-e85ab2f09739@redhat.com>
- <4e5404a7-20dc-cb5d-6307-b66fae8f77a4@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtWRZ-0000ax-D8
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:18:29 -0400
+Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:37302)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtWRX-0001Up-KK
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:18:28 -0400
+Received: by mail-oo1-xc42.google.com with SMTP id t6so338718ooh.4
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 06:18:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8ZY8bGxqxcWM00BH3NHEsaeW1z3uQMbHXaqbyT5Dk3U=;
+ b=jFiVpB4bH4ALqrDQrPlrRt64pM73t6TM2+h0zzq9Cnx4F6dDgJBLjYt0U4N+1QVLKF
+ 2o1+IJ86BIYPJkMLsKDdOg/h0F+E3LIs+HbCHt4W83Ysz3q3JhcJSEjFi2bknx0PwnBg
+ eDGCBfVdx9jpqPIVhNjMK7Fwb8aOB4coWFsDhJtueDCa7WWwgCtNgmxhB74c61gIlcJF
+ P7fc+R3X4DaVf6XMkVWWdVSKGopdxR1As6ggqKomGj1xZ4kqHGJzpj1vdX5CYaZ4JvFb
+ 8a6WhJ8zIiF2X2BS9IkAB6W993Ygg0lvPRA/EuMpd7DKfubljZWUF3AoJJ2zOSJxVUf0
+ wJmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8ZY8bGxqxcWM00BH3NHEsaeW1z3uQMbHXaqbyT5Dk3U=;
+ b=f/HVJHbAV20mgf/S8cLx3GeS5TN+5j/eMrPwun2t10zm1mX7u/Ayv7ldQb+HXW6m+r
+ +VbK/4vEdnl+itqBgzxRFLvb2D2uNrYogX/fCmcfCtbmQvHdNhDNMeSddb+2c447eG3X
+ svSuXgVuiT8Sde5s+covhFlGmozYJjLLk2Jg/qpuUMCjHJS3tCmC6a+51IyeQwyu/3kv
+ TN0D56cmM14L3utBfGjsTeW6As1eoVIw+Fng00DSzR/bzJ+XXRYpUUT33vNG4Ovq69v1
+ tPGgl2JCWpiww+9lkM0LFRumaWpEm4hUWwoUwJQWrYW9G6lr72Za4wbBUWNOUtUQ0MYL
+ iY+Q==
+X-Gm-Message-State: AOAM533opICiGUi/iz7V2ykS+HVzt4JNCoMh/5G0xm02N/og9VR4khZf
+ Ke/Yo+u6fgfCxpFuN4cVK7lGvF/ZPHd4dTHcYDTA5w==
+X-Google-Smtp-Source: ABdhPJxZQqSRBSLDI9EUzJT+l1FIZoC3Opr6HMvoXfkZdku2CgGW48hq5XoMaEbrAAmd/nYdovkROxLRFFgRTXOMVog=
+X-Received: by 2002:a4a:2f15:: with SMTP id p21mr54553250oop.20.1594300706350; 
+ Thu, 09 Jul 2020 06:18:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4e5404a7-20dc-cb5d-6307-b66fae8f77a4@redhat.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:33:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+References: <cover.1593806826.git.jcd@tribudubois.net>
+In-Reply-To: <cover.1593806826.git.jcd@tribudubois.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 Jul 2020 14:18:15 +0100
+Message-ID: <CAFEAcA-vXJdepwhYPZggKJgHV1hDhfzZjQmmCsk9RZzZE9tvmA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] Add ability to choose MDIO phy number to i.MX
+ processors
+To: Jean-Christophe Dubois <jcd@tribudubois.net>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,59 +93,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cleber Rosa <cleber@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Chubb <peter.chubb@nicta.com.au>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 09, 2020 at 03:10:44PM +0200, Thomas Huth wrote:
-> On 09/07/2020 12.33, Paolo Bonzini wrote:
-> > On 09/07/20 12:22, Thomas Huth wrote:
-> >> FWIW, seems like we could use the "pandoc" tool to convert Mediawiki
-> >> (our old Wiki) to Markdown (Gitlab wiki). I've done a quick test and
-> >> converted https://wiki.qemu.org/Contribute/MailingLists into
-> >> https://gitlab.com/huth/qemu/-/wikis/Contribute/MailingLists with some
-> >> few clicks.
-> >>
-> >> But the longer I look at most Wiki pages, the more I think that we
-> >> should convert the important pages rather into a part of qemu-web
-> >> instead. I'll have a closer look and will suggest some patches when time
-> >> permits...
-> > 
-> > The wiki was cleaned up more or less at the same time as the
-> > qemu-web.git repo was created (actually as a prerequisite), it's
-> > actually not in a bad shape.
-> 
-> There are still quite a bit of pages that either contain hardly any
-> usable information or are completely outdated. Paolo, Stefan, may I ask
-> you to check whether the following pages could be deleted? I don't have
-> access rights to delete a page, so if you agree that they are mostly
-> useless, please go ahead and delete them:
+On Sat, 4 Jul 2020 at 20:12, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
+>
+> This patch set adds the ability to select the Ethernet PHY device number
+> for the i.MX25 processor, the i.MX6 processor and the i.MX7 processor.
+>
+> Note: the i.MX6UL processor was addressed in a previous patch.
+>
+> Jean-Christophe Dubois (3):
+>   Add the ability to change the FEC PHY MDIO device number on i.MX25
+>     processor
+>   Add the ability to change the FEC PHY MDIO device number on i.MX6
+>     processor
+>   Add the ability to change the FEC PHY MDIO devices numbers on i.MX7
+>     processor
 
-> - https://wiki.qemu.org/Features/LibvirtWiresharkDissector
->   seems to be a libvirt proposal - IMHO should not be in the QEMU wiki
 
-This was a GSoC project and at that time libvirt GSoC projects were
-under the QEMU umbrella. Libvirt now runs GSoC itself.
 
-Either way, there's no particularly important content here, but it is
-the second hit in google for "libvirt wireshark" ! I'm fine with it
-being removed in general unless we want to keep a record of old GSoc
-projects ?
+Applied to target-arm.next, thanks.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+-- PMM
 
