@@ -2,79 +2,78 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C290FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A38A4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:20:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87D1220767
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:14:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C6442065D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:20:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZiiSf2hy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D1220767
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="axsHK+OZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C6442065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtc0Y-0008Ni-SN
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 15:14:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50936)
+	id 1jtc5m-0001sG-OA
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 15:20:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtbzx-0007hQ-Be
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:14:21 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43512)
+ id 1jtc5B-0001Bz-6U
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:19:45 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45181)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtbzv-00053S-Ge
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:14:20 -0400
-Received: by mail-oi1-x241.google.com with SMTP id x83so2760096oif.10
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 12:14:18 -0700 (PDT)
+ id 1jtc59-0005gP-N6
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:19:44 -0400
+Received: by mail-ot1-x341.google.com with SMTP id h1so2453854otq.12
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 12:19:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=3tmiRfBlz6AR5ERL/X2E9qzH0gGmzWuAAimpyQmTUSg=;
- b=ZiiSf2hyZ9pxd/Vb0cO7sutu44m9AB/YFoqXZr9b2ihtLoV0uIZcjnIlK/8nN4EHi7
- fUOq85oxzu9AWnUKAPUg3e3zhY8SuPjNOmceFZVhl2uO+HLGXlHFxK/NWETJ4jrpjA0o
- 2pQXLFMknpqs2urmXAauynbh04v80ZE+1lscFPzUE+q7KVzT7k2RoVXeWWL6bHr5yg2+
- o4uAOEgqHirczvQLUGQBb4hI2iy3H2M4rv66zZKBzHDG22HUpz4gWd3ssmAtMUMCqk/J
- jZk3dSfvy0XelxaWz6AdKe+zutme3RD0vRWBO/5yNtMwWzQM+YvVKj9HrOn9tclSJ9Qx
- nAOw==
+ bh=P2qYvp66cuwqIuOxXjaqzUeXwAbQY2fv8/ZXtTQnDqM=;
+ b=axsHK+OZoKBvTOTWyMmTiLsz6mEUMP57JgAYTItukgVKlo/j0qVkhSECe8HZgHVXyX
+ InUG1bmqckmmqqk4sOJutFIJ4T6B+emqWgAos8oSyXOJadwIRMWUK/+oWeBckxbExfXI
+ YgXZgcBrHNF7gXQ8M1DUX+gM241cVyRK8ew1phoO+U0J89bkK6gZolJbNxSx0jRlu5OI
+ wQr0J4UFDSukJ126Muo/A9jyHydDDz7iRcB1n6x5QQ1kunFgLnvwOgaZlTvI77eiEiGy
+ SmfCXtyvAhEqq1lx92P/nBacP7Po3bxSYyef1RWdZCS+lsXIBg4VNhFUvMRcOriIWFyt
+ 9VVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=3tmiRfBlz6AR5ERL/X2E9qzH0gGmzWuAAimpyQmTUSg=;
- b=rcvYMjI2zRBuoRyrVhLkh1yaE17K4lHYpbIQvK7lOl/VVP5KL35RCmKOizlX6U7GpM
- pslozsH5zSMv7jt0pXcBkp2kkBkhNwmYchP9R3P3kYW7at2P20G23x4L8juUJ91f42kY
- ebGztxycJrVFub6w+ORlwfCt4ZcecY83e3YtVWFrQgs2jqUDrWK1kiDrdZxOp0lXVoaR
- K5fSLyCzaRRKrZ+ktVkDaQ1djn5HX+indGmSWemnSF05a4T29adLhhhHEndtfLEy5U7R
- EaTHIwopSyI8aIJ58J1X9MiQJk1BwtJIAgfTVP1iBF27kbi/pWvEg42yLW/JQl0TTEAY
- c1sw==
-X-Gm-Message-State: AOAM531Ue/qg9vOMm1cfhfGfAVrEJEn+kEXpzDySh3RTyMosbUVN/u6E
- qdWB48il/BSojCxzs24cm98Zs+oKYxEKCe6ExMHGYQ==
-X-Google-Smtp-Source: ABdhPJyRLvthYFvora3F8m8aDgpJALw3IT020DXRrPtPCELfvbjKYXqBC90IHmi3GTURDz3Xtd2a9IymngKqvYEMIjI=
-X-Received: by 2002:aca:54c9:: with SMTP id i192mr1375678oib.163.1594322058138; 
- Thu, 09 Jul 2020 12:14:18 -0700 (PDT)
+ bh=P2qYvp66cuwqIuOxXjaqzUeXwAbQY2fv8/ZXtTQnDqM=;
+ b=o1HzOsg81e3PtGN2MwDaCTmFiPsmAkKo8S1+abR90fNJ6YuD6Wvi5lkDOhrmL2D//h
+ 4Od7Z/IfjukmXw4+LORj9LnWDnoErwVrnmiU1UXF1kBcY2/jRNZI2LirFWMuR5OO7Q/Y
+ WKSs7lC5SYw2fhY33a0HNePh91NGoPa/chlDgIrKyygqRwHcifNgE92tyw/ATosgTV+g
+ Od6OG1Ba/dm5WjXbe0LjmrUU/Z65GoZ7AL9K7LPnp8k3/c1cFnVFAs+lSVt9vj6a1Smi
+ 50Q+8cRet1VV5KU6gjWxj9HC2vziUDuK8EaGjwUUXyFhe4AnI6RyGmJlGyT8T/9EKT01
+ LYlw==
+X-Gm-Message-State: AOAM530w24yv6n1U3Nw7w9BBDL0qxpNFSki/0Rbb9hVbAPJvDSj32gv7
+ tk94kpMVyh2NjWACsQrkyoqxDMTF2i26YyGSEXd0IA==
+X-Google-Smtp-Source: ABdhPJwJjzA2ifNkU3eDlvaisFuMrHr+T2JLZ/0mj46EDAX5CsUoxVP9ohBunSFd9brEdMXe3hZ3tB5dkBg7UV0opoc=
+X-Received: by 2002:a05:6830:10ce:: with SMTP id
+ z14mr48306860oto.135.1594322382470; 
+ Thu, 09 Jul 2020 12:19:42 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200703201911.26573-1-f4bug@amsat.org>
- <20200703201911.26573-19-f4bug@amsat.org>
-In-Reply-To: <20200703201911.26573-19-f4bug@amsat.org>
+In-Reply-To: <20200703201911.26573-1-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 9 Jul 2020 20:14:07 +0100
-Message-ID: <CAFEAcA98Wz2URx3Pt0YfaoQSPnnMT4wg6HBfzdDO4Zq+4fgT5g@mail.gmail.com>
-Subject: Re: [RFC PATCH 18/18] hw/core/qdev: Display warning for devices
- missing migration state
+Date: Thu, 9 Jul 2020 20:19:31 +0100
+Message-ID: <CAFEAcA8Cu2N5qX55rUk_yd4R6PdJX+X5KPQmMiQPFakP3ShZ-A@mail.gmail.com>
+Subject: Re: [PATCH 00/18] hw: Mark the device with no migratable fields
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -116,41 +115,33 @@ Sender: "Qemu-devel"
 On Fri, 3 Jul 2020 at 21:19, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
 wrote:
 >
-> When built with --enable-qdev-debug, QEMU displays warnings
-> listing devices missing migration state:
+> This is a proof-of-concept after chatting with Peter Maydell
+> on IRC earlier.
 >
->   $ qemu-system-arm -S -M spitz
->   qemu-system-arm: warning: missing migration state for type: 'pxa270-c0-=
-arm-cpu'
->   qemu-system-arm: warning: missing migration state for type: 'serial'
->   qemu-system-arm: warning: missing migration state for type: 'pxa2xx-pcm=
-cia'
->   qemu-system-arm: warning: missing migration state for type: 'pxa2xx-pcm=
-cia'
->   qemu-system-arm: warning: missing migration state for type: 'pxa2xx-i2c=
--slave'
->   qemu-system-arm: warning: missing migration state for type: 'pxa2xx-i2c=
--slave'
->   qemu-system-arm: warning: missing migration state for type: 'ads7846'
->   qemu-system-arm: warning: missing migration state for type: 'max1111'
+> Introduce the vmstate_no_state_to_migrate structure, and
+> a reference to it: vmstate_qdev_no_state_to_migrate.
+> Use this reference in devices with no fields to migrate.
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> RFC because there might be something simpler than --enable-qdev-debug.
+> This is useful to catch devices missing vmstate, such:
+> - ads7846
+> - mcf-uart
+> - mcf-fec
+> - versatile_i2c
+> - ...
+>
+> I am not sure about:
+> - gpex-pcihost
 
-I think where we'd like to get to is installing a migration
-blocker if the machine has any devices which don't have a vmsd.
-But for that we'd need to be pretty sure we'd got all the devices
-on machines where we care about migration, and we're clearly a
-fair way from that (eg we need to do something about the
-devices like the CPU which don't have a vmsd but handle their
-migration some other way so they don't trigger the condition
-for warning/migration-blocker).
+I think it's correct that this has no internal state:
+the only interesting state is in the GPEXRootState, which
+is a TYPE_GPEX_ROOT_DEVICE which migrates itself.
 
-I don't have a strong objection to this --enable-qdev-debug, I guess.
-Another option halfway between this and a full migration-blocker
-would be do a warn_report() for the relevant devices when savevm
-tries to migrate them.
+I made some comments on the "meaty" bits of the patchset,
+and reviewed one or two of the "mark this device as
+having no migration state" patches, but it doesn't seem
+worth reviewing all of them until the migration submaintainers
+have a chance to weigh in on whether they like the concept
+(I expect they're busy right now with freeze-related stuff :-))
 
 thanks
 -- PMM
