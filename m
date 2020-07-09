@@ -2,131 +2,105 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D1AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A05B6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B34D2074B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:20:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BEF22074B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:22:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WzxIvCfq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B34D2074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avKKe0HR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BEF22074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtWT5-0002P9-R6
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:20:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33524)
+	id 1jtWVI-0003Wf-5q
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:22:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtWSV-0001ro-Ia
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:19:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48965
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtWUa-000301-3q
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:21:36 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35038
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtWST-0001Zx-Ve
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:19:27 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtWUY-0001t3-HW
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:21:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594300764;
+ s=mimecast20190719; t=1594300893;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=WK3duEUX9r0p3fcjJ0IQ4V4UP68S5ACcJhSdpfHGt5o=;
- b=WzxIvCfq208JjxzUViTpnj8gLLGhFMou2jZz5bLeGMkPhVKMF1WLd60+023uWnwwz1tnau
- 39+77x+lVcaeXc98xtfczQyUeAd0u/QrphjLzGLEwDCQXEcufx7P8XgsMLeRrc+4DZO8tT
- vLuOuFJoLNB2sqQBn+tT0CcO/awI6pM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-mmZ2nd29NjeyUvgbH-OI5w-1; Thu, 09 Jul 2020 09:19:23 -0400
-X-MC-Unique: mmZ2nd29NjeyUvgbH-OI5w-1
-Received: by mail-wr1-f72.google.com with SMTP id a18so1904449wrm.14
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 06:19:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=WK3duEUX9r0p3fcjJ0IQ4V4UP68S5ACcJhSdpfHGt5o=;
- b=Ceeo8Lsz87wrmvWd1rrW6OfJ6UUbagUyZSGrUByDuIz95DjZ+/ROdH7EeNTT4kiFC2
- O7aDJ8yAPmTJgnO1dh30v5B0VxBrcCyvOiEawRNBoaEsiISL8KJAXkIjQFeDxKBG3G67
- h6VbF4aBiZjJNBcBDYh83eBZywg39KS3oIA+dRzHNSiQdakZ2/CawJLXhccYtlE+tJ0u
- h70mel9wOapuX3xq9J/wv6WUG+52Y61WSbJoThNm2IGx6ZLJKYEOTfoqpXzRRvShxhV0
- kS3Tiv4U4Kcdz27EoBBtiNLzTqvqpDCKP143J5fGzYyOZQRZAOTZIckcuxtZg87yongN
- q14w==
-X-Gm-Message-State: AOAM53134kia75dtsRFUR8DTreXT3KnZ3rvOKvhv77lq6kZi4webj07o
- WnDeAQpFdqWQ7xE06gTQgnaCXxN/p8Q7V8jDgCJPBFRBWnZOOne0laP2xzmOvd64dbh6Z9XzP5A
- V18G0Ho+SQkbV+B0=
-X-Received: by 2002:a7b:c09a:: with SMTP id r26mr14023051wmh.176.1594300762156; 
- Thu, 09 Jul 2020 06:19:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzN+rMv1xaogmCi/8siIG1LIyg2Kuh4I5k/CNvuWJh5QBnF4K5O7U7yk/h4dwF2ZSyMr8mP7w==
-X-Received: by 2002:a7b:c09a:: with SMTP id r26mr14023020wmh.176.1594300761921; 
- Thu, 09 Jul 2020 06:19:21 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id g82sm5004328wma.37.2020.07.09.06.19.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 09 Jul 2020 06:19:21 -0700 (PDT)
-Subject: Re: [PATCH] cpu: Add starts_halted() method
-To: Greg Kurz <groug@kaod.org>
-References: <20200707204333.261506-1-bauerman@linux.ibm.com>
- <20200707214917.GX7276@habkost.net> <87y2nu3nxq.fsf@morokweng.localdomain>
- <c53b36b7-ee7b-bb66-8220-cce788fd631d@redhat.com>
- <20200708100038.GG18595@umbus.fritz.box>
- <CAFEAcA9V7Uha9-rz+JY-5HkazCWuTk1vkLnw1m9Lw-bXXKbkvw@mail.gmail.com>
- <20200708152540.GZ7276@habkost.net>
- <da4b5a4c-7a72-6e07-b423-1487ad358c31@redhat.com>
- <20200708213900.GD780932@habkost.net>
- <714621e2-4585-e6ee-5812-f3a45aa09267@redhat.com>
- <20200709115413.722d4feb@bahia.lan>
- <69e8f708-4fa7-6240-1484-febae0246ae6@redhat.com>
- <20200709125525.29d28d6a@bahia.lan>
- <9951d4cb-7aba-bc65-91be-1fe57393d68e@redhat.com>
- <20200709151320.720fb0f0@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <75d3fffa-1740-0868-cf8f-1dd9fd03b1c3@redhat.com>
-Date: Thu, 9 Jul 2020 15:19:20 +0200
+ bh=nohWBNQJxLDFveFzf7xLGBA1czeRfdxG/kGdca8ONzQ=;
+ b=avKKe0HR2pVLZynym6+2avEUpwYEoA+zKJ/gleYPgf566wCog+MD1XavXN49MNrA038gvs
+ R/s4p93TiePvABPCx9DGyvQ87j+cFxNPD0qO+9o13TQlYML6d8nOZFDY4HNXWdIJYmLg4i
+ YnXlHJ4UP0a52hS9umAfvYUt4sA7JNg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-FNTpWg67PZCtcINYOwX7vg-1; Thu, 09 Jul 2020 09:21:31 -0400
+X-MC-Unique: FNTpWg67PZCtcINYOwX7vg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6351E800EB6;
+ Thu,  9 Jul 2020 13:21:30 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
+ [10.36.113.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F2DF95D98A;
+ Thu,  9 Jul 2020 13:21:28 +0000 (UTC)
+Subject: Re: [PATCH v10 34/34] iotests: Add tests for qcow2 images with
+ extended L2 entries
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1593791819.git.berto@igalia.com>
+ <005fe0f46ca2fbcf1ee9a40a03e4bc6bc2112748.1593791819.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f2c621ad-b4be-0325-d0e2-4eec81e08e03@redhat.com>
+Date: Thu, 9 Jul 2020 15:21:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200709151320.720fb0f0@bahia.lan>
-Content-Language: en-US
+In-Reply-To: <005fe0f46ca2fbcf1ee9a40a03e4bc6bc2112748.1593791819.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:25:10
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="oYiNeQHRccoYjhUbPfSyIF6OnYk1P5pRp"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:20:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -147,84 +121,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Thiago Jung Bauermann <bauerman@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/9/20 3:13 PM, Greg Kurz wrote:
-> On Thu, 9 Jul 2020 14:21:04 +0200
-> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
-> 
->> On 7/9/20 12:55 PM, Greg Kurz wrote:
->>> On Thu, 9 Jul 2020 12:18:06 +0200
->>> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>>
-> 
-> [...]
-> 
->>>>>
->>>>> FYI, PAPR requires all vCPUs to be "stopped" by default. It is up to the
->>>>> guest to start them explicitly through an RTAS call. The hypervisor is
->>>>> only responsible to start a single vCPU (see spapr_cpu_set_entry_state()
->>>>> called from spapr_machine_reset()) to be able to boot the guest.
->>>>>
->>>>> So I'm not sure to see how that would depend on the accelerator...
->>>>
->>>> $ qemu-system-ppc64 -M pseries-5.0,accel=tcg -d in_asm
->>>> qemu-system-ppc64: warning: TCG doesn't support requested feature,
->>>> cap-cfpc=workaround
->>>> qemu-system-ppc64: warning: TCG doesn't support requested feature,
->>>> cap-sbbc=workaround
->>>> qemu-system-ppc64: warning: TCG doesn't support requested feature,
->>>> cap-ibs=workaround
->>>> qemu-system-ppc64: warning: TCG doesn't support requested feature,
->>>> cap-ccf-assist=on
->>>> ----------------
->>>> IN:
->>>> 0x00000100:  48003f00  b        0x4000
->>>>
->>>> ----------------
->>>> IN:
->>>> 0x00004000:  7c7f1b78  mr       r31, r3
->>>> 0x00004004:  7d6000a6  mfmsr    r11
->>>> 0x00004008:  3980a000  li       r12, 0xa000
->>>> 0x0000400c:  798c83c6  sldi     r12, r12, 0x30
->>>> 0x00004010:  7d6b6378  or       r11, r11, r12
->>>> 0x00004014:  7d600164  mtmsrd   r11
->>>> ...
->>>>
->>>> The vCPU doesn't seem stopped to me...
->>>>
->>>> Am I missing something?
->>>>
->>>
->>> Yeah this is the boot vCPU which is required to be started
->>> by the platform as explained above, but if you had more
->>> vCPUs the other ones would be stopped until the guest OS
->>> asks us to start them.
->>
->> Ah OK, so we are good :)
->>
->> The machine simply has to set the 'start-powered-off' flag on
->> all vCPUS except the 1st one.
->>
-> 
-> We only want the first vCPU to start when the platform is
-> fully configured, so I'd rather put 'start-powered-off' on
-> every body and explicitly power on the first one during
-> machine reset as we do now.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oYiNeQHRccoYjhUbPfSyIF6OnYk1P5pRp
+Content-Type: multipart/mixed; boundary="nJNnnZsTBHHCgdTWLOPz2PhJFUU0PvDuq"
 
-I meant "we are good" in reference to the beginning of
-this thread with Thiago and Eduardo:
+--nJNnnZsTBHHCgdTWLOPz2PhJFUU0PvDuq
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-- 'start-powered-off' is a CPU feature (not machine)
-- machine set the 'start-powered-off' field
+On 03.07.20 17:58, Alberto Garcia wrote:
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  tests/qemu-iotests/271     | 901 +++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/271.out | 724 +++++++++++++++++++++++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 1626 insertions(+)
+>  create mode 100755 tests/qemu-iotests/271
+>  create mode 100644 tests/qemu-iotests/271.out
+
+[...]
+
+> diff --git a/tests/qemu-iotests/271.out b/tests/qemu-iotests/271.out
+> new file mode 100644
+> index 0000000000..07c1e7b46d
+> --- /dev/null
+> +++ b/tests/qemu-iotests/271.out
+> @@ -0,0 +1,724 @@
+
+[...]
+
+> +### qemu-img amend ###
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
+> +qemu-img: Toggling extended L2 entries is not supported
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
+> +qemu-img: Toggling extended L2 entries is not supported
+
+With Maxim=E2=80=99s patches, this code in patch 31 became unnecessary, so =
+it
+should now read =E2=80=9Cqemu-img: Invalid parameter 'extended_l2'\nThis op=
+tion
+is only supported for image creation=E2=80=9D.
+
+With that fixed:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--nJNnnZsTBHHCgdTWLOPz2PhJFUU0PvDuq--
+
+--oYiNeQHRccoYjhUbPfSyIF6OnYk1P5pRp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8HGdcACgkQ9AfbAGHV
+z0ABRQf9ESRDbqNvgIVmzFM/2I4TyVJpDVRg1eRu1uSo+PClQag/ZcnRHYXp0yeL
+ygeJt7WRMv4XlQTvPLEM0OT34vd94QPIezethkLi+VA44O05uIPbrHPvnjn8j4/U
+cC5fD8ZHdS5oaLDmfH8c/8PKVcKFZ0Btn15HgvEg6EPHdivseKbuCTTXCHRM1EY/
+r5nLyMsfMGW+lUF/0WHv44yH7XdDZoC6LpvauJuSswwst/oTF4oF6IG08rDxN8Xz
+6v59VwsPQn1ZDtSSG5aTCzZDmlSIiH8H3aCCJeEimbSixy7lr4Dgpe7JQcXkiVoN
+AKYnfKOMZcQvNAOhVk76QBnbh7jWaA==
+=Fe+J
+-----END PGP SIGNATURE-----
+
+--oYiNeQHRccoYjhUbPfSyIF6OnYk1P5pRp--
 
 
