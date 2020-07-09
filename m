@@ -6,68 +6,66 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF70C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 017ABC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:44:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A7DC206DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:43:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD111206DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 19:44:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BjhGlp0o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7DC206DF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8RI5pv7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD111206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtcSb-000718-Bj
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 15:43:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58214)
+	id 1jtcSn-0007b4-UA
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 15:44:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jtcRe-0005fR-1l
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:42:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23201
+ id 1jtcRk-0005p7-TF
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:43:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31261
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jtcRb-0000L6-Fv
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:42:57 -0400
+ id 1jtcRj-0000Ls-DT
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 15:43:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594323774;
+ s=mimecast20190719; t=1594323782;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UZcJrarPJgGm1jV7/efWRXPgvu2LKpJ/mvxKN0TDqE4=;
- b=BjhGlp0oTQnukoCFPGbG/J0Rn8uVVQw4dXkohS+xELag2mrmBclS0p8EHc8sA2qabClEjY
- T1OA8iqgaGDjK6I4v1XImqvWEVQwUwWCep8TK3AO0vikBuPug7yh7jIo+IAdBrYbi9vi28
- 1GZ6SQyublDPp7rCzVZSe88JICiO1DE=
+ bh=te6tqsuUblZeB+laI3sr13z1brb8lvD5tZ2Ty4GUvwY=;
+ b=A8RI5pv7JVpkg5pwcDgfjMcmG4NZod7px0JK+nKbmSgK9Ahkx9yljhcHP2EtTMvWdN9ssF
+ LanNFnOcyJCfEQ6HWQVinCotgnTXVC92zuEpHb3Y7uRErJYkt/LgJM43b3he7/h5CGaTOU
+ +h07aTlNOFj4fdnwPLaEJI5xJZGwsbU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-Jj0fLsdFOyiIaWgSmdr-hQ-1; Thu, 09 Jul 2020 15:42:51 -0400
-X-MC-Unique: Jj0fLsdFOyiIaWgSmdr-hQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-246-1Kj6Rd5yOd2B7XflZL25dA-1; Thu, 09 Jul 2020 15:42:58 -0400
+X-MC-Unique: 1Kj6Rd5yOd2B7XflZL25dA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5FD11B18BC0;
- Thu,  9 Jul 2020 19:42:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 887101B18BC1;
+ Thu,  9 Jul 2020 19:42:57 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DFB825C1C3;
- Thu,  9 Jul 2020 19:42:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F98619D7C;
+ Thu,  9 Jul 2020 19:42:53 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/13] uri: add g_auto macros for URI & QueryParams
-Date: Thu,  9 Jul 2020 23:42:22 +0400
-Message-Id: <20200709194234.2117650-2-marcandre.lureau@redhat.com>
+Subject: [PATCH 02/13] block/nbd: auto-ify URI parsing variables
+Date: Thu,  9 Jul 2020 23:42:23 +0400
+Message-Id: <20200709194234.2117650-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20200709194234.2117650-1-marcandre.lureau@redhat.com>
 References: <20200709194234.2117650-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -106,23 +104,84 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- include/qemu/uri.h | 3 +++
- 1 file changed, 3 insertions(+)
+ block/nbd.c | 27 ++++++++-------------------
+ 1 file changed, 8 insertions(+), 19 deletions(-)
 
-diff --git a/include/qemu/uri.h b/include/qemu/uri.h
-index d201c61260d..b246a59449b 100644
---- a/include/qemu/uri.h
-+++ b/include/qemu/uri.h
-@@ -105,6 +105,9 @@ struct QueryParams *query_params_new (int init_alloc);
- extern QueryParams *query_params_parse (const char *query);
- extern void query_params_free (QueryParams *ps);
+diff --git a/block/nbd.c b/block/nbd.c
+index eed160c5cda..faadcab442b 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -1516,10 +1516,9 @@ static int nbd_client_connect(BlockDriverState *bs, Error **errp)
  
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(URI, uri_free)
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QueryParams, query_params_free)
-+
- #ifdef __cplusplus
+ static int nbd_parse_uri(const char *filename, QDict *options)
+ {
+-    URI *uri;
++    g_autoptr(URI) uri = NULL;
++    g_autoptr(QueryParams) qp = NULL;
+     const char *p;
+-    QueryParams *qp = NULL;
+-    int ret = 0;
+     bool is_unix;
+ 
+     uri = uri_parse(filename);
+@@ -1535,8 +1534,7 @@ static int nbd_parse_uri(const char *filename, QDict *options)
+     } else if (!g_strcmp0(uri->scheme, "nbd+unix")) {
+         is_unix = true;
+     } else {
+-        ret = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+ 
+     p = uri->path ? uri->path : "";
+@@ -1549,26 +1547,23 @@ static int nbd_parse_uri(const char *filename, QDict *options)
+ 
+     qp = query_params_parse(uri->query);
+     if (qp->n > 1 || (is_unix && !qp->n) || (!is_unix && qp->n)) {
+-        ret = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+ 
+     if (is_unix) {
+         /* nbd+unix:///export?socket=path */
+         if (uri->server || uri->port || strcmp(qp->p[0].name, "socket")) {
+-            ret = -EINVAL;
+-            goto out;
++            return -EINVAL;
+         }
+         qdict_put_str(options, "server.type", "unix");
+         qdict_put_str(options, "server.path", qp->p[0].value);
+     } else {
+         QString *host;
+-        char *port_str;
++        g_autofree char *port_str = NULL;
+ 
+         /* nbd[+tcp]://host[:port]/export */
+         if (!uri->server) {
+-            ret = -EINVAL;
+-            goto out;
++            return -EINVAL;
+         }
+ 
+         /* strip braces from literal IPv6 address */
+@@ -1584,15 +1579,9 @@ static int nbd_parse_uri(const char *filename, QDict *options)
+ 
+         port_str = g_strdup_printf("%d", uri->port ?: NBD_DEFAULT_PORT);
+         qdict_put_str(options, "server.port", port_str);
+-        g_free(port_str);
+     }
+ 
+-out:
+-    if (qp) {
+-        query_params_free(qp);
+-    }
+-    uri_free(uri);
+-    return ret;
++    return 0;
  }
- #endif
+ 
+ static bool nbd_has_filename_options_conflict(QDict *options, Error **errp)
 -- 
 2.27.0.221.ga08a83db2b
 
