@@ -2,79 +2,123 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C714AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:08:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 269B120767
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 964192078B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:08:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GV6HelsQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269B120767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="lKxh29/0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 964192078B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtZ5W-0002pi-Dr
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 12:07:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56662)
+	id 1jtZ5n-0003IE-Th
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 12:08:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtZ2m-0007T8-Ti
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:05:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46022
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtZ2j-0000zv-Ug
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:05:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594310700;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=1uP0rRX5sys7IyYf81527/O/Op13w4EXz/SwyxzIwdA=;
- b=GV6HelsQoLwk++MxE0UjeMvWtL4p0wc8lcaOTCt5B/igP1eACHs3I9XXbt2Hd0aTFgYEJY
- NzFnQ0hxjc3zkTvVzJ+LRGsPvunxpluhdnmWZgNG50hR5y0ZuaItq4aVZf2TJK7Ti2Rvfv
- b3AVWnKF9TjG5l2gTX/1JkcUrPJmeFo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-D1ihEJy-OiylAYsqzMmpqQ-1; Thu, 09 Jul 2020 12:04:43 -0400
-X-MC-Unique: D1ihEJy-OiylAYsqzMmpqQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D3D8186A8DE;
- Thu,  9 Jul 2020 16:04:42 +0000 (UTC)
-Received: from thuth.com (ovpn-112-106.ams2.redhat.com [10.36.112.106])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3098B60BE2;
- Thu,  9 Jul 2020 16:04:40 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
-	Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH] docs/system/s390x: Improve the 3270 documentation
-Date: Thu,  9 Jul 2020 18:04:39 +0200
-Message-Id: <20200709160439.15088-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 10:34:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jtZ56-0002QS-7M
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:07:28 -0400
+Received: from mail-eopbgr80111.outbound.protection.outlook.com
+ ([40.107.8.111]:38927 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jtZ54-0001Sj-9j
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:07:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=obIm3zmXu0ekq/s1jZJn6ksDk0O+qufZCQaAHs0zap3lMijIX35VMBRHlgha8hCVeqxLcHp4iGy5wZ1RtEZbkK2gL7o4SVyaCFksliVAtkQknICRHvdfywgnyfwGO+J9R/m10VVeQ2jc35Sb3f71RhICcyKnxUCVr4GSuppEdUHpZBxcEIiT1iR6XwwRiY+cHei3/tKOBPTR65+bSC6kn6OFXLq6z6m9YUcBRsgY8N3px/wiXTNu8GmHUeqAjBce6FdR6tyG/Ok/VQmTYxH0w/Z/kW0udiDzIXDYYRVllUhXD+F190Clli3VdQ8StIZnys3PT+tbK3jsbtYOd2XCWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JqbrL1uyqJdKso/LidwZnYhWNbWd5W1B7hd6KlVBqD0=;
+ b=mz5DsE4Qatp/l8VbIykqv0YCk4ZZVXJJ9I7a7DFBgQr5dZgk9YlUoPDrGpocvSaKbmjEjKHj7D48DaRUkDVYzdFR530Qu2seX0ushpLDlZ2LPBYMRCafUdHUnvpiIS0SNhxtfG/xy3K+hKlZW0Di0GbTSE6H39G35/ksSWF6ZYvl7Vi5wENJwTxvBJXFdX3K+0Kfqom1uvbHFTpI4aJcCBQvaWvWqPH7kRUAJbRdwLf4niwUKGrU2JiSCylk7QNwoEmuFA7H5aRSoksxN73sXSFnZrYrr5jYIF3GAslvpRcXRdwkv8kwFt0c7w1T73orl+++4HIsUhr6fUvCF6HowQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JqbrL1uyqJdKso/LidwZnYhWNbWd5W1B7hd6KlVBqD0=;
+ b=lKxh29/0gIl8/BkawqdjoyKgeFghHKf0NppmFi99yEi7Q8GrDm7RGzKT6A/QobhLFSHUQW7fDxJhnTR6A1G0P8Bgc1ZJImxeLDYY4qDWG1NCekoPJAR31tpq2DOxHPgxgaCwNT2yE5oN9Ro8/RIYQFapqePKvudWtic/trqKdnM=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
+ by AM6PR0302MB3223.eurprd03.prod.outlook.com (2603:10a6:209:1d::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.27; Thu, 9 Jul
+ 2020 15:52:20 +0000
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3174.021; Thu, 9 Jul 2020
+ 15:52:20 +0000
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] Add support for a group of btrfs filesystem ioctl
+Date: Thu,  9 Jul 2020 17:51:59 +0200
+Message-Id: <20200709155203.21106-1-Filip.Bozuta@syrmia.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM3PR07CA0147.eurprd07.prod.outlook.com
+ (2603:10a6:207:8::33) To AM6PR03MB5233.eurprd03.prod.outlook.com
+ (2603:10a6:20b:d1::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (109.245.225.24) by
+ AM3PR07CA0147.eurprd07.prod.outlook.com (2603:10a6:207:8::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3174.8 via Frontend Transport; Thu, 9 Jul 2020 15:52:19 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [109.245.225.24]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4f864539-9de3-4877-c870-08d824201013
+X-MS-TrafficTypeDiagnostic: AM6PR0302MB3223:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR0302MB32238A6DB7B9D5C24AB02F2BEB640@AM6PR0302MB3223.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
+X-Forefront-PRVS: 04599F3534
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tj/oTro/vUJMhlLUS0CfvtCbzkfX5l/mljUp09bQ+4OO+iKLBCll9AzpXr04LhykbxhF/nCOIyOxvUx6YiFBMCnW550CnUjksnX3iIH5rvUlI77a6RKFgv058tXWzXgl/bhj8fHeDST9oUPWFl1X+jh9ncpBLlvhi78jaur48xW4HwHcCsP/+BNDeA+kCGuvdDJmyjs6Mu6bK3xgO4Nhw+mNI7cmzMmPhkhWWRgtSxcJg6AFHejtj7agRfds80jwjhmS6xwqXnUrWiXeRP1Z/2YoLwzEAVHsHKlTNIdxbg8wvnhO29CMG+335kTvY+DnB5FZ+GAdJUo90+yx87ErqFKapm+HerQh9hYFof4bXVIscEM5dP9kQrtbIgB90gZ5xgXRFEgBvf5L590bqQr+Xgr3g0o73HSlhd2HNqPbC4S/39MY8tXJ0FPE8+4JpBSsxkNtxVaddVTbiaH8KSwtQg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(376002)(396003)(39830400003)(366004)(136003)(346002)(66946007)(66476007)(16526019)(186003)(66556008)(26005)(36756003)(52116002)(2616005)(966005)(956004)(6506007)(6916009)(107886003)(2906002)(6486002)(83380400001)(54906003)(6512007)(86362001)(1076003)(4326008)(8676002)(508600001)(5660300002)(316002)(6666004)(69590400007)(8936002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: FDjse/CbvLNM8HrNiVrDwnehuGu7r/h1JvcDsUL0o3XQ8OtFqvYc2k4mHhXVsenHC/L+W3aSvmIqYsGHC+hD+ZgX5cKccc4w0mJLMZIJVrFDz9eInVp7TZmcRTRA1pWrMQOj7zF+M9fdAms6gEwd5y9zbLN5PpYerDxrberpBiOs4brw5k5VastC5b0gVd1xDtNwQMk2PvEOnJ21JE9IORg/a1vBZLOLA9Nl5Kxrd2Cm9N/JT7rVK77Q3A0gMAxI7H+ngyM78VSIxO7xwYDAZsyd1AMfOYeFpe1LvpGBjW+oHWYckhieTqdjfNbSS1ZRrCZwemiPK+UgKPRidNXK/UEuTNNNqN1FaBBbDWcrZVGTRyNtTkU+sszUA9f77JE1qWLumUnfxp2m3skYb2zUdG+djRZNYwHdGk1OJ6wKP3cUo2Czl19SoxJXVMfhAj1t3LPuOBHr8ajny7B+d1cvPzp0M6/uBy/X1YWvCk8Q0ag=
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f864539-9de3-4877-c870-08d824201013
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2020 15:52:20.2639 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 028yL9R2JPsHd4BEHaUCkOo5VnLPtHSmEnNPc4Wa4tX+Uj3nEHvJ0tMCT+afKUNy1CSwhKQGvyyYMcdtIrkaLA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR0302MB3223
+Received-SPF: pass client-ip=40.107.8.111;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 12:07:24
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -4
+X-Spam_score: -0.5
+X-Spam_bar: /
+X-Spam_report: (-0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ RCVD_IN_SBL_CSS=3.335, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,89 +131,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is some additional information about the 3270 support in our
-Wiki at https://wiki.qemu.org/Features/3270 - so let's include this
-information into the main documentation now to have one single
-source of information (the Wiki page could later be removed).
+This series covers support for following btrfs ioctls
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- docs/system/s390x/3270.rst | 43 ++++++++++++++++++++++++++++++++------
- 1 file changed, 37 insertions(+), 6 deletions(-)
+    *BTRFS_SUBVOL_CREATE      *BTRFS_IOC_ADD_DEV
+    *BTRFS_SUBVOL_SETFLAGS    *BTRFS_IOC_RM_DEV
+    *BTRFS_SUBVOL_GETFLAGS    *BTRFS_IOC_DEV_INFO
+    *BTRFS_GET_SUBVOL_INFO    *BTRFS_IOC_GET_DEV_STATS
+    *BTRFS_IOC_SNAP_CREATE    *BTRFS_IOC_GET_FEATURES
+    *BTRFS_IOC_SNAP_DESTROY   *BTRFS_IOC_SET_FEATURES
+    *BTRFS_IOC_SCAN_DEV       *BTRFS_IOC_GET_SUPPORTED_FEATURES
 
-diff --git a/docs/system/s390x/3270.rst b/docs/system/s390x/3270.rst
-index 1774cdcadf..80350264d7 100644
---- a/docs/system/s390x/3270.rst
-+++ b/docs/system/s390x/3270.rst
-@@ -1,9 +1,15 @@
- 3270 devices
- ============
- 
--QEMU supports connecting an external 3270 terminal emulator (such as
--``x3270``) to make a single 3270 device available to a guest. Note that this
--supports basic features only.
-+The 3270 is the classic 'green-screen' console of the mainframes (see the
-+`IBM 3270 Wikipedia article <https://en.wikipedia.org/wiki/IBM_3270>`__).
-+
-+The 3270 data stream is not implemented within QEMU; the device only provides
-+TN3270 (a telnet extension; see `RFC 854 <https://tools.ietf.org/html/rfc854>`__
-+and `RFC 1576 <https://tools.ietf.org/html/rfc1576>`__) and leaves the heavy
-+lifting to an external 3270 terminal emulator (such as ``x3270``) to make a
-+single 3270 device available to a guest. Note that this supports basic
-+features only.
- 
- To provide a 3270 device to a guest, create a ``x-terminal3270`` linked to
- a ``tn3270`` chardev. The guest will see a 3270 channel device. In order
-@@ -12,10 +18,14 @@ to actually be able to use it, attach the ``x3270`` emulator to the chardev.
- Example configuration
- ---------------------
- 
-+* Make sure that 3270 support is enabled in the guest's kernel. You need
-+  ``CONFIG_TN3270`` and at least one of ``CONFIG_TN3270_TTY`` (for additional
-+  ttys) or ``CONFIG_TN3270_CONSOLE`` (for a 3270 console).
-+
- * Add a ``tn3270`` chardev and a ``x-terminal3270`` to the QEMU command line::
- 
--    -chardev socket,id=char_0,host=0.0.0.0,port=2300,nowait,server,tn3270
--    -device x-terminal3270,chardev=char_0,devno=fe.0.000a,id=terminal_0
-+   -chardev socket,id=ch0,host=0.0.0.0,port=2300,nowait,server,tn3270
-+   -device x-terminal3270,chardev=ch0,devno=fe.0.000a,id=terminal0
- 
- * Start the guest. In the guest, use ``chccwdev -e 0.0.000a`` to enable
-   the device.
-@@ -29,4 +39,25 @@ Example configuration
- 
-     systemctl start serial-getty@3270-tty1.service
- 
--This should get you an addtional tty for logging into the guest.
-+  This should get you an addtional tty for logging into the guest.
-+
-+* If you want to use the 3270 device as the kernel console instead of an
-+  additional tty, you can also append ``conmode=3270 condev=000a`` to the
-+  guest's kernel command line. The kernel then should use the 3270 as
-+  console after the next boot.
-+
-+Restrictions
-+------------
-+
-+3270 support is still experimental. In particular:
-+
-+* Only one 3270 device is supported.
-+
-+* It has only been tested with Linux guests and the x3270 emulator.
-+
-+* TLS/SSL is not yet supported.
-+
-+* Resizing on reattach is not yet supported.
-+
-+* Multiple commands in one inbound buffer (for example, when the reset key
-+  is pressed while the network is slow) are not yet supported.
+The functionalities of individual ioctls were described in this series
+patch commit messages. Since all of these ioctls are added in kernel
+version 3.9, their definitions in file 'linux-user/ioctls.h' are
+enwrapped in an #ifdef directive.
+
+Testing method:
+
+    Mini test programs were written for these ioctls. These test programs
+    can be found on a repositort which is located on the link:
+    https://github.com/bozutaf/btrfs-tests
+
+    These test programs were compiled (sometimes using cross compilers) for
+    following architectures:
+
+         * Intel 64-bit (little endian)
+         * Power pc 32-bit (big endian)
+         * Power pc 64-bit (big endian)
+
+    The corresponding native programs were executed without using QEMU on
+    an intel x86_64 host.
+
+    All applicable compiled programs were in turn executed through QEMU
+    and the results obtained were the same ones gotten for native
+    execution.
+
+Filip Bozuta (4):
+  linux-user: Add support for a group of btrfs ioctls used for
+    subvolumes
+  linux-user: Add support for a group of btrfs ioctls used for snapshots
+  linux-user: Add support for btrfs ioctls used to manipulate with
+    devices
+  linux-user: Add support for btrfs ioctls used to get/set features
+
+ configure                  |  9 ++++++
+ linux-user/ioctls.h        | 59 ++++++++++++++++++++++++++++++++++++++
+ linux-user/syscall.c       |  3 ++
+ linux-user/syscall_defs.h  | 32 +++++++++++++++++++++
+ linux-user/syscall_types.h | 49 +++++++++++++++++++++++++++++++
+ 5 files changed, 152 insertions(+)
+
 -- 
-2.18.1
+2.25.1
 
 
