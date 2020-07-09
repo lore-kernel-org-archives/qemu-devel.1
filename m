@@ -2,99 +2,97 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32661C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A53CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1DEC208A7
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:35:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 586D1207BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:39:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzjhOI9k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1DEC208A7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GwITJ2Ch"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586D1207BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtWhj-0004qu-9k
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:35:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38572)
+	id 1jtWmB-0007Mb-LO
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:39:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtWgv-0004Qa-P1
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:34:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50966
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtWgt-0003je-AD
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:34:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594301658;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=pDsqSQQ8gP0qR3ZQLjnVIJ/ymoSLCPmhFPtjAoidZQ8=;
- b=NzjhOI9kUigxCVzcH7DHFu+ATfk4OBWWvGr69c4h/46qYjLUIKa0yhBp7FeLXsfj6FGxLp
- b2JBxDwZsvBST7Uot+ve2pXWDL0GQ1nMN4we8b/bXN1/XpdnuosF1VEGGZwI9jYV8D1mtj
- fjPmuF61Rkaqvj91AoLDKeAdWD9Zhkg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-SdXlpLbLMkG3i0ZMkB_sFw-1; Thu, 09 Jul 2020 09:34:16 -0400
-X-MC-Unique: SdXlpLbLMkG3i0ZMkB_sFw-1
-Received: by mail-wm1-f70.google.com with SMTP id q20so2181695wme.3
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 06:34:16 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtWlU-0006RA-3n; Thu, 09 Jul 2020 09:39:04 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56028)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtWlS-0004R3-EC; Thu, 09 Jul 2020 09:39:03 -0400
+Received: by mail-wm1-x341.google.com with SMTP id g75so1835333wme.5;
+ Thu, 09 Jul 2020 06:39:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=IMAkJsQQS63Q07JJMyqhaX6Y/9enYz61VenxRjMy40c=;
+ b=GwITJ2Chbft3/qxp5OL2M0q4asDG0nPH42mL2uvWLSoh9xhWA/sD2lh0+WmbI+Kpbm
+ OcxTuN1JIxqOu1Kg5ruXD5Es854msFPJH8dLUbt6/kM4XMwa72ehURnSNzMnTnQMzr+W
+ Oku7dVDdxZxvp2sIgD0yzIr8q2nTtBDqR3CJ/1Qo1BZ2Wcdb6Izsp99HKMH6y2im+mW0
+ d49ubplfCshZwmNIQXikFUUqjPEdzuAcaFydYSBmCQpVQA2UQor2NS3glgBQ25QSKCHf
+ HVflyRmFGjOlT4qZLdCeNBJPg7BMrJgCwBS50zyG1KSP4Zxrp/adaJza5fx/A1RjDxOf
+ GTXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=pDsqSQQ8gP0qR3ZQLjnVIJ/ymoSLCPmhFPtjAoidZQ8=;
- b=QVBi3E8cKZkCIWOtF47FT5C6wnU9qbIq9NFrDhKPuUke2bRhHVHKMYdlA2+6/W8xzW
- 0Cr4o1aNM/wmqCNi/FAxNUgfs+eQ2ryLItjGfB9y3Xtru+jgEFTaG3TSkX9RTcNtNpz4
- rLHKpTavgdRT7LKLY0uF8dJl//96gxsFuPv6o+5mnVitf2LV620sG/ts2gN9E5iC2/l8
- HStgi4yUUL6/WzbnRX51R5UR0musXran4/SzsgipuvhGH+x/BEorKZcFKgPbFVZr0RvJ
- 0je4q/L5bRl37tiQ4kWAeh43Z+hs2+3eIhQYRgIj0sVBFNF90hcGC01LdRGCmkio5Rnq
- C1TA==
-X-Gm-Message-State: AOAM530P5A7+lzkFhoybF35CaX7NTRGdmOADU4geh1mpIXF/y/73MOYU
- hY2vvheU3GtGTFTueZ0mDxzSWGVMYZ9qAyla1HvJtHJoZjMRvOIo0+Ayqe8RGb0mYsfBEtkTCjQ
- eg7cQ3Ze7h7uusHs=
-X-Received: by 2002:a7b:ca52:: with SMTP id m18mr41127wml.92.1594301654881;
- Thu, 09 Jul 2020 06:34:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyRjD47pMoPv0Pykkc+NwbLHI+zwl5flW3MmhaXslaZfGB8TM4R0VeYQvZVs/EBeKHXQ8TkOg==
-X-Received: by 2002:a7b:ca52:: with SMTP id m18mr41031wml.92.1594301653713;
- Thu, 09 Jul 2020 06:34:13 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 65sm6350358wre.6.2020.07.09.06.34.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Jul 2020 06:34:13 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] softmmu/vl: Include "qemu/rcu.h" for rcu_disable_atfork()
-Date: Thu,  9 Jul 2020 15:34:11 +0200
-Message-Id: <20200709133411.23929-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+ bh=IMAkJsQQS63Q07JJMyqhaX6Y/9enYz61VenxRjMy40c=;
+ b=ehMianQI8pkKr5yPlsukCWjA/tAk5kJM1F8lsLc3J6jiigLuppFvpfd5UWQ2g8CM5N
+ zc9r/rbyBtY4YOdcqdKdsBV3YztwcslH2KEoueqk8iMbl1XcYkdJHbv5kg34uZaKfpiS
+ pu4gALhE+vTYoUeRfVrBAZazLzoXogYn314OOFnBG1xRS4JVla5wNAtXAXFq4hCftTbk
+ Q7lZIKJ6YnUAsCelOQ4jIzEruwV7avgqoZbx4A2xtRo1GOo0Bshcpc8A7riDIrgmyxhb
+ Ul87dhqhysPuUFLSqdyca+szfv7u9bjLnTqLVzsrcoqQqueiUzwIFzbkGZB5CKZr+X45
+ OJng==
+X-Gm-Message-State: AOAM531mr0vJbgF7N2KfJcaHWnQ/g1QGPNVV5ya33s1svkQ9tk1AdjXT
+ lCgcBFWYxNqE4afHcd757XwUdNUTV8E=
+X-Google-Smtp-Source: ABdhPJxXPjk99ZIrLW7Z3jxWnHgoT2fh0qmhvHStHHXIUx6XPzr/uzLcMAV3FnCq7NXSRfG9WHSrwQ==
+X-Received: by 2002:a1c:2e58:: with SMTP id u85mr6597wmu.123.1594301940287;
+ Thu, 09 Jul 2020 06:39:00 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id q7sm5973238wrs.27.2020.07.09.06.38.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 09 Jul 2020 06:38:59 -0700 (PDT)
+Subject: Re: [PATCH] Fix MIPS add.s after
+ 1ace099f2acb952eaaef0ba7725879949a7e4406
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
+References: <20200703161515.25966-1-Alexander.Richardson@cl.cam.ac.uk>
+ <CAL1e-=huJ8hLCb7gG=cZ6bXcqMOUSA17NHpnCEED18MR4mKXhw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7449e90a-7d04-5a4c-d301-21a46242a1a6@amsat.org>
+Date: Thu, 9 Jul 2020 15:38:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 01:47:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAL1e-=huJ8hLCb7gG=cZ6bXcqMOUSA17NHpnCEED18MR4mKXhw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,38 +105,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In commit 73c6e4013b we let vl.c use rcu_disable_atfork()
-which is declared in "qemu/rcu.h", but forgot to include
-this header. Fortunately has never been a problem since
-vl.c includes "exec/memory.h" which includes "qemu/rcu.h".
+Hi Aleksandar,
 
-Include the missing header now in case we split vl.c later.
+On 7/7/20 6:26 PM, Aleksandar Markovic wrote:
+> On Fri, Jul 3, 2020 at 6:33 PM Alex Richardson
+> <Alexander.Richardson@cl.cam.ac.uk> wrote:
+>>
+>> After merging latest QEMU upstream into our CHERI fork, I noticed that
+>> some of the FPU tests in our MIPS baremetal testsuite
+>> (https://github.com/CTSRD-CHERI/cheritest) started failing. It turns out
+>> this commit accidentally changed add.s into a subtract.
+>>
+>> Signed-off-by: Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
+>> ---
+> 
+> Applied to MIPS + TCG Continuous Benchmarking queue.
 
-Fixes: 73c6e4013b ("rcu: disable pthread_atfork callbacks ASAP")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- softmmu/vl.c | 1 +
- 1 file changed, 1 insertion(+)
+If you don't mind I'll include this patch for the mips pull request I
+plan to send before hard freeze (on the list). I'm keeping your S-o-b.
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index ecbc18ba75..f243745c51 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -83,6 +83,7 @@
- #include "qemu/config-file.h"
- #include "qemu-options.h"
- #include "qemu/main-loop.h"
-+#include "qemu/rcu.h"
- #ifdef CONFIG_VIRTFS
- #include "fsdev/qemu-fsdev.h"
- #endif
--- 
-2.21.3
+> 
+>>  target/mips/fpu_helper.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+>> index 7a3a61cab3..56beda49d8 100644
+>> --- a/target/mips/fpu_helper.c
+>> +++ b/target/mips/fpu_helper.c
+>> @@ -1221,7 +1221,7 @@ uint32_t helper_float_add_s(CPUMIPSState *env,
+>>  {
+>>      uint32_t wt2;
+>>
+>> -    wt2 = float32_sub(fst0, fst1, &env->active_fpu.fp_status);
+>> +    wt2 = float32_add(fst0, fst1, &env->active_fpu.fp_status);
+>>      update_fcr31(env, GETPC());
+>>      return wt2;
+>>  }
+>> --
+>> 2.27.0
+>>
+>>
+> 
 
 
