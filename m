@@ -5,83 +5,82 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD0EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7815C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:07:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D2C520663
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83B4120663
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PsW8fobP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D2C520663
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r2PBewpq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B4120663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtTRt-0003SP-Fy
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 06:06:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52684)
+	id 1jtTSn-0004RJ-RW
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 06:07:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jtTRA-0002za-Jt; Thu, 09 Jul 2020 06:05:52 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42143)
+ id 1jtTRB-0002zk-FI; Thu, 09 Jul 2020 06:05:53 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:34922)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jtTR8-0005Jk-UO; Thu, 09 Jul 2020 06:05:52 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m22so766267pgv.9;
- Thu, 09 Jul 2020 03:05:50 -0700 (PDT)
+ id 1jtTR9-0005Jr-VH; Thu, 09 Jul 2020 06:05:53 -0400
+Received: by mail-pl1-x643.google.com with SMTP id x9so652141plr.2;
+ Thu, 09 Jul 2020 03:05:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AMyr7dWDU73aKt2+6divzOJRdddWTJsk4BMrMGpRhgw=;
- b=PsW8fobPnVQH0or/eZWzSMjyz42ZHEsBkYcsE3icVUBrgglScIGwSAJ5gkSngnKHCQ
- /Lzybe/A0+HIlpk4xyLf1rSxQnSr5G9wqunxx+25Fi6YUGeIcRZg4UPP1FhOjGKoJfJh
- undjdmEmG6mI6GnLRIJtYXwieQfTq0dRKD85tbXPs7NzkqazOVzMZVjY1i4AmiOoxzWu
- D2iqcdfFw5daTE5fvMfcfLl1yDLaPwNIL7pY6joFyLxOhpfIdUaKdhEkZq3qc5X3LrHM
- YM/oGX6o0Gh/fIGmr27UKW2q4whkpPfBa+VPf94IHy55zyFs5NHxCE5Guz7ZJZ+KvAur
- 8ZHA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=mm+f7F/Pdu5zigQk44EA/Ex1Vg2tqyqtOfNiVV6EHYA=;
+ b=r2PBewpqJTFDfFdFds1X2/yFvJT64aXWjBaTQlcIrmIYJCwfAhc3s24fDQCU9q1pcw
+ gzuU88ye67HoLpJrA2P+pNB7HWxc95TggaMRbQQ63Umfd2J/OIe23CB7I0+eAkPt2DuK
+ 2asrtujfTW27ShQ3pfu3UQcjpIjTOlTJDYvWhQ4+3b3tLAqNpS1aqfiFMmt9AmAKs4Xe
+ JbFgXU7kR6PmOt3rcYP9pyzAcEvJcXXHRouZIrJ+1d+biRyF53hSi7B9MemcxZIDgq8F
+ v3KKPEUmzn2ERsqXqC90TvWtT4ojb+rEzk9xlrAqRRHBlIxOPhD8rcnxjTNtcyj5R2wB
+ YHqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AMyr7dWDU73aKt2+6divzOJRdddWTJsk4BMrMGpRhgw=;
- b=QXfEtn8VxOSQH9pOWegnuj6Y6062RLlC7eMNK0YxQ2vBNVXLSXPQPrWj8GrbETXIs5
- +1/FTtYOIK3TiU5Xamd2SAJgIMZTrMbF2JgWuUHNgplbp5zZIrtWdy/oByK171KRtlsA
- gAltHk0KeFLzd5s7uYBPAgndCIDvCJSYwZgPwCMr46NhCl6gH46FGZe9FfEqGncTjdp2
- 0OGO7krTBYxANPQ2ps2GrWVsOnh9n8F68piv2O6nXXIN3EuDLhThx4otrzgWgY6/NFDG
- H18+MXKiS8qCHr/TRCj24o+iKepq20byb4+vZTDjEgZd3amiv70tbpjxqf5K+438vXde
- TiKw==
-X-Gm-Message-State: AOAM530r9A9juN4Ikb2eCmaVIOvri8REDSYUayY0L4+jn5MoORp5xu6b
- Rqg+B3+xP0BSiXoDZWaWvCc=
-X-Google-Smtp-Source: ABdhPJyCra5Czz21hjT4yVZQ6G7k1HetCZAaL3tU/+9FIDWY5QcvNkH0PjU1Xz0pdQf+V5kOjw7MXQ==
-X-Received: by 2002:a62:ce83:: with SMTP id
- y125mr55219087pfg.181.1594289149059; 
- Thu, 09 Jul 2020 03:05:49 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=mm+f7F/Pdu5zigQk44EA/Ex1Vg2tqyqtOfNiVV6EHYA=;
+ b=pZwUGMWbwNjyCA7TT8z64/lSW0EhgbW0UsfYWIj8HxHWUTZHwt7OoeaVz8Bn2TQuiz
+ ecduJOSXJpaD69T3FFQsyz+j66vNVAmpSb5Rht4NaLFU1ia7hjLBhMUjavgmg0lXsh6l
+ tf+xZIi/J7wYdB3meMtveaQtXuwaDZTJIY0oTAe5iH/oFqxW+Xm4mWIlMOvOJQ3BOO+j
+ LSR4RJ5B7003V8vlbHmcxoA2k38/ieee3rbKLzDvjbD6trccd8Y2Tr29Sax0HEnU4Je9
+ 13LU1Errmee4cHTC6kFU8PRpfuA4+vcgp/Z3nkbBiY7mWpBQTzfK24ryEPEafhjOjRlx
+ w6QA==
+X-Gm-Message-State: AOAM530vN+rQ8W6TxAJwLnSRMTk6nIAXW3rMKPaFFGEsLbWuEnAqhu/X
+ 735A2GXfpG3HpBM9tFrPp3g=
+X-Google-Smtp-Source: ABdhPJyIGAu+BOVUWelra4LrtVxE5f5UcZfBtGsvxfPcDcgyt1H7orDdzGDowMC914vpqZy26m5tJw==
+X-Received: by 2002:a17:902:ff0c:: with SMTP id
+ f12mr54612815plj.254.1594289150049; 
+ Thu, 09 Jul 2020 03:05:50 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id cv7sm2093972pjb.9.2020.07.09.03.05.48
+ by smtp.gmail.com with ESMTPSA id cv7sm2093972pjb.9.2020.07.09.03.05.49
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Thu, 09 Jul 2020 03:05:48 -0700 (PDT)
+ Thu, 09 Jul 2020 03:05:49 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmerdabbelt@google.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Subject: [PATCH v2 1/2] hw/riscv: Modify MROM size to end at 0x10000
-Date: Thu,  9 Jul 2020 03:05:43 -0700
-Message-Id: <1594289144-24723-1-git-send-email-bmeng.cn@gmail.com>
+Subject: [PATCH v2 2/2] hw/riscv: sifive_u: Provide a reliable way for
+ bootloader to detect whether it is running in QEMU
+Date: Thu,  9 Jul 2020 03:05:44 -0700
+Message-Id: <1594289144-24723-2-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=bmeng.cn@gmail.com; helo=mail-pg1-x543.google.com
+In-Reply-To: <1594289144-24723-1-git-send-email-bmeng.cn@gmail.com>
+References: <1594289144-24723-1-git-send-email-bmeng.cn@gmail.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,60 +109,62 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-At present the size of Mask ROM for sifive_u / spike / virt machines
-is set to 0x11000, which ends at an unusual address. This changes the
-size to 0xf000 so that it ends at 0x10000.
+The reset vector codes are subject to change, e.g.: with recent
+fw_dynamic type image support, it breaks oreboot again.
+
+Add a subregion in the MROM, with the size of machine RAM stored,
+so that we can provide a reliable way for bootloader to detect
+whether it is running in QEMU.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 ---
 
-(no changes since v1)
+Changes in v2:
+- correctly populate the value in little-endian
 
- hw/riscv/sifive_u.c | 2 +-
- hw/riscv/spike.c    | 2 +-
- hw/riscv/virt.c     | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ hw/riscv/sifive_u.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index dc46f64..3413369 100644
+index 3413369..79519d4 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -70,7 +70,7 @@ static const struct MemmapEntry {
-     hwaddr size;
- } sifive_u_memmap[] = {
-     [SIFIVE_U_DEBUG] =    {        0x0,      0x100 },
--    [SIFIVE_U_MROM] =     {     0x1000,    0x11000 },
-+    [SIFIVE_U_MROM] =     {     0x1000,     0xf000 },
-     [SIFIVE_U_CLINT] =    {  0x2000000,    0x10000 },
-     [SIFIVE_U_L2LIM] =    {  0x8000000,  0x2000000 },
-     [SIFIVE_U_PLIC] =     {  0xc000000,  0x4000000 },
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index a187aa3..ea4be98 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -57,7 +57,7 @@ static const struct MemmapEntry {
-     hwaddr base;
-     hwaddr size;
- } spike_memmap[] = {
--    [SPIKE_MROM] =     {     0x1000,    0x11000 },
-+    [SPIKE_MROM] =     {     0x1000,     0xf000 },
-     [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
-     [SPIKE_DRAM] =     { 0x80000000,        0x0 },
- };
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 5ca49c5..37b8c55 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -53,7 +53,7 @@ static const struct MemmapEntry {
-     hwaddr size;
- } virt_memmap[] = {
-     [VIRT_DEBUG] =       {        0x0,         0x100 },
--    [VIRT_MROM] =        {     0x1000,       0x11000 },
-+    [VIRT_MROM] =        {     0x1000,        0xf000 },
-     [VIRT_TEST] =        {   0x100000,        0x1000 },
-     [VIRT_RTC] =         {   0x101000,        0x1000 },
-     [VIRT_CLINT] =       {  0x2000000,       0x10000 },
+@@ -88,6 +88,7 @@ static const struct MemmapEntry {
+ 
+ #define OTP_SERIAL          1
+ #define GEM_REVISION        0x10070109
++#define MROM_RAMSIZE_OFFSET 0xf8
+ 
+ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     uint64_t mem_size, const char *cmdline)
+@@ -496,6 +497,26 @@ static void sifive_u_machine_init(MachineState *machine)
+     riscv_rom_copy_firmware_info(memmap[SIFIVE_U_MROM].base,
+                                  memmap[SIFIVE_U_MROM].size,
+                                  sizeof(reset_vec), kernel_entry);
++
++    /*
++     * Tell guest the machine ram size at MROM_RAMSIZE_OFFSET.
++     * On real hardware, the 64-bit value from MROM_RAMSIZE_OFFSET is zero.
++     * QEMU aware bootloader (e.g.: oreboot, U-Boot) can check value stored
++     * here to determine whether it is running in QEMU.
++     */
++
++    uint32_t ram_size[2] = {
++        machine->ram_size,
++        ((uint64_t)(machine->ram_size)) >> 32
++    };
++
++    /* copy in the ram size in little_endian byte order */
++    for (i = 0; i < ARRAY_SIZE(ram_size); i++) {
++        ram_size[i] = cpu_to_le32(ram_size[i]);
++    }
++    rom_add_blob_fixed_as("mrom.ram_size", ram_size, sizeof(ram_size),
++                          memmap[SIFIVE_U_MROM].base + MROM_RAMSIZE_OFFSET,
++                          &address_space_memory);
+ }
+ 
+ static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
 -- 
 2.7.4
 
