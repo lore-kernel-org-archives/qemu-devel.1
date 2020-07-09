@@ -2,68 +2,97 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96909C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E09DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:24:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B7542070E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:00:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B7542070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 14DFD2070E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 07:24:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YXalEV+J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14DFD2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtQXV-0005q1-Lu
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 03:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34390)
+	id 1jtQv7-0002AV-8l
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 03:24:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtQWw-0005Q6-SZ
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 02:59:38 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47992)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtQWu-0004Xb-Hn
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 02:59:38 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id C3B3BABCF;
- Thu,  9 Jul 2020 06:59:35 +0000 (UTC)
-Subject: Re: [PULL 00/53] Misc patches for QEMU 5.1 soft freeze
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20200706164155.24696-1-pbonzini@redhat.com>
- <CAFEAcA-F1FGde+=c3iS3wcRWG+i0RgYj5-jwafn0sX6EEYEsWA@mail.gmail.com>
- <1a9ad36f-f4ae-2ea5-3d69-03aa5580b60e@suse.de>
- <de27589f-6afb-b8cf-05a0-f5d34f9d2a58@redhat.com>
- <f17ca47d-f5e9-e710-5edb-9d92839ee7c1@suse.de>
- <56c7e153-e47b-aa5c-80c0-ab4f5c3d85e8@redhat.com>
- <57c79f36-4cf9-6188-ef40-b4f775add83d@suse.de>
- <0a3ab45d-468a-65f2-5b9d-440a0a950ded@suse.de>
- <CABgObfZA4+7q9+mg2NTXQC1f+usEsF0sXaNVt0+ursiJ4rAS=A@mail.gmail.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <717d9f61-56c1-875a-7de2-35a3376d515c@suse.de>
-Date: Thu, 9 Jul 2020 08:59:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jtQuD-0001Kr-Om
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 03:23:41 -0400
+Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:37255)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jtQuB-0007SL-Q6
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 03:23:41 -0400
+Received: by mail-ua1-x941.google.com with SMTP id q15so416831uap.4
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 00:23:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=eUvZdEHgBMGrL/+yxMrn6JnFoapfozZri9F2FF+zy78=;
+ b=YXalEV+J/kUNOhHmZypE2wOWvLiTb9lsCMKRxeVOs3O9bZ8Bw/yCIUhO8yvEjuyWfQ
+ nG28IQl4y89EbfEvopgaJvrzKE1zENx+rlxqdCh9qKeVv1ojm7nDNrx/lemkaCLEFSNq
+ +PweWUoZV+GCOAxaXcz85+lbQcENFp6ogZaUH1j92JUyZYbZCuxCEP+UUPbwDCfYZxAJ
+ T9a3vjrSGBm9JgYl1IG742rEkCdQEcShJOY/UvSVJ/bwpayOHhRk3nk8lzI7JmuEPPeg
+ cedei4eJ1fOF9C21Cl0Cvc+oGMbcA0yjmTXfub7OGx2WYbYNypfxZcWam162uNxn2dtq
+ /9Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eUvZdEHgBMGrL/+yxMrn6JnFoapfozZri9F2FF+zy78=;
+ b=nYVy6DNC5kVMfhOBrLydFePQgbtqXyQlz3lpu6xa50J8OLsfCrYT2EabSk5MtZQJVy
+ RytSGioUz1FFpw3GHIaspK5NMfAosWWXXjpcG5WIOVvZ6ymSnE/rJTwIdR8eylTi9PhU
+ cd6g4P0Lw/IkXc1MdkFaRzv8J3POk/diwWQXBmQNvUSKLpQhlLCDorGI93cMD5R79u5k
+ oc0VMCfIzmRxIvUjX173vWIAvDoxs13eX2K/bckUHPDm9uEhaBcNWXKyGmgvBQ0qzkYn
+ iTxt+qD9GX44Dnt4ISupeui8gnsCu/qhPH921vUJ3SG3pHqPktAj0ztDxTMQsGDFIyEC
+ iMhA==
+X-Gm-Message-State: AOAM5315sU0aEimlsDDfP+KujEhUoiFE3U5zPK+tubmFjGBieH0Go4Iv
+ qfY8HTuUVDDYIrCHVhnXzzo5rIL0hUKgUqPMR62W/A==
+X-Google-Smtp-Source: ABdhPJwjOdkWu9PaxRfqOM8sVzBoGtTHDXjNoMOjOq/RQl/P3P01UrlHfvNVPuj24/ZnGWb/Ne+nwED/8Zurf2TqSpA=
+X-Received: by 2002:ab0:6ec6:: with SMTP id c6mr54499527uav.7.1594279418295;
+ Thu, 09 Jul 2020 00:23:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CABgObfZA4+7q9+mg2NTXQC1f+usEsF0sXaNVt0+ursiJ4rAS=A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:20:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200707184730.3047754-1-hskinnemoen@google.com>
+ <20200707184730.3047754-6-hskinnemoen@google.com>
+ <4b7130f2-032c-3067-b2b6-876a2b17b707@amsat.org>
+ <CAFQmdRYi5QFHbcWQH-bWqAsSCidzYMedC8n+mib1DPpJuEy-Rw@mail.gmail.com>
+ <CAFQmdRZdUKvmi_eKdtCnR8uP63sRP9X0Z7oxZES56mtSz_=7FA@mail.gmail.com>
+ <af879fd1-dea8-a3f2-d3fb-13be24c0b740@amsat.org>
+In-Reply-To: <af879fd1-dea8-a3f2-d3fb-13be24c0b740@amsat.org>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Thu, 9 Jul 2020 00:23:26 -0700
+Message-ID: <CAFQmdRaqx9+Ftu4_p85q1E0aPUjBZfJ0ARB564WQVHmeSbjwXg@mail.gmail.com>
+Subject: Re: [PATCH v4 05/12] hw/arm: Add NPCM730 and NPCM750 SoC models
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>, Joel Stanley <joel@jms.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::941;
+ envelope-from=hskinnemoen@google.com; helo=mail-ua1-x941.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,75 +105,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/8/20 8:41 PM, Paolo Bonzini wrote:
-> 
-> 
-> Il mer 8 lug 2020, 20:25 Claudio Fontana <cfontana@suse.de <mailto:cfontana@suse.de>> ha scritto:
-> 
->     What I did notice is that all the code that directly or indirectly uses the functions is under an
-> 
->     if (0) (
->     )
-> 
->     since tcg_enabled is the constant 0.
-> 
->     By "indirectly" I mean that the static void qemu_tcg_cpu_thread_fn() function that calls those is referenced only by static void qemu_tcg_init_vcpu(), which is called only under an if (0),
->     ie if (tcg_enabled()).
-> 
-> 
-> Maybe my compiler is older.
-> 
->     I admit I am not familiar with the rationale of why the stubs are all built regardless, could we have that icount.o from stubs/ is replacing softmmu/icount.o to cause this?
-> 
-> 
-> No, stubs are in a static library and therefore are always overridden by symbols in the executable's .o files.
-> 
-> Paolo
-> 
-> 
+On Wed, Jul 8, 2020 at 10:34 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> On 7/9/20 2:06 AM, Havard Skinnemoen wrote:
+> > On Wed, Jul 8, 2020 at 11:13 AM Havard Skinnemoen
+> > <hskinnemoen@google.com> wrote:
+> >> On Wed, Jul 8, 2020 at 10:31 AM Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org> wrote:
+> >>> On 7/7/20 8:47 PM, Havard Skinnemoen wrote:
+> >>>> +typedef struct NPCM7xxClass {
+> >>>> +    DeviceClass         parent;
+> >>>
+> >>> Similar comment that elsewhere on this series, if NPCM7xxClass not us=
+ed
+> >>> outside of npcm7xx.c, keep it local.
+> >>
+> >> OK, will do.
+> >
+> > Turns out it is used in npcm7xx_boards.c, so it has to stay where it is=
+.
+>
+> Indeed:
+>
+> static void npcm7xx_load_kernel(MachineState *machine,
+>                                 NPCM7xxState *soc)
+> {
+>     NPCM7xxClass *sc =3D NPCM7XX_GET_CLASS(soc);
+>
+>     npcm7xx_binfo.ram_size =3D machine->ram_size;
+>     npcm7xx_binfo.nb_cpus =3D sc->num_cpus;
+>
+>     arm_load_kernel(&soc->cpu[0], machine, &npcm7xx_binfo);
+> }
+>
+> This is fine.
 
-Hi Paolo,
+It's also used here:
 
-which compiler, linker, binutils etc are you using?
+static void npcm7xx_set_soc_type(NPCM7xxMachineClass *nmc, const char *type=
+)
+{
+    NPCM7xxClass *sc =3D NPCM7XX_CLASS(object_class_by_name(type));
+    MachineClass *mc =3D MACHINE_CLASS(nmc);
 
-I am using
+    nmc->soc_type =3D type;
+    mc->default_cpus =3D mc->min_cpus =3D mc->max_cpus =3D sc->num_cpus;
+}
 
-$ gcc -v
-Using built-in specs.
-COLLECT_GCC=gcc
-COLLECT_LTO_WRAPPER=/usr/lib64/gcc/x86_64-suse-linux/7/lto-wrapper
-OFFLOAD_TARGET_NAMES=hsa:nvptx-none
-Target: x86_64-suse-linux
-Configured with: ../configure --prefix=/usr --infodir=/usr/share/info --mandir=/usr/share/man --libdir=/usr/lib64 --libexecdir=/usr/lib64 --enable-languages=c,c++,objc,fortran,obj-c++,ada,go --enable-offload-targets=hsa,nvptx-none=/usr/nvptx-none, --without-cuda-driver --enable-checking=release --disable-werror --with-gxx-include-dir=/usr/include/c++/7 --enable-ssp --disable-libssp --disable-libvtv --disable-libcc1 --disable-plugin --with-bugurl=https://bugs.opensuse.org/ --with-pkgversion='SUSE Linux' --with-slibdir=/lib64 --with-system-zlib --enable-libstdcxx-allocator=new --disable-libstdcxx-pch --enable-version-specific-runtime-libs --with-gcc-major-version-only --enable-linker-build-id --enable-linux-futex --enable-gnu-indirect-function --program-suffix=-7 --without-system-libunwind --enable-multilib --with-arch-32=x86-64 --with-tune=generic --build=x86_64-suse-linux --host=x86_64-suse-linux
-Thread model: posix
-gcc version 7.5.0 (SUSE Linux) 
+>
+> Just thinking loudly, we traditionally add the load_kernel() code
+> in the machine, because it is often specific to Linux guest, and
+> the SoC doesn't need to know about the guest OS.
+>
+> hw/arm/boot.c contains helpers also useful for firmwares.
+>
+> The SoC has a link to the DRAM so can get its size.
+> All the arm_boot_info fields are specific to this SoC.
+> So we could move a lot of code to npcm7xx.c, only declaring:
+>
+>   void npcm7xx_load_kernel(MachineState *machine,
+>                            NPCM7xxState *soc);
 
+I can do that, but it doesn't completely get rid of all references to
+NPCM7xxClass. I'm afraid there will always be some amount of coupling
+between the machines and corresponding SoCs.
 
-$ ld -v
-GNU ld (GNU Binutils; openSUSE Leap 15.1) 2.32.0.20190909-lp151.3.3
-
-anything else that we could use to find the real problem?
-
-Of course I can try a blind fix, where I suggest to explicitly provide the stubs,
-or you can apply the workaround you already suggested if you want,
-but currently I do not have any way to ensure that what I build is ok,
-since apparently the local build or any of the CI (travis, cirrus) is not sufficient to capture this.
-
-So getting to the bottom of the issue would be important going forward I think so I can ensure better input from my side.
-
-In general, the way current code is relying on the compiler to (maybe) compile out code that calls undefined symbols,
-using #define tcg_enabled 0 , and then having the undefined function calls in the code, seems less preferable than solving the problem explicitly
-with proper refactoring or with explicit stubs until proper refactoring is complete..
-
-Thanks,
-
-Claudio
-
- 
+Havard
 
