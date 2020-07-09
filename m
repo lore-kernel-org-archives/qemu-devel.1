@@ -1,135 +1,91 @@
 Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD345C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7297C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:58:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6812D20775
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:55:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9423220775
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:58:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RtgFuio0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6812D20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AaeAC+bu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9423220775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtam0-0001Wt-Ov
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 13:55:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59734)
+	id 1jtao8-00030T-Ty
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 13:58:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtalK-0000pC-SH
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:55:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28502
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtalH-0000da-PR
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:55:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594317306;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=kyzbD5sdgYvrskLAHDLEhyyAVOmXcj6Mnh4wlnDt5j8=;
- b=RtgFuio0v2ImK1xMHTwrw/Z0YFmNix0xh1K0s4tMmSgrwVmYypGuJ3Rmc/6qclHPp/0VjY
- l2J8OADR8kA7/UevS6lh+h8PuL76JCFAyr60vaG688sCU7dgPvxW67mPQ9kPz2OLLbe0e6
- YkFaVmRMnyimMrmICW8Tm9zl0OTXhCU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-gEn-ypjyP2q02LI00mR-Mw-1; Thu, 09 Jul 2020 13:55:02 -0400
-X-MC-Unique: gEn-ypjyP2q02LI00mR-Mw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7858100A8C3;
- Thu,  9 Jul 2020 17:55:00 +0000 (UTC)
-Received: from [10.36.112.79] (ovpn-112-79.ams2.redhat.com [10.36.112.79])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8000D5C662;
- Thu,  9 Jul 2020 17:54:53 +0000 (UTC)
-Subject: Re: [PATCH RFC 2/5] s390x: implement diag260
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200708185135.46694-1-david@redhat.com>
- <20200708185135.46694-3-david@redhat.com>
- <20200709123741.28a1e3b2.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <187bcbd4-a853-ce92-9a26-4aedc585211d@redhat.com>
-Date: Thu, 9 Jul 2020 19:54:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jtanH-00025R-B3; Thu, 09 Jul 2020 13:57:11 -0400
+Received: from mail-io1-xd34.google.com ([2607:f8b0:4864:20::d34]:44207)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jtanF-0000yG-JT; Thu, 09 Jul 2020 13:57:11 -0400
+Received: by mail-io1-xd34.google.com with SMTP id i4so3226633iov.11;
+ Thu, 09 Jul 2020 10:57:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=aR5izSzOEUPX3YFVw2MH19qHu1IzGHNevuGv3j+Fhnc=;
+ b=AaeAC+buwaRMteN3AyeJWezMAiOyD31SpX7rw1nhL8zD5KmbTVCU/xydvuM+yP53pS
+ U+kwfVT4uxftmyiYQsKrbr1iN4hEOAZfGES5QGsD9hGRMnS75gpVaHROXLWVKgEWD86q
+ VcSgRsLmeKx7dQISHkvGfobfIrwnG6u5Uxp+SjetOCkWmk4asLBZ5O+lQT+aM3TiG+2e
+ CRYSANWte/OmUTAIkg/v8S/B9FK8woMBMkve7bqOXWpmj58xMrhCB5GHgV/vJ5RUbSJQ
+ jJVmjuiB/FAMApV7lK/pJZGA6hhbqWhAwqVGhor/iH+XQQwLlTNNdF3Z3W971rL5WEwO
+ l/ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=aR5izSzOEUPX3YFVw2MH19qHu1IzGHNevuGv3j+Fhnc=;
+ b=qHeL1PX2xja6EJqtJRqQEJn2r3MDupnuH5OM6U3dWSrxuV0Vs2yNAhmSGZXR6TJcqN
+ AIZhynRx5a22FTQBIv6fCTrV+ABqEMhQVJI4EmNODXSEU2D2ONpqhlDC7LoGkdPOyXvB
+ 756kHfHRmx8WNzHQBGQOgKTVcXA37cJXIkzZvtG5G+6t2JM/F5uSktwUdO6WXG9BV57T
+ ctEf8msrzK2Sn2/LcVVlNmcZny9lZIppLuXAwPRHbAsrrpDm1p1Dqug3gI6uUyvRYD1a
+ OrsEYwt6sH7VjrqI5tJaRDwLcTeJp1F6eRplZwnjhr+rgU1b9hHFVZ5n/yOKndqW+xMv
+ 1TUQ==
+X-Gm-Message-State: AOAM532o1MyxofLx0fwSJ2v9Lv/Je+csSxaCeYC+n+IBD9zuAFkh95mO
+ xJ+R8ffM6juKIZiG1MmKrdtqwryJqdHLzLDUqUM=
+X-Google-Smtp-Source: ABdhPJzO3vyFFr9FpY+yEO1p7vDBZ9A4nL7LbhcyovLb8FgpHWvdEiUNu8H4TF0tZ5pjaGRFSbiJ8mUqgCiTPHoVZhQ=
+X-Received: by 2002:a05:6638:2195:: with SMTP id
+ s21mr58184906jaj.73.1594317427926; 
+ Thu, 09 Jul 2020 10:57:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200709123741.28a1e3b2.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 11:02:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200707132116.26207-1-f4bug@amsat.org>
+ <20200707132116.26207-3-f4bug@amsat.org>
+ <CAKmqyKNY+7tE9tcZm7_Th9qapo1CH0AwNwBf7vaf+7vSqBNtVA@mail.gmail.com>
+ <CAFEAcA_ZXgNHMAhBVmjvstyG=PpaHOtcmo=VgvfBQ3Z9VJTk_g@mail.gmail.com>
+ <3f1bf3ba-d6c3-a148-9850-076b2caa64d0@amsat.org>
+ <CAPan3Wr09ZbbHWO-dhGeK3zhZQv3smrzLpUGMj71NWh0hToZDg@mail.gmail.com>
+ <e87550d9-e1cc-cc15-2674-755249e9a965@amsat.org>
+ <CAFEAcA8em-bgU2xd8OG+bPLDCSZCF8Y2ay9U57D8p9m1SWO=9g@mail.gmail.com>
+In-Reply-To: <CAFEAcA8em-bgU2xd8OG+bPLDCSZCF8Y2ay9U57D8p9m1SWO=9g@mail.gmail.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Thu, 9 Jul 2020 19:56:56 +0200
+Message-ID: <CAPan3Wp2KBj9i3k4jVj2hQvVBQyKP42KysBj0h_0VQbRMnWBOA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/sd/sdcard: Do not allow invalid SD card sizes
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000f36b9005aa05f318"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d34;
+ envelope-from=nieklinnenbank@gmail.com; helo=mail-io1-xd34.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -143,187 +99,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Heiko Carstens <heiko.carstens@de.ibm.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Alistair Francis <alistair23@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.07.20 12:37, Cornelia Huck wrote:
-> On Wed,  8 Jul 2020 20:51:32 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Let's implement the "storage configuration" part of diag260. This diag
->> is found under z/VM, to indicate usable chunks of memory tot he guest OS.
->> As I don't have access to documentation, I have no clue what the actual
->> error cases are, and which other stuff we could eventually query using this
->> interface. Somebody with access to documentation should fix this. This
->> implementation seems to work with Linux guests just fine.
->>
->> The Linux kernel supports diag260 to query the available memory since
->> v4.20. Older kernels / kvm-unit-tests will later fail to run in such a VM
->> (with maxmem being defined and bigger than the memory size, e.g., "-m
->>  2G,maxmem=4G"), just as if support for SCLP storage information is not
->> implemented. They will fail to detect the actual initial memory size.
->>
->> This interface allows us to expose the maximum ramsize via sclp
->> and the initial ramsize via diag260 - without having to mess with the
->> memory increment size and having to align the initial memory size to it.
->>
->> This is a preparation for memory device support. We'll unlock the
->> implementation with a new QEMU machine that supports memory devices.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/diag.c        | 57 ++++++++++++++++++++++++++++++++++++++
->>  target/s390x/internal.h    |  2 ++
->>  target/s390x/kvm.c         | 11 ++++++++
->>  target/s390x/misc_helper.c |  6 ++++
->>  target/s390x/translate.c   |  4 +++
->>  5 files changed, 80 insertions(+)
->>
->> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
->> index 1a48429564..c3b1e24b2c 100644
->> --- a/target/s390x/diag.c
->> +++ b/target/s390x/diag.c
->> @@ -23,6 +23,63 @@
->>  #include "hw/s390x/pv.h"
->>  #include "kvm_s390x.h"
->>  
->> +void handle_diag_260(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
->> +{
->> +    MachineState *ms = MACHINE(qdev_get_machine());
->> +    const ram_addr_t initial_ram_size = ms->ram_size;
->> +    const uint64_t subcode = env->regs[r3];
->> +    S390CPU *cpu = env_archcpu(env);
->> +    ram_addr_t addr, length;
->> +    uint64_t tmp;
->> +
->> +    /* TODO: Unlock with new QEMU machine. */
->> +    if (false) {
->> +        s390_program_interrupt(env, PGM_OPERATION, ra);
->> +        return;
->> +    }
->> +
->> +    /*
->> +     * There also seems to be subcode "0xc", which stores the size of the
->> +     * first chunk and the total size to r1/r2. It's only used by very old
->> +     * Linux, so don't implement it.
-> 
-> FWIW,
-> https://www-01.ibm.com/servers/resourcelink/svc0302a.nsf/pages/zVMV7R1sc246272/$file/hcpb4_v7r1.pdf
-> seems to list the available subcodes. Anything but 0xc and 0x10 is for
-> 24/31 bit only, so we can safely ignore them. Not sure what we want to
-> do with 0xc: it is supposed to "Return the highest addressable byte of
-> virtual storage in the host-primary address space, including named
-> saved systems and saved segments", so returning the end of the address
-> space should be easy enough, but not very useful.
+--000000000000f36b9005aa05f318
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the link to the documentation! Either my google search skills
-are bad or that stuff is just hard to find :) I'll have a look and see
-how to make sense of 0xc. Smells like "maxram_size - 1" indeed.
+On Thu, Jul 9, 2020 at 4:15 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-> 
->> +     */
->> +    if ((r1 & 1) || subcode != 0x10) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->> +        return;
->> +    }
->> +    addr = env->regs[r1];
->> +    length = env->regs[r1 + 1];
->> +
->> +    /* FIXME: Somebody with documentation should fix this. */
-> 
-> Doc mentioned above says for specification exception:
-> 
-> "For subcode X'10':
-> • Rx is not an even-numbered register.
-> • The address contained in Rx is not on a quadword boundary.
-> • The length contained in Rx+1 is not a positive multiple of 16."
-> 
->> +    if (!QEMU_IS_ALIGNED(addr, 16) || !QEMU_IS_ALIGNED(length, 16)) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->> +        return;
->> +    }
->> +
->> +    /* FIXME: Somebody with documentation should fix this. */
->> +    if (!length) {
-> 
-> Probably specification exception as well?
+> On Thu, 9 Jul 2020 at 14:56, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+>
+> wrote:
+> >
+> > On 7/7/20 10:29 PM, Niek Linnenbank wrote:
+> > > So I manually copy & pasted the change into hw/sd/sd.c to test it.
+> > > It looks like the check works, but my concern is that with this chang=
+e,
+> > > we will be getting this error on 'off-the-shelf' images as well.
+> > > For example, the latest Raspbian image size also isn't a power of two=
+:
+> > >
+> > > $ ./arm-softmmu/qemu-system-arm -M raspi2 -sd
+> > > ~/Downloads/2020-05-27-raspios-buster-lite-armhf.img -nographic
+> > > WARNING: Image format was not specified for
+> > > '/home/me/Downloads/2020-05-27-raspios-buster-lite-armhf.img' and
+> > > probing guessed raw.
+> > >          Automatically detecting the format is dangerous for raw
+> images,
+> > > write operations on block 0 will be restricted.
+> > >          Specify the 'raw' format explicitly to remove the
+> restrictions.
+> > > qemu-system-arm: Invalid SD card size: 1.73 GiB (expecting at least 2
+> GiB)
+> > >
+> > > If we do decide that the change is needed, I would like to propose th=
+at
+> > > we also give the user some instructions
+> > > on how to fix it, maybe some 'dd' command?
+> >
+> > On POSIX we can suggest to use 'truncate -s 2G' from coreutils.
+> > This is not in the default Darwin packages.
+> > On Windows I have no clue.
+>
+> dd/truncate etc won't work if the image file is not raw (eg if
+> it's qcow2). The only chance you have of something that's actually
+> generic would probably involve "qemu-img resize". But I'm a bit
+> wary of having an error message that recommends that, because
+> what if we got it wrong?
+>
 
-Yeah I'll add "|| !length" above.
+Yeah good point Peter, I see what you mean. As I wrote to Philippe,
+i'll try to make a small patch with some instructions in the OrangePi board
+documentation,
+so then we'll at least have something there to help the user.
 
-> 
->> +        setcc(cpu, 3);
->> +        return;
->> +    }
->> +
->> +    /* FIXME: Somebody with documentation should fix this. */
-> 
-> For access exception:
-> 
-> "For subcode X'10', an error occurred trying to store the extent
-> information into the guest's output area."
-> 
+Regards,
+Niek
 
-Okay, looks good then!
 
->> +    if (!address_space_access_valid(&address_space_memory, addr, length, true,
->> +                                    MEMTXATTRS_UNSPECIFIED)) {
->> +        s390_program_interrupt(env, PGM_ADDRESSING, ra);
->> +        return;
->> +    }
->> +
->> +    /* Indicate our initial memory ([0 .. ram_size - 1]) */
->> +    tmp = cpu_to_be64(0);
->> +    cpu_physical_memory_write(addr, &tmp, sizeof(tmp));
->> +    tmp = cpu_to_be64(initial_ram_size - 1);
->> +    cpu_physical_memory_write(addr + sizeof(tmp), &tmp, sizeof(tmp));
->> +
->> +    /* Exactly one entry was stored. */
->> +    env->regs[r3] = 1;
->> +    setcc(cpu, 0);
->> +}
->> +
->>  int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
->>  {
->>      uint64_t func = env->regs[r1];
-> 
-> (...)
-> 
->> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
->> index 58dbc023eb..d7274eb320 100644
->> --- a/target/s390x/misc_helper.c
->> +++ b/target/s390x/misc_helper.c
->> @@ -116,6 +116,12 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
->>      uint64_t r;
->>  
->>      switch (num) {
->> +    case 0x260:
->> +        qemu_mutex_lock_iothread();
->> +        handle_diag_260(env, r1, r3, GETPC());
->> +        qemu_mutex_unlock_iothread();
->> +        r = 0;
->> +        break;
->>      case 0x500:
->>          /* KVM hypercall */
->>          qemu_mutex_lock_iothread();
-> 
-> Looking at the doc referenced above, it seems that we treat every diag
-> call as privileged under tcg; but it seems that 0x44 isn't? (Unrelated
-> to your patch; maybe I'm misreading.)
+>
+> thanks
+> -- PMM
+>
 
-Interesting. Adding in onto my todo list.
 
-Thanks again!
+--=20
+Niek Linnenbank
 
--- 
-Thanks,
+--000000000000f36b9005aa05f318
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-David / dhildenb
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jul 9, 2020 at 4:15 PM Peter =
+Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linar=
+o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex">On Thu, 9 Jul 2020 at 14:56, Philippe Mathieu-Daud=C3=A9 &lt;<a href=
+=3D"mailto:f4bug@amsat.org" target=3D"_blank">f4bug@amsat.org</a>&gt; wrote=
+:<br>
+&gt;<br>
+&gt; On 7/7/20 10:29 PM, Niek Linnenbank wrote:<br>
+&gt; &gt; So I manually copy &amp; pasted the change into hw/sd/sd.c to tes=
+t it.<br>
+&gt; &gt; It looks like the check works, but my concern is that with this c=
+hange,<br>
+&gt; &gt; we will be getting this error on &#39;off-the-shelf&#39; images a=
+s well.<br>
+&gt; &gt; For example, the latest Raspbian image size also isn&#39;t a powe=
+r of two:<br>
+&gt; &gt;<br>
+&gt; &gt; $ ./arm-softmmu/qemu-system-arm -M raspi2 -sd<br>
+&gt; &gt; ~/Downloads/2020-05-27-raspios-buster-lite-armhf.img -nographic<b=
+r>
+&gt; &gt; WARNING: Image format was not specified for<br>
+&gt; &gt; &#39;/home/me/Downloads/2020-05-27-raspios-buster-lite-armhf.img&=
+#39; and<br>
+&gt; &gt; probing guessed raw.<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Automatically detecting the for=
+mat is dangerous for raw images,<br>
+&gt; &gt; write operations on block 0 will be restricted.<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Specify the &#39;raw&#39; forma=
+t explicitly to remove the restrictions.<br>
+&gt; &gt; qemu-system-arm: Invalid SD card size: 1.73 GiB (expecting at lea=
+st 2 GiB)<br>
+&gt; &gt;<br>
+&gt; &gt; If we do decide that the change is needed, I would like to propos=
+e that<br>
+&gt; &gt; we also give the user some instructions<br>
+&gt; &gt; on how to fix it, maybe some &#39;dd&#39; command?<br>
+&gt;<br>
+&gt; On POSIX we can suggest to use &#39;truncate -s 2G&#39; from coreutils=
+.<br>
+&gt; This is not in the default Darwin packages.<br>
+&gt; On Windows I have no clue.<br>
+<br>
+dd/truncate etc won&#39;t work if the image file is not raw (eg if<br>
+it&#39;s qcow2). The only chance you have of something that&#39;s actually<=
+br>
+generic would probably involve &quot;qemu-img resize&quot;. But I&#39;m a b=
+it<br>
+wary of having an error message that recommends that, because<br>
+what if we got it wrong?<br></blockquote><div><br></div><div>Yeah good poin=
+t Peter, I see what you mean. As I wrote to Philippe,</div><div>i&#39;ll tr=
+y to make a small patch with some instructions in the OrangePi board docume=
+ntation,</div><div>so then we&#39;ll at least have something there to help =
+the user.</div><div><br></div><div>Regards,</div><div>Niek<br></div><div>=
+=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
+.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+thanks<br>
+-- PMM<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
 
+--000000000000f36b9005aa05f318--
 
