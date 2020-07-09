@@ -2,93 +2,131 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7815C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F968C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:08:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83B4120663
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C55920663
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:08:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r2PBewpq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B4120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fftw/Y6M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C55920663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtTSn-0004RJ-RW
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 06:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52690)
+	id 1jtTTd-0005Kt-EB
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 06:08:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jtTRB-0002zk-FI; Thu, 09 Jul 2020 06:05:53 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:34922)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jtTR9-0005Jr-VH; Thu, 09 Jul 2020 06:05:53 -0400
-Received: by mail-pl1-x643.google.com with SMTP id x9so652141plr.2;
- Thu, 09 Jul 2020 03:05:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=mm+f7F/Pdu5zigQk44EA/Ex1Vg2tqyqtOfNiVV6EHYA=;
- b=r2PBewpqJTFDfFdFds1X2/yFvJT64aXWjBaTQlcIrmIYJCwfAhc3s24fDQCU9q1pcw
- gzuU88ye67HoLpJrA2P+pNB7HWxc95TggaMRbQQ63Umfd2J/OIe23CB7I0+eAkPt2DuK
- 2asrtujfTW27ShQ3pfu3UQcjpIjTOlTJDYvWhQ4+3b3tLAqNpS1aqfiFMmt9AmAKs4Xe
- JbFgXU7kR6PmOt3rcYP9pyzAcEvJcXXHRouZIrJ+1d+biRyF53hSi7B9MemcxZIDgq8F
- v3KKPEUmzn2ERsqXqC90TvWtT4ojb+rEzk9xlrAqRRHBlIxOPhD8rcnxjTNtcyj5R2wB
- YHqg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtTSv-0004iI-Uz
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 06:07:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55622
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtTSu-0005UV-5z
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 06:07:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594289259;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=auihBxFb9cjWOGNIiF4X2LgiAl2xiZYtPtnAIbdvRro=;
+ b=fftw/Y6MN4/LIhdUD3XzENNUGbHt3XZz/JwkBVoN7tthGV/awuSR4U4hpxoX288EoAVcQe
+ ztY68cSINw1SUZtGP0Fpe6Iy0S+f/pK5XmBGDJQ6ON9NZfSEi542hWlL6BIjX298iscrax
+ UYfdHEEh4pb1Knas3rT6ALCnz7ByPOc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-GK9YFvtgMeSebcRMwYeKXQ-1; Thu, 09 Jul 2020 06:07:35 -0400
+X-MC-Unique: GK9YFvtgMeSebcRMwYeKXQ-1
+Received: by mail-wr1-f69.google.com with SMTP id c6so1575462wru.7
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 03:07:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=mm+f7F/Pdu5zigQk44EA/Ex1Vg2tqyqtOfNiVV6EHYA=;
- b=pZwUGMWbwNjyCA7TT8z64/lSW0EhgbW0UsfYWIj8HxHWUTZHwt7OoeaVz8Bn2TQuiz
- ecduJOSXJpaD69T3FFQsyz+j66vNVAmpSb5Rht4NaLFU1ia7hjLBhMUjavgmg0lXsh6l
- tf+xZIi/J7wYdB3meMtveaQtXuwaDZTJIY0oTAe5iH/oFqxW+Xm4mWIlMOvOJQ3BOO+j
- LSR4RJ5B7003V8vlbHmcxoA2k38/ieee3rbKLzDvjbD6trccd8Y2Tr29Sax0HEnU4Je9
- 13LU1Errmee4cHTC6kFU8PRpfuA4+vcgp/Z3nkbBiY7mWpBQTzfK24ryEPEafhjOjRlx
- w6QA==
-X-Gm-Message-State: AOAM530vN+rQ8W6TxAJwLnSRMTk6nIAXW3rMKPaFFGEsLbWuEnAqhu/X
- 735A2GXfpG3HpBM9tFrPp3g=
-X-Google-Smtp-Source: ABdhPJyIGAu+BOVUWelra4LrtVxE5f5UcZfBtGsvxfPcDcgyt1H7orDdzGDowMC914vpqZy26m5tJw==
-X-Received: by 2002:a17:902:ff0c:: with SMTP id
- f12mr54612815plj.254.1594289150049; 
- Thu, 09 Jul 2020 03:05:50 -0700 (PDT)
-Received: from localhost.localdomain (unknown-224-80.windriver.com.
- [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id cv7sm2093972pjb.9.2020.07.09.03.05.49
- (version=TLS1 cipher=AES128-SHA bits=128/128);
- Thu, 09 Jul 2020 03:05:49 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Subject: [PATCH v2 2/2] hw/riscv: sifive_u: Provide a reliable way for
- bootloader to detect whether it is running in QEMU
-Date: Thu,  9 Jul 2020 03:05:44 -0700
-Message-Id: <1594289144-24723-2-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1594289144-24723-1-git-send-email-bmeng.cn@gmail.com>
-References: <1594289144-24723-1-git-send-email-bmeng.cn@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=bmeng.cn@gmail.com; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=auihBxFb9cjWOGNIiF4X2LgiAl2xiZYtPtnAIbdvRro=;
+ b=V90xKvJH21XSYFOOzGxW3JJaQ3Zf6EPsScK7gsqTQYCHH5ArBkvgrKqgMTwP8JCVPp
+ 0LOPJ2IuBpwIYUNt6a3ItHmVWcu1vLn2uQHzXoy4TNGZwccQ34Ur53U6tWzMp6RyS3Zy
+ AOqqGksXzP3SiMQxAybGbDyQC6vI901GBVIMa2+cOdQ2b74ynvnwOkGlQgaIp51r+oin
+ c2VsNzkM5Q4g4zWtxu2G/vwSwKe8UsKBn+slP7QujsuKr9QnvaKLLtvgo2uGHYokZZeS
+ BD2xEHEf2MoqvFmZB1v16NroE7Yl+cW6A1G0YbJrBwKBfbG2rprObN8TGQmGAkPj3BGq
+ m5Jw==
+X-Gm-Message-State: AOAM533PKe2FZ8WmNyw967my3jZOf8NEmVtStCmCEKXy9gADdzTbIRml
+ u/sJMbBu0eYoGE2L4TDV7YxZJf6wNml75Og4lP58SfcuLjnZ7CrW3eJLui3uv0WOfxH3n2wj4SD
+ IA5hw06JiwzLvEzU=
+X-Received: by 2002:a5d:6412:: with SMTP id z18mr61104230wru.310.1594289254548; 
+ Thu, 09 Jul 2020 03:07:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzVlEMTihkNrwp4H2OKTekkypxW+dyhpj5k7SeQwtug5EabLWeHnMpPgiDbDmBnogUrliYNsg==
+X-Received: by 2002:a5d:6412:: with SMTP id z18mr61104195wru.310.1594289254279; 
+ Thu, 09 Jul 2020 03:07:34 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id j15sm4691729wrx.69.2020.07.09.03.07.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 09 Jul 2020 03:07:33 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] GitLab Gating CI: initial set of jobs,
+ documentation and scripts
+To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200709024657.2500558-1-crosa@redhat.com>
+ <20200709024657.2500558-3-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <05209e8d-e501-74d0-ef58-25f2a971a4a8@redhat.com>
+Date: Thu, 9 Jul 2020 12:07:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200709024657.2500558-3-crosa@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 01:47:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,70 +140,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+On 7/9/20 4:46 AM, Cleber Rosa wrote:
+> This is a mapping of Peter's "remake-merge-builds" and
+> "pull-buildtest" scripts, gone through some updates, adding some build
+> option and removing others.
+> 
+> The jobs currently cover the machines that the QEMU project owns, and that
+> are setup and ready to run jobs:
+> 
+>  - Ubuntu 18.04 on S390x
+>  - Ubuntu 20.04 on aarch64
+> 
+> During the development of this set of jobs, the GitLab CI was tested
+> with many other architectures, including ppc64, s390x and aarch64,
+> along with the other OSs (not included here):
+> 
+>  - Fedora 30
+>  - FreeBSD 12.1
+> 
+> More information can be found in the documentation itself.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  .gitlab-ci.d/gating.yml                | 146 +++++++++++++++++
+>  .gitlab-ci.yml                         |   1 +
+>  docs/devel/testing.rst                 | 147 +++++++++++++++++
 
-The reset vector codes are subject to change, e.g.: with recent
-fw_dynamic type image support, it breaks oreboot again.
+Time to consider moving the CI doc in a separate file...
 
-Add a subregion in the MROM, with the size of machine RAM stored,
-so that we can provide a reliable way for bootloader to detect
-whether it is running in QEMU.
+>  scripts/ci/setup/build-environment.yml | 217 +++++++++++++++++++++++++
+>  scripts/ci/setup/gitlab-runner.yml     |  72 ++++++++
+>  scripts/ci/setup/inventory             |   2 +
+>  scripts/ci/setup/vars.yml              |  13 ++
 
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Should we name these last two as inventory.template
+and vars.yml.template?
 
----
+Maybe you can add them with gitlab-runner.yml and a part of
+the documentation in a first patch,
 
-Changes in v2:
-- correctly populate the value in little-endian
+Then build-environment.yml and another part of the doc
+in another patch,
 
- hw/riscv/sifive_u.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Finally gating.yml and the related missing doc as the
+last patch?
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 3413369..79519d4 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -88,6 +88,7 @@ static const struct MemmapEntry {
- 
- #define OTP_SERIAL          1
- #define GEM_REVISION        0x10070109
-+#define MROM_RAMSIZE_OFFSET 0xf8
- 
- static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     uint64_t mem_size, const char *cmdline)
-@@ -496,6 +497,26 @@ static void sifive_u_machine_init(MachineState *machine)
-     riscv_rom_copy_firmware_info(memmap[SIFIVE_U_MROM].base,
-                                  memmap[SIFIVE_U_MROM].size,
-                                  sizeof(reset_vec), kernel_entry);
-+
-+    /*
-+     * Tell guest the machine ram size at MROM_RAMSIZE_OFFSET.
-+     * On real hardware, the 64-bit value from MROM_RAMSIZE_OFFSET is zero.
-+     * QEMU aware bootloader (e.g.: oreboot, U-Boot) can check value stored
-+     * here to determine whether it is running in QEMU.
-+     */
-+
-+    uint32_t ram_size[2] = {
-+        machine->ram_size,
-+        ((uint64_t)(machine->ram_size)) >> 32
-+    };
-+
-+    /* copy in the ram size in little_endian byte order */
-+    for (i = 0; i < ARRAY_SIZE(ram_size); i++) {
-+        ram_size[i] = cpu_to_le32(ram_size[i]);
-+    }
-+    rom_add_blob_fixed_as("mrom.ram_size", ram_size, sizeof(ram_size),
-+                          memmap[SIFIVE_U_MROM].base + MROM_RAMSIZE_OFFSET,
-+                          &address_space_memory);
- }
- 
- static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
--- 
-2.7.4
+>  7 files changed, 598 insertions(+)
+>  create mode 100644 .gitlab-ci.d/gating.yml
+>  create mode 100644 scripts/ci/setup/build-environment.yml
+>  create mode 100644 scripts/ci/setup/gitlab-runner.yml
+>  create mode 100644 scripts/ci/setup/inventory
+>  create mode 100644 scripts/ci/setup/vars.yml
+[...]
 
 
