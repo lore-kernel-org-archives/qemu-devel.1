@@ -2,93 +2,88 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17562C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07861C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:32:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D614A20772
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:31:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB20420772
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:32:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KQD5mAIk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D614A20772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kjQAKWYv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB20420772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtUlq-0007tR-3m
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 07:31:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52390)
+	id 1jtUn7-0000XN-TJ
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 07:32:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1jtUkf-0007JL-Mu
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:30:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39784
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1jtUkd-000227-Oe
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:30:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594294201;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xPdA4UDiA7K/5OS4U/6wpvL/bm+Ai4kA2FNaMg8lw10=;
- b=KQD5mAIkm+AhmumCEJ0vXSsSaxzgtv0jlkoOGJtns4jZ7L2XPDJFS1qMJegX1ybh9c7NGU
- mUd2QgjD6ReZ6mm5uDCOiP82goZGf+z/QH5m6JBS7J/lMdnkQ5w1BV2/CpmDWDrKEX8tJ3
- DnOs7OLnytjCxyn2CENnz9REBvRHcNc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-D4E0W20MP0qjzrQYUJqN-g-1; Thu, 09 Jul 2020 07:28:37 -0400
-X-MC-Unique: D4E0W20MP0qjzrQYUJqN-g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9477C186A8E0;
- Thu,  9 Jul 2020 11:28:36 +0000 (UTC)
-Received: from kinshicho.usersys.redhat.com (unknown [10.40.195.38])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DC7C35D9F3;
- Thu,  9 Jul 2020 11:28:29 +0000 (UTC)
-Message-ID: <a462a7e1094fea39e13436a940ef91bec809a8fc.camel@redhat.com>
-Subject: Re: [PATCH v2 2/2] GitLab Gating CI: initial set of jobs,
- documentation and scripts
-From: Andrea Bolognani <abologna@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>, Cleber
- Rosa <crosa@redhat.com>
-Date: Thu, 09 Jul 2020 13:28:27 +0200
-In-Reply-To: <20200709103029.GK3753300@redhat.com>
-References: <20200709024657.2500558-1-crosa@redhat.com>
- <20200709024657.2500558-3-crosa@redhat.com>
- <20200709103029.GK3753300@redhat.com>
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtUmG-0008FM-Cq
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:31:44 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:42816)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtUmD-0002Kz-RM
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:31:43 -0400
+Received: by mail-ot1-x330.google.com with SMTP id g37so1436149otb.9
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 04:31:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=WLWZV1rpOnDKtVi670UWK2xy4CeDE+Irw2r/vUCgnms=;
+ b=kjQAKWYv9EIXX5RVpfbWF1rm/pFfG6Cts0qGYocQa1lFZ62EhHJ8kDOMFOE0U5dEVZ
+ hEJucaWN527OdKdLFBUN71LVp65ji9nNUYLRk+DoutlA8/vCHdOXYBUUOVZTNlHi4gbP
+ xpFnK/UMEKXuwFVJUo3wDb5aR1RaGkGY+PSVIzg/7zyheA56J/4G7wNvpADcQMPxqZgr
+ svFDMcpsV00DMT7+5Fl+ksklsB1oFdic4FspV/GHkhAPvQrU7OeC/6bqRqg2Xh1lLOlv
+ +d/GsgZArFdMtWJNSuekzJ2p7CSfYPEj5sMPO/6IfHJWK/6BEOyVtluAa3Ph6bvk6dFs
+ hcIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=WLWZV1rpOnDKtVi670UWK2xy4CeDE+Irw2r/vUCgnms=;
+ b=N0bfyWHVuVm92ChFSOsIRH5NTpEWa71SWjwqKZPonHrngymysInAKRKMzkFUtMQ8Dk
+ BYpRKCWAIPDcD8G/ZzyuOzhBoa3J4bCituFajmnxRLKcjhsYNeWFI+mst9py0CCQ2bIJ
+ 2SxWZipY3unDnH4vO3kpuwSVGf4+c7BjnLJXBKwg9u4ccA1h0kQva9LvviIg9dCZ8g9N
+ y5L36tl+CAk5/y1CSqwSZH079+FUheV0UqDYZY4+UrfnHxm87ICITwjU2QNvNvUzpHag
+ vfdfF8hXe6YC9Nhikn++ySqmTy7vMgw6ZDbIoHJMncgMBpeldu/d2rETYne577H+mxXY
+ 9JmA==
+X-Gm-Message-State: AOAM530oW/dU7uwNw97/CjsMPBPb10122JkuEbIUs95/equaMGhOrYAQ
+ fbHevy1mv3ucVqpuEZCx3uWkSBaJRiHcJ/kynwxkbg==
+X-Google-Smtp-Source: ABdhPJxYc/B8nYPfOoATU0pGgMUTKnNFmONQcR31/ESpN/b+kO6A/mIxk+4ESO5k3ur4WZaGl8OISQL1RGrdr0gA8vg=
+X-Received: by 2002:a05:6830:10ce:: with SMTP id
+ z14mr46471855oto.135.1594294300289; 
+ Thu, 09 Jul 2020 04:31:40 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=abologna@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20200707070858.6622-1-alex.bennee@linaro.org>
+In-Reply-To: <20200707070858.6622-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 Jul 2020 12:31:28 +0100
+Message-ID: <CAFEAcA80gPAFRsJcFyO8ogNbSa_ex6fSaxnBYU6awU=Ug+Y7wg@mail.gmail.com>
+Subject: Re: [PULL 00/41] testing updates (vm, gitlab, misc build fixes)
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=abologna@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:33:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::330;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x330.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,68 +96,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2020-07-09 at 11:30 +0100, Daniel P. Berrangé wrote:
-> On Wed, Jul 08, 2020 at 10:46:57PM -0400, Cleber Rosa wrote:
-> > +- name: Installation of basic packages to build QEMU
-> > +  hosts: all
-> > +  vars_files:
-> > +    - vars.yml
-> > +  tasks:
-> > +    - name: Install basic packages to build QEMU on Ubuntu 18.04/20.04
-> > +      apt:
-> > +        update_cache: yes
-> > +        # This matches the packages on tests/docker/Dockerfiles/ubuntu1804.docker
-> 
-> I'd be inclined to actually use docker on the custom runners.
-> 
-> eg. instead of having separate physical machines or VMs for each
-> (distro, arch) pair, have a single host distro for the arch. Then
-> use docker to provide the build environment against each distro.
-> 
-> IOW, a RHEL-8 aarch64 host, running docker for ubuntu18.04, fedora30
-> etc.
-> 
-> That way we don't end up duplicating all these packages, and instead
-> can use  tests/docker/Dockerfiles/ubuntu1804.docker.  This ensures
-> that if a user needs to reproduce a build failure on their own local
-> aarch64 machine, they can run docker and get the exact same build
-> architecture.
-> 
-> It also has the benefit that we don't need to worry about how to
-> setup gitlab runners for every distro we care about. We only need to
-> do gitlab runner for the standard host distro, which spawns a pristine
-> throwaway docker env.
-> 
-> I appreciate this is a big change from what you've done in this patch
-> though, so don't consider this comment a blocker for initial merge.
-> I think we should do this as the long term strategy though. Essentially
-> for Linux builds, everything should always be container based.
+On Tue, 7 Jul 2020 at 08:09, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> There will be some docker failures until the official repository has
+> seeded but local builds should continue to work.
+>
+> ----
+>
+> The following changes since commit eb6490f544388dd24c0d054a96dd304bc72844=
+50:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-202=
+00703' into staging (2020-07-04 16:08:41 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-testing-and-misc-070720-1
+>
+> for you to fetch changes up to 6a726e8ca0286e3ed69945abd447099f6f6a903c:
+>
+>   tests/qht-bench: Adjust threshold computation (2020-07-07 07:57:41 +010=
+0)
+>
+> ----------------------------------------------------------------
+> Testing and build updates:
+>
+>   - tests/vm support for aarch64 VMs
+>   - tests/tcg better cross-compiler detection
+>   - update docker tooling to support registries
+>   - gitlab build docker images and store in registry
+>   - gitlab use docker images for builds
+>   - a number of skipIf updates to support move
+>   - linux-user MAP_FIXED_NOREPLACE fix
+>   - qht-bench compiler tweaks
+>   - configure fix for secret keyring
+>   - tsan fiber annotation clean-up
 
-Agreed. You should be able to set up a fairly minimal environment,
-which consists of Docker, gitlab-runner and not much else, using a
-long-term supported distro such as CentOS and then just schedule
-whatever container build on it. No need to provision a new machine
-every time a new Fedora release comes out, just create a container
-image for it and add it to the mix.
+freebsd failed:
 
-Additionally, the gitlab-runner Docker executor provides more
-isolation than the shell executor, so running untrusted builds
-becomes a more reasonable proposition - this is how the shared
-runners on gitlab.com work - and you don't have to worry about your
-jobs cleaning up properly after themselves nearly as much.
+perl: warning: Please check that your locale settings:
+perl: warning: Falling back to the standard locale ("C").
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+con recv: Loading /boot/defaults/loader.conf
+con recv: Loading /boot/device.hints
+con recv: Loading /boot/loader.conf
+con recv: Loading /boot/loader.conf.local
+con recv: \/  ```                        ` s` `.....---.......--.```
+-/ +o   .--`         /y:`      +.  yo`:.            :o      `+-   y/
+            -/`   -o/  .-                  ::/sy+:.  /
+    `--  / `:                          :` `:
+:`  /                          /  .-                        -.   --
+                  -.    `:`                  `:`      .--
+`--.         .---.....----.  ______               ____   _____ _____
+|  ____|             |  _ \ / ____|  __ \  | |___ _ __ ___  ___ | |_)
+| (___ | |  | | |  ___| '__/ _ \/ _ \|  _ < \___ \| |  | | | |   | | |
+ __/  __/| |_) |____) | |__| | | |   | | |    |    ||     |      |
+ | |_|   |_|  \___|\___||____/|_____/|_____/
+...........................................................................=
+...........................................................................=
+...........................................................................=
+...........................................................................=
+..............................Welcome
+to FreeBSD1. Boot Multi user [Enter]2. Boot Single user3. Escape to
+loader prompt4. RebootOptions:/\/\5. Kernel: default/kernel (1 of 1)6.
+Boot OptionsAutoboot
+con send: 3
+con recv:  in 10 seconds, hit [Enter] to boot or any other key to stop
+con recv:
+con recv: Exiting menu!
+con recv: Type '?' for a list of commands, 'help' for more detailed help.
+con recv: OK
+con send: set console=3Dcomconsole<enter>
+console: *** read timeout ***
+console: waiting for: 'OK'
+console: line buffer:
 
--- 
-Andrea Bolognani / Red Hat / Virtualization
+con recv:  set console=3Dcomconso
 
+Failed to prepare guest environment
+Traceback (most recent call last):
+  File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line 628, in =
+main
+    return vm.build_image(args.image)
+  File "/home/peter.maydell/qemu-freebsd/tests/vm/freebsd", line 163,
+in build_image
+    self.console_boot_serial()
+  File "/home/peter.maydell/qemu-freebsd/tests/vm/freebsd", line 76,
+in console_boot_serial
+    self.console_wait_send("OK", "boot\n")
+  File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line
+400, in console_wait_send
+    self.console_wait(wait)
+  File "/home/peter.maydell/qemu-freebsd/tests/vm/basevm.py", line
+340, in console_wait
+    chars =3D vm.console_socket.recv(1)
+  File "/home/peter.maydell/qemu-freebsd/tests/vm/../../python/qemu/console=
+_socket.py",
+line 96, in recv
+    raise socket.timeout
+socket.timeout
+
+
+NetBSD failed:
+con recv: postfix: rebuilding /etc/mail/aliases (missing /etc/mail/aliases.=
+db)
+con recv: Starting inetd.
+con recv: Starting cron.
+con recv: Thu Jul  9 10:40:07 UTC 2020
+con recv: NetBSD/amd64 (localhost) (constty)
+con recv: login:
+con send: qemu<enter>
+con recv:  Jul  9 10:40:09 localhost getty[756]: /dev/ttyE2: Device
+not configured
+con recv: Jul  9 10:40:09 localhost getty[703]: /dev/ttyE3: Device not
+configured
+con recv: Jul  9 10:40:09 localhost getty[753]: /dev/ttyE1: Device not
+configured
+con recv: qemu
+con recv: Password:
+con send: qemupass<enter>
+con recv: Login incorrect or refused on this terminal.
+console: *** read timeout ***
+console: waiting for: 'localhost$'
+console: line buffer:
+
+con recv: login:
+
+Failed to prepare guest environment
+Traceback (most recent call last):
+  File "/home/peter.maydell/qemu-netbsd/tests/vm/basevm.py", line 628, in m=
+ain
+    return vm.build_image(args.image)
+  File "/home/peter.maydell/qemu-netbsd/tests/vm/netbsd", line 174, in
+build_image
+    self._config["guest_pass"])
+  File "/home/peter.maydell/qemu-netbsd/tests/vm/basevm.py", line 408,
+in console_ssh_init
+    self.console_wait_send(prompt,      "mkdir .ssh\n")
+  File "/home/peter.maydell/qemu-netbsd/tests/vm/basevm.py", line 400,
+in console_wait_send
+    self.console_wait(wait)
+  File "/home/peter.maydell/qemu-netbsd/tests/vm/basevm.py", line 340,
+in console_wait
+    chars =3D vm.console_socket.recv(1)
+  File "/home/peter.maydell/qemu-netbsd/tests/vm/../../python/qemu/console_=
+socket.py",
+line 96, in recv
+    raise socket.timeout
+socket.timeout
+
+arm-linux-static check-tcg failed:
+  TEST    pauth-4 on aarch64
+  TEST    semihosting on aarch64
+  SKIPPED semiconsole on aarch64 because MANUAL ONLY
+  TEST    basic gdbstub support
+/tmp/tmp6ftb0v61qemu-gdbstub/gdbstub.socket: No such device or address.
+SKIPPING (not connected)
+  BUILD   TCG tests for aarch64_be-linux-user
+  BUILD   aarch64_be-linux-user guest-tests SKIPPED
+  RUN     TCG tests for aarch64_be-linux-user
+  RUN     tests for aarch64_be-linux-user SKIPPED
+make: Entering directory
+'/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+  BUILD   debian10
+Error response from daemon: manifest for
+registry.gitlab.com/qemu-project/qemu/qemu/debian10:latest not found
+make: Leaving directory
+'/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+make: Entering directory
+'/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+  BUILD   debian-alpha-cross
+Error response from daemon: manifest for
+registry.gitlab.com/qemu-project/qemu/qemu/debian-alpha-cross:latest
+not found
+registry.gitlab.com/qemu-project/qemu/qemu/debian10:latest not found
+Traceback (most recent call last):
+  File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+line 701, in <module>
+    sys.exit(main())
+  File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+line 697, in main
+    return args.cmdobj.run(args, argv)
+  File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+line 494, in run
+    extra_files_cksum=3Dcksum)
+  File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+line 347, in build_image
+    quiet=3Dquiet)
+  File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.6/subprocess.py", line 311, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t',
+'qemu/debian-alpha-cross', '-f',
+'/tmp/docker_buildsstz1jcy/tmp_7c70xjh.docker', '--build-arg',
+'BUILDKIT_INLINE_CACHE=3D1', '--cache-from',
+'registry.gitlab.com/qemu-project/qemu/qemu/debian-alpha-cross',
+'/tmp/docker_buildsstz1jcy']' returned non-zero exit status 1.
+/home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:58:
+recipe for target 'docker-image-debian-alpha-cross' failed
+make: *** [docker-image-debian-alpha-cross] Error 1
+
+
+Also a compile failure on s390x, but since this isn't related
+to changes you made afaict I wonder if it's the result of
+a change in the build environment:
+/home/ubuntu/qemu/block/ssh.c: In function =E2=80=98check_host_key_knownhos=
+ts=E2=80=99:
+/home/ubuntu/qemu/block/ssh.c:281:28: error: storage size of =E2=80=98state=
+=E2=80=99 isn=E2=80=99t known
+     enum ssh_known_hosts_e state;
+                            ^~~~~
+/home/ubuntu/qemu/block/ssh.c:289:13: error: implicit declaration of
+function =E2=80=98ssh_session_is_known_server=E2=80=99 [-Werror=3Dimplicit-=
+funct
+ion-declaration]
+     state =3D ssh_session_is_known_server(s->session);
+             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+[and other errors]
+
+
+thanks
+-- PMM
 
