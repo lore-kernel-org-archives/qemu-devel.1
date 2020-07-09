@@ -2,113 +2,107 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79322C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E452C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44A5220786
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA1C42074B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 14:11:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWIdNiV4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44A5220786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuuPv3HU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA1C42074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtXBT-00065S-JN
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 10:05:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48134)
+	id 1jtXGm-0007ap-UJ
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 10:11:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtXAh-0005UK-L8
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:05:07 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59121
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jtXGA-0007BD-Sv
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:10:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57863
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtXAf-0008QW-QU
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:05:07 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jtXG9-0000ni-0M
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 10:10:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594303504;
+ s=mimecast20190719; t=1594303843;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hU0fbvjd9e/gN+BVRH6KLXPLY7wZLxILIOvZtA5SshU=;
- b=OWIdNiV4d068mZzzDGVQZ8NtBKNVBxGOVnq2BL8Q7LesBHrXotLdMZ39nSAhPwxFAzl2Vo
- U2UTaiBB65/qvmmrxcJFQWA0rU5BprUhNE2P1z2Lv6/aG0SAy4yNYan+m3wPCV8DtGmqup
- 4CRMjaL/tPeM6TwTZo41Qdd0YNwpjEo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-VnjVV4-wPaGSEm8oXweugQ-1; Thu, 09 Jul 2020 10:05:01 -0400
-X-MC-Unique: VnjVV4-wPaGSEm8oXweugQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 452DC106B245;
- Thu,  9 Jul 2020 14:05:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
- [10.36.113.127])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 848115C3E7;
- Thu,  9 Jul 2020 14:04:58 +0000 (UTC)
-Subject: Re: [PATCH v10 31/34] qcow2: Add the 'extended_l2' option and the
- QCOW2_INCOMPAT_EXTL2 bit
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1593791819.git.berto@igalia.com>
- <7bd13895731899d66f75d4f6790957aefc5ba353.1593791819.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9591b0cd-c22c-5958-5737-a97460aa8411@redhat.com>
-Date: Thu, 9 Jul 2020 16:04:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=X9C+K8IFXHs6GEgIXOeuTGrJ0+spWy7M/yAcB1H4a0Q=;
+ b=EuuPv3HU/GIVZrrnVG7rkbdVEM/kzCFf7e9LelFWihhTkiAYZn0WrW/VhST4VENabdvFIz
+ NvJQgs242GsAMpx69EHZchL0hxDukTGtcTsT4gHW6SN/GhBCPcU0Di5znHuUFuVWqryc5M
+ qU7T/4+c+ozDhs58RaIbx2sXGxoOOiw=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-kbyPa1SKM4e9XaghEWAGjw-1; Thu, 09 Jul 2020 10:10:42 -0400
+X-MC-Unique: kbyPa1SKM4e9XaghEWAGjw-1
+Received: by mail-qv1-f71.google.com with SMTP id j6so1456388qvl.13
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 07:10:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=X9C+K8IFXHs6GEgIXOeuTGrJ0+spWy7M/yAcB1H4a0Q=;
+ b=kfZ7CqMinyDiENXPQOcOEpdcZAdx5Z5JxOF0lV2JZCGesj3en40BKd4NdTEp0S2H7W
+ EpORaMOJ0CBjH6jrU3KIKVZJyqphZRk0dxAe5X9mGkWt9Cx4q9qL7x+2xZgqO2ZIaIbI
+ +rJfmR+v19TbZfmMJbKbQ8Aw6SZQ3/Pjr5RsM0MsrZvd4U5Fed08y3VLC53AP/7sadwR
+ 5D2wT5Zh6Mgcd2xVy/Ngs3V30M1Sdh0hB3uRZ+r2hbFInFc1UBL2AViIfG90mnxbUvv1
+ 3O6g4nCRNidIllbLWid8OExfaLU9nRI7Cr0+cN953DV1YzazKi/18HndwDLKHZPhe950
+ kDkw==
+X-Gm-Message-State: AOAM5323uYa9+Q9rNag5Zq408UIsDUYtWowOLEdBkpad9bd5JBhOy6L2
+ YLVbJ8DX6DHx1YqXRRSkOUyG6armbcJzeX/2EyLpyPXSgjZQO/oGhI/Eh6OiJSCMsMZT8l5tdVx
+ pIs+szTS+zDn690o=
+X-Received: by 2002:a0c:f88e:: with SMTP id u14mr63994240qvn.81.1594303841801; 
+ Thu, 09 Jul 2020 07:10:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOqLUfnGnvsPJBa91TwEVHHdGNzCOKfRioWACXmNGhJ7lyfqpY2N32t4Clnl3RXXSgrBvnSg==
+X-Received: by 2002:a0c:f88e:: with SMTP id u14mr63994213qvn.81.1594303841460; 
+ Thu, 09 Jul 2020 07:10:41 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
+ by smtp.gmail.com with ESMTPSA id a6sm3966540qkd.69.2020.07.09.07.10.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 09 Jul 2020 07:10:40 -0700 (PDT)
+Date: Thu, 9 Jul 2020 10:10:37 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+Message-ID: <20200709141037.GF199122@xz-x1>
+References: <69f6d6e7-a0b1-abae-894e-4e81b7e0cc90@redhat.com>
+ <ff9e7af0-18c4-57e8-fc94-904fdce1123a@redhat.com>
+ <20200702154540.GI40675@xz-x1>
+ <34fe0e55-c0ae-8e56-462b-6281b6cca4f5@redhat.com>
+ <20200703130338.GD6677@xz-x1>
+ <c985b804-126c-94a1-b05e-430075f9e390@redhat.com>
+ <20200707195429.GF88106@xz-x1>
+ <5004a059-6eb0-4ef3-40b7-94dfbf9ec08f@redhat.com>
+ <20200708141657.GA199122@xz-x1>
+ <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7bd13895731899d66f75d4f6790957aefc5ba353.1593791819.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="uEnYLWJ1caK089Tfq2kS803Tvh0THWNDP"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:20:09
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:33:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,67 +115,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uEnYLWJ1caK089Tfq2kS803Tvh0THWNDP
-Content-Type: multipart/mixed; boundary="GbCzcuGKIzyEcMLibxIWJTU04Vggl6B6R"
+On Thu, Jul 09, 2020 at 01:58:33PM +0800, Jason Wang wrote:
+> > > - If we care the performance, it's better to implement the MAP event for
+> > > vhost, otherwise it could be a lot of IOTLB miss
+> > I feel like these are two things.
+> > 
+> > So far what we are talking about is whether vt-d should have knowledge about
+> > what kind of events one iommu notifier is interested in.  I still think we
+> > should keep this as answered in question 1.
+> > 
+> > The other question is whether we want to switch vhost from UNMAP to MAP/UNMAP
+> > events even without vDMA, so that vhost can establish the mapping even before
+> > IO starts.  IMHO it's doable, but only if the guest runs DPDK workloads.  When
+> > the guest is using dynamic iommu page mappings, I feel like that can be even
+> > slower, because then the worst case is for each IO we'll need to vmexit twice:
+> > 
+> >    - The first vmexit caused by an invalidation to MAP the page tables, so vhost
+> >      will setup the page table before IO starts
+> > 
+> >    - IO/DMA triggers and completes
+> > 
+> >    - The second vmexit caused by another invalidation to UNMAP the page tables
+> > 
+> > So it seems to be worse than when vhost only uses UNMAP like right now.  At
+> > least we only have one vmexit (when UNMAP).  We'll have a vhost translate()
+> > request from kernel to userspace, but IMHO that's cheaper than the vmexit.
+> 
+> 
+> Right but then I would still prefer to have another notifier.
+> 
+> Since vtd_page_walk has nothing to do with device IOTLB. IOMMU have a
+> dedicated command for flushing device IOTLB. But the check for
+> vtd_as_has_map_notifier is used to skip the device which can do demand
+> paging via ATS or device specific way. If we have two different notifiers,
+> vhost will be on the device iotlb notifier so we don't need it at all?
 
---GbCzcuGKIzyEcMLibxIWJTU04Vggl6B6R
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+But we can still have iommu notifier that only registers to UNMAP even after we
+introduce dev-iotlb notifier?  We don't want to do page walk for them as well.
+TCG should be the only one so far, but I don't know.. maybe there can still be
+new ones?
 
-On 03.07.20 17:58, Alberto Garcia wrote:
-> Now that the implementation of subclusters is complete we can finally
-> add the necessary options to create and read images with this feature,
-> which we call "extended L2 entries".
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
+Thanks,
 
-After running basically all test combinations I usually run, I noticed
-that 191 should also be modified to drop the extended_l2 option from the
-qemu-img info output (down under =E2=80=9Cchecking image base=E2=80=9D and =
-=E2=80=9Cchecking
-image layer=E2=80=9D, where there are sed //D calls already).  Otherwise, i=
-t=E2=80=99ll
-break with compat=3D0.10 (for no good reason).
-
-(It needs the format-specific info because it needs to check the
-encryption information, so it just manually drops everything it doesn=E2=80=
-=99t
-need.)
-
-Max
-
-
-
---GbCzcuGKIzyEcMLibxIWJTU04Vggl6B6R--
-
---uEnYLWJ1caK089Tfq2kS803Tvh0THWNDP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8HJAgACgkQ9AfbAGHV
-z0Acmgf+KjIARDPIc8SZCqxgvJ6B3XAP9JFIa1wl4G+oM+G10++MxlAGl//il8g7
-dG+gEy6vZGu5N9iArJmiYTlr+Xc+5+0io8N+U9L0v9Syro3ZCZIkcPQr0idMbBdN
-BmF5uOfMTGeSZyrcU9UQRcXF9ekBLva+ilO1r4nkPyhf9BId8LTNT1O10ndOUxHr
-3HQshPLVzHtadhJ9NPrKxX6Y4LjLQER68Pr4mr2hUZvivdfiMkr9OyPKInqm0Bt7
-zcFEKvmcGk7jcYxar3x7MvLWngfJWlo5dJiaccOPXohM1PcRCaSbX4+MmiMxSrnS
-1xm1SCkwcAsKJqapxYoFp+e2ron4aA==
-=ExzY
------END PGP SIGNATURE-----
-
---uEnYLWJ1caK089Tfq2kS803Tvh0THWNDP--
+-- 
+Peter Xu
 
 
