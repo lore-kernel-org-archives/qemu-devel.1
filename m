@@ -2,99 +2,89 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26614C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:10:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75090C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:13:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E292B2077D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:10:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FD6D2077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:13:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OfdGahAl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E292B2077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zwyk41OJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD6D2077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jta4S-00049t-2b
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 13:10:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47978)
+	id 1jta79-0006i6-IK
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 13:13:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jta3c-0002x6-QI
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:10:00 -0400
-Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:32775)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jta6B-0005bc-JV
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:12:39 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40161)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jta3a-0002cj-NG
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:10:00 -0400
-Received: by mail-vs1-xe41.google.com with SMTP id u133so1508553vsc.0
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 10:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jta69-0003EI-Je
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:12:39 -0400
+Received: by mail-lj1-x241.google.com with SMTP id j11so3251609ljo.7
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 10:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=oWgx/HXjd5VuWIsM/+lPXPhN2h9TrQ0jlUJlxiNqTTA=;
- b=OfdGahAlbLmlOCZtXS8KB+fM9hpNrgIJuQ7q/dAJ0IuBsfLq0rfi9sTBVI3nW7/Xvv
- 95AdYyzksUZui11wOvNsGOkR8zb/OmG/mbdjKUAYGGSGJW3B9d4r5rpidAzhx8OcE7Z4
- YPTly7856bfzqMJrKfTeLWZmJXozH+RmHq5eel3J41ozhjeOxKGF+RBWFsG4homlKHeu
- XCgpJ8i+8uTm8iMY35VdtxDMXEDUyPnXglhZj0mWQly9fCHX/gizt1KJ0NdK3rx89R8X
- QPREHrFlSye7L4lN1rkDWjdZzo/Vpb0sArVE9EtrQlvwZaMGSO50dhHcI9WkZlbuqOUB
- XklA==
+ bh=VZw3hsv4qH3PqD3OGEL0HYAcWbD07TY01E77mFXa2pA=;
+ b=Zwyk41OJdwICrYIYfSatOc+2AIVkNey2/LKilJsj4C/Uu/S4l+PbfElBDriXa70JwZ
+ DCOiitwFDToEPHOjqkqYGzoBOpBpfnNMMlj9ARgzoDboBViEKLDEBC1uWb2zR5NOrebf
+ fv781PujwLljpGlKIHjaHMS1PNncadj4DpZc62lq9ASjo9xMkVuKpkBqVxBYV+rju+7+
+ A4K4NQG7H5Iy4SPKjnTVFbmHF5qFnlkoe8iPWMYSYq0bTS1LTgqT8Md1cpJzpjmsF5Vk
+ ou/ZDzBAVeJIZ6z/OTchV5sIcKnYfVs5CXho1KVN8CrAq5DE0fUFetGmuzToBZ0Wt6pP
+ cuUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=oWgx/HXjd5VuWIsM/+lPXPhN2h9TrQ0jlUJlxiNqTTA=;
- b=FTT120ix4BmYqFRKVHs3VaSjMyVcqSwRHr6lLdYyic7a+UfNRdMuK5QGheI7X+hIpX
- eKUJxIk4R4H5ldtiwYiUH8v9TASpTYJ+om8MuN9j/y4HYluaPG2V3Fapa7eGjdXrQNg/
- bItfyeDvmlFHkzVBpIGL7iAkCtc/6cZ2nM9V6TmLZwVlX/rfNk23L799HL+IjOJhEu44
- ygsk//uW2qRpqeoSYaIR97Z6hUY4/SyiPALQEI4akkt/zGj5Dh2kFMuTHBtMXcmgh3Dn
- X8d9l4WfVDY7dPhb6kM5u3XpyI4OV7d6QLPb+HuWWdI/kuTYFTQhtWXtWpj6Y23uvIYc
- OPpA==
-X-Gm-Message-State: AOAM53389WO2vcywl8TEjCWX+RB9uqHBpvBEPlVcCiSSr0lDWyW+kHXn
- KgeiuKFWpFKWB4S/lGQUvGEconWvLG1D2Zn8/Pu0HQ==
-X-Google-Smtp-Source: ABdhPJymgopyJXkhTmqWErmhAbej2EY/ejRNVRzVuvpa/hWQq4OoI6MLRV2bcYmbOw8BR+WqfuNiuZSythOFoQcl4RA=
-X-Received: by 2002:a67:d88c:: with SMTP id f12mr46990229vsj.92.1594314596019; 
- Thu, 09 Jul 2020 10:09:56 -0700 (PDT)
+ bh=VZw3hsv4qH3PqD3OGEL0HYAcWbD07TY01E77mFXa2pA=;
+ b=cDvAzMhIUitYvmuX4vU5UwfqP/DliU0L3cyE1bO1zAFdNlYNBOVUbFOuJJkP2+1Uhv
+ BIwnC3GQMtrGtLLzunFHZy9Yhw1o1C7SkCQEE8JFUWGKdHrttCmaTs0YUt/ESHPvw9kN
+ WelP97H0qYq+8OWl2PBzXDkPNTExooPmO2HLdanxEdecflnUyz0U8a1VL0DcAHkPt/bn
+ Z1qAdDPuaC/Lys24VcAT9sCD9knFNOkyPoieIafCzDbMSpO3JI5vLDYNgLh6F4bwbwzS
+ 5TcK59OaMdw+HEBLf/rKqmHAE+yAMiqGK/GISfoRJ1RMXL7gyOjPXBhk+lSSAXlay8Hd
+ sbZA==
+X-Gm-Message-State: AOAM531UjUoRThyV1Dn/3r7nI1kjBKRMTx8lJNXjzJdox62WZiPX89zB
+ KtO39rms7u3nv1T3Q/tSdLLYcVqH6w39EcgO2Du/Sw==
+X-Google-Smtp-Source: ABdhPJwrPYK2MQqMDg2VFGekIvJzrSYpGNEK8mDfBnw4amXLnU7AAhBgKbPIWmYG1kBh1DI7d0exDS8mwO/oZ012N30=
+X-Received: by 2002:a2e:9855:: with SMTP id e21mr34338896ljj.424.1594314754675; 
+ Thu, 09 Jul 2020 10:12:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200709003608.3834629-1-hskinnemoen@google.com>
- <20200709003608.3834629-2-hskinnemoen@google.com>
- <2fe8ea5e-56de-f57f-6146-8355125daa7f@amsat.org>
- <CAFQmdRYx99PpWz6bftCvBR7=YRftD_WNex_A9aoDaeRg=4tsCw@mail.gmail.com>
- <bd2972b0-0684-e379-6d66-16ceb62deade@amsat.org>
-In-Reply-To: <bd2972b0-0684-e379-6d66-16ceb62deade@amsat.org>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Thu, 9 Jul 2020 10:09:44 -0700
-Message-ID: <CAFQmdRbHXhd9-HUQP5ET=JQEnQ3FMCQBHajwZrP5d7=iCc0tzA@mail.gmail.com>
-Subject: Re: [PATCH v5 01/11] hw/misc: Add NPCM7xx System Global Control
- Registers device model
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
- QEMU Developers <qemu-devel@nongnu.org>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
- CS20 KFTing <kfting@nuvoton.com>, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+References: <20200709141327.14631-1-alex.bennee@linaro.org>
+ <20200709141327.14631-9-alex.bennee@linaro.org>
+In-Reply-To: <20200709141327.14631-9-alex.bennee@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Thu, 9 Jul 2020 13:12:39 -0400
+Message-ID: <CAEyhzFtKVXUy7xy_NOqGhK__VkfxbZeODCJd7k+QgxMLDYDAgQ@mail.gmail.com>
+Subject: Re: [PATCH v1 08/13] plugins: expand the bb plugin to be thread safe
+ and track per-cpu
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e41;
- envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe41.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=robert.foley@linaro.org; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,217 +97,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, robhenry@microsoft.com,
+ f4bug@amsat.org, aaron@os.amperecomputing.com,
+ "Emilio G. Cota" <cota@braap.org>, Dave Bort <dbort@dbort.com>,
+ kuhn.chenqun@huawei.com, Peter Puhov <peter.puhov@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 9, 2020 at 9:23 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> On 7/9/20 8:43 AM, Havard Skinnemoen wrote:
-> > On Wed, Jul 8, 2020 at 11:04 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
-t.org> wrote:
-> >> On 7/9/20 2:35 AM, Havard Skinnemoen wrote:
-> >>> Implement a device model for the System Global Control Registers in t=
-he
-> >>> NPCM730 and NPCM750 BMC SoCs.
-> >>>
-> >>> This is primarily used to enable SMP boot (the boot ROM spins reading
-> >>> the SCRPAD register) and DDR memory initialization; other registers a=
-re
-> >>> best effort for now.
-> >>>
-> >>> The reset values of the MDLR and PWRON registers are determined by th=
-e
-> >>> SoC variant (730 vs 750) and board straps respectively.
-> >>>
-> >>> Reviewed-by: Joel Stanley <joel@jms.id.au>
-> >>> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> >>> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
-> >>> ---
-> [...]
-> >>> diff --git a/hw/misc/npcm7xx_gcr.c b/hw/misc/npcm7xx_gcr.c
-> >>> new file mode 100644
-> >>> index 0000000000..9934cd238d
-> >>> --- /dev/null
-> >>> +++ b/hw/misc/npcm7xx_gcr.c
-> >>> @@ -0,0 +1,226 @@
-> >>> +/*
-> >>> + * Nuvoton NPCM7xx System Global Control Registers.
-> >>> + *
-> >>> + * Copyright 2020 Google LLC
-> >>> + *
-> >>> + * This program is free software; you can redistribute it and/or mod=
-ify it
-> >>> + * under the terms of the GNU General Public License as published by=
- the
-> >>> + * Free Software Foundation; either version 2 of the License, or
-> >>> + * (at your option) any later version.
-> >>> + *
-> >>> + * This program is distributed in the hope that it will be useful, b=
-ut WITHOUT
-> >>> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
-Y or
-> >>> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public Lice=
-nse
-> >>> + * for more details.
-> >>> + */
-> >>> +
-> >>> +#include "qemu/osdep.h"
-> >>> +
-> >>> +#include "hw/misc/npcm7xx_gcr.h"
-> >>> +#include "hw/qdev-properties.h"
-> >>> +#include "migration/vmstate.h"
-> >>> +#include "qapi/error.h"
-> >>> +#include "qemu/log.h"
-> >>> +#include "qemu/module.h"
-> >>> +#include "qemu/units.h"
-> >>> +
-> >>> +#include "trace.h"
-> >>> +
-> >>> +static const uint32_t cold_reset_values[NPCM7XX_GCR_NR_REGS] =3D {
-> >>> +    [NPCM7XX_GCR_PDID]          =3D 0x04a92750,   /* Poleg A1 */
-> >>> +    [NPCM7XX_GCR_MISCPE]        =3D 0x0000ffff,
-> >>> +    [NPCM7XX_GCR_SPSWC]         =3D 0x00000003,
-> >>> +    [NPCM7XX_GCR_INTCR]         =3D 0x0000035e,
-> >>> +    [NPCM7XX_GCR_HIFCR]         =3D 0x0000004e,
-> >>> +    [NPCM7XX_GCR_INTCR2]        =3D (1U << 19),   /* DDR initialized=
- */
-> >>> +    [NPCM7XX_GCR_RESSR]         =3D 0x80000000,
-> >>> +    [NPCM7XX_GCR_DSCNT]         =3D 0x000000c0,
-> >>> +    [NPCM7XX_GCR_DAVCLVLR]      =3D 0x5a00f3cf,
-> >>> +    [NPCM7XX_GCR_SCRPAD]        =3D 0x00000008,
-> >>> +    [NPCM7XX_GCR_USB1PHYCTL]    =3D 0x034730e4,
-> >>> +    [NPCM7XX_GCR_USB2PHYCTL]    =3D 0x034730e4,
-> >>> +};
-> >>> +
-> >>> +static uint64_t npcm7xx_gcr_read(void *opaque, hwaddr offset, unsign=
-ed size)
-> >>> +{
-> >>> +    uint32_t reg =3D offset / sizeof(uint32_t);
-> >>> +    NPCM7xxGCRState *s =3D opaque;
-> >>> +
-> >>> +    if (reg >=3D NPCM7XX_GCR_NR_REGS) {
-> >>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: offset 0x%04x out of ran=
-ge\n",
-> >>> +                      __func__, (unsigned int)offset);
-> >>
-> >> Maybe use HWADDR_PRIx instead of casting to int?
-> >
-> > Will do, thanks!
->
-> Glad you are not annoyed by my review comments.
->
-> FYI your series quality is in my top-4 "adding new machine to QEMU".
-> I'd like to use it as example to follow.
->
-> I am slowly reviewing because this is not part of my work duties,
-> so I do that in my free time before/after work, which is why I can
-> barely do more that 2 per day, as I have to learn the SoC and
-> cross check documentation (or in this case, existing firmware code
-> since there is no public doc).
+Reviewed-by: Robert Foley <robert.foley@linaro.org>
 
-Your feedback is super valuable, thanks a lot. I really appreciate it.
-
+On Thu, 9 Jul 2020 at 10:13, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
 >
-> [...]
-> >>> +static void npcm7xx_gcr_realize(DeviceState *dev, Error **errp)
-> >>> +{
-> >>> +    NPCM7xxGCRState *s =3D NPCM7XX_GCR(dev);
-> >>> +    uint64_t dram_size;
-> >>> +    Error *err =3D NULL;
-> >>> +    Object *obj;
-> >>> +
-> >>> +    obj =3D object_property_get_link(OBJECT(dev), "dram-mr", &err);
-> >>> +    if (!obj) {
-> >>> +        error_setg(errp, "%s: required dram-mr link not found: %s",
-> >>> +                   __func__, error_get_pretty(err));
-> >>> +        return;
-> >>> +    }
-> >>> +    dram_size =3D memory_region_size(MEMORY_REGION(obj));
-> >>> +
-> >>> +    /* Power-on reset value */
-> >>> +    s->reset_intcr3 =3D 0x00001002;
-> >>> +
-> >>> +    /*
-> >>> +     * The GMMAP (Graphics Memory Map) field is used by u-boot to de=
-tect the
-> >>> +     * DRAM size, and is normally initialized by the boot block as p=
-art of DRAM
-> >>> +     * training. However, since we don't have a complete emulation o=
-f the
-> >>> +     * memory controller and try to make it look like it has already=
- been
-> >>> +     * initialized, the boot block will skip this initialization, an=
-d we need
-> >>> +     * to make sure this field is set correctly up front.
-> >>> +     *
-> >>> +     * WARNING: some versions of u-boot only looks at bits 8 and 9, =
-so 2 GiB or
-> >>> +     * more of DRAM will be interpreted as 128 MiB.
-> >>
-> >> I'd say u-boot is right in wrapping at 2GB, as more DRAM is
-> >> un-addressable.
-> >
-> > Ah, maybe I shouldn't have said "or more". The bug is that if you
-> > specify _exactly_ 2GiB, u-boot will see 128 MiB.
-> >
-> > But I agree more than 2GiB doesn't make sense, so I'll add a check for =
-that.
-> >
-> > Not sure if I agree that the check should be here. > 2 GiB is an
-> > addressing limitation, and the GCR module shouldn't really know what
-> > the SoC's address space looks like. The lower limit is because the GCR
-> > module can't encode anything less than 128 MiB.
-> >
-> >>> +     *
-> >>> +     * https://github.com/Nuvoton-Israel/u-boot/blob/2aef993bd2aafeb=
-5408dbaad0f3ce099ee40c4aa/board/nuvoton/poleg/poleg.c#L244
-> >>> +     */
-> >>> +    if (dram_size >=3D 2 * GiB) {
-> >>
-> >> See my comment in this series on the machine patch.
-> >>
-> >>> +        s->reset_intcr3 |=3D 4 << 8;
-> >>> +    } else if (dram_size >=3D 1 * GiB) {
-> >>> +        s->reset_intcr3 |=3D 3 << 8;
-> >>> +    } else if (dram_size >=3D 512 * MiB) {
-> >>> +        s->reset_intcr3 |=3D 2 << 8;
-> >>> +    } else if (dram_size >=3D 256 * MiB) {
-> >>> +        s->reset_intcr3 |=3D 1 << 8;
-> >>> +    } else if (dram_size >=3D 128 * MiB) {
-> >>> +        s->reset_intcr3 |=3D 0 << 8;
+> While there isn't any easy way to make the inline counts thread safe
+> we can ensure the callback based ones are. While we are at it we can
+> reduce introduce a new option ("idle") to dump a report of the current
+> bb and insn count each time a vCPU enters the idle state.
 >
-> I think this can be simplified as:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Dave Bort <dbort@dbort.com>
 >
->          s->reset_intcr3 =3D (4 - clz32(dram_size)) << 8;
+> ---
+> v2
+>   - fixup for non-inline linux-user case
+>   - minor cleanup and re-factor
+> ---
+>  tests/plugin/bb.c | 96 ++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 83 insertions(+), 13 deletions(-)
 >
-> Which implicitly truncate to power of 2 (which is what this
-> block does, as you can have only 1 bank managed per this SGC).
-
-Good idea. I find this a little easier to understand though:
-
-#define NPCM7XX_GCR_MIN_DRAM_SIZE   (128 * MiB)
-
-    s->reset_intcr3 |=3D ctz64(dram_size / NPCM7XX_GCR_MIN_DRAM_SIZE) << 8;
-
-> But checking is_power_of_2(dram_size) and reporting an error
-> else, is probably even better.
-
-OK, I'll add a check for this, and also explicit checks for too large
-and too small. The former is currently redundant with the DRAM size
-check I'm adding to npcm7xx_realize(), but I kind of like the idea of
-checking for encoding limitations and addressing limitations
-separately, as they may not necessarily stay the same forever.
-
-> >>> +    } else {
-> >>> +        error_setg(errp,
-> >>> +                   "npcm7xx_gcr: DRAM size %" PRIu64
-> >>> +                   " is too small (need 128 MiB minimum)",
-> >>> +                   dram_size);
-> >>
-> >> Ah, so you could add the same error for >2GB. Easier.
-> >>
-> >> Preferably using HWADDR_PRIx, and similar error for >2GB:
-> >> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
+> index df19fd359df3..89c373e19cd8 100644
+> --- a/tests/plugin/bb.c
+> +++ b/tests/plugin/bb.c
+> @@ -16,24 +16,67 @@
+>
+>  QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
+>
+> -static uint64_t bb_count;
+> -static uint64_t insn_count;
+> +typedef struct {
+> +    GMutex lock;
+> +    int index;
+> +    uint64_t bb_count;
+> +    uint64_t insn_count;
+> +} CPUCount;
+> +
+> +/* Used by the inline & linux-user counts */
+>  static bool do_inline;
+> +static CPUCount inline_count;
+> +
+> +/* Dump running CPU total on idle? */
+> +static bool idle_report;
+> +static GPtrArray *counts;
+> +static int max_cpus;
+> +
+> +static void gen_one_cpu_report(CPUCount *count, GString *report)
+> +{
+> +    if (count->bb_count) {
+> +        g_string_append_printf(report, "CPU%d: "
+> +                               "bb's: %" PRIu64", insns: %" PRIu64 "\n",
+> +                               count->index,
+> +                               count->bb_count, count->insn_count);
+> +    }
+> +}
+>
+>  static void plugin_exit(qemu_plugin_id_t id, void *p)
+>  {
+> -    g_autofree gchar *out =3D g_strdup_printf(
+> -        "bb's: %" PRIu64", insns: %" PRIu64 "\n",
+> -        bb_count, insn_count);
+> -    qemu_plugin_outs(out);
+> +    g_autoptr(GString) report =3D g_string_new("");
+> +
+> +    if (do_inline || !max_cpus) {
+> +        g_string_printf(report, "bb's: %" PRIu64", insns: %" PRIu64 "\n"=
+,
+> +                        inline_count.bb_count, inline_count.insn_count);
+> +    } else {
+> +        g_ptr_array_foreach(counts, (GFunc) gen_one_cpu_report, report);
+> +    }
+> +    qemu_plugin_outs(report->str);
+> +}
+> +
+> +static void vcpu_idle(qemu_plugin_id_t id, unsigned int cpu_index)
+> +{
+> +    CPUCount *count =3D g_ptr_array_index(counts, cpu_index);
+> +    g_autoptr(GString) report =3D g_string_new("");
+> +    gen_one_cpu_report(count, report);
+> +
+> +    if (report->len > 0) {
+> +        g_string_prepend(report, "Idling ");
+> +        qemu_plugin_outs(report->str);
+> +    }
+>  }
+>
+>  static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
+>  {
+> -    unsigned long n_insns =3D (unsigned long)udata;
+> +    CPUCount *count =3D max_cpus ?
+> +        g_ptr_array_index(counts, cpu_index) : &inline_count;
+>
+> -    insn_count +=3D n_insns;
+> -    bb_count++;
+> +    unsigned long n_insns =3D (unsigned long)udata;
+> +    g_mutex_lock(&count->lock);
+> +    count->insn_count +=3D n_insns;
+> +    count->bb_count++;
+> +    g_mutex_unlock(&count->lock);
+>  }
+>
+>  static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb=
+)
+> @@ -42,9 +85,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct q=
+emu_plugin_tb *tb)
+>
+>      if (do_inline) {
+>          qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_=
+ADD_U64,
+> -                                                 &bb_count, 1);
+> +                                                 &inline_count.bb_count,=
+ 1);
+>          qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_=
+ADD_U64,
+> -                                                 &insn_count, n_insns);
+> +                                                 &inline_count.insn_coun=
+t, n_insns);
+>      } else {
+>          qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
+>                                               QEMU_PLUGIN_CB_NO_REGS,
+> @@ -56,8 +99,35 @@ QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin=
+_id_t id,
+>                                             const qemu_info_t *info,
+>                                             int argc, char **argv)
+>  {
+> -    if (argc && strcmp(argv[0], "inline") =3D=3D 0) {
+> -        do_inline =3D true;
+> +    int i;
+> +
+> +    for (i =3D 0; i < argc; i++) {
+> +        char *opt =3D argv[i];
+> +        if (g_strcmp0(opt, "inline") =3D=3D 0) {
+> +            do_inline =3D true;
+> +        } else if (g_strcmp0(opt, "idle") =3D=3D 0) {
+> +            idle_report =3D true;
+> +        } else {
+> +            fprintf(stderr, "option parsing failed: %s\n", opt);
+> +            return -1;
+> +        }
+> +    }
+> +
+> +    if (info->system_emulation && !do_inline) {
+> +        max_cpus =3D info->system.max_vcpus;
+> +        counts =3D g_ptr_array_new();
+> +        for (i =3D 0; i < max_cpus; i++) {
+> +            CPUCount *count =3D g_new0(CPUCount, 1);
+> +            g_mutex_init(&count->lock);
+> +            count->index =3D i;
+> +            g_ptr_array_add(counts, count);
+> +        }
+> +    } else if (!do_inline) {
+> +        g_mutex_init(&inline_count.lock);
+> +    }
+> +
+> +    if (idle_report) {
+> +        qemu_plugin_register_vcpu_idle_cb(id, vcpu_idle);
+>      }
+>
+>      qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
+> --
+> 2.20.1
+>
 
