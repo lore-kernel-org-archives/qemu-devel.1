@@ -1,95 +1,87 @@
 Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D156FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 21:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2F9C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 22:13:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9610520672
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 21:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A51DE20672
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 22:13:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hESHln3/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9610520672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hBjyjc8u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51DE20672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jteXA-0000RB-PO
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 17:56:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34678)
+	id 1jten4-0005y9-VP
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 18:13:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jteWF-0007u2-Tu
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 17:55:52 -0400
-Received: from mail-io1-xd29.google.com ([2607:f8b0:4864:20::d29]:43069)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jteWD-0001Nb-Qq
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 17:55:51 -0400
-Received: by mail-io1-xd29.google.com with SMTP id k23so3925455iom.10
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 14:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NfM2q5MsuBtISTcEk8XsvmXu9yzaadVqFdqRjRzwqBA=;
- b=hESHln3/xT/Sy8Ueo1UuNcqXissaF2EJK6dH/uX2GLoXLOo0iFzEfl8BTtw2/JtH1t
- bOQ8BIKrXlmy/GYKYORjDrZ0O6zC163DL/uKxfpMcwFnwbAaUOvzZHtyxT8OxZtGhhYd
- Qwv2dTUbiGC+VTMRehdWJM5qsti658ehrw9KhfbDPQRt8FvYP47dhdvWWT8vGcGMvq9s
- xTaDny8fHuRfJn8OyaQyXpXXgPE0vwRs3CXTh5OTRdP7LAOriOk5wMo1kiiquAS1UzMI
- IYGMKyxADIM3HeU2tLjpcts48rNj1P0WiqJCnWo2lujbTdRd9nJGPSwVWkB7EzIqDePz
- 0l5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NfM2q5MsuBtISTcEk8XsvmXu9yzaadVqFdqRjRzwqBA=;
- b=eCVmd3xt0afYnzWqN06kYFM/dtx29YHLdcL6h9WOwR4saN3Et4GT7LuXSdWxSSMsOG
- C5cAUSYHF0CX9lUpo+pqs5dJRNP6BgTX4KUgrt5W/NZfpd26OMUHV+n1VOhsie8M6atq
- npwsPUKN0dzEpXfnlvZvjDy0vq/wsFWsW5IWW6gD8FA1oy7nEkYNeZr56O2FlCKuehkF
- ggl9Lq1bMScLu3xaMrYDvgsFJU3RvQJTDvTFoa1a0bruWYg4sFBtdjFNdfduhDueguP5
- zEoofdORiDGnTIYlAe0M2sFMjWyIogdrxSxyMyF4sQ4JmT41eGekd5vYyaHkN07tPGiJ
- Dpmw==
-X-Gm-Message-State: AOAM533BpbDGud1f8e7Isu1RsvmAG4BI1WsrUdZTOe3V8bPbu9zVpGsM
- zN1ICeR4E9YQ9RtGYvcBIAL068wuD2hOo/Ee4v8=
-X-Google-Smtp-Source: ABdhPJwBqkfPQLl8z5RQbPpG3NDfxMOzqic1LEjpVzTR58KDnCJMN7QfSF5AvRNfvjL3lceaIfF4/9gTwILygP9u6is=
-X-Received: by 2002:a6b:8e56:: with SMTP id q83mr44843203iod.61.1594331747605; 
- Thu, 09 Jul 2020 14:55:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jtemV-0005WV-95
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 18:12:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39331
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jtemS-0003fo-NO
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 18:12:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594332754;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=N1mCkufpRLREc+9eTeDoIwzlzFpK023Z9H3JMSZ4OeQ=;
+ b=hBjyjc8u7j9UWzjDvqRML/n8VtVX2lrt6+h3+gwmdJTXLBd4UeeI9LJFg8yAcaoplYlbKO
+ 8lBYP1nsY41r32QIEWnVtSKkPqZefljIVw0aU7YefCm5qlK3LMahvF8P+JRCeYTrvyeung
+ Y30XpxdhTL8xZsokLKZZksO0KlOKiN4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-dHoEW4GvM6SN_yI9xHlBuA-1; Thu, 09 Jul 2020 18:12:31 -0400
+X-MC-Unique: dHoEW4GvM6SN_yI9xHlBuA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45726106B244;
+ Thu,  9 Jul 2020 22:12:29 +0000 (UTC)
+Received: from localhost (ovpn-116-140.rdu2.redhat.com [10.10.116.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AABA65D9C9;
+ Thu,  9 Jul 2020 22:12:28 +0000 (UTC)
+Date: Thu, 9 Jul 2020 18:12:26 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v5 1/4] target/i386: add missing vmx features for several
+ CPU models
+Message-ID: <20200709221226.GM780932@habkost.net>
+References: <20200619073114.24303-1-chenyi.qiang@intel.com>
+ <20200619073114.24303-2-chenyi.qiang@intel.com>
 MIME-Version: 1.0
-References: <BY5PR02MB677298C4D2C2B63EF409AA5CCA6B0@BY5PR02MB6772.namprd02.prod.outlook.com>
- <CADBGO7-hp4Pyfn+rq9d=ZxHmpMwitv-oLjYPJmCKSH6cLHVx=w@mail.gmail.com>
- <CADBGO78-mqwapj+mdpFUO-puL0OZ_1QeBc+4yo4S9g1O4deNjg@mail.gmail.com>
- <2d312ec0-d280-c0e3-2b1e-ff9c70c3168f@gmail.com>
- <20200707075740.dkc76ceb7wytdoem@sirius.home.kraxel.org>
- <CADBGO79KSm3KV7=otOg=u7WjwBV=j3T7iU0fcTF-nGgtZvy+Aw@mail.gmail.com>
- <20200708072947.7hynrm53622tp3ha@sirius.home.kraxel.org>
- <CADBGO7-38Q3MS-G5rCbW1i_1rvq7NRf2J+bMErXr=7xhZ=jEWg@mail.gmail.com>
- <20200708102958.kxnlr5outhsufxv5@sirius.home.kraxel.org>
- <CADBGO7_08su0HqP1uiwvkLfwq3NUmUxoLhRK5H3b0v=C4iPYFg@mail.gmail.com>
- <20200709075702.2mrm45ncbfmmikde@sirius.home.kraxel.org>
-In-Reply-To: <20200709075702.2mrm45ncbfmmikde@sirius.home.kraxel.org>
-From: Paul Zimmerman <pauldzim@gmail.com>
-Date: Thu, 9 Jul 2020 14:55:21 -0700
-Message-ID: <CADBGO7-yccD+F6EZ-SqGc4pFgYoueQ-HvEAMyBLwO_BuXpN3SQ@mail.gmail.com>
-Subject: Re: Failure prints during format or mounting a usb storage device
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000785e7a05aa09497d"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d29;
- envelope-from=pauldzim@gmail.com; helo=mail-io1-xd29.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200619073114.24303-2-chenyi.qiang@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 18:12:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,113 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <saipava@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vikram Garhwal <fnuv@xilinx.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Robert Hoo <robert.hu@linux.intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000785e7a05aa09497d
-Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 9, 2020 at 12:57 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+I'm very sorry for taking so long to review this.  Question
+below:
 
-> > Starting at line 1746 is the first CBW, it's for an Inquiry command.
-> >
-> > Starting at line 1759 is the response, notice at line 1761 the MSD debug
-> > says "Data in 64/36", which is strange.
->
-> Not really.  First is the packet size, second is the (remaining) data
-> size.  Inquiry data is 36 bytes, and dwc2 uses 64 byte instead of 36
-> byte transfers.
->
-> > Then the MSD defers the packet, even though the full 36 bytes has
-> > already been received.
->
-> Yes, and this is the problem.  The condition checks whenever there is
-> room left in the usb packet.  But we should also check whenever there
-> is actually more data pending, so how about this:
->
->     if (p->actual_length < p->iov.size && s->mode == USB_MSDM_DATAIN) {
->         DPRINTF("Deferring packet %p [wait data-in]\n", p);
->
-> take care,
->   Gerd
->
->
-Hi Gerd,
+On Fri, Jun 19, 2020 at 03:31:11PM +0800, Chenyi Qiang wrote:
+> Add some missing VMX features in Skylake-Server, Cascadelake-Server and
+> Icelake-Server CPU models based on the output of Paolo's script.
+> 
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 
-Hey, that works! But we still need to keep the rest of 7ad3d51ebb8a,
-or else s->data_len eventually goes negative and we hit the assertion
-on line 447 "Assertion `le32_to_cpu(s->csw.residue) == 0' failed.
+Why are you changing the v1 definition instead adding those new
+features in a new version of the CPU model, just like you did in
+patch 3/4?
 
-But with that, hcd-dwc2 seems to work fine, and also the error
-messages that Sai saw with hcd-xhci are gone.
+> ---
+>  target/i386/cpu.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index b1b311baa2..0b309ef3ab 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3002,6 +3002,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>               VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+>               VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+>               VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+>          .xlevel = 0x80000008,
+>          .model_id = "Intel Xeon Processor (Skylake)",
+>          .versions = (X86CPUVersionDefinition[]) {
+> @@ -3130,6 +3131,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>               VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+>               VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+>               VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+>          .xlevel = 0x80000008,
+>          .model_id = "Intel Xeon Processor (Cascadelake)",
+>          .versions = (X86CPUVersionDefinition[]) {
+> @@ -3477,7 +3479,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>               VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+>               VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+>               VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+> -             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS,
+> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+> +             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+>          .xlevel = 0x80000008,
+>          .model_id = "Intel Xeon Processor (Icelake)",
+>          .versions = (X86CPUVersionDefinition[]) {
+> -- 
+> 2.17.1
+> 
+> 
 
-Do you want to submit the patch for this?
+-- 
+Eduardo
 
-Thanks,
-Paul
-
---000000000000785e7a05aa09497d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><div class=3D"gmail_default" style=3D"fon=
-t-family:monospace"><br></div></div><br><div class=3D"gmail_quote"><div dir=
-=3D"ltr" class=3D"gmail_attr">On Thu, Jul 9, 2020 at 12:57 AM Gerd Hoffmann=
- &lt;<a href=3D"mailto:kraxel@redhat.com">kraxel@redhat.com</a>&gt; wrote:<=
-br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
-x;border-left:1px solid rgb(204,204,204);padding-left:1ex">&gt; Starting at=
- line 1746 is the first CBW, it&#39;s for an Inquiry command.<br>
-&gt; <br>
-&gt; Starting at line 1759 is the response, notice at line 1761 the MSD deb=
-ug<br>
-&gt; says &quot;Data in 64/36&quot;, which is strange.<br>
-<br>
-Not really.=C2=A0 First is the packet size, second is the (remaining) data<=
-br>
-size.=C2=A0 Inquiry data is 36 bytes, and dwc2 uses 64 byte instead of 36<b=
-r>
-byte transfers.<br>
-<br>
-&gt; Then the MSD defers the packet, even though the full 36 bytes has<br>
-&gt; already been received.<br>
-<br>
-Yes, and this is the problem.=C2=A0 The condition checks whenever there is<=
-br>
-room left in the usb packet.=C2=A0 But we should also check whenever there<=
-br>
-is actually more data pending, so how about this:<br>
-<br>
-=C2=A0 =C2=A0 if (p-&gt;actual_length &lt; p-&gt;iov.size &amp;&amp; s-&gt;=
-mode =3D=3D USB_MSDM_DATAIN) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 DPRINTF(&quot;Deferring packet %p [wait data-in=
-]\n&quot;, p);<br>
-<br>
-take care,<br>
-=C2=A0 Gerd<br>
-<br></blockquote><div><span class=3D"gmail_default" style=3D"font-family:mo=
-nospace"><br></span></div><div><span class=3D"gmail_default" style=3D"font-=
-family:monospace">Hi Gerd,</span></div><div><span class=3D"gmail_default" s=
-tyle=3D"font-family:monospace"><br></span></div><div><div class=3D"gmail_de=
-fault" style=3D"font-family:monospace">Hey, that works! But we still need t=
-o keep the rest of 7ad3d51ebb8a,</div><div class=3D"gmail_default" style=3D=
-"font-family:monospace">or else s-&gt;data_len eventually goes negative and=
- we hit the assertion</div><div class=3D"gmail_default" style=3D"font-famil=
-y:monospace">on line 447 &quot;Assertion `le32_to_cpu(s-&gt;csw.residue) =
-=3D=3D 0&#39; failed.</div><br></div><div><div class=3D"gmail_default" styl=
-e=3D"font-family:monospace">But with that, hcd-dwc2 seems to work fine, and=
- also the error</div><div class=3D"gmail_default" style=3D"font-family:mono=
-space">messages that Sai saw with hcd-xhci are gone.</div><div class=3D"gma=
-il_default" style=3D"font-family:monospace"><br></div><div class=3D"gmail_d=
-efault" style=3D"font-family:monospace">Do you want to submit the patch for=
- this?</div><br></div></div><div class=3D"gmail_quote"><div class=3D"gmail_=
-default" style=3D"font-family:monospace">Thanks,</div><div class=3D"gmail_d=
-efault" style=3D"font-family:monospace">Paul</div><div class=3D"gmail_defau=
-lt" style=3D"font-family:monospace"><br></div></div></div>
-
---000000000000785e7a05aa09497d--
 
