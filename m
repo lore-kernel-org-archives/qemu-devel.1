@@ -2,69 +2,92 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19867C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 18:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFF3C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 18:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D73B720775
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 18:39:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D73B720775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 5484220775
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 18:42:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g5Lpoevr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5484220775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtbRm-0001JI-6v
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 14:39:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43208)
+	id 1jtbV7-0002Uz-Kz
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 14:42:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtbRF-0000uM-2j
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 14:38:29 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37696)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtbRB-00086M-PF
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 14:38:28 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 6BD4BAD5C;
- Thu,  9 Jul 2020 18:38:22 +0000 (UTC)
-Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200629093504.3228-1-cfontana@suse.de>
- <20200629093504.3228-4-cfontana@suse.de>
- <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
- <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
- <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <e9dca3d1-f52d-13ce-2d7d-66958bc15765@suse.de>
-Date: Thu, 9 Jul 2020 20:38:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jtbUL-0001zx-EV
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 14:41:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55653
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jtbUI-0000ug-SU
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 14:41:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594320097;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/abt4u8FXLZ6JyAT6btNIAF39l7DMrS0VYSaaxD7CJE=;
+ b=g5LpoevreWH9DsVOokSr7jaheBWJ3EjbWUe6stWxxE5Vv/9PY8g54SDT72LWWodq+DyjUQ
+ Fx30KGnaWmFJhtbzE5SWOvlcuL05nI6jOCwCBDz6S4QT2xxNhPdcFm9y1x8Y/vIgw7coid
+ jZcYWnTd+4wp2HzVeo1w4E0sLoN/z6s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-W2S9c7ZuMiGwjt9ByLT5Vg-1; Thu, 09 Jul 2020 14:41:22 -0400
+X-MC-Unique: W2S9c7ZuMiGwjt9ByLT5Vg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F1F4800C64;
+ Thu,  9 Jul 2020 18:41:21 +0000 (UTC)
+Received: from localhost (ovpn-116-140.rdu2.redhat.com [10.10.116.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E12DB79CEA;
+ Thu,  9 Jul 2020 18:41:17 +0000 (UTC)
+Date: Thu, 9 Jul 2020 14:41:17 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PULL 00/12] Block patches
+Message-ID: <20200709184117.GG780932@habkost.net>
+References: <20200624100210.59975-1-stefanha@redhat.com>
+ <CAFEAcA_K7MtnEjRMZCbmYrJCm6qD4N7ZMHvGuAzXL9gD2zQNuA@mail.gmail.com>
+ <20200626102506.GD281902@stefanha-x1.localdomain>
+ <cab22670-6804-9ddc-c3ee-b6dcf3a74ac4@redhat.com>
+ <20200707220514.GY7276@habkost.net>
+ <20200709150206.GC4096@linux.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 10:31:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+In-Reply-To: <20200709150206.GC4096@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 11:02:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,256 +100,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
- Colin Xu <colin.xu@intel.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/8/20 5:05 PM, Paolo Bonzini wrote:
-> On 08/07/20 17:00, Claudio Fontana wrote:
->>> Bisectable, 100% failure rate, etc. :(  Can you split the patch in
->>> multiple parts, specifically separating any rename or introducing of
->>> includes from the final file move?
->> Hi Paolo,
->>
->> will take a look!
->>
->> Is this captured by some travis / cirrus-ci / anything I can easily see the result of?
->>
->>
+On Thu, Jul 09, 2020 at 05:02:06PM +0200, Kevin Wolf wrote:
+> Am 08.07.2020 um 00:05 hat Eduardo Habkost geschrieben:
+> > On Tue, Jul 07, 2020 at 05:28:21PM +0200, Philippe Mathieu-Daudé wrote:
+> > > On 6/26/20 12:25 PM, Stefan Hajnoczi wrote:
+> > > > On Thu, Jun 25, 2020 at 02:31:14PM +0100, Peter Maydell wrote:
+> > > >> On Wed, 24 Jun 2020 at 11:02, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > > >>>
+> > > >>> The following changes since commit 171199f56f5f9bdf1e5d670d09ef1351d8f01bae:
+> > > >>>
+> > > >>>   Merge remote-tracking branch 'remotes/alistair/tags/pull-riscv-to-apply-20200619-3' into staging (2020-06-22 14:45:25 +0100)
+> > > >>>
+> > > >>> are available in the Git repository at:
+> > > >>>
+> > > >>>   https://github.com/stefanha/qemu.git tags/block-pull-request
+> > > >>>
+> > > >>> for you to fetch changes up to 7838c67f22a81fcf669785cd6c0876438422071a:
+> > > >>>
+> > > >>>   block/nvme: support nested aio_poll() (2020-06-23 15:46:08 +0100)
+> > > >>>
+> > > >>> ----------------------------------------------------------------
+> > > >>> Pull request
+> > > >>>
+> > > >>> ----------------------------------------------------------------
+> > > >>
+> > > >> Failure on iotest 030, x86-64 Linux:
+> > > >>
+> > > >>   TEST    iotest-qcow2: 030 [fail]
+> > > >> QEMU          --
+> > > >> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64"
+> > > >> -nodefaults -display none -accel qtest
+> > > >> QEMU_IMG      --
+> > > >> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-img"
+> > > >> QEMU_IO       --
+> > > >> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-io"
+> > > >>  --cache writeback --aio threads -f qcow2
+> > > >> QEMU_NBD      --
+> > > >> "/home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/../../qemu-nbd"
+> > > >> IMGFMT        -- qcow2 (compat=1.1)
+> > > >> IMGPROTO      -- file
+> > > >> PLATFORM      -- Linux/x86_64 e104462 4.15.0-76-generic
+> > > >> TEST_DIR      --
+> > > >> /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/scratch
+> > > >> SOCK_DIR      -- /tmp/tmp.8tgdDjoZcO
+> > > >> SOCKET_SCM_HELPER --
+> > > >> /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotest/socket_scm_helper
+> > > >>
+> > > >> --- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/030.out
+> > > >>  2019-07-15 17:18:35.251364738 +0100
+> > > >> +++ /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/030.out.bad
+> > > >>   2020-06-25 14:04:28.500534007 +0100
+> > > >> @@ -1,5 +1,17 @@
+> > > >> -...........................
+> > > >> +.............F.............
+> > > >> +======================================================================
+> > > >> +FAIL: test_stream_parallel (__main__.TestParallelOps)
+> > > >> +----------------------------------------------------------------------
+> > > >> +Traceback (most recent call last):
+> > > >> +  File "030", line 246, in test_stream_parallel
+> > > >> +    self.assert_qmp(result, 'return', {})
+> > > >> +  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests.py",
+> > > >> line 848, in assert_qmp
+> > > >> +    result = self.dictpath(d, path)
+> > > >> +  File "/home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/iotests.py",
+> > > >> line 822, in dictpath
+> > > >> +    self.fail(f'failed path traversal for "{path}" in "{d}"')
+> > > >> +AssertionError: failed path traversal for "return" in "{'error':
+> > > >> {'class': 'DeviceNotActive', 'desc': "Block job 'stream-node8' not
+> > > >> found"}}"
+> > > >> +
+> > > >>  ----------------------------------------------------------------------
+> > > >>  Ran 27 tests
+> > > >>
+> > > >> -OK
+> > > >> +FAILED (failures=1)
+> > > > 
+> > > > Strange, I can't reproduce this failure on my pull request branch or on
+> > > > qemu.git/master.
+> > > > 
+> > > > Is this failure deterministic? Are you sure it is introduced by this
+> > > > pull request?
+> > > 
+> > > Probably not introduced by this pullreq, but I also hit it on FreeBSD:
+> > > https://cirrus-ci.com/task/4620718312783872?command=main#L5803
+> > > 
+> > >   TEST    iotest-qcow2: 030 [fail]
+> > > QEMU          --
+> > > "/tmp/cirrus-ci-build/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
+> > > -nodefaults -display none -machine virt -accel qtest
+> > > QEMU_IMG      --
+> > > "/tmp/cirrus-ci-build/build/tests/qemu-iotests/../../qemu-img"
+> > > QEMU_IO       --
+> > > "/tmp/cirrus-ci-build/build/tests/qemu-iotests/../../qemu-io"  --cache
+> > > writeback --aio threads -f qcow2
+> > > QEMU_NBD      --
+> > > "/tmp/cirrus-ci-build/build/tests/qemu-iotests/../../qemu-nbd"
+> > > IMGFMT        -- qcow2 (compat=1.1)
+> > > IMGPROTO      -- file
+> > > PLATFORM      -- FreeBSD/amd64 cirrus-task-4620718312783872 12.1-RELEASE
+> > > TEST_DIR      -- /tmp/cirrus-ci-build/build/tests/qemu-iotests/scratch
+> > > SOCK_DIR      -- /tmp/tmp.aZ5pxFLF
+> > > SOCKET_SCM_HELPER --
+> > > --- /tmp/cirrus-ci-build/tests/qemu-iotests/030.out	2020-07-07
+> > > 14:48:48.123804000 +0000
+> > > +++ /tmp/cirrus-ci-build/build/tests/qemu-iotests/030.out.bad	2020-07-07
+> > > 15:05:07.863685000 +0000
+> > > @@ -1,5 +1,17 @@
+> > > -...........................
+> > > +.............F.............
+> > > +======================================================================
+> > > +FAIL: test_stream_parallel (__main__.TestParallelOps)
+> > >  ----------------------------------------------------------------------
+> > > +Traceback (most recent call last):
+> > > +  File "030", line 246, in test_stream_parallel
+> > > +    self.assert_qmp(result, 'return', {})
+> > > +  File "/tmp/cirrus-ci-build/tests/qemu-iotests/iotests.py", line 848,
+> > > in assert_qmp
+> > > +    result = self.dictpath(d, path)
+> > > +  File "/tmp/cirrus-ci-build/tests/qemu-iotests/iotests.py", line 822,
+> > > in dictpath
+> > > +    self.fail(f'failed path traversal for "{path}" in "{d}"')
+> > > +AssertionError: failed path traversal for "return" in "{'error':
+> > > {'class': 'DeviceNotActive', 'desc': "Block job 'stream-node8' not found"}}"
+> > > +
+> > > +----------------------------------------------------------------------
+> > >  Ran 27 tests
+> > 
+> > Looks like a race condition that can be forced with a sleep call.
+> > With the following patch, I can reproduce it every time:
+> > 
+> >   diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+> >   index 1cdd7e2999..ee5374fc22 100755
+> >   --- a/tests/qemu-iotests/030
+> >   +++ b/tests/qemu-iotests/030
+> >   @@ -241,6 +241,7 @@ class TestParallelOps(iotests.QMPTestCase):
+> >                result = self.vm.qmp('block-stream', device=node_name, job_id=job_id, base=self.imgs[i-2], speed=512*1024)
+> >                self.assert_qmp(result, 'return', {})
+> >   
+> >   +        time.sleep(3)
+> >            for job in pending_jobs:
+> >                result = self.vm.qmp('block-job-set-speed', device=job, speed=0)
+> >                self.assert_qmp(result, 'return', {})
 > 
-> Nope, unfortunately we don't have an s390 CI.  But if you can get your
-> hands on one, just "./configure --target-list=s390x-softmmu && make &&
-> make check-block" will show it.
-
-So this is tricky, but I am making some progress after getting my hands on one.
-Maybe if someone understands s390 keys better, I could be clued in.
-
-In short this goes away if I again set icount to enabled for qtest,
-basically ensuring that --enable-tcg is there and then reenabling icount.
-
-qtest was forcing icount and shift=0 by creating qemu options, in order to misuse its counter feature,
-instead of using a separate counter.
-
-Removing that ugliness we end up with different behavior of save/load, because vmstate will now suddenly not contain icount-related values anymore.
-What I do not understand is why this causes a problem because save should just not store the icount state and load should just not load the icount state,
-and why we die on the load of s390 keys state (it works just fine for other architectures).
-
-Here is a diff that makes the problem disappear, but needs --enable-tcg:
-
-
-----------------------------------------------------------------------------------------------------
-diff --git a/accel/qtest.c b/accel/qtest.c
-index 119d0f16a4..4cb16abc2c 100644
---- a/accel/qtest.c
-+++ b/accel/qtest.c
-@@ -23,6 +23,12 @@
- 
- static int qtest_init_accel(MachineState *ms)
- {
-+    QemuOpts *opts = qemu_opts_create(qemu_find_opts("icount"), NULL, 0,
-+                                      &error_abort);
-+    qemu_opt_set(opts, "shift", "0", &error_abort);
-+    icount_configure(opts, &error_abort);
-+    qemu_opts_del(opts);
-+
-     return 0;
- }
- 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index f39fd5270b..a5e788c86a 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -2786,10 +2786,12 @@ static void configure_accelerators(const char *progname)
-         error_report("falling back to %s", ac->name);
-     }
- 
-+    /*
-     if (icount_enabled() && !tcg_enabled()) {
-         error_report("-icount is not allowed with hardware virtualization");
-         exit(1);
-    }
-+    */
- }
- 
- static void create_default_memdev(MachineState *ms, const char *path)
-----------------------------------------------------------------------------------------------------
-
-Without this patch, here is the full failure, maybe someone has a good hint, otherwise I'll keep digging from here inside the s390-specific code.
-
-QA output created by 267
-
-=== No block devices at all ===
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing:
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-Error: No block device can accept snapshots
-(qemu) info snapshots
-No available block device supports snapshots
-(qemu) loadvm snap0
-Error: No block device supports snapshots
-(qemu) quit
-
-
-=== -drive if=none ===
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -drive driver=file,file=TEST_DIR/t.IMGFMT,if=none
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-Error: Device 'none0' is writable but does not support snapshots
-(qemu) info snapshots
-No available block device supports snapshots
-(qemu) loadvm snap0
-Error: Device 'none0' is writable but does not support snapshots
-(qemu) quit
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=none
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-(qemu) info snapshots
-List of snapshots present on all disks:
-ID        TAG                     VM SIZE                DATE       VM CLOCK
---        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-(qemu) loadvm snap0
-(qemu) quit
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=none -device virtio-blk,drive=none0
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-(qemu) info snapshots
-List of snapshots present on all disks:
-ID        TAG                     VM SIZE                DATE       VM CLOCK
---        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-(qemu) loadvm snap0
-(qemu) quit
-
-
-=== -drive if=virtio ===
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -drive driver=file,file=TEST_DIR/t.IMGFMT,if=virtio
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-Error: Device 'virtio0' is writable but does not support snapshots
-(qemu) info snapshots
-No available block device supports snapshots
-(qemu) loadvm snap0
-Error: Device 'virtio0' is writable but does not support snapshots
-(qemu) quit
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=virtio
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-(qemu) info snapshots
-List of snapshots present on all disks:
-ID        TAG                     VM SIZE                DATE       VM CLOCK
---        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-(qemu) loadvm snap0
-(qemu) quit
-
-
-=== Simple -blockdev ===
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-Error: Device '' is writable but does not support snapshots
-(qemu) info snapshots
-No available block device supports snapshots
-(qemu) loadvm snap0
-Error: Device '' is writable but does not support snapshots
-(qemu) quit
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,node-name=fmt
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-(qemu) info snapshots
-List of snapshots present on all disks:
-ID        TAG                     VM SIZE                DATE       VM CLOCK
---        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-(qemu) loadvm snap0
-(qemu) quit
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=raw,file=file,node-name=raw -blockdev driver=IMGFMT,file=raw,node-name=fmt
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-(qemu) info snapshots
-List of snapshots present on all disks:
-ID        TAG                     VM SIZE                DATE       VM CLOCK
---        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-(qemu) loadvm snap0
-(qemu) quit
-
-
-=== -blockdev with a filter on top ===
-
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,node-name=fmt -blockdev driver=copy-on-read,file=fmt,node-name=filter
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-(qemu) info snapshots
-List of snapshots present on all disks:
-ID        TAG                     VM SIZE                DATE       VM CLOCK
---        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-(qemu) loadvm snap0
-(qemu) quit
-
-
-=== -blockdev with a backing file ===
-
-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT.base,node-name=backing-file -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,backing=backing-file,node-name=fmt
-QEMU X.Y.Z monitor - type 'help' for more information
-(qemu) savevm snap0
-(qemu) info snapshots
-List of snapshots present on all disks:
-ID        TAG                     VM SIZE                DATE       VM CLOCK
---        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-(qemu) loadvm snap0
-Unexpected storage key flag data: 0
-error while loading state for instance 0x0 of device 's390-skeys'
-Error: Error -22 while loading VM state
-
-
-
-
+> We can "fix" it for probably all realistic cases by lowering the speed
+> of the block job significantly. It's still not fully fixed for all
+> theoretical cases, but the pattern of starting a block job that is
+> throttled to a low speed so it will keep running for the next part of
+> the test is very common.
 > 
->>>
->>> 	#if defined CONFIG_TCG || !defined NEED_CPU_H
->>> 	extern bool icount_enabled(void);
->>> 	#else
->>> 	#define icount_enabled() 0
->>> 	#endif
->>>
->>> (This way, more TCG-only code in cpus.c gets elided).  You can integrate
->>> this change in the next version.
->>>
->>> Paolo
->>>
->>
->> Weird, I tested with --disable-tcg explicitly (but may be some time ago now, as I constantly rebased).
->>
->> Will take a look at the introduction of this #defines in place of variables,
->> as this mechanisms will not work in the future for target-specific modules.
+> Kevin
 > 
-> This is only done for per-target files so it should not be a problem.
+> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+> index 256b2bfbc6..31c028306b 100755
+> --- a/tests/qemu-iotests/030
+> +++ b/tests/qemu-iotests/030
+> @@ -243,7 +243,7 @@ class TestParallelOps(iotests.QMPTestCase):
+>              node_name = 'node%d' % i
+>              job_id = 'stream-%s' % node_name
+>              pending_jobs.append(job_id)
+> -            result = self.vm.qmp('block-stream', device=node_name, job_id=job_id, base=self.imgs[i-2], speed=512*1024)
+> +            result = self.vm.qmp('block-stream', device=node_name, job_id=job_id, base=self.imgs[i-2], speed=1024)
+>              self.assert_qmp(result, 'return', {})
 > 
-> Paolo
-> 
-> 
+>          for job in pending_jobs:
+
+Sounds good to me.  This would change the expected job completion
+time for the 2-4 MB images from 4-8 seconds to ~30-60 minutes,
+right?
+
+This is also a nice way to be sure (block-job-set-speed speed=0)
+is really working as expected.
+
+-- 
+Eduardo
 
 
