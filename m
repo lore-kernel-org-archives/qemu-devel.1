@@ -1,91 +1,79 @@
 Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0EB2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 577E5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:07:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDD7E20767
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 269B120767
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 16:07:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6lf57UA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD7E20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GV6HelsQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269B120767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtZ4I-000152-31
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 12:06:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55860)
+	id 1jtZ5W-0002pi-Dr
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 12:07:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jtZ0G-00054A-SG
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:02:28 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:40720)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jtZ0B-0000Qg-E7
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:02:28 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id f139so2386400wmf.5
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 09:02:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=UkEzIs/2mGlssaRdFH3mLGeknEVjmlMoUHWypue5+QU=;
- b=m6lf57UAGGJYA4sbgoftRnHRBxDNEYZeX0ZjhxbEHexuDJEXbQLpaWwW7/zBYkcwsQ
- C8bA/GX5JIaoa0yPe8UGL1NJhrvZcHAWShB3JOJYEQh+fTInFK9ed4/9sU6lc5QE3BJ4
- DGLeCgJ/XqwBYAj3NcPOsov1aIA5ha0s3WD5Bg5dCYPlvzygFvSugEXNtTDVHBXDzJFl
- WzohEJ4xGtXh0ZP1X4vbmfnkL0evfc7SB9EvFyNpzcLRls3RCcRRxqyw/iWD0kV8Nc8u
- DPa9FI2bxsfGVMSSu3jLh/rXiFLFD7MPD9jvjM6/6j3w48dv0Hu4CKHn7XR64nWdhnSf
- qYZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=UkEzIs/2mGlssaRdFH3mLGeknEVjmlMoUHWypue5+QU=;
- b=a1AFK85cK6EO+E1rjIzIeCx4T/JgzmDSsvIGFy/PS5Jqj86vCE3rn5OSwkMqi6EaGz
- +x1fyL1GQ2TdhvpjSmYijr46v1D1JbnJwgb550Lz84zvcWde/gEegDev6/qetGApIyfo
- 58Jf97X/vqVVCu4uiXjZFj334L1339Eyl+Yd2Gd5nXzTV+PkO4QQ/nVpwox9ALNPmi4V
- 1DWh1BWMwIjWQAuw65WV3GEADsTSeLiX2T6bL+ulK3ZRAZLcmorKrsxqCzuIx7X+mfs9
- PG3yOa2oCEcEU6pNfJzwtyv6piaPNWv+9VnaJgsdkqj6J19k69aEVTE7jLdAl/ExUWl2
- k41g==
-X-Gm-Message-State: AOAM530tHurCkMpc7h6rGo6ZpaEqz0U8h6pfbqlCdsCh+4NnQuUixcR0
- kMwkcYoLZlN27yZxlZ5Ny8EAxTnXr796odZIuPg=
-X-Google-Smtp-Source: ABdhPJzyf1v1lQTHlQqfOpmmuaNVIJrrRKFdEzGINWfz3UxlvZQdEonLJi9fF16mtoout+5QaANZlUlW/whI7w0Me/Y=
-X-Received: by 2002:a1c:2982:: with SMTP id p124mr787743wmp.26.1594310541668; 
- Thu, 09 Jul 2020 09:02:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAJ+F1C+o7mcb8B9dy_F3w08i7XLrO71qWyqYNaJrjv0j3DhnSg@mail.gmail.com>
- <2666aec2-9872-6af6-7705-d7ce553f611c@redhat.com>
- <20200709152630.GW3753300@redhat.com>
- <CAFEAcA_9NUeMJQWuzbmm9raW4zBgu3FFhgCabxBD_RhKMo9GxQ@mail.gmail.com>
- <CAJ+F1C+MK0tEyHS_xSD6bBWJZFALF6jOwFAU2zYoJimnyGRdAw@mail.gmail.com>
- <874kqgn0vj.fsf@linaro.org>
- <CAFEAcA_nk_EjsR59BGkBzYo_Gvkuqi_3AyODOxBm1Ec2gfxKww@mail.gmail.com>
-In-Reply-To: <CAFEAcA_nk_EjsR59BGkBzYo_Gvkuqi_3AyODOxBm1Ec2gfxKww@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 9 Jul 2020 20:02:09 +0400
-Message-ID: <CAJ+F1CJBuNvsUDkFVM2CgwjZjCeAztrVTsoo3tSVT90GR5rDNQ@mail.gmail.com>
-Subject: Re: Is VXHS actually maintained?
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000007f75da05aa045964"
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-wm1-x32c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtZ2m-0007T8-Ti
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:05:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46022
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtZ2j-0000zv-Ug
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 12:05:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594310700;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type;
+ bh=1uP0rRX5sys7IyYf81527/O/Op13w4EXz/SwyxzIwdA=;
+ b=GV6HelsQoLwk++MxE0UjeMvWtL4p0wc8lcaOTCt5B/igP1eACHs3I9XXbt2Hd0aTFgYEJY
+ NzFnQ0hxjc3zkTvVzJ+LRGsPvunxpluhdnmWZgNG50hR5y0ZuaItq4aVZf2TJK7Ti2Rvfv
+ b3AVWnKF9TjG5l2gTX/1JkcUrPJmeFo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-D1ihEJy-OiylAYsqzMmpqQ-1; Thu, 09 Jul 2020 12:04:43 -0400
+X-MC-Unique: D1ihEJy-OiylAYsqzMmpqQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D3D8186A8DE;
+ Thu,  9 Jul 2020 16:04:42 +0000 (UTC)
+Received: from thuth.com (ovpn-112-106.ams2.redhat.com [10.36.112.106])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3098B60BE2;
+ Thu,  9 Jul 2020 16:04:40 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH] docs/system/s390x: Improve the 3270 documentation
+Date: Thu,  9 Jul 2020 18:04:39 +0200
+Message-Id: <20200709160439.15088-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 10:34:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,63 +87,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Jeff Cody <codyprime@gmail.com>, QEMU <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, ashmit602@gmail.com
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007f75da05aa045964
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+There is some additional information about the 3270 support in our
+Wiki at https://wiki.qemu.org/Features/3270 - so let's include this
+information into the main documentation now to have one single
+source of information (the Wiki page could later be removed).
 
-Hi
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ docs/system/s390x/3270.rst | 43 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 37 insertions(+), 6 deletions(-)
 
-On Thu, Jul 9, 2020 at 7:52 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+diff --git a/docs/system/s390x/3270.rst b/docs/system/s390x/3270.rst
+index 1774cdcadf..80350264d7 100644
+--- a/docs/system/s390x/3270.rst
++++ b/docs/system/s390x/3270.rst
+@@ -1,9 +1,15 @@
+ 3270 devices
+ ============
+ 
+-QEMU supports connecting an external 3270 terminal emulator (such as
+-``x3270``) to make a single 3270 device available to a guest. Note that this
+-supports basic features only.
++The 3270 is the classic 'green-screen' console of the mainframes (see the
++`IBM 3270 Wikipedia article <https://en.wikipedia.org/wiki/IBM_3270>`__).
++
++The 3270 data stream is not implemented within QEMU; the device only provides
++TN3270 (a telnet extension; see `RFC 854 <https://tools.ietf.org/html/rfc854>`__
++and `RFC 1576 <https://tools.ietf.org/html/rfc1576>`__) and leaves the heavy
++lifting to an external 3270 terminal emulator (such as ``x3270``) to make a
++single 3270 device available to a guest. Note that this supports basic
++features only.
+ 
+ To provide a 3270 device to a guest, create a ``x-terminal3270`` linked to
+ a ``tn3270`` chardev. The guest will see a 3270 channel device. In order
+@@ -12,10 +18,14 @@ to actually be able to use it, attach the ``x3270`` emulator to the chardev.
+ Example configuration
+ ---------------------
+ 
++* Make sure that 3270 support is enabled in the guest's kernel. You need
++  ``CONFIG_TN3270`` and at least one of ``CONFIG_TN3270_TTY`` (for additional
++  ttys) or ``CONFIG_TN3270_CONSOLE`` (for a 3270 console).
++
+ * Add a ``tn3270`` chardev and a ``x-terminal3270`` to the QEMU command line::
+ 
+-    -chardev socket,id=char_0,host=0.0.0.0,port=2300,nowait,server,tn3270
+-    -device x-terminal3270,chardev=char_0,devno=fe.0.000a,id=terminal_0
++   -chardev socket,id=ch0,host=0.0.0.0,port=2300,nowait,server,tn3270
++   -device x-terminal3270,chardev=ch0,devno=fe.0.000a,id=terminal0
+ 
+ * Start the guest. In the guest, use ``chccwdev -e 0.0.000a`` to enable
+   the device.
+@@ -29,4 +39,25 @@ Example configuration
+ 
+     systemctl start serial-getty@3270-tty1.service
+ 
+-This should get you an addtional tty for logging into the guest.
++  This should get you an addtional tty for logging into the guest.
++
++* If you want to use the 3270 device as the kernel console instead of an
++  additional tty, you can also append ``conmode=3270 condev=000a`` to the
++  guest's kernel command line. The kernel then should use the 3270 as
++  console after the next boot.
++
++Restrictions
++------------
++
++3270 support is still experimental. In particular:
++
++* Only one 3270 device is supported.
++
++* It has only been tested with Linux guests and the x3270 emulator.
++
++* TLS/SSL is not yet supported.
++
++* Resizing on reattach is not yet supported.
++
++* Multiple commands in one inbound buffer (for example, when the reset key
++  is pressed while the network is slow) are not yet supported.
+-- 
+2.18.1
 
-> On Thu, 9 Jul 2020 at 16:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
-> > That looks more like it got missed in a clean-up series because we don'=
-t
-> > have coverage in our typical builds and CI?
->
-> Yes, very likely. But there's no point in fixing and then adding CI
-> for a config that our users have demonstrated that they do not use;
-> better to just remove it.
->
-
-Agree, I'll send a patch then.
-
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---0000000000007f75da05aa045964
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Hi</div><div><br></div><div><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jul 9, 2020 at 7:52 PM Pete=
-r Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lin=
-aro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
-t:1ex">On Thu, 9 Jul 2020 at 16:50, Alex Benn=C3=A9e &lt;<a href=3D"mailto:=
-alex.bennee@linaro.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt; wr=
-ote:<br>
-&gt; That looks more like it got missed in a clean-up series because we don=
-&#39;t<br>
-&gt; have coverage in our typical builds and CI?<br>
-<br>
-Yes, very likely. But there&#39;s no point in fixing and then adding CI<br>
-for a config that our users have demonstrated that they do not use;<br>
-better to just remove it.<br></blockquote><div><br></div><div>Agree, I&#39;=
-ll send a patch then.<br></div><br clear=3D"all"></div><br>-- <br><div dir=
-=3D"ltr" class=3D"gmail_signature">Marc-Andr=C3=A9 Lureau<br></div></div></=
-div>
-
---0000000000007f75da05aa045964--
 
