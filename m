@@ -2,68 +2,90 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C62C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B02BBC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AAA42074B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:28:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AAA42074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6F865206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:35:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UC/DfTHW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F865206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtSrP-0007Kc-Ik
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 05:28:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43382)
+	id 1jtSxm-0000Qa-Jh
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 05:35:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jtSqq-0006oV-N6
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:28:20 -0400
-Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:38796)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jtSqo-0000Da-KE
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:28:20 -0400
-Received: from player687.ha.ovh.net (unknown [10.108.57.18])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id D8C511712B0
- for <qemu-devel@nongnu.org>; Thu,  9 Jul 2020 11:28:15 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player687.ha.ovh.net (Postfix) with ESMTPSA id 3973E1429A812;
- Thu,  9 Jul 2020 09:28:06 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0051e762cb4-fab0-416e-ad2b-f6aae970f9ce,B4CBA90B3A6AD114FE081C226458375F80ABDB80)
- smtp.auth=groug@kaod.org
-Date: Thu, 9 Jul 2020 11:28:01 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: qemu-system-ppc64 abort()s with pcie bridges
-Message-ID: <20200709112801.0f4cae40@bahia.lan>
-In-Reply-To: <20200708115703.7926205a@bahia.lan>
-References: <211dfb13-64cc-850b-4936-0f20f0157d7c@redhat.com>
- <20200708115703.7926205a@bahia.lan>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jtSxB-0008JC-Oq
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:34:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31581
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jtSxA-0001IN-0d
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:34:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594287290;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=95m+vveXFqdFSJz1YEHUha3bRVCC5LtbQKgAMro6tp8=;
+ b=UC/DfTHWTnOrodTM84a587zGnaZ+c4w3SHs7CoiRaUZ3mPIJZ+HpfMwbpdE5S+uuV1HUuc
+ C9UV0dsVPM1Dx4pxgCzcdCYaT5xP+cVBIAZ94HxY9wW8qkn3iVgDgEtYOtZlGDM9gvM/TL
+ D6jV++2eZh0vAalm1Sze7039alf57d0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-agGgjExyMRuvHTp8DCC8mA-1; Thu, 09 Jul 2020 05:34:47 -0400
+X-MC-Unique: agGgjExyMRuvHTp8DCC8mA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 302DB108BD09;
+ Thu,  9 Jul 2020 09:34:46 +0000 (UTC)
+Received: from starship (unknown [10.35.206.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0C0345D9DD;
+ Thu,  9 Jul 2020 09:34:40 +0000 (UTC)
+Message-ID: <c413edca1ae1e78a03dad7775d9a955684321ea0.camel@redhat.com>
+Subject: Re: [PATCH v2 2/7] Implement drain_call_rcu and use it in
+ hmp_device_del
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 09 Jul 2020 12:34:39 +0300
+In-Reply-To: <20200527131148.GH29137@stefanha-x1.localdomain>
+References: <20200511160951.8733-1-mlevitsk@redhat.com>
+ <20200511160951.8733-3-mlevitsk@redhat.com>
+ <20200527131148.GH29137@stefanha-x1.localdomain>
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 16370303174541220146
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudelgdduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeukeejkeeiffeftdevueekvdetjeegieevhffgjefgtdeluddvgfefleekueevueenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=178.33.251.19; envelope-from=groug@kaod.org;
- helo=14.mo7.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 05:28:16
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:20:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,143 +99,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- =?UTF-8?B?Q8Op?= =?UTF-8?B?ZHJpYw==?= Le Goater <clg@kaod.org>,
- David Gibson <dgibson@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jul 2020 11:57:03 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On Wed, 2020-05-27 at 14:11 +0100, Stefan Hajnoczi wrote:
+> On Mon, May 11, 2020 at 07:09:46PM +0300, Maxim Levitsky wrote:
+> >  /* The operands of the minus operator must have the same type,
+> >   * which must be the one that we specify in the cast.
+> > diff --git a/qdev-monitor.c b/qdev-monitor.c
+> > index 56cee1483f..70877840a2 100644
+> > --- a/qdev-monitor.c
+> > +++ b/qdev-monitor.c
+> > @@ -812,6 +812,8 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
+> >          return;
+> >      }
+> >      dev = qdev_device_add(opts, &local_err);
+> > +    drain_call_rcu();
+> 
+> Please include comments explaining what each drain waits for. Without
+> comments we'll quickly lose track of why drain_call_rcu() calls are
+> necessary (similar to documenting memory barrier or refcount inc/dec
+> pairing).
+> 
+> > diff --git a/util/rcu.c b/util/rcu.c
+> > index 60a37f72c3..e8b1c4d6c5 100644
+> > --- a/util/rcu.c
+> > +++ b/util/rcu.c
+> > @@ -293,6 +293,39 @@ void call_rcu1(struct rcu_head *node, void (*func)(struct rcu_head *node))
+> >      qemu_event_set(&rcu_call_ready_event);
+> >  }
+> >  
+> > +
+> > +struct rcu_drain {
+> > +    struct rcu_head rcu;
+> > +    QemuEvent drain_complete_event;
+> > +};
+> > +
+> > +static void drain_rcu_callback(struct rcu_head *node)
+> > +{
+> > +    struct rcu_drain *event = (struct rcu_drain *)node;
+> > +    qemu_event_set(&event->drain_complete_event);
+> 
+> A comment would be nice explaining that callbacks are invoked in
+> sequence so we're sure that all previously scheduled callbacks have
+> completed when drain_rcu_callback() is invoked.
+> 
+> > +}
+> > +
+> > +void drain_call_rcu(void)
+> 
+> Please document that the main loop mutex is dropped if it's held. This
+> will prevent surprises and allow callers to think about thread-safety
+> across this call.
 
-> On Wed, 8 Jul 2020 10:03:47 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
->=20
-> >=20
-> >  Hi,
-> >=20
-> > qemu-system-ppc64 currently abort()s when it is started with a pcie
-> > bridge device:
-> >=20
-> > $ qemu-system-ppc64 -M pseries-5.1 -device pcie-pci-bridge
-> > Unexpected error in object_property_find() at qom/object.c:1240:
-> > qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not =
-found
-> > Aborted (core dumped)
-> >=20
-> > or:
-> >=20
-> > $ qemu-system-ppc64 -M pseries -device dec-21154-p2p-bridge
-> > Unexpected error in object_property_find() at qom/object.c:1240:
-> > qemu-system-ppc64: -device dec-21154-p2p-bridge: Property '.chassis_nr'
-> > not found
-> > Aborted (core dumped)
-> >=20
-> > That's kind of ugly, and it shows up as error when running
-> > scripts/device-crash-test. Is there an easy way to avoid the abort() and
-> > fail more gracefully here?
-> >=20
->=20
-> And even worse, this can tear down a running guest with hotplug :\
->=20
-> (qemu) device_add pcie-pci-bridge=20
-> Unexpected error in object_property_find() at /home/greg/Work/qemu/qemu-p=
-pc/qom/object.c:1240:
-> Property '.chassis_nr' not found
-> Aborted (core dumped)
->=20
-> This is caused by recent commit:
->=20
-> commit 7ef1553dac8ef8dbe547b58d7420461a16be0eeb
-> Author: Markus Armbruster <armbru@redhat.com>
-> Date:   Tue May 5 17:29:25 2020 +0200
->=20
->     spapr_pci: Drop some dead error handling
->    =20
->     chassis_from_bus() uses object_property_get_uint() to get property
->     "chassis_nr" of the bridge device.  Failure would be a programming
->     error.  Pass &error_abort, and simplify its callers.
->    =20
->     Cc: David Gibson <david@gibson.dropbear.id.au>
->     Cc: qemu-ppc@nongnu.org
->     Signed-off-by: Markus Armbruster <armbru@redhat.com>
->     Acked-by: David Gibson <david@gibson.dropbear.id.au>
->     Reviewed-by: Greg Kurz <groug@kaod.org>
->     Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->     Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->     Message-Id: <20200505152926.18877-18-armbru@redhat.com>
->=20
-> Before that, we would simply print the "chassir_nr not found" error,
-> and in case of a cold plugged device exit.
->=20
-> The root cause is that the sPAPR PCI code assumes that a PCI bridge
-> has a "chassir_nr" property, ie. it is a standard PCI bridge. Other
-> PCI bridge types don't have that. Not sure yet why this information
-> is required, I'll check LoPAPR.
->=20
-
-More on this side : each slot of a PCI bridge is associated a DRC (a
-PAPR thingy to handle hot plug/unplug). Each DRC must have a unique
-identifier system-wide. We used to use the bus number to compute
-the DRC id but it was broken, so we now _hijack_ "chassis_nr" as an
-alternative since this commit:
-
-commit 05929a6c5dfe1028ef66250b7bbf11939f8e77cd
-Author: David Gibson <david@gibson.dropbear.id.au>
-Date:   Wed Apr 10 11:49:28 2019 +1000
-
-    spapr: Don't use bus number for building DRC ids
-
-This means that we only support the standard pci-bridge device,
-and this relies on the availability of "chassis_nr". Failure
-to find this property is then not a programming error, but
-an expected case where we want to fail gracefully (ie. revert
-Markus's commit mentioned above).
-
-While reading code I realized that we have another problem : the
-realization of the pci-bridge device does fail if "chassis_nr" is
-zero, but I failed to find a uniqueness check. And we get:
-
-$ qemu-system-ppc64 -device pci-bridge,chassis_nr=3D1 -device pci-bridge,ch=
-assis_nr=3D1
-Unexpected error in object_property_try_add() at qom/object.c:1167:
-qemu-system-ppc64: -device pci-bridge,chassis_nr=3D1: attempt to add duplic=
-ate property '40000100' to object (type 'container')
-Aborted (core dumped)
-
-It is very confusing to see that we state that "chassis_nr" is unique
-several times in slotid_cap_init() but it is never enforced anywhere.
-
-    if (!chassis) {
-        error_setg(errp, "Bridge chassis not specified. Each bridge is requ=
-ired"
-                   " to be assigned a unique chassis id > 0.");
-        return -EINVAL;
-    }
-
-or
-
-    /* We make each chassis unique, this way each bridge is First in Chassi=
-s */
+Done.
+> 
+> Aside from the comment requests:
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
 
-Michael, Marcel or anyone with PCI knowledge,
-
-Can you shed some light on the semantics of "chassis_nr" ?
-
-> In the meantime, since we're in soft freeze, I guess we should
-> revert Markus's patch and add a big fat comment to explain
-> what's going on and maybe change the error message to something
-> more informative, eg. "PCIE-to-PCI bridges are not supported".
->=20
-> Thoughts ?
->=20
-> >  Thomas
-> >=20
->=20
+Best regards,
+	Maxim levitsky
 
 
