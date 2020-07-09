@@ -2,106 +2,80 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9EDBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEFFDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:17:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 753572074B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:14:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C19C20674
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 10:17:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ig2WYxJg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 753572074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="is6HlnuT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C19C20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtTZg-0000P1-QE
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 06:14:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54704)
+	id 1jtTcC-0001eD-P5
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 06:17:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtTYy-0007xx-D5
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 06:13:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47828
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jtTbO-0001Ck-IH
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 06:16:26 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48457
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtTYw-0006Jl-W2
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 06:13:56 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jtTbM-0006jV-P6
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 06:16:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594289634;
+ s=mimecast20190719; t=1594289784;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=wNG4hzSmJvE4yWuCBBYKJY9FgYx1yq7ZUqi+f7hrSBA=;
- b=Ig2WYxJgLrKQliKdh7DfZJgpTVl2EaX8+Zy4V4V210N8xYpBRjRZIlLuoSqX6+GUkM406B
- 14/r0/xxA0KJALdyDnnLHTX644/eS0ge53aCMaOyAAh7kTmGAEVXSr//4U8qu8Bb2hToFt
- mkc2zH3IYstE9JDTAngzX8LwLwOtb+c=
+ in-reply-to:in-reply-to:references:references;
+ bh=USqgZ0gMfhK/wGfMDMy7hVD9XYBnbo/vlt3YTl7ZlZU=;
+ b=is6HlnuTxzZb5Lnz0tooZ5PN7e7A42XdGA7jYWoLSquZpel8b0hMR82gXiZup+rMN1cWSk
+ OOB1xt29N1d+G2DKmKbKW4XgS8yoXtwa/AKyx3nvt6w/Vx6gJbRW2GVopK2aMuOEYEU97K
+ JOgtfiGTDevGZQspQUtqzOgyFLqk3Mw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-PKgrvvddPRKdMW3wor0WOw-1; Thu, 09 Jul 2020 06:13:50 -0400
-X-MC-Unique: PKgrvvddPRKdMW3wor0WOw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-94-J9Tc0dFHPByvUpiSo9XPcg-1; Thu, 09 Jul 2020 06:16:17 -0400
+X-MC-Unique: J9Tc0dFHPByvUpiSo9XPcg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E19B48005B0;
- Thu,  9 Jul 2020 10:13:48 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
- [10.36.113.127])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 57040610F2;
- Thu,  9 Jul 2020 10:13:47 +0000 (UTC)
-Subject: Re: [PATCH v10 02/34] qcow2: Convert qcow2_get_cluster_offset() into
- qcow2_get_host_offset()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1593791819.git.berto@igalia.com>
- <33f610f0f842b376e04cec60c855b289c3a14b39.1593791819.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7fd1f2c8-86b3-7547-e7f8-cea985bb80b4@redhat.com>
-Date: Thu, 9 Jul 2020 12:13:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A25CC10152A7;
+ Thu,  9 Jul 2020 10:16:08 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com
+ [10.36.112.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BFDAA6FEDA;
+ Thu,  9 Jul 2020 10:16:03 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id B92D231F63; Thu,  9 Jul 2020 12:16:02 +0200 (CEST)
+Date: Thu, 9 Jul 2020 12:16:02 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Subject: Re: Migrating custom qemu.org infrastructure to GitLab
+Message-ID: <20200709101602.lc2uipjlxobjvjn3@sirius.home.kraxel.org>
+References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
+ <20200708105353.GE3229307@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <33f610f0f842b376e04cec60c855b289c3a14b39.1593791819.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200708105353.GE3229307@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="NyUkniGvMMBmF2wAXdfg1vI5XFQwBvf8Q"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 01:47:04
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:20:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -109,7 +83,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,64 +96,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Cleber Rosa <cleber@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NyUkniGvMMBmF2wAXdfg1vI5XFQwBvf8Q
-Content-Type: multipart/mixed; boundary="AsMCawdaATJ1GcLPaVfl6QE3yDg4cBzMo"
+  Hi,
 
---AsMCawdaATJ1GcLPaVfl6QE3yDg4cBzMo
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> > 2. wiki.qemu.org is a MediaWiki instance. Account creation is a hurdle
+> > to one-time or new contributors. It is unclear whether GitLab's wiki
+> > is expressive enough for a lossless conversion of the existing QEMU
+> > wiki. Any volunteers interested in evaluating the wiki migration would
+> > be appreciated.
+> 
+> Yeah, this is a potentially big piece of work. We didn't finish this
+> in libvirt either. Looking at the libvirt mediawiki though, I decided
+> not todo a straight export/import of all content.
 
-On 03.07.20 17:57, Alberto Garcia wrote:
-> qcow2_get_cluster_offset() takes an (unaligned) guest offset and
-> returns the (aligned) offset of the corresponding cluster in the qcow2
-> image.
->=20
-> In practice none of the callers need to know where the cluster starts
-> so this patch makes the function calculate and return the final host
-> offset directly. The function is also renamed accordingly.
->=20
-> There is a pre-existing exception with compressed clusters: in this
-> case the function returns the complete cluster descriptor (containing
-> the offset and size of the compressed data). This does not change with
-> this patch but it is now documented.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2.h         |  4 ++--
->  block/qcow2-cluster.c | 41 +++++++++++++++++++++++------------------
->  block/qcow2.c         | 24 +++++++-----------------
->  3 files changed, 32 insertions(+), 37 deletions(-)
+FYI: gitlab wiki is basically just a git repo with markdown pages +
+renderer + gui editor.  You can also update the wiki using git clone +
+edit + git commit + git push.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---AsMCawdaATJ1GcLPaVfl6QE3yDg4cBzMo--
-
---NyUkniGvMMBmF2wAXdfg1vI5XFQwBvf8Q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8G7dkACgkQ9AfbAGHV
-z0CREAgArCv9NFC+8vX0gR6vvCD0HwKodFqLEl+TKkvkYDzFIlgJVZuMc1O5CiYO
-xl5ibaM2c/D83lrSm0Mq7W70RN9flKx67KsY1sXPT0POrt1T2fvjQ3onwOxfhmFL
-+Px/SKZiYi7UTiKwwr4EbDzN88p4XOGqouBLLjDckRS4fndR7+2PWOB3toGp1KO7
-ZWxL4n8+HtmcJPbze+AhoYEDSBXYz/uJ7lQHhoGx06SqxMigNxs/RKGgIhI9nP/+
-GF4wzUGWZ9ydqbHch7sNvN74vGJrCdI2inLZXAJuZdKBxbpamNkByp2PUTsrKKXI
-IBqHVzVZLXl9/4ayS50A5enaaxQ54A==
-=//M9
------END PGP SIGNATURE-----
-
---NyUkniGvMMBmF2wAXdfg1vI5XFQwBvf8Q--
+take care,
+  Gerd
 
 
