@@ -2,66 +2,65 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE68C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D87B6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 784B3206A1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2B2D206A1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 08:25:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Em1Rj1z1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784B3206A1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PxRgkqm7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B2D206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtRoq-0001Vo-F0
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 04:22:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52340)
+	id 1jtRrv-0002fH-TR
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 04:25:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtRnr-0000a2-Ss
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:21:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47948
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtRrM-0002A3-Ho
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:24:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47153
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtRnp-00073y-TP
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:21:11 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtRrJ-0007OE-MC
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 04:24:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594282865;
+ s=mimecast20190719; t=1594283085;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fACF4Y1hxAJIg2fQfepcIGg3TyqIqmPxOtcf4/Im5SQ=;
- b=Em1Rj1z1d/23WbD1hnpdTmcR/ICuI6P/D5/7PP9L63Yq2n+e/lkDoydl8ekfkDHd6S9pSI
- jMgVzytLb2vccmH9jS7lfuFOl7uReC4hlLF20LJozacI3/wqnPuYdeC44/r1/B1x1q7UkH
- SfA0/AI5s9+ljA9FEFiV1WRB80WKCGE=
+ bh=xJs22n6nBvbDAhlh7YOjxdMebZQRH57ci+85DxTHC1A=;
+ b=PxRgkqm7YOCR8iaRTu3WA6pFQFtOFYCYyGxy/VgItLgWhY90yLJHYYxt7L0K9RSHi4rQp6
+ HmNGDYe+dDhNm6qIAblOXS3hE4HYdx1V7T9TppepYv5IzJmBlFEnIgKhgP72mIQ8xDoaHf
+ ew1lSIVGZZKIYQz1bvXyIUa3V61rAfU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-c27z7xV5PAmNjuT-JXMVwA-1; Thu, 09 Jul 2020 04:21:03 -0400
-X-MC-Unique: c27z7xV5PAmNjuT-JXMVwA-1
+ us-mta-190-_Men2jVmMqyWXggbciibzA-1; Thu, 09 Jul 2020 04:24:42 -0400
+X-MC-Unique: _Men2jVmMqyWXggbciibzA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2149AA6B67;
- Thu,  9 Jul 2020 08:21:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4E1318FF660;
+ Thu,  9 Jul 2020 08:24:41 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
  [10.36.113.127])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BE6C31A7CA;
- Thu,  9 Jul 2020 08:21:00 +0000 (UTC)
-Subject: Re: [PATCH v7 00/47] block: Deal with filters
-To: Eric Blake <eblake@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 79EB21A7CA;
+ Thu,  9 Jul 2020 08:24:40 +0000 (UTC)
+Subject: Re: [PATCH v7 02/47] block: Add chain helper functions
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
 References: <20200625152215.941773-1-mreitz@redhat.com>
- <4d7fa326-ef87-5753-cc2a-bb26fc555864@virtuozzo.com>
- <f36f56ba-1549-1612-8b24-4e93337b2f39@redhat.com>
+ <20200625152215.941773-3-mreitz@redhat.com>
+ <5c2a81c7-851c-aeb4-84b7-3bd61417495e@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -87,12 +86,12 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f9746566-1e3d-5b24-add0-aea49955a950@redhat.com>
-Date: Thu, 9 Jul 2020 10:20:59 +0200
+Message-ID: <7244733b-3092-a1f1-55f1-35a964a7c791@redhat.com>
+Date: Thu, 9 Jul 2020 10:24:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <f36f56ba-1549-1612-8b24-4e93337b2f39@redhat.com>
+In-Reply-To: <5c2a81c7-851c-aeb4-84b7-3bd61417495e@virtuozzo.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
@@ -100,10 +99,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="DztaPVJcYxz5QPPGUnUqzjyOM4Rm5tayb"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 01:47:04
+ boundary="H006wDWmRSfeXG8UiXiRW4DyMbSEjOUqT"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:20:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -111,7 +110,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,73 +130,108 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DztaPVJcYxz5QPPGUnUqzjyOM4Rm5tayb
-Content-Type: multipart/mixed; boundary="Mj4CoePhBzQVjDmG08ZIxMkxf7SpfvpuN"
+--H006wDWmRSfeXG8UiXiRW4DyMbSEjOUqT
+Content-Type: multipart/mixed; boundary="rLKlzxse3QKS5YskAmqTt5mtvjMvowVKf"
 
---Mj4CoePhBzQVjDmG08ZIxMkxf7SpfvpuN
+--rLKlzxse3QKS5YskAmqTt5mtvjMvowVKf
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 08.07.20 22:47, Eric Blake wrote:
-> On 7/8/20 12:20 PM, Andrey Shinkevich wrote:
->> On 25.06.2020 18:21, Max Reitz wrote:
->>> v6:
->>> https://lists.nongnu.org/archive/html/qemu-devel/2019-08/msg01715.html
->>>
->>> Branch: https://github.com/XanClic/qemu.git child-access-functions-v7
->>> Branch: https://git.xanclic.moe/XanClic/qemu.git
->>> child-access-functions-v7
->>>
->>>
->> I cloned the branch from the github and built successfully.
+On 08.07.20 19:20, Andrey Shinkevich wrote:
+> On 25.06.2020 18:21, Max Reitz wrote:
+>> Add some helper functions for skipping filters in a chain of block
+>> nodes.
 >>
->> Running the iotests reports multiple errors of such a kind:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 include/block/block_int.h |=C2=A0 3 +++
+>> =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 55 ++++++++++++++++++=
++++++++++++++++++++++
+>> =C2=A0 2 files changed, 58 insertions(+)
 >>
->> 128: readarray -td '' formatting_line < <(sed -e 's/, fmt=3D/\x0/')
->>
->> "./common.filter: line 128: readarray: -d: invalid option"
->>
->> introduced with the commit
->>
->> a7399eb iotests: Make _filter_img_create more active
+>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>> index bb3457c5e8..5da793bfc3 100644
+>> --- a/include/block/block_int.h
+>> +++ b/include/block/block_int.h
+>> @@ -1382,6 +1382,9 @@ BdrvChild *bdrv_cow_child(BlockDriverState *bs);
+>> =C2=A0 BdrvChild *bdrv_filter_child(BlockDriverState *bs);
+>> =C2=A0 BdrvChild *bdrv_filter_or_cow_child(BlockDriverState *bs);
+>> =C2=A0 BdrvChild *bdrv_primary_child(BlockDriverState *bs);
+>> +BlockDriverState *bdrv_skip_implicit_filters(BlockDriverState *bs);
+>> +BlockDriverState *bdrv_skip_filters(BlockDriverState *bs);
+>> +BlockDriverState *bdrv_backing_chain_next(BlockDriverState *bs);
+>> =C2=A0 =C2=A0 static inline BlockDriverState *child_bs(BdrvChild *child)
+>> =C2=A0 {
+>> diff --git a/block.c b/block.c
+>> index 5a42ef49fd..0a0b855261 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -7008,3 +7008,58 @@ BdrvChild *bdrv_primary_child(BlockDriverState
+>> *bs)
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>> =C2=A0 }
+>> +
+>> +static BlockDriverState *bdrv_do_skip_filters(BlockDriverState *bs,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool
+>> stop_on_explicit_filter)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 BdrvChild *c;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (!bs) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 while (!(stop_on_explicit_filter && !bs->implicit)) =
+{
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c =3D bdrv_filter_child(bs);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!c) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 brea=
+k;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs =3D c->bs;
 >=20
-> You appear to be staging off an unreleased preliminary tree.=C2=A0 a7399e=
-b is
-> not upstream; the upstream commit 'iotests: Make _filter_img_create more
-> active' is commit 57ee95ed, and while it uses readarray, it does not use
-> the problematic -d.=C2=A0 In other words, it looks like the problem was
-> caught and fixed in between the original patch creation and the pull
-> request.
+> Could it be child_bs(bs) ?
 
-Ah, sorry, my mail client=E2=80=99s threading layout hid this mail from me =
-a bit.
+Well, in a sense, but not really.  We need to check whether there is a
+child before overwriting @bs (because @bs must stay a non-NULL pointer),
+so we wouldn=E2=80=99t have fewer lines of code if we replaced =E2=80=9CBdr=
+vChild *c=E2=80=9D by
+=E2=80=9CBlockDriverState *child_bs=E2=80=9D, and then used bdrv_child() to=
+ set child_bs.
 
-Yes.  Well, no, it wasn=E2=80=99t fixed before the pull request, but it was
-fixed in the second pull request.  But yes.
+(And because we have to check whether @c is NULL anyway, there is no
+real reason to use child_bs(c) instead of c->bs afterwards.)
 
-Max
+>> +=C2=A0=C2=A0=C2=A0 }
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
+Thanks a lot for reviewing!
 
 
---Mj4CoePhBzQVjDmG08ZIxMkxf7SpfvpuN--
+--rLKlzxse3QKS5YskAmqTt5mtvjMvowVKf--
 
---DztaPVJcYxz5QPPGUnUqzjyOM4Rm5tayb
+--H006wDWmRSfeXG8UiXiRW4DyMbSEjOUqT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8G02sACgkQ9AfbAGHV
-z0BXjwgAgnGzpI6R8EUh7zQtC9yVy5hDakMiI9GkPXN7WqWFuigPOLydiCVrh40z
-6KWfT3zCR9D3FUHZpABBDHXm8YcqNfpr1RxKxbby5AVrgHJpiBVKFz1f6iCm9ijo
-io8qG6MDMBBAOdT4qoJhr7tsYT0sBZeO/AdeWRph75KNh17oM8Ksf66LlmOj2zQo
-hx/rcAdyWQPaJBHFBIDAKlEMJpuPaUdsLVmicBaaTu+4MPd33qwUsjPVFxWliwwT
-RycPG9Es+PIEb97L2LA6zfO7e5iljSpYctohb1q2aJ1jtCzKg/2A2oZAkK2k0CaF
-hY/DYkogIvZS8wjlfPNxuHyqcMqFIA==
-=XfQS
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8G1EYACgkQ9AfbAGHV
+z0C+5wf9HE9Hz1AtZSaRjGxPf5PAPgBXy5X3+FZoqlAwaN3ac82C5pU226LKISp8
+kOZ+y6VTgub7ijXvS2HGrMChkyF24J/XwLiJ2XcjKZu1jJyLH7IshqjM5XJiSSxB
+ZF5EoABKtmNwla6aXkfVyNs4Atn2B9i9EbpqKFSnR0RgC/2deiT4ESaGyGHHfSw9
+Mg4b16dCTvcpXtakLjjIxivtKTMg5OAWdOrJ184c1tfsFSFA5AXo5QULseG22sGw
+hj6riNFrlv968wr/cIC4Jzd+dezxWDYU8jeaYm9X1rFwA8OVm90ucJs8d8ElVnuj
+7y3vl2++qf+KQ92OQ7y+SpxdF/NKgw==
+=zDhQ
 -----END PGP SIGNATURE-----
 
---DztaPVJcYxz5QPPGUnUqzjyOM4Rm5tayb--
+--H006wDWmRSfeXG8UiXiRW4DyMbSEjOUqT--
 
 
