@@ -4,77 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2F9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 22:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9793EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 22:14:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A51DE20672
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 22:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F21F20672
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 22:14:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hBjyjc8u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51DE20672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8vZkmBX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F21F20672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jten4-0005y9-VP
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 18:13:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38882)
+	id 1jteny-0006zl-IG
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 18:14:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jtemV-0005WV-95
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 18:12:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39331
+ id 1jtemq-0005rV-8Y
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 18:13:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21788
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jtemS-0003fo-NO
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 18:12:38 -0400
+ id 1jtemo-0003jA-NY
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 18:12:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594332754;
+ s=mimecast20190719; t=1594332777;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=N1mCkufpRLREc+9eTeDoIwzlzFpK023Z9H3JMSZ4OeQ=;
- b=hBjyjc8u7j9UWzjDvqRML/n8VtVX2lrt6+h3+gwmdJTXLBd4UeeI9LJFg8yAcaoplYlbKO
- 8lBYP1nsY41r32QIEWnVtSKkPqZefljIVw0aU7YefCm5qlK3LMahvF8P+JRCeYTrvyeung
- Y30XpxdhTL8xZsokLKZZksO0KlOKiN4=
+ bh=Ml5FKUKnYHZsTWk15Ev+B9F4v60VD7kLhAS0ZRjIvWw=;
+ b=K8vZkmBX2znSuI7kzR4s19SO2fEq14FJ+oAgTRSqbJwSkOiHLwXq0xHdBC63vXCJ96BVyH
+ Xjz5nLjGemKLirkbAmZV+aECScpKccQnw2+UMLR9rtiQ46By0TI2kLfKfQrT0kGpmLTMYe
+ GGN3xtdqOPXXwyxvd3E+wMES6xl2QIs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-dHoEW4GvM6SN_yI9xHlBuA-1; Thu, 09 Jul 2020 18:12:31 -0400
-X-MC-Unique: dHoEW4GvM6SN_yI9xHlBuA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-40-5qELZ-6sMo6q1eaNxC0GUQ-1; Thu, 09 Jul 2020 18:12:56 -0400
+X-MC-Unique: 5qELZ-6sMo6q1eaNxC0GUQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45726106B244;
- Thu,  9 Jul 2020 22:12:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDD361081;
+ Thu,  9 Jul 2020 22:12:54 +0000 (UTC)
 Received: from localhost (ovpn-116-140.rdu2.redhat.com [10.10.116.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AABA65D9C9;
- Thu,  9 Jul 2020 22:12:28 +0000 (UTC)
-Date: Thu, 9 Jul 2020 18:12:26 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9394B10013C2;
+ Thu,  9 Jul 2020 22:12:54 +0000 (UTC)
+Date: Thu, 9 Jul 2020 18:12:54 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v5 1/4] target/i386: add missing vmx features for several
- CPU models
-Message-ID: <20200709221226.GM780932@habkost.net>
+Subject: Re: [PATCH v5 4/4] target/i386: modify Icelake-Server CPU model number
+Message-ID: <20200709221254.GN780932@habkost.net>
 References: <20200619073114.24303-1-chenyi.qiang@intel.com>
- <20200619073114.24303-2-chenyi.qiang@intel.com>
+ <20200619073114.24303-5-chenyi.qiang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200619073114.24303-2-chenyi.qiang@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200619073114.24303-5-chenyi.qiang@intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 18:12:34
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 11:25:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -102,55 +102,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-I'm very sorry for taking so long to review this.  Question
-below:
-
-On Fri, Jun 19, 2020 at 03:31:11PM +0800, Chenyi Qiang wrote:
-> Add some missing VMX features in Skylake-Server, Cascadelake-Server and
-> Icelake-Server CPU models based on the output of Paolo's script.
+On Fri, Jun 19, 2020 at 03:31:14PM +0800, Chenyi Qiang wrote:
+> According to the Intel Icelake family list, Icelake-Server uses model
+> number 106(0x6A).
 > 
 > Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 
-Why are you changing the v1 definition instead adding those new
-features in a new version of the CPU model, just like you did in
-patch 3/4?
+Same question as in patch 1/4: why are you changing v1 instead of
+adding a new version?
+
 
 > ---
->  target/i386/cpu.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  target/i386/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index b1b311baa2..0b309ef3ab 100644
+> index 3c81ca543f..f919607fa0 100644
 > --- a/target/i386/cpu.c
 > +++ b/target/i386/cpu.c
-> @@ -3002,6 +3002,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->               VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
->               VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
->               VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel = 0x80000008,
->          .model_id = "Intel Xeon Processor (Skylake)",
->          .versions = (X86CPUVersionDefinition[]) {
-> @@ -3130,6 +3131,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->               VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
->               VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
->               VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel = 0x80000008,
->          .model_id = "Intel Xeon Processor (Cascadelake)",
->          .versions = (X86CPUVersionDefinition[]) {
-> @@ -3477,7 +3479,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
->               VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
->               VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
->               VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
-> -             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS,
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
-> +             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
-> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel = 0x80000008,
->          .model_id = "Intel Xeon Processor (Icelake)",
->          .versions = (X86CPUVersionDefinition[]) {
+> @@ -3384,7 +3384,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>          .level = 0xd,
+>          .vendor = CPUID_VENDOR_INTEL,
+>          .family = 6,
+> -        .model = 134,
+> +        .model = 106,
+>          .stepping = 0,
+>          .features[FEAT_1_EDX] =
+>              CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
 > -- 
 > 2.17.1
 > 
