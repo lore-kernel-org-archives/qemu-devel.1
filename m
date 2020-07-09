@@ -2,98 +2,96 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB881C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6106C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:07:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2E6A206DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:04:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8308F20772
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 00:07:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BjR1+6xJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E6A206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gM5jz38Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8308F20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtK3d-0001o2-Uz
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:04:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41562)
+	id 1jtK63-00034A-Oh
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jul 2020 20:07:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtK2a-0001N5-Ha
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:03:52 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33114)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jtK5K-0002US-3n
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:06:42 -0400
+Received: from mail-vk1-xa41.google.com ([2607:f8b0:4864:20::a41]:43809)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtK2Y-0005VA-RQ
- for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:03:52 -0400
-Received: by mail-pl1-x642.google.com with SMTP id 72so75832ple.0
- for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 17:03:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=44zJ0BLabxtvajiH/W+HkJKQie0u2+TL3xVYxcmUzjY=;
- b=BjR1+6xJF0qT7ZDCE57l7FGxeGkrvJDLzmQO3mb4QIFXrT7/s+IQbUR8LbLXhFvnS2
- awt01wKRwjnvGR5KSUO/lBsbWrf44kC95orrtQ/oxpe2vUz3xDIfr8kFCh3H7/6sbAo4
- d/nrHBE7ozXwPYjJ4VgGYdEgGIKRS0huPUlXo/hBXKdidG8cwXuqKmC+xaDixSmeBVcd
- TDImGkQsruEZFH/bKYB0ibzuENIhPD4kG/IbR5BXvPuE8h1rqOT44edtMvbu3FgRDJLZ
- IatAUJAPGQ2Y6r7L2F4whQUy96BZlu3WI82BuboUbRF7dlhTHkcsjtXJX3VTf6OM9S2h
- lAHw==
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jtK5I-0005q4-JN
+ for qemu-devel@nongnu.org; Wed, 08 Jul 2020 20:06:41 -0400
+Received: by mail-vk1-xa41.google.com with SMTP id e10so42400vkm.10
+ for <qemu-devel@nongnu.org>; Wed, 08 Jul 2020 17:06:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=0QjbGbfdZrC4ER9Op5TZkuMTIqOSXOzGsj5W0a7/Z28=;
+ b=gM5jz38ZhokgtSHk4gJ9CoFWqhE8Yryxdl/eXz6y+qXpmVJuVPgiaw6V0GMdPdyohj
+ 9rKup83NjrvQvlQEbk74BZHVMwHTbxVKgaH/s0cd+5ExSHws4fYgbwRoRHuiwVXIAwcb
+ 6se59hrOYyPbwe3sXL9iON1mg3jsEgA3YTmdNiMBy383N0MRTeYObfPgOHO4nDUAgEda
+ wXvOstpgcH0dxJwPoPzYBTY6AkvJozkEk5mWRd8uM4Nc3VxbF0oI1i/C5Sn1hrcDllun
+ lSxoTiY8HhxUSoDXIEumVBumS064WlBwx6gv/dmqvCdGu0JPg9eWZ1r8ifLAQr8kNlmU
+ pZww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=44zJ0BLabxtvajiH/W+HkJKQie0u2+TL3xVYxcmUzjY=;
- b=gsq7r4kuN5vnbn3ky9SZPmRsIRP6eZ5gTMX9oBudkobDrcbiXCofpOfskUORP5cW5V
- XtmE6WQudrj9p4eSsUQ4ZaLkXf+FMsN3gCjnFwkOeq+DSPm1Msah+bD4KGp/Rz77pKni
- T+102O5pZVRmbDYfzb3/Ss3BFHWPcYcyPB5meUAsk/Z4GS2vs/90+0H20ZhkA8pBcy9t
- JiDBn054IeJP0cF9HlL4fb1ScklskWYNOr+0N5gXcjRMVJYxz//wkSwbp1fGTLpBs3SO
- 4OJL/pnb9RHCUWUg3wq+Q8pmjXLMyynUFhj5qk7nNZvOxqgFbkpsNTU3NbSQ795D4cPw
- Vl/w==
-X-Gm-Message-State: AOAM5301KmQPTsElvvNQwicB83oRDS5IjhLs08AEHIZKIAeWhEtWEZbX
- 4VCpsRkW0ygp23Qpg2tduI+Tcw==
-X-Google-Smtp-Source: ABdhPJz0CLI3u6FsZTgaDIHQfuWrXw3SyjC3XVQxwD7MQRgpfYGok/9jZdaIePO84IIyiwxd+Ji2hw==
-X-Received: by 2002:a17:90a:3a81:: with SMTP id
- b1mr12412447pjc.217.1594253029425; 
- Wed, 08 Jul 2020 17:03:49 -0700 (PDT)
-Received: from [192.168.7.121] (24-113-145-216.wavecable.com. [24.113.145.216])
- by smtp.gmail.com with ESMTPSA id v28sm809416pgn.81.2020.07.08.17.03.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jul 2020 17:03:48 -0700 (PDT)
-Subject: Re: [PATCH v3 03/21] softfloat: add xtensa specialization for
- pickNaNMulAdd
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-References: <20200708222101.24568-1-jcmvbkbc@gmail.com>
- <20200708222101.24568-4-jcmvbkbc@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9940df7c-4cb3-a994-d43f-adc959fd5257@linaro.org>
-Date: Wed, 8 Jul 2020 17:03:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=0QjbGbfdZrC4ER9Op5TZkuMTIqOSXOzGsj5W0a7/Z28=;
+ b=pRVDpJUiUtiVHhOpHJ1oRkAyr3NnZEwhUVyEr5kIkZwhhgwmbzhB70akftn+gCgJXZ
+ O+zMk+j4wA+nOxaQafz9HCFgTaWGNrUniuMn5Qx4w1Z7/lx8Ut+XfD5Dyfn5hC34RfO3
+ XOtNl9ueKhMhav93IIb9YwryGcJ8NYhQcJhl56/8pfgqpBjTa27ims7lyNefHQ2gHd0L
+ aXXksgh+1AYmB51QlYF/rQut41iaVyKbDxM+u8o+P2FvX/sYiZve2nIxuBYuyK5NrXb/
+ QCEYWPoH2BwdZ8vg6lNZkoUWapvKcyPpizAqNTzfhWDpWzW2Bo6GcGd+l8LRUKI8xZA0
+ Y0Kw==
+X-Gm-Message-State: AOAM533LiR8xFX9nOHuf6PGbnUSc2XF3U2nIiMv9mQrw/+zhAixqooYV
+ cUDe/D8AMVjN7g8/eNMdWmrDocUbisrVJTMH5kb2lw==
+X-Google-Smtp-Source: ABdhPJzi8caXorcntwgygNhgvgvmG03Pnd+qvUuFfbv04ZiNn9Wlqd+gPkNwBtyqZSyRZmPYMK2zpoc18bPvuuj+60k=
+X-Received: by 2002:a05:6122:130b:: with SMTP id
+ e11mr12160252vkp.20.1594253199000; 
+ Wed, 08 Jul 2020 17:06:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200708222101.24568-4-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+References: <20200707184730.3047754-1-hskinnemoen@google.com>
+ <20200707184730.3047754-6-hskinnemoen@google.com>
+ <4b7130f2-032c-3067-b2b6-876a2b17b707@amsat.org>
+ <CAFQmdRYi5QFHbcWQH-bWqAsSCidzYMedC8n+mib1DPpJuEy-Rw@mail.gmail.com>
+In-Reply-To: <CAFQmdRYi5QFHbcWQH-bWqAsSCidzYMedC8n+mib1DPpJuEy-Rw@mail.gmail.com>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Wed, 8 Jul 2020 17:06:27 -0700
+Message-ID: <CAFQmdRZdUKvmi_eKdtCnR8uP63sRP9X0Z7oxZES56mtSz_=7FA@mail.gmail.com>
+Subject: Re: [PATCH v4 05/12] hw/arm: Add NPCM730 and NPCM750 SoC models
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>, Joel Stanley <joel@jms.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::a41;
+ envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,31 +104,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/8/20 3:20 PM, Max Filippov wrote:
-> pickNaNMulAdd logic on Xtensa is to apply pickNaN to the inputs of the
-> expression (a * b) + c. However if default NaN is produces as a result
-> of (a * b) calculation it is not considered when c is NaN.
-> So with two pickNaN variants there must be two pickNaNMulAdd variants.
-> In addition the invalid flag is always set when (a * b) produces NaN.
-> 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: "Alex Bennée" <alex.bennee@linaro.org>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
-> Changes v2->v3:
-> - handle infzero case in pickNaNMulAdd properly and reword commit
->   message
+On Wed, Jul 8, 2020 at 11:13 AM Havard Skinnemoen
+<hskinnemoen@google.com> wrote:
+> On Wed, Jul 8, 2020 at 10:31 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org> wrote:
+> > On 7/7/20 8:47 PM, Havard Skinnemoen wrote:
+> > > +typedef struct NPCM7xxClass {
+> > > +    DeviceClass         parent;
+> >
+> > Similar comment that elsewhere on this series, if NPCM7xxClass not used
+> > outside of npcm7xx.c, keep it local.
+>
+> OK, will do.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Turns out it is used in npcm7xx_boards.c, so it has to stay where it is.
 
-
-r~
-
+Havard
 
