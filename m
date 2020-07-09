@@ -2,125 +2,121 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F03B8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A77C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:30:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9B83207D0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:28:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="l3nJl0Ah"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B83207D0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 97FE4207D0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 15:30:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97FE4207D0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtYTa-0002xH-1K
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 11:28:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46904)
+	id 1jtYV1-0004DG-Tm
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 11:30:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtYSg-0001sN-G4; Thu, 09 Jul 2020 11:27:46 -0400
-Received: from mail-eopbgr80090.outbound.protection.outlook.com
- ([40.107.8.90]:6976 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtYTg-0003MC-PB
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 11:28:48 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:52785)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtYSd-0002JB-Hr; Thu, 09 Jul 2020 11:27:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RXCkGjGto0zef+SSjDemr1ERFyvqDw46udZNDYPb8B7DSsUrnbty/fmALEcxPexTOCYcx2buh/1wwLiQn1Zu1h4ly+25swYAJ+yN7t0+qUSoxvvMHIhgN9qDdT+e/664HynQdZvIP8UEyMybIz4HUyDTSA5mUUb2DR9mCfI+2hThxLBYWfbBZIZfU/uWJEWVCYLMfxbcG8bjWbZj11XjZGOh+xWpZrMIJoNuAY7HqbV/OUv7OKK8sHsL7d5NJJG4oOG1OdKWPNsrFNNn4aTTJkpiAN0KPFhtICVh/c/dFiTpgkQorcAC9oxa7G7VeP7R8oailhnEk1Hx8T9Hv5P8CA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NdT+P9niMP1ycnT/vTvg1vEdSFGI+Yb9eT9fMcPQW0s=;
- b=m+6SAHbAK+bmeaYQfm3Jla34Hmf4NSPkyuvGbwQ84jg/VFpbVw17sFAmQ0p3QDI+pEtfG2ONZGq7bFUEOrCjAYeRKCE78+yCF/jiFxbuLaAUCfuKCjliu+QF1G36J7H+FIqhixikVBqt/ATjJ9/h4Ag2NdyA3s+IfgfdKjWhYKpUeNXKMr2kwNselJhM0Zzl2KHMPe8gxQWRQORq1ogDs+BnQDVQV1wN8nodxwiZQIXt6suRAHVvVUN+UDblv0O6TmFCmwc5bOqPWuy5VX3g6NdaXboTZLCbFcb+5d6ZJ1KcSC21B0H99lWGg7xkH8dakBr1Y3Os0KNEz+l+Sdlk0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NdT+P9niMP1ycnT/vTvg1vEdSFGI+Yb9eT9fMcPQW0s=;
- b=l3nJl0AhERyxrIU1FLGIoF6GdWD5FwmBJyCqHZK+DnvwGBKBFMDGMtvtbHWKjpJEXw2NLXmXmVVY5YSjLX43iMj7eNWTTco5WwiPsMUElTKKKgSLcJDo96SLTm/PvS5xCQ/mzzDJUOR5Z5Hio3RGViSsaEYqS1UGdD2M53ykvfM=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB4721.eurprd08.prod.outlook.com (2603:10a6:20b:c7::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Thu, 9 Jul
- 2020 15:27:40 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.021; Thu, 9 Jul 2020
- 15:27:40 +0000
-Subject: Re: [PATCH v7 14/47] stream: Deal with filters
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-15-mreitz@redhat.com>
- <ed502f80-f4a2-bfb8-7395-5842f8103991@virtuozzo.com>
-Message-ID: <e60d230b-d064-2533-5e25-d6e58bd5deea@virtuozzo.com>
-Date: Thu, 9 Jul 2020 18:27:35 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <ed502f80-f4a2-bfb8-7395-5842f8103991@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM0PR04CA0047.eurprd04.prod.outlook.com
- (2603:10a6:208:1::24) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jtYTe-0002Nr-Qc
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 11:28:48 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1McYTD-1kTiZi3PcD-00cyRz; Thu, 09 Jul 2020 17:28:36 +0200
+Subject: Re: [PULL 11/12] linux-user: Add strace support for printing
+ arguments of ioctl()
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200704162545.311133-1-laurent@vivier.eu>
+ <20200704162545.311133-12-laurent@vivier.eu>
+ <CAFEAcA-AYy_ixjHsX+OYN=Vx-63qdeEDY-cTit7A7wHLMiq_xA@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <8ca4bf38-b783-7a0c-06c0-44dc46d284ac@vivier.eu>
+Date: Thu, 9 Jul 2020 17:28:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.191) by
- AM0PR04CA0047.eurprd04.prod.outlook.com (2603:10a6:208:1::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.20 via Frontend Transport; Thu, 9 Jul 2020 15:27:38 +0000
-X-Originating-IP: [109.252.114.191]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cfd158c9-f3d9-4af5-e95a-08d8241c9dd2
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4721:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4721BF5BDD976ABDDF35351DF4640@AM6PR08MB4721.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: x0ZBR6kBGzAqrp8p2bVXOtsRknz9I0FZpETd7ycTjQDXDWC/tddLpkot+HxYd5Y0pzCKvo1Vz0z4a2PaoW1qENbqofrGv4RNj8qBXfVA6PQEFQAvI24/fTfXH7+3IruJ1pjPSEhGvGX3hdQaDVXEI09LN6ZscrIwKegFJPioWWWvKUDfgReVnnyhiQ54hSicrcfDX6oZqy17eZWpWoGziqbrxjUmZu/Wvr7KIbGrIb6bKjtvoGcQBnTvIQ7A5jPW2tTzUdKBV1UUbqOdDOSpIUBH5bee1ftyNWzNI+cfcL8b9QCp1eG1c9vKKbNG/nKFD59BO1ksnkeTjJhgDUy2n0oARIn73AovnxI7do+DmfcptW8PBJDgOBBQdwPG8u8R
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(136003)(39840400004)(376002)(396003)(366004)(54906003)(66556008)(66476007)(66946007)(52116002)(31696002)(83380400001)(4326008)(2906002)(86362001)(8936002)(31686004)(8676002)(478600001)(6512007)(316002)(16526019)(956004)(6666004)(6486002)(5660300002)(36756003)(2616005)(26005)(53546011)(186003)(6506007)(44832011)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: pYUQ1hK+Um3sjwPuRWWLs2D0+9cBQCSa2LRirgt8hm9xV4J7ZY9apny33B9GDOptp8dMn2h59qQX0qiHnN6qHfeJRZxPZJqQ0+34EDPMmkmTmtTAUN2AVujVU/eN0e/LExPW9jOHxg5RcyPL+NXUOUk+09co0lOiWdj7ezKC21edE9LOljqPZ2RJhSDHTM/KEzIxLNo1IUu0I0zBOjnwTFw+X0LvgEZJ6Gp+x7TMWOX7yQg+oNJvxBOM6R8JIfXDVPFPgYuCTqmVDkI1FGVS/b+XsEtRsfpg6KA7KdOy653Egg2/J52Wx+iEBLCUgjItXkpgwrVDCzmTjSZbzKzfR4krqEB3a5MHt9cffo9mw1GgM3k/HHMcPRH+zXpcad4veb9O/C9EgifOWWRDxJU3O4IWrbCkud57yP5T73NUjDzMKDXevWgo27bHnpo0R8edbVUdFW+642GEsuWMLEHzEZkcaF6/oZ+44q4aNSY+tZ8hAAyzcozP0Fgrf1PmO2EQ
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfd158c9-f3d9-4af5-e95a-08d8241c9dd2
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2020 15:27:39.9444 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pGp1fuTOQ5U1RtwXOwi930RTTKcVhyNZ8sksa/klCaniqvZZKvxgWDZPTXt5ado2dsPtl4fm+gSPu7/cdkOZw7RKl0sScZuZKbdeUs58DmU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4721
-Received-SPF: pass client-ip=40.107.8.90;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 11:27:41
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA-AYy_ixjHsX+OYN=Vx-63qdeEDY-cTit7A7wHLMiq_xA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:tqVawsNNOYoRLMQb4pW+5+RA3bSs/mAmeFejp9OuxQkCYDgvo+s
+ MLU5BV9edFpag3zfAu/2c2ErkV5jWLLA4nr3bBtnpQywNX6oaXrzAS8ORuUdUGNh+aTWSCE
+ //bBvxhz3lLkheOiAs5skagp1edNkhvQLeSlDTUxkv/QO1an5gcSYesMQfm6DNHQ0d6uROi
+ z9CICIcYSXo6ATYPwCDFg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:jr5cFMZWfTo=:U0uYwfbYTwBmB1xuAnQYnd
+ JYQad63LMwS0vsYPIZ4fyNQyuVF505VSimnUSw+bLyxprP8PWUpLaiz781e3RAFMPBZlQd9xy
+ 5M6lyziGK62KIuHv+lwf5ckMYlQ1+JHlgD+WRvhszZ3wPSqiBDXR3Ofr5R5VG59CLjO5p4QE/
+ cGX2YzcKMDxTiU0YfViWMD9VAT8jLxmOMutBQlYI77E0+26dB9f8DVBiyGfnZFnzX0VzGX0zw
+ do8nCHlYZQqMnh+4An+LvQkE7s+96i2VswqXVwSWzUGoyEdFUJEj7FyqvTaqD3EDVDJb2zCB3
+ HoailUuaqDs66Lq9bx+M8dTKE2n2ZOB4mo2JRoI/MKpxJ6+5U6xKu1smz4p5ct9p3GHWzhE0T
+ tx7leENPn8/BV8nGZ/gJ5Za0fLOaSVTBT1C/gWVAQrWoVndg+FfkyzEYHYJsE9y9HsjBeJN8s
+ sJSAidA+z8HQyGZ13x5asc2ya+6ZkKo8F82+qrmQsEKamLUlD/flj5T0zVmX9k5fAShp7vbOg
+ pt9BpwHIseR9B2KkYFv0TUZkPh+TAbaApASb0LXUnLD88FnKi5PpAmaAYfJw5LBc492sTdM+2
+ U4cYN0etWVhQOqDx9c0GFBTC/5MHYBQOcA+wVQW6ZHkhfb/noTJwqL1JTp18itcrAMqHQ1U1z
+ 7E+fNdOhAcZOaGR5b6WWUCprxeSHVc9Af+QbyM+7CyyxCkVjFqwcA0AhW6wRbkkJpEDhvGURq
+ rD4ezhqrrtIMY/Zf2gnZp69z1Z+p+rVQ0L/dYP/4dDvEyhUh7Rff2W94Vr4cLOrxrpt5oqnNH
+ pl4HIpLivTTOt7VAGraPgKFu4cx1QxMY8ll53qAI1N45kZc+4gdlU4tZzU12Xyu0RhcvC/7
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 11:28:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,49 +129,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.07.2020 17:52, Andrey Shinkevich wrote:
-> On 25.06.2020 18:21, Max Reitz wrote:
->> Because of the (not so recent anymore) changes that make the stream job
->> independent of the base node and instead track the node above it, we
->> have to split that "bottom" node into two cases: The bottom COW node,
->> and the node directly above the base node (which may be an R/W filter
->> or the bottom COW node).
+Le 09/07/2020 à 17:20, Peter Maydell a écrit :
+> On Sat, 4 Jul 2020 at 17:36, Laurent Vivier <laurent@vivier.eu> wrote:
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   qapi/block-core.json |  4 +++
->>   block/stream.c       | 63 ++++++++++++++++++++++++++++++++------------
->>   blockdev.c           |  4 ++-
->>   3 files changed, 53 insertions(+), 18 deletions(-)
+>> From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 >>
-...
->> +    BlockDriverState *base_overlay = bdrv_find_overlay(bs, base);
->> +    BlockDriverState *above_base;
->>   -    if (bdrv_freeze_backing_chain(bs, bottom, errp) < 0) {
->> +    if (!base_overlay) {
->> +        error_setg(errp, "'%s' is not in the backing chain of '%s'",
->> +                   base->node_name, bs->node_name);
->
-> Sorry, I am not clear with the error message.
->
-> In this case, there is no an intermediate COW node but the base, if 
-> not NULL, is
->
-> in the backing chain of bs, isn't it?
->
-I am discarding this question. No need to answer.
-
-Andrey
-
-
->> +        return;
->> +    }
+>> This patch implements functionality for strace argument printing for ioctls.
+> 
+> Hi; Coverity points out some issues in this change:
+> 
+> 
+>> +#ifdef TARGET_NR_ioctl
+>> +static void
+>> +print_syscall_ret_ioctl(const struct syscallname *name, abi_long ret,
+>> +                        abi_long arg0, abi_long arg1, abi_long arg2,
+>> +                        abi_long arg3, abi_long arg4, abi_long arg5)
+>> +{
+>> +    print_syscall_err(ret);
 >> +
+>> +    if (ret >= 0) {
+>> +        qemu_log(TARGET_ABI_FMT_ld, ret);
+>> +
+>> +        const IOCTLEntry *ie;
+>> +        const argtype *arg_type;
+>> +        void *argptr;
+>> +        int target_size;
+>> +
+>> +        for (ie = ioctl_entries; ie->target_cmd != 0; ie++) {
+>> +            if (ie->target_cmd == arg1) {
+>> +                break;
+>> +            }
+>> +        }
+>> +
+>> +        if (ie->target_cmd == arg1 &&
+>> +           (ie->access == IOC_R || ie->access == IOC_RW)) {
+>> +            arg_type = ie->arg_type;
+>> +            qemu_log(" (");
+>> +            arg_type++;
+>> +            target_size = thunk_type_size(arg_type, 0);
+>> +            argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
+> 
+> Here we fail to check that lock_user() didn't return NULL...
+> 
+>> +            thunk_print(argptr, arg_type);
+> 
+> ...which would cause a segfault in thunk_print().
+> This is CID 1430271.
+> 
+>> +            unlock_user(argptr, arg2, target_size);
+>> +            qemu_log(")");
+>> +        }
+>> +    }
+>> +    qemu_log("\n");
+>> +}
+>> +#endif
+> 
+>> +#ifdef TARGET_NR_ioctl
+>> +static void
+>> +print_ioctl(const struct syscallname *name,
+>> +            abi_long arg0, abi_long arg1, abi_long arg2,
+>> +            abi_long arg3, abi_long arg4, abi_long arg5)
+>> +{
+> 
+>> +            case TYPE_PTR:
+>> +                switch (ie->access) {
+>> +                case IOC_R:
+>> +                    print_pointer(arg2, 1);
+>> +                    break;
+>> +                case IOC_W:
+>> +                case IOC_RW:
+>> +                    arg_type++;
+>> +                    target_size = thunk_type_size(arg_type, 0);
+>> +                    argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
+>> +                    thunk_print(argptr, arg_type);
+> 
+> Similarly here we need to check that lock_user didn't fail.
+> This is CID 1430272.
+> 
+>> +                    unlock_user(argptr, arg2, target_size);
+>> +                    break;
+>> +                }
+>> +                break;
+>> +            default:
+>> +                g_assert_not_reached();
+>> +            }
+>> +        }
+>> +    }
+>> +    print_syscall_epilogue(name);
+>> +}
+
+Thank you Peter.
+
+I fix that.
+
+Laurent
 
 
