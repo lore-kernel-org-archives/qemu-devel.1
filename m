@@ -2,130 +2,101 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD9CCC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:15:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B4FDC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:25:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 972382077D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:15:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 365B820767
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:25:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="N8/esuUX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972382077D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg2ps7Ny"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 365B820767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jta9L-00011m-U6
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 13:15:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49892)
+	id 1jtaII-0004Qm-HW
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 13:25:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jta8U-0008Jd-Vz
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:15:03 -0400
-Received: from mail-eopbgr130093.outbound.protection.outlook.com
- ([40.107.13.93]:48282 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jta8P-0003yc-L0
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:15:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AIoIKjeunssT2yccxlrvaNFdV8XF3nkknq6RHROi2hQuFgI94rhohtbxWe53A3kDqYyfllK/OSA+qyIBxh0Wu47hT1QxvL4TggOwJ1fQzqWLyDtQelv5vUxq6BxRJDRNsUOlXWiML89HUA9dsGUoEr8TnQmXngrhTYgJu0lwPh7RUGAZnEx2GCqxV07Kn9vRzcmqQcR58CwOd7bPWEKn4vGrKp1QdQF6Z3izPhBwjU3usCRlPCe5Ra3hzOSPWE97If4qUzOCgUA5VxsVZHirRoMX7xmGGFXsWuRib6LfHP/BOTCez66uMpRYWAGQJQD4H0AZ8A7jV2IPawxvFWrKHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YVoMtPWiinm6KUopFcJPA9WqxlihcpwCa58qNDTUKq8=;
- b=bTi2CZ+Zlck1sHoSPVa2EGFxt9C3g/Wn882W84xdj+s/iZ4F/3KXHHeIum+k1yjjYwPJIyxAk2XW580bf4kp4AXnbs3CQlZAGYDm5IMGSj1plSanwnSbkugT1igrD1Tijfl5WL3juFHHhu7TNMZHBa0jcCLWwTqnqFwwqb0lvdvIxGGrpkct+hPFs7fkF7TUhTRB44tFg9auARo0mty2qmoWymQQjXm8bywfuE2IzpCKvRR7eVQBYaQvUUfIw4bGO7hum7dUGiNwmWBVcjgqd4gZ+ZZ3pPPHMmY838w3yIECqGW87nHG1A96JTbtBgFo2AUoFmclw27HDhsZbs1XgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YVoMtPWiinm6KUopFcJPA9WqxlihcpwCa58qNDTUKq8=;
- b=N8/esuUX9wXG1wQM3rkel0F06EFAmzEQCPHi522hzgJ7Jfkuij+Z0NlSSlOUjE/1MK30zi410WNkV7940aRffA6aRBeo6J6ekumdyuk230LtHv9q9JkdOQ3ggh5ON9ZOjpgvaUKXaInOoKtMTjOe3LPLAbqQEGvWTu18I5rtG2M=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3960.eurprd08.prod.outlook.com (2603:10a6:20b:ad::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Thu, 9 Jul
- 2020 17:14:54 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3174.021; Thu, 9 Jul 2020
- 17:14:54 +0000
-Subject: Re: [PATCH 0/2] keepalive default
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <20200708191540.28455-1-vsementsov@virtuozzo.com>
- <20200709083510.GF3753300@redhat.com>
- <daa7864d-8979-1987-caf7-cca3cb9849ca@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <436ac597-c25d-16a8-31bc-a895938af807@virtuozzo.com>
-Date: Thu, 9 Jul 2020 20:14:52 +0300
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtaHi-0003zw-Pv; Thu, 09 Jul 2020 13:24:34 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50599)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtaHg-0005Ih-MZ; Thu, 09 Jul 2020 13:24:34 -0400
+Received: by mail-wm1-x342.google.com with SMTP id l17so2778517wmj.0;
+ Thu, 09 Jul 2020 10:24:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FroE2zU3ssE8zNj2T3/EsITAjmRYrihVr+myfUlNlRU=;
+ b=gg2ps7Ny821rrcp7E1fHfd7AQ82vj20ix2DEcPXCRHvmexuOOBcDz8l2iTX9LZfjQt
+ 6azlxIkW0vAvZqy0oJ+9XQKSU9As0HlHeQ49jS17gAkvGaG2JevdB1wWFDwMtgQZmSlR
+ Gf0vyw0XSaWBrwQw3+kjAk2nbzZ+WQS1B9eLKII4mQEKDmuWTMXj/EwEwhE5evmodb36
+ DFDlEW9MCGYe2hlq31sTnL6xS+IfgsCO7CoMqoT/4wiZczSWojIkAOF0n+5UeD4qUXyp
+ RTYpHrAQvh/9zFt3CAFs9cXTJuEsMAp/r0UWRLfVwaACoT28Ovojv7p1/CfPaGML1g7a
+ CqRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FroE2zU3ssE8zNj2T3/EsITAjmRYrihVr+myfUlNlRU=;
+ b=kQAw91YH4NnokcSaguSN4cmGmjWPh8ba6osW/Cbv4jhZLuGISdNOZ2Am/ypoVwublT
+ gdX1c0X9L0yLXgMijjfEBDdlDDUj80avmH7sNp1iIdRVyACcpwpq4Z/ux9uMKPjArpZD
+ uJ+Gbr2kf+Kk2RFUc0XEujjG2GcRU4YgYxFuwFAC0m6CQc7/NBOI483DMyshsQxBdcuZ
+ 08C4TgIgntbZF+Klp4WriV5Osw7D6TaS0jdZjLJKNTPoUxbjYp3OLur7kTlUOg2jiEzm
+ nCVOwEe/aVGR1E1XGC84pFwaw9WJTNhSpyvQDrMRO3dt5pRetobAUk0NE2XsvZd3JtO0
+ dd/Q==
+X-Gm-Message-State: AOAM532b/zrHEp+Z7xqf40YaDm6IVLm2kiFvHIh31OPzsVwsLBGovr+x
+ i4aUkVQ9gxXCF6UH1TGxX2Q=
+X-Google-Smtp-Source: ABdhPJwN+zHXaDqgEuT3FBM8/xKEosDZo1fT2m5NqdWildONVntpRQaUq0aIyXYWFrvrzDOb6P8ELA==
+X-Received: by 2002:a1c:e910:: with SMTP id q16mr1050400wmc.188.1594315470393; 
+ Thu, 09 Jul 2020 10:24:30 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id 26sm5358767wmj.25.2020.07.09.10.24.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 09 Jul 2020 10:24:29 -0700 (PDT)
+Subject: Re: [PATCH v5 01/11] hw/misc: Add NPCM7xx System Global Control
+ Registers device model
+To: Havard Skinnemoen <hskinnemoen@google.com>
+References: <20200709003608.3834629-1-hskinnemoen@google.com>
+ <20200709003608.3834629-2-hskinnemoen@google.com>
+ <2fe8ea5e-56de-f57f-6146-8355125daa7f@amsat.org>
+ <CAFQmdRYx99PpWz6bftCvBR7=YRftD_WNex_A9aoDaeRg=4tsCw@mail.gmail.com>
+ <bd2972b0-0684-e379-6d66-16ceb62deade@amsat.org>
+ <CAFQmdRbHXhd9-HUQP5ET=JQEnQ3FMCQBHajwZrP5d7=iCc0tzA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ee8bc620-6d58-98ef-1c53-a8687282af50@amsat.org>
+Date: Thu, 9 Jul 2020 19:24:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <daa7864d-8979-1987-caf7-cca3cb9849ca@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <CAFQmdRbHXhd9-HUQP5ET=JQEnQ3FMCQBHajwZrP5d7=iCc0tzA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM4PR0902CA0018.eurprd09.prod.outlook.com
- (2603:10a6:200:9b::28) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.189) by
- AM4PR0902CA0018.eurprd09.prod.outlook.com (2603:10a6:200:9b::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend
- Transport; Thu, 9 Jul 2020 17:14:53 +0000
-X-Originating-IP: [185.215.60.189]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9ee0421c-685e-460a-ce82-08d8242b98d3
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3960:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB396077E3D384E1434A17C89BC1640@AM6PR08MB3960.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:820;
-X-Forefront-PRVS: 04599F3534
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tKUo2YmfWTcRJgmdjKZDk6JKaXeR3CPKM3BcS55iBMp4oKBr2IJPmFIj+JW8WmZlL9CyNcqWXtqMvenOHgB4GP8pr8XNWNZQxIc3QahFNmBAHEIiKXXkmxCOAfsqRZO25W8R9I8ukDZu6L34vVcwsiNp8z8wOveQkt/qzTohwDcvJ87R66d5cRehFSmoZgEYUj1+7EnfmwFu5f1cQZi4bQbWgplIzvJzgzDf9OU/qkP5PHCxVUAsEDuSjbC9FKI5aAvB7vj8ThPCx2zONzws2YoOBKnZmGhjt/fhV7iarH9YlWRPZp1/ykA04MApkhrgMQiPs6o6OR19NlX2NQGtV5Ctzx2bGgdKREt3Xt0poD6wwzpwd/DY48jwwyZCuY9L
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(39840400004)(136003)(396003)(346002)(376002)(956004)(31696002)(36756003)(31686004)(6486002)(107886003)(2906002)(2616005)(66946007)(66476007)(52116002)(5660300002)(66556008)(16576012)(86362001)(186003)(8936002)(16526019)(26005)(316002)(4326008)(478600001)(83380400001)(8676002)(110136005)(53546011)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: B7Ud2dMS3ellSbO0Ws/128PBa4kbjsR95eWS6EY2BnQGAsJC8ssILWkCWJ0PWzh4nBDa0O72yt1w2YAYSsva7qobWUMNiKuJU6BYMrkkCdkZprPrhp54EpQqNkoBN1SLxXqwVzFa1bVpNYWRN5brP+McU7/Gd9OeIqoJrEaU4BVtuSrXuqqkmVsqHgXqFKjF5S5mg4PEPAhOD6tS1NquyjCoh6Lddtf6RMqElHhhJ1zyBHQn5qchWUduVHlDCElhOf9dYJr8ZeJjXtC00whaq9s/h5o0GWA4GoJs4+bIlnGSvdvwGVCGDQ1T1Tc00ZypYxTccNaUHTQhbUimD3gQmm6vem4ROR7UfimdHAQu2thUwZEU9VNuR8uCRv/Bahgh0I2fm1DkadAOeskuSrbleyI2ZxL34kAnOjJnH+hjoGKcOB0n1VSWqf3ULfoeeaHVVTm/o0+PgC31r+Kf+XOXgKmHjlfo2zx1WlhmsD0dEnb+eN7/ZAOlx194eHu9V6Oi
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9ee0421c-685e-460a-ce82-08d8242b98d3
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2020 17:14:54.0460 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lyF5eSEShGcz7hbfr4YD40eCoD4HnqapaRAeF4O+y4lrcham5/yHJmfaylY6vo8mANRE/EsYngm0853BJXBI3x9A0jhnS34kZY+vUPiJwrQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3960
-Received-SPF: pass client-ip=40.107.13.93;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 13:14:55
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 10
+X-Spam_score: 1.0
+X-Spam_bar: +
+X-Spam_report: (1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, PDS_OTHER_BAD_TLD=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,32 +109,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, kraxel@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, CS20 KFTing <kfting@nuvoton.com>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-09.07.2020 18:34, Eric Blake wrote:
-> On 7/9/20 3:35 AM, Daniel P. Berrangé wrote:
->> On Wed, Jul 08, 2020 at 10:15:37PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all!
+On 7/9/20 7:09 PM, Havard Skinnemoen wrote:
+> On Thu, Jul 9, 2020 at 9:23 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> On 7/9/20 8:43 AM, Havard Skinnemoen wrote:
+>>> On Wed, Jul 8, 2020 at 11:04 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>> On 7/9/20 2:35 AM, Havard Skinnemoen wrote:
+>>>>> Implement a device model for the System Global Control Registers in the
+>>>>> NPCM730 and NPCM750 BMC SoCs.
+>>>>>
+>>>>> This is primarily used to enable SMP boot (the boot ROM spins reading
+>>>>> the SCRPAD register) and DDR memory initialization; other registers are
+>>>>> best effort for now.
+>>>>>
+>>>>> The reset values of the MDLR and PWRON registers are determined by the
+>>>>> SoC variant (730 vs 750) and board straps respectively.
+>>>>>
+>>>>> Reviewed-by: Joel Stanley <joel@jms.id.au>
+>>>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+>>>>> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+>>>>> ---
+>> [...]
+>>>>> diff --git a/hw/misc/npcm7xx_gcr.c b/hw/misc/npcm7xx_gcr.c
+>>>>> new file mode 100644
+>>>>> index 0000000000..9934cd238d
+>>>>> --- /dev/null
+>>>>> +++ b/hw/misc/npcm7xx_gcr.c
+>>>>> @@ -0,0 +1,226 @@
+>>>>> +/*
+>>>>> + * Nuvoton NPCM7xx System Global Control Registers.
+>>>>> + *
+>>>>> + * Copyright 2020 Google LLC
+>>>>> + *
+>>>>> + * This program is free software; you can redistribute it and/or modify it
+>>>>> + * under the terms of the GNU General Public License as published by the
+>>>>> + * Free Software Foundation; either version 2 of the License, or
+>>>>> + * (at your option) any later version.
+>>>>> + *
+>>>>> + * This program is distributed in the hope that it will be useful, but WITHOUT
+>>>>> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+>>>>> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+>>>>> + * for more details.
+>>>>> + */
+>>>>> +
+>>>>> +#include "qemu/osdep.h"
+>>>>> +
+>>>>> +#include "hw/misc/npcm7xx_gcr.h"
+>>>>> +#include "hw/qdev-properties.h"
+>>>>> +#include "migration/vmstate.h"
+>>>>> +#include "qapi/error.h"
+>>>>> +#include "qemu/log.h"
+>>>>> +#include "qemu/module.h"
+>>>>> +#include "qemu/units.h"
+>>>>> +
+>>>>> +#include "trace.h"
+>>>>> +
+>>>>> +static const uint32_t cold_reset_values[NPCM7XX_GCR_NR_REGS] = {
+>>>>> +    [NPCM7XX_GCR_PDID]          = 0x04a92750,   /* Poleg A1 */
+>>>>> +    [NPCM7XX_GCR_MISCPE]        = 0x0000ffff,
+>>>>> +    [NPCM7XX_GCR_SPSWC]         = 0x00000003,
+>>>>> +    [NPCM7XX_GCR_INTCR]         = 0x0000035e,
+>>>>> +    [NPCM7XX_GCR_HIFCR]         = 0x0000004e,
+>>>>> +    [NPCM7XX_GCR_INTCR2]        = (1U << 19),   /* DDR initialized */
+>>>>> +    [NPCM7XX_GCR_RESSR]         = 0x80000000,
+>>>>> +    [NPCM7XX_GCR_DSCNT]         = 0x000000c0,
+>>>>> +    [NPCM7XX_GCR_DAVCLVLR]      = 0x5a00f3cf,
+>>>>> +    [NPCM7XX_GCR_SCRPAD]        = 0x00000008,
+>>>>> +    [NPCM7XX_GCR_USB1PHYCTL]    = 0x034730e4,
+>>>>> +    [NPCM7XX_GCR_USB2PHYCTL]    = 0x034730e4,
+>>>>> +};
+>>>>> +
+>>>>> +static uint64_t npcm7xx_gcr_read(void *opaque, hwaddr offset, unsigned size)
+>>>>> +{
+>>>>> +    uint32_t reg = offset / sizeof(uint32_t);
+>>>>> +    NPCM7xxGCRState *s = opaque;
+>>>>> +
+>>>>> +    if (reg >= NPCM7XX_GCR_NR_REGS) {
+>>>>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: offset 0x%04x out of range\n",
+>>>>> +                      __func__, (unsigned int)offset);
+>>>>
+>>>> Maybe use HWADDR_PRIx instead of casting to int?
 >>>
->>> We understood, that keepalive is almost superfluous with default 2 hours
->>> in /proc/tcp_keepalive_time. Forcing user to setup keepalive for the
->>> whole system doesn't seem right, better setup it per-socket.
+>>> Will do, thanks!
 >>
->> Adding the ability to explicitly configure the keepalive settings makes
->> sense for QEMU. Completely ignoring system defaults when no explicit
->> settings are given though is not valid IMHO.
+>> Glad you are not annoyed by my review comments.
+>>
+>> FYI your series quality is in my top-4 "adding new machine to QEMU".
+>> I'd like to use it as example to follow.
+>>
+>> I am slowly reviewing because this is not part of my work duties,
+>> so I do that in my free time before/after work, which is why I can
+>> barely do more that 2 per day, as I have to learn the SoC and
+>> cross check documentation (or in this case, existing firmware code
+>> since there is no public doc).
 > 
-> We already have the ability to add per-socket keepalive (see commit aec21d3175, in 4.2).  I guess what you are trying to further do is determine whether the default value for that field, when not explicitly specified by the user, can have saner semantics (default off for chardev sockets, default on for nbd clients where retry was enabled).  But since you already have to explicitly opt-in to nbd retry, what's so hard about opting in to keepalive at the same time, other than more typing?  Given that the easiest way to do this is via a machine-coded generation of the command line or QMP command, it doesn't seem that hard to just keep things as they are with explicit opt-in to per-socket keepalive.
+> Your feedback is super valuable, thanks a lot. I really appreciate it.
+
+OK I'll continue, but might not have time until next week.
+After I plan to test too.
+
+What would be useful is an acceptance test (see examples in
+tests/acceptance/), using the artefacts from the link you shared
+elsewhere:
+https://openpower.xyz/job/run-meta-ci/distro=ubuntu,label=builder,target=gsj/lastSuccessfulBuild/artifact/openbmc/build/tmp/deploy/images/gsj/
+
+But these are apparently not stable links (expire after 30 days?).
+
+>> [...]
+>>>>> +static void npcm7xx_gcr_realize(DeviceState *dev, Error **errp)
+>>>>> +{
+>>>>> +    NPCM7xxGCRState *s = NPCM7XX_GCR(dev);
+>>>>> +    uint64_t dram_size;
+>>>>> +    Error *err = NULL;
+>>>>> +    Object *obj;
+>>>>> +
+>>>>> +    obj = object_property_get_link(OBJECT(dev), "dram-mr", &err);
+>>>>> +    if (!obj) {
+>>>>> +        error_setg(errp, "%s: required dram-mr link not found: %s",
+>>>>> +                   __func__, error_get_pretty(err));
+>>>>> +        return;
+>>>>> +    }
+>>>>> +    dram_size = memory_region_size(MEMORY_REGION(obj));
+>>>>> +
+>>>>> +    /* Power-on reset value */
+>>>>> +    s->reset_intcr3 = 0x00001002;
+>>>>> +
+>>>>> +    /*
+>>>>> +     * The GMMAP (Graphics Memory Map) field is used by u-boot to detect the
+>>>>> +     * DRAM size, and is normally initialized by the boot block as part of DRAM
+>>>>> +     * training. However, since we don't have a complete emulation of the
+>>>>> +     * memory controller and try to make it look like it has already been
+>>>>> +     * initialized, the boot block will skip this initialization, and we need
+>>>>> +     * to make sure this field is set correctly up front.
+>>>>> +     *
+>>>>> +     * WARNING: some versions of u-boot only looks at bits 8 and 9, so 2 GiB or
+>>>>> +     * more of DRAM will be interpreted as 128 MiB.
+>>>>
+>>>> I'd say u-boot is right in wrapping at 2GB, as more DRAM is
+>>>> un-addressable.
+>>>
+>>> Ah, maybe I shouldn't have said "or more". The bug is that if you
+>>> specify _exactly_ 2GiB, u-boot will see 128 MiB.
+>>>
+>>> But I agree more than 2GiB doesn't make sense, so I'll add a check for that.
+>>>
+>>> Not sure if I agree that the check should be here. > 2 GiB is an
+>>> addressing limitation, and the GCR module shouldn't really know what
+>>> the SoC's address space looks like. The lower limit is because the GCR
+>>> module can't encode anything less than 128 MiB.
+>>>
+>>>>> +     *
+>>>>> +     * https://github.com/Nuvoton-Israel/u-boot/blob/2aef993bd2aafeb5408dbaad0f3ce099ee40c4aa/board/nuvoton/poleg/poleg.c#L244
+>>>>> +     */
+>>>>> +    if (dram_size >= 2 * GiB) {
+>>>>
+>>>> See my comment in this series on the machine patch.
+>>>>
+>>>>> +        s->reset_intcr3 |= 4 << 8;
+>>>>> +    } else if (dram_size >= 1 * GiB) {
+>>>>> +        s->reset_intcr3 |= 3 << 8;
+>>>>> +    } else if (dram_size >= 512 * MiB) {
+>>>>> +        s->reset_intcr3 |= 2 << 8;
+>>>>> +    } else if (dram_size >= 256 * MiB) {
+>>>>> +        s->reset_intcr3 |= 1 << 8;
+>>>>> +    } else if (dram_size >= 128 * MiB) {
+>>>>> +        s->reset_intcr3 |= 0 << 8;
+>>
+>> I think this can be simplified as:
+>>
+>>          s->reset_intcr3 = (4 - clz32(dram_size)) << 8;
+>>
+>> Which implicitly truncate to power of 2 (which is what this
+>> block does, as you can have only 1 bank managed per this SGC).
 > 
+> Good idea. I find this a little easier to understand though:
+> 
+> #define NPCM7XX_GCR_MIN_DRAM_SIZE   (128 * MiB)
+> 
+>     s->reset_intcr3 |= ctz64(dram_size / NPCM7XX_GCR_MIN_DRAM_SIZE) << 8;
 
-Hmm. Looking at the code, I remember that reconnect is not optional, it works by default now. The option we have is "reconnect-delay" which only specify, after how much seconds we'll automatically fail the requests, not retrying them (0 seconds by default). Still, NBD tries to reconnect in background anyway.
+I like it, furthermore it will work with >4GB if this model is
+ever reused on an ARMv8-A SoC.
 
-In our downstream we have now old version of nbd-reconnect interface and enabled non-zero "delay" by default.
-
--- 
-Best regards,
-Vladimir
+>> But checking is_power_of_2(dram_size) and reporting an error
+>> else, is probably even better.
+> 
+> OK, I'll add a check for this, and also explicit checks for too large
+> and too small. The former is currently redundant with the DRAM size
+> check I'm adding to npcm7xx_realize(), but I kind of like the idea of
+> checking for encoding limitations and addressing limitations
+> separately, as they may not necessarily stay the same forever.
+> 
+>>>>> +    } else {
+>>>>> +        error_setg(errp,
+>>>>> +                   "npcm7xx_gcr: DRAM size %" PRIu64
+>>>>> +                   " is too small (need 128 MiB minimum)",
+>>>>> +                   dram_size);
+>>>>
+>>>> Ah, so you could add the same error for >2GB. Easier.
+>>>>
+>>>> Preferably using HWADDR_PRIx, and similar error for >2GB:
+>>>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
 
