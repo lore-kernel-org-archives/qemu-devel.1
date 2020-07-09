@@ -2,134 +2,69 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 336E8C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C62C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:28:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01DEB2076A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:27:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jl99ZsRk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DEB2076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4AAA42074B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 09:28:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AAA42074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtSpX-00065z-9U
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 05:26:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43064)
+	id 1jtSrP-0007Kc-Ik
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 05:28:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtSox-0005e2-QU
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:26:23 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50327
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtSow-0008UX-5Q
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:26:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594286781;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=kn5ij3+Ju5D32JN4Z+QqtWl7wwgWk9Ye47vwvd1wIr8=;
- b=Jl99ZsRkoTzP31LlArl/xhtp8NsA6SUGcrQDEOH7VewKYvh479ceZJJ1vX0zjumT2iYb3C
- eP3bRfJl5fA9q38yqjxzUWLdeYka6XPX1KuO487aQQ4rs9SgOzn0OoNBBnzrF0JL5s5LS1
- J391H6qqJNiZfjULNHbNbvEWb8i+HK8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-JEzLatfdMI2tYPKAMeKqyg-1; Thu, 09 Jul 2020 05:26:19 -0400
-X-MC-Unique: JEzLatfdMI2tYPKAMeKqyg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88FE91081;
- Thu,  9 Jul 2020 09:26:17 +0000 (UTC)
-Received: from [10.36.114.174] (ovpn-114-174.ams2.redhat.com [10.36.114.174])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9CCB073FEA;
- Thu,  9 Jul 2020 09:26:12 +0000 (UTC)
-Subject: Re: [PATCH RFC 4/5] s390x: implement virtio-mem-ccw
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200708185135.46694-1-david@redhat.com>
- <20200708185135.46694-5-david@redhat.com>
- <20200709112436.0ca1e95f.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <bafaf439-1c45-8a79-4e6e-3bac94854b57@redhat.com>
-Date: Thu, 9 Jul 2020 11:26:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jtSqq-0006oV-N6
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:28:20 -0400
+Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:38796)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jtSqo-0000Da-KE
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 05:28:20 -0400
+Received: from player687.ha.ovh.net (unknown [10.108.57.18])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id D8C511712B0
+ for <qemu-devel@nongnu.org>; Thu,  9 Jul 2020 11:28:15 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player687.ha.ovh.net (Postfix) with ESMTPSA id 3973E1429A812;
+ Thu,  9 Jul 2020 09:28:06 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-104R0051e762cb4-fab0-416e-ad2b-f6aae970f9ce,B4CBA90B3A6AD114FE081C226458375F80ABDB80)
+ smtp.auth=groug@kaod.org
+Date: Thu, 9 Jul 2020 11:28:01 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: qemu-system-ppc64 abort()s with pcie bridges
+Message-ID: <20200709112801.0f4cae40@bahia.lan>
+In-Reply-To: <20200708115703.7926205a@bahia.lan>
+References: <211dfb13-64cc-850b-4936-0f20f0157d7c@redhat.com>
+ <20200708115703.7926205a@bahia.lan>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200709112436.0ca1e95f.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 04:33:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 16370303174541220146
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudelgdduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeukeejkeeiffeftdevueekvdetjeegieevhffgjefgtdeluddvgfefleekueevueenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=178.33.251.19; envelope-from=groug@kaod.org;
+ helo=14.mo7.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 05:28:16
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,50 +77,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Heiko Carstens <heiko.carstens@de.ibm.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ =?UTF-8?B?Q8Op?= =?UTF-8?B?ZHJpYw==?= Le Goater <clg@kaod.org>,
+ David Gibson <dgibson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.07.20 11:24, Cornelia Huck wrote:
-> On Wed,  8 Jul 2020 20:51:34 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Add a proper CCW proxy device, similar to the PCI variant.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/virtio-ccw-mem.c | 165 ++++++++++++++++++++++++++++++++++++++
->>  hw/s390x/virtio-ccw.h     |  13 +++
->>  2 files changed, 178 insertions(+)
->>  create mode 100644 hw/s390x/virtio-ccw-mem.c
-> 
-> (...)
-> 
->> +static void virtio_ccw_mem_instance_init(Object *obj)
->> +{
->> +    VirtIOMEMCcw *ccw_mem = VIRTIO_MEM_CCW(obj);
->> +    VirtIOMEMClass *vmc;
->> +    VirtIOMEM *vmem;
->> +
-> 
-> I think you want
-> 
->     ccw_dev->force_revision_1 = true;
-> 
-> here (similar to forcing virtio-pci to modern-only.)
+On Wed, 8 Jul 2020 11:57:03 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-Ah, that's the magic bit, was looking for that. Thanks!
+> On Wed, 8 Jul 2020 10:03:47 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+> >=20
+> >  Hi,
+> >=20
+> > qemu-system-ppc64 currently abort()s when it is started with a pcie
+> > bridge device:
+> >=20
+> > $ qemu-system-ppc64 -M pseries-5.1 -device pcie-pci-bridge
+> > Unexpected error in object_property_find() at qom/object.c:1240:
+> > qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not =
+found
+> > Aborted (core dumped)
+> >=20
+> > or:
+> >=20
+> > $ qemu-system-ppc64 -M pseries -device dec-21154-p2p-bridge
+> > Unexpected error in object_property_find() at qom/object.c:1240:
+> > qemu-system-ppc64: -device dec-21154-p2p-bridge: Property '.chassis_nr'
+> > not found
+> > Aborted (core dumped)
+> >=20
+> > That's kind of ugly, and it shows up as error when running
+> > scripts/device-crash-test. Is there an easy way to avoid the abort() and
+> > fail more gracefully here?
+> >=20
+>=20
+> And even worse, this can tear down a running guest with hotplug :\
+>=20
+> (qemu) device_add pcie-pci-bridge=20
+> Unexpected error in object_property_find() at /home/greg/Work/qemu/qemu-p=
+pc/qom/object.c:1240:
+> Property '.chassis_nr' not found
+> Aborted (core dumped)
+>=20
+> This is caused by recent commit:
+>=20
+> commit 7ef1553dac8ef8dbe547b58d7420461a16be0eeb
+> Author: Markus Armbruster <armbru@redhat.com>
+> Date:   Tue May 5 17:29:25 2020 +0200
+>=20
+>     spapr_pci: Drop some dead error handling
+>    =20
+>     chassis_from_bus() uses object_property_get_uint() to get property
+>     "chassis_nr" of the bridge device.  Failure would be a programming
+>     error.  Pass &error_abort, and simplify its callers.
+>    =20
+>     Cc: David Gibson <david@gibson.dropbear.id.au>
+>     Cc: qemu-ppc@nongnu.org
+>     Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>     Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>     Reviewed-by: Greg Kurz <groug@kaod.org>
+>     Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>     Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>     Message-Id: <20200505152926.18877-18-armbru@redhat.com>
+>=20
+> Before that, we would simply print the "chassir_nr not found" error,
+> and in case of a cold plugged device exit.
+>=20
+> The root cause is that the sPAPR PCI code assumes that a PCI bridge
+> has a "chassir_nr" property, ie. it is a standard PCI bridge. Other
+> PCI bridge types don't have that. Not sure yet why this information
+> is required, I'll check LoPAPR.
+>=20
+
+More on this side : each slot of a PCI bridge is associated a DRC (a
+PAPR thingy to handle hot plug/unplug). Each DRC must have a unique
+identifier system-wide. We used to use the bus number to compute
+the DRC id but it was broken, so we now _hijack_ "chassis_nr" as an
+alternative since this commit:
+
+commit 05929a6c5dfe1028ef66250b7bbf11939f8e77cd
+Author: David Gibson <david@gibson.dropbear.id.au>
+Date:   Wed Apr 10 11:49:28 2019 +1000
+
+    spapr: Don't use bus number for building DRC ids
+
+This means that we only support the standard pci-bridge device,
+and this relies on the availability of "chassis_nr". Failure
+to find this property is then not a programming error, but
+an expected case where we want to fail gracefully (ie. revert
+Markus's commit mentioned above).
+
+While reading code I realized that we have another problem : the
+realization of the pci-bridge device does fail if "chassis_nr" is
+zero, but I failed to find a uniqueness check. And we get:
+
+$ qemu-system-ppc64 -device pci-bridge,chassis_nr=3D1 -device pci-bridge,ch=
+assis_nr=3D1
+Unexpected error in object_property_try_add() at qom/object.c:1167:
+qemu-system-ppc64: -device pci-bridge,chassis_nr=3D1: attempt to add duplic=
+ate property '40000100' to object (type 'container')
+Aborted (core dumped)
+
+It is very confusing to see that we state that "chassis_nr" is unique
+several times in slotid_cap_init() but it is never enforced anywhere.
+
+    if (!chassis) {
+        error_setg(errp, "Bridge chassis not specified. Each bridge is requ=
+ired"
+                   " to be assigned a unique chassis id > 0.");
+        return -EINVAL;
+    }
+
+or
+
+    /* We make each chassis unique, this way each bridge is First in Chassi=
+s */
 
 
--- 
-Thanks,
+Michael, Marcel or anyone with PCI knowledge,
 
-David / dhildenb
+Can you shed some light on the semantics of "chassis_nr" ?
+
+> In the meantime, since we're in soft freeze, I guess we should
+> revert Markus's patch and add a big fat comment to explain
+> what's going on and maybe change the error message to something
+> more informative, eg. "PCIE-to-PCI bridges are not supported".
+>=20
+> Thoughts ?
+>=20
+> >  Thomas
+> >=20
+>=20
 
 
