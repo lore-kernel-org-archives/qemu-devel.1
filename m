@@ -2,54 +2,98 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C9CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32661C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:35:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 150BA20672
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:32:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150BA20672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	by mail.kernel.org (Postfix) with ESMTPS id F1DEC208A7
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 13:35:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzjhOI9k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1DEC208A7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtWeq-0003gd-Ck
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:32:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36046)
+	id 1jtWhj-0004qu-9k
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 09:35:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jtWZk-0005KM-Ar; Thu, 09 Jul 2020 09:26:56 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58684 helo=relay3.sw.ru)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jtWZg-0002ZT-C7; Thu, 09 Jul 2020 09:26:56 -0400
-Received: from [192.168.15.130] (helo=iris.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.93)
- (envelope-from <den@openvz.org>)
- id 1jtWZY-00044k-0V; Thu, 09 Jul 2020 16:26:44 +0300
-From: "Denis V. Lunev" <den@openvz.org>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 5/6] block/io: improve savevm performance
-Date: Thu,  9 Jul 2020 16:26:43 +0300
-Message-Id: <20200709132644.28470-6-den@openvz.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200709132644.28470-1-den@openvz.org>
-References: <20200709132644.28470-1-den@openvz.org>
-Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
- helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 09:26:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtWgv-0004Qa-P1
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:34:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50966
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtWgt-0003je-AD
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 09:34:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594301658;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=pDsqSQQ8gP0qR3ZQLjnVIJ/ymoSLCPmhFPtjAoidZQ8=;
+ b=NzjhOI9kUigxCVzcH7DHFu+ATfk4OBWWvGr69c4h/46qYjLUIKa0yhBp7FeLXsfj6FGxLp
+ b2JBxDwZsvBST7Uot+ve2pXWDL0GQ1nMN4we8b/bXN1/XpdnuosF1VEGGZwI9jYV8D1mtj
+ fjPmuF61Rkaqvj91AoLDKeAdWD9Zhkg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-SdXlpLbLMkG3i0ZMkB_sFw-1; Thu, 09 Jul 2020 09:34:16 -0400
+X-MC-Unique: SdXlpLbLMkG3i0ZMkB_sFw-1
+Received: by mail-wm1-f70.google.com with SMTP id q20so2181695wme.3
+ for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 06:34:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=pDsqSQQ8gP0qR3ZQLjnVIJ/ymoSLCPmhFPtjAoidZQ8=;
+ b=QVBi3E8cKZkCIWOtF47FT5C6wnU9qbIq9NFrDhKPuUke2bRhHVHKMYdlA2+6/W8xzW
+ 0Cr4o1aNM/wmqCNi/FAxNUgfs+eQ2ryLItjGfB9y3Xtru+jgEFTaG3TSkX9RTcNtNpz4
+ rLHKpTavgdRT7LKLY0uF8dJl//96gxsFuPv6o+5mnVitf2LV620sG/ts2gN9E5iC2/l8
+ HStgi4yUUL6/WzbnRX51R5UR0musXran4/SzsgipuvhGH+x/BEorKZcFKgPbFVZr0RvJ
+ 0je4q/L5bRl37tiQ4kWAeh43Z+hs2+3eIhQYRgIj0sVBFNF90hcGC01LdRGCmkio5Rnq
+ C1TA==
+X-Gm-Message-State: AOAM530P5A7+lzkFhoybF35CaX7NTRGdmOADU4geh1mpIXF/y/73MOYU
+ hY2vvheU3GtGTFTueZ0mDxzSWGVMYZ9qAyla1HvJtHJoZjMRvOIo0+Ayqe8RGb0mYsfBEtkTCjQ
+ eg7cQ3Ze7h7uusHs=
+X-Received: by 2002:a7b:ca52:: with SMTP id m18mr41127wml.92.1594301654881;
+ Thu, 09 Jul 2020 06:34:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyRjD47pMoPv0Pykkc+NwbLHI+zwl5flW3MmhaXslaZfGB8TM4R0VeYQvZVs/EBeKHXQ8TkOg==
+X-Received: by 2002:a7b:ca52:: with SMTP id m18mr41031wml.92.1594301653713;
+ Thu, 09 Jul 2020 06:34:13 -0700 (PDT)
+Received: from localhost.localdomain
+ (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id 65sm6350358wre.6.2020.07.09.06.34.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 09 Jul 2020 06:34:13 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] softmmu/vl: Include "qemu/rcu.h" for rcu_disable_atfork()
+Date: Thu,  9 Jul 2020 15:34:11 +0200
+Message-Id: <20200709133411.23929-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 01:47:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -63,252 +107,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch does 2 standard basic things:
-- it creates intermediate buffer for all writes from QEMU migration code
-  to block driver,
-- this buffer is sent to disk asynchronously, allowing several writes to
-  run in parallel.
+In commit 73c6e4013b we let vl.c use rcu_disable_atfork()
+which is declared in "qemu/rcu.h", but forgot to include
+this header. Fortunately has never been a problem since
+vl.c includes "exec/memory.h" which includes "qemu/rcu.h".
 
-Thus bdrv_vmstate_write() is becoming asynchronous. All pending operations
-completion are performed in newly invented bdrv_finalize_vmstate().
+Include the missing header now in case we split vl.c later.
 
-In general, migration code is fantastically inefficent (by observation),
-buffers are not aligned and sent with arbitrary pieces, a lot of time
-less than 100 bytes at a chunk, which results in read-modify-write
-operations if target file descriptor is opened with O_DIRECT. It should
-also be noted that all operations are performed into unallocated image
-blocks, which also suffer due to partial writes to such new clusters
-even on cached file descriptors.
-
-Snapshot creation time (2 GB Fedora-31 VM running over NVME storage):
-                original     fixed
-cached:          1.79s       1.27s
-non-cached:      3.29s       0.81s
-
-The difference over HDD would be more significant :)
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Fam Zheng <fam@euphon.net>
-CC: Juan Quintela <quintela@redhat.com>
-CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Fixes: 73c6e4013b ("rcu: disable pthread_atfork callbacks ASAP")
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- block/io.c                | 126 +++++++++++++++++++++++++++++++++++++-
- include/block/block_int.h |   8 +++
- 2 files changed, 132 insertions(+), 2 deletions(-)
+ softmmu/vl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/io.c b/block/io.c
-index be1fac0be8..061d3239b9 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -26,6 +26,7 @@
- #include "trace.h"
- #include "sysemu/block-backend.h"
- #include "block/aio-wait.h"
-+#include "block/aio_task.h"
- #include "block/blockjob.h"
- #include "block/blockjob_int.h"
- #include "block/block_int.h"
-@@ -33,6 +34,7 @@
- #include "qapi/error.h"
- #include "qemu/error-report.h"
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index ecbc18ba75..f243745c51 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -83,6 +83,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu-options.h"
  #include "qemu/main-loop.h"
-+#include "qemu/units.h"
- #include "sysemu/replay.h"
- 
- /* Maximum bounce buffer for copy-on-read and write zeroes, in bytes */
-@@ -2640,6 +2642,103 @@ typedef struct BdrvVmstateCo {
-     bool                is_read;
- } BdrvVmstateCo;
- 
-+typedef struct BdrvVMStateTask {
-+    AioTask task;
-+
-+    BlockDriverState *bs;
-+    int64_t offset;
-+    void *buf;
-+    size_t bytes;
-+} BdrvVMStateTask;
-+
-+typedef struct BdrvSaveVMState {
-+    AioTaskPool *pool;
-+    BdrvVMStateTask *t;
-+} BdrvSaveVMState;
-+
-+
-+static coroutine_fn int bdrv_co_vmstate_save_task_entry(AioTask *task)
-+{
-+    int err = 0;
-+    BdrvVMStateTask *t = container_of(task, BdrvVMStateTask, task);
-+
-+    if (t->bytes != 0) {
-+        QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, t->buf, t->bytes);
-+
-+        bdrv_inc_in_flight(t->bs);
-+        err = t->bs->drv->bdrv_save_vmstate(t->bs, &qiov, t->offset);
-+        bdrv_dec_in_flight(t->bs);
-+    }
-+
-+    qemu_vfree(t->buf);
-+    return err;
-+}
-+
-+static BdrvVMStateTask *bdrv_vmstate_task_create(BlockDriverState *bs,
-+                                                 int64_t pos, size_t size)
-+{
-+    BdrvVMStateTask *t = g_new(BdrvVMStateTask, 1);
-+
-+    *t = (BdrvVMStateTask) {
-+        .task.func = bdrv_co_vmstate_save_task_entry,
-+        .buf = qemu_blockalign(bs, size),
-+        .offset = pos,
-+        .bs = bs,
-+    };
-+
-+    return t;
-+}
-+
-+static int bdrv_co_do_save_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
-+                                   int64_t pos)
-+{
-+    BdrvSaveVMState *state = bs->savevm_state;
-+    BdrvVMStateTask *t;
-+    size_t buf_size = MAX(bdrv_get_cluster_size(bs), 1 * MiB);
-+    size_t to_copy, off;
-+
-+    if (state == NULL) {
-+        state = g_new(BdrvSaveVMState, 1);
-+        *state = (BdrvSaveVMState) {
-+            .pool = aio_task_pool_new(BDRV_VMSTATE_WORKERS_MAX),
-+            .t = bdrv_vmstate_task_create(bs, pos, buf_size),
-+        };
-+
-+        bs->savevm_state = state;
-+    }
-+
-+    if (aio_task_pool_status(state->pool) < 0) {
-+        /*
-+         * The operation as a whole is unsuccessful. Prohibit all futher
-+         * operations. If we clean here, new useless ops will come again.
-+         * Thus we rely on caller for cleanup here.
-+         */
-+        return aio_task_pool_status(state->pool);
-+    }
-+
-+    t = state->t;
-+    if (t->offset + t->bytes != pos) {
-+        /* Normally this branch is not reachable from migration */
-+        return bs->drv->bdrv_save_vmstate(bs, qiov, pos);
-+    }
-+
-+    off = 0;
-+    while (1) {
-+        to_copy = MIN(qiov->size - off, buf_size - t->bytes);
-+        qemu_iovec_to_buf(qiov, off, t->buf + t->bytes, to_copy);
-+        t->bytes += to_copy;
-+        if (t->bytes < buf_size) {
-+            return 0;
-+        }
-+
-+        aio_task_pool_start_task(state->pool, &t->task);
-+
-+        pos += to_copy;
-+        off += to_copy;
-+        state->t = t = bdrv_vmstate_task_create(bs, pos, buf_size);
-+    }
-+}
-+
- static int coroutine_fn
- bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                    bool is_read)
-@@ -2655,7 +2754,7 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-         if (is_read) {
-             ret = drv->bdrv_load_vmstate(bs, qiov, pos);
-         } else {
--            ret = drv->bdrv_save_vmstate(bs, qiov, pos);
-+            ret = bdrv_co_do_save_vmstate(bs, qiov, pos);
-         }
-     } else if (bs->file) {
-         ret = bdrv_co_rw_vmstate(bs->file->bs, qiov, pos, is_read);
-@@ -2726,7 +2825,30 @@ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
- 
- static int coroutine_fn bdrv_co_finalize_vmstate(BlockDriverState *bs)
- {
--    return 0;
-+    int err;
-+    BdrvSaveVMState *state = bs->savevm_state;
-+
-+    if (bs->drv->bdrv_save_vmstate == NULL && bs->file != NULL) {
-+        return bdrv_co_finalize_vmstate(bs->file->bs);
-+    }
-+    if (state == NULL) {
-+        return 0;
-+    }
-+
-+    if (aio_task_pool_status(state->pool) >= 0) {
-+        /* We are on success path, commit last chunk if possible */
-+        aio_task_pool_start_task(state->pool, &state->t->task);
-+    }
-+
-+    aio_task_pool_wait_all(state->pool);
-+    err = aio_task_pool_status(state->pool);
-+
-+    aio_task_pool_free(state->pool);
-+    g_free(state);
-+
-+    bs->savevm_state = NULL;
-+
-+    return err;
- }
- 
- static int coroutine_fn bdrv_finalize_vmstate_co_entry(void *opaque)
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 3d6cf88592..e975ac4c21 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -61,6 +61,8 @@
- 
- #define BLOCK_PROBE_BUF_SIZE        512
- 
-+#define BDRV_VMSTATE_WORKERS_MAX    8
-+
- enum BdrvTrackedRequestType {
-     BDRV_TRACKED_READ,
-     BDRV_TRACKED_WRITE,
-@@ -808,6 +810,9 @@ struct BdrvChild {
-     QLIST_ENTRY(BdrvChild) next_parent;
- };
- 
-+
-+typedef struct BdrvSaveVMState BdrvSaveVMState;
-+
- /*
-  * Note: the function bdrv_append() copies and swaps contents of
-  * BlockDriverStates, so if you add new fields to this struct, please
-@@ -971,6 +976,9 @@ struct BlockDriverState {
- 
-     /* BdrvChild links to this node may never be frozen */
-     bool never_freeze;
-+
-+    /* Intermediate buffer for VM state saving from snapshot creation code */
-+    BdrvSaveVMState *savevm_state;
- };
- 
- struct BlockBackendRootState {
++#include "qemu/rcu.h"
+ #ifdef CONFIG_VIRTFS
+ #include "fsdev/qemu-fsdev.h"
+ #endif
 -- 
-2.17.1
+2.21.3
 
 
