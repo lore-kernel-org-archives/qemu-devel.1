@@ -2,61 +2,92 @@ Return-Path: <SRS0=Qbil=AU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBA0C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EEDC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 985BE2076A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:53:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 985BE2076A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 540F62076A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:54:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4xJ66ij"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 540F62076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtV6y-0002fr-UT
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 07:53:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60652)
+	id 1jtV8O-00048t-LO
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 07:54:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lma@suse.de>) id 1jtV6O-0002CC-DU
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:52:32 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51314)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lma@suse.de>) id 1jtV6M-0005ZK-I1
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:52:32 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 89EA4ADD7;
- Thu,  9 Jul 2020 11:52:27 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jtV6p-0002eb-PD
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:52:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45470
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jtV6n-0005ht-UI
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:52:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594295576;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MEUmS449zc+LVMIL5Dy5Yph45es5AIROwB5bJmRAiMg=;
+ b=D4xJ66ijfudr2lmVQbhTIqP1ETZp6nl3wbglpxom8B/X0fNcFmUWz3vwYQnEbo/LxW1Qo0
+ ts+jpV69mzXZS/KuQYwkBhAtjEiIgb4CuK2IK26Z/0nVH86OhOl6CfIXIWtX6alFLe5+oJ
+ OUTvtiWy1sbnZE8QIHQxQZoxZfiITkE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-xBnGCVQBPtGAH4KMDP5aTg-1; Thu, 09 Jul 2020 07:52:49 -0400
+X-MC-Unique: xBnGCVQBPtGAH4KMDP5aTg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4666B1089;
+ Thu,  9 Jul 2020 11:52:48 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DB331002380;
+ Thu,  9 Jul 2020 11:52:43 +0000 (UTC)
+Date: Thu, 9 Jul 2020 12:52:39 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 2/2] util/qemu-sockets: make keep-alive enabled by default
+Message-ID: <20200709115239.GL3753300@redhat.com>
+References: <20200708191540.28455-1-vsementsov@virtuozzo.com>
+ <20200708191540.28455-3-vsementsov@virtuozzo.com>
+ <20200709082954.GD3753300@redhat.com>
+ <62e64c31-1f6b-f27e-82ca-dfb3085a9869@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+In-Reply-To: <62e64c31-1f6b-f27e-82ca-dfb3085a9869@virtuozzo.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Date: Thu, 09 Jul 2020 11:52:27 +0000
-From: Lin Ma <lma@suse.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Questions about online resizing a lun passthrough disk with
- virtio-scsi
-In-Reply-To: <a1d96da7-444e-d3b0-abd5-63cdab92e869@redhat.com>
-References: <af3e33e4a5bb15d9f0b30c8de4941a37@suse.de>
- <a1d96da7-444e-d3b0-abd5-63cdab92e869@redhat.com>
-User-Agent: Roundcube Webmail
-Message-ID: <bb1050f276b9f0a6447f64f1e31b69c9@suse.de>
-X-Sender: lma@suse.de
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=lma@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/07 17:20:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 01:47:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,51 +101,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: den@openvz.org, kraxel@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-07-08 15:11, Paolo Bonzini wrote:
-> On 08/07/20 16:44, lma wrote:
->> 
->> Is the 'block_resize' mandatory to notify guest os after online 
->> resizing
->> a lun passed through disk? I'm curious it because I found there're 
->> couple
->> of ways can make guest os realize the disk capacity change.
->> e.g:
->> * run 'block_resize' via qmp to let virtio-scsi notify the frontend 
->> about
->>   capacity change.
->> * run 'rescan-scsi-bus.sh -s' inside guest.
->> * run 'sg_readcap --16 /dev/sda' inside guest.
->> 
->> I knew that the purpose of 'block_resize' is not only to notify guest 
->> os,
->> but also to update some internal structure's member, say 
->> bs->total_sectors.
->> What if I forgot to run 'block_resize', but run 'rescan-scsi-bus.sh 
->> -s'
->> in guest?
+On Thu, Jul 09, 2020 at 11:49:17AM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> 09.07.2020 11:29, Daniel P. Berrangé wrote:
+> > On Wed, Jul 08, 2020 at 10:15:39PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> > > Keep-alive won't hurt, let's try to enable it even if not requested by
+> > > user.
+> > 
+> > Keep-alive intentionally breaks TCP connections earlier than normal
+> > in face of transient networking problems.
+> > 
+> > The question is more about which type of pain is more desirable. A
+> > stall in the network connection (for a potentially very long time),
+> > or an intentionally broken socket.
+> > 
+> > I'm not at all convinced it is a good idea to intentionally break
+> > /all/ QEMU sockets in the face of transient problems, even if the
+> > problems last for 2 hours or more.
+> > 
+> > I could see keep-alives being ok on some QEMU socket. For example
+> > VNC/SPICE clients, as there is no downside to proactively culling
+> > them as they can trivially reconnect. Migration too is quite
+> > reasonable to use keep alives, as you generally want migration to
+> > run to completion in a short amount of time, and aborting migration
+> > needs to be safe no matter what.
+> > 
+> > Breaking chardevs or block devices or network devices that use
+> > QEMU sockets though will be disruptive. The only solution once
+> > those backends have a dead socket is going to be to kill QEMU
+> > and cold-boot the VM again.
+> > 
 > 
-> Request start and length are checked even for passthrough disks (see
-> scsi_disk_dma_command in hw/scsi/scsi-disk.c, called by
-> scsi_block_dma_command), but the maximum LBA is snooped from READ
-> CAPACITY commands (see scsi_read_complete in hw/scsi/scsi-generic.c).
-> So as long as rescan-scsi-bus.sh results in a READ CAPACITY command, it
-> should work.
+> Reasonable, thanks for explanation.
+> 
+> We are mostly interested in keep-alive for migration and NBD connections.
+> (NBD driver has ability to reconnect). What do you think about setting
+> keep-alive (with some KEEPIDLE smaller than 2 hours) by default for
+> migration and NBD (at least when NBD reconnect is enabled), would it be
+> valid?
 
-Yeah, the rescan-scsi-bus.sh does result in a READ CAPACITY command.
+I think it should be reasonable to set by default for those particular
+scenarios, as both are expecting failures and ready to take action when
+they occur.
 
-> It's not recommended however, because block_resize will report the
-> change to the guest directly with a CAPACITY HAS CHANGED unit attention
-> condition.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Got it, The 'block_resize' is the recommended or necessary step, Even 
-for
-passthrough disk online resizing.
-
-Thanks for your information,
-Lin
 
