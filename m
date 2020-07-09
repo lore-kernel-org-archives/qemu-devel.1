@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBE0C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E13C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:12:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D14520772
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 11:35:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F3A72077D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jul 2020 17:12:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="WEaZ3vcL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D14520772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="b47obNY6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F3A72077D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtUpX-0002hR-BE
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 07:35:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53672)
+	id 1jta6B-0005RQ-E6
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 13:12:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jtUoe-0002HX-0I
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:34:12 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:28622)
+ id 1jta5D-0004zQ-1q
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:11:39 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:49913)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jtUoa-0002b4-3S
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 07:34:11 -0400
+ id 1jta5B-0002xV-5T
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 13:11:38 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1594294450; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1594314695; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=uDHvFhuHMPTaOiHlnvsyhxVlpLdBtafk6+mJPDpxEH4=;
- b=WEaZ3vcLG0WFHSpPglc+/aYoNcsQh8tLf106cr/9s3/u35d/pq0j5UQmqrt12vOftKahHVqN
- nJn3OxbzZyGS5c84txrxadU4gActobB7Gy8vWJoHhwlI9gSu0r3CNK8gsWpGYbi49uBgb0BW
- fHCMNc79A9KcixaB+38bBhbyN7g=
+ Sender; bh=11ChjOBsKvEONMUUiKfih6zIoKgwwKZb8L+kmHjl8ZQ=;
+ b=b47obNY64PIh3jdi/dZpkFm2LwtWgCFHGdzgvGKeju/nX8+7R47f5H/N6NTWT17y/YB44SyZ
+ Yh4QVB2kiV1uWEkZyL043VYLGL4A62wKFcjFX76BR+yuKsu+GkGCF14fNq4nd7yiqTgIK9XE
+ DV2lIpEAZWqk1w4keaAwu/ZzbV4=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (64.90.74.34.bc.googleusercontent.com
- [34.74.90.64]) by smtp-out-n08.prod.us-east-1.postgun.com with SMTP id
- 5f0700a6d07c135855a31093 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Thu, 09 Jul 2020 11:33:58 GMT
-Date: Thu, 09 Jul 2020 11:33:57 +0000
-Message-ID: <5f0700a5c4487_2cbf3fde4a537f381673a0@sidekiq-catchall-01-sv-gprd.mail>
-Subject: QEMU | Pipeline #164743957 has failed for master | 48f22ad0
+Received: from mg.gitlab.com (74.90.74.34.bc.googleusercontent.com
+ [34.74.90.74]) by smtp-out-n18.prod.us-west-2.postgun.com with SMTP id
+ 5f074fb9a33b1a3dd4571072 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Thu, 09 Jul 2020 17:11:21 GMT
+Date: Thu, 09 Jul 2020 17:11:20 +0000
+Message-ID: <5f074fb827f26_7cd93fa34d371dbc1570d@sidekiq-catchall-02-sv-gprd.mail>
+Subject: QEMU | Pipeline #164899134 has failed for master | 3d7cad3c
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5f0700a5ba154_2cbf3fde4a537f381672c0";
+ boundary="--==_mimepart_5f074fb81cadc_7cd93fa34d371dbc1569dd";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 164743957
+X-GitLab-Pipeline-Id: 164899134
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -69,7 +69,7 @@ X-Auto-Response-Suppress: All
 Received-SPF: pass client-ip=192.237.158.143;
  envelope-from=bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com;
  helo=do158-143.mg.gitlab.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 06:28:13
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 11:54:02
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -9
 X-Spam_score: -1.0
@@ -99,7 +99,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5f0700a5ba154_2cbf3fde4a537f381672c0
+----==_mimepart_5f074fb81cadc_7cd93fa34d371dbc1569dd
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,22 +111,21 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: 48f22ad0 ( https://gitlab.com/qemu-project/qemu/-/commit/48f22ad0=
-4ead83e61b4b35871ec6f6109779b791 )
-Commit Message: Merge remote-tracking branch 'remotes/vivier/ta...
+Commit: 3d7cad3c ( https://gitlab.com/qemu-project/qemu/-/commit/3d7cad3c=
+2388cb74451d50cf455a42d349236161 )
+Commit Message: Merge remote-tracking branch 'remotes/vivier2/t...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #164743957 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
-4743957 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #164899134 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
+4899134 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 1 failed build.
 
-Job #630887368 ( https://gitlab.com/qemu-project/qemu/-/jobs/630887368/ra=
+Job #631609165 ( https://gitlab.com/qemu-project/qemu/-/jobs/631609165/ra=
 w )
 
 Stage: test
 Name: build-disabled
-Trace: qemu-system-i386: falling back to tcg
-Could not access KVM kernel module: No such file or directory
+Trace: Could not access KVM kernel module: No such file or directory
 qemu-system-i386: -accel kvm: failed to initialize kvm: No such file or d=
 irectory
 qemu-system-i386: falling back to tcg
@@ -155,7 +154,8 @@ qemu-system-i386: falling back to tcg
   TEST    check-qtest-ppc64: tests/qtest/qmp-test
   TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test
   TEST    check-qtest-ppc64: tests/qtest/qom-test
-section_end:1594294436:step_script
+  TEST    check-qtest-ppc64: tests/qtest/test-hmp
+section_end:1594314606:step_script
 =1B[0K=1B[31;1mERROR: Job failed: execution took longer than 1h0m0s secon=
 ds
 =1B[0;m
@@ -168,7 +168,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5f0700a5ba154_2cbf3fde4a537f381672c0
+----==_mimepart_5f074fb81cadc_7cd93fa34d371dbc1569dd
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -183,7 +183,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #164743957 has failed for master | 48f22ad0</title=
+<title>QEMU | Pipeline #164899134 has failed for master | 3d7cad3c</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -351,17 +351,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/48f22ad04ead83e6=
-1b4b35871ec6f6109779b791" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/3d7cad3c2388cb74=
+451d50cf455a42d349236161" style=3D"color: #3777b0; text-decoration: none;=
 ">
-48f22ad0
+3d7cad3c
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/vivier/ta...
+Merge remote-tracking branch 'remotes/vivier2/t...
 </div>
 </td>
 </tr>
@@ -418,9 +418,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/164743957" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/164899134" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#164743957
+#164899134
 </a>
 triggered by
 </td>
@@ -497,7 +497,7 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/630887368" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/631609165" style=3D=
 "color: #3777b0; text-decoration: none;">
 build-disabled
 </a>
@@ -510,32 +510,32 @@ sans-serif; padding: 0 0 16px;">
 <pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>qemu-syst=
-em-i386: falling back to tcg<br />Could not access KVM kernel module: No =
-such file or directory<br />qemu-system-i386: -accel kvm: failed to initi=
-alize kvm: No such file or directory<br />qemu-system-i386: falling back =
-to tcg<br />Could not access KVM kernel module: No such file or directory=
-<br />qemu-system-i386: -accel kvm: failed to initialize kvm: No such fil=
-e or directory<br />qemu-system-i386: falling back to tcg<br />  TEST    =
-check-qtest-i386: tests/qtest/device-introspect-test<br />  TEST    check=
--qtest-i386: tests/qtest/machine-none-test<br />  TEST    check-qtest-i38=
-6: tests/qtest/qmp-test<br />  TEST    check-qtest-i386: tests/qtest/qmp-=
-cmd-test<br />  TEST    check-qtest-i386: tests/qtest/qom-test<br />  TES=
-T    check-qtest-i386: tests/qtest/test-hmp<br />  TEST    check-qtest-i3=
-86: tests/qtest/qos-test<br />  TEST    check-qtest-mips64: tests/qtest/e=
-ndianness-test<br />  TEST    check-qtest-mips64: tests/qtest/display-vga=
--test<br />  TEST    check-qtest-mips64: tests/qtest/cdrom-test<br />  TE=
-ST    check-qtest-mips64: tests/qtest/device-introspect-test<br />  TEST =
-   check-qtest-mips64: tests/qtest/machine-none-test<br />  TEST    check=
--qtest-mips64: tests/qtest/qmp-test<br />  TEST    check-qtest-mips64: te=
-sts/qtest/qmp-cmd-test<br />  TEST    check-qtest-mips64: tests/qtest/qom=
--test<br />  TEST    check-qtest-mips64: tests/qtest/test-hmp<br />  TEST=
-    check-qtest-mips64: tests/qtest/qos-test<br />  TEST    check-qtest-p=
-pc64: tests/qtest/machine-none-test<br />  TEST    check-qtest-ppc64: tes=
-ts/qtest/qmp-test<br />  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-t=
-est<br />  TEST    check-qtest-ppc64: tests/qtest/qom-test<br /></span><s=
-pan class=3D"term-fg-l-red term-bold">ERROR: Job failed: execution took l=
-onger than 1h0m0s seconds<br /></span></pre>
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>Could not=
+ access KVM kernel module: No such file or directory<br />qemu-system-i38=
+6: -accel kvm: failed to initialize kvm: No such file or directory<br />q=
+emu-system-i386: falling back to tcg<br />Could not access KVM kernel mod=
+ule: No such file or directory<br />qemu-system-i386: -accel kvm: failed =
+to initialize kvm: No such file or directory<br />qemu-system-i386: falli=
+ng back to tcg<br />  TEST    check-qtest-i386: tests/qtest/device-intros=
+pect-test<br />  TEST    check-qtest-i386: tests/qtest/machine-none-test<=
+br />  TEST    check-qtest-i386: tests/qtest/qmp-test<br />  TEST    chec=
+k-qtest-i386: tests/qtest/qmp-cmd-test<br />  TEST    check-qtest-i386: t=
+ests/qtest/qom-test<br />  TEST    check-qtest-i386: tests/qtest/test-hmp=
+<br />  TEST    check-qtest-i386: tests/qtest/qos-test<br />  TEST    che=
+ck-qtest-mips64: tests/qtest/endianness-test<br />  TEST    check-qtest-m=
+ips64: tests/qtest/display-vga-test<br />  TEST    check-qtest-mips64: te=
+sts/qtest/cdrom-test<br />  TEST    check-qtest-mips64: tests/qtest/devic=
+e-introspect-test<br />  TEST    check-qtest-mips64: tests/qtest/machine-=
+none-test<br />  TEST    check-qtest-mips64: tests/qtest/qmp-test<br />  =
+TEST    check-qtest-mips64: tests/qtest/qmp-cmd-test<br />  TEST    check=
+-qtest-mips64: tests/qtest/qom-test<br />  TEST    check-qtest-mips64: te=
+sts/qtest/test-hmp<br />  TEST    check-qtest-mips64: tests/qtest/qos-tes=
+t<br />  TEST    check-qtest-ppc64: tests/qtest/machine-none-test<br />  =
+TEST    check-qtest-ppc64: tests/qtest/qmp-test<br />  TEST    check-qtes=
+t-ppc64: tests/qtest/qmp-cmd-test<br />  TEST    check-qtest-ppc64: tests=
+/qtest/qom-test<br />  TEST    check-qtest-ppc64: tests/qtest/test-hmp<br=
+ /></span><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exec=
+ution took longer than 1h0m0s seconds<br /></span></pre>
 </td>
 </tr>
 </tbody>
@@ -583,5 +583,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5f0700a5ba154_2cbf3fde4a537f381672c0--
+----==_mimepart_5f074fb81cadc_7cd93fa34d371dbc1569dd--
 
