@@ -2,105 +2,80 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 057DEC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A04BAC433E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2CB72075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:26:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nUqx9LRK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2CB72075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6B57C2075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:28:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B57C2075D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtxjF-0006tI-8a
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:26:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43760)
+	id 1jtxlL-00014A-M9
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:28:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtxiG-0006Gt-FE
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:32 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36633)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jtxiV-0006ZN-GB
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41636)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtxiF-0005U2-2c
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:32 -0400
-Received: by mail-pl1-x644.google.com with SMTP id d10so2591783pll.3
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 11:25:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=oZx5zNpDuCVQIImo8UZ34arIH8i7Ln286Ic8aFPR3ko=;
- b=nUqx9LRKXs3zqQqZdmgK/Xn2XXAjd93o0CpdQL03Vnagw55m2/z9pCkzfivHo7HtRn
- P6L/CkyUuermBv4/EqjpJ+8r1SAPvr02ATfIx1oFjnklOHH27SZEI9tb+Tu0sWQXHFV9
- nImzkfN6uqE8x/x8tTQZRGF2TV6CUaR3j/7egIDq9lBAl+Kog84GGVmjnTdSth7qg+Qr
- 8cKQRIOwq8XZPGpbAMiXyJJYDBogf7qUzsug3QU7aIlWMwM6udV7SQdujw7PaIxd+fPG
- KNnyklM3hL75N9fux0Z2Ukeh6SpAFGf5dUBcFUwJVSSgBfdSy3qMDYLoPrbr+FRr8w2r
- wRHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=oZx5zNpDuCVQIImo8UZ34arIH8i7Ln286Ic8aFPR3ko=;
- b=nRT4pKPaCgrVPQmhn3a2rq2N0/XYY0HAx+Zx7TM5e+e3Rih53uZalMzDeo8EC4Z3HE
- wmt/kB6GrQUkqM+Lc78G0u820J7P+yT/JVfovkLTlzuYYn8g/ZLJwk+TEhuaodork6qc
- 1lGIATgdG/0o/6AeNRbjvNlO2fXEc+b2DNLWd4T19SgrauOojS1UNorcxSMlHQ8Xztnj
- krHcCmAjQ/wMCqs9XFQDfz3mK7sre8wP9r5rEqg+0/2UxFLpvGcW8CVUKYO+T3zH8JJ2
- dBYhlrZqHZiJrdDWxL61LcmuzrnrhyYiLjGHujiAdnsM+Nq88gPlPZSTqIqEusUqEtBG
- uapg==
-X-Gm-Message-State: AOAM530eh4D3NT3x67bs37JZpVRke+jClqLHW4+ms8Rqf8QpCE9p+mbg
- 0fzskWlOc4RhDzV5vZMZIqu5Yw==
-X-Google-Smtp-Source: ABdhPJxH5nlNE88caxLe1vuFtGR5wfZhUQvQ+gJ8rquMi9ItK+U//qQuaosPyjDK/P+R7zp+TUvapA==
-X-Received: by 2002:a17:90a:c003:: with SMTP id
- p3mr7129114pjt.120.1594405529617; 
- Fri, 10 Jul 2020 11:25:29 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id y198sm6654054pfg.116.2020.07.10.11.25.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 11:25:28 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 4/4] target/avr/translate: Fix SBRC/SBRS
- instructions
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200707070021.10031-1-f4bug@amsat.org>
- <20200707070021.10031-5-f4bug@amsat.org>
- <9c799b29-baa9-82c1-7329-aa9a3bff4664@linaro.org>
- <eea7799a-9959-0fb0-3bc4-001f97cbea50@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e3c613e9-a596-cbf8-30b9-68c8cfde1ee7@linaro.org>
-Date: Fri, 10 Jul 2020 11:25:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jtxiS-0005XY-09
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jtxiP-0002oz-PV
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 957AD2E80F1
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <eea7799a-9959-0fb0-3bc4-001f97cbea50@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Jul 2020 18:09:39 -0000
+From: Dmitry <1885332@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: langston0 xeioexception
+X-Launchpad-Bug-Reporter: Langston (langston0)
+X-Launchpad-Bug-Modifier: Dmitry (xeioexception)
+References: <159320263008.26082.15752081078008046631.malonedeb@gac.canonical.com>
+Message-Id: <159440457965.19540.14125391390154347989.malone@chaenomeles.canonical.com>
+Subject: [Bug 1885332] Re: Error in user-mode calculation of ELF aux vector's
+ AT_PHDR
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0e43cc233172cb4527166e0a4e42fc146924b558
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 14:25:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -109,29 +84,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- Joaquin de Andres <me@xcancerberox.com.ar>, Michael Rolnik <mrolnik@gmail.com>,
- Sarah Harris <S.E.Harris@kent.ac.uk>
+Reply-To: Bug 1885332 <1885332@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/7/20 9:58 AM, Philippe Mathieu-Daudé wrote:
-> I couldn't run Sarah's test suite on Fedora 30:
-> 
-> /usr/lib/gcc/avr/9.2.0/../../../../avr/bin/ld: cannot find
-> crtatmega2560.o: No such file or directory
-> /usr/lib/gcc/avr/9.2.0/../../../../avr/bin/ld: cannot find -lm
-> /usr/lib/gcc/avr/9.2.0/../../../../avr/bin/ld: cannot find -lc
-> /usr/lib/gcc/avr/9.2.0/../../../../avr/bin/ld: cannot find -latmega2560
-> collect2: error: ld returned 1 exit status
-> 
-> I'll try on some Debian based host.
-
-I believe the debian avr-libc package will have those, and should be pulled in
-by gcc-avr.
+@langston0 Thanks for detailed explanation, got the same problem for
+qemu-s390.
 
 
+The way to reproduce (linux kernel >=3D 4.8, for example: Ubuntu 18.04):
+# Register qemu binfmt_misc handlers
+$ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-r~
+$ cat Dockerfile.s390x =
+
+FROM s390x/ubuntu
+RUN apt-get update && \
+    apt-get install -y \
+    gcc make libpcre3-dev libreadline-dev
+
+RUN cd /home && git clone https://github.com/nginx/njs
+
+RUN cd /home/njs && ./configure --cc-opt=3D'-O0 -static -lm -lrt -pthread
+-Wl,--whole-archive -lpthread -ltinfo -Wl,--no-whole-archive' && make
+njs
+
+$ docker build -t njs/390x -f Dockerfile.s390x .
+
+# check the binary (WORKS!)
+# inside docker s390 binaries are executed using qemu-s390-static from the =
+host
+$ docker run  -t njs/390x /home/njs/build/njs -c 'console.log("hello")'
+hello
+
+# copy binary to host
+$ docker run  -v `pwd`:/m -ti njs/390x cp /home/njs/build/njs /m/njs-s390
+
+# deregister binfmt handler
+$ sudo bash -c "echo -1 > /proc/sys/fs/binfmt_misc/qemu-s390x"
+
+# run qemu gdb
+$ qemu-s390x  -g 12345 ./njs-s390
+
+# in a separate terminal
+$ gdb-multiarch ./njs-s390 -ex 'target remote localhost:12345'
+0x0000000001000520 in _start ()
+(gdb) si
+0x0000000001000524 in _start ()
+(gdb) si
+0x000000000100052a in _start ()
+(gdb) c
+Continuing.
+
+Program received signal SIGILL, Illegal instruction.
+0x00000000011a418c in _dl_aux_init ()
+(gdb) bt
+#0  0x00000000011a418c in _dl_aux_init ()
+#1  0x00000000011663f0 in __libc_start_main ()
+#2  0x0000000001000564 in _start ()
+
+qemu-s390x --version
+qemu-s390x version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.28)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1885332
+
+Title:
+  Error in user-mode calculation of ELF aux vector's AT_PHDR
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  I have an (admittedly strange) statically-linked ELF binary for Linux tha=
+t runs just fine on top of the Linux kernel in QEMU full-system emulation, =
+but crashes before main in user-mode emulation. Specifically, it crashes wh=
+en initializing thread-local storage in glibc's _dl_aux_init, because it re=
+ads out a strange value from the AT_PHDR entry of the ELF aux vector.
+
+  The binary has these program headers:
+
+    Program Headers:
+      Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Ali=
+gn
+      EXIDX          0x065874 0x00075874 0x00075874 0x00570 0x00570 R   0x4
+      PHDR           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
+000
+      LOAD           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
+000
+      LOAD           0x000000 0x00010000 0x00010000 0x65de8 0x65de8 R E 0x1=
+0000
+      LOAD           0x066b7c 0x00086b7c 0x00086b7c 0x02384 0x02384 RW  0x1=
+0000
+      NOTE           0x000114 0x00010114 0x00010114 0x00044 0x00044 R   0x4
+      TLS            0x066b7c 0x00086b7c 0x00086b7c 0x00010 0x00030 R   0x4
+      GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x8
+      GNU_RELRO      0x066b7c 0x00086b7c 0x00086b7c 0x00484 0x00484 R   0x1
+      LOAD           0x07e000 0x00089000 0x00089000 0x03f44 0x03f44 R E 0x1=
+000
+      LOAD           0x098000 0x00030000 0x00030000 0x01000 0x01000 RW  0x1=
+000
+
+  If I build the Linux kernel with the following patch to the very end
+  of create_elf_tables in fs/binfmt_elf.c
+
+    /* Put the elf_info on the stack in the right place.  */
+    elf_addr_t *my_auxv =3D (elf_addr_t *) mm->saved_auxv;
+    int i;
+    for (i =3D 0; i < 15; i++) {
+      printk("0x%x =3D 0x%x", my_auxv[2*i], my_auxv[(2*i)+ 1]);
+    }
+    if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
+        return -EFAULT;
+    return 0;
+
+  and run it like this:
+
+    qemu-system-arm \
+      -M versatilepb \
+      -nographic \
+      -dtb ./dts/versatile-pb.dtb \
+      -kernel zImage \
+      -M versatilepb \
+      -m 128M \
+      -append "earlyprintk=3Dvga,keep" \
+      -initrd initramfs
+
+  after I've built the kernel initramfs like this (where "init" is the
+  binary in question):
+
+    make ARCH=3Darm versatile_defconfig
+    make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- all -j10
+    cp "$1" arch/arm/boot/init
+    cd arch/arm/boot
+    echo init | cpio -o --format=3Dnewc > initramfs
+
+  then I get the following output. This is the kernel's view of the aux
+  vector for this binary:
+
+    0x10 =3D 0x1d7
+    0x6 =3D 0x1000
+    0x11 =3D 0x64
+    0x3 =3D 0x900000
+    0x4 =3D 0x20
+    0x5 =3D 0xb
+    0x7 =3D 0x0
+    0x8 =3D 0x0
+    0x9 =3D 0x101b8
+    0xb =3D 0x0
+    0xc =3D 0x0
+    0xd =3D 0x0
+    0xe =3D 0x0
+    0x17 =3D 0x0
+    0x19 =3D 0xbec62fb5
+
+  However, if I run "qemu-arm -g 12345 binary" and use GDB to peek at
+  the aux vector at the beginning of __libc_start_init (for example,
+  using this Python GDB API script: https://gist.github.com/langston-
+  barrett/5573d64ae0c9953e2fa0fe26847a5e1e), then I see the following
+  values:
+
+    AT_PHDR =3D 0xae000
+    AT_PHENT =3D 0x20
+    AT_PHNUM =3D 0xb
+    AT_PAGESZ =3D 0x1000
+    AT_BASE =3D 0x0
+    AT_FLAGS =3D 0x0
+    AT_ENTRY =3D 0x10230
+    AT_UID =3D 0x3e9
+    AT_EUID =3D 0x3e9
+    AT_GID =3D 0x3e9
+    AT_EGID =3D 0x3e9
+    AT_HWCAP =3D 0x1fb8d7
+    AT_CLKTCK =3D 0x64
+    AT_RANDOM =3D -0x103c0
+    AT_HWCAP2 =3D 0x1f
+    AT_NULL =3D 0x0
+
+  The crucial difference is in AT_PHDR (0x3), which is indeed the
+  virtual address of the PHDR segment when the kernel calculates it, but
+  is not when QEMU calculates it.
+
+  qemu-arm --version
+  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.26)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1885332/+subscriptions
 
