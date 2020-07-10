@@ -2,81 +2,125 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D36C433EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B71C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:13:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4794620748
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:09:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F8D120748
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:13:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLup1zPT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4794620748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSPejn6L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F8D120748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtrqS-0005Gn-K2
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:09:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58800)
+	id 1jtruD-0006wS-Ly
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jtrog-0003f4-Hs
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:07:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28429
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtrtX-0006Ut-PZ
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:12:47 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38926
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jtrod-0000km-SV
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:07:45 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtrtV-0001PU-Ph
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:12:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594382862;
+ s=mimecast20190719; t=1594383164;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=xilYkgB0PZ/XOy/E5cw08wrW1nC4VeY/hDyOZ/Tx8Xk=;
- b=WLup1zPTj/7XeLTEYqj3qaxggutwojTOQSgplYM7Lns6gfS7WqwD8FAoCviN9dRcih8DNN
- vsLgyZzleyxVIVWzhm+1QNqz6d90/1uLZDMPyyRaQGkmkQTngCGMqzac+0ywLulpHYN9uO
- dndSbqGJzaoqbA4CNPT2+ZwAXDjUkwI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=OU0vISDj2ooYIdJMrM389MohRmfrynEkSKGt9EynN+w=;
+ b=PSPejn6Li6EA9dHX072yPsAxuJ1QHYH06afmg6n2Rbdf28h+buOxVXPzO+M8wZTSWE1Q0I
+ 0lTW2qw/M/n6uLn9C7my/4D5GOUjw8g13VWlJTGKqQTbFXPB+RxyFJ6U6h6qKSa5C52qG4
+ dAFasj1NgxXG0PIob0CnYknravbxZqs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-X2p58j07NSmJyahQJ0_cGw-1; Fri, 10 Jul 2020 08:07:39 -0400
-X-MC-Unique: X2p58j07NSmJyahQJ0_cGw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-371-A6dUOF2kOq6KzxqGzgZ2yQ-1; Fri, 10 Jul 2020 08:12:40 -0400
+X-MC-Unique: A6dUOF2kOq6KzxqGzgZ2yQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CFA4107ACCA;
- Fri, 10 Jul 2020 12:07:38 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-57.ams2.redhat.com [10.36.114.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E10912DE60;
- Fri, 10 Jul 2020 12:07:32 +0000 (UTC)
-Date: Fri, 10 Jul 2020 14:07:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 2/2] hw/sd/sdcard: Do not allow invalid SD card sizes
-Message-ID: <20200710120731.GE6641@linux.fritz.box>
-References: <20200707132116.26207-1-f4bug@amsat.org>
- <20200707132116.26207-3-f4bug@amsat.org>
- <CAKmqyKNY+7tE9tcZm7_Th9qapo1CH0AwNwBf7vaf+7vSqBNtVA@mail.gmail.com>
- <CAFEAcA_ZXgNHMAhBVmjvstyG=PpaHOtcmo=VgvfBQ3Z9VJTk_g@mail.gmail.com>
- <3f1bf3ba-d6c3-a148-9850-076b2caa64d0@amsat.org>
- <CAPan3Wr09ZbbHWO-dhGeK3zhZQv3smrzLpUGMj71NWh0hToZDg@mail.gmail.com>
- <e87550d9-e1cc-cc15-2674-755249e9a965@amsat.org>
- <CAFEAcA8em-bgU2xd8OG+bPLDCSZCF8Y2ay9U57D8p9m1SWO=9g@mail.gmail.com>
- <20200710095827.GD6641@linux.fritz.box>
- <CAFEAcA_+JpRpNSd7SwBD=OcDxqZ1Mf3xTYR2DM0Os_fFZs4VOg@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6259D801E6A;
+ Fri, 10 Jul 2020 12:12:39 +0000 (UTC)
+Received: from [10.36.114.41] (ovpn-114-41.ams2.redhat.com [10.36.114.41])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 60E9A7EF89;
+ Fri, 10 Jul 2020 12:12:34 +0000 (UTC)
+Subject: Re: [PATCH RFC 2/5] s390x: implement diag260
+From: David Hildenbrand <david@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+References: <20200708185135.46694-1-david@redhat.com>
+ <20200708185135.46694-3-david@redhat.com>
+ <efe7e845-2e0f-96ba-7e29-c6ac74db9e2f@de.ibm.com>
+ <c86e5b12-883a-8522-a15c-9af3804e003c@redhat.com>
+ <a337aa94-cd0a-de6f-70df-35428b3e3a3a@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <0e04ce47-b761-27c3-bc80-ba8338d4253e@redhat.com>
+Date: Fri, 10 Jul 2020 14:12:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_+JpRpNSd7SwBD=OcDxqZ1Mf3xTYR2DM0Os_fFZs4VOg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <a337aa94-cd0a-de6f-70df-35428b3e3a3a@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 23:35:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -99,43 +143,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu-block <qemu-block@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>,
- Alistair Francis <alistair23@gmail.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x@nongnu.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 10.07.2020 um 11:59 hat Peter Maydell geschrieben:
-> On Fri, 10 Jul 2020 at 10:58, Kevin Wolf <kwolf@redhat.com> wrote:
-> >
-> > Am 09.07.2020 um 16:15 hat Peter Maydell geschrieben:
-> > > dd/truncate etc won't work if the image file is not raw (eg if
-> > > it's qcow2). The only chance you have of something that's actually
-> > > generic would probably involve "qemu-img resize". But I'm a bit
-> > > wary of having an error message that recommends that, because
-> > > what if we got it wrong?
-> >
-> > What is your concern that we might get wrong? The suggestion is always
-> > extending the size rather than shrinking, so it should be harmless and
-> > easy to undo. (Hm, we should finally make --shrink mandatory for
-> > shrinking. We've printed a deprecation warning for almost three years.)
+On 10.07.20 11:17, David Hildenbrand wrote:
+> On 09.07.20 20:15, David Hildenbrand wrote:
+>> On 09.07.20 12:52, Christian Borntraeger wrote:
+>>>
+>>> On 08.07.20 20:51, David Hildenbrand wrote:
+>>>> Let's implement the "storage configuration" part of diag260. This diag
+>>>> is found under z/VM, to indicate usable chunks of memory tot he guest OS.
+>>>> As I don't have access to documentation, I have no clue what the actual
+>>>> error cases are, and which other stuff we could eventually query using this
+>>>> interface. Somebody with access to documentation should fix this. This
+>>>> implementation seems to work with Linux guests just fine.
+>>>>
+>>>> The Linux kernel supports diag260 to query the available memory since
+>>>> v4.20. Older kernels / kvm-unit-tests will later fail to run in such a VM
+>>>> (with maxmem being defined and bigger than the memory size, e.g., "-m
+>>>>  2G,maxmem=4G"), just as if support for SCLP storage information is not
+>>>> implemented. They will fail to detect the actual initial memory size.
+>>>>
+>>>> This interface allows us to expose the maximum ramsize via sclp
+>>>> and the initial ramsize via diag260 - without having to mess with the
+>>>> memory increment size and having to align the initial memory size to it.
+>>>>
+>>>> This is a preparation for memory device support. We'll unlock the
+>>>> implementation with a new QEMU machine that supports memory devices.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>
+>>> I have not looked into this, so this is purely a question. 
+>>>
+>>> Is there a way to hotplug virtio-mem memory beyond the initial size of 
+>>> the memory as specified by the  initial sclp)? then we could avoid doing
+>>> this platform specfic diag260?
+>>
+>> We need a way to tell the guest about the maximum possible PFN, so it
+>> can prepare for that. E.g. on x86-64 this is usually done via ACPI SRAT
+>> tables. On s390x, the only way I see is using a combination of diag260,
+>> without introducing any other new mechanisms.
+>>
+>> Currently Linux selects 3. vs 4 level page tables based on that size (I
+>> think that's what you were referring to with the 4TB limit). I can see
+>> that kasan also does some magic based on the value ("populate kasan
+>> shadow for untracked memory"), but did not look into the details. I
+>> *think* kasan will never be able to track that memory, but am not
+>> completely sure.
+>>
+>> I'd like to avoid something as you propose (that's why I searched and
+>> discovered diag260 after all :) ), especially to not silently break in
+>> the future, when other assumptions based on that value are introduced.
+>>
+>> E.g., on my z/VM LinuxOne Community Cloud machine, diag260 gets used as
+>> default, so it does not seem to be a corner case mechanism nowadays.
+>>
 > 
-> If there's a qemu-img command line that will always only
-> extend the image size and never let the user accidentally
-> shrink it and throw away data, then great. I'd happily
-> recommend that.
+> Note: Reading about diag260 subcode 0xc, we could modify Linux to query
+> the maximum possible pfn via diag260 0xc. Then, we maybe could avoid
+> indicating maxram size via SCLP, and keep diag260-unaware OSs keep
+> working as before. Thoughts?
 
-I think removing deprecated behaviour is a change that we can still make
-in the early freeze. So if you agree, I'll send a patch that makes
-shrinking an image without --shrink a hard error in 5.1.
+Implemented it, seems to work fine.
 
-Kevin
+-- 
+Thanks,
+
+David / dhildenb
 
 
