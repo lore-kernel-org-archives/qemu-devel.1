@@ -2,63 +2,89 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B770C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CADC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:35:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 001F720578
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:34:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001F720578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 1BA8B20578
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:35:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="C6fogeXk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA8B20578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jttB3-00071W-9d
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:34:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53198)
+	id 1jttBc-0008HE-D0
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:35:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jtt1D-0004Gj-Ca
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:24:47 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:50948)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jtt1B-0003IX-Ew
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:24:46 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 06ADNUa2010187
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Fri, 10 Jul 2020 09:23:35 -0400
-Date: Fri, 10 Jul 2020 09:23:30 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] softmmu/vl: Be less verbose about missing KVM when
- running the qtests
-Message-ID: <20200710132330.7xgutur2hhki75ez@mozz.bu.edu>
-References: <20200710085020.28222-1-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jtrwX-0001CY-QW
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:15:53 -0400
+Received: from mail-oo1-xc33.google.com ([2607:f8b0:4864:20::c33]:44899)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jtrwV-0001tW-Ru
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:15:53 -0400
+Received: by mail-oo1-xc33.google.com with SMTP id o36so947080ooi.11
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 05:15:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yDT+xjbmnBte6qteDf60M/ur8XNiuBuAS62SAURwG3k=;
+ b=C6fogeXkPiLhlQDXxKIrRSQhObU9bT8gK7T0kUgqQ3N47gmRikkk8EUjQEob0fop7C
+ f7PPXISnFp8BJs7J0azVnPJdOnQx9d55RtIQbSaJabRyN4Oljx3riOdkD6yCNq/LEzLt
+ Sn0UTAYNYn0MwcsvkGCVIm2/59tbVgN7HCSCdAnZTLyHKzqPAJ+DYjiFAKSsfuLnMnVu
+ zdyZPY/8E34xz28XvIjlZz5ity8h3uvcO27JRT6Yk8yn3W123sw6JuwX9VJw1+qrCmi+
+ PoFq0MDePXJLJd70CwKDJK8M2Z10wfg3Wt1zeZehvnLwAVrrZTSlf1Yzq1MLYBNoHRTp
+ yanQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yDT+xjbmnBte6qteDf60M/ur8XNiuBuAS62SAURwG3k=;
+ b=dGduLD1uZTqLYqa7Q9xk1oqYvL4vKBIqbS4mQwXd3A70gxUr2B9gU2I6F6Zwn5MuxC
+ ys0ZmgeqGG5TKSk7eQRkkR4TAmaELNiKMbOpsQ+rZEU/Z4vWHKu7PWabBxv3vKkPvGnm
+ +Rcb1rdyzK0BXUC8A0WM+mQug7jU0EqHLVcoRc6hAGfMnSutNRjqbSjKxJvGuSWeA99Q
+ WlvpbzAzRq4j6zzVtY03TnGmlLt1madh0HtmXkCs6Bwkpwgz4KFcbLwsvWgUpiWNWJrK
+ RjVfa4LnqHHOZayBwROZuAQS9xDqACVwonzwek9tXmjcF53uTJDtTOavanRPvwhVJYaY
+ Ma8A==
+X-Gm-Message-State: AOAM530oUv3w3B7tO/M/2OrY/ZDWviqqIpaXakq4wzkLQuhMDd7me10/
+ lbOF31SCXgQlQIPRMr/XwpvViM91Nm0sOuaeggo1oQ==
+X-Google-Smtp-Source: ABdhPJwO2/B5rFJaobapmPDWRjaAC8DsbqGLa3X8OzLuayknrC8dKNHVVqqJIau8WdB1LLxi4pFPd2cKhMeCLVJULmQ=
+X-Received: by 2002:a4a:2a41:: with SMTP id x1mr59812266oox.79.1594383350670; 
+ Fri, 10 Jul 2020 05:15:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200710085020.28222-1-thuth@redhat.com>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 09:24:44
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+ <20200710104920.13550-61-frank.chang@sifive.com> <87k0zblgjx.fsf@linaro.org>
+In-Reply-To: <87k0zblgjx.fsf@linaro.org>
+From: Frank Chang <frank.chang@sifive.com>
+Date: Fri, 10 Jul 2020 20:15:39 +0800
+Message-ID: <CAE_xrPhKg1FeRwW0zS-jpfo8XL7WvSFywif27X0kAYgh044N6w@mail.gmail.com>
+Subject: Re: [RFC 60/65] softfloat: add fp16 and uint8/int8 interconvert
+ functions
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="00000000000040c49a05aa154d29"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c33;
+ envelope-from=frank.chang@sifive.com; helo=mail-oo1-xc33.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:18 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,94 +96,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200710 1050, Thomas Huth wrote:
-> Some of the qtests use "-accel kvm -accel tcg" to run real guest code.
-> This causes some error messages when kvm is not available. We do not
-> really care about these messages since the fallback to tcg is expected
-> here. So let's silence them to avoid that they spoil the output of
-> the tests.
-> 
-> Unfortunately, we can not use the qtest_enabled() wrapper in this case,
-> since the qtest accelerator itself is not initialized. Thus we have to
-> test for the qtest_chrdev variable instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+--00000000000040c49a05aa154d29
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
+On Fri, Jul 10, 2020 at 8:07 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 
-> ---
->  softmmu/vl.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 3f58ffd4dc..0066f50fb2 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -164,8 +164,9 @@ bool boot_strict;
->  uint8_t *boot_splash_filedata;
->  int only_migratable; /* turn it off unless user states otherwise */
->  bool wakeup_suspend_enabled;
-> -
->  int icount_align_option;
-> +static const char *qtest_chrdev;
-> +static const char *qtest_log;
->  
->  /* The bytes in qemu_uuid are in the order specified by RFC4122, _not_ in the
->   * little-endian "wire format" described in the SMBIOS 2.6 specification.
-> @@ -2693,10 +2694,15 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
->      AccelClass *ac = accel_find(acc);
->      AccelState *accel;
->      int ret;
-> +    bool qtest_with_kvm;
-> +
-> +    qtest_with_kvm = g_str_equal(acc, "kvm") && qtest_chrdev != NULL;
->  
->      if (!ac) {
->          *p_init_failed = true;
-> -        error_report("invalid accelerator %s", acc);
-> +        if (!qtest_with_kvm) {
-> +            error_report("invalid accelerator %s", acc);
-> +        }
->          return 0;
->      }
->      accel = ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
-> @@ -2708,8 +2714,9 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
->      ret = accel_init_machine(accel, current_machine);
->      if (ret < 0) {
->          *p_init_failed = true;
-> -        error_report("failed to initialize %s: %s",
-> -                     acc, strerror(-ret));
-> +        if (!qtest_with_kvm || ret != -ENOENT) {
-> +            error_report("failed to initialize %s: %s", acc, strerror(-ret));
-> +        }
->          return 0;
->      }
->  
-> @@ -2780,7 +2787,7 @@ static void configure_accelerators(const char *progname)
->          exit(1);
->      }
->  
-> -    if (init_failed) {
-> +    if (init_failed && !qtest_chrdev) {
->          AccelClass *ac = ACCEL_GET_CLASS(current_accel());
->          error_report("falling back to %s", ac->name);
->      }
-> @@ -2830,8 +2837,6 @@ void qemu_init(int argc, char **argv, char **envp)
->      MachineClass *machine_class;
->      const char *cpu_option;
->      const char *vga_model = NULL;
-> -    const char *qtest_chrdev = NULL;
-> -    const char *qtest_log = NULL;
->      const char *incoming = NULL;
->      bool userconfig = true;
->      bool nographic = false;
-> -- 
-> 2.18.1
-> 
-> 
+>
+> frank.chang@sifive.com writes:
+>
+> > From: Frank Chang <frank.chang@sifive.com>
+> >
+> > Signed-off-by: Frank Chang <frank.chang@sifive.com>
+>
+> Did I miss the rest of the series somewhere?
+>
+> Otherwise this looks fine to me:
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> If you mean float16 to uint8 and int8 conversion functions, this commit i=
+s
+everything.
+I think I just cc the mail based on *scripts/get_maintainer.pl
+<http://get_maintainer.pl>*, so probably didn't send the whole series to
+everyone.
+--
+Frank Chang
+
+> --
+> Alex Benn=C3=A9e
+>
+
+--00000000000040c49a05aa154d29
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">On Fri, Jul 10, 2020 at 8:07 PM Alex Benn=
+=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.or=
+g</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquote class=3D"g=
+mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
+,204,204);padding-left:1ex"><br>
+<a href=3D"mailto:frank.chang@sifive.com" target=3D"_blank">frank.chang@sif=
+ive.com</a> writes:<br>
+<br>
+&gt; From: Frank Chang &lt;<a href=3D"mailto:frank.chang@sifive.com" target=
+=3D"_blank">frank.chang@sifive.com</a>&gt;<br>
+&gt;<br>
+&gt; Signed-off-by: Frank Chang &lt;<a href=3D"mailto:frank.chang@sifive.co=
+m" target=3D"_blank">frank.chang@sifive.com</a>&gt;<br>
+<br>
+Did I miss the rest of the series somewhere?<br>
+<br>
+Otherwise this looks fine to me:<br>
+<br>
+Reviewed-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org"=
+ target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
+<br></blockquote><div>If you mean float16 to uint8 and int8 conversion func=
+tions, this commit is everything.<br>I think I just cc the mail based on <i=
+>scripts/<a href=3D"http://get_maintainer.pl">get_maintainer.pl</a></i>, so=
+ probably=C2=A0didn&#39;t=C2=A0send the whole series to everyone.</div><div=
+>--</div><div>Frank Chang</div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">
+-- <br>
+Alex Benn=C3=A9e<br>
+</blockquote></div></div>
+
+--00000000000040c49a05aa154d29--
 
