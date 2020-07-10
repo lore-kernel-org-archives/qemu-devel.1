@@ -2,92 +2,133 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF84C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 07:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62721C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 07:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2CA3207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 07:29:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DE5D206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 07:47:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=livius-net.20150623.gappssmtp.com header.i=@livius-net.20150623.gappssmtp.com header.b="c+S2x7nJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2CA3207DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=livius.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3q/G+kn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DE5D206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtnTf-0002RY-A2
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 03:29:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46758)
+	id 1jtnkx-0007ab-FW
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 03:47:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1jtnSm-0001xa-Sc
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 03:28:52 -0400
-Received: from mail-ej1-x62f.google.com ([2a00:1450:4864:20::62f]:45989)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1jtnSl-00065V-4H
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 03:28:52 -0400
-Received: by mail-ej1-x62f.google.com with SMTP id a1so4945716ejg.12
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 00:28:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=livius-net.20150623.gappssmtp.com; s=20150623;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=WjqfAGkAksY6AYdZk+rXH7hH11A68G1QINHCHU5BUzk=;
- b=c+S2x7nJjBboxiPrGO1v2edxMENTswDxa5dZQxv4QWc3WHR51mlZ79aMC7c5oYhVfK
- uw7NEk66RH4oQdXqZa7v1rlrzDpTt1PUcOv51uzJs0cx3YaPDXkc6uvfzw7ACkuRXcvB
- ZaqAotqLYNmStE9RqzTLWi7WMNVHQRNkalCCEflmjw9ouFi+ZsJeHuUtnEkRBwB3etiw
- PX5e1pGwfYM1mLyCcA0f46b+hYvk3b+ho1m0kN92gHWKCk0DULfv5UlW592WmnB687R7
- DfxbTF+iv+vXvyPo7go33H8MgFSuB+1kjW5Rth3o+wD2jD2kgb4FesVIbQOvD3j+malT
- pVbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=WjqfAGkAksY6AYdZk+rXH7hH11A68G1QINHCHU5BUzk=;
- b=Yq9/fFCRksINjR+Kos0nIw0yTLpdp8G397535Ewx08XGdSzDmY2CAE4Opq7aynV0+e
- hXxeevIsuJFW7ZFxvP4KObgT0PdHUovSE6MqXRkM+0wjXyIShvF4VFxiu6IxhkfDszi4
- lSG8lQ5oNG0rBkVTvygjAmcMlcS1P1bqaeFjMK//R+W3SJwQkCpntH/OF8k075ybewY5
- P7i10T9sa+VP2yVo6bdcUmobWH36nP+SyH3T6WobKTG6w89/lSGH2003EDZKiNJMxXAJ
- MTtePE1xMpQoKt5TYtK9cyQw6Swkdy44JMkPzl/MSkcLI0VZF9OxpG49Xb1z33TLgZK7
- OK6A==
-X-Gm-Message-State: AOAM5302rUfrsTgdM4GvSyVklEltnD8TBHs8sXF1SFL3Gc3/keXpUtYr
- Hr26IDJ0Hiu5e2wY9rTX56uG1A==
-X-Google-Smtp-Source: ABdhPJzUgdJ1GEdC2bsnOON6AqOVXFas6un6PKHLmIg2flaY7Mn68hh55Ukj/GIutraYDMcTtrH/+A==
-X-Received: by 2002:a17:906:57c6:: with SMTP id
- u6mr58732850ejr.194.1594366129360; 
- Fri, 10 Jul 2020 00:28:49 -0700 (PDT)
-Received: from wks.local ([86.121.22.151])
- by smtp.gmail.com with ESMTPSA id w3sm3705057edq.65.2020.07.10.00.28.48
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 10 Jul 2020 00:28:48 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: Separate notifications from list messages?
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <0a3689e1-001a-76ec-894d-0bb63115ecdd@redhat.com>
-Date: Fri, 10 Jul 2020 10:28:47 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <9D50B226-B5C2-4AC5-AC95-C7BE716FFFBE@livius.net>
-References: <E646BE29-B46F-4B56-ADF5-B0DC6CCEF422@livius.net>
- <0a3689e1-001a-76ec-894d-0bb63115ecdd@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
-Received-SPF: none client-ip=2a00:1450:4864:20::62f;
- envelope-from=ilg@livius.net; helo=mail-ej1-x62f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtnkB-000780-Nd
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 03:46:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24951
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jtnk9-0008Nx-2L
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 03:46:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594367207;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=oOReF1Yzb1qVlHGffl/SIfYuhR8a3fsSedzMFcoYJ2g=;
+ b=R3q/G+knOCJieCCVCuU0iTz/uQUpAt8V4wglf1lPXkwYCzegZiukyH3eA7A6d5yxK2I51M
+ RGOtooVFtynojRcRTflHkoIBWOv6UcMsS1iYykJ3hUZKumEyXzwnvixM9cGgnRc3omxZFg
+ kfkc3bNKGwteR9cf7ARi9mo64SYEoWI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-etcfdi3cOsaZHIydVyhsug-1; Fri, 10 Jul 2020 03:46:46 -0400
+X-MC-Unique: etcfdi3cOsaZHIydVyhsug-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76DB91082;
+ Fri, 10 Jul 2020 07:46:44 +0000 (UTC)
+Received: from [10.36.114.41] (ovpn-114-41.ams2.redhat.com [10.36.114.41])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 834847EF80;
+ Fri, 10 Jul 2020 07:46:39 +0000 (UTC)
+Subject: Re: [PATCH RFC 3/5] s390x: prepare device memory address space
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200708185135.46694-1-david@redhat.com>
+ <20200708185135.46694-4-david@redhat.com>
+ <20200709125949.7870d454.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <f1f5c940-445e-2905-f0d2-9ed12df1d31d@redhat.com>
+Date: Fri, 10 Jul 2020 09:46:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200709125949.7870d454.cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:36:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,25 +141,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Heiko Carstens <heiko.carstens@de.ibm.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 09.07.20 12:59, Cornelia Huck wrote:
+> On Wed,  8 Jul 2020 20:51:33 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> Let's allocate the device memory information and setup the device
+>> memory address space. Expose the maximum ramsize via SCLP and the actual
+>> initial ramsize via diag260.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c         | 43 ++++++++++++++++++++++++++++++
+>>  hw/s390x/sclp.c                    | 12 +++++++--
+>>  include/hw/s390x/s390-virtio-ccw.h |  3 +++
+>>  target/s390x/diag.c                |  4 +--
+>>  4 files changed, 58 insertions(+), 4 deletions(-)
+> 
+> (...)
+> 
+>> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+>> index c3b1e24b2c..6b33eb0efc 100644
+>> --- a/target/s390x/diag.c
+>> +++ b/target/s390x/diag.c
+>> @@ -32,8 +32,8 @@ void handle_diag_260(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+>>      ram_addr_t addr, length;
+>>      uint64_t tmp;
+>>  
+>> -    /* TODO: Unlock with new QEMU machine. */
+>> -    if (false) {
+>> +    /* Support for diag260 is glued to support for memory devices. */
+> 
+> I'm wondering why you need to do this... sure, the availability of a
+> new diagnose could be perceived as a guest-visible change, but does the
+> information presented change anything? Without memory devices, it will
+> just duplicate the information already reported via SCLP, IIUC?
 
+Yes, it's essentially providing redundant information without memory
+devices.
 
-> On 10 Jul 2020, at 07:19, Thomas Huth <thuth@redhat.com> wrote:
->=20
-> ... creating a qemu-notify mailing list for notification e-mails?
+One could sense diag260 in the guest and assume it will work on
+successive invocations. E.g., issue subcode 0xc while checking for
+exceptions, then issue subcode 0x10 without checking for exceptions. If
+we migrate in between, we could be in trouble.
 
-In GitHub it is possible to 'Watch' projects, and when doing so, you get =
-various notifications.
+Yes, it's somewhat unlikely, I don't have a strong opinion here. Gluing
+it to some migration-safe mechanism (here, the machine) felt like the
+right thing to do.
 
-Isn't something similar available in GitLab too?
+-- 
+Thanks,
 
-
-Liviu
-
+David / dhildenb
 
 
