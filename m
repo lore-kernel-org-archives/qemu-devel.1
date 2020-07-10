@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0E2C433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA94C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:02:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA73820720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 391F020720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:02:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="FTTVTuiw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA73820720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="CsuAOc7x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391F020720
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtsdU-0007Ww-2o
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:00:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37890)
+	id 1jtsf9-0002Ft-EQ
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:01:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqeC-0005d1-0G
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:52:52 -0400
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:34321)
+ id 1jtqd9-0005FV-Py
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:51:47 -0400
+Received: from mail-pj1-x1029.google.com ([2607:f8b0:4864:20::1029]:37586)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqe8-0006lw-N6
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:52:51 -0400
-Received: by mail-pl1-x630.google.com with SMTP id o1so2110734plk.1
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:52:48 -0700 (PDT)
+ id 1jtqd7-0006c1-VK
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:51:47 -0400
+Received: by mail-pj1-x1029.google.com with SMTP id o22so2452090pjw.2
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:51:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=H41L/c769O6KSVWBIuJ2iUjaV79i+MAagdFluKpYDk4=;
- b=FTTVTuiwNFWLTg2UNikso/LhrIXRJqqeP424eGhNFhKmcXCwBbxkdSPvlbmgW/RkS5
- 9+YTJUJsW1OYGSkIlwEqm7vehG4uGWbXkBfxF4EKS9SPAG9O9APgvpXt/kTwCIckikwq
- r3CJL7Ky3iiPqmZTuqESFEn6LzWVqWnhDlEjwaVtjzInZXNdEHeWjKPJk2p6b89yuNBP
- ZYaVpKWGBiEAO6HS5Y3ZwTdUwaFzrydhB+yK3gRpfvD1WJovNUHYZW/uYMz6E7wWcBis
- glvpK/5FVkg/f/kXWP8ghW5TXJzdNzOQSP5yrTmnyxSMXvXHoXIoReb2qw96v2UWNMJb
- DXTQ==
+ bh=+iRPmbuMdHobYwBjPg2b0Sm7HMs4t/YW9apRnR/5t8o=;
+ b=CsuAOc7xk4yxCD5LA1pkrcOUS7WccygzGsuvv5jv8UlV5Sfo1jH4ImDYrUVt/QvCR6
+ sug543m8rc60/9kDnrXdS063yWWcsLBwCiNxGZQbPTf8ID18fye7ItIiafIIIG0Unnh5
+ ML0xu1IatfcOWCm4z7F0NU/ZzKE3V+JgdXjsPVVREo9ZaRfRjGCiHb6+ryAaB9Gpfklr
+ Veo4dO5EgpBpdDlfVUzbWLa+AlcfNGeJkupzws7gNgBnpnhn+c7K3nHdDapAkfbh3Ukp
+ 0WQ9CR7FCtsAie7q3H1glBS4GhRUpeuQBuEDLYaabxikiyKcCLnU/aMwVJsaec3vvFPC
+ pzTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=H41L/c769O6KSVWBIuJ2iUjaV79i+MAagdFluKpYDk4=;
- b=UfjTvW8F9GjLOkbn3JS26vEsOFylBHxMLYEGMbM9hIgM7Z2Zv2UYCTZlPVA8HuQn87
- k8olHg6mb6zvkN/rNx3YPt29IipWnai1Eka5rZWSCdPbqgE5QJY2GzuH2KwxBavYOILZ
- yQ1pBzrU4KBszzBcJl4v4DWRenj6EiYAhSnRcWH+GQ0duO3Ct32rv09dSnAZd/U8zokN
- fNNN3Y1mR/PJlr4QqJikBQd9StLkg5nTvggeeLBJr1NdoTZPwcUJWs8S/luihZYEO4x9
- 5D+LwoA3vYy53DXVEXR/Ry3P1Dmc+Kx6FVqiptAR3cnHdmewDVy8vGXN9ckSf6td7odH
- ioJw==
-X-Gm-Message-State: AOAM530hKVbWmpPhQOpScwQG/nSS4UXCIgbXMu7sGQtgPVXLFe+NJLEI
- CelY0rmjijxZPqcjM1ymS8gCJKLLN1fPtA==
-X-Google-Smtp-Source: ABdhPJzD7vKPrtc5sbzqobubLtrrvWKABNcsvNO5X9+KXouAL6HiaUfuPgDSg9rTxwGLfHkoz4fpdg==
-X-Received: by 2002:a17:90b:213:: with SMTP id
- fy19mr4849469pjb.41.1594378366939; 
- Fri, 10 Jul 2020 03:52:46 -0700 (PDT)
+ bh=+iRPmbuMdHobYwBjPg2b0Sm7HMs4t/YW9apRnR/5t8o=;
+ b=COXPBNE6KRf+bnh/FMOpeacQacpYJpeTkenMZKQ3nDTYwrqKuUdLjxSjWk7c4Q+F4u
+ 5cMlG2gNTZw2BhVMJ3JkCo+OGqPoB/bQXMCBtAycuaXOyWdEiOtuz8sBpYl1sAn6EhPD
+ x9GutSrZgY6pHMeoUXv1NjnQ8SeLaiMFZfJbljLfaTv6Mzok3BoWjwrzkDvvZ2V+1Fpa
+ BFVZWmSrF2OkzaU8d5p1segXIKQkIqNYJgi6LGSORJMRtGB40XSRwI9EcAtW/47FMCAX
+ S5v3AJgrp3G4S0QCgdiVSnr7xLBjM2j6YrOMuv/hfee4FfNl6/XpWptrC5s9inCfnCl8
+ GNBg==
+X-Gm-Message-State: AOAM530uKX7n55h5EXXWAQpPcxs31bta2lyQ4pMY7eTPq1t22LzIaM3v
+ DbIBh3mheM0zuIdUxM00VagkyeN8MuXJOA==
+X-Google-Smtp-Source: ABdhPJzUKKaQP0qcurt2PTKPaLO9e5SLsuP7veEcYmF+FxSm6osEv2DUPJ2ishmw5AqeskX/U3GSQg==
+X-Received: by 2002:a17:902:7807:: with SMTP id
+ p7mr59943994pll.242.1594378304044; 
+ Fri, 10 Jul 2020 03:51:44 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.52.44
+ by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.51.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jul 2020 03:52:46 -0700 (PDT)
+ Fri, 10 Jul 2020 03:51:43 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC 33/65] target/riscv: rvv-0.9: single-width averaging add and
- subtract instructions
-Date: Fri, 10 Jul 2020 18:48:47 +0800
-Message-Id: <20200710104920.13550-34-frank.chang@sifive.com>
+Subject: [RFC 17/65] target/riscv: rvv-0.9: fault-only-first unit stride load
+Date: Fri, 10 Jul 2020 18:48:31 +0800
+Message-Id: <20200710104920.13550-18-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
 References: <20200710104920.13550-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::630;
- envelope-from=frank.chang@sifive.com; helo=mail-pl1-x630.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1029;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1029.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -115,186 +114,235 @@ From: Frank Chang <frank.chang@sifive.com>
 
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- target/riscv/helper.h                   | 16 ++++++
- target/riscv/insn32.decode              | 13 +++--
- target/riscv/insn_trans/trans_rvv.inc.c |  5 +-
- target/riscv/vector_helper.c            | 74 +++++++++++++++++++++++++
- 4 files changed, 102 insertions(+), 6 deletions(-)
+ target/riscv/helper.h                   | 27 +++---------
+ target/riscv/insn32.decode              | 14 +++----
+ target/riscv/insn_trans/trans_rvv.inc.c | 31 ++++----------
+ target/riscv/vector_helper.c            | 56 +++++++++----------------
+ 4 files changed, 38 insertions(+), 90 deletions(-)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index e53fad1fd5..b253fee76d 100644
+index 99ea68b0b9..d83d1def4e 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -676,18 +676,34 @@ DEF_HELPER_6(vaadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vaadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vaadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vaadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vasub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vasub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vasub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vasub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vaadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vaadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vaadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vaadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vaaddu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vasub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vasub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vasub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vasub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vasubu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
- 
- DEF_HELPER_6(vsmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vsmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+@@ -140,28 +140,11 @@ DEF_HELPER_6(vsxei64_8_v, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsxei64_16_v, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsxei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsxei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_5(vlbff_v_b, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlbff_v_h, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlbff_v_w, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlbff_v_d, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlhff_v_h, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlhff_v_w, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlhff_v_d, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlwff_v_w, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlwff_v_d, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vleff_v_b, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vleff_v_h, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vleff_v_w, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vleff_v_d, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlbuff_v_b, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlbuff_v_h, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlbuff_v_w, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlbuff_v_d, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlhuff_v_h, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlhuff_v_w, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlhuff_v_d, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlwuff_v_w, void, ptr, ptr, tl, env, i32)
+-DEF_HELPER_5(vlwuff_v_d, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vle8ff_v, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vle16ff_v, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vle32ff_v, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vle64ff_v, void, ptr, ptr, tl, env, i32)
++
+ #ifdef TARGET_RISCV64
+ DEF_HELPER_6(vamoswapw_v_d, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vamoswapd_v_d, void, ptr, ptr, tl, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 5c31936a92..0521ca4ab4 100644
+index 46542d162e..b0aaa186b8 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -439,11 +439,14 @@ vssubu_vv       100010 . ..... ..... 000 ..... 1010111 @r_vm
- vssubu_vx       100010 . ..... ..... 100 ..... 1010111 @r_vm
- vssub_vv        100011 . ..... ..... 000 ..... 1010111 @r_vm
- vssub_vx        100011 . ..... ..... 100 ..... 1010111 @r_vm
--vaadd_vv        100100 . ..... ..... 000 ..... 1010111 @r_vm
--vaadd_vx        100100 . ..... ..... 100 ..... 1010111 @r_vm
--vaadd_vi        100100 . ..... ..... 011 ..... 1010111 @r_vm
--vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
--vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
-+vaadd_vv        001001 . ..... ..... 010 ..... 1010111 @r_vm
-+vaadd_vx        001001 . ..... ..... 110 ..... 1010111 @r_vm
-+vaaddu_vv       001000 . ..... ..... 010 ..... 1010111 @r_vm
-+vaaddu_vx       001000 . ..... ..... 110 ..... 1010111 @r_vm
-+vasub_vv        001011 . ..... ..... 010 ..... 1010111 @r_vm
-+vasub_vx        001011 . ..... ..... 110 ..... 1010111 @r_vm
-+vasubu_vv       001010 . ..... ..... 010 ..... 1010111 @r_vm
-+vasubu_vx       001010 . ..... ..... 110 ..... 1010111 @r_vm
- vsmul_vv        100111 . ..... ..... 000 ..... 1010111 @r_vm
- vsmul_vx        100111 . ..... ..... 100 ..... 1010111 @r_vm
- vwsmaccu_vv     111100 . ..... ..... 000 ..... 1010111 @r_vm
+@@ -249,14 +249,6 @@ vsse16_v    ... 010 . ..... ..... 101 ..... 0100111 @r_nfvm
+ vsse32_v    ... 010 . ..... ..... 110 ..... 0100111 @r_nfvm
+ vsse64_v    ... 010 . ..... ..... 111 ..... 0100111 @r_nfvm
+ 
+-vlbff_v    ... 100 . 10000 ..... 000 ..... 0000111 @r2_nfvm
+-vlhff_v    ... 100 . 10000 ..... 101 ..... 0000111 @r2_nfvm
+-vlwff_v    ... 100 . 10000 ..... 110 ..... 0000111 @r2_nfvm
+-vleff_v    ... 000 . 10000 ..... 111 ..... 0000111 @r2_nfvm
+-vlbuff_v   ... 000 . 10000 ..... 000 ..... 0000111 @r2_nfvm
+-vlhuff_v   ... 000 . 10000 ..... 101 ..... 0000111 @r2_nfvm
+-vlwuff_v   ... 000 . 10000 ..... 110 ..... 0000111 @r2_nfvm
+-
+ # Vector indexed load insns.
+ vlxei8_v      ... 011 . ..... ..... 000 ..... 0000111 @r_nfvm
+ vlxei16_v     ... 011 . ..... ..... 101 ..... 0000111 @r_nfvm
+@@ -269,6 +261,12 @@ vsxei16_v     ... 0-1 . ..... ..... 101 ..... 0100111 @r_nfvm
+ vsxei32_v     ... 0-1 . ..... ..... 110 ..... 0100111 @r_nfvm
+ vsxei64_v     ... 0-1 . ..... ..... 111 ..... 0100111 @r_nfvm
+ 
++# Vector unit-stride fault-only-first load insns.
++vle8ff_v      ... 000 . 10000 ..... 000 ..... 0000111 @r2_nfvm
++vle16ff_v     ... 000 . 10000 ..... 101 ..... 0000111 @r2_nfvm
++vle32ff_v     ... 000 . 10000 ..... 110 ..... 0000111 @r2_nfvm
++vle64ff_v     ... 000 . 10000 ..... 111 ..... 0000111 @r2_nfvm
++
+ #*** Vector AMO operations are encoded under the standard AMO major opcode ***
+ vamoswapw_v     00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
+ vamoaddw_v      00000 . . ..... ..... 110 ..... 0101111 @r_wdvm
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index dc9064e868..d90820ff6a 100644
+index 417edbe5a1..d8fea3af4c 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2062,10 +2062,13 @@ GEN_OPIVI_TRANS(vsadd_vi, 0, vsadd_vx, opivx_check)
+@@ -771,25 +771,13 @@ static bool ldff_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
+ {
+     uint32_t data = 0;
+     gen_helper_ldst_us *fn;
+-    static gen_helper_ldst_us * const fns[7][4] = {
+-        { gen_helper_vlbff_v_b,  gen_helper_vlbff_v_h,
+-          gen_helper_vlbff_v_w,  gen_helper_vlbff_v_d },
+-        { NULL,                  gen_helper_vlhff_v_h,
+-          gen_helper_vlhff_v_w,  gen_helper_vlhff_v_d },
+-        { NULL,                  NULL,
+-          gen_helper_vlwff_v_w,  gen_helper_vlwff_v_d },
+-        { gen_helper_vleff_v_b,  gen_helper_vleff_v_h,
+-          gen_helper_vleff_v_w,  gen_helper_vleff_v_d },
+-        { gen_helper_vlbuff_v_b, gen_helper_vlbuff_v_h,
+-          gen_helper_vlbuff_v_w, gen_helper_vlbuff_v_d },
+-        { NULL,                  gen_helper_vlhuff_v_h,
+-          gen_helper_vlhuff_v_w, gen_helper_vlhuff_v_d },
+-        { NULL,                  NULL,
+-          gen_helper_vlwuff_v_w, gen_helper_vlwuff_v_d }
++    static gen_helper_ldst_us * const fns[4] = {
++        gen_helper_vle8ff_v, gen_helper_vle16ff_v,
++        gen_helper_vle32ff_v, gen_helper_vle64ff_v
+     };
+     bool ret;
  
- /* Vector Single-Width Averaging Add and Subtract */
- GEN_OPIVV_TRANS(vaadd_vv, opivv_check)
-+GEN_OPIVV_TRANS(vaaddu_vv, opivv_check)
- GEN_OPIVV_TRANS(vasub_vv, opivv_check)
-+GEN_OPIVV_TRANS(vasubu_vv, opivv_check)
- GEN_OPIVX_TRANS(vaadd_vx,  opivx_check)
-+GEN_OPIVX_TRANS(vaaddu_vx,  opivx_check)
- GEN_OPIVX_TRANS(vasub_vx,  opivx_check)
--GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
-+GEN_OPIVX_TRANS(vasubu_vx,  opivx_check)
+-    fn =  fns[seq][s->sew];
++    fn = fns[seq];
+     if (fn == NULL) {
+         return false;
+     }
+@@ -805,13 +793,10 @@ static bool ldff_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
+     return ret;
+ }
  
- /* Vector Single-Width Fractional Multiply with Rounding and Saturation */
- GEN_OPIVV_TRANS(vsmul_vv, opivv_check)
+-GEN_VEXT_TRANS(vlbff_v, 0, r2nfvm, ldff_op, ld_us_check)
+-GEN_VEXT_TRANS(vlhff_v, 1, r2nfvm, ldff_op, ld_us_check)
+-GEN_VEXT_TRANS(vlwff_v, 2, r2nfvm, ldff_op, ld_us_check)
+-GEN_VEXT_TRANS(vleff_v, 3, r2nfvm, ldff_op, ld_us_check)
+-GEN_VEXT_TRANS(vlbuff_v, 4, r2nfvm, ldff_op, ld_us_check)
+-GEN_VEXT_TRANS(vlhuff_v, 5, r2nfvm, ldff_op, ld_us_check)
+-GEN_VEXT_TRANS(vlwuff_v, 6, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vle8ff_v,  8,  0, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vle16ff_v, 16, 1, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vle32ff_v, 32, 2, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vle64ff_v, 64, 3, r2nfvm, ldff_op, ld_us_check)
+ 
+ /*
+  *** vector atomic operation
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 70a4505736..17cc1a96e9 100644
+index 3ec56bb6fc..86d01a96a3 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -2658,6 +2658,43 @@ GEN_VEXT_VX_RM(vaadd_vx_h, 2, 2, clearh)
- GEN_VEXT_VX_RM(vaadd_vx_w, 4, 4, clearl)
- GEN_VEXT_VX_RM(vaadd_vx_d, 8, 8, clearq)
- 
-+static inline uint32_t aaddu32(CPURISCVState *env, int vxrm,
-+                               uint32_t a, uint32_t b)
-+{
-+    uint64_t res = (uint64_t)a + b;
-+    uint8_t round = get_round(vxrm, res, 1);
-+
-+    return (res >> 1) + round;
-+}
-+
-+static inline uint64_t aaddu64(CPURISCVState *env, int vxrm,
-+                               uint64_t a, uint64_t b)
-+{
-+    uint64_t res = a + b;
-+    uint8_t round = get_round(vxrm, res, 1);
-+    uint64_t over = res < a ? ((uint64_t)1 << 63) : 0;
-+
-+    return ((res >> 1) | over) + round;
-+}
-+
-+RVVCALL(OPIVV2_RM, vaaddu_vv_b, OP_UUU_B, H1, H1, H1, aaddu32)
-+RVVCALL(OPIVV2_RM, vaaddu_vv_h, OP_UUU_H, H2, H2, H2, aaddu32)
-+RVVCALL(OPIVV2_RM, vaaddu_vv_w, OP_UUU_W, H4, H4, H4, aaddu32)
-+RVVCALL(OPIVV2_RM, vaaddu_vv_d, OP_UUU_D, H8, H8, H8, aaddu64)
-+GEN_VEXT_VV_RM(vaaddu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vaaddu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vaaddu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vaaddu_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vaaddu_vx_b, OP_UUU_B, H1, H1, aaddu32)
-+RVVCALL(OPIVX2_RM, vaaddu_vx_h, OP_UUU_H, H2, H2, aaddu32)
-+RVVCALL(OPIVX2_RM, vaaddu_vx_w, OP_UUU_W, H4, H4, aaddu32)
-+RVVCALL(OPIVX2_RM, vaaddu_vx_d, OP_UUU_D, H8, H8, aaddu64)
-+GEN_VEXT_VX_RM(vaaddu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vaaddu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vaaddu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vaaddu_vx_d, 8, 8, clearq)
-+
- static inline int32_t asub32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
+@@ -564,7 +564,7 @@ vext_ldff(void *vd, void *v0, target_ulong base,
+           CPURISCVState *env, uint32_t desc,
+           vext_ldst_elem_fn *ldst_elem,
+           clear_fn *clear_elem,
+-          uint32_t esz, uint32_t msz, uintptr_t ra)
++          uint32_t esz, uintptr_t ra)
  {
-     int64_t res = (int64_t)a - b;
-@@ -2694,6 +2731,43 @@ GEN_VEXT_VX_RM(vasub_vx_h, 2, 2, clearh)
- GEN_VEXT_VX_RM(vasub_vx_w, 4, 4, clearl)
- GEN_VEXT_VX_RM(vasub_vx_d, 8, 8, clearq)
+     void *host;
+     uint32_t i, k, vl = 0;
+@@ -579,24 +579,24 @@ vext_ldff(void *vd, void *v0, target_ulong base,
+         if (!vm && !vext_elem_mask(v0, i)) {
+             continue;
+         }
+-        addr = base + nf * i * msz;
++        addr = base + nf * i * esz;
+         if (i == 0) {
+-            probe_pages(env, addr, nf * msz, ra, MMU_DATA_LOAD);
++            probe_pages(env, addr, nf * esz, ra, MMU_DATA_LOAD);
+         } else {
+             /* if it triggers an exception, no need to check watchpoint */
+-            remain = nf * msz;
++            remain = nf * esz;
+             while (remain > 0) {
+                 offset = -(addr | TARGET_PAGE_MASK);
+                 host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD,
+                                          cpu_mmu_index(env, false));
+                 if (host) {
+ #ifdef CONFIG_USER_ONLY
+-                    if (page_check_range(addr, nf * msz, PAGE_READ) < 0) {
++                    if (page_check_range(addr, nf * esz, PAGE_READ) < 0) {
+                         vl = i;
+                         goto ProbeSuccess;
+                     }
+ #else
+-                    probe_pages(env, addr, nf * msz, ra, MMU_DATA_LOAD);
++                    probe_pages(env, addr, nf * esz, ra, MMU_DATA_LOAD);
+ #endif
+                 } else {
+                     vl = i;
+@@ -621,7 +621,7 @@ ProbeSuccess:
+             continue;
+         }
+         while (k < nf) {
+-            target_ulong addr = base + (i * nf + k) * msz;
++            target_ulong addr = base + (i * nf + k) * esz;
+             ldst_elem(env, addr, i + k * vlmax, vd, ra);
+             k++;
+         }
+@@ -636,36 +636,18 @@ ProbeSuccess:
+     }
+ }
  
-+static inline uint32_t asubu32(CPURISCVState *env, int vxrm,
-+                               uint32_t a, uint32_t b)
-+{
-+    int64_t res = (int64_t)a - b;
-+    uint8_t round = get_round(vxrm, res, 1);
-+
-+    return (res >> 1) + round;
+-#define GEN_VEXT_LDFF(NAME, MTYPE, ETYPE, LOAD_FN, CLEAR_FN)     \
+-void HELPER(NAME)(void *vd, void *v0, target_ulong base,         \
+-                  CPURISCVState *env, uint32_t desc)             \
+-{                                                                \
+-    vext_ldff(vd, v0, base, env, desc, LOAD_FN, CLEAR_FN,        \
+-              sizeof(ETYPE), sizeof(MTYPE), GETPC());            \
+-}
+-
+-GEN_VEXT_LDFF(vlbff_v_b,  int8_t,   int8_t,   ldb_b,  clearb)
+-GEN_VEXT_LDFF(vlbff_v_h,  int8_t,   int16_t,  ldb_h,  clearh)
+-GEN_VEXT_LDFF(vlbff_v_w,  int8_t,   int32_t,  ldb_w,  clearl)
+-GEN_VEXT_LDFF(vlbff_v_d,  int8_t,   int64_t,  ldb_d,  clearq)
+-GEN_VEXT_LDFF(vlhff_v_h,  int16_t,  int16_t,  ldh_h,  clearh)
+-GEN_VEXT_LDFF(vlhff_v_w,  int16_t,  int32_t,  ldh_w,  clearl)
+-GEN_VEXT_LDFF(vlhff_v_d,  int16_t,  int64_t,  ldh_d,  clearq)
+-GEN_VEXT_LDFF(vlwff_v_w,  int32_t,  int32_t,  ldw_w,  clearl)
+-GEN_VEXT_LDFF(vlwff_v_d,  int32_t,  int64_t,  ldw_d,  clearq)
+-GEN_VEXT_LDFF(vleff_v_b,  int8_t,   int8_t,   lde_b,  clearb)
+-GEN_VEXT_LDFF(vleff_v_h,  int16_t,  int16_t,  lde_h,  clearh)
+-GEN_VEXT_LDFF(vleff_v_w,  int32_t,  int32_t,  lde_w,  clearl)
+-GEN_VEXT_LDFF(vleff_v_d,  int64_t,  int64_t,  lde_d,  clearq)
+-GEN_VEXT_LDFF(vlbuff_v_b, uint8_t,  uint8_t,  ldbu_b, clearb)
+-GEN_VEXT_LDFF(vlbuff_v_h, uint8_t,  uint16_t, ldbu_h, clearh)
+-GEN_VEXT_LDFF(vlbuff_v_w, uint8_t,  uint32_t, ldbu_w, clearl)
+-GEN_VEXT_LDFF(vlbuff_v_d, uint8_t,  uint64_t, ldbu_d, clearq)
+-GEN_VEXT_LDFF(vlhuff_v_h, uint16_t, uint16_t, ldhu_h, clearh)
+-GEN_VEXT_LDFF(vlhuff_v_w, uint16_t, uint32_t, ldhu_w, clearl)
+-GEN_VEXT_LDFF(vlhuff_v_d, uint16_t, uint64_t, ldhu_d, clearq)
+-GEN_VEXT_LDFF(vlwuff_v_w, uint32_t, uint32_t, ldwu_w, clearl)
+-GEN_VEXT_LDFF(vlwuff_v_d, uint32_t, uint64_t, ldwu_d, clearq)
++#define GEN_VEXT_LDFF(NAME, ETYPE, LOAD_FN, CLEAR_FN)     \
++void HELPER(NAME)(void *vd, void *v0, target_ulong base,  \
++                  CPURISCVState *env, uint32_t desc)      \
++{                                                         \
++    vext_ldff(vd, v0, base, env, desc, LOAD_FN, CLEAR_FN, \
++              sizeof(ETYPE), GETPC());                    \
 +}
 +
-+static inline uint64_t asubu64(CPURISCVState *env, int vxrm,
-+                               uint64_t a, uint64_t b)
-+{
-+    uint64_t res = (uint64_t)a - b;
-+    uint8_t round = get_round(vxrm, res, 1);
-+    uint64_t over = res > a ? ((uint64_t)1 << 63) : 0;
-+
-+    return ((res >> 1) | over) + round;
-+}
-+
-+RVVCALL(OPIVV2_RM, vasubu_vv_b, OP_UUU_B, H1, H1, H1, asubu32)
-+RVVCALL(OPIVV2_RM, vasubu_vv_h, OP_UUU_H, H2, H2, H2, asubu32)
-+RVVCALL(OPIVV2_RM, vasubu_vv_w, OP_UUU_W, H4, H4, H4, asubu32)
-+RVVCALL(OPIVV2_RM, vasubu_vv_d, OP_UUU_D, H8, H8, H8, asubu64)
-+GEN_VEXT_VV_RM(vasubu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV_RM(vasubu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_RM(vasubu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_RM(vasubu_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2_RM, vasubu_vx_b, OP_UUU_B, H1, H1, asubu32)
-+RVVCALL(OPIVX2_RM, vasubu_vx_h, OP_UUU_H, H2, H2, asubu32)
-+RVVCALL(OPIVX2_RM, vasubu_vx_w, OP_UUU_W, H4, H4, asubu32)
-+RVVCALL(OPIVX2_RM, vasubu_vx_d, OP_UUU_D, H8, H8, asubu64)
-+GEN_VEXT_VX_RM(vasubu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX_RM(vasubu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX_RM(vasubu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX_RM(vasubu_vx_d, 8, 8, clearq)
-+
- /* Vector Single-Width Fractional Multiply with Rounding and Saturation */
- static inline int8_t vsmul8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
- {
++GEN_VEXT_LDFF(vle8ff_v,  int8_t,  lde_b, clearb)
++GEN_VEXT_LDFF(vle16ff_v, int16_t, lde_h, clearh)
++GEN_VEXT_LDFF(vle32ff_v, int32_t, lde_w, clearl)
++GEN_VEXT_LDFF(vle64ff_v, int64_t, lde_d, clearq)
+ 
+ /*
+  *** Vector AMO Operations (Zvamo)
 -- 
 2.17.1
 
