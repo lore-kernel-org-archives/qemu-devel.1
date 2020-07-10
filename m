@@ -6,83 +6,82 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB86C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A9DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0909B2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B779020720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:07:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nbN5jS+l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0909B2075D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w3vVLg/w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B779020720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtxBe-0003j1-6k
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 13:51:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36574)
+	id 1jtxR5-0006oz-W1
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtxB4-0003HU-5P
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 13:51:14 -0400
-Received: from mail-pj1-x102d.google.com ([2607:f8b0:4864:20::102d]:50495)
+ id 1jtxQN-0006P0-RK
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:07:03 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:37425)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtxB2-00018B-M9
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 13:51:13 -0400
-Received: by mail-pj1-x102d.google.com with SMTP id k71so2930429pje.0
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 10:51:12 -0700 (PDT)
+ id 1jtxQL-00038R-VG
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:07:03 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id d4so2863651pgk.4
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 11:07:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=avoF3qspIGHMxjGxvwi7YRJvZdniZ+4Dd1+ivub60iA=;
- b=nbN5jS+lTu337pJoHX2dGDwkV78iU/btb0VR8nrGOxJ0/mnlD3sS6ij/8EjqFuFF1I
- IJk7IkLYzdT2c1Jt9zsXj+bId7XK+2EmlC2XpB3MQ863aSaB2vavJFp3PuIjozlTvHrL
- zDf0c7QlUdjNlHAnacc8x5ra67jUhs9TUfdbfgdSDdnS3YQMaB1flAAmI+EOwm5sgohv
- G/Pw6V9UqX/ySdHjf/mxBeHNNtIVBrdrhY+V4CM+122FSjae2geIT8fD45n5563CX6jE
- VZgXcDq15Rc6FRE9eM3PdCeTpnv0FLVORDTeIp7An74PhQX9JiLWjhIXfV3PohFHTPRb
- X4Vw==
+ bh=Ucp5d4dL3vJ9H0Aep9vCc+dnoOzT2R8NaA85KEAUyos=;
+ b=w3vVLg/wA9/uVfFXYdLU7mOQ19oVB9mI0Du+ELfYwVWJpkVYSUQ3g4HWDUQRpW2jKT
+ 7v/YvEiyqH1nPrubAFgLqwnsyYQn3kOPGmgKZtyeBpFUsovTQshOA8AUcVBED+pkBHN5
+ fm7gGAmkrlXKFoQ4HEV8sLvK0BIBaCSuHZtY/3V5+1UXZII3D5i9rkY9bYyLmeDkH5CH
+ CRKFVHQV2R4hkdwTqWA5gb6vNSXwMP05ATCWTmxWb57DbACri0cXFaSbW66arPNAaR5Y
+ L5+G/13wSHuAq/nHkhdYHaF87uHBZ/WC59p+HuN680vXo44UQkeAx3eKfW2RSNlpC9q0
+ S/PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=avoF3qspIGHMxjGxvwi7YRJvZdniZ+4Dd1+ivub60iA=;
- b=ZMjJrVyu0LiWGXvwQu9SIJcPtRcPp2Pjc9TkAEyudUr05mfSEHlS8rWds0QoBmTaed
- e7J3KSCVLpCr8VtlRt4LmowRD91CQlGIIySA0VlSv6wtmwiuuW5qkOJTkFIKb4igs0AP
- 5cb0ZiaXnmPjYGjZyk+RYMp7pIKIX3cqORJKeLxIszJ7aKwOUPchhLKdFbNN6AgWxo1y
- QpFx5HeufwGWlCNMSyMQ3xONlWO8Vq3OP0kY5Zer82J2cB7uyBdh219twJ9sBVSls585
- +rsGiqOCYgMR9W7T1sA16ji+AuaPkMMB7pjM4L2iPb0lbbyQrhitmiBfGgKDukInQIe7
- 5I6w==
-X-Gm-Message-State: AOAM5330Y+1YF85L9aDqcx9y9CO8MdIoR/byaqVi988TIgMtzkvEAbKC
- EL45GHcwLDm//kku0AaqBJ4i3A==
-X-Google-Smtp-Source: ABdhPJyEBQjzs5f8x9Rlt7AFj6JiR0v3u6GSNK4++N0Jp9TKE6KGaZc8lviaiTswaLtbcOHjo9xAAA==
-X-Received: by 2002:a17:90a:ff16:: with SMTP id
- ce22mr7220765pjb.160.1594403471087; 
- Fri, 10 Jul 2020 10:51:11 -0700 (PDT)
+ bh=Ucp5d4dL3vJ9H0Aep9vCc+dnoOzT2R8NaA85KEAUyos=;
+ b=lfv2Zthb2UKIMQxdbDY4BmxNMDChwqAvXoyjh4wm3ozDeNcxba7A+g2829Uo1GgZQ6
+ /c0AAi3fMdG4YoXSIKuul93ukGYpZODfW+/lxZCggbWZ2RikKgDAjA6o+GmFa1YLq7tJ
+ Our9+S+hQeZVtnSwaxuUScXcOCBmWF3gPI7Oy3eR5+m7W+jiE5m8VyRxJH3w1fiSmgWv
+ 3HKx2nTCHVTGg8H3IcA7LGWbBK+36RcJ25mClVMFGnb9rSdW+w/tCOGg/+JVCVdcTPRs
+ m1yqIyHaPRmggva7D6/1dcl9O6mYDDlmh5rI7HMKaxW9rJXrgKPy4VqTJMdotiBnJ/hZ
+ xppA==
+X-Gm-Message-State: AOAM530xRBuwIjJ2BmJ8yvDQ4PSPtwuL4QlKs9XI2LbJEoGc3/j0Z5Js
+ 5S5bow3gln0l6A40yDGRsbMyEg==
+X-Google-Smtp-Source: ABdhPJwEoebs6DW//hj9nZ+hlv0MH6TvgoEK2oMknVczX+noXjtCHuQCcfJcVuWS4QHlBTfgo9Vhag==
+X-Received: by 2002:aa7:8d95:: with SMTP id i21mr16118927pfr.240.1594404420012; 
+ Fri, 10 Jul 2020 11:07:00 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id ml8sm6051475pjb.47.2020.07.10.10.51.08
+ by smtp.gmail.com with ESMTPSA id v8sm6354241pjf.46.2020.07.10.11.06.58
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 10:51:09 -0700 (PDT)
-Subject: Re: [RFC 12/65] target/riscv: rvv-0.9: update check functions
+ Fri, 10 Jul 2020 11:06:59 -0700 (PDT)
+Subject: Re: [RFC 13/65] target/riscv: rvv-0.9: configure instructions
 To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 References: <20200710104920.13550-1-frank.chang@sifive.com>
- <20200710104920.13550-13-frank.chang@sifive.com>
+ <20200710104920.13550-14-frank.chang@sifive.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ea39eb18-20fe-eecf-454c-6afc04d711f7@linaro.org>
-Date: Fri, 10 Jul 2020 10:51:06 -0700
+Message-ID: <facf726b-d355-b0af-3f7f-5574593aa44c@linaro.org>
+Date: Fri, 10 Jul 2020 11:06:57 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200710104920.13550-13-frank.chang@sifive.com>
+In-Reply-To: <20200710104920.13550-14-frank.chang@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102d;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -113,29 +112,47 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/10/20 3:48 AM, frank.chang@sifive.com wrote:
-> +#define REQUIRE_RVV do {    \
-> +    if (s->mstatus_vs == 0) \
-> +        return false;       \
-> +} while (0)
+> -static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl *a)
+> +static bool trans_vsetvl(DisasContext *s, arg_vsetvl *a)
 
-You've used this macro already back in patch 7.  I guess it should not have
-been there?  Or this bit belongs there, one or the other.
+Do not mix this change with anything else.
 
-I think this patch requires a description and justification.  I have no idea
-why you are replacing
+> +    rd = tcg_const_i32(a->rd);
+> +    rs1 = tcg_const_i32(a->rs1);
 
-> -    return (vext_check_isa_ill(s) &&
-> -            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-> -            vext_check_reg(s, a->rd, false) &&
-> -            vext_check_reg(s, a->rs2, false) &&
-> -            vext_check_reg(s, a->rs1, false));
+Any time you put a register number into a tcg const, there's probably a better
+way to do things.
 
-with invisible returns
+> -    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
+> -    if (a->rs1 == 0) {
+> -        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
+> -        s1 = tcg_const_tl(RV_VLEN_MAX);
+> -    } else {
+> -        s1 = tcg_temp_new();
+> -        gen_get_gpr(s1, a->rs1);
+> -    }
 
-> +    REQUIRE_RVV;
-> +    VEXT_CHECK_ISA_ILL(s);
-> +    VEXT_CHECK_SSS(s, a->rd, a->rs1, a->rs2, a->vm, true);
-> +    return true;
+E.g. this code should be kept, and add
+
+    if (a->rd == 0 && a->rs1 == 0) {
+        s1 = tcg_temp_new();
+        tcg_gen_mov_tl(s1, cpu_vl);
+    } else ...
+
+
+> +    if ((sew > cpu->cfg.elen)
+> +        || vill
+> +        || vflmul < ((float)sew / cpu->cfg.elen)
+> +        || (ediv != 0)
+> +        || (reserved != 0)) {
+>          /* only set vill bit. */
+>          env->vtype = FIELD_DP64(0, VTYPE, VILL, 1);
+> -        env->vl = 0;
+> -        env->vstart = 0;
+>          return 0;
+>      }
+
+You do need to check 0.7.1 so long as it's supported.
 
 
 r~
