@@ -2,94 +2,97 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE1ADC433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D2FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A664420748
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:46:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 779FC20720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:52:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S7uoxruu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A664420748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KM98t7I5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779FC20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvEM-00057H-Fm
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:46:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34344)
+	id 1jtvK1-00042A-Mz
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:52:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtvDL-0004Fm-C4
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:45:28 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47512
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jtvFH-0006dp-VX
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:47:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54723
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtvDH-0008Fn-I9
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:45:26 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jtvFF-0008TK-Cm
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:47:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594395921;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1594396044;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=F+4Xyk4MNefNGQ2BcIq91VLQea/AHI/7gAXPVV3J3uE=;
- b=S7uoxruuVJxQmWyoGo42sn2vbX/HUssG7YuveDMKgVe3Zt08RPtEFlpy4URTJebtdVXM+F
- GI9WAgmIZ3eJPFGhtdTPUuoPXpEEwe8NLaCi5NWNYCzn80TCxzfPhC0hqiJV5oEY4Jyo+p
- yJ2tZ9x1N7MeHvneNJHJkEWZq7ZaiyU=
+ in-reply-to:in-reply-to:references:references;
+ bh=BsLZb1+ZnK5IwPxSC5iY7m2RmAP3bgsknV5rSozsrAU=;
+ b=KM98t7I5fDqndqRujawosylDZRFzC1KP+3bH8EFD609ZUgD3cxqux09WN0hDW2SFSEYP3A
+ ysVb2Ko4gicHeCaNI2lAumgeTAOO6bADPh2Of7QzoEYtTKyAC2TOmfwPTPphaY2BnfhUc0
+ UZ16KYYzaDo03g4tOcGkMSkV9z3XTls=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-QuZG9FCKOHikvwxq6jwSEQ-1; Fri, 10 Jul 2020 11:45:19 -0400
-X-MC-Unique: QuZG9FCKOHikvwxq6jwSEQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-286-I06VZLcYNourDj8z1LJTlw-1; Fri, 10 Jul 2020 11:47:12 -0400
+X-MC-Unique: I06VZLcYNourDj8z1LJTlw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9E2B800D5C;
- Fri, 10 Jul 2020 15:45:17 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-68.ams2.redhat.com [10.36.112.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E78257EFA6;
- Fri, 10 Jul 2020 15:45:05 +0000 (UTC)
-Subject: Re: [PULL 00/32] AVR port
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200707181710.30950-1-f4bug@amsat.org>
- <CAFEAcA85TE+W39fphhm77hNKmAJyEMmaTseDkL1t4gTkzzcbJQ@mail.gmail.com>
- <47ca6b92-cedb-a6c4-754b-b7cd5da597e7@redhat.com>
- <CAFEAcA_wBT+Yfsn+DFZkcRxYWKmF04U2JHNVz5mNuXabeDcN5g@mail.gmail.com>
- <544208da-9dad-5fab-ab43-b2537a1f2f90@amsat.org>
- <d2dd51b4-2f10-a33a-66be-6357c52d8564@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f3796a46-1fb1-e70b-a08f-93ddec443184@redhat.com>
-Date: Fri, 10 Jul 2020 17:45:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61B64193F560;
+ Fri, 10 Jul 2020 15:47:11 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BAD5F74F5E;
+ Fri, 10 Jul 2020 15:47:09 +0000 (UTC)
+Date: Fri, 10 Jul 2020 16:47:06 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
+Message-ID: <20200710154706.GC4034168@redhat.com>
+References: <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
+ <CAFEAcA-UbHpj_xSbqjTsaURt8yPZjuYOmd3pe97vg_G7--17Cw@mail.gmail.com>
+ <e78820bb-af5f-c2a0-7727-1a0caedfa584@suse.de>
+ <CAFEAcA-raDJ2pSUG-OYHcJi_LnQwxMHvcyjsD7+=WxGYcrSz3w@mail.gmail.com>
+ <a8113ed1-c508-0502-4f88-77f875d1a739@redhat.com>
+ <40f4c566-8a5b-c27e-22a7-2a112a0cd77d@suse.de>
+ <c6e3336f-38b8-a8fa-4862-58e6f094711d@redhat.com>
+ <CAFEAcA80XK4voLDj+8kVFcHJb35HT9HL+Qh8kGb3_Qe5Em9ouw@mail.gmail.com>
+ <adeb1f02-c712-e256-6840-649795fdc3b5@redhat.com>
+ <CAFEAcA9f0tadztJP7Ki0potF6=E+GaG8a_X_5HTyH2yw2T7goA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <d2dd51b4-2f10-a33a-66be-6357c52d8564@amsat.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CAFEAcA9f0tadztJP7Ki0potF6=E+GaG8a_X_5HTyH2yw2T7goA@mail.gmail.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 23:35:58
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 04:36:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,81 +105,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
- Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Michael Rolnik <mrolnik@gmail.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Claudio Fontana <cfontana@suse.de>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/07/2020 17.32, Philippe Mathieu-Daudé wrote:
-> On 7/10/20 5:17 PM, Philippe Mathieu-Daudé wrote:
->> On 7/10/20 5:12 PM, Peter Maydell wrote:
->>> On Fri, 10 Jul 2020 at 16:03, Thomas Huth <thuth@redhat.com> wrote:
->>>> Endianess bug ... this should fix it:
->>>>
->>>> diff --git a/target/avr/helper.c b/target/avr/helper.c
->>>> --- a/target/avr/helper.c
->>>> +++ b/target/avr/helper.c
->>>> @@ -337,6 +337,7 @@ void helper_fullwr(CPUAVRState *env, uint32_t data,
->>>> uint32_t addr)
->>>>          helper_outb(env, addr - NUMBER_OF_CPU_REGISTERS, data);
->>>>      } else {
->>>>          /* memory */
->>>> -        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
->>>> +        uint8_t data8 = data;
->>>> +        cpu_physical_memory_write(OFFSET_DATA + addr, &data8, 1);
->>>>      }
->>>
->>> Or equivalently
->>>   address_space_stb(&address_space_memory, data, MEMTXATTRS_UNSPECIFIED, NULL);
->>>
->>> (better choices of address space may be available, but this is
->>> the exact-same-behaviour one).
->>
->> Ah, this is my stashed fix:
->>
->> -- >8 --
->> @@ -320,8 +320,10 @@ target_ulong helper_fullrd(CPUAVRState *env,
->> uint32_t addr)
->>   *  this function implements ST instruction when there is a posibility
->> to write
->>   *  into a CPU register
->>   */
->> -void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
->> +void helper_fullwr(CPUAVRState *env, uint32_t data32, uint32_t addr)
->>  {
->> +    uint8_t data = data32;
->> +    assert(data == data32);
->> +
->>      env->fullacc = false;
->>
->> ---
->>
->> 3 ways to do the same :) The assert is probably superfluous.
->>
->> I don't like the fact that env->r[addr] (which is u8) is silently casted
->> from u32.
+On Fri, Jul 10, 2020 at 04:42:11PM +0100, Peter Maydell wrote:
+> On Fri, 10 Jul 2020 at 16:31, Max Reitz <mreitz@redhat.com> wrote:
+> >
+> > On 10.07.20 17:18, Peter Maydell wrote:
+> > > readarray only arrived sometime in bash 4, and the OSX system
+> > > bash is 3.2.57, so it won't have that builtin.
+> >
+> > It arrived with 4.0, actually, which was released 11 years ago.
+> > I had assumed that would be sufficiently mature.
+> >
+> > So, um, 11 years isn’t sufficiently mature then and I’ll have to work
+> > around not having readarray for macOS?
 > 
-> I'll squash Peter suggested fix:
-[...]
-> @@ -305,13 +308,14 @@ target_ulong helper_fullrd(CPUAVRState *env,
-> uint32_t addr)
+> It's the usual Apple-vs-GPL3 issue.
 > 
->      if (addr < NUMBER_OF_CPU_REGISTERS) {
->          /* CPU registers */
-> -        data = env->r[addr];
-> +        data = cpu_to_le32(env->r[addr]);
+> I note that the iotests do seem to regularly run into
+> non-portable constructs: Kevin's latest pullreq has
+> just failed due to a use of 'truncate' that doesn't
+> work on the BSDs.
 
-That part looks wrong?
+Since we already depend on homebrew for the build environment, we can
+pull in the newer bash from homebrew, and ignore the ancient version
+from macOS stock install.
 
- Thomas
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
