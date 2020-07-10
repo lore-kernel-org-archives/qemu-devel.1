@@ -2,87 +2,96 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78645C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 11:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6701C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 11:44:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 404BD20748
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 11:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91AF420748
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 11:44:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sLyzJODa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404BD20748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zp/Ca4kS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91AF420748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtrQg-0003I6-Go
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 07:42:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49356)
+	id 1jtrS7-0004Rn-T5
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 07:44:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtrPu-0002Gt-Ih
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 07:42:10 -0400
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:37877)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtrPs-000585-IT
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 07:42:10 -0400
-Received: by mail-oi1-x233.google.com with SMTP id 12so4552106oir.4
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 04:42:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ur5fmL2//NpBrO6ICFw2f2m5pVnQgDZZhEJ7nt1Tmk4=;
- b=sLyzJODaM9GEPEd3SHbkQKl5CBIJbOxinCOzmOe5hUoBELWkiLg6VjKUrEWkCB67kL
- x1PGIWSu/HNoTMk0E20sl7rpNg7pEDaEvQLmvDJxf5Yiuik+0km1IkBgeDIFh3vscTfd
- qmzNXUy4ACtXjVfrKAhzjljbqTINZm1LW4hRRG/9/F5917zbVhrNrfv92rT1g3XAC+Uo
- 0pP1fVYQsPCSDt514matH/525o0N9pv/bgPY5C9bNjC9BAlWZgscj7DLB5qdwUUknA0w
- tU3zTEVmT4XXri98vYpqSna8O/Etwt2VJauTJGvkSkqq49VQIBVzQsdlDnir2r0zdWAs
- 0zqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ur5fmL2//NpBrO6ICFw2f2m5pVnQgDZZhEJ7nt1Tmk4=;
- b=ZGdgSggHEFoNRx+XU6qdWlz5v7IjnSNQNso4MDLOpICIRD55cohDeD2wTN3OZeZabo
- trzRDHDqACV7yc2U3aIQyIgR5a6cXW+C3ylrZzd9AMkG79heG3bomj2m03k0xiVp5ZEI
- 7HIeBk8BjSgh+A72BCnaBNPtGH4r3mWpVaj/64YLSq2fej7oJApUn6Hkx7F+yyu0LYjK
- ZrrNBskgz+2ypL4ehWLXhwXUf7TTAQIONRQeKGEjk0oKsP2vK94UV06tyKBttf7/5UUZ
- KqdNcYHTeIe2kY1Vjg3ZAoX5+gJniAIdeXk1zBtRgMScXyp6Yet2e7XZJDSkIpBtoDRa
- nGPA==
-X-Gm-Message-State: AOAM532m2VZ9yf2jw/xL8Z9QRNHKgbj7QoO4KRo0b11iVQUa7PylzWXn
- Fp+fiOUdI9a1MK0ci2gSPozXX7bxYZV+VU3Ev9bHvA==
-X-Google-Smtp-Source: ABdhPJzzQ3aBZxk5c1hSm8oD50TfIJIPTYvaZT2VlTEkv0tGCyNWCUd8KFG7zan0c5FxAxsiXIU+jiHMKNbdYJrTgzM=
-X-Received: by 2002:aca:1706:: with SMTP id j6mr3693500oii.146.1594381327400; 
- Fri, 10 Jul 2020 04:42:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtrRE-0003zR-P3
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 07:43:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58006
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtrRC-0005Gs-2w
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 07:43:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594381408;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=ML75WD+90Fett/Dr2JwiOxAyRTCdyuGSUrI6n8p+3wg=;
+ b=Zp/Ca4kSmR145A51e4s/M3vWV+WG83Pgezv26XdPgar4XNv86GubmpsNTzG9SCXA9ZBFT7
+ y6UjR8e4otRwDYGGPTyhjf4jrYJY2HulTbqxmkH1dOlTc9qjspwO2xVP8UuPnOfPhcgRjA
+ yAxcBEDsWYmpRXp3SS2BkOzPihUWGQg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-511-HbwiFkZsMb2dLLJ9kRz8xA-1; Fri, 10 Jul 2020 07:43:26 -0400
+X-MC-Unique: HbwiFkZsMb2dLLJ9kRz8xA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AD4C100CC84;
+ Fri, 10 Jul 2020 11:43:25 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-68.ams2.redhat.com [10.36.112.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C211574F5F;
+ Fri, 10 Jul 2020 11:43:16 +0000 (UTC)
+Subject: Re: Separate notifications from list messages?
+To: Liviu Ionescu <ilg@livius.net>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>
+References: <E646BE29-B46F-4B56-ADF5-B0DC6CCEF422@livius.net>
+ <0a3689e1-001a-76ec-894d-0bb63115ecdd@redhat.com>
+ <CAFEAcA-Y_e9V2UTEZoVbxOWQcs_eP96cMQ1J2BtC6Y0AAUTgSA@mail.gmail.com>
+ <FF6A540C-7C16-4FFC-9A6D-FAB9EFE56B7F@livius.net>
+ <CAFEAcA_c3M-NQcXMt7pnA1qn9B8AYSnFMP1zHx3i_cU2cqpnSQ@mail.gmail.com>
+ <008CCEB6-D3F4-4F1A-80DE-83F47873851F@livius.net>
+ <20200710085454.GD4017912@redhat.com>
+ <94ACA177-24F6-461F-B12E-79958D713BF1@livius.net>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <663720e1-7ee1-8d0b-df6e-ada96bfc3e8a@redhat.com>
+Date: Fri, 10 Jul 2020 13:43:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200707181710.30950-1-f4bug@amsat.org>
-In-Reply-To: <20200707181710.30950-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Jul 2020 12:41:56 +0100
-Message-ID: <CAFEAcA85TE+W39fphhm77hNKmAJyEMmaTseDkL1t4gTkzzcbJQ@mail.gmail.com>
-Subject: Re: [PULL 00/32] AVR port
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::233;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x233.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <94ACA177-24F6-461F-B12E-79958D713BF1@livius.net>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 23:35:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,67 +104,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
- Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Michael Rolnik <mrolnik@gmail.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 7 Jul 2020 at 19:19, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->
-> Possible false-positives from checkpatch:
->
->   WARNING: added, moved or deleted file(s), does MAINTAINERS need updatin=
-g?
->
-> The following changes since commit 7623b5ba017f61de5d7c2bba12c6feb3d55091=
-b1:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.1-p=
-ull-=3D
-> request' into staging (2020-07-06 11:40:10 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/philmd/qemu.git tags/avr-port-20200707
->
-> for you to fetch changes up to 0cdaf2f343491f60dbf7dd2a912cd88b5f9f899c:
->
->   target/avr/disas: Fix store instructions display order (2020-07-07 20:1=
-4:15=3D
->  +0200)
->
-> ----------------------------------------------------------------
-> 8bit AVR port from Michael Rolnik.
->
-> Michael started to work on the AVR port few years ago [*] and kept
-> improving the code over various series.
+On 10/07/2020 11.24, Liviu Ionescu wrote:
+> 
+> 
+>> On 10 Jul 2020, at 11:54, Daniel P. Berrangé <berrange@redhat.com> wrote:
+>>
+>> This wasn't a mistake - it was very delibrate, precisely so that all
+>> involved in QEMU development will see the failures, instead of expecting
+>> a handful of people to take all the work of dealing with failures. In
+>> general anyone who's a regular contributor has a shared responsibility
+>> to help keep QEMU building reliably.
+> 
+> Yes, sure, but the typical workflow allows anyone to submit contributions, these contributions are automatically checked by CI, and if they pass, someone with administrative rights merges them into the repo.
+> 
+> Thus the main responsibility for dealing with failures goes to the contributor, there is little the community can do to fix the failures.
 
-Hi; I'm afraid this fails "make check" on big-endian hosts (s390x, ppc64):
+Ok, I think here's the misunderstanding: The Gitlab messages that you
+can see currently on the list are from the main repository, not from a
+contributor's private repo! Yes, there is currently quite a bit broken
+in master, and that's why you get all these messages via the mailing
+list. Before Philippe turned them on, they went almost unnoticed, apart
+from some few people who used gitlab on their own. Now these problems
+get at least some more attention ;-)
 
-MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-QTEST_QEMU_BINARY=3Davr-softmmu/qemu-system-avr QTEST_QEMU_IMG=3Dqemu-img
-tests/qtest/boot-serial-test -m=3Dquick -k --tap < /dev/null |
-./scripts/tap-driver.pl --test-name=3D"boot-serial-test"
-qemu-system-avr: execution left flash memory
+ Thomas
 
-** (tests/qtest/boot-serial-test:24048): ERROR **: 11:00:46.466:
-Failed to find expected string. Please check
-'/tmp/qtest-boot-serial-sVGEXHI'
-ERROR - Bail out! FATAL-ERROR: Failed to find expected string. Please
-check '/tmp/qtest-boot-serial-sVGEXHI'
-
-thanks
--- PMM
 
