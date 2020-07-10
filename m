@@ -2,91 +2,80 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7369C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B10DEC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1FF0207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 800CB207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:51:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KhwfgSoB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1FF0207DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUdzf4ND"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800CB207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtokP-0006Hw-Up
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 04:51:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35584)
+	id 1jtokY-0006Wg-Kq
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 04:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtojR-0005Ma-9X
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:50:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51711
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtojm-0005ff-HV
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:50:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28888
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtojP-0007d3-As
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:50:09 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtojk-0007od-RV
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:50:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594371005;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=Sujqwt9PQuEHjpHbgGmsiu+y6vspVGQ9YRyaWGhpHJI=;
- b=KhwfgSoBsaKfAIdPOvIlZwuYI3bSodPRhmWrsBYBKq1MXw8E60QUj18VJLhdGsZQKQQe9T
- YwO1kksTI2tNX17eUyFe8Z8lWXRM+w9xdxux33wulRD75+3SNlBv2v4zm2ldVacFIaXcbW
- eFX8xpA0muPe7yxTKg0ob/xN7ei96gQ=
+ s=mimecast20190719; t=1594371028;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:content-type:content-type;
+ bh=rZ3yeXUflsE6CBniuyPz6PS4FYtZkwSWg/vG1Xwgv+0=;
+ b=XUdzf4NDNUFNq/GxJQsQqboaLg8Mol/e/VYtKm5t6qR6gkZ09ksMeMUBvyBqU23XEBTagR
+ kIq0nAmGNy6s2ndnpAThHbFRPGLj0QsO0FznzyCDHwzQ0aIx4lARQDtb+cdrWZc9RAQRud
+ KzWy/AtvrgtYyjQW4bfzywm7X1f2Fw0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-xh6Cx1CAOieikxktKBKYLg-1; Fri, 10 Jul 2020 04:50:03 -0400
-X-MC-Unique: xh6Cx1CAOieikxktKBKYLg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-377-ZrlJe5RTO9qVt_12bsamag-1; Fri, 10 Jul 2020 04:50:25 -0400
+X-MC-Unique: ZrlJe5RTO9qVt_12bsamag-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A1981B18BCD;
- Fri, 10 Jul 2020 08:50:01 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2568D1002380;
- Fri, 10 Jul 2020 08:49:56 +0000 (UTC)
-Date: Fri, 10 Jul 2020 09:49:54 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: Separate notifications from list messages?
-Message-ID: <20200710084954.GC4017912@redhat.com>
-References: <E646BE29-B46F-4B56-ADF5-B0DC6CCEF422@livius.net>
- <0a3689e1-001a-76ec-894d-0bb63115ecdd@redhat.com>
- <CAFEAcA-Y_e9V2UTEZoVbxOWQcs_eP96cMQ1J2BtC6Y0AAUTgSA@mail.gmail.com>
- <FF6A540C-7C16-4FFC-9A6D-FAB9EFE56B7F@livius.net>
- <CAFEAcA_c3M-NQcXMt7pnA1qn9B8AYSnFMP1zHx3i_cU2cqpnSQ@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_c3M-NQcXMt7pnA1qn9B8AYSnFMP1zHx3i_cU2cqpnSQ@mail.gmail.com>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 304B110059B2
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 08:50:24 +0000 (UTC)
+Received: from thuth.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 511C65C1BD;
+ Fri, 10 Jul 2020 08:50:22 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] softmmu/vl: Be less verbose about missing KVM when running
+ the qtests
+Date: Fri, 10 Jul 2020 10:50:20 +0200
+Message-Id: <20200710085020.28222-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 23:35:58
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:36:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,59 +88,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Liviu Ionescu <ilg@livius.net>, Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 10, 2020 at 09:32:28AM +0100, Peter Maydell wrote:
-> On Fri, 10 Jul 2020 at 09:25, Liviu Ionescu <ilg@livius.net> wrote:
-> >
-> >
-> >
-> > > On 10 Jul 2020, at 11:09, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > >
-> > > What sort of notifications are we talking about here ?
-> >
-> > For example:
-> >
-> > ...
-> > Received: from mg.gitlab.com (74.90.74.34.bc.googleusercontent.com
-> >  [34.74.90.74]) by smtp-out-n18.prod.us-west-2.postgun.com with SMTP id
-> >  5f074fb9a33b1a3dd4571072 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
-> >  Thu, 09 Jul 2020 17:11:21 GMT
-> > Date: Thu, 09 Jul 2020 17:11:20 +0000
-> > Message-ID: <5f074fb827f26_7cd93fa34d371dbc1570d@sidekiq-catchall-02-sv-gprd.mail>
-> > Subject: QEMU | Pipeline #164899134 has failed for master | 3d7cad3c
-> > Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
-> > From: GitLab via <qemu-devel@nongnu.org>
-> > ...
-> 
-> Thanks; yeah, I've seen those go past. Do we expect any other
-> kinds to appear as we make more use of gitlab?
+Some of the qtests use "-accel kvm -accel tcg" to run real guest code.
+This causes some error messages when kvm is not available. We do not
+really care about these messages since the fallback to tcg is expected
+here. So let's silence them to avoid that they spoil the output of
+the tests.
 
-This was an explicit configuration choice to make the CI failure reports
-appear on the list, rather than expecting one or two people to be
-responsible for watching the CI. IME if we move them off to a separate
-list in practice almost no one will bother to subscribe to the list.
+Unfortunately, we can not use the qtest_enabled() wrapper in this case,
+since the qtest accelerator itself is not initialized. Thus we have to
+test for the qtest_chrdev variable instead.
 
-Ideally we would not have any failures in the first place, but right now
-GitLab CI is done post-merge.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ softmmu/vl.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-When Peter starts using GitLab CI as one of the pre-merge gates, then we
-should see very few CI failure messages on list. We'll likely still get
-a few due to transient infrastructure problems. I think this is the
-important thing to focus on here, rather than trying to hide away the
-current CI failures.
-
-Regards,
-Daniel
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 3f58ffd4dc..0066f50fb2 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -164,8 +164,9 @@ bool boot_strict;
+ uint8_t *boot_splash_filedata;
+ int only_migratable; /* turn it off unless user states otherwise */
+ bool wakeup_suspend_enabled;
+-
+ int icount_align_option;
++static const char *qtest_chrdev;
++static const char *qtest_log;
+ 
+ /* The bytes in qemu_uuid are in the order specified by RFC4122, _not_ in the
+  * little-endian "wire format" described in the SMBIOS 2.6 specification.
+@@ -2693,10 +2694,15 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+     AccelClass *ac = accel_find(acc);
+     AccelState *accel;
+     int ret;
++    bool qtest_with_kvm;
++
++    qtest_with_kvm = g_str_equal(acc, "kvm") && qtest_chrdev != NULL;
+ 
+     if (!ac) {
+         *p_init_failed = true;
+-        error_report("invalid accelerator %s", acc);
++        if (!qtest_with_kvm) {
++            error_report("invalid accelerator %s", acc);
++        }
+         return 0;
+     }
+     accel = ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
+@@ -2708,8 +2714,9 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+     ret = accel_init_machine(accel, current_machine);
+     if (ret < 0) {
+         *p_init_failed = true;
+-        error_report("failed to initialize %s: %s",
+-                     acc, strerror(-ret));
++        if (!qtest_with_kvm || ret != -ENOENT) {
++            error_report("failed to initialize %s: %s", acc, strerror(-ret));
++        }
+         return 0;
+     }
+ 
+@@ -2780,7 +2787,7 @@ static void configure_accelerators(const char *progname)
+         exit(1);
+     }
+ 
+-    if (init_failed) {
++    if (init_failed && !qtest_chrdev) {
+         AccelClass *ac = ACCEL_GET_CLASS(current_accel());
+         error_report("falling back to %s", ac->name);
+     }
+@@ -2830,8 +2837,6 @@ void qemu_init(int argc, char **argv, char **envp)
+     MachineClass *machine_class;
+     const char *cpu_option;
+     const char *vga_model = NULL;
+-    const char *qtest_chrdev = NULL;
+-    const char *qtest_log = NULL;
+     const char *incoming = NULL;
+     bool userconfig = true;
+     bool nographic = false;
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.18.1
 
 
