@@ -6,82 +6,84 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A9DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36665C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B779020720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 009CC20720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:16:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w3vVLg/w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B779020720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hZrPguzQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 009CC20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtxR5-0006oz-W1
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:07:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
+	id 1jtxZm-0001CI-5E
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:16:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtxQN-0006P0-RK
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:07:03 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:37425)
+ id 1jtxYh-0000Ah-4j
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:15:39 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:39946)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtxQL-00038R-VG
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:07:03 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id d4so2863651pgk.4
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 11:07:01 -0700 (PDT)
+ id 1jtxYe-0004BZ-D0
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:15:38 -0400
+Received: by mail-pg1-x530.google.com with SMTP id e18so2873006pgn.7
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 11:15:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Ucp5d4dL3vJ9H0Aep9vCc+dnoOzT2R8NaA85KEAUyos=;
- b=w3vVLg/wA9/uVfFXYdLU7mOQ19oVB9mI0Du+ELfYwVWJpkVYSUQ3g4HWDUQRpW2jKT
- 7v/YvEiyqH1nPrubAFgLqwnsyYQn3kOPGmgKZtyeBpFUsovTQshOA8AUcVBED+pkBHN5
- fm7gGAmkrlXKFoQ4HEV8sLvK0BIBaCSuHZtY/3V5+1UXZII3D5i9rkY9bYyLmeDkH5CH
- CRKFVHQV2R4hkdwTqWA5gb6vNSXwMP05ATCWTmxWb57DbACri0cXFaSbW66arPNAaR5Y
- L5+G/13wSHuAq/nHkhdYHaF87uHBZ/WC59p+HuN680vXo44UQkeAx3eKfW2RSNlpC9q0
- S/PQ==
+ bh=whVeT42wRXTpzJNWOVvJaKOIZq0iTJhITxhcz8Zntv4=;
+ b=hZrPguzQZw0bh29Jm8ptcnowu1/BY2+1fpEGKjQ5Wv9UBwyG8Z5nrVMCMWog3ip7an
+ mUI8nN8qZKNDK1iFOL3ESQdtsbCBSrD0MV+HphTS2g1W1CsXdTfCjEtuQFPW+P2ohThV
+ 7xxkuNQ2A7KUo41lnEPI/2UskmsNVlwo1OqlxNWskkpU/U61OAnVaaDnSqf/OPIdGCDi
+ 9JcYlNulsK1vBYqPjNP0xLk1hvSSn1Gv0Vcpi+TeFD27HXHIAu2NqXJu0IEn1ov0lkJ6
+ H0hrgmzqcGjHn4vfR5c2KhHnt8QZU0W3iCnSZ0ehQ15WH3UrYWX0lIKvEeC3cr5RbfRV
+ pkTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Ucp5d4dL3vJ9H0Aep9vCc+dnoOzT2R8NaA85KEAUyos=;
- b=lfv2Zthb2UKIMQxdbDY4BmxNMDChwqAvXoyjh4wm3ozDeNcxba7A+g2829Uo1GgZQ6
- /c0AAi3fMdG4YoXSIKuul93ukGYpZODfW+/lxZCggbWZ2RikKgDAjA6o+GmFa1YLq7tJ
- Our9+S+hQeZVtnSwaxuUScXcOCBmWF3gPI7Oy3eR5+m7W+jiE5m8VyRxJH3w1fiSmgWv
- 3HKx2nTCHVTGg8H3IcA7LGWbBK+36RcJ25mClVMFGnb9rSdW+w/tCOGg/+JVCVdcTPRs
- m1yqIyHaPRmggva7D6/1dcl9O6mYDDlmh5rI7HMKaxW9rJXrgKPy4VqTJMdotiBnJ/hZ
- xppA==
-X-Gm-Message-State: AOAM530xRBuwIjJ2BmJ8yvDQ4PSPtwuL4QlKs9XI2LbJEoGc3/j0Z5Js
- 5S5bow3gln0l6A40yDGRsbMyEg==
-X-Google-Smtp-Source: ABdhPJwEoebs6DW//hj9nZ+hlv0MH6TvgoEK2oMknVczX+noXjtCHuQCcfJcVuWS4QHlBTfgo9Vhag==
-X-Received: by 2002:aa7:8d95:: with SMTP id i21mr16118927pfr.240.1594404420012; 
- Fri, 10 Jul 2020 11:07:00 -0700 (PDT)
+ bh=whVeT42wRXTpzJNWOVvJaKOIZq0iTJhITxhcz8Zntv4=;
+ b=uKt9N/a72Bg1Ap7xbw28SMZtc78Kvh0KqATrKEKhf0T3H0t3klzOgCLQsn3H2pqXJD
+ B7FaHnMQRDe+kjoB2VonICu7hfpRxv8jXXMRttlNK0aQa22BudlJqbt3zPFjqbnfxdfF
+ PUve4STIohRA6YnWm5oU//qfN6bsigkS4UPSEWqf/W4m2lSbWr7N2VkreXa7SSw+YtRP
+ KOeBIAcRf4eJ035h8uAxG67D3ohz/FxkM5fu1Bq55138mr/IMXQkLJT8LDACalNw4Fi1
+ EdVlpU2R+3ZR5aj677ZcG4JV8cGrdGCjFx3Ggfe6I82wbsxS+aukAdJDRQiafRlkpc4G
+ g5pg==
+X-Gm-Message-State: AOAM5336BRNDL+vClGEY1JfYsB2gTLfqP360QJeIhP5/y/+9xL0RPCP+
+ 88DgpCmQixWbYrNf+x9qmpq3vQ==
+X-Google-Smtp-Source: ABdhPJx/Ms73ovz36oeiSFtJOm3lwqC1VblrvPXpMTI0QyBvWhMovnVedfr33MPMvTmvx0CAsW4B2Q==
+X-Received: by 2002:a63:778c:: with SMTP id
+ s134mr57276224pgc.273.1594404933895; 
+ Fri, 10 Jul 2020 11:15:33 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id v8sm6354241pjf.46.2020.07.10.11.06.58
+ by smtp.gmail.com with ESMTPSA id r204sm6913827pfc.134.2020.07.10.11.15.32
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 11:06:59 -0700 (PDT)
-Subject: Re: [RFC 13/65] target/riscv: rvv-0.9: configure instructions
+ Fri, 10 Jul 2020 11:15:32 -0700 (PDT)
+Subject: Re: [RFC 14/65] target/riscv: rvv-0.9: stride load and store
+ instructions
 To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 References: <20200710104920.13550-1-frank.chang@sifive.com>
- <20200710104920.13550-14-frank.chang@sifive.com>
+ <20200710104920.13550-15-frank.chang@sifive.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <facf726b-d355-b0af-3f7f-5574593aa44c@linaro.org>
-Date: Fri, 10 Jul 2020 11:06:57 -0700
+Message-ID: <0dc40d00-a89d-9818-9fd3-2bce4141eca7@linaro.org>
+Date: Fri, 10 Jul 2020 11:15:30 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200710104920.13550-14-frank.chang@sifive.com>
+In-Reply-To: <20200710104920.13550-15-frank.chang@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::530;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x530.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -90,7 +92,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,47 +114,23 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/10/20 3:48 AM, frank.chang@sifive.com wrote:
-> -static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl *a)
-> +static bool trans_vsetvl(DisasContext *s, arg_vsetvl *a)
+>  # *** Vector loads and stores are encoded within LOADFP/STORE-FP ***
+> -vlb_v      ... 100 . 00000 ..... 000 ..... 0000111 @r2_nfvm
+> -vlh_v      ... 100 . 00000 ..... 101 ..... 0000111 @r2_nfvm
+> -vlw_v      ... 100 . 00000 ..... 110 ..... 0000111 @r2_nfvm
 
-Do not mix this change with anything else.
+Again, something you can't do until 0.7.1 is not supported.
 
-> +    rd = tcg_const_i32(a->rd);
-> +    rs1 = tcg_const_i32(a->rs1);
+If you don't want to simultaneously support 0.7.1 and 0.9/1.0, then you should
+simply remove 0.7.1 in the first patch, so that there's no confusion.
 
-Any time you put a register number into a tcg const, there's probably a better
-way to do things.
+Is the rest of it mostly renaming?  You should definitely expand on what you're
+doing within each patch description.  A description of what has changed in the
+spec since 0.7.1 will help the reviewer validate that you've gotten all of the
+corner cases.
 
-> -    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
-> -    if (a->rs1 == 0) {
-> -        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
-> -        s1 = tcg_const_tl(RV_VLEN_MAX);
-> -    } else {
-> -        s1 = tcg_temp_new();
-> -        gen_get_gpr(s1, a->rs1);
-> -    }
-
-E.g. this code should be kept, and add
-
-    if (a->rd == 0 && a->rs1 == 0) {
-        s1 = tcg_temp_new();
-        tcg_gen_mov_tl(s1, cpu_vl);
-    } else ...
-
-
-> +    if ((sew > cpu->cfg.elen)
-> +        || vill
-> +        || vflmul < ((float)sew / cpu->cfg.elen)
-> +        || (ediv != 0)
-> +        || (reserved != 0)) {
->          /* only set vill bit. */
->          env->vtype = FIELD_DP64(0, VTYPE, VILL, 1);
-> -        env->vl = 0;
-> -        env->vstart = 0;
->          return 0;
->      }
-
-You do need to check 0.7.1 so long as it's supported.
+I am going to stop reviewing this patch series now, as I expect that most of
+the remaining patches will have similar comments.
 
 
 r~
