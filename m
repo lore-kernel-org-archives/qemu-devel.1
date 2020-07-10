@@ -2,91 +2,96 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145D5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE16C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:56:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7A62207BC
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35459207BC
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 08:56:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TS562ITU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A62207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=livius-net.20150623.gappssmtp.com header.i=@livius-net.20150623.gappssmtp.com header.b="g1hiiQaO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35459207BC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=livius.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtopA-0001fY-5C
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 04:56:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37148)
+	id 1jtopK-0001yi-GH
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 04:56:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtooF-0000VS-Ip
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:55:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48769
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jtooD-0008HO-PS
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:55:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594371304;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=hSK3YT+bBH1LkWCzHcxv8lG9Iqnh/QyCOuQuwSwg5l4=;
- b=TS562ITUtmTx/zU0yvVEpI6I5NX8RztYCIDLc/zKxH1IWcdeKJ/TquUfK32b9AwVcffe8J
- TnLaq3kiRg5bEOL66S+o9e/J40TNt8AJ1r893cVHkwX1AAyLU3KPHNc01wwdqN2iHH8iRu
- UaUECxEVfRKZ6DhXJZ9lwErRtgkVS0k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-33B3PpzfMiafor5fYsyBxg-1; Fri, 10 Jul 2020 04:55:02 -0400
-X-MC-Unique: 33B3PpzfMiafor5fYsyBxg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D37498014D7;
- Fri, 10 Jul 2020 08:55:01 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EA7C5C1BD;
- Fri, 10 Jul 2020 08:54:57 +0000 (UTC)
-Date: Fri, 10 Jul 2020 09:54:54 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Liviu Ionescu <ilg@livius.net>
+ (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1jtooU-0000nB-Pt
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:55:22 -0400
+Received: from mail-ej1-x631.google.com ([2a00:1450:4864:20::631]:35711)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1jtooT-0008Nv-7F
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 04:55:22 -0400
+Received: by mail-ej1-x631.google.com with SMTP id rk21so5232239ejb.2
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 01:55:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=livius-net.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=tFGB6pN/nzVO8AjRQQp5DIc0iLyGvJLmglzxJRXFK14=;
+ b=g1hiiQaOgd0abBVZjtqnPn3HvWnG9UVIYFe/Ctg7Ci0xGMtPoWCA+lwkHJac6Qfjqz
+ 8uljls/m4d8hYFp2vZLcthL2WV03onHGxWSvQROhejGxm+Z71SIjucPjTGZvez1ABdsk
+ KUxPKQ0SqGmoWP8/MQj/NUUMALRuUn0jNqDMXnKp0c1ZSWthZZj6sDD+kifzuJI1M6AF
+ Mei9Olr6SbV8OczCwrMvv3y7tQhVlIYBqdXpyYTuW5YqKy1Zse/dtRFkJkX1hLod00hg
+ lvs97WbavBswRrb848/hLqPhbYrSgPUjpMJ+y67WCeVhi8DUeEdCw+6GYZ3gIFMAcBGs
+ is+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=tFGB6pN/nzVO8AjRQQp5DIc0iLyGvJLmglzxJRXFK14=;
+ b=TBSkwF4D0FZU+L1GprY2GIlLjmFzfy1mEXO9Kkr9NNA39Tp0pocIaQ6TDeaxNbTWl3
+ fSyyd9q92s+c6LeLoOG4TND64/mtGw/fPGNVBnAyFPOPVneYOeqNUPnKrq00nXbqq4A9
+ 7gK/qt6DVqq54YXy+wfMiOlNheE3TUvoEDGnGY9WPW5bF9Dck63EyKIv1TtuVZRKUQjg
+ pCnkso8pLUH3qzV18ua1nay98AnDO5xcBsAkxk4glm0Fn62/FTwLRSSlJVufPJLjV8BS
+ tQafsdy+ZBdXMPxa/8LZFsmmrRgWL+F3AkXp2n2CIuM4D/fstl9MLVLXFQ21cmFJPEkA
+ Ehxw==
+X-Gm-Message-State: AOAM533rCowrx2cme5lCtwrPFiXlHfZUYD6ayYdgP8Z4dHlISa30p5J8
+ 24yAKvMJ2rGxFR0HmjvGOdSv0w==
+X-Google-Smtp-Source: ABdhPJzmbWlehQhLHWZMBkDK+XrMI1rWeQr/Q++2oDmeN8p0RZKXqku/R5qpaSHaK34Lq6dN1/EKWQ==
+X-Received: by 2002:a17:906:414c:: with SMTP id
+ l12mr40938256ejk.417.1594371319667; 
+ Fri, 10 Jul 2020 01:55:19 -0700 (PDT)
+Received: from wks.local ([86.121.22.151])
+ by smtp.gmail.com with ESMTPSA id 23sm3954080edx.75.2020.07.10.01.55.18
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 10 Jul 2020 01:55:18 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
 Subject: Re: Separate notifications from list messages?
-Message-ID: <20200710085454.GD4017912@redhat.com>
+From: Liviu Ionescu <ilg@livius.net>
+In-Reply-To: <20200710084954.GC4017912@redhat.com>
+Date: Fri, 10 Jul 2020 11:55:17 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <6FAC9C6F-68F0-4EE9-A4F0-9D7CE56FD932@livius.net>
 References: <E646BE29-B46F-4B56-ADF5-B0DC6CCEF422@livius.net>
  <0a3689e1-001a-76ec-894d-0bb63115ecdd@redhat.com>
  <CAFEAcA-Y_e9V2UTEZoVbxOWQcs_eP96cMQ1J2BtC6Y0AAUTgSA@mail.gmail.com>
  <FF6A540C-7C16-4FFC-9A6D-FAB9EFE56B7F@livius.net>
  <CAFEAcA_c3M-NQcXMt7pnA1qn9B8AYSnFMP1zHx3i_cU2cqpnSQ@mail.gmail.com>
- <008CCEB6-D3F4-4F1A-80DE-83F47873851F@livius.net>
-MIME-Version: 1.0
-In-Reply-To: <008CCEB6-D3F4-4F1A-80DE-83F47873851F@livius.net>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 22:08:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ <20200710084954.GC4017912@redhat.com>
+To: =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+Received-SPF: none client-ip=2a00:1450:4864:20::631;
+ envelope-from=ilg@livius.net; helo=mail-ej1-x631.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,42 +104,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 10, 2020 at 11:40:05AM +0300, Liviu Ionescu wrote:
-> 
-> 
-> > On 10 Jul 2020, at 11:32, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > 
-> > ... Do we expect any other
-> > kinds to appear as we make more use of gitlab?
-> 
-> I have zero experience with gitlab, but on github yes, most project activity can trigger notifications.
-> 
-> this is not a problem in itself. the problem is that, instead of
-> using a personal email address, the qemu-devel list was used
-> somewhere in the project settings, and all notifications go to the list.
 
-This wasn't a mistake - it was very delibrate, precisely so that all
-involved in QEMU development will see the failures, instead of expecting
-a handful of people to take all the work of dealing with failures. In
-general anyone who's a regular contributor has a shared responsibility
-to help keep QEMU building reliably.
 
-Given the overall volume of mail on qemu-devel, a handful of notifications
-from CI each day is not a burden IMHO.
+> On 10 Jul 2020, at 11:49, Daniel P. Berrang=C3=A9 =
+<berrange@redhat.com> wrote:
+>=20
+> This was an explicit configuration choice to make the CI failure =
+reports
+> appear on the list, rather than expecting one or two people to be
+> responsible for watching the CI.=20
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I'm not familiar with your workflow, it might be so, but normally only =
+those who submit changes (pull requests on GitHub) should be notified on =
+the results.
+
+
+regards,
+
+Liviu
 
 
