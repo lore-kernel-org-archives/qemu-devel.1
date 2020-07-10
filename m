@@ -2,80 +2,89 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4591C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A93C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:30:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 972C62075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:30:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972C62075D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5B2BA206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:30:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u5oHFlPk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B2BA206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtxmp-0002Sk-TN
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:30:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43860)
+	id 1jtxn1-0002a7-Ik
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:30:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtxiV-0006Zx-Sl
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41668)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtxll-0001k2-3s
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:29:09 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:36373)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtxiS-0005Xp-6L
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jtxiR-0002p0-4G
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1C1612E806D
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:43 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtxlj-0005oy-0H
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:29:08 -0400
+Received: by mail-ot1-x330.google.com with SMTP id 72so4883766otc.3
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 11:29:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=63ZT757P5weU9D1gEkdPogX86zZV2Md4Bn6eVgv+H38=;
+ b=u5oHFlPk+PviXgvqv3eg50G0VYKC+wJZYmRw5S5Xx3AkHWiPW26yZNFeRDI+Uz31iW
+ lBtswkddEZytCy7sPm80GUyUxZs/xca7iCag2x7BF9BG6yRIhJlxeH2STZ1oalIMlxAs
+ KpvlMaDMJk/doDsJlryZwPysKLJI1NRAKofcD9Ftb4WccLjrwdL2TGOQ0ZSYOSr3bQh0
+ Ds6NeXWGTjMhVyukO9Goi20l1WZJbY1JM7Iw2UJTNHg/xjuN+zYSAssvy0XD9dMK9hTF
+ stLzpobr/+HABo/D+GNMfraZrT64mrvmq2BTdo+ItOYdaHxuhPtFLdX9YEoj84U4y2+J
+ fGfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=63ZT757P5weU9D1gEkdPogX86zZV2Md4Bn6eVgv+H38=;
+ b=fGGj4rTLw1xmszhC1pCijalqd309GpCA52B0gYHMryPxHMA3IEQO6i1h10KgMOYLER
+ 9LwKiJw/wr8TWWEW6Ay23I3LAP3Lz1uAEpoF1CoTYoyI+s40qyLdGr5QiOZ7mReGCyek
+ FR7Na8aw9LC/fFX2xaXCwfyeZpL10Tt/TKvsdjYiOwCfPr7xmpbUZzDU+Lw9jRuQ4xfl
+ cbWJizUzQbSeYR1fJJylQOqZWcR9POg3iFsGAX6RVeUkzfNGKiTVbzOztW8yAgv3vady
+ V/HngXoXVdRx0wSMz2NWD5zFksG0n3YuEAonr9jTNTStkxjjoXhvmhy4D/ELnbMVXmno
+ xJ8A==
+X-Gm-Message-State: AOAM530mHI46i8goe9vjkaq2fp55yEVFODYoVFwukcFfqG3eZ0SPVVkS
+ IknqHoE7cj4YTfDVuICWwz4BVIbHBnIkMyLHYIT5msCt
+X-Google-Smtp-Source: ABdhPJxcsCisJDuORubEMj9hcxIeQDLJsyzIoD976PWiya7vi0ja6xesz8IT9FlEgjuqn5Asm0T1mY2hSjPwiSorjnM=
+X-Received: by 2002:a9d:7303:: with SMTP id e3mr51466110otk.221.1594405745535; 
+ Fri, 10 Jul 2020 11:29:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Jul 2020 18:18:12 -0000
-From: Dmitry <1885332@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: langston0 xeioexception
-X-Launchpad-Bug-Reporter: Langston (langston0)
-X-Launchpad-Bug-Modifier: Dmitry (xeioexception)
-References: <159320263008.26082.15752081078008046631.malonedeb@gac.canonical.com>
-Message-Id: <159440509211.11910.6418686072155246577.malone@soybean.canonical.com>
-Subject: [Bug 1885332] Re: Error in user-mode calculation of ELF aux vector's
- AT_PHDR
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b117ec187318f90e3720eaed0f044ccf1d1929cd
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 14:25:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20200707210749.18699-1-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20200707210749.18699-1-mark.cave-ayland@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Jul 2020 19:28:54 +0100
+Message-ID: <CAFEAcA9sX0KBoRwLziAXtawRCWodnU1PZX=q3VSQm_5kkv=s4Q@mail.gmail.com>
+Subject: Re: [PULL 0/1] qemu-openbios queue 20200707
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::330;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x330.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,144 +93,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1885332 <1885332@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> runs just fine on top of the Linux kernel in QEMU full-system
-emulation, but crashes before main in user-mode emulation
+On Tue, 7 Jul 2020 at 22:08, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+>
+> The following changes since commit eb2c66b10efd2b914b56b20ae90655914310c925:
+>
+>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-07-06' into staging (2020-07-07 19:47:26 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/mcayland/qemu.git tags/qemu-openbios-20200707
+>
+> for you to fetch changes up to 1e04092feecfc8caaf314df2670bf9c645a0b122:
+>
+>   Update OpenBIOS images to 75fbb41d built from submodule. (2020-07-07 21:54:37 +0100)
+>
+> ----------------------------------------------------------------
+> qemu-openbios queue
+>
+> ----------------------------------------------------------------
 
-So it seems system vs user-mode is not the issue here, probably it is
-related to gdb mode in user-mode qemu.
 
--- =
+Applied, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1885332
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-Title:
-  Error in user-mode calculation of ELF aux vector's AT_PHDR
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  I have an (admittedly strange) statically-linked ELF binary for Linux tha=
-t runs just fine on top of the Linux kernel in QEMU full-system emulation, =
-but crashes before main in user-mode emulation. Specifically, it crashes wh=
-en initializing thread-local storage in glibc's _dl_aux_init, because it re=
-ads out a strange value from the AT_PHDR entry of the ELF aux vector.
-
-  The binary has these program headers:
-
-    Program Headers:
-      Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Ali=
-gn
-      EXIDX          0x065874 0x00075874 0x00075874 0x00570 0x00570 R   0x4
-      PHDR           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x0a3000 0x00900000 0x00900000 0x00160 0x00160 R   0x1=
-000
-      LOAD           0x000000 0x00010000 0x00010000 0x65de8 0x65de8 R E 0x1=
-0000
-      LOAD           0x066b7c 0x00086b7c 0x00086b7c 0x02384 0x02384 RW  0x1=
-0000
-      NOTE           0x000114 0x00010114 0x00010114 0x00044 0x00044 R   0x4
-      TLS            0x066b7c 0x00086b7c 0x00086b7c 0x00010 0x00030 R   0x4
-      GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x8
-      GNU_RELRO      0x066b7c 0x00086b7c 0x00086b7c 0x00484 0x00484 R   0x1
-      LOAD           0x07e000 0x00089000 0x00089000 0x03f44 0x03f44 R E 0x1=
-000
-      LOAD           0x098000 0x00030000 0x00030000 0x01000 0x01000 RW  0x1=
-000
-
-  If I build the Linux kernel with the following patch to the very end
-  of create_elf_tables in fs/binfmt_elf.c
-
-    /* Put the elf_info on the stack in the right place.  */
-    elf_addr_t *my_auxv =3D (elf_addr_t *) mm->saved_auxv;
-    int i;
-    for (i =3D 0; i < 15; i++) {
-      printk("0x%x =3D 0x%x", my_auxv[2*i], my_auxv[(2*i)+ 1]);
-    }
-    if (copy_to_user(sp, mm->saved_auxv, ei_index * sizeof(elf_addr_t)))
-        return -EFAULT;
-    return 0;
-
-  and run it like this:
-
-    qemu-system-arm \
-      -M versatilepb \
-      -nographic \
-      -dtb ./dts/versatile-pb.dtb \
-      -kernel zImage \
-      -M versatilepb \
-      -m 128M \
-      -append "earlyprintk=3Dvga,keep" \
-      -initrd initramfs
-
-  after I've built the kernel initramfs like this (where "init" is the
-  binary in question):
-
-    make ARCH=3Darm versatile_defconfig
-    make ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- all -j10
-    cp "$1" arch/arm/boot/init
-    cd arch/arm/boot
-    echo init | cpio -o --format=3Dnewc > initramfs
-
-  then I get the following output. This is the kernel's view of the aux
-  vector for this binary:
-
-    0x10 =3D 0x1d7
-    0x6 =3D 0x1000
-    0x11 =3D 0x64
-    0x3 =3D 0x900000
-    0x4 =3D 0x20
-    0x5 =3D 0xb
-    0x7 =3D 0x0
-    0x8 =3D 0x0
-    0x9 =3D 0x101b8
-    0xb =3D 0x0
-    0xc =3D 0x0
-    0xd =3D 0x0
-    0xe =3D 0x0
-    0x17 =3D 0x0
-    0x19 =3D 0xbec62fb5
-
-  However, if I run "qemu-arm -g 12345 binary" and use GDB to peek at
-  the aux vector at the beginning of __libc_start_init (for example,
-  using this Python GDB API script: https://gist.github.com/langston-
-  barrett/5573d64ae0c9953e2fa0fe26847a5e1e), then I see the following
-  values:
-
-    AT_PHDR =3D 0xae000
-    AT_PHENT =3D 0x20
-    AT_PHNUM =3D 0xb
-    AT_PAGESZ =3D 0x1000
-    AT_BASE =3D 0x0
-    AT_FLAGS =3D 0x0
-    AT_ENTRY =3D 0x10230
-    AT_UID =3D 0x3e9
-    AT_EUID =3D 0x3e9
-    AT_GID =3D 0x3e9
-    AT_EGID =3D 0x3e9
-    AT_HWCAP =3D 0x1fb8d7
-    AT_CLKTCK =3D 0x64
-    AT_RANDOM =3D -0x103c0
-    AT_HWCAP2 =3D 0x1f
-    AT_NULL =3D 0x0
-
-  The crucial difference is in AT_PHDR (0x3), which is indeed the
-  virtual address of the PHDR segment when the kernel calculates it, but
-  is not when QEMU calculates it.
-
-  qemu-arm --version
-  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.26)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1885332/+subscriptions
+-- PMM
 
