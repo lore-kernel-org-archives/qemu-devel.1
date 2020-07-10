@@ -4,63 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E1AC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F56BC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:29:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51B722077D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:29:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D70C2076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:29:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IbviGaNe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51B722077D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V84JFYXN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D70C2076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtlaw-0004cA-L9
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 01:29:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50894)
+	id 1jtlbQ-0005Ib-Dc
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 01:29:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jtlUh-0007mK-4B
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 01:22:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47132
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jtlUi-0007rU-Ve
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 01:22:44 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22823
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jtlUf-0008Fg-D4
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 01:22:42 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jtlUh-0008GI-BY
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 01:22:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594358560;
+ s=mimecast20190719; t=1594358562;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xy9s+1wdx+fQwdHHZY7/5KndW5zbjdDLC4YYERX1j7M=;
- b=IbviGaNeC4uIN8A9t9Gk7V6plrQR+UGOyzzdfdYBtnxtZ2AAYbjy9cJMHwPAApNs0sfHkd
- JUtMklDabAnRjNC+hRVnrZ7E9A62ZMt36RlhLzVjtOMPQ4dxmF6jKhrZ+hS5wL53Vaw8nl
- HHyi+uWgVR+fSm4H5v66EH46a6RlA7I=
+ bh=Aw+4u07sLBxkyTq5k1epb1ejZH5/G/p+Hitk0UEMZ10=;
+ b=V84JFYXNmXm7VcKYjDxKV09WaNXQOkDdjAfTDHvnUwH13Duqy/CkkqSb8GnBcAvFzFjvxT
+ LLfQ51CNQihTqV2LFcZV5K4I2OAIZPrmH09Xc3gsgu9Pc5Q0n7w9vhlH+mMxncJeH6yGm6
+ 6DU6y3swQpGRfE0YduER8URPLEVjrfY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-467-279Qz5BWPhC5Lm3wr7NrFw-1; Fri, 10 Jul 2020 01:22:36 -0400
-X-MC-Unique: 279Qz5BWPhC5Lm3wr7NrFw-1
+ us-mta-198-bQ_k2b3eMaqa7M25hmtFtg-1; Fri, 10 Jul 2020 01:22:41 -0400
+X-MC-Unique: bQ_k2b3eMaqa7M25hmtFtg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37FF91082;
- Fri, 10 Jul 2020 05:22:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EECB1009441;
+ Fri, 10 Jul 2020 05:22:40 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-118-196.rdu2.redhat.com [10.10.118.196])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 33E0379231;
- Fri, 10 Jul 2020 05:22:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2AF1A920C2;
+ Fri, 10 Jul 2020 05:22:39 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 11/16] python/machine.py: use qmp.command
-Date: Fri, 10 Jul 2020 01:22:15 -0400
-Message-Id: <20200710052220.3306-12-jsnow@redhat.com>
+Subject: [PATCH v5 15/16] iotests.py: Adjust HMP kwargs typing
+Date: Fri, 10 Jul 2020 01:22:19 -0400
+Message-Id: <20200710052220.3306-16-jsnow@redhat.com>
 In-Reply-To: <20200710052220.3306-1-jsnow@redhat.com>
 References: <20200710052220.3306-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -69,9 +68,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:36:21
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 22:08:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -79,7 +78,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,72 +99,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-machine.py and qmp.py both do the same thing here; refactor machine.py
-to use qmp.py's functionality more directly.
+mypy wants to ensure there's consistency between the kwargs arguments
+types and any unspecified keyword arguments. In this case, conv_keys is
+a bool, but the remaining keys are Any type. Mypy (correctly) infers the
+**kwargs type to be **Dict[str, str], which is not compatible with
+conv_keys: bool.
+
+Because QMP typing is a little fraught right now anyway, re-type kwargs
+to Dict[str, Any] which has the benefit of silencing this check right
+now.
+
+A future re-design might type these more aggressively, but this will
+give us a baseline to work from with minimal disruption.
+
+(Thanks Kevin Wolf for the debugging assist here)
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- python/qemu/machine.py | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/iotests.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 48e70253fa..0df94c3211 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -26,6 +26,8 @@
- import socket
- import tempfile
- from typing import (
-+    Any,
-+    Dict,
-     List,
-     Optional,
-     Type,
-@@ -505,17 +507,23 @@ def set_qmp_monitor(self, enabled=True):
-             self._qmp_set = False
-             self._qmp = None
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 4457786f09..d5cde7c0da 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -553,7 +553,7 @@ def add_incoming(self, addr):
  
--    def qmp(self, cmd, conv_keys=True, **args):
--        """
--        Invoke a QMP command and return the response dict
--        """
-+    @classmethod
-+    def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
-         qmp_args = dict()
-         for key, value in args.items():
--            if conv_keys:
-+            if _conv_keys:
-                 qmp_args[key.replace('_', '-')] = value
-             else:
-                 qmp_args[key] = value
-+        return qmp_args
- 
-+    def qmp(self, cmd: str,
-+            conv_keys: bool = True,
-+            **args: Any) -> QMPMessage:
-+        """
-+        Invoke a QMP command and return the response dict
-+        """
-+        qmp_args = self._qmp_args(conv_keys, **args)
-         return self._qmp.cmd(cmd, args=qmp_args)
- 
-     def command(self, cmd, conv_keys=True, **args):
-@@ -524,12 +532,8 @@ def command(self, cmd, conv_keys=True, **args):
-         On success return the response dict.
-         On failure raise an exception.
-         """
--        reply = self.qmp(cmd, conv_keys, **args)
--        if reply is None:
--            raise qmp.QMPError("Monitor is closed")
--        if "error" in reply:
--            raise qmp.QMPResponseError(reply)
--        return reply["return"]
-+        qmp_args = self._qmp_args(conv_keys, **args)
-+        return self._qmp.command(cmd, **qmp_args)
- 
-     def get_qmp_event(self, wait=False):
-         """
+     def hmp(self, command_line: str, use_log: bool = False) -> QMPMessage:
+         cmd = 'human-monitor-command'
+-        kwargs = {'command-line': command_line}
++        kwargs: Dict[str, Any] = {'command-line': command_line}
+         if use_log:
+             return self.qmp_log(cmd, **kwargs)
+         else:
 -- 
 2.21.3
 
