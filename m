@@ -2,84 +2,84 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7373C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8031BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:06:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A44A420663
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:06:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B9042076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 05:06:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P53YiLUw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A44A420663
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pHH2oOCW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B9042076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtlF0-0006Iu-So
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 01:06:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47322)
+	id 1jtlF6-0006YH-FM
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 01:06:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jtlDx-0004af-W7; Fri, 10 Jul 2020 01:05:26 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:35960)
+ id 1jtlE0-0004h2-JQ; Fri, 10 Jul 2020 01:05:28 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39811)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jtlDv-0006II-Ra; Fri, 10 Jul 2020 01:05:25 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id md7so2093568pjb.1;
- Thu, 09 Jul 2020 22:05:23 -0700 (PDT)
+ id 1jtlDy-0006Iq-SZ; Fri, 10 Jul 2020 01:05:28 -0400
+Received: by mail-pg1-x543.google.com with SMTP id z5so1989145pgb.6;
+ Thu, 09 Jul 2020 22:05:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=YoykrVtjYqt8oRbnP42shFLWN1mv4jmw4/LHlHynF4c=;
- b=P53YiLUwAwoTMlQ9dJlo12Vsikft+qEkadhR0y9D7P3pNExuyv84K94qYJ637is81T
- vQVeCxI4oRRCjBqvxCsQUE3hSv7CUATgZRmWFV79g94sMZ2zrmQYG2/8nc+Suuy04Pzq
- 5JGoQ/qul48vY/TnXoAsyL1MF9SLpd2sEBggYMJOpoUnHIOC6RLM+Y7dtIW7ibj6pqfU
- Vn6hXyCqyAtsQ0j/ft5mV8zljhdcGdUGMvH/I9DOU/Pv42vEJulYDkBGEbxN5DweGzce
- BCEzruRYMIb+OKX0wM9YDdEZVqapDK9sLSs/PR1qJBn8jJM4O0VU6RqvmOXrqigHWdmF
- +Zkw==
+ bh=M0wM1ATVTCyAhKblgVkTw/n2u4Z2M1VeonuoZ3M/FH4=;
+ b=pHH2oOCWTUiLfcpCg+2n+ozlCH9eNLdPQBkuJlcwnkxtD/pjE0IswLwOLxBawXfwak
+ RkXqk+RHuU/iSkiThqKAKH6WlqXWV53OUmeoHInJZDGdQyG1RyP8SVHxhhHbU4o2KkHl
+ aVm1FH9OHdjNP72V+MjkNeOO5PSdvzhn/rYjotSqnArNfx/UaKmDvWU7fjoA9+yy08p8
+ 1sWU9B+btYQX+RZKVUacal3lVp4RfCYa4ig+oJ1hrd2OoqOORFBehM4bSWs/xKJPCAzs
+ 3Z5JnnyCJsG3ruGC3vs0+p9G4ux51cIiU2ruDsY6oj9Lf0EoG9ggLnwxI5A/5C5fcyvV
+ c7mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=YoykrVtjYqt8oRbnP42shFLWN1mv4jmw4/LHlHynF4c=;
- b=jFYts9iTfmXOiYT22+PLiCdYZHZ7cYR78lkISF4nSY2o9Fp5rPAJ09NWl6lVNCvQRS
- i/Ew3HMLJapRAebe9hbDAsvdAD+SQ0tpCvO/15GMuuCr/jgAJgL3j29goJTy+ppFjwzP
- 0vRVfiAJZxbkSWF7kIrjsXcZjcMxiEyq+E+r4pBkm2jvu9E1MniSc8H9MBmWQDJm2+T7
- 1r17gi6VOrqdC3p5QiuYSJLqw2y/MTH2iQYOxBRyq0CnS3becmDI0PXXENsVVvnXfFHk
- J0tIcDWU56LaZCRjdx6vrVLBXRdzpafhCMLvIWl0qKeK/SR5FPfyz4Pw0b/isjCTrndR
- fDRQ==
-X-Gm-Message-State: AOAM5332GQYNebTOta1eVwe5BVWuVY37VuBJR85sO/XLjQIPzZmz/JnL
- 8ewmN44j51dgfC+YKGU84X9j7FUC
-X-Google-Smtp-Source: ABdhPJxXZRxqR8o3XG5Wi0wuQ2xR6kltGyn+6V5gXRVEJWLFj3XVMFOppadTinvhR+M8eFNrIVpZYQ==
-X-Received: by 2002:a17:90a:e50c:: with SMTP id
- t12mr3667315pjy.209.1594357522338; 
- Thu, 09 Jul 2020 22:05:22 -0700 (PDT)
+ bh=M0wM1ATVTCyAhKblgVkTw/n2u4Z2M1VeonuoZ3M/FH4=;
+ b=ayjEXHFg2B83mSOZsNRW4waKCMF5Fygd9SAwnA0vOtCCvRvkT1sCeJ91NdVu8wJod6
+ pKiBYtQ8xCyH6XaVAk2q9SDiwasplOnRGaYf2+MLd04+flHUAWm3vmtXR3ufjlKMPiPb
+ cK0g8wnBsqlpCM/RKmEJ2oYAwUIcR+ft2Q/t2LI5MsGmQCs+R8d2dNoFJxCmAHAN4FCt
+ SsT8uDv041lXjoHD2OJJ+gaAMN57aVBUClogmRDJQBv5ghcVe/dWiyLZSMMGyEmHQFzP
+ dI4mHn/SC2ibtBlAe3xefyDGD2W0nEsqdOrp1GJXFVLSaGotncvc52bOzMuGaBtdDJ2A
+ CEUA==
+X-Gm-Message-State: AOAM533PEgzh2p3C0vH1HjrECgS464cHVR11J4qPBIoCf4zymA6QbV8e
+ OuKRO4et8sXVx+9440ulX+g=
+X-Google-Smtp-Source: ABdhPJxptjaIPa/0K0dhKenWIkpv133f8nE/dsK6sXHBVix9F+WYOLl2ZN30SGASislc8Y/L/CDKww==
+X-Received: by 2002:aa7:8e0c:: with SMTP id c12mr19780775pfr.38.1594357525346; 
+ Thu, 09 Jul 2020 22:05:25 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id g30sm4659175pfq.189.2020.07.09.22.05.21
+ by smtp.gmail.com with ESMTPSA id g30sm4659175pfq.189.2020.07.09.22.05.24
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Thu, 09 Jul 2020 22:05:21 -0700 (PDT)
+ Thu, 09 Jul 2020 22:05:24 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmerdabbelt@google.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Subject: [PATCH v4 2/7] roms/opensbi: Upgrade from v0.7 to v0.8
-Date: Thu,  9 Jul 2020 22:04:54 -0700
-Message-Id: <1594357499-29068-3-git-send-email-bmeng.cn@gmail.com>
+Subject: [PATCH v4 5/7] hw/riscv: spike: Change the default bios to use
+ generic platform image
+Date: Thu,  9 Jul 2020 22:04:57 -0700
+Message-Id: <1594357499-29068-6-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1594357499-29068-1-git-send-email-bmeng.cn@gmail.com>
 References: <1594357499-29068-1-git-send-email-bmeng.cn@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=bmeng.cn@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,8 +87,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,99 +108,11 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-Upgrade OpenSBI from v0.7 to v0.8.
+To keep sync with other RISC-V machines, change the default bios to
+use generic platform fw_dynamic.elf image.
 
-The v0.8 release includes the following commits:
-
-1bb00ab lib: No need to provide default PMP region using platform callbacks
-a9eac67 include: sbi_platform: Combine reboot and shutdown into one callback
-6585fab lib: utils: Add SiFive test device
-4781545 platform: Add Nuclei UX600 platform
-3a326af scripts: adapt binary archive script for Nuclei UX600
-5bdf022 firmware: fw_base: Remove CSR_MTVEC update check
-e6c1345 lib: utils/serial: Skip baudrate config if input frequency is zero
-01a8c8e lib: utils: Improve fdt_parse_uart8250() API
-0a0093b lib: utils: Add fdt_parse_uart8250_node() function
-243b0d0 lib: utils: Remove redundant clint_ipi_sync() declaration
-e3ad7c1 lib: utils: Rename fdt_parse_clint() to fdt_parse_compat_addr()
-a39cd6f lib: utils: Add FDT match table based node lookup
-dd33b9e lib: utils: Make fdt_get_node_addr_size() public function
-66185b3 lib: utils: Add fdt_parse_sifive_uart_node() function
-19e966b lib: utils: Add fdt_parse_hart_id() function
-44dd7be lib: utils: Add fdt_parse_max_hart_id() API
-f0eb503 lib: utils: Add fdt_parse_plic_node() function
-1ac794c include: Add array_size() macro
-8ff2b94 lib: utils: Add simple FDT timer framework
-76f0f81 lib: utils: Add simple FDT ipi framework
-75322a6 lib: utils: Add simple FDT irqchip framework
-76a8940 lib: utils: Add simple FDT serial framework
-7cc6fa4 lib: utils: Add simple FDT reset framework
-4d06353 firmware: fw_base: Introduce optional fw_platform_init()
-f1aa9e5 platform: Add generic FDT based platform support
-1f21b99 lib: sbi: Print platform hart count at boot time
-2ba7087 scripts: Add generic platform to create-binary-archive.sh
-4f18c6e platform: generic: Add Sifive FU540 TLB flush range limit override
-13717a8 platform: Remove qemu/virt directory
-65c06b0 platform: Remove spike directory
-d626037 docs: Add missing links in platform.md
-7993ca2 include: sbi: Remove redundant page table related defines
-5338679 lib: sbi_tlb: Fix remote TLB HFENCE VVMA implementation
-dc38929 lib: sbi: Improve misa_string() implementation
-433bac7 docs: platform/generic: Add details about stdout-path DT property
-b4efa70 docs: platform/generic: Add details about IPI and timer expectations
-dfd9dd6 docs: Add platform requirements document
-c2286b6 docs: Fix ordering of pages in table of contents
-7be75f5 docs: Don't use italic text in page title
-63a513e lib: Rename unprivileged trap handler
-aef9a60 lib: Add csr detect support
-13ca20d lib: Create a separate math helper function file
-79d0fad lib: utils: Update reserved memory fdt node even if PMP is not present
-6a053f6 lib: Add support for hart specific features
-b2df751 platform: Move platform features to hart
-4938024 platform: fpga: Remove redundant platform specific features
-ec0d2a7 lib: timer: Provide a hart based timer feature
-1f235ec lib: Add platform features in boot time print
-22c4334 lib: Add hart features in boot time print
-36833ab lib: Optimize inline assembly for unprivilege access functions
-38a4b54 firmware: Correct spelling mistakes
-28b4052 lib: sbi: detect features before everything else in sbi_hart_init()
-4984183 lib: sbi: Improve get_feature_str() implementation and usage
-3aa1036 lib: sbi: Remove extra spaces from boot time prints
-3a8fc81 lib: sbi: Print platform HART count just before boot HART id
-63b0f5f include: sbi: Use scratch pointer as parmeter in HART feature APIs
-2966510 lib: sbi: Few cosmetic improvements to HART feature detection
-a38bea9 lib: sbi_hart: Detect number of supported PMP regions
-89ba634 include: sbi: Add firmware extension constants
-73d6ef3 lib: utils: Remove redundant parameters from PLIC init functions
-446a9c6 lib: utils: Allow PLIC functions to be used for multiple PLICs
-2c685c2 lib: utils: Extend fdt_find_match() Implementation
-d30bb68 lib: utils/irqchip: Initialize all matching irqchip DT nodes
-a9a9751 lib: utils: Allow CLINT functions to be used for multiple CLINTs
-569dd64 lib: utils: Add fdt_parse_clint_node() function
-6956e83 lib: utils/ipi: Initialize all matching ipi DT nodes
-a63f05f lib: utils/timer: Initialize all matching timer DT nodes
-30b6040 Makefile: Fix builtin DTB compilation for out-of-tree platforms
-64f1408 firmware: fw_base: Make builtin DTB available to fw_platform_init()
-4ce6b7a firmware: fw_base: Don't OR forced FW_OPTIONS
-86ec534 firmware: Allow fw_platform_init() to return updated FDT location
-c6c65ee Makefile: Preprocess builtin DTS
-4e3876d Makefile: Add mechanism for platforms to have multiple builtin DTBs
-72019ee platform: kendryte/k210: Use new mechanism of builtin DTB
-51f0e4a firmware: Remove FW_PAYLOAD_FDT and related documentation
-1b8c012 lib: Add RISC-V hypervisor v0.6.1 support
-79bfd67 docs: Use doxygen config to mark the main page
-106b888 docs: Remove redundant documentation about combined payload use case
-9802906 platform: Add AE350 platform specific SBI handler
-32f87e5 platform: Add AE350 cache control SBIs
-e2c3f01 lib: Fix __sbi_hfence_gvma_vmid_gpa() and __sbi_hfence_vvma_asid_va()
-6966ad0 platform/lib: Allow the OS to map the regions that are protected by PMP
-518e85c platform: Update Nuclei ux600 platform support
-d5725c2 lib: Don't print delegation CSRs if there is no S-Mode
-637b348 lib: Fix the SBI_HART_HAS_MCOUNTEREN feature check
-db56ef3 platform: Add support for Shakti C-class SoC from IIT-M
-9bd5f8f lib: sbi: Fix 32/64 bits variable compatibility
-2314101 lib: Don't return any invalid error from SBI ecall
-a98258d include: Bump-up version to 0.8
+While we are here, add some comments to mention that using ELF files
+for the Spike machine was intentional.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
 Reviewed-by: Anup Patel <anup@brainfault.org>
@@ -208,21 +120,48 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 ---
 
-(no changes since v2)
+(no changes since v3)
 
-Changes in v2:
-- Upgrade OpenSBI to v0.8 release
+Changes in v3:
+- Change to fw_dynamic.elf for Spike
 
- roms/opensbi | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/spike.c                               |   9 +++++++--
+ pc-bios/opensbi-riscv32-generic-fw_dynamic.elf | Bin 0 -> 558668 bytes
+ pc-bios/opensbi-riscv64-generic-fw_dynamic.elf | Bin 0 -> 620424 bytes
+ 3 files changed, 7 insertions(+), 2 deletions(-)
+ create mode 100644 pc-bios/opensbi-riscv32-generic-fw_dynamic.elf
+ create mode 100644 pc-bios/opensbi-riscv64-generic-fw_dynamic.elf
 
-diff --git a/roms/opensbi b/roms/opensbi
-index 9f1b72c..a98258d 160000
---- a/roms/opensbi
-+++ b/roms/opensbi
-@@ -1 +1 @@
--Subproject commit 9f1b72ce66d659e91013b358939e832fb27223f5
-+Subproject commit a98258d0b537a295f517bbc8d813007336731fa9
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index b295a43..a187aa3 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -42,10 +42,15 @@
+ #include "sysemu/qtest.h"
+ #include "sysemu/sysemu.h"
+ 
++/*
++ * Not like other RISC-V machines that use plain binary bios images,
++ * keeping ELF files here was intentional because BIN files don't work
++ * for the Spike machine as HTIF emulation depends on ELF parsing.
++ */
+ #if defined(TARGET_RISCV32)
+-# define BIOS_FILENAME "opensbi-riscv32-spike-fw_jump.elf"
++# define BIOS_FILENAME "opensbi-riscv32-generic-fw_dynamic.elf"
+ #else
+-# define BIOS_FILENAME "opensbi-riscv64-spike-fw_jump.elf"
++# define BIOS_FILENAME "opensbi-riscv64-generic-fw_dynamic.elf"
+ #endif
+ 
+ static const struct MemmapEntry {
+diff --git a/pc-bios/opensbi-riscv32-generic-fw_dynamic.elf b/pc-bios/opensbi-riscv32-generic-fw_dynamic.elf
+new file mode 100644
+index 0000000..eb9ebf5
+Binary files /dev/null and b/pc-bios/opensbi-riscv32-generic-fw_dynamic.elf differ
+diff --git a/pc-bios/opensbi-riscv64-generic-fw_dynamic.elf b/pc-bios/opensbi-riscv64-generic-fw_dynamic.elf
+new file mode 100644
+index 0000000..642a64e
+Binary files /dev/null and b/pc-bios/opensbi-riscv64-generic-fw_dynamic.elf differ
 -- 
 2.7.4
 
