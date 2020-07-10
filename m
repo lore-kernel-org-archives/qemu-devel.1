@@ -2,93 +2,100 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC720C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:32:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D60C4C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:33:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B6A920578
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:32:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1B3D20578
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:33:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="A12frDBz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B6A920578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eNlE9d1g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1B3D20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtt8v-0002ek-TM
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:32:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38812)
+	id 1jtt9E-00037o-OC
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:33:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqfb-00069B-MH
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:54:19 -0400
-Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:39529)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqfa-0006zV-0D
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:54:19 -0400
-Received: by mail-pj1-x102a.google.com with SMTP id b92so2448435pjc.4
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:54:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=0y2Zz7uq/+7dxNuHpbzv8HKYgLmeDEKfa3P6rGLA6+c=;
- b=A12frDBzzibMkK7Jj0OGmHNWp4Np+dnQPMTo3TLowKlU188u0DfoGAExV7kmk1YxA7
- 4SPZHUtkodeamqpqhBI9kZJ0uD5DYhVZCRaB859eWfRCx9doY8YhZWDJ896hsCO+8W0N
- hgTXkD6t+Z1jzU3/bBYdME7SsfYaVpSODLEmLMUpIgsZnxhxdRTi1QuceVby7XimRwrl
- di1oxGP9gRYgrXnT7/8C4OklGKW/CfF+5+jFpc0RB3tOaMIYBGwxeS5t5x90TGFQN2Xp
- r+iZtKTusM5ct+kcg9lmoG7wxpsnpPnfHNQUM9Kpcryi+gBxoTIUQew+JlM81aGzkE2B
- aWmA==
+ (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
+ id 1jtsxI-0004wF-G0
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:20:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35661
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
+ id 1jtsxG-0002qo-KM
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:20:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594387241;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mqszcgvdPDw8SpORCSiqDEUSYgctVFGgYc2o/0RFKDY=;
+ b=eNlE9d1gXUYEFDK7WLGlhjQ5020il0zUnfqKDfuodhDNtStCKo4uEEOLQrc/YsDgYg2cBE
+ FI0ncuf2WuCI3y4WjL6hi08V6jknKGPe9gsNLNcLJQ7xVD/tb0HIjsenYFyBZgb5xMtJXq
+ 8/7d0EUrY44eO2Q0nvny274Y1Kj3X6U=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-PqE6Cc73O5eS-O0wSQrkvQ-1; Fri, 10 Jul 2020 09:20:40 -0400
+X-MC-Unique: PqE6Cc73O5eS-O0wSQrkvQ-1
+Received: by mail-ej1-f69.google.com with SMTP id do21so6475040ejc.2
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 06:20:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=0y2Zz7uq/+7dxNuHpbzv8HKYgLmeDEKfa3P6rGLA6+c=;
- b=WwjxFyUfBzZXU5mvA+uHrfS1I17B0qks7r2xjbBk0LQUNE4rqOM7xI+HFWHocWG1ci
- U2alDhAJEo5kcyrZzhiu8vE8bwJ/uPgX61sidCQLcUURW56Ub5f0uAIXVvoSEk5XyIku
- yrd9KB4ig0nFllSqIMmviACDWGu2JGQ2sljSTdnWTA6jUF5xxhOcxmQWppGDwlgcEa3Q
- EERfSWfHgjBR2R9mQh4STiABN9YstWpSdL8WcCKb956GiNQvpCJiPIMhcWEkgl+tw6et
- GWInGuzav9wZQwK4YLlO9GIVNKvimagIW4+pnRV0rreOZC8KNwUFgbDdCvPBTIHb3S/4
- Fmjg==
-X-Gm-Message-State: AOAM532C0/zCDYNkquqVbXsCcJ/8cWqpTbS+gTNupuGhZXcYE7fmbCDk
- 2jRdX5sC0TqhilDRY2WhjNdY9w2Z/jzm2Q==
-X-Google-Smtp-Source: ABdhPJwAKetzumjOLTBCPmX2UUm14xgr+EUvT/1d31qBPt9quCyOgHG7UTctjSFehEJ+wF8mpXSdFA==
-X-Received: by 2002:a17:90a:348d:: with SMTP id
- p13mr5011708pjb.108.1594378456632; 
- Fri, 10 Jul 2020 03:54:16 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.54.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jul 2020 03:54:16 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC 55/65] target/riscv: rvv-0.9: remove vmford.vv and vmford.vf
-Date: Fri, 10 Jul 2020 18:49:09 +0800
-Message-Id: <20200710104920.13550-56-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
-References: <20200710104920.13550-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102a;
- envelope-from=frank.chang@sifive.com; helo=mail-pj1-x102a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mqszcgvdPDw8SpORCSiqDEUSYgctVFGgYc2o/0RFKDY=;
+ b=clg04SUZ2evgwPbTQ3MTIDFEhKZW8Masyv6jmYK07s4M3JjWwizNjSeYy08X9tmGrf
+ bQ8Hio3NgaGoQLoPshJZKBRbtffkWh4Aneb9pgFN45K1wjoTEMPkN+HxzlFMVkCFxmF1
+ H58kAOgT3lwmaV8VuPncD5wTbfdkev+DmC8i8RdRvJ8SP+rfZ0vw7JcSgeWvLQL7dUsw
+ 0PGWl2LZmh5p/aUozKDudw76aURAlHHapI/bLTnFMUxyRUr6vUFY0TodO6wn954r7xaF
+ qhfJhYQkjOZsBM9zV7Ulexf2ZbJ3hojJ/IU3BqwOBijBgHIdWi1MAQD3TDtnQOA+sCcD
+ FMhg==
+X-Gm-Message-State: AOAM532AcxzUWnEvfIqaSKb8W4dsu9eiMlM88K34s5Mq28b5YeUZbSSR
+ W7/9ZB9WpHztWe9socuD0aD7Vi3Z5NV8wMGQpsK+ih5kw21XkA0qXOpRojzCQSRkCQ23pNTEU8w
+ 9GVksZ3yvnGBnZ0HQn0ixAwlankmCf+0=
+X-Received: by 2002:a05:6402:3048:: with SMTP id
+ bu8mr79773116edb.367.1594387239171; 
+ Fri, 10 Jul 2020 06:20:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyNzwyO5TJsS623hQd2fQfBWh5e36L3OtMEClpuVshBhJUtYEaXpfIuTVuht6gcpihNkSxHWU8L+MONMvBPuxs=
+X-Received: by 2002:a05:6402:3048:: with SMTP id
+ bu8mr79773092edb.367.1594387238825; 
+ Fri, 10 Jul 2020 06:20:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200710085417.638904-1-mcascell@redhat.com>
+ <CAFEAcA-pRXOz5JVcwHa8=oaeogwaOK0YVXYQiJUpdM_rFZ+QTA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-pRXOz5JVcwHa8=oaeogwaOK0YVXYQiJUpdM_rFZ+QTA@mail.gmail.com>
+From: Mauro Matteo Cascella <mcascell@redhat.com>
+Date: Fri, 10 Jul 2020 15:20:28 +0200
+Message-ID: <CAA8xKjWpU_e5wPoT0jQWx9kFG-A_iO8MioMAqS-raDSPG3nX1A@mail.gmail.com>
+Subject: Re: [PATCH] hw/net/ftgmac100: Fix integer overflow in
+ ftgmac100_do_tx()
+To: Peter Maydell <peter.maydell@linaro.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mcascell@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:36:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:18 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,101 +107,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Frank Chang <frank.chang@sifive.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+On Fri, Jul 10, 2020 at 1:33 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 10 Jul 2020 at 09:56, Mauro Matteo Cascella <mcascell@redhat.com> wrote:
+> >
+> > An integer overflow issue was reported by Mr. Ziming Zhang, CC'd here. It
+> > occurs while inserting the VLAN tag in packets whose length is less than
+> > 12 bytes, as (len-12) is passed to memmove() without proper checking.
+> > This patch is intended to fix this issue by checking the minimum
+> > Ethernet frame size during packet transmission.
+> >
+> > Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+> > Signed-off-by: Mauro Matteo Cascella <mcascell@redhat.com>
+> > ---
+> >  hw/net/ftgmac100.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> >
+> > diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+> > index 043ba61b86..bcf4d84aea 100644
+> > --- a/hw/net/ftgmac100.c
+> > +++ b/hw/net/ftgmac100.c
+> > @@ -238,6 +238,11 @@ typedef struct {
+> >   */
+> >  #define FTGMAC100_MAX_FRAME_SIZE    9220
+> >
+> > +/*
+> > + * Min frame size
+> > + */
+> > +#define FTGMAC100_MIN_FRAME_SIZE    64
+> > +
+> >  /* Limits depending on the type of the frame
+> >   *
+> >   *   9216 for Jumbo frames (+ 4 for VLAN)
+> > @@ -507,6 +512,15 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
+> >          }
+> >
+> >          len = FTGMAC100_TXDES0_TXBUF_SIZE(bd.des0);
+> > +
+> > +        /* drop small packets */
+> > +        if (bd.des0 & FTGMAC100_TXDES0_FTS &&
+> > +            len < FTGMAC100_MIN_FRAME_SIZE) {
+> > +            qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too small: %d bytes\n",
+> > +                          __func__, len);
+> > +            break;
+> > +        }
+> > +
+>
+> Andrew, Cedric: do you have the datasheet for this devic? Do you
+> know if we should also be flagging the error back to the
+> guest somehow?
+>
+> I think a 'break' here means we'll never update the
+> descriptor flags to hand it back to the guest, which
+> is probably not what the hardware does.
+>
+> thanks
+> -- PMM
+>
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
----
- target/riscv/helper.h                   |  6 ------
- target/riscv/insn32.decode              |  2 --
- target/riscv/insn_trans/trans_rvv.inc.c |  2 --
- target/riscv/vector_helper.c            | 13 -------------
- 4 files changed, 23 deletions(-)
+I thought of setting FTGMAC100_INT_XPKT_LOST, but not sure if this is
+the most appropriate flag here.
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index b56342f333..e9655453bc 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -945,12 +945,6 @@ DEF_HELPER_6(vmfgt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vmfge_vf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vmfge_vf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vmfge_vf_d, void, ptr, ptr, i64, ptr, env, i32)
--DEF_HELPER_6(vmford_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vmford_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vmford_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vmford_vf_h, void, ptr, ptr, i64, ptr, env, i32)
--DEF_HELPER_6(vmford_vf_w, void, ptr, ptr, i64, ptr, env, i32)
--DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- 
- DEF_HELPER_5(vfclass_v_h, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfclass_v_w, void, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 2be673c2c7..47337abe52 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -535,8 +535,6 @@ vmfle_vv        011001 . ..... ..... 001 ..... 1010111 @r_vm
- vmfle_vf        011001 . ..... ..... 101 ..... 1010111 @r_vm
- vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
- vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
--vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
--vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
- vfclass_v       010011 . ..... 10000 001 ..... 1010111 @r2_vm
- vfmerge_vfm     010111 0 ..... ..... 101 ..... 1010111 @r_vm_0
- vfmv_v_f        010111 1 00000 ..... 101 ..... 1010111 @r2
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 6481fa7465..2490fc5732 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2564,7 +2564,6 @@ GEN_OPFVV_TRANS(vmfeq_vv, opfvv_cmp_check)
- GEN_OPFVV_TRANS(vmfne_vv, opfvv_cmp_check)
- GEN_OPFVV_TRANS(vmflt_vv, opfvv_cmp_check)
- GEN_OPFVV_TRANS(vmfle_vv, opfvv_cmp_check)
--GEN_OPFVV_TRANS(vmford_vv, opfvv_cmp_check)
- 
- static bool opfvf_cmp_check(DisasContext *s, arg_rmrr *a)
- {
-@@ -2581,7 +2580,6 @@ GEN_OPFVF_TRANS(vmflt_vf, opfvf_cmp_check)
- GEN_OPFVF_TRANS(vmfle_vf, opfvf_cmp_check)
- GEN_OPFVF_TRANS(vmfgt_vf, opfvf_cmp_check)
- GEN_OPFVF_TRANS(vmfge_vf, opfvf_cmp_check)
--GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
- 
- /* Vector Floating-Point Classify Instruction */
- GEN_OPFV_TRANS(vfclass_v, opfv_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 41faa3592e..42a48be5fd 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4107,19 +4107,6 @@ GEN_VEXT_CMP_VF(vmfge_vf_h, uint16_t, H2, vmfge16)
- GEN_VEXT_CMP_VF(vmfge_vf_w, uint32_t, H4, vmfge32)
- GEN_VEXT_CMP_VF(vmfge_vf_d, uint64_t, H8, vmfge64)
- 
--static bool float16_unordered_quiet(uint16_t a, uint16_t b, float_status *s)
--{
--    FloatRelation compare = float16_compare_quiet(a, b, s);
--    return compare == float_relation_unordered;
--}
--
--GEN_VEXT_CMP_VV_ENV(vmford_vv_h, uint16_t, H2, !float16_unordered_quiet)
--GEN_VEXT_CMP_VV_ENV(vmford_vv_w, uint32_t, H4, !float32_unordered_quiet)
--GEN_VEXT_CMP_VV_ENV(vmford_vv_d, uint64_t, H8, !float64_unordered_quiet)
--GEN_VEXT_CMP_VF(vmford_vf_h, uint16_t, H2, !float16_unordered_quiet)
--GEN_VEXT_CMP_VF(vmford_vf_w, uint32_t, H4, !float32_unordered_quiet)
--GEN_VEXT_CMP_VF(vmford_vf_d, uint64_t, H8, !float64_unordered_quiet)
--
- /* Vector Floating-Point Classify Instruction */
- #define OPIVV1(NAME, TD, T2, TX2, HD, HS2, OP)         \
- static void do_##NAME(void *vd, void *vs2, int i)      \
--- 
-2.17.1
+Regards,
+Mauro
 
 
