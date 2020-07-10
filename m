@@ -2,91 +2,87 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F209C433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 23:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127C2C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 23:50:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F37AF20657
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 23:38:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF9922077D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 23:50:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TwKiIPkL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F37AF20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZi8NSDC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF9922077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ju2b2-0008PV-88
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 19:38:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50066)
+	id 1ju2mN-0003VW-Ta
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 19:50:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1ju2aU-0007yb-Iu
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 19:37:50 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:50522)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1ju2aS-0001jo-RG
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 19:37:50 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id k71so3253827pje.0
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 16:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WQIquz29/3Mrs8KUr9l4jEYupeyadrQoaBZ2fCjluGU=;
- b=TwKiIPkLB049OzbPEaP6CU3m5yO1dUvja6BAohH5PHb0Mnnabb4MEJeujTQ5k6pas4
- FZbWfeikMy28Rt9GnLNvS3Tn5YihyqV0szBNLNtooOpOHU1bGh7daOgHKPgmRJwa70xR
- 5zBWwyuR9l4YeOGDuFpEWhtNzR4+1qq5cCYfaYPrOnSNHfGMIt5XUB86TU4/z1S7FIHl
- LJGzSi7g/OFPT1k6Yl/NLoAX7cfcfaGHJuBgjFtfMnJuIMevNOuIetXDS/vMyMBkedNi
- 59JdtjsQSrDdGB+RrGbZ4upxSUNs8oGR9wymOYWNNqeSCQJAEBrN0mOmNJko8F1eiUOx
- rXow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WQIquz29/3Mrs8KUr9l4jEYupeyadrQoaBZ2fCjluGU=;
- b=Ie+6O1YEgrQhWzzv54Nyr2I7l41Uxisl8R5tZ1+8IeNDMuB1o9nXtYeQfTPpucQhja
- d7Q9JnqQD+g3USSyj97iM8avTfUq+k7nuBfIJMFcDkQT780ar9973KM6BnqwWlZU5Hkp
- BNO4aXInw0dWCFKH3l+Xulzsm5PLBXwVlA0b1cPJGp9BZG2n41v5IHtixexp50LqATNC
- XALEVfmF64DvV5gPHNPkVPjaCzhoCG3pHCrem3SELE0bkUk/RNaoewQGyABZ0CTIjnvd
- u7JhfzGzNDxKtrJqCQCH1sx0+0EHpN03KzNpckmKCOW6qqaA+V0B4v+CHjDYm7YV20Ls
- QW3Q==
-X-Gm-Message-State: AOAM531hRQgTODUB12G/29jED3pZBULfBuqFB7L78OTOyKprgLMI5VUp
- eGRxZppav3VuSwS7NHc+qm3/IVWNn9A=
-X-Google-Smtp-Source: ABdhPJwpj6n6o6QzCNzXB+A/qwqQEadvT2OrOwXPXOhg5uSDsY/eHXtEDQxyLpscTwW8cCNe9wkxHQ==
-X-Received: by 2002:a17:90a:c305:: with SMTP id
- g5mr7491809pjt.62.1594424266748; 
- Fri, 10 Jul 2020 16:37:46 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id e16sm7097326pff.180.2020.07.10.16.37.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jul 2020 16:37:45 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1ju2lZ-000264-6T
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 19:49:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39122
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1ju2lW-0002uf-QA
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 19:49:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594424953;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=l8utxLwaNAiiMOI2KtG/DyUw3rlELxriZ7d3RyB2kN8=;
+ b=OZi8NSDCZy/zd/45SmE5ScqI1kYykP6Z1eNk4Ru+flMnM0otRPT3XuVkyfB97hmGSU/5jI
+ jTKBnbFzUiZhwm3DvaUybxuQidD40FiO4w5YysAf8ToBHeElGJ/H6XE8KKpBZbFIEDnyut
+ znNqI2Xl/0wDF5LRQ7bnyxjoKFH9hxI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-XB3Emkh4Mc2nAp1ba4GGRQ-1; Fri, 10 Jul 2020 19:49:12 -0400
+X-MC-Unique: XB3Emkh4Mc2nAp1ba4GGRQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3341719057A0
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 23:49:11 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 027355C298
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 23:49:10 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.1] tcg: Save/restore vecop_list around minmax fallback
-Date: Fri, 10 Jul 2020 16:37:43 -0700
-Message-Id: <20200710233743.177884-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
+Subject: [PULL v3 47/47] linux-headers: update again to 5.8
+Date: Fri, 10 Jul 2020 19:49:09 -0400
+Message-Id: <20200710234909.21682-3-pbonzini@redhat.com>
+In-Reply-To: <20200710234909.21682-1-pbonzini@redhat.com>
+References: <20200710234909.21682-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 19:49:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,46 +95,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Forgetting this asserts when tcg_gen_cmp_vec is called from
-within tcg_gen_cmpsel_vec.
+5.8-rc1 inadvertently broke userspace ABI compatibility.  Merge
+again with latest kvm/master to undo that.
 
-Fixes: 72b4c792c7a
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
+ linux-headers/asm-arm/unistd-common.h | 1 +
+ linux-headers/asm-x86/kvm.h           | 5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-I found this while testing SVE2 (and the patch is included in the
-large SVE2 patch set), but it seems like it should be reproducible
-with master.  What's needed is a guest vector minmax operation of
-a size that is not supported by the host.  In the case of x86_64
-host, that would be a 64-bit minmax.
-
-
-r~
-
----
- tcg/tcg-op-vec.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index f784517d84..ed6fb55fe1 100644
---- a/tcg/tcg-op-vec.c
-+++ b/tcg/tcg-op-vec.c
-@@ -657,7 +657,9 @@ static void do_minmax(unsigned vece, TCGv_vec r, TCGv_vec a,
-                       TCGv_vec b, TCGOpcode opc, TCGCond cond)
- {
-     if (!do_op3(vece, r, a, b, opc)) {
-+        const TCGOpcode *hold_list = tcg_swap_vecop_list(NULL);
-         tcg_gen_cmpsel_vec(cond, vece, r, a, b, a, b);
-+        tcg_swap_vecop_list(hold_list);
-     }
- }
+diff --git a/linux-headers/asm-arm/unistd-common.h b/linux-headers/asm-arm/unistd-common.h
+index 23de64e44c..57cd1f21db 100644
+--- a/linux-headers/asm-arm/unistd-common.h
++++ b/linux-headers/asm-arm/unistd-common.h
+@@ -392,5 +392,6 @@
+ #define __NR_clone3 (__NR_SYSCALL_BASE + 435)
+ #define __NR_openat2 (__NR_SYSCALL_BASE + 437)
+ #define __NR_pidfd_getfd (__NR_SYSCALL_BASE + 438)
++#define __NR_faccessat2 (__NR_SYSCALL_BASE + 439)
  
+ #endif /* _ASM_ARM_UNISTD_COMMON_H */
+diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+index 17c5a038f4..0780f97c18 100644
+--- a/linux-headers/asm-x86/kvm.h
++++ b/linux-headers/asm-x86/kvm.h
+@@ -408,14 +408,15 @@ struct kvm_vmx_nested_state_data {
+ };
+ 
+ struct kvm_vmx_nested_state_hdr {
+-	__u32 flags;
+ 	__u64 vmxon_pa;
+ 	__u64 vmcs12_pa;
+-	__u64 preemption_timer_deadline;
+ 
+ 	struct {
+ 		__u16 flags;
+ 	} smm;
++
++	__u32 flags;
++	__u64 preemption_timer_deadline;
+ };
+ 
+ struct kvm_svm_nested_state_data {
 -- 
-2.25.1
+2.26.2
 
 
