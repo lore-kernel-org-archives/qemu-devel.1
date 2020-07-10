@@ -2,96 +2,67 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 657FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E323C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:21:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29CA32076A
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:20:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ryuE6Qx1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29CA32076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E1AFF2076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:21:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1AFF2076A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtyZX-0003kk-Dq
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 15:20:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55504)
+	id 1jtyaW-0004zv-5Q
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 15:21:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtyYY-0003Jf-EG
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 15:19:34 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55204)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtyYW-0003wL-My
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 15:19:34 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id mn17so3019555pjb.4
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 12:19:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=c2H+Fzts6jlxRmP7ALD3tcuRMWGFAO43A0XGsGTY3DA=;
- b=ryuE6Qx1IQgjaCbtMQthSHtBmFlOuLEXubEHZBomSmX1ktDVHI8YfGn1wnbF8ki0/F
- tgLyADUr0HPtrh5wHeQrRku4LEVJ3IhlqcVuH15JZ+ls6RuPEmd7N7dbT6gTMBdnHUlz
- k+ItWvKe3eBaJzhd3SJxT2cVUThFWkcIxDtiVSeGQkGyqGLFq9J09DI8jfjn93G2r42d
- Oz8/QpA/hzlimNyw9HzVA+Xm/OGFWM743OkTWkwZ9ay38GxTGRlFS84iFdqgFyDb2JUc
- DAiwzYw25sLjhYNiEkRerVOZMpyUCU5+VSlWOg6yG7yMo9WQPAddpQ+wCYjBnqEt7QBp
- FXCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=c2H+Fzts6jlxRmP7ALD3tcuRMWGFAO43A0XGsGTY3DA=;
- b=dv1YXcLhgbWomqitc5t04uuB6sGY3Yr5mPL2ReIZ/pvJuC23UdM60g5LUh+gmM4VNV
- xff7/b/Lw9gxQAt2BNzEimdOSn+HPCl6fuosHli7WFQD+eDHaZ3auFmQsLZDOgrbuXfY
- 9Z8MerMMUhuSY7Clolae0039ugo8r6Sfcipfz0JhJ6rEie8f7XPMPvX2zrWkNXdHlxui
- S4oqArysJ/HIemc/0UU9Y2bi2ppf82bslvWAPhn+Lxja8Mcqd36VyxaehjU7rTKNzk7X
- KvAW/CtgUTVtKMbtUO7YxxaXABrKnOJVYSV5fJ2JFlm1d2rPO+cOOcqXWxFsmD6Ck5Fm
- BdTA==
-X-Gm-Message-State: AOAM530XWUN4GnrDytt0vlLLzb6Wrcdf7EFVf6ZPq6N6v4yc6FZS6aun
- sAKOurYQvbI5lGjDpSc5ySJ8M79CDZo=
-X-Google-Smtp-Source: ABdhPJys+PudYMWUftyJKTFgX+8Qy8jEeKU8LST78MhIwrO/ozcCM3V1tR4E6JofrFKJza3rULnWgQ==
-X-Received: by 2002:a17:902:bb8a:: with SMTP id
- m10mr4325021pls.137.1594408770283; 
- Fri, 10 Jul 2020 12:19:30 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id c3sm6743673pfo.203.2020.07.10.12.19.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 12:19:29 -0700 (PDT)
-Subject: Re: [RFC PATCH] configure: remove all dependencies on a (re)configure
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200708175335.31292-1-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f6b6f12d-4917-7256-0583-63f77951bb4f@linaro.org>
-Date: Fri, 10 Jul 2020 12:19:27 -0700
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtyZL-0003nd-QR
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 15:20:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36162)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtyZD-0003yl-N9
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 15:20:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id DA4CEAD04;
+ Fri, 10 Jul 2020 19:20:11 +0000 (UTC)
+Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200629093504.3228-1-cfontana@suse.de>
+ <20200629093504.3228-4-cfontana@suse.de>
+ <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
+ <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
+ <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
+ <e9dca3d1-f52d-13ce-2d7d-66958bc15765@suse.de>
+ <d0bc3f23-98c0-eadb-55ed-3377f43c494a@suse.de>
+ <20200710083356.4c6e9f78.cohuck@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <eb8e29c7-4cb5-8273-1c94-e62ea9e06485@suse.de>
+Date: Fri, 10 Jul 2020 21:20:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200708175335.31292-1-alex.bennee@linaro.org>
+In-Reply-To: <20200710083356.4c6e9f78.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:07:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,39 +76,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ "Jason J. Herne" <jjherne@linux.ibm.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, haxm-team@intel.com,
+ Colin Xu <colin.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/8/20 10:53 AM, Alex Bennée wrote:
-> The previous code was brittle and missed cases such as the mipn32
-> variants which for some reason has the 64 bit syscalls. This leads to
-> a number of binary targets having deps lines like:
+On 7/10/20 8:33 AM, Cornelia Huck wrote:
+> On Thu, 9 Jul 2020 20:46:56 +0200
+> Claudio Fontana <cfontana@suse.de> wrote:
 > 
->   all.clang-sanitizer/mipsn32el-linux-user/linux-user/signal.d
->   140:  /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h \
->   455:/home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:
+>> On 7/9/20 8:38 PM, Claudio Fontana wrote:
+>>> On 7/8/20 5:05 PM, Paolo Bonzini wrote:  
+>>>> On 08/07/20 17:00, Claudio Fontana wrote:  
+>>>>>> Bisectable, 100% failure rate, etc. :(  Can you split the patch in
+>>>>>> multiple parts, specifically separating any rename or introducing of
+>>>>>> includes from the final file move?  
+>>>>> Hi Paolo,
+>>>>>
+>>>>> will take a look!
+>>>>>
+>>>>> Is this captured by some travis / cirrus-ci / anything I can easily see the result of?
+>>>>>
+>>>>>  
+>>>>
+>>>> Nope, unfortunately we don't have an s390 CI.  But if you can get your
+>>>> hands on one, just "./configure --target-list=s390x-softmmu && make &&
+>>>> make check-block" will show it.  
+>>>
+>>> So this is tricky, but I am making some progress after getting my hands on one.
+>>> Maybe if someone understands s390 keys better, I could be clued in.  
+>>
+>>
+>> Also adding Cornelia to Cc:.
+>>
+>> Maybe the savevm_s390_storage_keys SaveVMHandlers etc assume that the icount state part of the vmstate is there?
 > 
->   all.clang-sanitizer/mipsn32el-linux-user/linux-user/syscall.d
->   146:  /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h \
->   485:/home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:
-> 
-> which in turn would trigger the re-generation of syscall_nr.h in the
-> source tree (thanks to generic %/syscall_nr.h rules). The previous
-> code attempts to clean it out but misses edge cases but fails.
-> 
-> After spending a day trying to understand how this was happening I'm
-> unconvinced that there are not other such breakages possible with this
-> "caching". As we add more auto-generated code to the build it is likely
-> to trip up again. Apply a hammer to the problem.
-> 
-> Fixes: 91e5998f18 (which fixes 5f29856b852d and 4d6a835dea47)
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  configure | 15 ++++++---------
->  1 file changed, 6 insertions(+), 9 deletions(-)
+> I don't see anything that would deal with icount here. Adding Jason to
+> cc: in case he has an idea. (I assume it would behave the same under
+> KVM, as the only thing different are the internal callbacks.)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+yes, same between tcg and kvm.
 
-r~
+> 
+>>
+>>
+>>>
+>>> In short this goes away if I again set icount to enabled for qtest,
+>>> basically ensuring that --enable-tcg is there and then reenabling icount.
+>>>
+>>> qtest was forcing icount and shift=0 by creating qemu options, in order to misuse its counter feature,
+>>> instead of using a separate counter.
+>>>
+>>> Removing that ugliness we end up with different behavior of save/load, because vmstate will now suddenly not contain icount-related values anymore.
+>>> What I do not understand is why this causes a problem because save should just not store the icount state and load should just not load the icount state,
+>>> and why we die on the load of s390 keys state (it works just fine for other architectures).
+> 
+> Yes, I don't really see why skeys is so special. No endianness stuff, I
+> assume?
+
+
+No, does not seem to be the issue.
+
+I discovered a way simpler way to "fix" it: 
+
+static bool icount_state_needed(void *opaque)
+{
+    return 1;
+}
+
+Ie, making sure that the state is always saved/restored, even when unused.
+
+Really weird.
+
+I logged/debugged the vmstate code, and I can see that things seem symmetric between save and load when it comes to timers.
+
+something puts 0s into the key somehow...
+
+
+
+
+
+
+
+> 
+>>>
+>>> Here is a diff that makes the problem disappear, but needs --enable-tcg:
+>>>
+>>>
+>>> ----------------------------------------------------------------------------------------------------
+>>> diff --git a/accel/qtest.c b/accel/qtest.c
+>>> index 119d0f16a4..4cb16abc2c 100644
+>>> --- a/accel/qtest.c
+>>> +++ b/accel/qtest.c
+>>> @@ -23,6 +23,12 @@
+>>>  
+>>>  static int qtest_init_accel(MachineState *ms)
+>>>  {
+>>> +    QemuOpts *opts = qemu_opts_create(qemu_find_opts("icount"), NULL, 0,
+>>> +                                      &error_abort);
+>>> +    qemu_opt_set(opts, "shift", "0", &error_abort);
+>>> +    icount_configure(opts, &error_abort);
+>>> +    qemu_opts_del(opts);
+>>> +
+>>>      return 0;
+>>>  }
+>>>  
+>>> diff --git a/softmmu/vl.c b/softmmu/vl.c
+>>> index f39fd5270b..a5e788c86a 100644
+>>> --- a/softmmu/vl.c
+>>> +++ b/softmmu/vl.c
+>>> @@ -2786,10 +2786,12 @@ static void configure_accelerators(const char *progname)
+>>>          error_report("falling back to %s", ac->name);
+>>>      }
+>>>  
+>>> +    /*
+>>>      if (icount_enabled() && !tcg_enabled()) {
+>>>          error_report("-icount is not allowed with hardware virtualization");
+>>>          exit(1);
+>>>     }
+>>> +    */
+>>>  }
+>>>  
+>>>  static void create_default_memdev(MachineState *ms, const char *path)
+>>> ----------------------------------------------------------------------------------------------------
+>>>
+>>> Without this patch, here is the full failure, maybe someone has a good hint, otherwise I'll keep digging from here inside the s390-specific code.
+>>>
+>>> QA output created by 267
+>>>
+>>> === No block devices at all ===
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing:
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> Error: No block device can accept snapshots
+>>> (qemu) info snapshots
+>>> No available block device supports snapshots
+>>> (qemu) loadvm snap0
+>>> Error: No block device supports snapshots
+>>> (qemu) quit
+>>>
+>>>
+>>> === -drive if=none ===
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -drive driver=file,file=TEST_DIR/t.IMGFMT,if=none
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> Error: Device 'none0' is writable but does not support snapshots
+>>> (qemu) info snapshots
+>>> No available block device supports snapshots
+>>> (qemu) loadvm snap0
+>>> Error: Device 'none0' is writable but does not support snapshots
+>>> (qemu) quit
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=none
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> (qemu) info snapshots
+>>> List of snapshots present on all disks:
+>>> ID        TAG                     VM SIZE                DATE       VM CLOCK
+>>> --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>>> (qemu) loadvm snap0
+>>> (qemu) quit
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=none -device virtio-blk,drive=none0
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> (qemu) info snapshots
+>>> List of snapshots present on all disks:
+>>> ID        TAG                     VM SIZE                DATE       VM CLOCK
+>>> --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>>> (qemu) loadvm snap0
+>>> (qemu) quit
+>>>
+>>>
+>>> === -drive if=virtio ===
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -drive driver=file,file=TEST_DIR/t.IMGFMT,if=virtio
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> Error: Device 'virtio0' is writable but does not support snapshots
+>>> (qemu) info snapshots
+>>> No available block device supports snapshots
+>>> (qemu) loadvm snap0
+>>> Error: Device 'virtio0' is writable but does not support snapshots
+>>> (qemu) quit
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=virtio
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> (qemu) info snapshots
+>>> List of snapshots present on all disks:
+>>> ID        TAG                     VM SIZE                DATE       VM CLOCK
+>>> --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>>> (qemu) loadvm snap0
+>>> (qemu) quit
+>>>
+>>>
+>>> === Simple -blockdev ===
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> Error: Device '' is writable but does not support snapshots
+>>> (qemu) info snapshots
+>>> No available block device supports snapshots
+>>> (qemu) loadvm snap0
+>>> Error: Device '' is writable but does not support snapshots
+>>> (qemu) quit
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,node-name=fmt
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> (qemu) info snapshots
+>>> List of snapshots present on all disks:
+>>> ID        TAG                     VM SIZE                DATE       VM CLOCK
+>>> --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>>> (qemu) loadvm snap0
+>>> (qemu) quit
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=raw,file=file,node-name=raw -blockdev driver=IMGFMT,file=raw,node-name=fmt
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> (qemu) info snapshots
+>>> List of snapshots present on all disks:
+>>> ID        TAG                     VM SIZE                DATE       VM CLOCK
+>>> --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>>> (qemu) loadvm snap0
+>>> (qemu) quit
+>>>
+>>>
+>>> === -blockdev with a filter on top ===
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>>> Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,node-name=fmt -blockdev driver=copy-on-read,file=fmt,node-name=filter
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> (qemu) info snapshots
+>>> List of snapshots present on all disks:
+>>> ID        TAG                     VM SIZE                DATE       VM CLOCK
+>>> --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>>> (qemu) loadvm snap0
+>>> (qemu) quit
+>>>
+>>>
+>>> === -blockdev with a backing file ===
+>>>
+>>> Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
+>>> Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
+>>> Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT.base,node-name=backing-file -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,backing=backing-file,node-name=fmt
+>>> QEMU X.Y.Z monitor - type 'help' for more information
+>>> (qemu) savevm snap0
+>>> (qemu) info snapshots
+>>> List of snapshots present on all disks:
+>>> ID        TAG                     VM SIZE                DATE       VM CLOCK
+>>> --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+>>> (qemu) loadvm snap0
+>>> Unexpected storage key flag data: 0
+>>> error while loading state for instance 0x0 of device 's390-skeys'
+>>> Error: Error -22 while loading VM state
+>>>
+>>>
+>>>
+>>>   
+>>>>  
+>>>>>>
+>>>>>> 	#if defined CONFIG_TCG || !defined NEED_CPU_H
+>>>>>> 	extern bool icount_enabled(void);
+>>>>>> 	#else
+>>>>>> 	#define icount_enabled() 0
+>>>>>> 	#endif
+>>>>>>
+>>>>>> (This way, more TCG-only code in cpus.c gets elided).  You can integrate
+>>>>>> this change in the next version.
+>>>>>>
+>>>>>> Paolo
+>>>>>>  
+>>>>>
+>>>>> Weird, I tested with --disable-tcg explicitly (but may be some time ago now, as I constantly rebased).
+>>>>>
+>>>>> Will take a look at the introduction of this #defines in place of variables,
+>>>>> as this mechanisms will not work in the future for target-specific modules.  
+>>>>
+>>>> This is only done for per-target files so it should not be a problem.
+>>>>
+>>>> Paolo
+>>>>
+>>>>  
+>>>
+>>>   
+>>
+> 
+> 
+
 
