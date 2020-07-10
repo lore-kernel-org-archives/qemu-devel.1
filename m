@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A04BAC433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4591C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:30:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B57C2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:28:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B57C2075D
+	by mail.kernel.org (Postfix) with ESMTPS id 972C62075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 18:30:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972C62075D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtxlL-00014A-M9
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:28:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43854)
+	id 1jtxmp-0002Sk-TN
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 14:30:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtxiV-0006ZN-GB
+ id 1jtxiV-0006Zx-Sl
  for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41636)
+Received: from indium.canonical.com ([91.189.90.7]:41668)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jtxiS-0005XY-09
+ id 1jtxiS-0005Xp-6L
  for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:25:47 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jtxiP-0002oz-PV
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:41 +0000
+ id 1jtxiR-0002p0-4G
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 957AD2E80F1
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:41 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 1C1612E806D
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 18:25:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Jul 2020 18:09:39 -0000
+Date: Fri, 10 Jul 2020 18:18:12 -0000
 From: Dmitry <1885332@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: langston0 xeioexception
 X-Launchpad-Bug-Reporter: Langston (langston0)
 X-Launchpad-Bug-Modifier: Dmitry (xeioexception)
 References: <159320263008.26082.15752081078008046631.malonedeb@gac.canonical.com>
-Message-Id: <159440457965.19540.14125391390154347989.malone@chaenomeles.canonical.com>
+Message-Id: <159440509211.11910.6418686072155246577.malone@soybean.canonical.com>
 Subject: [Bug 1885332] Re: Error in user-mode calculation of ELF aux vector's
  AT_PHDR
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -62,7 +62,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0e43cc233172cb4527166e0a4e42fc146924b558
+X-Launchpad-Hash: b117ec187318f90e3720eaed0f044ccf1d1929cd
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 14:25:42
@@ -89,63 +89,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-@langston0 Thanks for detailed explanation, got the same problem for
-qemu-s390.
+> runs just fine on top of the Linux kernel in QEMU full-system
+emulation, but crashes before main in user-mode emulation
 
-
-The way to reproduce (linux kernel >=3D 4.8, for example: Ubuntu 18.04):
-# Register qemu binfmt_misc handlers
-$ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-$ cat Dockerfile.s390x =
-
-FROM s390x/ubuntu
-RUN apt-get update && \
-    apt-get install -y \
-    gcc make libpcre3-dev libreadline-dev
-
-RUN cd /home && git clone https://github.com/nginx/njs
-
-RUN cd /home/njs && ./configure --cc-opt=3D'-O0 -static -lm -lrt -pthread
--Wl,--whole-archive -lpthread -ltinfo -Wl,--no-whole-archive' && make
-njs
-
-$ docker build -t njs/390x -f Dockerfile.s390x .
-
-# check the binary (WORKS!)
-# inside docker s390 binaries are executed using qemu-s390-static from the =
-host
-$ docker run  -t njs/390x /home/njs/build/njs -c 'console.log("hello")'
-hello
-
-# copy binary to host
-$ docker run  -v `pwd`:/m -ti njs/390x cp /home/njs/build/njs /m/njs-s390
-
-# deregister binfmt handler
-$ sudo bash -c "echo -1 > /proc/sys/fs/binfmt_misc/qemu-s390x"
-
-# run qemu gdb
-$ qemu-s390x  -g 12345 ./njs-s390
-
-# in a separate terminal
-$ gdb-multiarch ./njs-s390 -ex 'target remote localhost:12345'
-0x0000000001000520 in _start ()
-(gdb) si
-0x0000000001000524 in _start ()
-(gdb) si
-0x000000000100052a in _start ()
-(gdb) c
-Continuing.
-
-Program received signal SIGILL, Illegal instruction.
-0x00000000011a418c in _dl_aux_init ()
-(gdb) bt
-#0  0x00000000011a418c in _dl_aux_init ()
-#1  0x00000000011663f0 in __libc_start_main ()
-#2  0x0000000001000564 in _start ()
-
-qemu-s390x --version
-qemu-s390x version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.28)
+So it seems system vs user-mode is not the issue here, probably it is
+related to gdb mode in user-mode qemu.
 
 -- =
 
