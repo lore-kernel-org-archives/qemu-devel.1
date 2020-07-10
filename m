@@ -2,91 +2,96 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8844C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD43C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:09:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87B4E20772
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA5C620772
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:09:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYpRxjaa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B4E20772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gYg+FaCb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA5C620772
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtpur-0004aQ-QW
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 06:06:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53968)
+	id 1jtpyH-0005pm-8T
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 06:09:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jtpuG-0003xE-8y
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:05:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23257
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jtpuE-0000XG-TK
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:05:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594375521;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jdoClQRd0kYRbTPnH/mx31fwlDLsWEJ/umer1a6uy3Y=;
- b=TYpRxjaaS0y7OhHx0AVtp/pDg3BE4QzWoHjnNeyhFA2I3uKyurq6zxz3CUnE7lNxaoUWCu
- 9Ya0TkJ/ex6VQyrb8+n/6bQn1+jJuc36tRR7gnN1cPKg3horOHuiXvRzEcUGeguP2vQUyV
- TqP2e60eSbiEQ7Dr6y5V2Yga2M956JY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-syxqKGvbNIGxddEvLqyp8g-1; Fri, 10 Jul 2020 06:05:18 -0400
-X-MC-Unique: syxqKGvbNIGxddEvLqyp8g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E6C51083E82;
- Fri, 10 Jul 2020 10:05:14 +0000 (UTC)
-Received: from [10.36.113.241] (ovpn-113-241.ams2.redhat.com [10.36.113.241])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BE9560E1C;
- Fri, 10 Jul 2020 10:05:06 +0000 (UTC)
-Subject: Re: [PATCH v3 11/11] hw/arm/smmuv3: Advertise SMMUv3.2 range
- invalidation
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200708141856.15776-1-eric.auger@redhat.com>
- <20200708141856.15776-12-eric.auger@redhat.com>
- <CAFEAcA-zXyzq5ph3U0vFuqRz9=NEq-piw_9gsYbrwg=+g9nbXw@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <41b72b3d-e0b5-f6b1-69a3-2940246447d7@redhat.com>
-Date: Fri, 10 Jul 2020 12:05:04 +0200
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtpxh-0005If-9R; Fri, 10 Jul 2020 06:08:57 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42088)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jtpxf-0000xI-La; Fri, 10 Jul 2020 06:08:57 -0400
+Received: by mail-wr1-x442.google.com with SMTP id o11so5342139wrv.9;
+ Fri, 10 Jul 2020 03:08:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=UlkyKKBHO+nUNuANLJRz8KQYbRRZFrR6NlkBYUvk8jM=;
+ b=gYg+FaCbFubUC+SxvRX72CVICXR4jdhkcmMxUk0hLVBPnagEu6qklj09IrFe+9m8nO
+ wCC292wkRPCu+DsB3yumX3lrxbFjQw8JZx2Q4enwZhV8WQGbHVclT+sI7n1Ml7JzZiRu
+ tqrKBSmEDgTsPphEPFemYEU+EVxoZGWydCeQfXdiwFsJEW/loODL68HoJeWvF1TzJCww
+ EzjUSqSivwHUndw2zXkpe43E6cE7CUzsbLtZGtYglbbzKt9+K0WwUUsq3qerxCtrdsr7
+ M0D+3lktdbLyQ49EVwnyUlrX0lN/hbEFXJebtX17wQrWMo1+EQRrF4wXcb0VX3zGONv6
+ gmGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UlkyKKBHO+nUNuANLJRz8KQYbRRZFrR6NlkBYUvk8jM=;
+ b=HsaB83HqUhMWfThGybJrovV3TxqjfDzF8rJp9KV//JiEHN40twQu4b5oSrhRPeE9TP
+ 6NOdGdEwm89i9wFAuA+ohyx3696dMyk2MG+ze6ST+ubXDChN2PkBxwA7O5mn6uQjo7uL
+ U+tAWXzqo6BKeO7XGB95pt0nHfAzUoNxXrEvbRIAz5FusyvjLqo/vveUymxj9FLSFSaS
+ dZK0XndP70RpvQZY8HpLZt9aYAoT33wmQWTEHHcrDiOl0ooxIj/Q2KdC97ciMV4omSMb
+ uFUHoVq/HfGoyP1d91gQZ+zrJwyDC2/+Vsaoaa3eLHfwujH4VONJHrq2OBdo5KdJ2kJu
+ vsoQ==
+X-Gm-Message-State: AOAM530xbN4/u+4y7hV0wggtWVe2HO+cBj3CkV3SyOKd4+s/mZQb8ZST
+ v3j3WDWBWanptcuQpzKHX6QVTmA2ws4=
+X-Google-Smtp-Source: ABdhPJzzRXFRWQBwR9q93n4Zu8ICezeX6SdfQIg7wfMpu676xpnmiDFO44wK28jf5C4x8+exNuOzDw==
+X-Received: by 2002:a5d:55cb:: with SMTP id i11mr63753788wrw.28.1594375733558; 
+ Fri, 10 Jul 2020 03:08:53 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id f12sm9688728wrj.48.2020.07.10.03.08.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 10 Jul 2020 03:08:52 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/2] hw/sd: Deprecate the SPI mode and the SPI to SD
+ adapter
+To: Bin Meng <bmeng.cn@gmail.com>, Pragnesh Patel <pragnesh.patel@sifive.com>
+References: <20200705220731.28101-1-f4bug@amsat.org>
+ <CAEUhbmXV1ZvL3N7di0HgVnGmMB69H=RTFFET=3+VLyK+e3Dj8A@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f5acfe73-b0ac-1cd7-0e3b-694f6bf6e615@amsat.org>
+Date: Fri, 10 Jul 2020 12:08:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-zXyzq5ph3U0vFuqRz9=NEq-piw_9gsYbrwg=+g9nbXw@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAEUhbmXV1ZvL3N7di0HgVnGmMB69H=RTFFET=3+VLyK+e3Dj8A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 04:36:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,51 +104,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will@kernel.org>,
- zhangfei.gao@foxmail.com, QEMU Developers <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- Robin Murphy <robin.murphy@arm.com>, Rob Herring <robh@kernel.org>,
- Eric Auger <eric.auger.pro@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <huth@tuxfamily.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ libvir-list@redhat.com, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
-
-On 7/10/20 11:47 AM, Peter Maydell wrote:
-> On Wed, 8 Jul 2020 at 15:20, Eric Auger <eric.auger@redhat.com> wrote:
+On 7/10/20 11:27 AM, Bin Meng wrote:
+> Hi Philippe,
+> 
+> On Mon, Jul 6, 2020 at 6:07 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
 >>
->> Expose the RIL bit so that the guest driver uses range
->> invalidation. Range invalidation being an SMMU3.2 feature,
->> let AIDR advertise SMMUv3.2 support.
+>> I tried to maintain the SPI mode because it is useful in
+>> tiny embedded devices, and thought it would be helpful for
+>> the AVR MCUs.
+>> As AVR was blocked, I thought it was wise to deprecate the
+>> SPI mode as users are interested in the faster MMC mode.
+>> Today Thomas surprised me by posting an update of it!
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg720089.html
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> I'm still posting this as RFC to discuss, but I'm reconsiderating
+>> keeping this mode a bit more.
+>>
 > 
-> I think that to advertise SMMUv3.2 we would also need to
-> set the IDR3.BBML field to something non-zero. That means
-> we need to analyze our implementation of the caching of page
-> table structures to see if we need to do anything different
-> (per the behaviours and guarantees described in section 3.21.1
-> of the spec).
-you're right. I need to further study this feature.
-
-I felt difficult to find out which features are mandatory for a given
-revision number.
+> AFAIK, SiFive folks (Pragnesh in cc) are investigating supporting QSPI
+> model on "sifive_u" machine, and it will definitely use this SPI over
+> SD model.
 > 
-> Alternatively, we could take advantage of the language
-> in section 2.5 that says that a v3.x implementation is
-> allowed to implement features from v3.(x+1), and just
-> set the RIL bit while leaving AIDR advertising us as v3.1.
-Indeed :-)
+> In fact, the QSPI is the last big gap in the "sifive_u" machine to
+> make it a complete platform for hardware replacement.
 
-Thank you for the review!
+Good news!
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+I have some idea about the design, but don't have the time to work
+on it. Help in this area is welcomed, and I am happy to review the
+patches.
 
+The way I'd do it is keep the generic sd.c code and make it an abstract
+class (or interface), and split SD / SPI protocols handling in different
+implementation files. Only the negotiation at reset is common, once you
+switch to a protocol mode you can't switch to another without resetting
+the device. Also this would make the MMC protocol (already implemented
+by Xilinx) upstreamable more easily.
+
+Having different files also allows different maintenance granularity.
+
+I haven't looked at QSPI, but I expect it to be quite different that
+the old SPI mode.
+
+Regards,
+
+Phil.
 
