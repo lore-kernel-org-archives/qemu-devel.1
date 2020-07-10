@@ -2,98 +2,125 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF12C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F846C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88A9A20720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2920B20720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:55:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kdqpCd8p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88A9A20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QVLTEz83"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2920B20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvN6-0007s5-SA
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35548)
+	id 1jtvNC-0007zs-Et
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:55:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtvIc-0002wW-Dl
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:50:54 -0400
-Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:33083)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtvIW-0000bE-7l
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:50:54 -0400
-Received: by mail-oo1-xc44.google.com with SMTP id d125so1084484oob.0
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 08:50:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=8mEhu8veV3Gnf9WIN+SjyxzLBHgb7ONc/B1MVOgnFH8=;
- b=kdqpCd8pmaytLDjuxWHuXXjFm1lUjjxv0wTFqdsCEY1jhZqwN9Y0yoOwbgzgWFrKdb
- 4AzQ9Bf9VPsMqP/+5OvHeKN2U36vh/MxUQ25E+sOtNSoiTq1CZbR2PJWUDJQkehu53ix
- JWFbEJo+u28qOj27MYzzKhZ5dKWurYamdaZuHVpXmYgo8I5/LYB9uTQ+JVdmm34VPRMp
- gK+vupFJB6TkLo5Wr/0E33XWFxo+T0qbJ3QGdmMiiNnIVEJQbDjsHqsWJPhWob7qHk/D
- w8WA48BdiU3HoGPrU79vmssn9Q6fBK+ODI2H2Ho59iAMI6X/tha0GwjPEUFGWaTVSOWU
- 6yTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=8mEhu8veV3Gnf9WIN+SjyxzLBHgb7ONc/B1MVOgnFH8=;
- b=IsIo3cmkhjTUIp3eNWfU4hyXRVOI3OFDEhoIjW0lnzwpSD8kIaseHHbV1Okz7Oxt3J
- Zx5fuAWNZy9TpaRbGf8wQSMSX0iKRM9OmMq9OVhsvTJqEzZVlAzKFfZYYR0Krwll/LCN
- EDhpOhVmgxDzeLqOM/n23Brr/ZYoBNt2deEY9JTWjdERdFWHs4dCIepnkXf2UecGAYO6
- pgwYb0ewKMmvtAPnYelr9DYWOXtHqvgiyrtH8fuK3uD4ZwdOaaslQH2N1LbkmyVgiE3+
- S6+ZF/Y66cjkwcfGPOqiJA+9DVXH37vAeFFU66r1aELEgldO8+cku0Fwi1GsY+uOSOYE
- eTPA==
-X-Gm-Message-State: AOAM531XwlEHu8jAbIZnOjP/VXDGzDVY5aWKcdhfaYyMmZIPflPIDzjh
- HC1579q4D7dvYw2L4NP51im4fd22k+UQMZI26rcHRg==
-X-Google-Smtp-Source: ABdhPJyFq9PrtR89HStX4qxDsSJFNPrs+ED3KuyHZri2G/y/0oQTlCE+NsipV9FI6t3hUERhAmRstuJbwQ9Hzpvcm3g=
-X-Received: by 2002:a4a:2f15:: with SMTP id p21mr59592290oop.20.1594396246853; 
- Fri, 10 Jul 2020 08:50:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jtvLr-0006eY-7K; Fri, 10 Jul 2020 11:54:15 -0400
+Received: from mail-db8eur05on2124.outbound.protection.outlook.com
+ ([40.107.20.124]:16012 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jtvLn-0000wy-Ec; Fri, 10 Jul 2020 11:54:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VmO0g2FBbFI7LURN7WM3wtmNFu+/H+TSesvz0y2oXhTr1KQl+aGRLQswkMpnIIJnMyq5bCXK0WPFglkbciSksqEKn+79CRvmbZmdFsDRI9KSJshXq5sTWPwpyEPrV9n/tN9CKhL38U1oSmVtgA2rf0x0XdPLZKS2YEk+dNYw9eJ5f8m8l9Usvmc0eQL/E96iyWkI0m2HgIW969EfCUik6OGR0I8F3P5fAoSsxNMOaHOFcFvDtq7PdOnIhQ8sMm8VhNlvXxChtpDYDLIUM4oHkK+vRK6w2rM1H0RVRg8pLUAm1tLVjKigYuBoKt14/3hnnXVH+PvyAdZO89i3ZoO6QQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fuvKlsO0ui3i+/+lZMRUx4yIliTGRa5dVSlGG822KK8=;
+ b=Pi+Rzsur1KbNOTrteBB2Ynyj7jisnxFUyZRUDO7H59q3LzVPgYIzly/5Cg7A0VohHDaCM+dS203rmXvgKZbdlrfPVAm3/w2CIxRzFcC2+iJ3rMcc4WtkGxkWnbZzYvL8GCh4/duQEPUAxqV2dfv6/H4G80K0IF8Pg+TB0tYfWQLO4dOIdH1OGwZC+IIvfF7dLPHVdocgAHaxboYqKPYPphXuPd3tPwwmnpNNtUEtN/dVOO0MtV+oR9csqjZgB90hOIIv9TtIwZpKmUhtOFX3xOtIcIRQT1b6AVYzUToZaT0Iroy8jzZDsgpECSN1zSTegL6hilaGgFdpFFeo+sdH/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fuvKlsO0ui3i+/+lZMRUx4yIliTGRa5dVSlGG822KK8=;
+ b=QVLTEz83tWTcoCB5jGee2tsd19gNQb67PRAMkGoyn9fzHm2QcBpJ472ySZQ+05ZSJfU8pPE/FWdVKyBF3Qfava+cAozSt9kKfgzhzk8kQSqTO+qW3zwdVAJIYZwWzJEvN2LeuQ/qa0RmEYQqkcbt5TjbvEOMGNRRakZRYHGFnK8=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM5PR0802MB2609.eurprd08.prod.outlook.com (2603:10a6:203:98::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.23; Fri, 10 Jul
+ 2020 15:54:08 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.021; Fri, 10 Jul 2020
+ 15:54:08 +0000
+Subject: Re: [PATCH v7 16/47] block: Use bdrv_cow_child() in bdrv_co_truncate()
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-17-mreitz@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <4ea280fe-6ba1-7a2c-176d-4448de718b75@virtuozzo.com>
+Date: Fri, 10 Jul 2020 18:54:04 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <20200625152215.941773-17-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
+X-ClientProxiedBy: AM4PR0101CA0083.eurprd01.prod.exchangelabs.com
+ (2603:10a6:200:41::51) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
-References: <20200708172542.25012-1-pbonzini@redhat.com>
- <CAFEAcA8b6sn8fXOKwqOF6MvsKT5oKqS+4jjYDPAPvnXmVimLiQ@mail.gmail.com>
- <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
- <CAFEAcA-UbHpj_xSbqjTsaURt8yPZjuYOmd3pe97vg_G7--17Cw@mail.gmail.com>
- <e78820bb-af5f-c2a0-7727-1a0caedfa584@suse.de>
- <CAFEAcA-raDJ2pSUG-OYHcJi_LnQwxMHvcyjsD7+=WxGYcrSz3w@mail.gmail.com>
- <a8113ed1-c508-0502-4f88-77f875d1a739@redhat.com>
- <40f4c566-8a5b-c27e-22a7-2a112a0cd77d@suse.de>
- <c6e3336f-38b8-a8fa-4862-58e6f094711d@redhat.com>
- <CAFEAcA80XK4voLDj+8kVFcHJb35HT9HL+Qh8kGb3_Qe5Em9ouw@mail.gmail.com>
- <adeb1f02-c712-e256-6840-649795fdc3b5@redhat.com>
- <CAFEAcA9f0tadztJP7Ki0potF6=E+GaG8a_X_5HTyH2yw2T7goA@mail.gmail.com>
- <2ea3943d-fc5b-4d75-deb2-06723da2ac74@redhat.com>
-In-Reply-To: <2ea3943d-fc5b-4d75-deb2-06723da2ac74@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Jul 2020 16:50:35 +0100
-Message-ID: <CAFEAcA8xyqyY4dKxZo-3=G2P177X9_v6wHG8Txrkin52gE=oMA@mail.gmail.com>
-Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.191) by
+ AM4PR0101CA0083.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::51) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend
+ Transport; Fri, 10 Jul 2020 15:54:07 +0000
+X-Originating-IP: [109.252.114.191]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1d0ca910-5f02-4aa4-ea20-08d824e97ab0
+X-MS-TrafficTypeDiagnostic: AM5PR0802MB2609:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB260925D61388DB4AFBB80AC1F4650@AM5PR0802MB2609.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1122;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VpK5skjXxCFhJp2mLf2kwFDPlniZTFw1Iohb5UbJdn1r6KvQLpAHGC07V4oTytaewtx9NxpIcq16MBJpnMMYnVV/yUTDkZ81qM7cenyD6hqGz1fqXO+5QZIhXquQ+iLyfb3TazwlhOy0wEC856lyADC6pyfjWyjMAbuVjYUw+eTyPaPPTMhSsd9PGBeVmsYO8rOsnx/aHETrlasxEECrFiveK7WGlEdBBxuA+J3FL6PQzKhmJtOtpcU/hlsJyThM4MXMBzafTv/ycRaS++ZDYsR/l/Yp1/HC1z8wfNj84DmmdHrY15xC0xSoswVqvenQq48Mp0tusNLO9zOCmJbupwwe1IL7eiWsSOADZw+zi1pnuakwBKZ8TFAOj+foMBuK
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39840400004)(376002)(136003)(396003)(346002)(366004)(5660300002)(16526019)(54906003)(26005)(83380400001)(36756003)(53546011)(52116002)(6512007)(4326008)(6506007)(2616005)(478600001)(31686004)(186003)(44832011)(8936002)(6486002)(31696002)(8676002)(956004)(316002)(66946007)(66476007)(86362001)(6666004)(2906002)(66556008)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: uqzjB8MMdfuaOxM0Y5oWxGRPdgU66xH4af1axcKetXDp6YyH4LH0/NucEF85/Sr/lQyGyrIVSXrYcQdHkT9V7uYDvq/IqhPiO5M6aGJtH6GKn95VASQxG4CdipfH+CP+HcZWwllVPJb3lLpe6quX8eyBmTtgDEOq5brfcwkjEw4SD4Eu9yDbFbScnZliat99mwBMUFbtSpYsML/ZhCZY1mHXrFPjuLlDQS4qkBII3afmX8LkOyMCFztm2rHcsW2jRp/GpzzxXaInpeKZqaodH8qZh/hYES3zbK/5IMpxWQmuw2c492LTjZnUfcgUxsc3DNxVIOHu+LfziinAeb6qlJhWKSvjJt55i3UiyGIQMtQdrNzS1v/4hBSmN0FGwiiaOH5oMmTy/JMWUeDaBsjYe9hRWJ27OMRaTtNHFlt6TtuHR4TA0Kr3sttF4FLUSw62q0Kt4sqldBHUKhRm/qItskOM/XOuciwWzI9pAws3hYgrzhNzbPbNSB2Fxmpxgfqz
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d0ca910-5f02-4aa4-ea20-08d824e97ab0
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 15:54:08.1607 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: v7NlDJf85aAzsYK2fHrqmNelNBlLR4CCyHXrngAaoKbv9sCWyj8C2pUSoy8sKyNAhjJkBESzG0JxMIfb4ZE2iLgCmivhV5e7QhC3B018vDk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2609
+Received-SPF: pass client-ip=40.107.20.124;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 11:54:09
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,53 +133,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Claudio Fontana <cfontana@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 Jul 2020 at 16:46, Max Reitz <mreitz@redhat.com> wrote:
+On 25.06.2020 18:21, Max Reitz wrote:
+> The condition modified here is not about potentially filtered children,
+> but only about COW sources (i.e. traditional backing files).
 >
-> On 10.07.20 17:42, Peter Maydell wrote:
-> > On Fri, 10 Jul 2020 at 16:31, Max Reitz <mreitz@redhat.com> wrote:
-> >>
-> >> On 10.07.20 17:18, Peter Maydell wrote:
-> >>> readarray only arrived sometime in bash 4, and the OSX system
-> >>> bash is 3.2.57, so it won't have that builtin.
-> >>
-> >> It arrived with 4.0, actually, which was released 11 years ago.
-> >> I had assumed that would be sufficiently mature.
-> >>
-> >> So, um, 11 years isn=E2=80=99t sufficiently mature then and I=E2=80=99=
-ll have to work
-> >> around not having readarray for macOS?
-> >
-> > It's the usual Apple-vs-GPL3 issue.
-> >
-> > I note that the iotests do seem to regularly run into
-> > non-portable constructs: Kevin's latest pullreq has
-> > just failed due to a use of 'truncate' that doesn't
-> > work on the BSDs.
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block/io.c | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
 >
-> :/
->
-> I=E2=80=99ll send a patch to drop readarray.
-
-Thanks. I realised as a result of discussion on IRC that
-this slipped through my testing because my OSX system
-wasn't running iotests at all because it didn't have a
-GNU sed available.
-
-As Dan says, the other option is to do the same thing we
-do for GNU sed, and skip all the iotests if we don't
-have a new enough bash. I can always install sed and
-bash out of homebrew to bring my setup into line with the
-cirrus CI one. If we take that path we should update the
-cirrus CI config to make sure it also installs homebrew
-bash (and that the iotests use bash-from-the-path, not
-/bin/bash.)
-
--- PMM
+> diff --git a/block/io.c b/block/io.c
+> index dc9891d6ce..097a3861d8 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -3308,7 +3308,7 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
+>                                     Error **errp)
+>   {
+>       BlockDriverState *bs = child->bs;
+> -    BdrvChild *filtered;
+> +    BdrvChild *filtered, *backing;
+>       BlockDriver *drv = bs->drv;
+>       BdrvTrackedRequest req;
+>       int64_t old_size, new_bytes;
+> @@ -3361,6 +3361,7 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
+>       }
+>   
+>       filtered = bdrv_filter_child(bs);
+> +    backing = bdrv_cow_child(bs);
+>   
+>       /*
+>        * If the image has a backing file that is large enough that it would
+> @@ -3372,10 +3373,10 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
+>        * backing file, taking care of keeping things consistent with that backing
+>        * file is the user's responsibility.
+>        */
+> -    if (new_bytes && bs->backing) {
+> +    if (new_bytes && backing) {
+>           int64_t backing_len;
+>   
+> -        backing_len = bdrv_getlength(backing_bs(bs));
+> +        backing_len = bdrv_getlength(backing->bs);
+>           if (backing_len < 0) {
+>               ret = backing_len;
+>               error_setg_errno(errp, -ret, "Could not get backing file size");
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
