@@ -2,135 +2,92 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D418C433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE0FC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:28:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF5D9207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:27:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC479207BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:28:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ezlCpgRe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF5D9207DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="KBB/zwv5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC479207BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtt4H-00016L-N7
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:27:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49898)
+	id 1jtt4L-0001Eq-4U
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:28:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtsot-0004Nc-VO
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:12:03 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21792
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jtsop-0001jJ-QC
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:12:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594386718;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JuTmDEshOYBkfZZzsJnqpBp+8KLaVBqsoCELSDAKmBg=;
- b=ezlCpgReIRAGhYW9EcWRGQchYpMpGTlgdaURxNdR+zeCmEbQalsd9mcf3e/Z9Vz9yz3Gen
- Hev+UEyJMlNEu1NR3VHMn1M9o6w63oBUTEBTzxRZAkC0olesY1+3yfi8chK6/jK7uN85Ot
- 5SUdv4BFJpBHhVWLXZ7LMWeJixuf1bk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-v9KMrYjdPtyTTngEsMPW2g-1; Fri, 10 Jul 2020 09:11:53 -0400
-X-MC-Unique: v9KMrYjdPtyTTngEsMPW2g-1
-Received: by mail-wr1-f70.google.com with SMTP id o25so6010122wro.16
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 06:11:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jtqf5-0005xP-45
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:53:47 -0400
+Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:41213)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jtqf3-0006vv-FK
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:53:46 -0400
+Received: by mail-pg1-x52a.google.com with SMTP id g67so2366791pgc.8
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=dXTMaAytKPgGZOYeyuxp0EWgMM3z2nIrmJVAFe7+Hao=;
+ b=KBB/zwv5c6qxCKaKAn9hZDdnGprEAOI7k/HC1dJr85VrzU6Enx56RRMEljq4se79wA
+ mqglcCMLByHGhwC330W67z5AfRAXzjmUFRMB12+t99LkXbVrk11FzXaPauhOQJDC7tin
+ mtMud9V0NGxsPYG/R9EoPuEpOmK4ctkulRJ3tfvpmcNhiVdL6rHiA0kmIlB+eho2S9al
+ 2wdAu1rQR2Q5xd4giTsjofBZ3URH7nW9RScD8q+xkmfeAtf3jR17KsBy6A+MYtADEeT8
+ 2XoRTYXwYyBfdkU5PPGJdxGc6II3FQemmZYdk0QGyFIhK56h+Z5fx/YC81cWUkw20MKT
+ TndA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=JuTmDEshOYBkfZZzsJnqpBp+8KLaVBqsoCELSDAKmBg=;
- b=M6GwN9pU6sow6/v4+vthAZOPZlC9C0uIaHfJAFW7COJ1QoiP3tiIjh/g06707wPZH5
- W8jdP6YFkuhd1RDi9jA50vnwKugKnNEd1ws5BPunUUt7P76skABzhZtkHWFaNIDc/6Qu
- kphG/UE0JKOL0BhXgqs14oxemFq6qYR9K0UADmP0LKTlB4f1vyxdZoudHyVmfb2vHN+G
- Ma+nf4dBbcLU9eL966ha1lOAhHwhFUaKt+1MBssCKSrw3yeWQmz+dK7pFZMaG7XMzx0E
- 91lYAo262yCYcmAEleCNm+8xLBaYPlymCr0I0raz7ans10RdpS2f5J4RvXiUHFD6pNZQ
- 5eZA==
-X-Gm-Message-State: AOAM5307RGmToIr161MBuGO2bRg4uo8SkpPjxU2qJgiOqFnieImfiTrf
- R8nRyCUbVREn3Ep7ekIG/0MZ6drY2FSHpOQbw9wIawQoiSRVt68q6Mabntl7pCDE8hf0Rped3Az
- TAT/gDi8Of+uo0Wo=
-X-Received: by 2002:a5d:4283:: with SMTP id k3mr66815785wrq.322.1594386711519; 
- Fri, 10 Jul 2020 06:11:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzFpLrMDrBqdYLcFoIGNH+brrlWjrqZWrc7ZpSSKtcyv2oxN/4CPbXScx/g1S/5nQRko5aNEg==
-X-Received: by 2002:a5d:4283:: with SMTP id k3mr66815758wrq.322.1594386711254; 
- Fri, 10 Jul 2020 06:11:51 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id t141sm10270725wmt.26.2020.07.10.06.11.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 06:11:50 -0700 (PDT)
-Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
-To: Peter Maydell <peter.maydell@linaro.org>,
- Claudio Fontana <cfontana@suse.de>
-References: <20200708172542.25012-1-pbonzini@redhat.com>
- <CAFEAcA8b6sn8fXOKwqOF6MvsKT5oKqS+4jjYDPAPvnXmVimLiQ@mail.gmail.com>
- <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
- <CAFEAcA-UbHpj_xSbqjTsaURt8yPZjuYOmd3pe97vg_G7--17Cw@mail.gmail.com>
- <e78820bb-af5f-c2a0-7727-1a0caedfa584@suse.de>
- <CAFEAcA-raDJ2pSUG-OYHcJi_LnQwxMHvcyjsD7+=WxGYcrSz3w@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <a8113ed1-c508-0502-4f88-77f875d1a739@redhat.com>
-Date: Fri, 10 Jul 2020 15:11:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-raDJ2pSUG-OYHcJi_LnQwxMHvcyjsD7+=WxGYcrSz3w@mail.gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 23:35:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=dXTMaAytKPgGZOYeyuxp0EWgMM3z2nIrmJVAFe7+Hao=;
+ b=RYJht9kt32JdJvOnP++j9E3AXMjU0fO1+XwB3b7K7rGooFS/Qi3wAuccShHg/xE6Fq
+ Tx7VDKIgGf3AUYdvnLMjzT2vReiku+zu9oVejzJsqhpzDDvMyCbGJ+fma3GLr8wL2yll
+ /Sh/6tMmS3y+4xwGMlRSgLMpvHvJi0Yg84Pxh1dbCYtQYFhCawYzAwFsZjq6Ap81+z1n
+ gnSqKjN9KsT6RN/FAioeFbwL1E3IutOn1x4zyNTULkwo35IRrKVoctN+0pGWS2FAzFN/
+ Ffa7VxfUqCWSRmafv5/4LcPHIn/JRETJlEnvoNGPGmQDo8pS0Fgr+7MAduHfL6bO9hMY
+ 0vZA==
+X-Gm-Message-State: AOAM5312jldS/Nl5ocEr3Z8wwi+6il9h21qx7+yL8KOQNfQBpUK3L+Wf
+ yt3Yw2Lg3m7wchCGGY0WkCwqk+6b9/317g==
+X-Google-Smtp-Source: ABdhPJzpCzypn7STcLlHGeGT+U4vaGkyo4jBY5Lf96pVIX+YY5YbTvxKOStaZndzxQTxfqOnVJxzJw==
+X-Received: by 2002:a63:4b44:: with SMTP id k4mr60185561pgl.305.1594378424063; 
+ Fri, 10 Jul 2020 03:53:44 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.53.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jul 2020 03:53:43 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC 47/65] target/riscv: rvv-0.9: floating-point slide instructions
+Date: Fri, 10 Jul 2020 18:49:01 +0800
+Message-Id: <20200710104920.13550-48-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52a;
+ envelope-from=frank.chang@sifive.com; helo=mail-pg1-x52a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:18 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -142,44 +99,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Frank Chang <frank.chang@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/20 2:55 PM, Peter Maydell wrote:
-> On Fri, 10 Jul 2020 at 13:52, Claudio Fontana <cfontana@suse.de> wrote:
->> If you can access it,
->>
->> https://cirrus-ci.com/task/5537514263937024?command=main#L2039
->>
->> the thing is treated here as a warning, which is in the middle of a large amount of other warnings.
->>
->> private/var/folders/3y/l0z1x3693dl_8n0qybp4dqwh0000gn/T/cirrus-ci-build/ui/vnc-auth-sasl.c:648:29: warning: 'sasl_errdetail' is deprecated: first deprecated in macOS 10.11 [-Wdeprecated-declarations]
->>                             sasl_errdetail(vs->sasl.conn));
->>
->> /* ... lots of similar warnings */
->>
->> private/var/folders/3y/l0z1x3693dl_8n0qybp4dqwh0000gn/T/cirrus-ci-build/ui/cocoa.m:1478:9: warning: implicit declaration of function 'cpu_throttle_set' is invalid in C99 [-Wimplicit-function-declaration]
->>         cpu_throttle_set(throttle_pct);
->>         ^
->>
->>
->> Apparently the cirrus-ci I am using is not treating this as an error, while what you are using is..
-> 
-> Ah, I see. Yeah, configure by default doesn't enable -Werror for OSX.
-> My build tree has
->  '--extra-cflags=-fdiagnostics-color=never -Werror
-> -Wno-error=deprecated-declarations'
+From: Frank Chang <frank.chang@sifive.com>
 
-TIL this is different on OSX...
+Add the following instructions:
 
-> 
-> (of which the last two are relevant here). We should probably
-> make configure use -Werror on OSX now with the same logic as Linux,
-> I've been using it that way for ages without issues.
+* vfslide1up.vf
+* vfslide1down.vf
 
-Yes please!
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+---
+ target/riscv/helper.h                   |  7 ++++
+ target/riscv/insn32.decode              |  2 +
+ target/riscv/insn_trans/trans_rvv.inc.c |  4 ++
+ target/riscv/vector_helper.c            | 51 +++++++++++++++++++++++++
+ 4 files changed, 64 insertions(+)
+
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 2a4e1ea773..d2bf9be551 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1114,6 +1114,13 @@ DEF_HELPER_6(vslide1down_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+ 
++DEF_HELPER_6(vfslide1up_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfslide1up_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfslide1up_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfslide1down_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfslide1down_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfslide1down_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++
+ DEF_HELPER_6(vrgather_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index acd65cb3a7..ed34ccd0e3 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -530,6 +530,8 @@ vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
+ vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
++vfslide1up_vf   001110 . ..... ..... 101 ..... 1010111 @r_vm
++vfslide1down_vf 001111 . ..... ..... 101 ..... 1010111 @r_vm
+ vmfeq_vv        011000 . ..... ..... 001 ..... 1010111 @r_vm
+ vmfeq_vf        011000 . ..... ..... 101 ..... 1010111 @r_vm
+ vmfne_vv        011100 . ..... ..... 001 ..... 1010111 @r_vm
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index dab642ab7a..f46cccc9bb 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -3248,6 +3248,10 @@ GEN_OPIVX_TRANS(vslidedown_vx, slidedown_check)
+ GEN_OPIVX_TRANS(vslide1down_vx, slidedown_check)
+ GEN_OPIVI_TRANS(vslidedown_vi, 1, vslidedown_vx, slidedown_check)
+ 
++/* Vector Floating-Point Slide Instructions */
++GEN_OPFVF_TRANS(vfslide1up_vf, slideup_check)
++GEN_OPFVF_TRANS(vfslide1down_vf, slidedown_check)
++
+ /* Vector Register Gather Instruction */
+ static bool vrgather_vv_check(DisasContext *s, arg_rmrr *a)
+ {
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 050f4fd895..cf245e0145 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -5016,6 +5016,57 @@ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_h, uint16_t, H2)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_w, uint32_t, H4)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_d, uint64_t, H8)
+ 
++/* Vector Floating-Point Slide Instructions */
++#define GEN_VEXT_VFSLIDE1UP_VF(NAME, ETYPE, H)                            \
++void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,             \
++                  CPURISCVState *env, uint32_t desc)                      \
++{                                                                         \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t i;                                                           \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, i)) {                              \
++            continue;                                                     \
++        }                                                                 \
++        if (i == 0) {                                                     \
++            *((ETYPE *)vd + H(i)) = s1;                                   \
++        } else {                                                          \
++            *((ETYPE *)vd + H(i)) = *((ETYPE *)vs2 + H(i - 1));           \
++        }                                                                 \
++    }                                                                     \
++}
++
++/* vfslide1up.vf vd, vs2, rs1, vm # vd[0]=f[rs1], vd[i+1] = vs2[i] */
++GEN_VEXT_VFSLIDE1UP_VF(vfslide1up_vf_h, uint16_t, H1)
++GEN_VEXT_VFSLIDE1UP_VF(vfslide1up_vf_w, uint32_t, H1)
++GEN_VEXT_VFSLIDE1UP_VF(vfslide1up_vf_d, uint64_t, H1)
++
++#define GEN_VEXT_VFSLIDE1DOWN_VF(NAME, ETYPE, H)                          \
++void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,             \
++                  CPURISCVState *env, uint32_t desc)                      \
++{                                                                         \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t i;                                                           \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, i)) {                              \
++            continue;                                                     \
++        }                                                                 \
++        if (i == vl - 1) {                                                \
++            *((ETYPE *)vd + H(i)) = s1;                                   \
++        } else {                                                          \
++            *((ETYPE *)vd + H(i)) = *((ETYPE *)vs2 + H(i + 1));           \
++        }                                                                 \
++    }                                                                     \
++}
++
++/* vfslide1down.vf vd, vs2, rs1, vm # vd[i] = vs2[i+1], vd[vl-1]=f[rs1] */
++GEN_VEXT_VFSLIDE1DOWN_VF(vfslide1down_vf_h, uint16_t, H1)
++GEN_VEXT_VFSLIDE1DOWN_VF(vfslide1down_vf_w, uint32_t, H1)
++GEN_VEXT_VFSLIDE1DOWN_VF(vfslide1down_vf_d, uint64_t, H1)
++
+ /* Vector Register Gather Instruction */
+ #define GEN_VEXT_VRGATHER_VV(NAME, ETYPE, H, CLEAR_FN)                    \
+ void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
+-- 
+2.17.1
 
 
