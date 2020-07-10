@@ -2,68 +2,72 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7FEC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1455EC433DF
 	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59CCE2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D080D2075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MA3kV/Bb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59CCE2075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LuXlNLgH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D080D2075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ju126-00012W-K1
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 17:58:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60298)
+	id 1ju125-00012F-Ul
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 17:58:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ju11L-00009X-Jp
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ju11L-00009V-Je
  for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:57:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33742
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30819
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ju11K-0006iT-4e
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:57:27 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ju11J-0006iN-7g
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:57:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594418245;
+ s=mimecast20190719; t=1594418243;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=P6DpuLW4/jM6fi08NYsJ28X4mhkrVuQT4SQ+ixSppnY=;
- b=MA3kV/BbAp757/BiNqkrXgbPPgAlkA6JnRIRFxzJETsvYHog6Oy/bj7fqMS+e38f1H25HB
- KFyPXiCMvR012sJxXTRjiklmeVBtqD2R4fkMKjvZiCvG8EQ2K9PAsIJPVcufyzzJ5E0qk2
- kaKnMb7lYXVjQ+S5wP7ooHNy3adtHlQ=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7q8vOP8qJwDhi6KpMVzx7O8VexTDhx8f2ylgyr7HV8I=;
+ b=LuXlNLgHe8L3CbdgicwX6jtpNYMOnc/msA1Cv2zJyQHQkkH2oINpOu3M4fwxhtkdNVmrte
+ WMZnje8HsMxkSbZ2pTHxruUYq06fbhmtMzIVbp2aIYrpRiKVVBCwLJQW1XmWbEfK0ZSqkS
+ RARbGTNbA85ABGv5dLd+jQUdDpeSkSk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-gZdrSj4UO762Om8238UTgA-1; Fri, 10 Jul 2020 17:57:20 -0400
-X-MC-Unique: gZdrSj4UO762Om8238UTgA-1
+ us-mta-198-NEMDs0lDNB2LWbtdl3EIeA-1; Fri, 10 Jul 2020 17:57:21 -0400
+X-MC-Unique: NEMDs0lDNB2LWbtdl3EIeA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 308A0800FF1;
- Fri, 10 Jul 2020 21:57:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16F598027E3;
+ Fri, 10 Jul 2020 21:57:20 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-118-196.rdu2.redhat.com [10.10.118.196])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7180010013C4;
- Fri, 10 Jul 2020 21:57:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5777810013C4;
+ Fri, 10 Jul 2020 21:57:19 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/1] MAINTAINERS: Add Python library stanza
-Date: Fri, 10 Jul 2020 17:57:17 -0400
-Message-Id: <20200710215718.13034-1-jsnow@redhat.com>
+Subject: [PATCH 1/1] MAINTAINERS: Add Python library stanza
+Date: Fri, 10 Jul 2020 17:57:18 -0400
+Message-Id: <20200710215718.13034-2-jsnow@redhat.com>
+In-Reply-To: <20200710215718.13034-1-jsnow@redhat.com>
+References: <20200710215718.13034-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -94,14 +98,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I'm proposing that I split the actual Python library off from the other
+miscellaneous python scripts we have and declare it maintained. Add
+myself as a maintainer of this folder, along with Cleber.
 
-
-John Snow (1):
-  MAINTAINERS: Add Python library stanza
-
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
  MAINTAINERS | 9 ++++++++-
  1 file changed, 8 insertions(+), 1 deletion(-)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6aa54f7f8f..fe1dcd5a76 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2280,11 +2280,18 @@ S: Maintained
+ F: include/sysemu/cryptodev*.h
+ F: backends/cryptodev*.c
+ 
++Python library
++M: John Snow <jsnow@redhat.com>
++M: Cleber Rosa <crosa@redhat.com>
++R: Eduardo Habkost <ehabkost@redhat.com>
++S: Maintained
++F: python/*
++T: git https://gitlab.com/jsnow/qemu.git python
++
+ Python scripts
+ M: Eduardo Habkost <ehabkost@redhat.com>
+ M: Cleber Rosa <crosa@redhat.com>
+ S: Odd fixes
+-F: python/qemu/*py
+ F: scripts/*.py
+ F: tests/*.py
+ 
 -- 
 2.21.3
 
