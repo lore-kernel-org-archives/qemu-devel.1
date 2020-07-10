@@ -2,79 +2,89 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7099C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:44:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC30EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:47:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9694920772
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:44:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7670C2077D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:47:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GK5Yqf9I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9694920772
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gUTobrv8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7670C2077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtsO6-0000xd-Rz
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:44:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42416)
+	id 1jtsRD-0002QU-OT
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:47:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtsNV-0000W7-UL
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:43:45 -0400
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:44348)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jtsQQ-0001je-LQ
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:46:46 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56120)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtsNU-0006Ro-Ae
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:43:45 -0400
-Received: by mail-ot1-x331.google.com with SMTP id 5so4072245oty.11
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 05:43:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jtsQP-0006rM-47
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:46:46 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g75so6027979wme.5
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 05:46:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jzZ4tdygMYk94EEE7lclKYcFQ7u+F7kr7cFzrJ3yG5Y=;
- b=GK5Yqf9IUx1kafksat0/yXvFTWmVT0w67l5kBN33nIjSA4x8PiyJ46GFafi5AHODIm
- pW3lkaqq15HldZlrz5UHam4t45dMIgM5TexxU+vxiWTkkbexQBykB3Sg2/1ZEFVIbU4Z
- yAhXHZxdvVdM59a7Pmsh9TO6xwG1bKUTvFYRd7uiNb8XcRJEM4O3s6dsyfj+oi+rvQBR
- ILaZHQ7TuSlnH9ibkM49w0mxckDjdQ0mE6Ei302cEVbWoTjcdALs5umDdu7pBzeJXyWi
- pPdn+W4omJdG79ikBQM8UQSN37wnk/lV6fzHPhm1D7M76x8VrIgimlUvTY/N4gPwfQqY
- yj9w==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=dlLqlXdtwhripTUgct/ZJP4rwsh+B45YhAdKamTdLFY=;
+ b=gUTobrv8x3S3KEbwZJVyO0hMd3wVK53SmsDusx3W+7Ts5Z6oeUBorh803xg5jidpF8
+ 3nxWRl2vvJgHe15mSS14xndNVYy29z5zM48EoaM+OUF7a6e1ZbXyJyjMwZKOrOroUS6b
+ L9AE0xzuRgxnKMfPNaMJqGt6k6TpMW3y8mymrEIUb48jeNdCHAcjyA5pr9E1QC/xj4Z2
+ z+J3YEl08bbv70+HRXdsFhH48Rv3yk30gqIVHkJHNndrtiYBRWXm9csB8CthWZIQbaaG
+ ZkYmTYbcSY8Vxus25RFxvY5LmxSTgcZMUBieWuCtsk8XoipdCkXUxkl8zIN+Mjrd/61U
+ wkwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jzZ4tdygMYk94EEE7lclKYcFQ7u+F7kr7cFzrJ3yG5Y=;
- b=phfb5uHS/AoPw2NIk6IRxiQd31qdBte0HDagbMdGv07kCUjhJS8dlWO3VCdtqCymzY
- pzXvjSIgu91Gnis+M8Yi3IrmGl0fLOa6EmT2ChnQIfit1TELLKeM1ml+IHstWrPjgbaK
- 6uNpyW6YD5w2Tq1GQ2wOSQAHw5bANOUBfSU9h2FbgCO3RT8q60qWs/UwEVkKcq0gebW+
- gbGWnLO6gbc+H41LuCe29Aoh7bkt2m3MP3l4XJV4jdF4jR2KFv0xg/fw7XtXMNh7gfMo
- mgFqs2LdFUJK032RksZ8zk73lRDPLMC6TWnQImg8c1Qyke5X0nYKFPGTfXywSRG4Ecjj
- zxjg==
-X-Gm-Message-State: AOAM532gjOaTA5GIh0+zQ6Zg5lXUsgBLu54+9YTBcDrwaSgl1ft9Ct4u
- DxJ/xwA5qMf0ITQOuk2GsZd4jDII6XCgxqrQHYmL+Q==
-X-Google-Smtp-Source: ABdhPJwvs5EuSZy1Cm/g5+0FtKf2KEX8GCAk0//F/Elr2XinulJzD/vTZqk2FMF1XRIlz/JUYSMeaFklisaDch7/6yI=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr51209389oto.135.1594385022737; 
- Fri, 10 Jul 2020 05:43:42 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=dlLqlXdtwhripTUgct/ZJP4rwsh+B45YhAdKamTdLFY=;
+ b=kF5Q91tJVanh+5Adz48M6wT0DDBGicZj9scpM9haJ0+eu2iAHov3ObEpOEvLExTpLm
+ mUJ9jLNXZ3LXmJuXJ+XeugZ6zONSI6ruM9PEZ2Rh+jTDqyjSknD2Xbj+eid02nYiO4/m
+ v/ZaKxrCu018bub5tXJDpn2/wKVXoTIEUMWrvzYYZxFJgV786vMD27N3bShjFlEM7Lnp
+ QgUFApzu1kebboO3UqOjI+YBUbQJ8tdbl12yLxRCsVlcgDW7b/vjgVzOH5c8+cFJ7l7j
+ gMSRGlxdpCbyirMIhDlGA6/32IZFnDKvCo8FWzKQYiliVBuWuxP6xhE2pikcbsJHV2Ok
+ E73g==
+X-Gm-Message-State: AOAM530SUyZu+evfoNduSZrJNZNmOxmlbnwlEGbiW/yOid6S11mNomGv
+ lAc6CB5tNHvuWZf08/S4LitMNQ==
+X-Google-Smtp-Source: ABdhPJwkjd/F7+t3ieVj+oVIzkke8Srv4gtK32W+Qcy3woW54S5QQhfj3x6YSLwuAFtD6Wu6DX9wTQ==
+X-Received: by 2002:a1c:9994:: with SMTP id b142mr4825236wme.141.1594385203532; 
+ Fri, 10 Jul 2020 05:46:43 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a22sm9031655wmj.9.2020.07.10.05.46.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jul 2020 05:46:39 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 552E11FF7E;
+ Fri, 10 Jul 2020 13:46:38 +0100 (BST)
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+ <20200710104920.13550-61-frank.chang@sifive.com>
+ <87k0zblgjx.fsf@linaro.org>
+ <CAE_xrPhKg1FeRwW0zS-jpfo8XL7WvSFywif27X0kAYgh044N6w@mail.gmail.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Frank Chang <frank.chang@sifive.com>
+Subject: Re: [RFC 60/65] softfloat: add fp16 and uint8/int8 interconvert
+ functions
+In-reply-to: <CAE_xrPhKg1FeRwW0zS-jpfo8XL7WvSFywif27X0kAYgh044N6w@mail.gmail.com>
+Date: Fri, 10 Jul 2020 13:46:38 +0100
+Message-ID: <878sfrleq9.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200708172542.25012-1-pbonzini@redhat.com>
- <CAFEAcA8b6sn8fXOKwqOF6MvsKT5oKqS+4jjYDPAPvnXmVimLiQ@mail.gmail.com>
- <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
-In-Reply-To: <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Jul 2020 13:43:31 +0100
-Message-ID: <CAFEAcA-UbHpj_xSbqjTsaURt8yPZjuYOmd3pe97vg_G7--17Cw@mail.gmail.com>
-Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
-To: Claudio Fontana <cfontana@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::331;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x331.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -83,7 +93,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,19 +106,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 Jul 2020 at 13:38, Claudio Fontana <cfontana@suse.de> wrote:
-> I got regular green test reports from cirrus-ci for Mac, seems different compilation options.
 
-That's odd -- what is cirrus-ci doing differently? Building
-the cocoa UI frontend is the default and is definitely
-something we want to be testing in the CI...
+Frank Chang <frank.chang@sifive.com> writes:
 
-thanks
--- PMM
+> On Fri, Jul 10, 2020 at 8:07 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>
+>>
+>> frank.chang@sifive.com writes:
+>>
+>> > From: Frank Chang <frank.chang@sifive.com>
+>> >
+>> > Signed-off-by: Frank Chang <frank.chang@sifive.com>
+>>
+>> Did I miss the rest of the series somewhere?
+>>
+>> Otherwise this looks fine to me:
+>>
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> If you mean float16 to uint8 and int8 conversion functions, this commit =
+is
+> everything.
+> I think I just cc the mail based on *scripts/get_maintainer.pl
+> <http://get_maintainer.pl>*, so probably didn't send the whole series to
+> everyone.
+
+Usually I see the rest of the thread from the mailing list. I can't see:
+
+  In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
+  References: <20200710104920.13550-1-frank.chang@sifive.com>
+
+on any of the qemu mailing lists.
+
+--=20
+Alex Benn=C3=A9e
 
