@@ -2,88 +2,89 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EF9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77CD8C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:04:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37CC2206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:03:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D992206F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:04:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VU/NXzd4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37CC2206C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ihrd50Lr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D992206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ju0Av-0002by-Ep
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 17:03:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49286)
+	id 1ju0C0-0003eC-H1
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 17:04:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1ju0AH-00025t-He
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:02:37 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38809)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1ju0BC-00038j-2G
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:03:34 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35925)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1ju0AF-0008Ms-Pi
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:02:37 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f18so7181655wml.3
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 14:02:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1ju0BA-0008RI-5f
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:03:33 -0400
+Received: by mail-pg1-x544.google.com with SMTP id p3so3056613pgh.3
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 14:03:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=O1y9yYA/o/HzSAWykiYrrgEbKdJXgXx74QYZQ1QKLlA=;
- b=VU/NXzd4xCmmiTN3kvbrudogO21tAqdjotL/MtVDhXr8fsJoOOfxm5p94lcj86HLv8
- Qu/SNgsUu0FJXcNUAUTX3f1JiV3HMHfDgFt84FrE0OEaUFYvsOp6MvcD10bs1Bo+cYwQ
- wEFIgIWeiQ8veQKj/9QRlPteHg9sHB/p+MM57bqo1QwUvuYqWt82EZq0R+3soLGjLTxf
- YonOWARalWRZwck23GuIJSsuF8cJE/MJrEisNCzyScwt/gqlXyIfAEjTIWrC6KiL+qB0
- dPwJOu/pgeDjzqAyaxUIJglW1cmpM91Q8h9HbvggyMQq5/CPB63XysFWezfZbtnwDimA
- EB2A==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=YZiKQH8gnB5mj4utBfSI8q1PiCadk1xemrgzTDz055Q=;
+ b=ihrd50LrTxcsDw00mVJmpFO9m/yg3v39jg2mJEtw7UUkpa1kuGdZLWevOemPdfa3H2
+ THPcyMT4ShKCtmCrSukN9dWU1x+7Ljynfndc/dOF8tUcsOH8ostB45V8zZa+pTx5CSoM
+ 0Nzce73NCUJcLgfDUxouxMFpXMLJxW9A5z2V6tCG06a75uUQ1JGvkTq2PjutnTXAlQly
+ xPpMOXwNteKCoSwqXbBI2OuPmQxG8VNBQWbaECEVw8g2zZC0wNzmI4D73Ayy1kcYpq/6
+ CquirqkJGi6qrYTVhLgt8dSzwIAzQcjvtc4uWL8H3Ma7LXSefo5GjTJmFPp9lKlqGxg6
+ JR5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=O1y9yYA/o/HzSAWykiYrrgEbKdJXgXx74QYZQ1QKLlA=;
- b=MgRAGjhmuXBikGpzYv9ch563534rs+89r4DBgdqY1IXInOIzx0TKCcW2YejePvp0I3
- NvkfftmZHB0ba47uqv4eMHkZ22/50a+jTOACy3S0JGN5pKQ9/+42Py0lLYvfIocjQFpa
- /DJV0cjYuh3NS7Kk6RZ3vzXfIl6EF+Km1ZVjXZrXDtc5DkrO4K/5nGAYSViwTb/NJvyR
- 5cs1mNAAQgh2vebC0wqGJHKYwdjMIfT+aaPLtUW9nRTca7oDOzFJb0rP6ytjA8T82xUv
- WpL0v8DHxomwTHEl9RGFwCrnFCXyQU6yYJTzhspc1UuQjKpjOlgXFERGxZqoqZ9w4s9a
- aenw==
-X-Gm-Message-State: AOAM533/OzP4MgOKp02SolXc3Y5hscl2ikDFoVAq4KgogWVcuJgVtJeQ
- msWRZ/+OUXqLtRcdWXthCYn9mA==
-X-Google-Smtp-Source: ABdhPJxMfUv3wN89PJ/88haEY9ge2mzDfhkRu2wE+JrsmHvwXaqc0iWkVg8t2lMRyIurrZqIJtATVQ==
-X-Received: by 2002:a05:600c:258:: with SMTP id
- 24mr6873695wmj.70.1594414953455; 
- Fri, 10 Jul 2020 14:02:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u8sm11414270wrt.28.2020.07.10.14.02.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jul 2020 14:02:32 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 21C381FF7E;
- Fri, 10 Jul 2020 22:02:31 +0100 (BST)
-References: <20200710163253.381630-1-mreitz@redhat.com>
- <20200710163253.381630-2-mreitz@redhat.com>
-User-agent: mu4e 1.5.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH 1/2] iotests: Drop readarray from _do_filter_img_create
-In-reply-to: <20200710163253.381630-2-mreitz@redhat.com>
-Date: Fri, 10 Jul 2020 22:02:30 +0100
-Message-ID: <87imevjd7d.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YZiKQH8gnB5mj4utBfSI8q1PiCadk1xemrgzTDz055Q=;
+ b=EU5yABzJfrNdrXfbdxuNUo6Yh52EcuQ41dG5PlfswYBNPLR0owXkhsE8EwLB9EJGJ1
+ jHrvYHH8hWdeCL3GXPKpkouzgM0l1TgGnubitU66lQIeIgA+1f8ipwwGuHKkzsfyreT7
+ RO73cr4q0oPVtkoE4Raiv3gFCGHpDe9/X1w48dj3n/BgthMU+DqX6dUW74SAXIGCd8tG
+ Olo95+8qObxDGRqeoVf3Xq8DC2v9MesPMPB6LoTF2/qdBFvC5eTS8veM4B2WG/kTmHZ0
+ cg+uIenJ94rRxfePq69gJTNFgG6XoNdlDe7UcYkaDyLlGXJHRxpKOJ20U/pLDvrL8qhv
+ 4BpQ==
+X-Gm-Message-State: AOAM531O7lJxSJEnXKnrDf09A1sRu1alVQ235OuqbNQ1MYQQsljM7Ogw
+ u2PkS4/Y1omIjib2imttx+N/TA==
+X-Google-Smtp-Source: ABdhPJwT/I/PZT2y7fug89PnFW4RtRepYu1/u+4q4lMf8xPJcr4QJ53yJIJzLfmdfVc+50IK28e9Xw==
+X-Received: by 2002:a63:fc43:: with SMTP id r3mr60441981pgk.423.1594415010254; 
+ Fri, 10 Jul 2020 14:03:30 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id t137sm6875945pgc.32.2020.07.10.14.03.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 10 Jul 2020 14:03:29 -0700 (PDT)
+Subject: Re: [PATCH v1 04/13] cputlb: ensure we save the IOTLB data in case of
+ reset
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200709141327.14631-1-alex.bennee@linaro.org>
+ <20200709141327.14631-5-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7ebfe683-5c6b-064b-7bab-3b9624f0a3f8@linaro.org>
+Date: Fri, 10 Jul 2020 14:03:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
+In-Reply-To: <20200709141327.14631-5-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,57 +106,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
+ Paolo Bonzini <pbonzini@redhat.com>, f4bug@amsat.org, robhenry@microsoft.com,
+ aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
+ peter.puhov@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
+ aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Max Reitz <mreitz@redhat.com> writes:
-
-> Some systems where we run tests on do not have a 4.x bash, so they do
-> not have readarray.  While it looked a bit nicer than messing with
-> `head` and `tail`, we do not really need it, so we might as well not use
-> it.
-
-I've fixed the cirrus build failure by brew installing a more recent
-bash. However if we prefer we could do this.
-
->
-> Reported-by: Claudio Fontana <cfontana@suse.de>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 7/9/20 7:13 AM, Alex Bennée wrote:
+> Any write to a device might cause a re-arrangement of memory
+> triggering a TLB flush and potential re-size of the TLB invalidating
+> previous entries. This would cause users of qemu_plugin_get_hwaddr()
+> to see the warning:
+> 
+>   invalid use of qemu_plugin_get_hwaddr
+> 
+> because of the failed tlb_lookup which should always succeed. To
+> prevent this we save the IOTLB data in case it is later needed by a
+> plugin doing a lookup.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
 > ---
->  tests/qemu-iotests/common.filter | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
-.filter
-> index 3833206327..345c3ca03e 100644
-> --- a/tests/qemu-iotests/common.filter
-> +++ b/tests/qemu-iotests/common.filter
-> @@ -138,13 +138,13 @@ _do_filter_img_create()
->      # Split the line into the pre-options part ($filename_part, which
->      # precedes ", fmt=3D") and the options part ($options, which starts
->      # with "fmt=3D")
-> -    # (And just echo everything before the first "^Formatting")
-> -    readarray formatting_line < <($SED -e 's/, fmt=3D/\n/')
-> +    read formatting_line
->=20=20
-> -    filename_part=3D${formatting_line[0]}
-> -    unset formatting_line[0]
-> +    # Split line at the first ", fmt=3D"
-> +    formatting_line=3D$(echo "$formatting_line" | $SED -e 's/, fmt=3D/\n=
-fmt=3D/')
->=20=20
-> -    options=3D"fmt=3D${formatting_line[@]}"
-> +    filename_part=3D$(echo "$formatting_line" | head -n 1)
-> +    options=3D$(echo "$formatting_line" | tail -n +2)
->=20=20
->      # Set grep_data_file to '\|data_file' to keep it; make it empty
->      # to drop it.
+> v2
+>   - save the entry instead of re-running the tlb_fill.
+> v3
+>   - don't abuse TLS, use CPUState to store data
+>   - just use g_free_rcu() to avoid ugliness
+>   - verify addr matches before returning data
+>   - ws fix
+> ---
+>  include/hw/core/cpu.h   |  4 +++
+>  include/qemu/typedefs.h |  1 +
+>  accel/tcg/cputlb.c      | 57 +++++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 60 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> index b3f4b7931823..bedbf098dc57 100644
+> --- a/include/hw/core/cpu.h
+> +++ b/include/hw/core/cpu.h
+> @@ -417,7 +417,11 @@ struct CPUState {
+>  
+>      DECLARE_BITMAP(plugin_mask, QEMU_PLUGIN_EV_MAX);
+>  
+> +#ifdef CONFIG_PLUGIN
+>      GArray *plugin_mem_cbs;
+> +    /* saved iotlb data from io_writex */
+> +    SavedIOTLB *saved_iotlb;
+> +#endif
+>  
+>      /* TODO Move common fields from CPUArchState here. */
+>      int cpu_index;
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 15f5047bf1dc..427027a9707a 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -116,6 +116,7 @@ typedef struct QObject QObject;
+>  typedef struct QString QString;
+>  typedef struct RAMBlock RAMBlock;
+>  typedef struct Range Range;
+> +typedef struct SavedIOTLB SavedIOTLB;
+>  typedef struct SHPCDevice SHPCDevice;
+>  typedef struct SSIBus SSIBus;
+>  typedef struct VirtIODevice VirtIODevice;
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 1e815357c709..8636b66e036a 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -1073,6 +1073,42 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+>      return val;
+>  }
+>  
+> +#ifdef CONFIG_PLUGIN
+> +
+> +typedef struct SavedIOTLB {
+> +    struct rcu_head rcu;
+> +    hwaddr addr;
+> +    MemoryRegionSection *section;
+> +    hwaddr mr_offset;
+> +} SavedIOTLB;
+> +
+> +/*
+> + * Save a potentially trashed IOTLB entry for later lookup by plugin.
+> + *
+> + * We also need to track the thread storage address because the RCU
+> + * cleanup that runs when we leave the critical region (the current
+> + * execution) is actually in a different thread.
+> + */
+> +static void save_iotlb_data(CPUState *cs, hwaddr addr, MemoryRegionSection *section, hwaddr mr_offset)
+
+Overlong line.
+
+> +{
+> +    SavedIOTLB *old, *new = g_new(SavedIOTLB, 1);
+> +    new->addr = addr;
+> +    new->section = section;
+> +    new->mr_offset = mr_offset;
+> +    old = atomic_rcu_read(&cs->saved_iotlb);
+> +    atomic_rcu_set(&cs->saved_iotlb, new);
+> +    if (old) {
+> +        g_free_rcu(old, rcu);
+> +    }
+> +}
+
+I'm a bit confused by this.  Why all the multiple allocation?  How many
+consumers are you expecting, and more are you expecting multiple memory
+operations in flight at once?
+
+If multiple memory operations in flight, then why aren't we chaining them
+together, so that you can search through multiple alternatives.
+
+If only one memory operation in flight, why are you allocating memory at all,
+much less managing it with rcu?  Just put one structure (or a collection of
+fields) into CPUState and be done.
+
+> +
+> +#else
+> +static void save_iotlb_data(CPUState *cs, hwaddr addr, MemoryRegionSection *section, hwaddr mr_offset)
+> +{
+> +    /* do nothing */
+> +}
+> +#endif
+
+Surely better to move the ifdef inside the function so that you don't have to
+replicate the definition?
+
+> +        SavedIOTLB *saved = atomic_rcu_read(&cpu->saved_iotlb);
+> +        if (saved && saved->addr == tlb_addr) {
+> +            data->is_io = true;
+> +            data->v.io.section = saved->section;
+> +            data->v.io.offset = saved->mr_offset;
+> +            return true;
+> +        }
+
+Should that test in fact be an assert?  Why would this fail?
 
 
---=20
-Alex Benn=C3=A9e
+r~
 
