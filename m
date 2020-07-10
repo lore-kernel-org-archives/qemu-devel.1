@@ -2,124 +2,72 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
+	DATE_IN_FUTURE_06_12,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB978C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4FBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:50:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A3EF20725
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:49:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UpeuS8X3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A3EF20725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B005F20720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:50:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B005F20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvHb-0000te-MR
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:49:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34654)
+	id 1jtvIN-0002C7-UT
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:50:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtvEo-0005kQ-Ps
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:46:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51089
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtvEm-0008SI-DH
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:46:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594396015;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=VPVnLiKIFiK/9Ui2qexB47hJpFV6cj0oOmmUx/0iEW0=;
- b=UpeuS8X3HLx+UtaGbRYiR0mCTRxSZ05gmGneFZHbuCnkcJ1n+aDNNuzHBs/WOV06R/3p6j
- AVNqUFMgut2ubReszJQstNvSGP+tBBEqBvDdGNNjNqYCk1XR0kn0wiWUTu4Kwt6u3la1ha
- WeQo9de/T+CUmyWH+Y5oD4if4mMfjgE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-oFcHhfZoNteA-39AippQsg-1; Fri, 10 Jul 2020 11:46:53 -0400
-X-MC-Unique: oFcHhfZoNteA-39AippQsg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 844951083E84;
- Fri, 10 Jul 2020 15:46:52 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
- [10.36.113.127])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E2787EF9B;
- Fri, 10 Jul 2020 15:46:51 +0000 (UTC)
-Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200708172542.25012-1-pbonzini@redhat.com>
- <CAFEAcA8b6sn8fXOKwqOF6MvsKT5oKqS+4jjYDPAPvnXmVimLiQ@mail.gmail.com>
- <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
- <CAFEAcA-UbHpj_xSbqjTsaURt8yPZjuYOmd3pe97vg_G7--17Cw@mail.gmail.com>
- <e78820bb-af5f-c2a0-7727-1a0caedfa584@suse.de>
- <CAFEAcA-raDJ2pSUG-OYHcJi_LnQwxMHvcyjsD7+=WxGYcrSz3w@mail.gmail.com>
- <a8113ed1-c508-0502-4f88-77f875d1a739@redhat.com>
- <40f4c566-8a5b-c27e-22a7-2a112a0cd77d@suse.de>
- <c6e3336f-38b8-a8fa-4862-58e6f094711d@redhat.com>
- <CAFEAcA80XK4voLDj+8kVFcHJb35HT9HL+Qh8kGb3_Qe5Em9ouw@mail.gmail.com>
- <adeb1f02-c712-e256-6840-649795fdc3b5@redhat.com>
- <CAFEAcA9f0tadztJP7Ki0potF6=E+GaG8a_X_5HTyH2yw2T7goA@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <2ea3943d-fc5b-4d75-deb2-06723da2ac74@redhat.com>
-Date: Fri, 10 Jul 2020 17:46:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <wentong.wu@intel.com>)
+ id 1jtvEV-0005bh-Le; Fri, 10 Jul 2020 11:46:39 -0400
+Received: from mga06.intel.com ([134.134.136.31]:41018)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <wentong.wu@intel.com>)
+ id 1jtvET-0008Qq-2L; Fri, 10 Jul 2020 11:46:39 -0400
+IronPort-SDR: Iv8Ru4CMog5ZsfQgUuHPnzxu3bqrznBqdnCHT5UIE+HnLDzehmWIY+ko2028B2g17LyrMRW3vj
+ BXKs5kxmJS7Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9678"; a="209754753"
+X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; d="scan'208";a="209754753"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 10 Jul 2020 08:46:34 -0700
+IronPort-SDR: TQRhjWwWId/AWMmXjERSCPjmdXHso115aC8naLI78bJsJlzur2rABZgZ1ZFDubgQfaf+s0OBuh
+ YRQkRYqRHhUA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; d="scan'208";a="484686394"
+Received: from unknown (HELO localhost.localdomain.sh.intel.com)
+ ([10.239.153.142])
+ by fmsmga005.fm.intel.com with ESMTP; 10 Jul 2020 08:46:32 -0700
+From: Wentong Wu <wentong.wu@intel.com>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PATCH v2 4/4] hw/nios2: exit to main CPU loop only when unmasking
+ interrupts
+Date: Fri, 10 Jul 2020 19:34:33 -0400
+Message-Id: <20200710233433.19729-4-wentong.wu@intel.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200710233433.19729-1-wentong.wu@intel.com>
+References: <20200710233433.19729-1-wentong.wu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9f0tadztJP7Ki0potF6=E+GaG8a_X_5HTyH2yw2T7goA@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 23:35:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=134.134.136.31; envelope-from=wentong.wu@intel.com;
+ helo=mga06.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 11:46:35
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -22
+X-Spam_score: -2.3
+X-Spam_bar: --
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_FUTURE_06_12=1.947,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,37 +80,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Claudio Fontana <cfontana@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, marex@denx.de, crwulff@gmail.com,
+ Wentong Wu <wentong.wu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10.07.20 17:42, Peter Maydell wrote:
-> On Fri, 10 Jul 2020 at 16:31, Max Reitz <mreitz@redhat.com> wrote:
->>
->> On 10.07.20 17:18, Peter Maydell wrote:
->>> readarray only arrived sometime in bash 4, and the OSX system
->>> bash is 3.2.57, so it won't have that builtin.
->>
->> It arrived with 4.0, actually, which was released 11 years ago.
->> I had assumed that would be sufficiently mature.
->>
->> So, um, 11 years isn’t sufficiently mature then and I’ll have to work
->> around not having readarray for macOS?
-> 
-> It's the usual Apple-vs-GPL3 issue.
-> 
-> I note that the iotests do seem to regularly run into
-> non-portable constructs: Kevin's latest pullreq has
-> just failed due to a use of 'truncate' that doesn't
-> work on the BSDs.
+Only when guest code is unmasking interrupts, terminate the excution
+of translated code and exit to the main CPU loop to handle previous
+pended interrupts because of the interrupts mask by guest code.
 
-:/
+Signed-off-by: Wentong Wu <wentong.wu@intel.com>
+---
+ hw/nios2/cpu_pic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I’ll send a patch to drop readarray.
-
-Max
+diff --git a/hw/nios2/cpu_pic.c b/hw/nios2/cpu_pic.c
+index 1c1989d5..5ea7e52a 100644
+--- a/hw/nios2/cpu_pic.c
++++ b/hw/nios2/cpu_pic.c
+@@ -54,7 +54,8 @@ static void nios2_pic_cpu_handler(void *opaque, int irq, int level)
+ 
+ void nios2_check_interrupts(CPUNios2State *env)
+ {
+-    if (env->irq_pending) {
++    if (env->irq_pending &&
++        (env->regs[CR_STATUS] & CR_STATUS_PIE)) {
+         env->irq_pending = 0;
+         cpu_interrupt(env_cpu(env), CPU_INTERRUPT_HARD);
+     }
+-- 
+2.21.3
 
 
