@@ -2,68 +2,84 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBCAC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBBFBC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:33:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AF5420657
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:33:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6840C20657
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:33:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="g8uU4jch"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF5420657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ijZh+43b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6840C20657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvxQ-0003hL-E3
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:33:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42780)
+	id 1jtvyI-0005jJ-Jg
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:33:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jtvfS-0003G8-Go; Fri, 10 Jul 2020 12:14:30 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:43854)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jtvfJ-0004wF-MK; Fri, 10 Jul 2020 12:14:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=wI3TwV908BhBisL9PFEr4SOnyuhOIobK8NYSya/vLt8=; 
- b=g8uU4jchJn+yjNrxR+xFs4wrCiWyihqggKpauasEPp1m9NlG6kpB0oar14QglAx7DA0My3UQyziGJHdG+r7QKytNInuBeiDV/Q4c4K3wFqAnUkvUp/2kg/kJku9dGDpgZ1uYEU0ucAj1M3j85fKSv49PDj8k98vQ6+5BOAejppz5yxSL2i/jCUHvQD6YS5tMlym8aY4V/0zNHQyKRtO/Zc1ur2u4SiiNgGhqqc/dexj3/rXjVgbNumDB4N3jaG2m9+JUl0AVnKbu/oV1gvSJY73FlEdfsx97UrrMXDj1tY63yda1n76tcpxz0WRbraLowkGMkyHsT6WKGVvB94SY1g==;
-Received: from [81.0.43.0] (helo=perseus.local)
- by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jtvea-0003k5-Nf; Fri, 10 Jul 2020 18:13:36 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1jtveL-0001RQ-IC; Fri, 10 Jul 2020 18:13:21 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v11 29/34] qcow2: Add subcluster support to qcow2_measure()
-Date: Fri, 10 Jul 2020 18:13:11 +0200
-Message-Id: <7efae2efd5e36b42d2570743a12576d68ce53685.1594396418.git.berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1594396418.git.berto@igalia.com>
-References: <cover.1594396418.git.berto@igalia.com>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtvxO-00044s-10
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:33:02 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57159
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtvxM-0007vh-G6
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:33:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594398779;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cvyzzuBWOhSh/D2b/DAr+rl5JnwWsbc2V629CLjsrqI=;
+ b=ijZh+43bbf/ZpAN2OwgJfF22XY+Wvn8C8KmC4wSrLx5A5yw6xUM/7lcB/AJ2Xgd33h8Eej
+ 8hsau9TUF4fnxj8aN+w9kKUMIICztRssppgN0lHsTRJI1sWgGKzCQ7pvI8n+/brJ8vEavS
+ R/mHv9suNdqvbhX0iVUjTr6bYdBCVZw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-krdl1TxwMjqcSqRuSs_jpw-1; Fri, 10 Jul 2020 12:32:58 -0400
+X-MC-Unique: krdl1TxwMjqcSqRuSs_jpw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17525107BEF5;
+ Fri, 10 Jul 2020 16:32:57 +0000 (UTC)
+Received: from localhost (ovpn-113-127.ams2.redhat.com [10.36.113.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B050C17D82;
+ Fri, 10 Jul 2020 16:32:56 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH 1/2] iotests: Drop readarray from _do_filter_img_create
+Date: Fri, 10 Jul 2020 18:32:51 +0200
+Message-Id: <20200710163253.381630-2-mreitz@redhat.com>
+In-Reply-To: <20200710163253.381630-1-mreitz@redhat.com>
+References: <20200710163253.381630-1-mreitz@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 12:13:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 22:08:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,96 +92,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- Derek Su <dereksu@qnap.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Extended L2 entries are bigger than normal L2 entries so this has an
-impact on the amount of metadata needed for a qcow2 file.
+Some systems where we run tests on do not have a 4.x bash, so they do
+not have readarray.  While it looked a bit nicer than messing with
+`head` and `tail`, we do not really need it, so we might as well not use
+it.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reported-by: Claudio Fontana <cfontana@suse.de>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/common.filter | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 358e60a261..9ab2a91c8b 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3232,28 +3232,31 @@ int64_t qcow2_refcount_metadata_size(int64_t clusters, size_t cluster_size,
-  * @total_size: virtual disk size in bytes
-  * @cluster_size: cluster size in bytes
-  * @refcount_order: refcount bits power-of-2 exponent
-+ * @extended_l2: true if the image has extended L2 entries
-  *
-  * Returns: Total number of bytes required for the fully allocated image
-  * (including metadata).
-  */
- static int64_t qcow2_calc_prealloc_size(int64_t total_size,
-                                         size_t cluster_size,
--                                        int refcount_order)
-+                                        int refcount_order,
-+                                        bool extended_l2)
- {
-     int64_t meta_size = 0;
-     uint64_t nl1e, nl2e;
-     int64_t aligned_total_size = ROUND_UP(total_size, cluster_size);
-+    size_t l2e_size = extended_l2 ? L2E_SIZE_EXTENDED : L2E_SIZE_NORMAL;
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 3833206327..345c3ca03e 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -138,13 +138,13 @@ _do_filter_img_create()
+     # Split the line into the pre-options part ($filename_part, which
+     # precedes ", fmt=") and the options part ($options, which starts
+     # with "fmt=")
+-    # (And just echo everything before the first "^Formatting")
+-    readarray formatting_line < <($SED -e 's/, fmt=/\n/')
++    read formatting_line
  
-     /* header: 1 cluster */
-     meta_size += cluster_size;
+-    filename_part=${formatting_line[0]}
+-    unset formatting_line[0]
++    # Split line at the first ", fmt="
++    formatting_line=$(echo "$formatting_line" | $SED -e 's/, fmt=/\nfmt=/')
  
-     /* total size of L2 tables */
-     nl2e = aligned_total_size / cluster_size;
--    nl2e = ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
--    meta_size += nl2e * sizeof(uint64_t);
-+    nl2e = ROUND_UP(nl2e, cluster_size / l2e_size);
-+    meta_size += nl2e * l2e_size;
+-    options="fmt=${formatting_line[@]}"
++    filename_part=$(echo "$formatting_line" | head -n 1)
++    options=$(echo "$formatting_line" | tail -n +2)
  
-     /* total size of L1 tables */
--    nl1e = nl2e * sizeof(uint64_t) / cluster_size;
-+    nl1e = nl2e * l2e_size / cluster_size;
-     nl1e = ROUND_UP(nl1e, cluster_size / sizeof(uint64_t));
-     meta_size += nl1e * sizeof(uint64_t);
- 
-@@ -4838,6 +4841,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-     PreallocMode prealloc;
-     bool has_backing_file;
-     bool has_luks;
-+    bool extended_l2 = false; /* Set to false until the option is added */
-+    size_t l2e_size;
- 
-     /* Parse image creation options */
-     cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
-@@ -4896,8 +4901,9 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-     virtual_size = ROUND_UP(virtual_size, cluster_size);
- 
-     /* Check that virtual disk size is valid */
-+    l2e_size = extended_l2 ? L2E_SIZE_EXTENDED : L2E_SIZE_NORMAL;
-     l2_tables = DIV_ROUND_UP(virtual_size / cluster_size,
--                             cluster_size / sizeof(uint64_t));
-+                             cluster_size / l2e_size);
-     if (l2_tables * sizeof(uint64_t) > QCOW_MAX_L1_SIZE) {
-         error_setg(&local_err, "The image size is too large "
-                                "(try using a larger cluster size)");
-@@ -4960,9 +4966,9 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-     }
- 
-     info = g_new0(BlockMeasureInfo, 1);
--    info->fully_allocated =
-+    info->fully_allocated = luks_payload_size +
-         qcow2_calc_prealloc_size(virtual_size, cluster_size,
--                                 ctz32(refcount_bits)) + luks_payload_size;
-+                                 ctz32(refcount_bits), extended_l2);
- 
-     /*
-      * Remove data clusters that are not required.  This overestimates the
+     # Set grep_data_file to '\|data_file' to keep it; make it empty
+     # to drop it.
 -- 
-2.20.1
+2.26.2
 
 
