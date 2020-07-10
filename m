@@ -7,49 +7,48 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 276EBC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6E8C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:26:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF6E1206F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:20:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA86520657
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:26:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="UakEYuMf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6E1206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Ho4HACYg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA86520657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvli-0006Wf-5J
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:20:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42408)
+	id 1jtvqr-0000X6-Us
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:26:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jtvf5-0002FK-ES; Fri, 10 Jul 2020 12:14:07 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:43500)
+ id 1jtvfN-000329-Be; Fri, 10 Jul 2020 12:14:25 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:43649)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jtvey-0004v0-41; Fri, 10 Jul 2020 12:14:07 -0400
+ id 1jtvfI-0004vR-Iz; Fri, 10 Jul 2020 12:14:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=MvVSycQQC8KVkYxr++0oWV9Dkuj9qnJokoUfd8+GF6A=; 
- b=UakEYuMfn4kxEhuohvdQ5CJojRt8zLerBnkpPlnHUeWwlZIia7vPHfuIEFAKy/prlE/5UETb86c0qx47Bn4AQlO70DQGRfdyDCcKUc3Oihu3NDy/oSPMM2ngLOKRXl7/T7QJ5VPPYVfpdjY5oyShQF1rq0L57IGZlqxfbLSfTvwtzhUU7//Z3cIJKTVvePZ/wTaM6TVzh6b2DWOzB9Nforbap+13JYitz19y0bILBDE3/6zVyU8b14mZPcTsbvs/XIPdcwRGLTvXVlmIcJxK01qMFJIlyJ46njUVrJcfvQIkLdOkwe66OgWkNwqnNupAOGJZsQ+yzgjyi1D9c0K2SQ==;
+ bh=DWFzz4T+AhoA6h3Vs/ROK38xw63e6XfJbmyzdTE6EKY=; 
+ b=Ho4HACYg7NPW2YaJiZ48JQOVK8+Wfa6Ekfav7ab9rO/b9p5PC5heCNbIORnm2qvJW1bLwqSANC+O1u/rUl6V8dJ3qdPPz/sLVCvDpS+bjwy7t3++37d1eQiHDQHGyilP5jlzuIN048Qk3quTyPJv+qi7FuCaQTcna3+2/J3EznZESTxBzT2P4BP5Lm0gwV2iwkxgnELgcEFiRaYM9vKlYAwmBjG6yZ45Sf4mv6xEXTEKDEbZrRrZyBUgnJfquEV5FRMJQnPXtSGagfXaiQB8Kf0IhfitUxLbtDEiR7EMrxKvo46nXkHER7DwHYmaXdaEMVazoP9DX9pemNgm76VgBA==;
 Received: from [81.0.43.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jtveZ-0003jU-By; Fri, 10 Jul 2020 18:13:35 +0200
+ id 1jtvea-0003jd-9D; Fri, 10 Jul 2020 18:13:36 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jtveK-0001QG-M3; Fri, 10 Jul 2020 18:13:20 +0200
+ id 1jtveK-0001QU-SI; Fri, 10 Jul 2020 18:13:20 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v11 04/34] qcow2: Split cluster_needs_cow() out of
- count_cow_clusters()
-Date: Fri, 10 Jul 2020 18:12:46 +0200
-Message-Id: <65e5d9627ca2ebe7e62deaeddf60949c33067d9d.1594396418.git.berto@igalia.com>
+Subject: [PATCH v11 10/34] qcow2: Add offset_to_sc_index()
+Date: Fri, 10 Jul 2020 18:12:52 +0200
+Message-Id: <56e3e4ac0d827c6a2f5f259106c5ddb7c4ca2653.1594396418.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1594396418.git.berto@igalia.com>
 References: <cover.1594396418.git.berto@igalia.com>
@@ -85,71 +84,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to need it in other places.
+For a given offset, return the subcluster number within its cluster
+(i.e. with 32 subclusters per cluster it returns a number between 0
+and 31).
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2-cluster.c | 34 +++++++++++++++++++---------------
- 1 file changed, 19 insertions(+), 15 deletions(-)
+ block/qcow2.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 360da3f6b2..543f515c81 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1088,6 +1088,24 @@ static void calculate_l2_meta(BlockDriverState *bs,
-     QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
+diff --git a/block/qcow2.h b/block/qcow2.h
+index eee4c8de9c..2503374677 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -581,6 +581,11 @@ static inline int offset_to_l2_slice_index(BDRVQcow2State *s, int64_t offset)
+     return (offset >> s->cluster_bits) & (s->l2_slice_size - 1);
  }
  
-+/* Returns true if writing to a cluster requires COW */
-+static bool cluster_needs_cow(BlockDriverState *bs, uint64_t l2_entry)
++static inline int offset_to_sc_index(BDRVQcow2State *s, int64_t offset)
 +{
-+    switch (qcow2_get_cluster_type(bs, l2_entry)) {
-+    case QCOW2_CLUSTER_NORMAL:
-+        if (l2_entry & QCOW_OFLAG_COPIED) {
-+            return false;
-+        }
-+    case QCOW2_CLUSTER_UNALLOCATED:
-+    case QCOW2_CLUSTER_COMPRESSED:
-+    case QCOW2_CLUSTER_ZERO_PLAIN:
-+    case QCOW2_CLUSTER_ZERO_ALLOC:
-+        return true;
-+    default:
-+        abort();
-+    }
++    return (offset >> s->subcluster_bits) & (s->subclusters_per_cluster - 1);
 +}
 +
- /*
-  * Returns the number of contiguous clusters that can be used for an allocating
-  * write, but require COW to be performed (this includes yet unallocated space,
-@@ -1100,25 +1118,11 @@ static int count_cow_clusters(BlockDriverState *bs, int nb_clusters,
- 
-     for (i = 0; i < nb_clusters; i++) {
-         uint64_t l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
--        QCow2ClusterType cluster_type = qcow2_get_cluster_type(bs, l2_entry);
--
--        switch(cluster_type) {
--        case QCOW2_CLUSTER_NORMAL:
--            if (l2_entry & QCOW_OFLAG_COPIED) {
--                goto out;
--            }
-+        if (!cluster_needs_cow(bs, l2_entry)) {
-             break;
--        case QCOW2_CLUSTER_UNALLOCATED:
--        case QCOW2_CLUSTER_COMPRESSED:
--        case QCOW2_CLUSTER_ZERO_PLAIN:
--        case QCOW2_CLUSTER_ZERO_ALLOC:
--            break;
--        default:
--            abort();
-         }
-     }
- 
--out:
-     assert(i <= nb_clusters);
-     return i;
- }
+ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+ {
+     return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bits);
 -- 
 2.20.1
 
