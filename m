@@ -2,96 +2,55 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BABC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D467C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:29:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9920D20725
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:29:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O/zpWb7d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9920D20725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 75CCF20720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:29:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75CCF20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtwpd-0007Ww-Tg
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 13:29:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59610)
+	id 1jtwpn-0007t6-Ln
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 13:29:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtwoA-0005kY-9f
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 13:27:34 -0400
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:35336)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtwo7-0006fu-BM
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 13:27:34 -0400
-Received: by mail-pl1-x62a.google.com with SMTP id x9so2530779plr.2
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 10:27:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MGw1xnIhMlU3+HyGZ+q0KK/sZgrz0+mONwYEG3A9hmE=;
- b=O/zpWb7dilaa4B9k/DHhXwpxKsU6ltfE8Pwc6SrppMyGw88dbNOrlAqdozfEl37yRh
- mVy6nbhdZ7OSs5j3FTrVNYv80fvRRBP0mvyed4ViX5qMEFHwqgEtB0ofyxJKIsO6GTi/
- bpx3VTtek7FCaYzgFFuV+704Dd2np1AfLCEs9iqJVGql7AaoSkiGb+flYb2cruUBhpN9
- DVFeCoZgaIKOLUdBgvET6AgHvWcPCI1ZQ9eDYRi2srrFNhFOmGUAZqn/P7YkEBbnjxci
- +LkWqbv/8k/tvcRGFKqWS4KxwwJx3iAPYG/ljXbyVS70975Egm3m+ttUf7hWVRGlZVwc
- lX6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MGw1xnIhMlU3+HyGZ+q0KK/sZgrz0+mONwYEG3A9hmE=;
- b=ErAiRfjsdxwtNR0dB/NiL7NTVnUFxs+lBOyfodGLB0r4FpeNWWvoV2Nb8l8N2BnGSS
- L2/uBKKOpG8d4s3/8CdmWnki94Wc+8vOWm0EqAvuNS76/s/JuZaSSk/NCb9Ag91ZNnEY
- 48FhBqDkxojnB3JrHpZxHrCjidUv9oiTWNE9Wo0cxXb96gdhlIwXNyGhTJZLO9TY5BBa
- 2FbzC/65BCaRAqI7KwI8sI3xILc3sRr5nEClm1Hah4LWlJXXAaLjOaGH0O4YOMB2awDz
- 1Zc5hUe2fUgTddeeGyQpx0XqiQVU3RFxOkKBJ/sBMdqDPCjTVUZUbTIpr+ld9V8hqN9a
- TUyg==
-X-Gm-Message-State: AOAM532D1XloJmzj5OZvKhGWvIixOaEI3aW0N09hCx/QhGVQ1ytu+XGL
- ym89p2kbc9Cx+kXbCEY1R0Hbig==
-X-Google-Smtp-Source: ABdhPJzo7HaYnOJlSXveXMoQH8G7sNhEagbCrbuMGjPmGg7dIrbFcVpLDNxImBnoqakxCJ3Nm8viYQ==
-X-Received: by 2002:a17:902:c411:: with SMTP id
- k17mr56177688plk.165.1594402049873; 
- Fri, 10 Jul 2020 10:27:29 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id g8sm6338215pgr.70.2020.07.10.10.27.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 10:27:29 -0700 (PDT)
-Subject: Re: [RFC 07/65] target/riscv: rvv-0.9: add vector context status
-To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <20200710104920.13550-1-frank.chang@sifive.com>
- <20200710104920.13550-8-frank.chang@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <52547eb2-4bda-e97a-3c5e-8565da3579de@linaro.org>
-Date: Fri, 10 Jul 2020 10:27:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200710104920.13550-8-frank.chang@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62a;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jtwnx-0005MO-CR; Fri, 10 Jul 2020 13:27:21 -0400
+Received: from relay.sw.ru ([185.231.240.75]:57036 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jtwnu-0006dU-HA; Fri, 10 Jul 2020 13:27:21 -0400
+Received: from [192.168.15.187] (helo=iris.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <den@openvz.org>)
+ id 1jtwnk-0008U2-DE; Fri, 10 Jul 2020 20:27:08 +0300
+From: "Denis V. Lunev" <den@openvz.org>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 2/2] block: add logging facility for long standing IO requests
+Date: Fri, 10 Jul 2020 20:27:11 +0300
+Message-Id: <20200710172711.8059-3-den@openvz.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200710172711.8059-1-den@openvz.org>
+References: <20200710172711.8059-1-den@openvz.org>
+Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
+ helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 13:27:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,32 +64,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/20 3:48 AM, frank.chang@sifive.com wrote:
-> From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> 
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> Signed-off-by: Frank Chang <frank.chang@sifive.com>
-> ---
->  target/riscv/cpu.h                      |  4 ++
->  target/riscv/cpu_bits.h                 |  1 +
->  target/riscv/cpu_helper.c               | 13 ++++++
->  target/riscv/csr.c                      | 25 ++++++++++-
->  target/riscv/insn_trans/trans_rvv.inc.c | 57 +++++++++++++++++++++----
->  target/riscv/translate.c                | 32 ++++++++++++++
->  6 files changed, 123 insertions(+), 9 deletions(-)
+There are severe delays with IO requests processing if QEMU is running in
+virtual machine or over software defined storage. Such delays potentially
+results in unpredictable guest behavior. For example, guests over IDE or
+SATA drive could remount filesystem read-only if write is performed
+longer than 10 seconds.
 
-BTW, I think this should be split.
+Such reports are very complex to process. Some good starting point for this
+seems quite reasonable. This patch provides one. It adds logging of such
+potentially dangerous long IO operations.
 
-One patch for the csr.c changes, another for the translate changes.
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+---
+ block/accounting.c         | 59 +++++++++++++++++++++++++++++++++++++-
+ blockdev.c                 |  7 ++++-
+ include/block/accounting.h |  5 +++-
+ 3 files changed, 68 insertions(+), 3 deletions(-)
 
+diff --git a/block/accounting.c b/block/accounting.c
+index 8d41c8a83a..3002444fa5 100644
+--- a/block/accounting.c
++++ b/block/accounting.c
+@@ -27,7 +27,9 @@
+ #include "block/accounting.h"
+ #include "block/block_int.h"
+ #include "qemu/timer.h"
++#include "qemu/log.h"
+ #include "sysemu/qtest.h"
++#include "sysemu/block-backend.h"
+ 
+ static QEMUClockType clock_type = QEMU_CLOCK_REALTIME;
+ static const int qtest_latency_ns = NANOSECONDS_PER_SECOND / 1000;
+@@ -41,10 +43,11 @@ void block_acct_init(BlockAcctStats *stats)
+ }
+ 
+ void block_acct_setup(BlockAcctStats *stats, bool account_invalid,
+-                      bool account_failed)
++                      bool account_failed, unsigned latency_log_threshold_ms)
+ {
+     stats->account_invalid = account_invalid;
+     stats->account_failed = account_failed;
++    stats->latency_log_threshold_ms = latency_log_threshold_ms;
+ }
+ 
+ void block_acct_cleanup(BlockAcctStats *stats)
+@@ -182,6 +185,58 @@ void block_latency_histograms_clear(BlockAcctStats *stats)
+     }
+ }
+ 
++static const char *block_account_type(enum BlockAcctType type)
++{
++    switch (type) {
++    case BLOCK_ACCT_READ:
++        return "READ";
++    case BLOCK_ACCT_WRITE:
++        return "WRITE";
++    case BLOCK_ACCT_FLUSH:
++        return "DISCARD";
++    case BLOCK_ACCT_UNMAP:
++        return "TRUNCATE";
++    case BLOCK_ACCT_NONE:
++        return "NONE";
++    case BLOCK_MAX_IOTYPE:
++        break;
++    }
++    return "UNKNOWN";
++}
++
++static void block_acct_report_long(BlockAcctStats *stats,
++                                   BlockAcctCookie *cookie, int64_t latency_ns)
++{
++    unsigned latency_ms = latency_ns / 1000000;
++    int64_t start_time_host_s;
++    char buf[64];
++    struct tm t;
++    BlockDriverState *bs;
++
++    if (cookie->type == BLOCK_ACCT_NONE) {
++        return;
++    }
++    if (stats->latency_log_threshold_ms == 0) {
++        return;
++    }
++    if (latency_ms < stats->latency_log_threshold_ms) {
++        return;
++    }
++
++    start_time_host_s = cookie->start_time_ns / 1000000000ull;
++    strftime(buf, sizeof(buf), "%m-%d %H:%M:%S",
++             localtime_r(&start_time_host_s, &t));
++
++    bs = blk_bs(blk_stats2blk(stats));
++    qemu_log("long %s[%ld] IO request: %d.03%d since %s.%03d bs: %s(%s, %s)\n",
++             block_account_type(cookie->type), cookie->bytes,
++             (int)(latency_ms / 1000), (int)(latency_ms % 1000), buf,
++             (int)((cookie->start_time_ns / 1000000) % 1000),
++             bs == NULL ? "unknown" : bdrv_get_node_name(bs),
++             bs == NULL ? "unknown" : bdrv_get_format_name(bs),
++             bs == NULL ? "unknown" : bs->filename);
++}
++
+ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+                                  bool failed)
+ {
+@@ -222,6 +277,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+ 
+     qemu_mutex_unlock(&stats->lock);
+ 
++    block_acct_report_long(stats, cookie, latency_ns);
++
+     cookie->type = BLOCK_ACCT_NONE;
+ }
+ 
+diff --git a/blockdev.c b/blockdev.c
+index 31d5eaf6bf..d87260958c 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -625,7 +625,8 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+ 
+         bs->detect_zeroes = detect_zeroes;
+ 
+-        block_acct_setup(blk_get_stats(blk), account_invalid, account_failed);
++        block_acct_setup(blk_get_stats(blk), account_invalid, account_failed,
++                qemu_opt_get_number(opts, "latency-log-threshold", 0));
+ 
+         if (!parse_stats_intervals(blk_get_stats(blk), interval_list, errp)) {
+             blk_unref(blk);
+@@ -3740,6 +3741,10 @@ QemuOptsList qemu_common_drive_opts = {
+             .type = QEMU_OPT_BOOL,
+             .help = "whether to account for failed I/O operations "
+                     "in the statistics",
++        },{
++            .name = "latency-log-threshold",
++            .type = QEMU_OPT_STRING,
++            .help = "threshold for long I/O report (disabled if <=0), in ms",
+         },
+         { /* end of list */ }
+     },
+diff --git a/include/block/accounting.h b/include/block/accounting.h
+index 878b4c3581..c3ea25f9aa 100644
+--- a/include/block/accounting.h
++++ b/include/block/accounting.h
+@@ -91,6 +91,9 @@ struct BlockAcctStats {
+     bool account_invalid;
+     bool account_failed;
+     BlockLatencyHistogram latency_histogram[BLOCK_MAX_IOTYPE];
++
++    /* Threshold for long I/O detection, ms */
++    unsigned latency_log_threshold_ms;
+ };
+ 
+ typedef struct BlockAcctCookie {
+@@ -101,7 +104,7 @@ typedef struct BlockAcctCookie {
+ 
+ void block_acct_init(BlockAcctStats *stats);
+ void block_acct_setup(BlockAcctStats *stats, bool account_invalid,
+-                     bool account_failed);
++                      bool account_failed, unsigned latency_log_threshold_ms);
+ void block_acct_cleanup(BlockAcctStats *stats);
+ void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length);
+ BlockAcctTimedStats *block_acct_interval_next(BlockAcctStats *stats,
+-- 
+2.17.1
 
-r~
 
