@@ -2,104 +2,89 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C44CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04677C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44F0B2078B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:04:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2605206C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:06:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PwqyYJZd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44F0B2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IWatbWSl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2605206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvW4-00045e-IM
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:04:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39446)
+	id 1jtvXz-000622-3w
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:06:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtvVM-000375-VQ
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:04:05 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:37760)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jtvVK-0003Jc-W7
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:04:04 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id o22so2809260pjw.2
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 09:04:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=mn5jpHrE3w7uofC/IDA3jOmsg5PYtCdD8dkmLEEZGSk=;
- b=PwqyYJZdf1zU3w9Ps7pAVlLxnfQ9Iv/BQpBqedl66aOsd6AXJEO/yXB36fBTSFoefL
- yREpfOhAEYPgG28nPbRED2IpB6fyg/saNwR7rBuihbzNS+un6AIgpE0iXSuRu1KKakWb
- IKJXtjsNm8yb+rEZ0H6CPo4r15EY1tFt35hy5VhnctkUyxCOVIec9VGVALhpZtKOeAUr
- z8bVvwjoLTsWonUrI2QQRb9sHHCQ7RxtYWnOmW51O5qASs2jDux/rN5VeLvv8vnyMv93
- Igh8fO+YNsJWskaJMdLbrdUkYVp2vUky635R4t7UJQWhSRHxOOfCDExq4pl1yn778uC9
- yx2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mn5jpHrE3w7uofC/IDA3jOmsg5PYtCdD8dkmLEEZGSk=;
- b=npy+683V1UE0C1QFCYnMGMOBn3ZZfRwQdd6dN6Teum0zy07hpUVuasS1juGWOtWYxG
- 9TDx0rRwyvONTOy1hR5JOhE/DYvyWGK9NzvXY3Z3HBOy+ANz7LFnJMTAzS6yLaLqD97l
- yKB2mSj5Oq//H2dVJg+Iykh1VoRgzkqO/bhz6P2YTOCeccRt2xUTD/j6Av3OWSQcDQRs
- xo4/DR5FXykaOjfIE5hLQ/OUmyDqtkmd7ydp3Cc6DSlnC7ej8202ElkfQnx488dv7abB
- zS9si92ziOR4yNTaLcWuYvI4mtQoZQb9kiqyqBBM5qOp2BhDahUGQlYnnutkE6f34fhj
- j/WQ==
-X-Gm-Message-State: AOAM530LMgTKc6ElkSwYRVQjpO+5O4FSgJKW+M+I3tc6DzYbgcARJVLG
- /2CGl9Y5HaWu7l86NokTvfAH2g==
-X-Google-Smtp-Source: ABdhPJwDmlZFyijDiwZoct/wiusNbcJKFWWuENWsv5GDs7q56gmrHSYjalZFU5woM6zCIML77lLNBg==
-X-Received: by 2002:a17:90b:3555:: with SMTP id
- lt21mr6851750pjb.234.1594397041110; 
- Fri, 10 Jul 2020 09:04:01 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id ev14sm6158728pjb.0.2020.07.10.09.04.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 09:04:00 -0700 (PDT)
-Subject: Re: [PATCH 0/6] target/riscv: NaN-boxing for multiple precison
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Chih-Min Chao <chihmin.chao@sifive.com>
-References: <20200626205917.4545-1-zhiwei_liu@c-sky.com>
- <6d2e6876-18a8-b32a-0879-565693b6d446@linaro.org>
- <3c139607-9cac-a28a-c296-b0e147b3b20f@c-sky.com>
- <53a00d93-be8b-6cc2-e091-215c71661453@c-sky.com>
- <0d484d59-ceeb-862b-4c44-e57065b914c0@linaro.org>
- <2d2eb1ec-22fa-cf2c-9a45-ee954a23fa63@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <cbdeae92-7eed-dcf2-f552-be3757af4d9f@linaro.org>
-Date: Fri, 10 Jul 2020 09:03:58 -0700
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jtvX6-00054A-Sm
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:05:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27677
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jtvX4-0003dQ-8z
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:05:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594397149;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZMjS9VahHy+svXZWBHGSPJl1zgai5DnSLIODjXfJfIE=;
+ b=IWatbWSlwa04dmCBVrLL2/kL/n4sHeBUQmL4ocJ7j9XiM9FMOmVG5S1n0yU5bdsnRI5NnR
+ u/OmMQahuylfSonjp3LG4txuxROF/NoIewO0vo67bgZniFMaiZv/pOXIme6ZvifK87DFFu
+ MP11gQWObGMkffWoB+rWnx3O2mOyWD8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-904Fk3lCP0m8GGSOmF47qg-1; Fri, 10 Jul 2020 12:05:47 -0400
+X-MC-Unique: 904Fk3lCP0m8GGSOmF47qg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 483D98027E4;
+ Fri, 10 Jul 2020 16:05:46 +0000 (UTC)
+Received: from [10.3.112.178] (ovpn-112-178.phx2.redhat.com [10.3.112.178])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DBBAC70101;
+ Fri, 10 Jul 2020 16:05:45 +0000 (UTC)
+Subject: Re: [PULL v2] Block layer patches
+To: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
+References: <20200709121713.283092-1-kwolf@redhat.com>
+ <CAFEAcA-LwS=MhC9ewXrQht2GzLMa951uGP=8MNGsTPqzEO89GA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ee21a2d5-0160-f95c-0eef-53d3266041ea@redhat.com>
+Date: Fri, 10 Jul 2020 11:05:45 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <2d2eb1ec-22fa-cf2c-9a45-ee954a23fa63@c-sky.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA-LwS=MhC9ewXrQht2GzLMa951uGP=8MNGsTPqzEO89GA@mail.gmail.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 04:36:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,30 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/20 12:03 AM, LIU Zhiwei wrote:
-> The comment is moving both inputs check and the result nan-boxing code to
-> helper functions.
+On 7/10/20 10:41 AM, Peter Maydell wrote:
+
+>>    qemu-img: Deprecate use of -b without -F (2020-07-09 14:14:55 +0200)
+>>
+>> ----------------------------------------------------------------
+>> Block layer patches:
+>>
+>> - file-posix: Mitigate file fragmentation with extent size hints
+>> - Tighten qemu-img rules on missing backing format
+>> - qemu-img map: Don't limit block status request size
+>>
 > 
-> In my opinion, it doesn't matter whether put them into helper functions or into
-> translation functions.
-> More importantly, we should add inputs check and result nan-boxing for all
-> single float point instructions.
+> iotest 114 fails on FreeBSD and OpenBSD (and probably NetBSD
+> but that build hasn't reported back yet): looks like a
+> non-portable use of 'truncate' ?
 > 
-> If you insist on we should move it to helper functions, I'd like to.:-)
 
-I don't insist, but I think it makes sense to do so.
+> @@ -1,8 +1,11 @@
+>   QA output created by 114
+> -qemu-img: warning: Deprecated use of backing file without explicit
+> backing format (detected format of raw)
+> -Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> backing_file=TEST_DIR/t.IMGFMT.orig
+> +truncate: illegal option -- -
+> +usage: truncate [-c] -s [+|-|%|/]size[K|k|M|m|G|g|T|t] file ...
+> +       truncate [-c] -r rfile file ...
+> +qemu-img: TEST_DIR/t.IMGFMT: Could not open 'TEST_DIR/t.IMGFMT.orig':
 
-Less code in translate means less time in the JIT, and more sharing of the icache.
+Yep, 'truncate' is not POSIX, but we've been lucky that most of our uses 
+have been under '_supported_os Linux'; test 272 runs on BSD with 
+'truncate -s' instead of 'truncate --size'.  The fix is obvious; I can 
+post the followup to squash in if that will help.
 
-Sometimes it's a tradeoff, but in this case because we will always call a
-helper, I think that the benefits are all positive to move the extra code into
-the helper.
-
-
-r~
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
