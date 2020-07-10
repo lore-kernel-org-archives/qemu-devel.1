@@ -2,86 +2,76 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CC2C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 01:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72EAEC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 01:46:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D8AE20725
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 01:43:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+oQlOAk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D8AE20725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4330E20725
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 01:46:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4330E20725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jti4O-0005N3-Ah
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 21:43:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56354)
+	id 1jti7T-0006Vg-Jn
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jul 2020 21:46:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jti3s-0004wx-Ex
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 21:42:48 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45509)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jti3q-0005aJ-UC
- for qemu-devel@nongnu.org; Thu, 09 Jul 2020 21:42:48 -0400
-Received: by mail-oi1-x244.google.com with SMTP id j11so3498479oiw.12
- for <qemu-devel@nongnu.org>; Thu, 09 Jul 2020 18:42:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=2TE4peOVWul/YTuw0DycxeKO2DnWH5uCH0QQgszSp5Q=;
- b=h+oQlOAkrnF8nHFBMofwifPEFshswEvGyAmi3NGYo3XvVTM/tQaEP3pE3gLgOVeYu0
- cdZ2Q9ILt4y3QYZ8e2+boDEtl6ER2kCmXnbRvUhWcZ8uO0F5W2uU0kiQsSErNfwtWIc4
- P2g6bg8hQhenDV43mGHO3bJSriDMifAPzI2y9+lD6DM2c1girVksIxJ0CVXyDxuccD6g
- Olqh2Gjd5luPxOgwkXBkkn9NrSOf9q82sBAiT+qnDhRGUV0GL5pB0gEkTb6ZD6NO2EB5
- xYOtwEyJTinO2BJU6u4xouA+GHdhVzwaccpj/TDSFORiRZBYl4R44iaufb2RClTf3oO0
- 0FSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=2TE4peOVWul/YTuw0DycxeKO2DnWH5uCH0QQgszSp5Q=;
- b=gZQCpJr3Sv+DialJp7ye1Z9R92+oMyIbxqbssQbiH/tgIgMuKp1QM11Hhi+iJHGzSQ
- hFs1zKq3iIohCaoZTmAdSR/Mx2PwUyjqzPI1FW0bArP9I38Dma3+0sf/0QUwET+9kwLJ
- Oce4a7npteIKv7B5GFEJRm+DTl4u4EcjUq1IW8ilEu8/GjpH2bxjshk3WBhSTnuTQlpD
- lLTyc5C5r8X9Kzpg02/oYvdsjnQf5uBHk3bPYrDnT/QJNnoQKoL1HCdxdw56ZddMNREA
- A5VWoDvm1MZbXIRkH8gvCSAyh8TxlIDCFZM1gfaey7aCMAYb2PP4emOZhwOWU/Xx8m02
- 8JOA==
-X-Gm-Message-State: AOAM5323/xlmEkpSf99Sr96reu8ai8vIAesMzf5taMgqpuszVjzEGNWo
- 7zWcZyjaKmPUJp+VhvDnE8ZW+SdoyfY5lWOEJAA=
-X-Google-Smtp-Source: ABdhPJzBDZeUJuWDi16jAlUjbraU/nAL/3XQwEtJFtCEk/LkEil6HodE1IoWJysRWlVryBpDtxSINKMjKYHhGFrX/z8=
-X-Received: by 2002:aca:494d:: with SMTP id w74mr2533124oia.97.1594345365399; 
- Thu, 09 Jul 2020 18:42:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
+ id 1jti6x-00066M-Bn
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 21:45:59 -0400
+Received: from mga14.intel.com ([192.55.52.115]:7353)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
+ id 1jti6u-00065k-P7
+ for qemu-devel@nongnu.org; Thu, 09 Jul 2020 21:45:58 -0400
+IronPort-SDR: r9D2wm6VWhAnTIb5r+4qlYKU8UnS1tlDNjpsxBbf6WHrCJiwLMwVb40svWBSECy8B2Z2IJk+mc
+ 2cvY72fK1/6w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9677"; a="147226706"
+X-IronPort-AV: E=Sophos;i="5.75,334,1589266800"; d="scan'208";a="147226706"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 09 Jul 2020 18:45:52 -0700
+IronPort-SDR: jUynXOGmi99VsdlT7dPH7IyX02daP5nNiaariiem2KPvnyAKyROisWAjWKzOFWlud5Guv5GgF6
+ Ebj9ip+9RLDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,334,1589266800"; d="scan'208";a="389324311"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.93])
+ ([10.238.2.93])
+ by fmsmga001.fm.intel.com with ESMTP; 09 Jul 2020 18:45:50 -0700
+Subject: Re: [PATCH v5 1/4] target/i386: add missing vmx features for several
+ CPU models
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20200619073114.24303-1-chenyi.qiang@intel.com>
+ <20200619073114.24303-2-chenyi.qiang@intel.com>
+ <20200709221226.GM780932@habkost.net>
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+Message-ID: <d3542ac6-9282-ed88-3819-3cc8b3368ee7@intel.com>
+Date: Fri, 10 Jul 2020 09:45:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200709175848.650400-1-ppandit@redhat.com>
-In-Reply-To: <20200709175848.650400-1-ppandit@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 10 Jul 2020 09:42:09 +0800
-Message-ID: <CAKXe6S+=uvPGAFO7DSdfmvtQp9vtHn1p9djhwZiwiMXkaTiCMA@mail.gmail.com>
-Subject: Re: [PATCH] 9p: null terminate fs driver options list
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200709221226.GM780932@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=192.55.52.115;
+ envelope-from=chenyi.qiang@intel.com; helo=mga14.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 21:45:52
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,58 +84,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Greg Kurz <groug@kaod.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Robert Hoo <robert.hu@linux.intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8810=E6=97=A5=E5=
-=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=882:01=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> NULL terminate fs driver options' list, validate_opt() looks for
-> a null entry to terminate the loop.
->
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-> ---
->  fsdev/qemu-fsdev.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-> index a9e069c0c7..3da64e9f72 100644
-> --- a/fsdev/qemu-fsdev.c
-> +++ b/fsdev/qemu-fsdev.c
-> @@ -78,6 +78,7 @@ static FsDriverTable FsDrivers[] =3D {
->              "throttling.iops-read-max-length",
->              "throttling.iops-write-max-length",
->              "throttling.iops-size",
-> +            NULL
->          },
->      },
->      {
-> @@ -85,6 +86,7 @@ static FsDriverTable FsDrivers[] =3D {
->          .ops =3D &synth_ops,
->          .opts =3D (const char * []) {
->              COMMON_FS_DRIVER_OPTIONS,
-> +            NULL
->          },
->      },
->      {
-> @@ -95,6 +97,7 @@ static FsDriverTable FsDrivers[] =3D {
->              "socket",
->              "sock_fd",
->              "writeout",
-> +            NULL
->          },
->      },
->  };
-> --
-> 2.26.2
->
->
+On 7/10/2020 6:12 AM, Eduardo Habkost wrote:
+> 
+> I'm very sorry for taking so long to review this.  Question
+> below:
+> 
+> On Fri, Jun 19, 2020 at 03:31:11PM +0800, Chenyi Qiang wrote:
+>> Add some missing VMX features in Skylake-Server, Cascadelake-Server and
+>> Icelake-Server CPU models based on the output of Paolo's script.
+>>
+>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> 
+> Why are you changing the v1 definition instead adding those new
+> features in a new version of the CPU model, just like you did in
+> patch 3/4?
+> 
+
+I suppose these missing vmx features are not quite necessary for 
+customers. Just post it here to see if they are worth being added.
+Adding a new version is reasonable. Is it appropriate to put all the 
+missing features in patch 1/4, 3/4, 4/4 in a same version?
+
+>> ---
+>>   target/i386/cpu.c | 6 +++++-
+>>   1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index b1b311baa2..0b309ef3ab 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -3002,6 +3002,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>>                VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+>>                VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+>>                VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+>> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+>>           .xlevel = 0x80000008,
+>>           .model_id = "Intel Xeon Processor (Skylake)",
+>>           .versions = (X86CPUVersionDefinition[]) {
+>> @@ -3130,6 +3131,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>>                VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+>>                VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+>>                VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+>> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+>>           .xlevel = 0x80000008,
+>>           .model_id = "Intel Xeon Processor (Cascadelake)",
+>>           .versions = (X86CPUVersionDefinition[]) {
+>> @@ -3477,7 +3479,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>>                VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
+>>                VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+>>                VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENABLE_INVPCID |
+>> -             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS,
+>> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS |
+>> +             VMX_SECONDARY_EXEC_RDSEED_EXITING | VMX_SECONDARY_EXEC_ENABLE_PML,
+>> +        .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+>>           .xlevel = 0x80000008,
+>>           .model_id = "Intel Xeon Processor (Icelake)",
+>>           .versions = (X86CPUVersionDefinition[]) {
+>> -- 
+>> 2.17.1
+>>
+>>
+> 
 
