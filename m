@@ -2,65 +2,93 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD27C433F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1401FC433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4343A20720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:56:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4343A20720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id D878D20720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:58:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZY9uldhl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D878D20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtsaC-00018l-JI
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:56:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45320)
+	id 1jtsbW-0003du-1b
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtsZG-0000Gp-Fp
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:55:54 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45626)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jtsZE-0007zu-4N
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:55:54 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 2C978ACBF;
- Fri, 10 Jul 2020 12:55:51 +0000 (UTC)
-Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
-To: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20200708172542.25012-1-pbonzini@redhat.com>
- <CAFEAcA8b6sn8fXOKwqOF6MvsKT5oKqS+4jjYDPAPvnXmVimLiQ@mail.gmail.com>
- <CAFEAcA-hVrJ90E=qQP+3CONPozQLrnaAP3LC1DwP7KuJ0nAwQA@mail.gmail.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <4abf6e80-abaf-5edc-c19b-cf5867843071@suse.de>
-Date: Fri, 10 Jul 2020 14:55:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-hVrJ90E=qQP+3CONPozQLrnaAP3LC1DwP7KuJ0nAwQA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:07:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jtqbv-0004kq-HN
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:50:31 -0400
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:42307)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jtqbt-0006EK-3N
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:50:31 -0400
+Received: by mail-pf1-x433.google.com with SMTP id 1so2374836pfn.9
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:50:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=dY1VnCufQZpa+aF68DC4K7OikxwvWj2GSrpOqri/zyA=;
+ b=ZY9uldhl3XCVsiWK2GRXkZh5RfFmPh6KGV9OSMRbSVpk9NNnpIYmjImeKM1/xkw7W0
+ fDvXKgrFg4TMXvNQXZSjdLZStDsMOISYAuIpWkrVkxYCY4wAcxopuBlaS3BTP2tlyqLU
+ /EcUjFVLYtN1Y1peKwJXd0WiBrSLkcfYL7hIknrKCtk7x4+J5uowplOjEPjerkHzplMu
+ wqXPTWJHHC/H3lzk8VgoOrgHfFDMfS0RjmdFcgK0gNjmhijKX3JStmBWqwL5KexpHdtB
+ uMNiLgh9K5FqTTAzKRIwM+DK2eM9+4vMZ5NF2GAOAEzpPLLHZ/spTsbANhnSg0Vu3Ghm
+ 39Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=dY1VnCufQZpa+aF68DC4K7OikxwvWj2GSrpOqri/zyA=;
+ b=ujeNr5oTZ2V/O4OXIRja5x43we1bzWFXLBe+7XfczmLkb9MdanLPJC4UzIMv7937ta
+ bKMPtguZLOuotktBv6gOIAdDlbF7G9AZSLlA57MJDrvratQbtnkWN51c7d+wqTg0r9Zz
+ ngDmwvxn/kyx1/ovtDeHRSQ07Je7V7/26d8gU9K66joPRVjMY+zPe3YMN7rL55yQshCC
+ DQcTSc7lZE3cAsHka1M3Fd2lEiiIWXuEz6sQxA8J5+qVCcL9ILPovpy87cXTwZakQPNS
+ Ql3xLDKjRnA3lPPzNAb5+H09TANZas5L65OrzMCTUE3jONWVkomcJwYQJpqHrQI9vzCn
+ GcAQ==
+X-Gm-Message-State: AOAM531MWfAlHPWJ1hXAQqOp3FuPbOozgLeF7DGxNNkogyrpboAPuNVy
+ 1oYcI+AMRxLghPwgg8Eyolxf3k3ccLBekg==
+X-Google-Smtp-Source: ABdhPJxy8e+X38Cnw0Gzb9HAP1qeyzPcOIpSgG90Z2J1eL2fzHkCQrqPMN8kbArg0IupXeaXgzmj0A==
+X-Received: by 2002:a65:4502:: with SMTP id n2mr46494850pgq.132.1594378227180; 
+ Fri, 10 Jul 2020 03:50:27 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.50.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jul 2020 03:50:26 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC 02/65] target/riscv: correct the gvec IR called in
+ gen_vec_rsub16_i64()
+Date: Fri, 10 Jul 2020 18:48:16 +0800
+Message-Id: <20200710104920.13550-3-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::433;
+ envelope-from=frank.chang@sifive.com; helo=mail-pf1-x433.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:17 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,70 +100,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Frank Chang <frank.chang@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/20 2:28 PM, Peter Maydell wrote:
-> On Fri, 10 Jul 2020 at 13:14, Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->> On Wed, 8 Jul 2020 at 22:32, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>
->>> The following changes since commit eb2c66b10efd2b914b56b20ae90655914310c925:
->>>
->>>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-07-06' into staging (2020-07-07 19:47:26 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   git://github.com/bonzini/qemu.git tags/for-upstream
->>>
->>> for you to fetch changes up to 392f34e59755f99d69586a63e0f5d80a7ef67f94:
->>>
->>>   apic: Report current_count via 'info lapic' (2020-07-08 10:01:08 -0400)
->>
->> Hi; this still has the OSX failure, I'm afraid:
->>
->> /Users/pm215/src/qemu-for-merges/ui/cocoa.m:1478:9: error: implicit
->> declaration of function 'cpu_throttle_set' is invalid in C99 [-
->> Werror,-Wimplicit-function-declaration]
->>         cpu_throttle_set(throttle_pct);
->>         ^
->> /Users/pm215/src/qemu-for-merges/ui/cocoa.m:1478:9: error: this
->> function declaration is not a prototype [-Werror,-Wstrict-prototypes]
-> 
-> Squashing this into "cpu-throttle: new module, extracted from cpus.c"
-> should fix this (ui/cocoa.m was just forgotten when adding #include lines
-> after moving the function into its own header):
-> 
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index cb556e4e66..0910b4a716 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -32,6 +32,7 @@
->  #include "ui/input.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/runstate.h"
-> +#include "sysemu/cpu-throttle.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-commands-block.h"
->  #include "qapi/qapi-commands-misc.h"
-> 
-> (am just doing a compile-and-test run with that change).
-> 
-> thanks
-> -- PMM
-> 
+From: Frank Chang <frank.chang@sifive.com>
 
-Ah, just noticed this, yes, indeed I clearly forgot that,
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+---
+ target/riscv/insn_trans/trans_rvv.inc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-at the same time clearly I need to improve both my local environment and the CI setups I am using,
-because for me everything works!
-
-Or, we could swap configurations so that QEMU builds are always successful... ;-)
-
-Ciao,
-
-Claudio
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 433cdacbe1..7cd08f0868 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -937,7 +937,7 @@ static void gen_vec_rsub8_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+ 
+ static void gen_vec_rsub16_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+ {
+-    tcg_gen_vec_sub8_i64(d, b, a);
++    tcg_gen_vec_sub16_i64(d, b, a);
+ }
+ 
+ static void gen_rsub_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
+-- 
+2.17.1
 
 
