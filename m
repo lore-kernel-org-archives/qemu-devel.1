@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EDCFC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4121C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:02:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2D4A20772
+	by mail.kernel.org (Postfix) with ESMTPS id BF2D920720
 	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:02:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZN3n2MiI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D4A20772
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="adlI23sr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF2D920720
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtsfS-0002b4-4h
+	id 1jtsfS-0002b5-0q
 	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:02:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38038)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqeO-0005i6-IW
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:53:04 -0400
-Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:33041)
+ id 1jtqcV-000524-PD
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:51:07 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:41212)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqeL-0006o9-LQ
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:53:04 -0400
-Received: by mail-pg1-x536.google.com with SMTP id o13so2388775pgf.0
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:52:59 -0700 (PDT)
+ id 1jtqcT-0006WI-7R
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:51:07 -0400
+Received: by mail-pg1-x532.google.com with SMTP id g67so2364095pgc.8
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:51:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=V77vPoxF5wHJpkr1vzvCn6SW3F0N4bm+U02KvfCaIVI=;
- b=ZN3n2MiIsrq2WKB/kZQwU6uZ48ML4UPuftw4uG+h7nxnkBmiACIQ8m6kCMJNhW44hK
- KRxTzK1rMLvVsnRCR7nmVqluXt2k26dvvmnZ83aq87+QYWyCSzLsEtKzuSQfzBWYls7x
- UueDoUh4t72U+sKTHZyNDTM8t1TK9jkEOqcxRXusclZjq0cOeRUYEYAkK6BQ9dWETdPB
- xYQVcwHQlaTjsvfKUM4glJ3zYOmq/2Ou2fXzvnYrXbeRLcCkZUK6sWJtm8x56B8mW9mC
- Zml7eBu00q9J9ymiyI6ejLt1eXMtLvNGil6siFlRIoaQGo0mxjx+u8kwKV07GQEcmSe+
- PY+w==
+ bh=B6X3Angz3a9fADBGRD8iRciXrYqjv/GzyJKhnyt8KN0=;
+ b=adlI23sr1hWB/wr7xH6KCe1dssnuRPPkXCJ8wbGLyzv37r6OG6FiupB+YVJ0AT95UA
+ zdDmBwSWNCrbW0C56yYzhspgom2+QHlztcONxiFLn5GAnTbL4tIQdPJcZza9G95ttsLH
+ O8KU3M/gQxHsGraptX6tIzWLliqYhwMIqVzAYpf2HQ0caPnqc2o9pw6rGOThwLFtomve
+ wXRaYjsvgwHboBJFtqvFHAVk9MoS0e0WDmErUTalpeFgtY1aNuiHpZx8wlfGyJoQUuDa
+ HjYJ2cid6u6UnPGMI8i7ZgHsYQDn8lcRh1UzASN68JC/ZLmpqMNKmQZrpfC3qt3eoDeb
+ lvaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=V77vPoxF5wHJpkr1vzvCn6SW3F0N4bm+U02KvfCaIVI=;
- b=OpUPCASlfQA5AkhItW65ibJi5JnYU1E2z3BcXdaFfXYEHWD8o9VLtben8EwAe+XQ8d
- y9FYXN0yD44OT5urO8bODtD+cDw2Er35HWfIVzNqOg7soST4eph9yW6kxq39FR13dGnK
- +IHS3PFUVxtxoIPrC9aWsCpCUaut+CnzA6cy4MOOjanbOxVlYREqk6xQ5AvolfK0Rg0v
- VstpmsuhU/BJzzB6DJr+3qhcyZkd26zm7Ze3Rrb1kzWhZ8Ohf1nr0UpcFzI+nHOsdKLf
- oFjrTXw/OOXdSJy0YanDkiydNozOoIddtqFIJns9BqYLVJ4JK/rtYk8RwoLpNAm/iso3
- VMvQ==
-X-Gm-Message-State: AOAM531YTx68g8jdTRT7lIEpi9Ldhwt682qlL4UkK3GLfAkSV+wWzmKv
- SHFpy6iayDZxaNCtyOkcTnlnucIHWwT2NQ==
-X-Google-Smtp-Source: ABdhPJwVW9LsPG2L47xzLT3c1ypXUUo85tqOwTPZgjv7BYHb+jSpwgBtAwa0nh+qb7R304qhSsNbEQ==
-X-Received: by 2002:a62:3814:: with SMTP id f20mr62652011pfa.278.1594378378755; 
- Fri, 10 Jul 2020 03:52:58 -0700 (PDT)
+ bh=B6X3Angz3a9fADBGRD8iRciXrYqjv/GzyJKhnyt8KN0=;
+ b=SsKR+dXgrZEmcrSRamDqfu4j9Czy6JRh1dYXw6T7VOTnzKJGZfMZklsfqI9HpZUxOD
+ 6QH/HeyJC7b3NB4EbjjOyly6YRDbVgJhj59Ux5LnrxCZCQrlao0u3jx0ekMQ0xTAnW1v
+ xje/gFZvlPfAiBmTwIEIUgYX1pgjHbO4VCZ4BASc4mto6c/ZnaFu6a83fe6Fr0a1pqV0
+ nBiSqgLIFm70EjGX9gx3pDp9xvdbQtgzASrl/9BfNCUO2igCt+fykdt+rt9rEgA9dPo5
+ AV5dWPS+Hng7Y+BLjIR48KMuzY07eoWyxWv8/zT867GH/dOaRycvQGlHbf+jtQdEBl9w
+ 3gKA==
+X-Gm-Message-State: AOAM531kDxzcZuut+0xnyFQeAQ1oQTXJvWqJk6wVLcI18AHsUKZP2GkY
+ OyP6JyFf1fyOyyjTDoXYATi9qN/jqIRqdg==
+X-Google-Smtp-Source: ABdhPJzsowJFyDhitTrHXZPVHvEhFqHZNWlBjrqKg1u+v3xXXbwEoTJIChVbLevmJLdm4wLOnzt4lA==
+X-Received: by 2002:a63:5a54:: with SMTP id k20mr57031539pgm.226.1594378263794; 
+ Fri, 10 Jul 2020 03:51:03 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.52.56
+ by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.51.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jul 2020 03:52:58 -0700 (PDT)
+ Fri, 10 Jul 2020 03:51:03 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC 36/65] target/riscv: rvv-0.9: widening integer multiply-add
- instructions
-Date: Fri, 10 Jul 2020 18:48:50 +0800
-Message-Id: <20200710104920.13550-37-frank.chang@sifive.com>
+Subject: [RFC 09/65] target/riscv: rvv-0.9: add vlenb register
+Date: Fri, 10 Jul 2020 18:48:23 +0800
+Message-Id: <20200710104920.13550-10-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
 References: <20200710104920.13550-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::536;
- envelope-from=frank.chang@sifive.com; helo=mail-pg1-x536.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
+ envelope-from=frank.chang@sifive.com; helo=mail-pg1-x532.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,39 +99,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Frank Chang <frank.chang@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Greentime Hu <greentime.hu@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- target/riscv/insn32.decode | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/riscv/cpu.c      | 1 +
+ target/riscv/cpu.h      | 1 +
+ target/riscv/cpu_bits.h | 1 +
+ target/riscv/csr.c      | 7 +++++++
+ 4 files changed, 10 insertions(+)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index bc6c788edf..c6a7145aa5 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -420,9 +420,9 @@ vwmaccu_vv      111100 . ..... ..... 010 ..... 1010111 @r_vm
- vwmaccu_vx      111100 . ..... ..... 110 ..... 1010111 @r_vm
- vwmacc_vv       111101 . ..... ..... 010 ..... 1010111 @r_vm
- vwmacc_vx       111101 . ..... ..... 110 ..... 1010111 @r_vm
--vwmaccsu_vv     111110 . ..... ..... 010 ..... 1010111 @r_vm
--vwmaccsu_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
--vwmaccus_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmaccsu_vv     111111 . ..... ..... 010 ..... 1010111 @r_vm
-+vwmaccsu_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmaccus_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
- vmv_v_v         010111 1 00000 ..... 000 ..... 1010111 @r2
- vmv_v_x         010111 1 00000 ..... 100 ..... 1010111 @r2
- vmv_v_i         010111 1 00000 ..... 011 ..... 1010111 @r2
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 228b9bdb5d..871c2ddfa1 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -317,6 +317,7 @@ static void riscv_cpu_reset(DeviceState *dev)
+     env->mstatus &= ~(MSTATUS_MIE | MSTATUS_MPRV);
+     env->mcause = 0;
+     env->pc = env->resetvec;
++    env->vlenb = cpu->cfg.vlen >> 3;
+ #endif
+     cs->exception_index = EXCP_NONE;
+     env->load_res = -1;
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index c02690ed0d..81c85bf4c2 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -111,6 +111,7 @@ struct CPURISCVState {
+     target_ulong vl;
+     target_ulong vstart;
+     target_ulong vtype;
++    target_ulong vlenb;
+ 
+     target_ulong pc;
+     target_ulong load_res;
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 79ae0accbc..62789e3720 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -63,6 +63,7 @@
+ #define CSR_VCSR            0x00f
+ #define CSR_VL              0xc20
+ #define CSR_VTYPE           0xc21
++#define CSR_VLENB           0xc22
+ 
+ /* VCSR fields */
+ #define VCSR_VXSAT_SHIFT    0
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 77d371f385..6b05c631f4 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -197,6 +197,12 @@ static int read_vtype(CPURISCVState *env, int csrno, target_ulong *val)
+     return 0;
+ }
+ 
++static int read_vlenb(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vlenb;
++    return 0;
++}
++
+ static int read_vl(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     *val = env->vl;
+@@ -1301,6 +1307,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_VCSR] =                { vs,   read_vcsr,        write_vcsr        },
+     [CSR_VL] =                  { vs,   read_vl                             },
+     [CSR_VTYPE] =               { vs,   read_vtype                          },
++    [CSR_VLENB] =               { vs,   read_vlenb                          },
+     /* User Timers and Counters */
+     [CSR_CYCLE] =               { ctr,  read_instret                        },
+     [CSR_INSTRET] =             { ctr,  read_instret                        },
 -- 
 2.17.1
 
