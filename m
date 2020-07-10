@@ -2,96 +2,97 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD43C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC569C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:12:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA5C620772
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96AF92077D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:12:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gYg+FaCb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA5C620772
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SZZ2m+fU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96AF92077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtpyH-0005pm-8T
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 06:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54892)
+	id 1jtq1K-0007p3-UI
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 06:12:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jtpxh-0005If-9R; Fri, 10 Jul 2020 06:08:57 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42088)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jtq0j-0007D5-Fp
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:12:05 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55109)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jtpxf-0000xI-La; Fri, 10 Jul 2020 06:08:57 -0400
-Received: by mail-wr1-x442.google.com with SMTP id o11so5342139wrv.9;
- Fri, 10 Jul 2020 03:08:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=UlkyKKBHO+nUNuANLJRz8KQYbRRZFrR6NlkBYUvk8jM=;
- b=gYg+FaCbFubUC+SxvRX72CVICXR4jdhkcmMxUk0hLVBPnagEu6qklj09IrFe+9m8nO
- wCC292wkRPCu+DsB3yumX3lrxbFjQw8JZx2Q4enwZhV8WQGbHVclT+sI7n1Ml7JzZiRu
- tqrKBSmEDgTsPphEPFemYEU+EVxoZGWydCeQfXdiwFsJEW/loODL68HoJeWvF1TzJCww
- EzjUSqSivwHUndw2zXkpe43E6cE7CUzsbLtZGtYglbbzKt9+K0WwUUsq3qerxCtrdsr7
- M0D+3lktdbLyQ49EVwnyUlrX0lN/hbEFXJebtX17wQrWMo1+EQRrF4wXcb0VX3zGONv6
- gmGA==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jtq0h-0001Kc-HT
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:12:05 -0400
+Received: by mail-wm1-x343.google.com with SMTP id o8so5529358wmh.4
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:12:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=GuTs3rjtpCsL6djToCJL3MWhitwdC/GJjlrGBFwbDnI=;
+ b=SZZ2m+fUEjKnoimN7vYvJ8s25b0QVOwdjMHBXqCNvDfGiZeOk5JkVjyczscF8ABubf
+ nlAPKm5PruNzsNRMLdtkQmBsaNjFUJ1ZBk6fTZsBZOD9eg3LbjOu4Gm77AD8NlYmZ9VU
+ Y1p1iqkRcLK6z120BrEcqMFTbwJ1pZygA9TY/Efy4ctLlD5jrVT7843bTBDtynruPyID
+ KMavzMYZGxToi3vnk6O9ObrJg0P+P8Mcox5tLAaWrm3KEUB0/D5WwEvbPEL90VFG1Ejg
+ 5qNx9WXMn9YxcZRN6EjMmaEk0EsuHcmzQNlknUd1Fh2DjJKr9IL6VZnBav4HPfvjgNKs
+ GHnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UlkyKKBHO+nUNuANLJRz8KQYbRRZFrR6NlkBYUvk8jM=;
- b=HsaB83HqUhMWfThGybJrovV3TxqjfDzF8rJp9KV//JiEHN40twQu4b5oSrhRPeE9TP
- 6NOdGdEwm89i9wFAuA+ohyx3696dMyk2MG+ze6ST+ubXDChN2PkBxwA7O5mn6uQjo7uL
- U+tAWXzqo6BKeO7XGB95pt0nHfAzUoNxXrEvbRIAz5FusyvjLqo/vveUymxj9FLSFSaS
- dZK0XndP70RpvQZY8HpLZt9aYAoT33wmQWTEHHcrDiOl0ooxIj/Q2KdC97ciMV4omSMb
- uFUHoVq/HfGoyP1d91gQZ+zrJwyDC2/+Vsaoaa3eLHfwujH4VONJHrq2OBdo5KdJ2kJu
- vsoQ==
-X-Gm-Message-State: AOAM530xbN4/u+4y7hV0wggtWVe2HO+cBj3CkV3SyOKd4+s/mZQb8ZST
- v3j3WDWBWanptcuQpzKHX6QVTmA2ws4=
-X-Google-Smtp-Source: ABdhPJzzRXFRWQBwR9q93n4Zu8ICezeX6SdfQIg7wfMpu676xpnmiDFO44wK28jf5C4x8+exNuOzDw==
-X-Received: by 2002:a5d:55cb:: with SMTP id i11mr63753788wrw.28.1594375733558; 
- Fri, 10 Jul 2020 03:08:53 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id f12sm9688728wrj.48.2020.07.10.03.08.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jul 2020 03:08:52 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/2] hw/sd: Deprecate the SPI mode and the SPI to SD
- adapter
-To: Bin Meng <bmeng.cn@gmail.com>, Pragnesh Patel <pragnesh.patel@sifive.com>
-References: <20200705220731.28101-1-f4bug@amsat.org>
- <CAEUhbmXV1ZvL3N7di0HgVnGmMB69H=RTFFET=3+VLyK+e3Dj8A@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f5acfe73-b0ac-1cd7-0e3b-694f6bf6e615@amsat.org>
-Date: Fri, 10 Jul 2020 12:08:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=GuTs3rjtpCsL6djToCJL3MWhitwdC/GJjlrGBFwbDnI=;
+ b=ueJZQ/SC9ZoExrXZueO5+7Sm+ooW2P2ITyI+SxMMv873xGEoZZ9lTCasTVCOWIsX4g
+ x231vZEKwZhl6r5aIiQI1W9vHOzUo52lXin4seAPfgR7OtQ6qKLNgkcjLiY+OaFrBQ54
+ nYdNZ1AXrLTk9Ibfcy5tqA2a9B9mRCKoq0PkCDUOTbHG3yAXrd8+Vz6T+Q9l7SZ/bE/E
+ 1Hs/iFvNULQmVQu232gLYU0yc0IuuKcfGwJXLgwgnBP13tLkmIglc030YO0HTaxBk2sh
+ bKaJpTO1cXaINi8YROi/zXlYEsnJyeE6gOhTfU/bM/r3O86mHU2S/bBKWFgmwT2GbqPD
+ llzQ==
+X-Gm-Message-State: AOAM53373oMms/zqUmbjEW2HtxTLq1EVmZSscLs+8Nq+jljo98x9Amew
+ XAGSUDO6oPE9v3vyM75Td/aWhiMcnXw=
+X-Google-Smtp-Source: ABdhPJyGFDuP/gzASgM07XxPXME4nqZXK8DgF8heG/jKJ1Jg225M6S9BiyevaoUAku1HsGsF53D8oQ==
+X-Received: by 2002:a7b:cb92:: with SMTP id m18mr4306472wmi.94.1594375921609; 
+ Fri, 10 Jul 2020 03:12:01 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id b62sm8639092wmh.38.2020.07.10.03.11.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jul 2020 03:11:59 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 338821FF7E;
+ Fri, 10 Jul 2020 11:11:58 +0100 (BST)
+References: <CALTWKrUE3r4+BMKQY1YX6zMOriKcd_5QNyqGBk5Z_S5ZZPs+4w@mail.gmail.com>
+ <87eepkn42e.fsf@linaro.org>
+ <CALTWKrWONHNa2atJ+S6cnjqkHvWs_+A+U7e7V5ZYJLwdoKBf4Q@mail.gmail.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#3] QEMU 5.0 and
+ 5.1-pre-soft-freeze Dissect Comparison
+In-reply-to: <CALTWKrWONHNa2atJ+S6cnjqkHvWs_+A+U7e7V5ZYJLwdoKBf4Q@mail.gmail.com>
+Date: Fri, 10 Jul 2020 11:11:57 +0100
+Message-ID: <87sgdzllw2.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAEUhbmXV1ZvL3N7di0HgVnGmMB69H=RTFFET=3+VLyK+e3Dj8A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,57 +105,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <huth@tuxfamily.org>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- libvir-list@redhat.com, qemu-arm <qemu-arm@nongnu.org>
+Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, luoyonggang@gmail.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/10/20 11:27 AM, Bin Meng wrote:
-> Hi Philippe,
-> 
-> On Mon, Jul 6, 2020 at 6:07 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+
+Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
+
+> On Thu, Jul 9, 2020 at 4:41 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
 >>
->> I tried to maintain the SPI mode because it is useful in
->> tiny embedded devices, and thought it would be helpful for
->> the AVR MCUs.
->> As AVR was blocked, I thought it was wise to deprecate the
->> SPI mode as users are interested in the faster MMC mode.
->> Today Thomas surprised me by posting an update of it!
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg720089.html
 >>
->> I'm still posting this as RFC to discuss, but I'm reconsiderating
->> keeping this mode a bit more.
+>> Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
 >>
-> 
-> AFAIK, SiFive folks (Pragnesh in cc) are investigating supporting QSPI
-> model on "sifive_u" machine, and it will definitely use this SPI over
-> SD model.
-> 
-> In fact, the QSPI is the last big gap in the "sifive_u" machine to
-> make it a complete platform for hardware replacement.
+>> > Hi,
+>> >
+>> > The third report of the TCG Continuous Benchmarking series utilizes
+>> > the tools presented in the previous report for comparing the
+>> > performance of 17 different targets across two versions of QEMU. The
+>> > two versions addressed are 5.0 and 5.1-pre-soft-freeze (current state
+>> > of QEMU).
+>> >
+>> > After summarizing the results, the report utilizes the KCachegrind
+>> > tool and dives into the analysis of why all three PowerPC targets
+>> > (ppc, ppc64, ppc64le) had a performance degradation between the two
+>> > QEMU versions.
+>>
+>> It's an interesting degradation especially as you would think that a
+>> change in the softfloat implementation should hit everyone in the same
+>> way.
+>>
+>
+> That's the same that I've thought of, but while working on next week's
+> report, it appears that this specific change introduced a performance
+> improvement in other targets!
+>
+>> We actually have a tool for benchmarking the softfloat implementation
+>> itself called fp-bench. You can find it in tests/fp. I would be curious
+>> to see if you saw a drop in performance in the following:
+>>
+>>   ./fp-bench -p double -o cmp
+>>
+>
+> I ran the command before and after the commit introducing the
+> degradation. Both runs gave results varying between 600~605 MFlops.
+> Running with Callgrind and the Coulomb benchmark, the results were:
+> Number of instructions before: 12,715,390,413
+> Number of isntructions after: 13,031,104,137
 
-Good news!
+You may have to average over several runs to see if there is a
+detectable change. It could be although there are more instructions
+being executed it makes no practical difference to the execution because
+the processor is just as efficient in scheduling the work to the
+execution units.
 
-I have some idea about the design, but don't have the time to work
-on it. Help in this area is welcomed, and I am happy to review the
-patches.
+You have to remember on modern processors the relationship between
+instructions and the utilisation of the eventual ALUs is tenuous at
+best. After everything has been converted to uOps and scheduled you
+might be doing broadly the same calculations. Pipeline and cache stalls
+are probably a more important metric here although I doubt figure much
+in the very tight loop of the benchmark.
 
-The way I'd do it is keep the generic sd.c code and make it an abstract
-class (or interface), and split SD / SPI protocols handling in different
-implementation files. Only the negotiation at reset is common, once you
-switch to a protocol mode you can't switch to another without resetting
-the device. Also this would make the MMC protocol (already implemented
-by Xilinx) upstreamable more easily.
+>
+>> >
+>> > Report link:
+>> > https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/QEMU-5.0-and-5=
+.1-pre-soft-freeze-Dissect-Comparison/
+>>
+>> If you identify a drop in performance due to a commit linking to it from
+>> the report wouldn't be a bad idea so those that want to quickly
+>> replicate the test can do before/after runs.
+>>
+>
+> Report number 5 will introduce a new tool for detecting commits
+> causing performance improvements and degradations. The report will
+> utilize this tool to find out the specific commit introducing these
+> changes.
 
-Having different files also allows different maintenance granularity.
+Excellent - keep up the good work ;-)
 
-I haven't looked at QSPI, but I expect it to be quite different that
-the old SPI mode.
+>
+>> >
+>> > Previous reports:
+>> > Report 1 - Measuring Basic Performance Metrics of QEMU:
+>> > https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
+>> > Report 2 - Dissecting QEMU Into Three Main Parts:
+>> > https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09441.html
+>> >
+>> > Best regards,
+>> > Ahmed Karaman
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>
+> Best regards,
+> Ahmed Karaman
 
-Regards,
 
-Phil.
+--=20
+Alex Benn=C3=A9e
 
