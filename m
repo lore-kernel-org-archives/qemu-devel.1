@@ -2,91 +2,90 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B043BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8844C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FD3B20767
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:01:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87B4E20772
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 10:06:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H9CHZv3u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FD3B20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYpRxjaa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B4E20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtpqA-0001Um-P0
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 06:01:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52664)
+	id 1jtpur-0004aQ-QW
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 06:06:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtpp6-0000g0-VG
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:00:05 -0400
-Received: from mail-il1-x12f.google.com ([2607:f8b0:4864:20::12f]:47102)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jtpp2-0007yh-PG
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:00:04 -0400
-Received: by mail-il1-x12f.google.com with SMTP id a6so4534567ilq.13
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YMYJp8UooEK2qAlnyIXtWbFsZX4V36cQ2iMWetlMdW8=;
- b=H9CHZv3uiaRZfAglcdKrzmERMcqWXOO5IylDO0HWGfaMnTPctdadubhDHzgdtCF9j2
- hXBFFBygcSzR4K48Ir1Q29TRDUsvlS9xtFnsEqAfPcNzMcoA9n20qrjccZ5CH+HLUNPh
- NNzxCXovdcxG01SdnwvSbGw+dZgx4FPU05uXt5ZDI0Cw83VQkwhM4aUS+wlYHCEzRrZ2
- uGVyuNXDPRIXvSZKmpNXnJg08XDXgS6tTgW26a3WWdfboJeAAhJO76KrhXoXXmHBPqOI
- rtxP2fDKQ0ueltLsV/neiiwHnb38bwXlzLhgPeyj+9hyI90cdlwvK7puZdng+iaamsjO
- 13Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YMYJp8UooEK2qAlnyIXtWbFsZX4V36cQ2iMWetlMdW8=;
- b=tjAlzBwoUK9MUX/byFjX47zkSWYf+Nn1OiIjQgibMr9pM2fJaqNaO5vfJpbq6yGEay
- xDPsNkA4hwRhv2XYKozzx8WcYEdIKyKmu+tAcKxDcFq1pXucYi5Zr3i854ccmB7GtLZW
- /JUGDLMTJDcwA9Zc17CMivYLb7MDM1gEaxPRDa1QIGobdhC55vQaJ/CHY9lRO1w3mSST
- MUKqNsSvymfS1l3pCo3tHnLFUV/VAhl2qTcK99Dd7GVti5Y4kRLciClruS9sYgh7vMcp
- rJGzS+/hBmS9CEezjk2Rpz7o2a0svHtiKW5Tr9p6wcwNo+yp1HglfoXCJ92WWOvXYBOC
- JG9A==
-X-Gm-Message-State: AOAM533u7uF+IBibxIjqDO/YUlDgIjbRdiD5o5FyHCkl8k360jpASJGQ
- e7T7QX70+NS8gh/gQ04dw4/4Seq1BBm7DDBaNSwr0A==
-X-Google-Smtp-Source: ABdhPJwtIykicljkChDTMxgBbiorpWZWP4H00ASLHYze2ZkKCNc67Ci/bRdSi0OIEgv5ByEtR8rSQy+V4WB7RJ7XgZA=
-X-Received: by 2002:a92:98c2:: with SMTP id a63mr49425582ill.246.1594375199768; 
- Fri, 10 Jul 2020 02:59:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtpuG-0003xE-8y
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:05:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23257
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jtpuE-0000XG-TK
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:05:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594375521;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jdoClQRd0kYRbTPnH/mx31fwlDLsWEJ/umer1a6uy3Y=;
+ b=TYpRxjaaS0y7OhHx0AVtp/pDg3BE4QzWoHjnNeyhFA2I3uKyurq6zxz3CUnE7lNxaoUWCu
+ 9Ya0TkJ/ex6VQyrb8+n/6bQn1+jJuc36tRR7gnN1cPKg3horOHuiXvRzEcUGeguP2vQUyV
+ TqP2e60eSbiEQ7Dr6y5V2Yga2M956JY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-466-syxqKGvbNIGxddEvLqyp8g-1; Fri, 10 Jul 2020 06:05:18 -0400
+X-MC-Unique: syxqKGvbNIGxddEvLqyp8g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E6C51083E82;
+ Fri, 10 Jul 2020 10:05:14 +0000 (UTC)
+Received: from [10.36.113.241] (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BE9560E1C;
+ Fri, 10 Jul 2020 10:05:06 +0000 (UTC)
+Subject: Re: [PATCH v3 11/11] hw/arm/smmuv3: Advertise SMMUv3.2 range
+ invalidation
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200708141856.15776-1-eric.auger@redhat.com>
+ <20200708141856.15776-12-eric.auger@redhat.com>
+ <CAFEAcA-zXyzq5ph3U0vFuqRz9=NEq-piw_9gsYbrwg=+g9nbXw@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <41b72b3d-e0b5-f6b1-69a3-2940246447d7@redhat.com>
+Date: Fri, 10 Jul 2020 12:05:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200707132116.26207-1-f4bug@amsat.org>
- <20200707132116.26207-3-f4bug@amsat.org>
- <CAKmqyKNY+7tE9tcZm7_Th9qapo1CH0AwNwBf7vaf+7vSqBNtVA@mail.gmail.com>
- <CAFEAcA_ZXgNHMAhBVmjvstyG=PpaHOtcmo=VgvfBQ3Z9VJTk_g@mail.gmail.com>
- <3f1bf3ba-d6c3-a148-9850-076b2caa64d0@amsat.org>
- <CAPan3Wr09ZbbHWO-dhGeK3zhZQv3smrzLpUGMj71NWh0hToZDg@mail.gmail.com>
- <e87550d9-e1cc-cc15-2674-755249e9a965@amsat.org>
- <CAFEAcA8em-bgU2xd8OG+bPLDCSZCF8Y2ay9U57D8p9m1SWO=9g@mail.gmail.com>
- <20200710095827.GD6641@linux.fritz.box>
-In-Reply-To: <20200710095827.GD6641@linux.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Jul 2020 10:59:48 +0100
-Message-ID: <CAFEAcA_+JpRpNSd7SwBD=OcDxqZ1Mf3xTYR2DM0Os_fFZs4VOg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] hw/sd/sdcard: Do not allow invalid SD card sizes
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::12f;
- envelope-from=peter.maydell@linaro.org; helo=mail-il1-x12f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <CAFEAcA-zXyzq5ph3U0vFuqRz9=NEq-piw_9gsYbrwg=+g9nbXw@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 04:36:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,38 +99,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu-block <qemu-block@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>,
- Alistair Francis <alistair23@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will@kernel.org>,
+ zhangfei.gao@foxmail.com, QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Robin Murphy <robin.murphy@arm.com>, Rob Herring <robh@kernel.org>,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 Jul 2020 at 10:58, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> Am 09.07.2020 um 16:15 hat Peter Maydell geschrieben:
-> > dd/truncate etc won't work if the image file is not raw (eg if
-> > it's qcow2). The only chance you have of something that's actually
-> > generic would probably involve "qemu-img resize". But I'm a bit
-> > wary of having an error message that recommends that, because
-> > what if we got it wrong?
->
-> What is your concern that we might get wrong? The suggestion is always
-> extending the size rather than shrinking, so it should be harmless and
-> easy to undo. (Hm, we should finally make --shrink mandatory for
-> shrinking. We've printed a deprecation warning for almost three years.)
+Hi Peter,
 
-If there's a qemu-img command line that will always only
-extend the image size and never let the user accidentally
-shrink it and throw away data, then great. I'd happily
-recommend that.
+On 7/10/20 11:47 AM, Peter Maydell wrote:
+> On Wed, 8 Jul 2020 at 15:20, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> Expose the RIL bit so that the guest driver uses range
+>> invalidation. Range invalidation being an SMMU3.2 feature,
+>> let AIDR advertise SMMUv3.2 support.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> I think that to advertise SMMUv3.2 we would also need to
+> set the IDR3.BBML field to something non-zero. That means
+> we need to analyze our implementation of the caching of page
+> table structures to see if we need to do anything different
+> (per the behaviours and guarantees described in section 3.21.1
+> of the spec).
+you're right. I need to further study this feature.
 
-thanks
--- PMM
+I felt difficult to find out which features are mandatory for a given
+revision number.
+> 
+> Alternatively, we could take advantage of the language
+> in section 2.5 that says that a v3.x implementation is
+> allowed to implement features from v3.(x+1), and just
+> set the RIL bit while leaving AIDR advertising us as v3.1.
+Indeed :-)
+
+Thank you for the review!
+
+Eric
+> 
+> thanks
+> -- PMM
+> 
+
 
