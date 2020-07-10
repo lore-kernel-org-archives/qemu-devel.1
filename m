@@ -2,56 +2,96 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08084C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BABC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:29:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D029A20720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:28:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D029A20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9920D20725
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 17:29:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O/zpWb7d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9920D20725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtwpR-00075t-Ty
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 13:28:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59526)
+	id 1jtwpd-0007Ww-Tg
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 13:29:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jtwnx-0005M1-27; Fri, 10 Jul 2020 13:27:21 -0400
-Received: from relay.sw.ru ([185.231.240.75]:57034 helo=relay3.sw.ru)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jtwnu-0006dS-TN; Fri, 10 Jul 2020 13:27:20 -0400
-Received: from [192.168.15.187] (helo=iris.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.93)
- (envelope-from <den@openvz.org>)
- id 1jtwnk-0008U2-6b; Fri, 10 Jul 2020 20:27:08 +0300
-From: "Denis V. Lunev" <den@openvz.org>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 1/2] block/block-backend: add converter from BlockAcctStats to
- BlockBackend
-Date: Fri, 10 Jul 2020 20:27:10 +0300
-Message-Id: <20200710172711.8059-2-den@openvz.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200710172711.8059-1-den@openvz.org>
-References: <20200710172711.8059-1-den@openvz.org>
-Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
- helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 13:27:14
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jtwoA-0005kY-9f
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 13:27:34 -0400
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:35336)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jtwo7-0006fu-BM
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 13:27:34 -0400
+Received: by mail-pl1-x62a.google.com with SMTP id x9so2530779plr.2
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 10:27:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=MGw1xnIhMlU3+HyGZ+q0KK/sZgrz0+mONwYEG3A9hmE=;
+ b=O/zpWb7dilaa4B9k/DHhXwpxKsU6ltfE8Pwc6SrppMyGw88dbNOrlAqdozfEl37yRh
+ mVy6nbhdZ7OSs5j3FTrVNYv80fvRRBP0mvyed4ViX5qMEFHwqgEtB0ofyxJKIsO6GTi/
+ bpx3VTtek7FCaYzgFFuV+704Dd2np1AfLCEs9iqJVGql7AaoSkiGb+flYb2cruUBhpN9
+ DVFeCoZgaIKOLUdBgvET6AgHvWcPCI1ZQ9eDYRi2srrFNhFOmGUAZqn/P7YkEBbnjxci
+ +LkWqbv/8k/tvcRGFKqWS4KxwwJx3iAPYG/ljXbyVS70975Egm3m+ttUf7hWVRGlZVwc
+ lX6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MGw1xnIhMlU3+HyGZ+q0KK/sZgrz0+mONwYEG3A9hmE=;
+ b=ErAiRfjsdxwtNR0dB/NiL7NTVnUFxs+lBOyfodGLB0r4FpeNWWvoV2Nb8l8N2BnGSS
+ L2/uBKKOpG8d4s3/8CdmWnki94Wc+8vOWm0EqAvuNS76/s/JuZaSSk/NCb9Ag91ZNnEY
+ 48FhBqDkxojnB3JrHpZxHrCjidUv9oiTWNE9Wo0cxXb96gdhlIwXNyGhTJZLO9TY5BBa
+ 2FbzC/65BCaRAqI7KwI8sI3xILc3sRr5nEClm1Hah4LWlJXXAaLjOaGH0O4YOMB2awDz
+ 1Zc5hUe2fUgTddeeGyQpx0XqiQVU3RFxOkKBJ/sBMdqDPCjTVUZUbTIpr+ld9V8hqN9a
+ TUyg==
+X-Gm-Message-State: AOAM532D1XloJmzj5OZvKhGWvIixOaEI3aW0N09hCx/QhGVQ1ytu+XGL
+ ym89p2kbc9Cx+kXbCEY1R0Hbig==
+X-Google-Smtp-Source: ABdhPJzo7HaYnOJlSXveXMoQH8G7sNhEagbCrbuMGjPmGg7dIrbFcVpLDNxImBnoqakxCJ3Nm8viYQ==
+X-Received: by 2002:a17:902:c411:: with SMTP id
+ k17mr56177688plk.165.1594402049873; 
+ Fri, 10 Jul 2020 10:27:29 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id g8sm6338215pgr.70.2020.07.10.10.27.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 10 Jul 2020 10:27:29 -0700 (PDT)
+Subject: Re: [RFC 07/65] target/riscv: rvv-0.9: add vector context status
+To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+ <20200710104920.13550-8-frank.chang@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <52547eb2-4bda-e97a-3c5e-8565da3579de@linaro.org>
+Date: Fri, 10 Jul 2020 10:27:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200710104920.13550-8-frank.chang@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::62a;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -65,55 +105,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now BlockAcctStats is always reside on BlockBackend. This structure
-is not used in any other place. Thus we are able to create a converter
-from one pointer to another.
+On 7/10/20 3:48 AM, frank.chang@sifive.com wrote:
+> From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> 
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Signed-off-by: Frank Chang <frank.chang@sifive.com>
+> ---
+>  target/riscv/cpu.h                      |  4 ++
+>  target/riscv/cpu_bits.h                 |  1 +
+>  target/riscv/cpu_helper.c               | 13 ++++++
+>  target/riscv/csr.c                      | 25 ++++++++++-
+>  target/riscv/insn_trans/trans_rvv.inc.c | 57 +++++++++++++++++++++----
+>  target/riscv/translate.c                | 32 ++++++++++++++
+>  6 files changed, 123 insertions(+), 9 deletions(-)
 
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
----
- block/block-backend.c          | 5 +++++
- include/sysemu/block-backend.h | 1 +
- 2 files changed, 6 insertions(+)
+BTW, I think this should be split.
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 6936b25c83..e77a7e468e 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2143,6 +2143,11 @@ BlockAcctStats *blk_get_stats(BlockBackend *blk)
-     return &blk->stats;
- }
- 
-+BlockBackend *blk_stats2blk(BlockAcctStats *s)
-+{
-+    return container_of(s, BlockBackend, stats);
-+}
-+
- void *blk_aio_get(const AIOCBInfo *aiocb_info, BlockBackend *blk,
-                   BlockCompletionFunc *cb, void *opaque)
- {
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 8203d7f6f9..bd4694e7bc 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -227,6 +227,7 @@ void blk_add_insert_bs_notifier(BlockBackend *blk, Notifier *notify);
- void blk_io_plug(BlockBackend *blk);
- void blk_io_unplug(BlockBackend *blk);
- BlockAcctStats *blk_get_stats(BlockBackend *blk);
-+BlockBackend *blk_stats2blk(BlockAcctStats *stats);
- BlockBackendRootState *blk_get_root_state(BlockBackend *blk);
- void blk_update_root_state(BlockBackend *blk);
- bool blk_get_detect_zeroes_from_root_state(BlockBackend *blk);
--- 
-2.17.1
+One patch for the csr.c changes, another for the translate changes.
 
+
+r~
 
