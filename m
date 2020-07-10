@@ -2,81 +2,83 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8599C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13945C433E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:19:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 931CE206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:18:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7E52206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:19:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="LD1jbWwZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 931CE206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="j4TBxW8R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E52206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtsvW-0000cv-S6
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:18:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37690)
+	id 1jtswH-0001yB-4W
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:19:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqdw-0005Wx-IT
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:52:36 -0400
-Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:40355)
+ id 1jtqfT-00066b-IH
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:54:11 -0400
+Received: from mail-pj1-x1035.google.com ([2607:f8b0:4864:20::1035]:39539)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqdu-0006j3-EK
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:52:36 -0400
-Received: by mail-pf1-x42d.google.com with SMTP id u5so2381850pfn.7
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:52:31 -0700 (PDT)
+ id 1jtqfS-0006yZ-1B
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:54:11 -0400
+Received: by mail-pj1-x1035.google.com with SMTP id b92so2448306pjc.4
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:54:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=7Q67QVqDBeMJrBOEyv3FAnRJwEl+sGTsKf9+UnYk/r8=;
- b=LD1jbWwZ33C2AiPVOpsPmCyuzRGQrL5wJtgLdCalFiKr+tMX++YqrF4egoajqYQBlG
- c3bKCUaaLpcDADeY3+zXpJg14dHW8Vw1kNcAwYCKaau/+LgcoAXBAcoxvYZKNROGlgpu
- K650sHJYpYdi8pMQ1Jy3UlHeIbn6bM3M6KTYtZL8m5fmoqgUS/wn3DL9DBf9Rlwg7iy7
- NeyYlLEwIJL/MtFO8RkQfFnPDlhiFhp8Qvr2QQoSZPIk5dErY94xOOP6+DMEwnys92GW
- MOBbsAZXoRnlwESxOkczvCKVUL+jJCEPnpAf18pig9HzMUX8+XCm6myRwktGz9fS8Mt0
- 2iyg==
+ bh=SQe+5VvW1r75JMKg4RkRNVzatof7TCQwBrRNcipixjc=;
+ b=j4TBxW8RsIbHgyI7CvEUCCqOd2LSblRcBeXjrjPECuPzgWx6W1QpON/+HPUKfjwckA
+ JBv9+D20WJVzHaDdvr5mlLCtk+pMRmsf/jST+ndkWp2m54zyi4h7iVnOgxyF9GCMtjZj
+ NuPVEVb+F1jTqbjhO+C5/KGgp3MyiPvIWpWm4A8uVTOl6xqq4NiD+J2Vffp2FNZDEHnt
+ YXO/VawqxY49MFbh63Gx6qU5VFV+EDQyI4KOESkCG3skmudZ8tX1A1ysPZ2HLQH04E3H
+ bDAwl38oi1ujLwS89mAislljrbjVtKzPQ0TA+ZmQy/+WCm0uRejUSSKTofvQp0XCpAz0
+ Nfhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=7Q67QVqDBeMJrBOEyv3FAnRJwEl+sGTsKf9+UnYk/r8=;
- b=nIHxtBjDUf8gCUA4kehMVR+PaaYPDElIL0mMi8ThejL5uspJ/td1LbKJo/4xcbw20P
- eG1lUDYbGH+5aJ1MCtEsC/kFTcgAs18QSZo8I/MJYYikhZ+Z6hn2/esKLgrtkLpZBP4K
- kNyZEM/ULNQLPrtfg3x0Dp69mLRPp16F7eA/i53wAuOzhOm32T/SztglTHrQfmm4cLVb
- fF+gDgjfzkzFWw31ewA8DTWpNUw7RB7eS8FJIzMJkU+ZfOGWw+muuysp+xGt7kkf225M
- y1WbvMMx0dTuxb+BjznKDlvpYHKYjsQosfKwE4JJYvnv5f+9jRyNK9YWz8+me9wjyX3O
- 05Bw==
-X-Gm-Message-State: AOAM532ZAYPzTvdKAjm5/k2QGMdVgtFV1kaeuhIheBNdDfdKRl8wzO+0
- Yd92O43X4h+2YTdN36PYZ0Rk6F4/0VV0vg==
-X-Google-Smtp-Source: ABdhPJySnn40O1t/tuo5uswcbCz0Efyx13E/OkIihVqOFJgIf4kcCc9DnE4PTfcvKfETa9uiQH92rw==
-X-Received: by 2002:a62:1c13:: with SMTP id c19mr46193619pfc.52.1594378350332; 
- Fri, 10 Jul 2020 03:52:30 -0700 (PDT)
+ bh=SQe+5VvW1r75JMKg4RkRNVzatof7TCQwBrRNcipixjc=;
+ b=n+Dsji5W3iVgrumCBnulBgaUexPV4aOJEgqCmkTnz/TGPbKFPCT077NTDjiz87eb9H
+ A+TA+b4AEAopfwec6C6nO3vkTxyyQfuRVENOJNnQjBn1wDvNQIDb31aTEp+CDl3hNn49
+ NjVUdPTiimJ/mp5wM3zjKQJC33EC3Gm1xsLbUM1CXXwxMF3gIsxHdSoKOtfHhnkI41JM
+ VbsLHEoRk4X7fBXpvBQ6ePmHtvQA0bh5KA3sDhhM/rtBf79G74c4wNc0s7nDhtYGR1jJ
+ XfJjnEytMmK3PLqFeGQSPKrd+14LEm6Uxn8KyZ8YQz2IGiocZWTeRjRHSG2EDdQ6b/V/
+ bt6g==
+X-Gm-Message-State: AOAM530CrCZHH1vocsRAtrEmMB9ucii66Bz1ZZIiFsIDRLrVH2ojyrQ7
+ zYE6WJSpjCLnJmGt3GxjvHJq4xU8uSjprg==
+X-Google-Smtp-Source: ABdhPJzfn/MzYeUeYqWcu+iCXv6BX1K3zITB0QBurXdU4c+ivUphmcMtk+V+CoSI5a9x5gz5QhnGOw==
+X-Received: by 2002:a17:90a:1a13:: with SMTP id
+ 19mr4574313pjk.167.1594378448628; 
+ Fri, 10 Jul 2020 03:54:08 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.52.28
+ by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.54.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jul 2020 03:52:29 -0700 (PDT)
+ Fri, 10 Jul 2020 03:54:08 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC 29/65] target/riscv: rvv-0.9: integer scalar move instructions
-Date: Fri, 10 Jul 2020 18:48:43 +0800
-Message-Id: <20200710104920.13550-30-frank.chang@sifive.com>
+Subject: [RFC 53/65] target/riscv: rvv-0.9: single-width scaling shift
+ instructions
+Date: Fri, 10 Jul 2020 18:49:07 +0800
+Message-Id: <20200710104920.13550-54-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
 References: <20200710104920.13550-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42d;
- envelope-from=frank.chang@sifive.com; helo=mail-pf1-x42d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1035;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1035.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,7 +89,7 @@ X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:17 -0400
+X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:18 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,103 +113,26 @@ Sender: "Qemu-devel"
 
 From: Frank Chang <frank.chang@sifive.com>
 
+Zero-extend vssra.vi immediate value.
+
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- target/riscv/insn32.decode              |  3 +-
- target/riscv/insn_trans/trans_rvv.inc.c | 59 +++++++++++++++++--------
- 2 files changed, 43 insertions(+), 19 deletions(-)
+ target/riscv/insn_trans/trans_rvv.inc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 01316c908d..ef53df7c73 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -580,8 +580,9 @@ vmsif_m         010100 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010100 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010100 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010100 . 00000 10001 010 ..... 1010111 @r1_vm
-+vmv_x_s         010000 1 ..... 00000 010 ..... 1010111 @r2rd
-+vmv_s_x         010000 1 00000 ..... 110 ..... 1010111 @r2
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
--vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
- vfmv_f_s        001100 1 ..... 00000 001 ..... 1010111 @r2rd
- vfmv_s_f        001101 1 00000 ..... 101 ..... 1010111 @r2
- vslideup_vx     001110 . ..... ..... 100 ..... 1010111 @r_vm
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index c03f3326cc..801b9319a5 100644
+index 34b0392625..5fa1f0c6ed 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2986,30 +2986,53 @@ static void vec_element_storei(DisasContext *s, int vreg,
-     store_element(val, cpu_env, endian_ofs(s, vreg, idx), s->sew);
- }
+@@ -2185,7 +2185,7 @@ GEN_OPIVV_TRANS(vssra_vv, opivv_check)
+ GEN_OPIVX_TRANS(vssrl_vx,  opivx_check)
+ GEN_OPIVX_TRANS(vssra_vx,  opivx_check)
+ GEN_OPIVI_TRANS(vssrl_vi, 1, vssrl_vx, opivx_check)
+-GEN_OPIVI_TRANS(vssra_vi, 0, vssra_vx, opivx_check)
++GEN_OPIVI_TRANS(vssra_vi, 1, vssra_vx, opivx_check)
  
-+/* vmv.x.s rd, vs2 # x[rd] = vs2[0] */
-+static bool trans_vmv_x_s(DisasContext *s, arg_vmv_x_s *a)
-+{
-+    REQUIRE_RVV;
-+    VEXT_CHECK_ISA_ILL(s);
-+
-+    TCGv_i64 t1;
-+    TCGv dest;
-+
-+    t1 = tcg_temp_new_i64();
-+    dest = tcg_temp_new();
-+    /*
-+     * load vreg and sign-extend to 64 bits,
-+     * then truncate to XLEN bits before storing to gpr.
-+     */
-+    vec_element_loadi(s, t1, a->rs2, 0, true);
-+    tcg_gen_trunc_i64_tl(dest, t1);
-+    gen_set_gpr(a->rd, dest);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free(dest);
-+    mark_vs_dirty(s);
-+
-+    return true;
-+}
-+
- /* vmv.s.x vd, rs1 # vd[0] = rs1 */
- static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
- {
--    if (vext_check_isa_ill(s)) {
--        /* This instruction ignores LMUL and vector register groups */
--        int maxsz = s->vlen >> 3;
--        TCGv_i64 t1;
--        TCGLabel *over = gen_new_label();
-+    REQUIRE_RVV;
-+    VEXT_CHECK_ISA_ILL(s);
- 
--        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
--        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), maxsz, maxsz, 0);
--        if (a->rs1 == 0) {
--            goto done;
--        }
-+    /* This instruction ignores LMUL and vector register groups */
-+    TCGv_i64 t1;
-+    TCGLabel *over = gen_new_label();
- 
--        t1 = tcg_temp_new_i64();
--        tcg_gen_extu_tl_i64(t1, cpu_gpr[a->rs1]);
--        vec_element_storei(s, a->rd, 0, t1);
--        tcg_temp_free_i64(t1);
--    done:
--        gen_set_label(over);
--        return true;
-+    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+    if (a->rs1 == 0) {
-+        goto done;
-     }
--    return false;
-+
-+    t1 = tcg_temp_new_i64();
-+    tcg_gen_extu_tl_i64(t1, cpu_gpr[a->rs1]);
-+    vec_element_storei(s, a->rd, 0, t1);
-+    tcg_temp_free_i64(t1);
-+done:
-+    gen_set_label(over);
-+    return true;
- }
- 
- /* Floating-Point Scalar Move Instructions */
+ /* Vector Narrowing Fixed-Point Clip Instructions */
+ GEN_OPIWV_NARROW_TRANS(vnclipu_wv)
 -- 
 2.17.1
 
