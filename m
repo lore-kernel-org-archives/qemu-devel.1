@@ -7,68 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B480C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5066EC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:20:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7D7920720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B50720720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:20:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DisEpdHZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D7920720
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C6wSjuTZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B50720720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtmCb-0002Mx-6r
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 02:08:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58604)
+	id 1jtmOF-0005Dv-CX
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 02:20:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtmC3-0001wt-26
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:07:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23362
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jtmNg-0004lw-RO
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:19:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59467
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jtmC0-0004yp-69
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:07:30 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jtmNe-0006Ok-L2
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:19:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594361246;
+ s=mimecast20190719; t=1594361968;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=6Ug6571A2wGeckp76nBxVhyGsxMMQ06/3UwSVf0f2xU=;
- b=DisEpdHZqdtba7dgnDkolTbgFczzMPhofLXsJaW4Ndb66ah4esqM/mw6RR6oHJ2t5EZGmN
- i4h4fU9S1h5dWfOfZ0jHKNOMiM9UCLofBrfwXaISsGMqUTzzB0zfm29YEzHnvYbod37gwS
- CZoWoLUrrahZpNkrXyrS+QBwx/IiBIE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yJkAYrKYAMC/z64jLWQ2qcx4VCMiQH3Q9Ra/pQNwqHE=;
+ b=C6wSjuTZR3GrU9B0RVWeHhRqRs2e9z+bJK4mhh3f+jvp//hpaiMcwdPBXYrGtOTE1+oT7Y
+ AcJZ1aQQGsDvO5s/OYcMDrMLcxQOBPoXvOw94Vp5phEnLwLEaSKRNO5nDciSytOp2CRYZQ
+ +s3+uXXcMyftmgtRkGGSCyMeXv9ihwI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-7T7dWYfJOE63oiY3fyMvsQ-1; Fri, 10 Jul 2020 02:07:24 -0400
-X-MC-Unique: 7T7dWYfJOE63oiY3fyMvsQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-4-Wv9ZomXYMaWQjTN5j_J3xQ-1; Fri, 10 Jul 2020 02:19:27 -0400
+X-MC-Unique: Wv9ZomXYMaWQjTN5j_J3xQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFB47800D5C
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 06:07:23 +0000 (UTC)
-Received: from thuth.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6C59F60E1C;
- Fri, 10 Jul 2020 06:07:21 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] tests: improve performance of device-introspect-test
-Date: Fri, 10 Jul 2020 08:07:19 +0200
-Message-Id: <20200710060719.22386-1-thuth@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B5AD1080
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 06:19:26 +0000 (UTC)
+Received: from gondolin (ovpn-112-227.ams2.redhat.com [10.36.112.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9180F920C7;
+ Fri, 10 Jul 2020 06:19:22 +0000 (UTC)
+Date: Fri, 10 Jul 2020 08:19:19 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] linux-headers: update again to 5.8-rc
+Message-ID: <20200710081919.145c30e5.cohuck@redhat.com>
+In-Reply-To: <20200709182849.10309-1-pbonzini@redhat.com>
+References: <20200709182849.10309-1-pbonzini@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:36:21
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:55:31
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -89,158 +95,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+On Thu,  9 Jul 2020 14:28:49 -0400
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Total execution time with "-m slow" and x86_64 QEMU, drops from 3
-minutes 15 seconds, down to 54 seconds.
+> 5.8-rc1 inadvertently broke userspace ABI compatibility.  Merge
+> again with latest kvm/master to undo that.
 
-Individual tests drop from 17-20 seconds, down to 3-4 seconds.
+Ouch.
 
-The cost of this change is that any QOM bugs resulting in the test
-failure will not be directly associated with the device that caused
-the failure. The test case is not frequently identifying such bugs
-though, and the cause is likely easily visible in the patch series
-that causes the failure. So overall the shorter running time is
-considered the more important factor.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> 	The patch should get to Linus tomorrow.  Posting here to
+> 	ensure it is on people's radar for hard freeze, because
+> 	I probably won't be around.
 
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-[thuth: Add the tree check to test_device_intro_none() and
- test_device_intro_abstract(), too, just to be sure...]
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Add the tree check to test_device_intro_none() and
-     test_device_intro_abstract(), too
+Looks good to me. We will probably be able to fill in the proper
+hash/rc-reference after the weekend and get this merged. This looks
+entirely appropriate even for freeze.
 
- When I run the following command, the test time drops from more
- than 20 minutes to 50 seconds now (wow!):
- 
- QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 \
-  time tests/qtest/device-introspect-test -m slow > /dev/null
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
- tests/qtest/device-introspect-test.c | 60 ++++++++++++++++++----------
- 1 file changed, 38 insertions(+), 22 deletions(-)
-
-diff --git a/tests/qtest/device-introspect-test.c b/tests/qtest/device-introspect-test.c
-index 9abb5ec889..d68b7856a7 100644
---- a/tests/qtest/device-introspect-test.c
-+++ b/tests/qtest/device-introspect-test.c
-@@ -105,14 +105,9 @@ static void test_one_device(QTestState *qts, const char *type)
- {
-     QDict *resp;
-     char *help;
--    char *qom_tree_start, *qom_tree_end;
--    char *qtree_start, *qtree_end;
- 
-     g_test_message("Testing device '%s'", type);
- 
--    qom_tree_start = qtest_hmp(qts, "info qom-tree");
--    qtree_start = qtest_hmp(qts, "info qtree");
--
-     resp = qtest_qmp(qts, "{'execute': 'device-list-properties',"
-                           " 'arguments': {'typename': %s}}",
-                type);
-@@ -120,21 +115,6 @@ static void test_one_device(QTestState *qts, const char *type)
- 
-     help = qtest_hmp(qts, "device_add \"%s,help\"", type);
-     g_free(help);
--
--    /*
--     * Some devices leave dangling pointers in QOM behind.
--     * "info qom-tree" or "info qtree" have a good chance at crashing then.
--     * Also make sure that the tree did not change.
--     */
--    qom_tree_end = qtest_hmp(qts, "info qom-tree");
--    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
--    g_free(qom_tree_start);
--    g_free(qom_tree_end);
--
--    qtree_end = qtest_hmp(qts, "info qtree");
--    g_assert_cmpstr(qtree_start, ==, qtree_end);
--    g_free(qtree_start);
--    g_free(qtree_end);
- }
- 
- static void test_device_intro_list(void)
-@@ -213,16 +193,38 @@ static void test_qom_list_fields(void)
- static void test_device_intro_none(void)
- {
-     QTestState *qts = qtest_init(common_args);
-+    g_autofree char *qom_tree_start = qtest_hmp(qts, "info qom-tree");
-+    g_autofree char *qom_tree_end = NULL;
-+    g_autofree char *qtree_start = qtest_hmp(qts, "info qtree");
-+    g_autofree char *qtree_end = NULL;
- 
-     test_one_device(qts, "nonexistent");
-+
-+    /* Make sure that really nothing changed in the trees */
-+    qom_tree_end = qtest_hmp(qts, "info qom-tree");
-+    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
-+    qtree_end = qtest_hmp(qts, "info qtree");
-+    g_assert_cmpstr(qtree_start, ==, qtree_end);
-+
-     qtest_quit(qts);
- }
- 
- static void test_device_intro_abstract(void)
- {
-     QTestState *qts = qtest_init(common_args);
-+    g_autofree char *qom_tree_start = qtest_hmp(qts, "info qom-tree");
-+    g_autofree char *qom_tree_end = NULL;
-+    g_autofree char *qtree_start = qtest_hmp(qts, "info qtree");
-+    g_autofree char *qtree_end = NULL;
- 
-     test_one_device(qts, "device");
-+
-+    /* Make sure that really nothing changed in the trees */
-+    qom_tree_end = qtest_hmp(qts, "info qom-tree");
-+    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
-+    qtree_end = qtest_hmp(qts, "info qtree");
-+    g_assert_cmpstr(qtree_start, ==, qtree_end);
-+
-     qtest_quit(qts);
- }
- 
-@@ -231,9 +233,12 @@ static void test_device_intro_concrete(const void *args)
-     QList *types;
-     QListEntry *entry;
-     const char *type;
--    QTestState *qts;
-+    QTestState *qts = qtest_init(args);
-+    g_autofree char *qom_tree_start = qtest_hmp(qts, "info qom-tree");
-+    g_autofree char *qom_tree_end = NULL;
-+    g_autofree char *qtree_start = qtest_hmp(qts, "info qtree");
-+    g_autofree char *qtree_end = NULL;
- 
--    qts = qtest_init(args);
-     types = device_type_list(qts, false);
- 
-     QLIST_FOREACH_ENTRY(types, entry) {
-@@ -243,6 +248,17 @@ static void test_device_intro_concrete(const void *args)
-         test_one_device(qts, type);
-     }
- 
-+    /*
-+     * Some devices leave dangling pointers in QOM behind.
-+     * "info qom-tree" or "info qtree" have a good chance at crashing then.
-+     * Also make sure that the tree did not change.
-+     */
-+    qom_tree_end = qtest_hmp(qts, "info qom-tree");
-+    g_assert_cmpstr(qom_tree_start, ==, qom_tree_end);
-+
-+    qtree_end = qtest_hmp(qts, "info qtree");
-+    g_assert_cmpstr(qtree_start, ==, qtree_end);
-+
-     qobject_unref(types);
-     qtest_quit(qts);
-     g_free((void *)args);
--- 
-2.18.1
+> 
+>  linux-headers/asm-arm/unistd-common.h | 1 +
+>  linux-headers/asm-x86/kvm.h           | 5 +++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-headers/asm-arm/unistd-common.h b/linux-headers/asm-arm/unistd-common.h
+> index 23de64e44c..57cd1f21db 100644
+> --- a/linux-headers/asm-arm/unistd-common.h
+> +++ b/linux-headers/asm-arm/unistd-common.h
+> @@ -392,5 +392,6 @@
+>  #define __NR_clone3 (__NR_SYSCALL_BASE + 435)
+>  #define __NR_openat2 (__NR_SYSCALL_BASE + 437)
+>  #define __NR_pidfd_getfd (__NR_SYSCALL_BASE + 438)
+> +#define __NR_faccessat2 (__NR_SYSCALL_BASE + 439)
+>  
+>  #endif /* _ASM_ARM_UNISTD_COMMON_H */
+> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+> index 17c5a038f4..0780f97c18 100644
+> --- a/linux-headers/asm-x86/kvm.h
+> +++ b/linux-headers/asm-x86/kvm.h
+> @@ -408,14 +408,15 @@ struct kvm_vmx_nested_state_data {
+>  };
+>  
+>  struct kvm_vmx_nested_state_hdr {
+> -	__u32 flags;
+>  	__u64 vmxon_pa;
+>  	__u64 vmcs12_pa;
+> -	__u64 preemption_timer_deadline;
+>  
+>  	struct {
+>  		__u16 flags;
+>  	} smm;
+> +
+> +	__u32 flags;
+> +	__u64 preemption_timer_deadline;
+>  };
+>  
+>  struct kvm_svm_nested_state_data {
 
 
