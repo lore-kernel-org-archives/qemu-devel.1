@@ -2,87 +2,89 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A24C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B4AC433E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:56:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D15A520720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3253A20772
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 12:56:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RG4lZd6p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D15A520720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xjdCdqSj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3253A20772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtsXk-0007u7-QV
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44698)
+	id 1jtsZz-0000m3-Cu
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 08:56:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jtsXD-0007Oq-4j
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:53:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38934
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jtsXB-0007dr-JQ
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:53:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594385624;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=sRyELt3ufqrxLdbZ+E3frAKACa20tM74SsSCN7u2eFg=;
- b=RG4lZd6p6mUAlHCFI32grv/1+nbBdxy8T/UZJ9c9mKuS0MRbdoQR8p4jLPIaDxqdErYU3L
- maP0tloPdwj2LkaNu5DhLnXJs9eNOx4ffbQWgp51+yUhPFM11ASFrv3VmnEjgdq5781Bp6
- 7JGujlSx7NUoOfuJoVs48bcBS5/y+WE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-7ItG1wJwOWeJZv-NCTOQhQ-1; Fri, 10 Jul 2020 08:53:40 -0400
-X-MC-Unique: 7ItG1wJwOWeJZv-NCTOQhQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F24FA80BCA7;
- Fri, 10 Jul 2020 12:53:38 +0000 (UTC)
-Received: from localhost (ovpn-114-251.ams2.redhat.com [10.36.114.251])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6BEA761E1;
- Fri, 10 Jul 2020 12:53:35 +0000 (UTC)
-Date: Fri, 10 Jul 2020 13:53:34 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Subject: Re: [PATCH v5 5/5] vhost-user-blk: default num_queues to -smp N
-Message-ID: <20200710125334.GB8433@stefanha-x1.localdomain>
-References: <20200706135650.438362-1-stefanha@redhat.com>
- <20200706135650.438362-6-stefanha@redhat.com>
- <CAFubqFsSTv_j_46sq=+Kz7uDnk8eYvB+moCLNeuV8nG9YKzb7A@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtsYn-0008PX-U2
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:55:25 -0400
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:37950)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jtsYm-0007rs-3e
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 08:55:25 -0400
+Received: by mail-oi1-x22d.google.com with SMTP id r8so4693018oij.5
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 05:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=kvJyznxC6mSq10YerkGA0VU25/yk8WpIbpFZEdgLZCw=;
+ b=xjdCdqSjmkJjw+o7wifVD1RoMZmwIPNJkQC+ZbZPayOlAL0FqX2Neml08EDbTdOFjv
+ utqrs1knpOhTQiKhKTEcRIfMjQDtTHFJxYamod0GGkjjU9BlD4W2UZfOYXieuB+0k6th
+ lH1A/VxsiFAgHPutA2ijN7lntENHpvLuzHlev+LGx6vSL21FBRdMlJM+a48H48+a6Jdr
+ SA6w2icQMAzpjY0azrqPIZNfhxYhuhnkfWzRMRT0ZHJF7RupSdfPEDNbLWtWqDgfFnWc
+ 7Xv1LwifXqZFucLqNxEByCf8n4lGS6fdCtXTder3HCHz+tyTH6A6udx5OdomGVfQ3ZTd
+ s8IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=kvJyznxC6mSq10YerkGA0VU25/yk8WpIbpFZEdgLZCw=;
+ b=kAQm9UVC/opjbxwTDSvYxazkWJTxZdrNYvwqkl+kxvOmx0AgEXRTpTGXiekKokNx66
+ HkRFNxQnHBHe0GydBznqr9/0et/aTB2rGIufUw0LoMH+oB6Jh67w0qiGg1gNZ5Gcteuh
+ 42vSAwt/YB2yPi8sAOIUY3Pf13Ar2M28SQxE0aJgZWebP7gBJ41159d2oKULnXcb8MlV
+ IeYrc6PDzpZD3SqfZpiBXFSdYo0OYvHGvWc+t03Hf0vqkN6H1WDg+KMnctYBFU9RCQ7S
+ VkSCnhX5elKA5WQH0QXoCXMYGmONLV7I3uzara02+TOFid9eBSDKrQNyb8atXAfW0X2i
+ JLWA==
+X-Gm-Message-State: AOAM5323pRGhRxlv7In3Ha5ch4oTtJNmKS5+6O0aRaS+f/TQ2gwBc4iZ
+ a+hhP/1F+TyHc7Zc40BlSpG8Fj4hW2kdv0CLfqtW8A==
+X-Google-Smtp-Source: ABdhPJyliAs2DhHLHL4EYeZtI0IHh2KFNioMEzE67u79ATkbZuw3BQ+97gjL+9V5sQRzvmTURx0NekE2y+JMiVx4pEk=
+X-Received: by 2002:aca:1706:: with SMTP id j6mr3893084oii.146.1594385723006; 
+ Fri, 10 Jul 2020 05:55:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFubqFsSTv_j_46sq=+Kz7uDnk8eYvB+moCLNeuV8nG9YKzb7A@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vGgW1X5XWziG23Ko"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 04:36:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200708172542.25012-1-pbonzini@redhat.com>
+ <CAFEAcA8b6sn8fXOKwqOF6MvsKT5oKqS+4jjYDPAPvnXmVimLiQ@mail.gmail.com>
+ <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
+ <CAFEAcA-UbHpj_xSbqjTsaURt8yPZjuYOmd3pe97vg_G7--17Cw@mail.gmail.com>
+ <e78820bb-af5f-c2a0-7727-1a0caedfa584@suse.de>
+In-Reply-To: <e78820bb-af5f-c2a0-7727-1a0caedfa584@suse.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Jul 2020 13:55:12 +0100
+Message-ID: <CAFEAcA-raDJ2pSUG-OYHcJi_LnQwxMHvcyjsD7+=WxGYcrSz3w@mail.gmail.com>
+Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
+To: Claudio Fontana <cfontana@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::22d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,61 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
- QEMU <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---vGgW1X5XWziG23Ko
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, 10 Jul 2020 at 13:52, Claudio Fontana <cfontana@suse.de> wrote:
+> If you can access it,
+>
+> https://cirrus-ci.com/task/5537514263937024?command=main#L2039
+>
+> the thing is treated here as a warning, which is in the middle of a large amount of other warnings.
+>
+> private/var/folders/3y/l0z1x3693dl_8n0qybp4dqwh0000gn/T/cirrus-ci-build/ui/vnc-auth-sasl.c:648:29: warning: 'sasl_errdetail' is deprecated: first deprecated in macOS 10.11 [-Wdeprecated-declarations]
+>                             sasl_errdetail(vs->sasl.conn));
+>
+> /* ... lots of similar warnings */
+>
+> private/var/folders/3y/l0z1x3693dl_8n0qybp4dqwh0000gn/T/cirrus-ci-build/ui/cocoa.m:1478:9: warning: implicit declaration of function 'cpu_throttle_set' is invalid in C99 [-Wimplicit-function-declaration]
+>         cpu_throttle_set(throttle_pct);
+>         ^
+>
+>
+> Apparently the cirrus-ci I am using is not treating this as an error, while what you are using is..
 
-On Thu, Jul 09, 2020 at 11:02:24AM -0700, Raphael Norwitz wrote:
-> On Mon, Jul 6, 2020 at 7:00 AM Stefan Hajnoczi <stefanha@redhat.com> wrot=
-e:
-> > diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> > index a00b854736..39aec42dae 100644
-> > --- a/hw/block/vhost-user-blk.c
-> > +++ b/hw/block/vhost-user-blk.c
-> > @@ -420,6 +420,9 @@ static void vhost_user_blk_device_realize(DeviceSta=
-te *dev, Error **errp)
-> >          return;
-> >      }
-> >
-> > +    if (s->num_queues =3D=3D VHOST_USER_BLK_AUTO_NUM_QUEUES) {
-> > +        s->num_queues =3D 1;
-> > +    }
->=20
-> What is this check for? Is it just a backstop to ensure that
-> num_queues is set to 1 if vhost-user-blk-pci doesn't update it?
+Ah, I see. Yeah, configure by default doesn't enable -Werror for OSX.
+My build tree has
+ '--extra-cflags=-fdiagnostics-color=never -Werror
+-Wno-error=deprecated-declarations'
 
-For the non-PCI VIRTIO transports that do not handle num_queues =3D=3D
-VHOST_USER_BLK_AUTO_NUM_QUEUES themselves.
+(of which the last two are relevant here). We should probably
+make configure use -Werror on OSX now with the same logic as Linux,
+I've been using it that way for ages without issues.
 
-Stefan
-
---vGgW1X5XWziG23Ko
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8IZM4ACgkQnKSrs4Gr
-c8gVBgf7Bxq7Oi+m44Ldvw3CQGCXsXZGFLyVksKSyHtsNtkHIWBs8hoYzIibbfiT
-3mBpdfa7HUDlaKzpJHWFCDUZrZeZO3S5w6w/BKvVFiCuLIGDhuRnnnuypHI2BoXj
-Fkhwo/wv/Wx9VMLagLGNgsgwsFDQGpO3iXIwGeE4CG0OmhfqWLIN6KApFzjPhapR
-nPAwEUz10BrvvY4n/74xIJXc91iZqG37CKLHNpVhEy52TwPI0WIbutcEu0Fyr1yG
-bipijtLgEC7r8JH5GM46d8nvFB6Pk8yEP+3ZmBlgR1XBqC+z8EUJmll9MIpZ1bNz
-LgPPcgas+aepE6TNVveDfsSgte8s2Q==
-=BTlk
------END PGP SIGNATURE-----
-
---vGgW1X5XWziG23Ko--
-
+thanks
+-- PMM
 
