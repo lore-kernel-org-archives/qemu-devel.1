@@ -2,82 +2,91 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 146E9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A505C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1DA82077D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:35:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 429AE206E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 06:36:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LcVkssf1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1DA82077D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvOqj1hD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 429AE206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtmcl-0000kW-3B
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 02:35:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34634)
+	id 1jtmeH-0001kq-I6
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 02:36:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34730)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jtmbr-0008Qd-Aq
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:34:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23330
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jtmcE-0000Kf-OF
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:34:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47438
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jtmbo-0007oK-M5
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:34:10 -0400
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jtmcC-0007sl-Rg
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 02:34:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594362847;
+ s=mimecast20190719; t=1594362871;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pjkXfzFLh1NtuikA4vh0Ebp095kM99Wlc9D7r5XXVO0=;
- b=LcVkssf1a9F1rwueac9YvOcL+WsDlStUnOofBnbCUElzRFFgcS9OzNCNtWQmaAS/ExXy5j
- /s+OZ87MTAvdF223uYLEUFsGssGM0mLlqyu577nbsqYJGt8BPoaHFL6nGpMsPFichrMt8h
- mYpZcuuvxqTuHy6oQDDUD/pcpw4uMm0=
+ bh=ZWnDwjLAKtI61PZNG7ENzjs4JhjJ9TzL6LS/QML/gIo=;
+ b=hvOqj1hDbterzgM1KCXEgX41/bY6Vm+iryduG+Q6MYau/M8fPcdt7S+O2P5XuAhuoYtYAy
+ FBiBRjhzbiC+4dvNe04uRMFTBMSC8PTJ1diO0u43zYGy1hSOxelt5EKZbczhRl9uazN9WD
+ 0InmkadF+0Ezihad5tBKRXfdtLrth54=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-st0Qpub0OfeCLIHSR2FWcA-1; Fri, 10 Jul 2020 02:34:05 -0400
-X-MC-Unique: st0Qpub0OfeCLIHSR2FWcA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-286-pB9d6YXaOYixou8WAoCXZg-1; Fri, 10 Jul 2020 02:34:29 -0400
+X-MC-Unique: pB9d6YXaOYixou8WAoCXZg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8AB9800D5C;
- Fri, 10 Jul 2020 06:34:02 +0000 (UTC)
-Received: from gondolin (ovpn-112-227.ams2.redhat.com [10.36.112.227])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0DD3A7611D;
- Fri, 10 Jul 2020 06:33:58 +0000 (UTC)
-Date: Fri, 10 Jul 2020 08:33:56 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Claudio Fontana <cfontana@suse.de>
-Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
-Message-ID: <20200710083356.4c6e9f78.cohuck@redhat.com>
-In-Reply-To: <d0bc3f23-98c0-eadb-55ed-3377f43c494a@suse.de>
-References: <20200629093504.3228-1-cfontana@suse.de>
- <20200629093504.3228-4-cfontana@suse.de>
- <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
- <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
- <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
- <e9dca3d1-f52d-13ce-2d7d-66958bc15765@suse.de>
- <d0bc3f23-98c0-eadb-55ed-3377f43c494a@suse.de>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8F1C80183C;
+ Fri, 10 Jul 2020 06:34:28 +0000 (UTC)
+Received: from [10.72.13.228] (ovpn-13-228.pek2.redhat.com [10.72.13.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 952EE5F7D8;
+ Fri, 10 Jul 2020 06:34:13 +0000 (UTC)
+Subject: Re: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+To: Peter Xu <peterx@redhat.com>
+References: <69f6d6e7-a0b1-abae-894e-4e81b7e0cc90@redhat.com>
+ <ff9e7af0-18c4-57e8-fc94-904fdce1123a@redhat.com>
+ <20200702154540.GI40675@xz-x1>
+ <34fe0e55-c0ae-8e56-462b-6281b6cca4f5@redhat.com>
+ <20200703130338.GD6677@xz-x1>
+ <c985b804-126c-94a1-b05e-430075f9e390@redhat.com>
+ <20200707195429.GF88106@xz-x1>
+ <5004a059-6eb0-4ef3-40b7-94dfbf9ec08f@redhat.com>
+ <20200708141657.GA199122@xz-x1>
+ <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
+ <20200709141037.GF199122@xz-x1>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <fb2f8d35-3f04-55ac-e0c0-7eeedbaf2429@redhat.com>
+Date: Fri, 10 Jul 2020 14:34:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200709141037.GF199122@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:36:21
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/09 22:08:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -98,285 +107,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Colin Xu <colin.xu@intel.com>, "Jason
- J. Herne" <jjherne@linux.ibm.com>,
- Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
- haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 9 Jul 2020 20:46:56 +0200
-Claudio Fontana <cfontana@suse.de> wrote:
 
-> On 7/9/20 8:38 PM, Claudio Fontana wrote:
-> > On 7/8/20 5:05 PM, Paolo Bonzini wrote:  
-> >> On 08/07/20 17:00, Claudio Fontana wrote:  
-> >>>> Bisectable, 100% failure rate, etc. :(  Can you split the patch in
-> >>>> multiple parts, specifically separating any rename or introducing of
-> >>>> includes from the final file move?  
-> >>> Hi Paolo,
-> >>>
-> >>> will take a look!
-> >>>
-> >>> Is this captured by some travis / cirrus-ci / anything I can easily see the result of?
-> >>>
-> >>>  
-> >>
-> >> Nope, unfortunately we don't have an s390 CI.  But if you can get your
-> >> hands on one, just "./configure --target-list=s390x-softmmu && make &&
-> >> make check-block" will show it.  
-> > 
-> > So this is tricky, but I am making some progress after getting my hands on one.
-> > Maybe if someone understands s390 keys better, I could be clued in.  
-> 
-> 
-> Also adding Cornelia to Cc:.
-> 
-> Maybe the savevm_s390_storage_keys SaveVMHandlers etc assume that the icount state part of the vmstate is there?
+On 2020/7/9 下午10:10, Peter Xu wrote:
+> On Thu, Jul 09, 2020 at 01:58:33PM +0800, Jason Wang wrote:
+>>>> - If we care the performance, it's better to implement the MAP event for
+>>>> vhost, otherwise it could be a lot of IOTLB miss
+>>> I feel like these are two things.
+>>>
+>>> So far what we are talking about is whether vt-d should have knowledge about
+>>> what kind of events one iommu notifier is interested in.  I still think we
+>>> should keep this as answered in question 1.
+>>>
+>>> The other question is whether we want to switch vhost from UNMAP to MAP/UNMAP
+>>> events even without vDMA, so that vhost can establish the mapping even before
+>>> IO starts.  IMHO it's doable, but only if the guest runs DPDK workloads.  When
+>>> the guest is using dynamic iommu page mappings, I feel like that can be even
+>>> slower, because then the worst case is for each IO we'll need to vmexit twice:
+>>>
+>>>     - The first vmexit caused by an invalidation to MAP the page tables, so vhost
+>>>       will setup the page table before IO starts
+>>>
+>>>     - IO/DMA triggers and completes
+>>>
+>>>     - The second vmexit caused by another invalidation to UNMAP the page tables
+>>>
+>>> So it seems to be worse than when vhost only uses UNMAP like right now.  At
+>>> least we only have one vmexit (when UNMAP).  We'll have a vhost translate()
+>>> request from kernel to userspace, but IMHO that's cheaper than the vmexit.
+>>
+>> Right but then I would still prefer to have another notifier.
+>>
+>> Since vtd_page_walk has nothing to do with device IOTLB. IOMMU have a
+>> dedicated command for flushing device IOTLB. But the check for
+>> vtd_as_has_map_notifier is used to skip the device which can do demand
+>> paging via ATS or device specific way. If we have two different notifiers,
+>> vhost will be on the device iotlb notifier so we don't need it at all?
+> But we can still have iommu notifier that only registers to UNMAP even after we
+> introduce dev-iotlb notifier?  We don't want to do page walk for them as well.
+> TCG should be the only one so far, but I don't know.. maybe there can still be
+> new ones?
 
-I don't see anything that would deal with icount here. Adding Jason to
-cc: in case he has an idea. (I assume it would behave the same under
-KVM, as the only thing different are the internal callbacks.)
 
-> 
-> 
-> > 
-> > In short this goes away if I again set icount to enabled for qtest,
-> > basically ensuring that --enable-tcg is there and then reenabling icount.
-> > 
-> > qtest was forcing icount and shift=0 by creating qemu options, in order to misuse its counter feature,
-> > instead of using a separate counter.
-> > 
-> > Removing that ugliness we end up with different behavior of save/load, because vmstate will now suddenly not contain icount-related values anymore.
-> > What I do not understand is why this causes a problem because save should just not store the icount state and load should just not load the icount state,
-> > and why we die on the load of s390 keys state (it works just fine for other architectures).
+I think you're right. But looking at the codes, it looks like the check 
+of vtd_as_has_map_notifier() was only used in:
 
-Yes, I don't really see why skeys is so special. No endianness stuff, I
-assume?
+1) vtd_iommu_replay()
+2) vtd_iotlb_page_invalidate_notify() (PSI)
 
-> > 
-> > Here is a diff that makes the problem disappear, but needs --enable-tcg:
-> > 
-> > 
-> > ----------------------------------------------------------------------------------------------------
-> > diff --git a/accel/qtest.c b/accel/qtest.c
-> > index 119d0f16a4..4cb16abc2c 100644
-> > --- a/accel/qtest.c
-> > +++ b/accel/qtest.c
-> > @@ -23,6 +23,12 @@
-> >  
-> >  static int qtest_init_accel(MachineState *ms)
-> >  {
-> > +    QemuOpts *opts = qemu_opts_create(qemu_find_opts("icount"), NULL, 0,
-> > +                                      &error_abort);
-> > +    qemu_opt_set(opts, "shift", "0", &error_abort);
-> > +    icount_configure(opts, &error_abort);
-> > +    qemu_opts_del(opts);
-> > +
-> >      return 0;
-> >  }
-> >  
-> > diff --git a/softmmu/vl.c b/softmmu/vl.c
-> > index f39fd5270b..a5e788c86a 100644
-> > --- a/softmmu/vl.c
-> > +++ b/softmmu/vl.c
-> > @@ -2786,10 +2786,12 @@ static void configure_accelerators(const char *progname)
-> >          error_report("falling back to %s", ac->name);
-> >      }
-> >  
-> > +    /*
-> >      if (icount_enabled() && !tcg_enabled()) {
-> >          error_report("-icount is not allowed with hardware virtualization");
-> >          exit(1);
-> >     }
-> > +    */
-> >  }
-> >  
-> >  static void create_default_memdev(MachineState *ms, const char *path)
-> > ----------------------------------------------------------------------------------------------------
-> > 
-> > Without this patch, here is the full failure, maybe someone has a good hint, otherwise I'll keep digging from here inside the s390-specific code.
-> > 
-> > QA output created by 267
-> > 
-> > === No block devices at all ===
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing:
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > Error: No block device can accept snapshots
-> > (qemu) info snapshots
-> > No available block device supports snapshots
-> > (qemu) loadvm snap0
-> > Error: No block device supports snapshots
-> > (qemu) quit
-> > 
-> > 
-> > === -drive if=none ===
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -drive driver=file,file=TEST_DIR/t.IMGFMT,if=none
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > Error: Device 'none0' is writable but does not support snapshots
-> > (qemu) info snapshots
-> > No available block device supports snapshots
-> > (qemu) loadvm snap0
-> > Error: Device 'none0' is writable but does not support snapshots
-> > (qemu) quit
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=none
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > (qemu) info snapshots
-> > List of snapshots present on all disks:
-> > ID        TAG                     VM SIZE                DATE       VM CLOCK
-> > --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-> > (qemu) loadvm snap0
-> > (qemu) quit
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=none -device virtio-blk,drive=none0
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > (qemu) info snapshots
-> > List of snapshots present on all disks:
-> > ID        TAG                     VM SIZE                DATE       VM CLOCK
-> > --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-> > (qemu) loadvm snap0
-> > (qemu) quit
-> > 
-> > 
-> > === -drive if=virtio ===
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -drive driver=file,file=TEST_DIR/t.IMGFMT,if=virtio
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > Error: Device 'virtio0' is writable but does not support snapshots
-> > (qemu) info snapshots
-> > No available block device supports snapshots
-> > (qemu) loadvm snap0
-> > Error: Device 'virtio0' is writable but does not support snapshots
-> > (qemu) quit
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -drive driver=IMGFMT,file=TEST_DIR/t.IMGFMT,if=virtio
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > (qemu) info snapshots
-> > List of snapshots present on all disks:
-> > ID        TAG                     VM SIZE                DATE       VM CLOCK
-> > --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-> > (qemu) loadvm snap0
-> > (qemu) quit
-> > 
-> > 
-> > === Simple -blockdev ===
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > Error: Device '' is writable but does not support snapshots
-> > (qemu) info snapshots
-> > No available block device supports snapshots
-> > (qemu) loadvm snap0
-> > Error: Device '' is writable but does not support snapshots
-> > (qemu) quit
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,node-name=fmt
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > (qemu) info snapshots
-> > List of snapshots present on all disks:
-> > ID        TAG                     VM SIZE                DATE       VM CLOCK
-> > --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-> > (qemu) loadvm snap0
-> > (qemu) quit
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=raw,file=file,node-name=raw -blockdev driver=IMGFMT,file=raw,node-name=fmt
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > (qemu) info snapshots
-> > List of snapshots present on all disks:
-> > ID        TAG                     VM SIZE                DATE       VM CLOCK
-> > --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-> > (qemu) loadvm snap0
-> > (qemu) quit
-> > 
-> > 
-> > === -blockdev with a filter on top ===
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
-> > Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,node-name=fmt -blockdev driver=copy-on-read,file=fmt,node-name=filter
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > (qemu) info snapshots
-> > List of snapshots present on all disks:
-> > ID        TAG                     VM SIZE                DATE       VM CLOCK
-> > --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-> > (qemu) loadvm snap0
-> > (qemu) quit
-> > 
-> > 
-> > === -blockdev with a backing file ===
-> > 
-> > Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
-> > Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
-> > Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT.base,node-name=backing-file -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,backing=backing-file,node-name=fmt
-> > QEMU X.Y.Z monitor - type 'help' for more information
-> > (qemu) savevm snap0
-> > (qemu) info snapshots
-> > List of snapshots present on all disks:
-> > ID        TAG                     VM SIZE                DATE       VM CLOCK
-> > --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
-> > (qemu) loadvm snap0
-> > Unexpected storage key flag data: 0
-> > error while loading state for instance 0x0 of device 's390-skeys'
-> > Error: Error -22 while loading VM state
-> > 
-> > 
-> > 
-> >   
-> >>  
-> >>>>
-> >>>> 	#if defined CONFIG_TCG || !defined NEED_CPU_H
-> >>>> 	extern bool icount_enabled(void);
-> >>>> 	#else
-> >>>> 	#define icount_enabled() 0
-> >>>> 	#endif
-> >>>>
-> >>>> (This way, more TCG-only code in cpus.c gets elided).  You can integrate
-> >>>> this change in the next version.
-> >>>>
-> >>>> Paolo
-> >>>>  
-> >>>
-> >>> Weird, I tested with --disable-tcg explicitly (but may be some time ago now, as I constantly rebased).
-> >>>
-> >>> Will take a look at the introduction of this #defines in place of variables,
-> >>> as this mechanisms will not work in the future for target-specific modules.  
-> >>
-> >> This is only done for per-target files so it should not be a problem.
-> >>
-> >> Paolo
-> >>
-> >>  
-> > 
-> >   
-> 
+For the replay, it's expensive anyhow. For PSI, I think it's just about 
+one or few mappings, not sure it will have obvious performance impact.
+
+And I had two questions:
+
+1) The codes doesn't check map for DSI or GI, does this match what spec 
+said? (It looks to me the spec is unclear in this part)
+2) for the replay() I don't see other implementations (either spapr or 
+generic one) that did unmap (actually they skip unmap explicitly), any 
+reason for doing this in intel IOMMU?
+
+Thanks
+
+
+>
+> Thanks,
+>
 
 
