@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B17C433EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B10C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9948206F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71DC920657
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:27:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="gI15HNww"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9948206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="e0aEmokc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DC920657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvre-00027h-UE
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:27:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42776)
+	id 1jtvsM-0003Gb-K5
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:27:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jtvfS-0003EZ-03; Fri, 10 Jul 2020 12:14:30 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:43846)
+ id 1jtvfO-00035G-H6; Fri, 10 Jul 2020 12:14:26 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:43678)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jtvfJ-0004w9-KI; Fri, 10 Jul 2020 12:14:29 -0400
+ id 1jtvfI-0004vV-Pz; Fri, 10 Jul 2020 12:14:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=m+3OCOC5/GSkJv0QsvUW6R6r3B15ZJKKLGEVM/tHqVA=; 
- b=gI15HNwwzHXwDkVHJyOvtiL49cnKj+GCWnDDujav/ybuYQ/YC6RCsJ6Mdq9JbPnaqGjVi0t0/cEfpj59Ogjj7k3pnzVNThjmpPEI3RXlvRpxH1QnKL0G/2RLf5BsiItQ1iKk7sn3sIjYFd9Km+ItoBuhs+dNt5e01cniK5rSWJpjFKYhwCRfkQsLacMiU5hWlymNhdMqlAyP5A8tErxxCilj8goOf2mUI+0WqTStBo9sey8cXlZLBgDUdHRGjeApJizlvAF7BGlWEIbtqKIchMzLESYyZwcxlAQZytiVMbFmozSXwxBzOm6EwNRsSrmVxtBdkN48y0QneWvf+EyP2w==;
+ bh=PswfzizGui7N0nWBDqMfs9oXoukNQIMoOin+a8N99U0=; 
+ b=e0aEmokckG/U1Vgt7x9Y+6xD5kEWuAj0cokjFdzKah08ao7wNtWDM9IpEqSlKpS1Bz2UYPPyayVdUSR4Aasajc70/XnVX9Jm4517uJHaW7/ORHvJuNdbvUSwjPvO4sIXv77FA4ccccPX2HhsmMer+7h4q34tqK+1vVZluqJMV6JiLBjYUmpUASXYF46Z/1cK8723+esgdNWio4NQhzj7qU/GC/AFxgonOm6CV0SaZtAgvCaBaROK5AG3Gwk7H8tD10+WSDCUIkvwheyX24FucVNt1Qpf1A6GF+u0nmFRQ2GdqXQ+fGge429mNYF9tiw9N+z89qjnSJpJY7qSBmMemg==;
 Received: from [81.0.43.0] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jtvea-0003k8-Od; Fri, 10 Jul 2020 18:13:36 +0200
+ id 1jtvea-0003jf-CJ; Fri, 10 Jul 2020 18:13:36 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jtveL-0001RT-JC; Fri, 10 Jul 2020 18:13:21 +0200
+ id 1jtveK-0001Qb-Un; Fri, 10 Jul 2020 18:13:20 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v11 30/34] qcow2: Add prealloc field to QCowL2Meta
-Date: Fri, 10 Jul 2020 18:13:12 +0200
-Message-Id: <960d4c444a4f5a870e2b47e5da322a73cd9a2f5a.1594396418.git.berto@igalia.com>
+Subject: [PATCH v11 12/34] qcow2: Add l2_entry_size()
+Date: Fri, 10 Jul 2020 18:12:54 +0200
+Message-Id: <d34d578bd0380e739e2dde3e8dd6187d3d249fa9.1594396418.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1594396418.git.berto@igalia.com>
 References: <cover.1594396418.git.berto@igalia.com>
@@ -84,112 +84,207 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This field allows us to indicate that the L2 metadata update does not
-come from a write request with actual data but from a preallocation
-request.
+qcow2 images with subclusters have 128-bit L2 entries. The first 64
+bits contain the same information as traditional images and the last
+64 bits form a bitmap with the status of each individual subcluster.
 
-For traditional images this does not make any difference, but for
-images with extended L2 entries this means that the clusters are
-allocated normally in the L2 table but individual subclusters are
-marked as unallocated.
-
-This will allow preallocating images that have a backing file.
-
-There is one special case: when we resize an existing image we can
-also request that the new clusters are preallocated. If the image
-already had a backing file then we have to hide any possible stale
-data and zero out the new clusters (see commit 955c7d6687 for more
-details).
-
-In this case the subclusters cannot be left as unallocated so the L2
-bitmap must be updated.
+Because of that we cannot assume that L2 entries are sizeof(uint64_t)
+anymore. This function returns the proper value for the image.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.h         | 8 ++++++++
- block/qcow2-cluster.c | 2 +-
- block/qcow2.c         | 6 ++++++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ block/qcow2.h          |  9 +++++++++
+ block/qcow2-cluster.c  | 12 ++++++------
+ block/qcow2-refcount.c | 14 ++++++++------
+ block/qcow2.c          |  8 ++++----
+ 4 files changed, 27 insertions(+), 16 deletions(-)
 
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 4ef4ae4ab0..f3499e53bf 100644
+index 4fe31adfd3..46b351229a 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -463,6 +463,14 @@ typedef struct QCowL2Meta
-      */
-     bool skip_cow;
+@@ -80,6 +80,10 @@
  
-+    /**
-+     * Indicates that this is not a normal write request but a preallocation.
-+     * If the image has extended L2 entries this means that no new individual
-+     * subclusters will be marked as allocated in the L2 bitmap (but any
-+     * existing contents of that bitmap will be kept).
-+     */
-+    bool prealloc;
+ #define QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER 32
+ 
++/* Size of normal and extended L2 entries */
++#define L2E_SIZE_NORMAL   (sizeof(uint64_t))
++#define L2E_SIZE_EXTENDED (sizeof(uint64_t) * 2)
 +
-     /**
-      * The I/O vector with the data from the actual guest write request.
-      * If non-NULL, this is meant to be merged together with the data
+ #define MIN_CLUSTER_BITS 9
+ #define MAX_CLUSTER_BITS 21
+ 
+@@ -521,6 +525,11 @@ static inline bool has_subclusters(BDRVQcow2State *s)
+     return false;
+ }
+ 
++static inline size_t l2_entry_size(BDRVQcow2State *s)
++{
++    return has_subclusters(s) ? L2E_SIZE_EXTENDED : L2E_SIZE_NORMAL;
++}
++
+ static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
+                                     int idx)
+ {
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index e023bc4b01..bbf373ad21 100644
+index b501642c56..9ba60f3fde 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1067,7 +1067,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-         set_l2_entry(s, l2_slice, l2_index + i, offset | QCOW_OFLAG_COPIED);
+@@ -208,7 +208,7 @@ static int l2_load(BlockDriverState *bs, uint64_t offset,
+                    uint64_t l2_offset, uint64_t **l2_slice)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    int start_of_slice = sizeof(uint64_t) *
++    int start_of_slice = l2_entry_size(s) *
+         (offset_to_l2_index(s, offset) - offset_to_l2_slice_index(s, offset));
  
-         /* Update bitmap with the subclusters that were just written */
--        if (has_subclusters(s)) {
-+        if (has_subclusters(s) && !m->prealloc) {
-             uint64_t l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
-             unsigned written_from = m->cow_start.offset;
-             unsigned written_to = m->cow_end.offset + m->cow_end.nb_bytes ?:
+     return qcow2_cache_get(bs, s->l2_table_cache, l2_offset + start_of_slice,
+@@ -281,7 +281,7 @@ static int l2_allocate(BlockDriverState *bs, int l1_index)
+ 
+     /* allocate a new l2 entry */
+ 
+-    l2_offset = qcow2_alloc_clusters(bs, s->l2_size * sizeof(uint64_t));
++    l2_offset = qcow2_alloc_clusters(bs, s->l2_size * l2_entry_size(s));
+     if (l2_offset < 0) {
+         ret = l2_offset;
+         goto fail;
+@@ -305,7 +305,7 @@ static int l2_allocate(BlockDriverState *bs, int l1_index)
+ 
+     /* allocate a new entry in the l2 cache */
+ 
+-    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
++    slice_size2 = s->l2_slice_size * l2_entry_size(s);
+     n_slices = s->cluster_size / slice_size2;
+ 
+     trace_qcow2_l2_allocate_get_empty(bs, l1_index);
+@@ -369,7 +369,7 @@ fail:
+     }
+     s->l1_table[l1_index] = old_l2_offset;
+     if (l2_offset > 0) {
+-        qcow2_free_clusters(bs, l2_offset, s->l2_size * sizeof(uint64_t),
++        qcow2_free_clusters(bs, l2_offset, s->l2_size * l2_entry_size(s),
+                             QCOW2_DISCARD_ALWAYS);
+     }
+     return ret;
+@@ -717,7 +717,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
+ 
+         /* Then decrease the refcount of the old table */
+         if (l2_offset) {
+-            qcow2_free_clusters(bs, l2_offset, s->l2_size * sizeof(uint64_t),
++            qcow2_free_clusters(bs, l2_offset, s->l2_size * l2_entry_size(s),
+                                 QCOW2_DISCARD_OTHER);
+         }
+ 
+@@ -1914,7 +1914,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
+     int ret;
+     int i, j;
+ 
+-    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
++    slice_size2 = s->l2_slice_size * l2_entry_size(s);
+     n_slices = s->cluster_size / slice_size2;
+ 
+     if (!is_active_l1) {
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 04546838e8..770c5dbc83 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1254,7 +1254,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
+     l2_slice = NULL;
+     l1_table = NULL;
+     l1_size2 = l1_size * sizeof(uint64_t);
+-    slice_size2 = s->l2_slice_size * sizeof(uint64_t);
++    slice_size2 = s->l2_slice_size * l2_entry_size(s);
+     n_slices = s->cluster_size / slice_size2;
+ 
+     s->cache_discards = true;
+@@ -1605,7 +1605,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+     int i, l2_size, nb_csectors, ret;
+ 
+     /* Read L2 table from disk */
+-    l2_size = s->l2_size * sizeof(uint64_t);
++    l2_size = s->l2_size * l2_entry_size(s);
+     l2_table = g_malloc(l2_size);
+ 
+     ret = bdrv_pread(bs->file, l2_offset, l2_table, l2_size);
+@@ -1680,15 +1680,16 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+                             fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR",
+                             offset);
+                     if (fix & BDRV_FIX_ERRORS) {
++                        int idx = i * (l2_entry_size(s) / sizeof(uint64_t));
+                         uint64_t l2e_offset =
+-                            l2_offset + (uint64_t)i * sizeof(uint64_t);
++                            l2_offset + (uint64_t)i * l2_entry_size(s);
+                         int ign = active ? QCOW2_OL_ACTIVE_L2 :
+                                            QCOW2_OL_INACTIVE_L2;
+ 
+                         l2_entry = QCOW_OFLAG_ZERO;
+                         set_l2_entry(s, l2_table, i, l2_entry);
+                         ret = qcow2_pre_write_overlap_check(bs, ign,
+-                                l2e_offset, sizeof(uint64_t), false);
++                                l2e_offset, l2_entry_size(s), false);
+                         if (ret < 0) {
+                             fprintf(stderr, "ERROR: Overlap check failed\n");
+                             res->check_errors++;
+@@ -1698,7 +1699,8 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+                         }
+ 
+                         ret = bdrv_pwrite_sync(bs->file, l2e_offset,
+-                                               &l2_table[i], sizeof(uint64_t));
++                                               &l2_table[idx],
++                                               l2_entry_size(s));
+                         if (ret < 0) {
+                             fprintf(stderr, "ERROR: Failed to overwrite L2 "
+                                     "table entry: %s\n", strerror(-ret));
+@@ -1905,7 +1907,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+         }
+ 
+         ret = bdrv_pread(bs->file, l2_offset, l2_table,
+-                         s->l2_size * sizeof(uint64_t));
++                         s->l2_size * l2_entry_size(s));
+         if (ret < 0) {
+             fprintf(stderr, "ERROR: Could not read L2 table: %s\n",
+                     strerror(-ret));
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 9ab2a91c8b..8ca0f22069 100644
+index e0349e6800..49772143b3 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2096,6 +2096,7 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
-         QCowL2Meta *next;
+@@ -883,7 +883,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+     uint64_t max_l2_entries = DIV_ROUND_UP(virtual_disk_size, s->cluster_size);
+     /* An L2 table is always one cluster in size so the max cache size
+      * should be a multiple of the cluster size. */
+-    uint64_t max_l2_cache = ROUND_UP(max_l2_entries * sizeof(uint64_t),
++    uint64_t max_l2_cache = ROUND_UP(max_l2_entries * l2_entry_size(s),
+                                      s->cluster_size);
  
-         if (link_l2) {
-+            assert(!l2meta->prealloc);
-             ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-             if (ret) {
-                 goto out;
-@@ -3130,6 +3131,7 @@ static int coroutine_fn preallocate_co(BlockDriverState *bs, uint64_t offset,
+     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
+@@ -1042,7 +1042,7 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+         }
+     }
  
-         while (meta) {
-             QCowL2Meta *next = meta->next;
-+            meta->prealloc = true;
+-    r->l2_slice_size = l2_cache_entry_size / sizeof(uint64_t);
++    r->l2_slice_size = l2_cache_entry_size / l2_entry_size(s);
+     r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size,
+                                            l2_cache_entry_size);
+     r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size,
+@@ -1489,7 +1489,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+         bs->encrypted = true;
+     }
  
-             ret = qcow2_alloc_cluster_link_l2(bs, meta);
-             if (ret < 0) {
-@@ -4217,6 +4219,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-         int64_t clusters_allocated;
-         int64_t old_file_size, last_cluster, new_file_size;
-         uint64_t nb_new_data_clusters, nb_new_l2_tables;
-+        bool subclusters_need_allocation = false;
- 
-         /* With a data file, preallocation means just allocating the metadata
-          * and forwarding the truncate request to the data file */
-@@ -4298,6 +4301,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-                                    BDRV_REQ_ZERO_WRITE, NULL);
-             if (ret >= 0) {
-                 flags &= ~BDRV_REQ_ZERO_WRITE;
-+                /* Ensure that we read zeroes and not backing file data */
-+                subclusters_need_allocation = true;
-             }
-         } else {
-             ret = -1;
-@@ -4336,6 +4341,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-                     .offset       = nb_clusters << s->cluster_bits,
-                     .nb_bytes     = 0,
-                 },
-+                .prealloc     = !subclusters_need_allocation,
-             };
-             qemu_co_queue_init(&allocation.dependent_requests);
- 
+-    s->l2_bits = s->cluster_bits - 3; /* L2 is always one cluster */
++    s->l2_bits = s->cluster_bits - ctz32(l2_entry_size(s));
+     s->l2_size = 1 << s->l2_bits;
+     /* 2^(s->refcount_order - 3) is the refcount width in bytes */
+     s->refcount_block_bits = s->cluster_bits - (s->refcount_order - 3);
+@@ -4238,7 +4238,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+          *  preallocation. All that matters is that we will not have to allocate
+          *  new refcount structures for them.) */
+         nb_new_l2_tables = DIV_ROUND_UP(nb_new_data_clusters,
+-                                        s->cluster_size / sizeof(uint64_t));
++                                        s->cluster_size / l2_entry_size(s));
+         /* The cluster range may not be aligned to L2 boundaries, so add one L2
+          * table for a potential head/tail */
+         nb_new_l2_tables++;
 -- 
 2.20.1
 
