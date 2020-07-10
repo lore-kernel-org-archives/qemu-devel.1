@@ -2,126 +2,87 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5A0C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72EEBC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:45:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23B822078D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:43:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3737C20748
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 19:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="F0JUJeZn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23B822078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TZRVYKcz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3737C20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtyvU-0006CZ-DN
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 15:43:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60444)
+	id 1jtyxd-00088B-CZ
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 15:45:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtyuZ-0005d0-1M; Fri, 10 Jul 2020 15:42:19 -0400
-Received: from mail-eopbgr40093.outbound.protection.outlook.com
- ([40.107.4.93]:55523 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtyuW-0006el-8t; Fri, 10 Jul 2020 15:42:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AMmF7QVOl34I0vVUOO/4d6qLTK28MhK4/k9g3Q4AaoF9DmWvdqSxVk1rsrutTtFR0sN1BpNFLnTXWIk/fcqAcsPR4NFrrRKD7dG34BErZ/ITbrJXbAdky/Mw7BFwKz0V9ChHIDzf9SSTbI9wFQvhU+AD4qZ7O1vHDzvJrcH2SEZo+wLO7uJAeOmF7qVOJCi31bxA2UA/QQooUKS4yUh7YAgceDRyS2Ql/W5A+PhnRc1Z3j7ripU+lyAc22XK2wEO/YUG4vQOYIzGxInP7aXILm6lhu+++BeK6rCKPVwv9TCsk+rDDbPym1QOaSoJjRXLBM/CBWWyOhR8ogmIdbGRhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iuR87FbHfmBdWls8shJmLHSW5DBD8d0iQpD3eZ35IhQ=;
- b=B5JooAAofURmajaL7/CxQZBQxPG1PlDTNok8cFJdchhEzVNOCggjfIf4sP3zJQ7pSGnJaa3Eewf1X3xaODp9ghr1MVR9LcVn1izJj7hrbzuok1ZlPGyICiouZ8mXaOyOXWOdii1BG1AwHbZficeM8O1wZ0qFy4R5yI1zPrqQZJhdgjIOma0Zyjd7ZZEpQjfZ4gmmpUDw7YCAt+9xApw/dh1rhSzuy3qOy+I48eNbnf6DUhCr4IHOVtqx9V0wSqCgUr/+GMQwRsQcKDvdNbjeSK9C04NH7RmRuvxvl3wPr3hH34qj18zflfMPCEmHxEZd8+qN+5W6jce6FDfXlh5c0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iuR87FbHfmBdWls8shJmLHSW5DBD8d0iQpD3eZ35IhQ=;
- b=F0JUJeZnwmNdaW0B1eH7yxR4Iwd8vhatNhBjyg7nDRaUDOoBYMcncnvNrhiMGyZK6i/uUrJT2ksw8OjG5EEsBQ6cW3mp2q/5rZMwjpSXWuASghQW2+fjHHRJ0vPRxtw4CehWzX9sRsNa/du9UDXQkDYnFRN0E0E8FmOslyHrwNk=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB4166.eurprd08.prod.outlook.com (2603:10a6:20b:a6::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Fri, 10 Jul
- 2020 19:42:13 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.021; Fri, 10 Jul 2020
- 19:42:13 +0000
-Subject: Re: [PATCH v7 17/47] block: Re-evaluate backing file handling in
- reopen
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-18-mreitz@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <cb80dda7-e3e1-afb1-10b5-18b09eb9669b@virtuozzo.com>
-Date: Fri, 10 Jul 2020 22:42:09 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-18-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM0PR10CA0028.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::38) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jtyww-0007Yd-Gy
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 15:44:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43469
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jtywt-0006yj-Vc
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 15:44:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594410282;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=G72TIalTCHtDtclrZbOhTXLtm9+ltuo0q57w3lqyp08=;
+ b=TZRVYKczSA8PRjh6DKSdpBJ2f+SU2pVWF/F0k9kX67DcX4vrchEVfwWmbQEBceEPHUEe5x
+ PDyc6cmWhFqIMGnNqnYu2O0IPdkiFBZwU4NKx9Q6B5PiPr8A4DbhsYkKFvkSi7qUZGPbcX
+ +YdpRe88AEZsX5ypIEuYJvhOZy0twzU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-495-QdOpJDrJN4CLaY-0HsYjow-1; Fri, 10 Jul 2020 15:44:39 -0400
+X-MC-Unique: QdOpJDrJN4CLaY-0HsYjow-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03A3E107ACCA;
+ Fri, 10 Jul 2020 19:44:38 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 903985C298;
+ Fri, 10 Jul 2020 19:44:24 +0000 (UTC)
+Date: Fri, 10 Jul 2020 21:44:19 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v5 16/20] microvm: wire up hotplug
+Message-ID: <20200710214419.6fad02cc@redhat.com>
+In-Reply-To: <20200707125356.32450-17-kraxel@redhat.com>
+References: <20200707125356.32450-1-kraxel@redhat.com>
+ <20200707125356.32450-17-kraxel@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.191) by
- AM0PR10CA0028.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::38) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22 via Frontend
- Transport; Fri, 10 Jul 2020 19:42:11 +0000
-X-Originating-IP: [109.252.114.191]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c714aef1-4c63-498e-e8db-08d8250957c4
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4166:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4166445CEBF629B490230DFDF4650@AM6PR08MB4166.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:612;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xCENqm/iD8gMt0k/AlIU6HYtNIwxJe8UKBcc4WknTEQie8qasJ7b9vYsg5vyf03TwjSTAiTq9Wb3b+TD9afJsldQNkustPSA9rUQItYV3AqfLUZIJGV4udK2WsJYbjihNSZu1nsqbtzzTTrT11KIOLUofbUni5oG1iclDCNZJ7w9j6ECkfH4UD0ZI1m0uIECoMoyyFHmkIQiifT6IXzCdh7wOCNnDpSMvmMp/rKcUOMm49L8Bpq88/HNjSrnDmE93Jg17EHo3TFL4zgZ229oPyARkvXPx/4BOELqUssOBXT+ymJhHUWNPdtDPq4XkxvvG6LyudqLmSaU+l1wsXkBL7E1/ZKk2fqu+wbGMjfTAD3MI3Hyv4YlHUbGCP7r2XAk
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(136003)(346002)(396003)(376002)(366004)(2616005)(86362001)(956004)(6486002)(83380400001)(36756003)(478600001)(44832011)(52116002)(31686004)(6506007)(53546011)(8936002)(31696002)(8676002)(2906002)(54906003)(66556008)(186003)(26005)(16526019)(316002)(5660300002)(4326008)(6512007)(66946007)(66476007)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: p+NzV/uebxp/yVHRp6oNYgIJ/qdm6IL/LSRQEuILJwty+bh7Dfir22UlHwqS6efrS2IeG8y18UrFAV31DWYdH8IijEqN71MZaTNcZfZB00BCut2WKtiUGJ0B5V/8uV+n1tLkKrvQkBCNDN+2+kZHBfuE1sEoTtPjdUTgKxH5AzcNFFK0NXmcMY48W7j2+jdQbJtYaxvEWnt+1X0k/dtFgTdzXa/+XbRkXtr5WcAzQpKGvZ3WhuIAVcTUlZzPeis5PIqFzm7G8Wafw0z0tbULqSaUKGX207q3oGu6RmM8wElistM5K3NM8++s9Iwxr5BLNcsjIpWxm8DNyr2njJ6LQb0SBvqfOlq2nmQUEhiHV4qMf5itqgEpni8ztf8y74EyiCWaL5CvLBW/9HZGxpxxooStc4zaA61VORYTAlnLWZmIY4Llx1gmInPkeE8gQTNFE1MjGRslOHOai6PhN/wT+oFh08emOC4X8Tses9UnJCyLB3PKfwlR9K5NSTm9RFbx
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c714aef1-4c63-498e-e8db-08d8250957c4
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 19:42:13.2689 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CAPSOVmNNzD99IfW/BhLAHrS86Yghg7t0ATlmh9IJanlt10AfNcJ2Jg5duX8C4qy619KauJEX2dC+oXRq3GWMtQ14H30/UlhxYhkcjo6Du4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4166
-Received-SPF: pass client-ip=40.107.4.93;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 15:42:14
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 15:08:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,124 +95,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.06.2020 18:21, Max Reitz wrote:
-> Reopening a node's backing child needs a bit of special handling because
-> the "backing" child has different defaults than all other children
-> (among other things).  Adding filter support here is a bit more
-> difficult than just using the child access functions.  In fact, we often
-> have to directly use bs->backing because these functions are about the
-> "backing" child (which may or may not be the COW backing file).
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On Tue,  7 Jul 2020 14:53:52 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+> The cpu hotplug code handles the initialization of coldplugged cpus
+> too, so it is needed even in case cpu hotplug is not supported.
+> 
+> Wire cpu hotplug up for microvm.
+> Without this we get a broken MADT table.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Blame is on me for calling it hotplug, HotplugHandlerClass is basically
+a set of hooks to wire things up regardless if it's hotplug or coldplug.
+In hindsight it was obvious at the time it was introduced.
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->   block.c | 46 ++++++++++++++++++++++++++++++++++++++--------
->   1 file changed, 38 insertions(+), 8 deletions(-)
->
-> diff --git a/block.c b/block.c
-> index 712230ef5c..8131d0b5eb 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -4026,26 +4026,56 @@ static int bdrv_reopen_parse_backing(BDRVReopenState *reopen_state,
->           }
->       }
->   
-> +    /*
-> +     * Ensure that @bs can really handle backing files, because we are
-> +     * about to give it one (or swap the existing one)
-> +     */
-> +    if (bs->drv->is_filter) {
-> +        /* Filters always have a file or a backing child */
-> +        if (!bs->backing) {
-> +            error_setg(errp, "'%s' is a %s filter node that does not support a "
-> +                       "backing child", bs->node_name, bs->drv->format_name);
-> +            return -EINVAL;
-> +        }
-> +    } else if (!bs->drv->supports_backing) {
-> +        error_setg(errp, "Driver '%s' of node '%s' does not support backing "
-> +                   "files", bs->drv->format_name, bs->node_name);
-> +        return -EINVAL;
-> +    }
+>  hw/i386/microvm.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 42 insertions(+)
+> 
+> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+> index 3d8a66cfc3ac..a5b16b728f9f 100644
+> --- a/hw/i386/microvm.c
+> +++ b/hw/i386/microvm.c
+> @@ -320,6 +320,39 @@ static void microvm_fix_kernel_cmdline(MachineState *machine)
+>      g_free(cmdline);
+>  }
+>  
+> +static void microvm_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> +                                       DeviceState *dev, Error **errp)
+> +{
+> +    x86_cpu_pre_plug(hotplug_dev, dev, errp);
+> +}
 > +
->       /*
->        * Find the "actual" backing file by skipping all links that point
->        * to an implicit node, if any (e.g. a commit filter node).
-> +     * We cannot use any of the bdrv_skip_*() functions here because
-> +     * those return the first explicit node, while we are looking for
-> +     * its overlay here.
->        */
->       overlay_bs = bs;
-> -    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implicit) {
-> -        overlay_bs = backing_bs(overlay_bs);
-> +    while (bdrv_filter_or_cow_bs(overlay_bs) &&
-> +           bdrv_filter_or_cow_bs(overlay_bs)->implicit)
-> +    {
-> +        overlay_bs = bdrv_filter_or_cow_bs(overlay_bs);
->       }
+> +static void microvm_device_plug_cb(HotplugHandler *hotplug_dev,
+> +                                   DeviceState *dev, Error **errp)
+> +{
+> +    x86_cpu_plug(hotplug_dev, dev, errp);
+> +}
+> +
+> +static void microvm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                             DeviceState *dev, Error **errp)
+> +{
+> +    error_setg(errp, "unplug not supported by microvm");
+> +}
+> +
+> +static void microvm_device_unplug_cb(HotplugHandler *hotplug_dev,
+> +                                     DeviceState *dev, Error **errp)
+> +{
+> +    error_setg(errp, "unplug not supported by microvm");
+> +}
+> +
+> +static HotplugHandler *microvm_get_hotplug_handler(MachineState *machine,
+> +                                                   DeviceState *dev)
+> +{
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> +        return HOTPLUG_HANDLER(machine);
+> +    }
+> +    return NULL;
+> +}
+> +
+>  static void microvm_machine_state_init(MachineState *machine)
+>  {
+>      MicrovmMachineState *mms = MICROVM_MACHINE(machine);
+> @@ -503,6 +536,7 @@ static void microvm_machine_initfn(Object *obj)
+>  static void microvm_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>  
+>      mc->init = microvm_machine_state_init;
+>  
+> @@ -523,6 +557,13 @@ static void microvm_class_init(ObjectClass *oc, void *data)
+>      /* Machine class handlers */
+>      mc->reset = microvm_machine_reset;
+>  
+> +    /* hotplug (for cpu coldplug) */
+> +    mc->get_hotplug_handler = microvm_get_hotplug_handler;
+> +    hc->pre_plug = microvm_device_pre_plug_cb;
+> +    hc->plug = microvm_device_plug_cb;
+> +    hc->unplug_request = microvm_device_unplug_request_cb;
+> +    hc->unplug = microvm_device_unplug_cb;
+> +
+>      object_class_property_add(oc, MICROVM_MACHINE_PIC, "OnOffAuto",
+>                                microvm_machine_get_pic,
+>                                microvm_machine_set_pic,
+> @@ -572,6 +613,7 @@ static const TypeInfo microvm_machine_info = {
+>      .class_size    = sizeof(MicrovmMachineClass),
+>      .class_init    = microvm_class_init,
+>      .interfaces = (InterfaceInfo[]) {
+> +         { TYPE_HOTPLUG_HANDLER },
+>           { }
+>      },
+>  };
 
-I believe that little optimization would work properly:
-
-
-for (BlockDriverState *below_bs = bdrv_filter_or_cow_bs(overlay_bs);
-        below_bs && below_bs->implicit;
-        below_bs = bdrv_filter_or_cow_bs(overlay_bs)) {
-          overlay_bs = below_bs;
-}
->   
->       /* If we want to replace the backing file we need some extra checks */
-> -    if (new_backing_bs != backing_bs(overlay_bs)) {
-> +    if (new_backing_bs != bdrv_filter_or_cow_bs(overlay_bs)) {
->           /* Check for implicit nodes between bs and its backing file */
->           if (bs != overlay_bs) {
->               error_setg(errp, "Cannot change backing link if '%s' has "
->                          "an implicit backing file", bs->node_name);
->               return -EPERM;
->           }
-> -        /* Check if the backing link that we want to replace is frozen */
-> -        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overlay_bs),
-> -                                         errp)) {
-> +        /*
-> +         * Check if the backing link that we want to replace is frozen.
-> +         * Note that
-> +         * bdrv_filter_or_cow_child(overlay_bs) == overlay_bs->backing,
-> +         * because we know that overlay_bs == bs, and that @bs
-> +         * either is a filter that uses ->backing or a COW format BDS
-> +         * with bs->drv->supports_backing == true.
-> +         */
-> +        if (bdrv_is_backing_chain_frozen(overlay_bs,
-> +                                         child_bs(overlay_bs->backing), errp))
-What would be wrong with bdrv_filter_or_cow_bs(overlay_bs) here?
-> +        {
->               return -EPERM;
->           }
->           reopen_state->replace_backing_bs = true;
-> @@ -4196,7 +4226,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
->        * its metadata. Otherwise the 'backing' option can be omitted.
->        */
->       if (drv->supports_backing && reopen_state->backing_missing &&
-> -        (backing_bs(reopen_state->bs) || reopen_state->bs->backing_file[0])) {
-= BlockDriverState*
-> +        (reopen_state->bs->backing || reopen_state->bs->backing_file[0])) {
-
-= BdrvChild*
-
-Are we OK with that?
-
->           error_setg(errp, "backing is missing for '%s'",
->                      reopen_state->bs->node_name);
->           ret = -EINVAL;
-> @@ -4337,7 +4367,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->        * from bdrv_set_backing_hd()) has the new values.
->        */
->       if (reopen_state->replace_backing_bs) {
-> -        BlockDriverState *old_backing_bs = backing_bs(bs);
-> +        BlockDriverState *old_backing_bs = child_bs(bs->backing);
->           assert(!old_backing_bs || !old_backing_bs->implicit);
->           /* Abort the permission update on the backing bs we're detaching */
->           if (old_backing_bs) {
 
