@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4EFC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6312EC433E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:05:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9947020748
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:05:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F54320748
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:05:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="CaAea5ql"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9947020748
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="MTY70OgS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F54320748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtsic-0000g6-Pk
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:05:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37584)
+	id 1jtsik-0000xO-GS
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:05:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqdl-0005Tr-2d
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:52:25 -0400
-Received: from mail-pj1-x1032.google.com ([2607:f8b0:4864:20::1032]:35222)
+ id 1jtqg1-0006JL-FS
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:54:45 -0400
+Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:54884)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jtqdj-0006gp-De
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:52:24 -0400
-Received: by mail-pj1-x1032.google.com with SMTP id f16so2454615pjt.0
- for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:52:23 -0700 (PDT)
+ id 1jtqfz-00073g-Mg
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 06:54:45 -0400
+Received: by mail-pj1-x1031.google.com with SMTP id mn17so2457115pjb.4
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 03:54:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=g/n/shcRANt+Py1I0cI3sy7fFEukQpkbO1lT8zVmbBo=;
- b=CaAea5qlN4iZPKQSrur0UwqT+jO+TLP75GdCROEsX7YU9vYC1ZdY8iRRtRv9cRnv1G
- I+dgMg+j6YrqY64cyaBSadn8tbAU/a/RjLviVzuwlYMNeHpKV1Cye3KKq1fLeUIavJd+
- OwlqKEYEHCTseLunsw4OO+wfkAdMGYct0029vwtIQyPFoeCqp7xDfwgLB61INV51ICGb
- nWREnQ1sl9njPfIk8kCWaYCI3nqa+ZTb3Zy4QxwVgWWBdhVG54nkyFVQveVzLDPz8Ik1
- +n0ky7TqGRHNrVHoA3Of5uiJFhzIusq/BT7Uyq1fjlFNOwGMiqXlpqCXw6J3OBkWaHzm
- 4++g==
+ bh=dzueMtfSoUxoNXtog0oLoApUQLNpkmASka89C67kCXk=;
+ b=MTY70OgSRr940IwbKL588JtbnzCDe2h5Fn99+eu3iJE9kd5+7zHs5JXgZpGNR9fY9Z
+ P3fsk2Vd/hyqQJGYXvSOA/yYgtFHsVVeL6SywSiN0hNc8irmMzNbR1tdBkY+OVYoYpqI
+ Nxrqj6enwaWyRrJpikruGyexWlcQRaf8oOwFSl+PNnPadiPbbMXCY4HxulBNPUsXXT3g
+ i07HhRnnc6fVhPVO8Ed+GZi+JriCm9epfilSFrE9Fb7JgZUTXgTNt5EkQ5WuXSNF7V/r
+ rEf0vT3rRv91kYOfy7pSksVvTmkkk3esGDwIgUihGDuBBf4/I0oU0Mfk/z1kIb+DsK5x
+ IzRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=g/n/shcRANt+Py1I0cI3sy7fFEukQpkbO1lT8zVmbBo=;
- b=Qlc7RggOzcfufh7s6zNPHXr2NiQ53JkzJO9yQgDF39M8fhjxLqmbEPrv6cV7jIPe2S
- UTKQfyYJmbIkmH9qYoNTGhZ/jvXGl6VyZl0ahdUmFbk+IoHeLGK5Hkkr/tOZJFz1pbyt
- 6JtCI80MHzZ5JSydUS1Y+ove5nnjMW6cETGuwl4tUYjmOABadwBKEaGN6CmLWBKK8gUe
- lqMhON9++fGpxdjErU/+l41b5rdzcIVvTdVXwLGccfcFh4gKZ2OeoXwRmDG9l4AaB6+U
- H4XhUZ4O7AHoBHqiA9jGfjh6rMHbdUdTSPIvm9diFOtf1PZI09n2vId2Ro4KH7Nw7TpA
- njzw==
-X-Gm-Message-State: AOAM533UsmE8QUvord94LzNjgdaxJ7hSp9SvIhoAEQBlX2LCTnxQdCo/
- SNJCuZEwy5CNwVpXalpXD7vNGYKX8uZ4fg==
-X-Google-Smtp-Source: ABdhPJyhrkEF4D8Bzz+uw5RCletqdpmNwNH6eDst71YKDB6ORObdXCOVxrxmj7ZKPXdRq5z0Zc2W4g==
-X-Received: by 2002:a17:90a:3624:: with SMTP id
- s33mr5038586pjb.148.1594378342130; 
- Fri, 10 Jul 2020 03:52:22 -0700 (PDT)
+ bh=dzueMtfSoUxoNXtog0oLoApUQLNpkmASka89C67kCXk=;
+ b=Nv42nmf/OU4WXSfGtW8n0v+3hI3Uxwpn3HDQ9MIEEDqym8LFDYSFpblf/v7nQx1Ogg
+ 24s974QsWMmKysAihGSULUDLyW/eX4HSg6nLUP4OqndalYEaQ2ybM66SeXE4U1hYiQC7
+ WNUnm3ldyq6voRvO8AzYVy2NLcxwriGX9RCcrBWYl1PutQKwBjGfacaDUJMpio9NxhUD
+ itEjxwcVsJnNzBwsXNTPkKomvQgbW9L1Crf5lPnlLh7jM1N9jx6brv9I6HtLLlbFgM+W
+ EA2czxRWkKpbPuduGlp3ECDAYV7+ksDHXd/oml2nOcH1uOhUr4CE6HaCh/GoQEjmHlO3
+ yvoQ==
+X-Gm-Message-State: AOAM533/J9sxtUH9Ras5uO+DH/3ajSN47pZWFgMW2Qwv6ilQ6kRLRKxY
+ VltCM5M7xrLMKfdB8z0DMvmzE8jN0uEiCg==
+X-Google-Smtp-Source: ABdhPJzCPhX2gxu6VpHm4J288zp+VDKNRJKoDyV/vj+v18DoXpk15oGDuzgvdAe3DdAjx4jr7biVaA==
+X-Received: by 2002:a17:90b:3684:: with SMTP id
+ mj4mr5255245pjb.66.1594378482386; 
+ Fri, 10 Jul 2020 03:54:42 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.52.19
+ by smtp.gmail.com with ESMTPSA id r191sm5519406pfr.181.2020.07.10.03.54.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jul 2020 03:52:21 -0700 (PDT)
+ Fri, 10 Jul 2020 03:54:42 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC 27/65] target/riscv: rvv-0.9: iota instruction
-Date: Fri, 10 Jul 2020 18:48:41 +0800
-Message-Id: <20200710104920.13550-28-frank.chang@sifive.com>
+Subject: [RFC 62/65] fpu: add api to handle alternative sNaN propagation
+Date: Fri, 10 Jul 2020 18:49:16 +0800
+Message-Id: <20200710104920.13550-63-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200710104920.13550-1-frank.chang@sifive.com>
 References: <20200710104920.13550-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1032;
- envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1032.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1031;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1031.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -86,9 +86,9 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:17 -0400
+X-Mailman-Approved-At: Fri, 10 Jul 2020 08:57:18 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,107 +100,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Frank Chang <frank.chang@sifive.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Frank Chang <frank.chang@sifive.com>,
+ Chih-Min Chao <chihmin.chao@sifive.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
 
+Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- target/riscv/insn32.decode              |  2 +-
- target/riscv/insn_trans/trans_rvv.inc.c | 44 ++++++++++++-------------
- target/riscv/vector_helper.c            |  2 +-
- 3 files changed, 24 insertions(+), 24 deletions(-)
+ fpu/softfloat.c         | 68 +++++++++++++++++++++++++----------------
+ include/fpu/softfloat.h |  6 ++++
+ 2 files changed, 48 insertions(+), 26 deletions(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 37b2582981..4560bc4379 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -578,7 +578,7 @@ vfirst_m        010000 . ..... 10001 010 ..... 1010111 @r2_vm
- vmsbf_m         010100 . ..... 00001 010 ..... 1010111 @r2_vm
- vmsif_m         010100 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010100 . ..... 00010 010 ..... 1010111 @r2_vm
--viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
-+viota_m         010100 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
- vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index c1efb87e8d..0e552c3660 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2785,29 +2785,29 @@ GEN_M_TRANS(vmsof_m)
- /* Vector Iota Instruction */
- static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index fa1c99c03e..028b857167 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -2777,23 +2777,32 @@ float64 uint16_to_float64(uint16_t a, float_status *status)
+  * and minNumMag() from the IEEE-754 2008.
+  */
+ static FloatParts minmax_floats(FloatParts a, FloatParts b, bool ismin,
+-                                bool ieee, bool ismag, float_status *s)
++                                bool ieee, bool ismag, bool issnan_prop,
++                                float_status *s)
  {
--    if (vext_check_isa_ill(s) &&
--        vext_check_reg(s, a->rd, false) &&
--        vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2, 1) &&
--        (a->vm != 0 || a->rd != 0)) {
--        uint32_t data = 0;
--        TCGLabel *over = gen_new_label();
--        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+    REQUIRE_RVV;
-+    VEXT_CHECK_ISA_ILL(s);
-+    require_noover(a->rd, s->flmul, a->rs2, 1);
-+    require_vm(a->vm, a->rd);
-+    require_align(a->rd, s->flmul);
- 
--        data = FIELD_DP32(data, VDATA, VM, a->vm);
--        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
--        data = FIELD_DP32(data, VDATA, VTA, s->vta);
--        data = FIELD_DP32(data, VDATA, VMA, s->vma);
--        static gen_helper_gvec_3_ptr * const fns[4] = {
--            gen_helper_viota_m_b, gen_helper_viota_m_h,
--            gen_helper_viota_m_w, gen_helper_viota_m_d,
--        };
--        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
--                           vreg_ofs(s, a->rs2), cpu_env, 0,
--                           s->vlen / 8, data, fns[s->sew]);
--        gen_set_label(over);
--        return true;
--    }
--    return false;
-+    uint32_t data = 0;
-+    TCGLabel *over = gen_new_label();
-+    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+     if (unlikely(is_nan(a.cls) || is_nan(b.cls))) {
+         if (ieee) {
+             /* Takes two floating-point values `a' and `b', one of
+              * which is a NaN, and returns the appropriate NaN
+              * result. If either `a' or `b' is a signaling NaN,
+-             * the invalid exception is raised.
++             * the invalid exception is raised but the NaN
++             * propagation is 'shall'.
+              */
+             if (is_snan(a.cls) || is_snan(b.cls)) {
+-                return pick_nan(a, b, s);
+-            } else if (is_nan(a.cls) && !is_nan(b.cls)) {
++                if (issnan_prop) {
++                    pick_nan(a, b, s);
++                } else {
++                    return pick_nan(a, b, s);
++                }
++            }
 +
-+    data = FIELD_DP32(data, VDATA, VM, a->vm);
-+    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+    data = FIELD_DP32(data, VDATA, VTA, s->vta);
-+    data = FIELD_DP32(data, VDATA, VMA, s->vma);
-+    static gen_helper_gvec_3_ptr * const fns[4] = {
-+        gen_helper_viota_m_b, gen_helper_viota_m_h,
-+        gen_helper_viota_m_w, gen_helper_viota_m_d,
-+    };
-+    tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+                       vreg_ofs(s, a->rs2), cpu_env, 0,
-+                       s->vlen / 8, data, fns[s->sew]);
-+    gen_set_label(over);
-+    return true;
++            if (is_nan(a.cls) && !is_nan(b.cls)) {
+                 return b;
+             } else if (is_nan(b.cls) && !is_nan(a.cls)) {
+                 return a;
+             }
+         }
++
+         return pick_nan(a, b, s);
+     } else {
+         int a_exp, b_exp;
+@@ -2847,37 +2856,44 @@ static FloatParts minmax_floats(FloatParts a, FloatParts b, bool ismin,
+     }
  }
  
- /* Vector Element Index Instruction */
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index bc1363fb7d..71a12c6c9b 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4748,7 +4748,7 @@ void HELPER(NAME)(void *vd, void *v0, void *vs2, CPURISCVState *env,      \
-     CLEAR_FN(vd, vta, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));     \
+-#define MINMAX(sz, name, ismin, isiee, ismag)                           \
++#define MINMAX(sz, name, ismin, isiee, ismag, issnan_prop)              \
+ float ## sz float ## sz ## _ ## name(float ## sz a, float ## sz b,      \
+                                      float_status *s)                   \
+ {                                                                       \
+     FloatParts pa = float ## sz ## _unpack_canonical(a, s);             \
+     FloatParts pb = float ## sz ## _unpack_canonical(b, s);             \
+-    FloatParts pr = minmax_floats(pa, pb, ismin, isiee, ismag, s);      \
++    FloatParts pr = minmax_floats(pa, pb, ismin, isiee, ismag,          \
++                                  issnan_prop, s);                      \
+                                                                         \
+     return float ## sz ## _round_pack_canonical(pr, s);                 \
  }
  
--GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
-+GEN_VEXT_VIOTA_M(viota_m_b, uint8_t,  H1, clearb)
- GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
- GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
- GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
+-MINMAX(16, min, true, false, false)
+-MINMAX(16, minnum, true, true, false)
+-MINMAX(16, minnummag, true, true, true)
+-MINMAX(16, max, false, false, false)
+-MINMAX(16, maxnum, false, true, false)
+-MINMAX(16, maxnummag, false, true, true)
+-
+-MINMAX(32, min, true, false, false)
+-MINMAX(32, minnum, true, true, false)
+-MINMAX(32, minnummag, true, true, true)
+-MINMAX(32, max, false, false, false)
+-MINMAX(32, maxnum, false, true, false)
+-MINMAX(32, maxnummag, false, true, true)
+-
+-MINMAX(64, min, true, false, false)
+-MINMAX(64, minnum, true, true, false)
+-MINMAX(64, minnummag, true, true, true)
+-MINMAX(64, max, false, false, false)
+-MINMAX(64, maxnum, false, true, false)
+-MINMAX(64, maxnummag, false, true, true)
++MINMAX(16, min, true, false, false, false)
++MINMAX(16, minnum, true, true, false, false)
++MINMAX(16, minnum_noprop, true, true, false, true)
++MINMAX(16, minnummag, true, true, true, false)
++MINMAX(16, max, false, false, false, false)
++MINMAX(16, maxnum, false, true, false, false)
++MINMAX(16, maxnum_noprop, false, true, false, true)
++MINMAX(16, maxnummag, false, true, true, false)
++
++MINMAX(32, min, true, false, false, false)
++MINMAX(32, minnum, true, true, false, false)
++MINMAX(32, minnum_noprop, true, true, false, true)
++MINMAX(32, minnummag, true, true, true, false)
++MINMAX(32, max, false, false, false, false)
++MINMAX(32, maxnum, false, true, false, false)
++MINMAX(32, maxnum_noprop, false, true, false, true)
++MINMAX(32, maxnummag, false, true, true, false)
++
++MINMAX(64, min, true, false, false, false)
++MINMAX(64, minnum, true, true, false, false)
++MINMAX(64, minnum_noprop, true, true, false, true)
++MINMAX(64, minnummag, true, true, true, false)
++MINMAX(64, max, false, false, false, false)
++MINMAX(64, maxnum, false, true, false, false)
++MINMAX(64, maxnum_noprop, false, true, false, true)
++MINMAX(64, maxnummag, false, true, true, false)
+ 
+ #undef MINMAX
+ 
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index b0ae8f6295..075c680456 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -239,6 +239,8 @@ float16 float16_minnum(float16, float16, float_status *status);
+ float16 float16_maxnum(float16, float16, float_status *status);
+ float16 float16_minnummag(float16, float16, float_status *status);
+ float16 float16_maxnummag(float16, float16, float_status *status);
++float16 float16_minnum_noprop(float16, float16, float_status *status);
++float16 float16_maxnum_noprop(float16, float16, float_status *status);
+ float16 float16_sqrt(float16, float_status *status);
+ FloatRelation float16_compare(float16, float16, float_status *status);
+ FloatRelation float16_compare_quiet(float16, float16, float_status *status);
+@@ -359,6 +361,8 @@ float32 float32_minnum(float32, float32, float_status *status);
+ float32 float32_maxnum(float32, float32, float_status *status);
+ float32 float32_minnummag(float32, float32, float_status *status);
+ float32 float32_maxnummag(float32, float32, float_status *status);
++float32 float32_minnum_noprop(float32, float32, float_status *status);
++float32 float32_maxnum_noprop(float32, float32, float_status *status);
+ bool float32_is_quiet_nan(float32, float_status *status);
+ bool float32_is_signaling_nan(float32, float_status *status);
+ float32 float32_silence_nan(float32, float_status *status);
+@@ -548,6 +552,8 @@ float64 float64_minnum(float64, float64, float_status *status);
+ float64 float64_maxnum(float64, float64, float_status *status);
+ float64 float64_minnummag(float64, float64, float_status *status);
+ float64 float64_maxnummag(float64, float64, float_status *status);
++float64 float64_minnum_noprop(float64, float64, float_status *status);
++float64 float64_maxnum_noprop(float64, float64, float_status *status);
+ bool float64_is_quiet_nan(float64 a, float_status *status);
+ bool float64_is_signaling_nan(float64, float_status *status);
+ float64 float64_silence_nan(float64, float_status *status);
 -- 
 2.17.1
 
