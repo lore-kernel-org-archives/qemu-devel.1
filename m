@@ -7,72 +7,93 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AFEC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 20:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EF9C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79D52206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 20:51:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37CC2206C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 21:03:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=poolhem.se header.i=@poolhem.se header.b="cT7a1Te6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D52206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=poolhem.se
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VU/NXzd4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37CC2206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtzzY-0008Sg-No
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 16:51:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42838)
+	id 1ju0Av-0002by-Ep
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 17:03:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hc981@poolhem.se>) id 1jtxdG-0004Sa-B9
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:20:22 -0400
-Received: from mailout12.inleed.net ([2a0b:dc80:cafe:112::1]:33771
- helo=ns12.inleed.net)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hc981@poolhem.se>) id 1jtxdB-0004vH-MN
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 14:20:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=poolhem.se; 
- s=x;
- h=Content-Transfer-Encoding:Content-Type:Mime-Version:Message-Id:
- Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:Content-Description:
- Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
- In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=DNkV/ewRN+UhmM2VZBQ28bw5wOLViMM+78CPkqMN7Jk=; b=cT7a1Te6vfsD4PWUSRSChAg7Pu
- AzT0G29/5R+8IUmU3OK+b1wMHUQch3rUmPsZb6jg8zd5xHPWutLFv/9AorfnBbvQbeF6XGXpuxXur
- pvLOZMKCIRjmp2lKi1SWLDeED34lzzvtMx7dXx8/xWGumXzv/BN0pwJ0ITBoQfaD5znP8qXgQBTQ6
- ujCXhqyU43EcpD6EI+l/lsRVqqeAVCdfMpoVwPSAf1EU/6Hj7Y9mhirgRFZZ98vqLtw36Z139glnc
- 1986+Rm9LMeaMJftHadjhG4XzVbNKsDsvU7x3jLHQhNo3ZGoal42lsEKQGPVpXcjPx4bEZc8dR7H/
- UWKxnSKQ==;
-Received: from [213.115.245.47] (helo=balrog.lkp.se)
- by ns12.inleed.net with esmtpa (Exim 4.93.0.4)
- (envelope-from <hc981@poolhem.se>)
- id 1jtxd8-00D3tN-Sc; Fri, 10 Jul 2020 20:20:14 +0200
-Date: Fri, 10 Jul 2020 20:19:11 +0200
-From: Henrik Carlqvist <hc981@poolhem.se>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Emulate dip switch language layout settings on SUN keyboard
-Message-Id: <20200710201911.3a3e336c.hc981@poolhem.se>
-X-Mailer: Sylpheed version 0.9.7 (GTK+ 1.2.10; i686-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Id: henrik@poolhem.se
-Received-SPF: none client-ip=2a0b:dc80:cafe:112::1;
- envelope-from=hc981@poolhem.se; helo=ns12.inleed.net
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1ju0AH-00025t-He
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:02:37 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38809)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1ju0AF-0008Ms-Pi
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 17:02:37 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f18so7181655wml.3
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 14:02:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=O1y9yYA/o/HzSAWykiYrrgEbKdJXgXx74QYZQ1QKLlA=;
+ b=VU/NXzd4xCmmiTN3kvbrudogO21tAqdjotL/MtVDhXr8fsJoOOfxm5p94lcj86HLv8
+ Qu/SNgsUu0FJXcNUAUTX3f1JiV3HMHfDgFt84FrE0OEaUFYvsOp6MvcD10bs1Bo+cYwQ
+ wEFIgIWeiQ8veQKj/9QRlPteHg9sHB/p+MM57bqo1QwUvuYqWt82EZq0R+3soLGjLTxf
+ YonOWARalWRZwck23GuIJSsuF8cJE/MJrEisNCzyScwt/gqlXyIfAEjTIWrC6KiL+qB0
+ dPwJOu/pgeDjzqAyaxUIJglW1cmpM91Q8h9HbvggyMQq5/CPB63XysFWezfZbtnwDimA
+ EB2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=O1y9yYA/o/HzSAWykiYrrgEbKdJXgXx74QYZQ1QKLlA=;
+ b=MgRAGjhmuXBikGpzYv9ch563534rs+89r4DBgdqY1IXInOIzx0TKCcW2YejePvp0I3
+ NvkfftmZHB0ba47uqv4eMHkZ22/50a+jTOACy3S0JGN5pKQ9/+42Py0lLYvfIocjQFpa
+ /DJV0cjYuh3NS7Kk6RZ3vzXfIl6EF+Km1ZVjXZrXDtc5DkrO4K/5nGAYSViwTb/NJvyR
+ 5cs1mNAAQgh2vebC0wqGJHKYwdjMIfT+aaPLtUW9nRTca7oDOzFJb0rP6ytjA8T82xUv
+ WpL0v8DHxomwTHEl9RGFwCrnFCXyQU6yYJTzhspc1UuQjKpjOlgXFERGxZqoqZ9w4s9a
+ aenw==
+X-Gm-Message-State: AOAM533/OzP4MgOKp02SolXc3Y5hscl2ikDFoVAq4KgogWVcuJgVtJeQ
+ msWRZ/+OUXqLtRcdWXthCYn9mA==
+X-Google-Smtp-Source: ABdhPJxMfUv3wN89PJ/88haEY9ge2mzDfhkRu2wE+JrsmHvwXaqc0iWkVg8t2lMRyIurrZqIJtATVQ==
+X-Received: by 2002:a05:600c:258:: with SMTP id
+ 24mr6873695wmj.70.1594414953455; 
+ Fri, 10 Jul 2020 14:02:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u8sm11414270wrt.28.2020.07.10.14.02.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jul 2020 14:02:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 21C381FF7E;
+ Fri, 10 Jul 2020 22:02:31 +0100 (BST)
+References: <20200710163253.381630-1-mreitz@redhat.com>
+ <20200710163253.381630-2-mreitz@redhat.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH 1/2] iotests: Drop readarray from _do_filter_img_create
+In-reply-to: <20200710163253.381630-2-mreitz@redhat.com>
+Date: Fri, 10 Jul 2020 22:02:30 +0100
+Message-ID: <87imevjd7d.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_SOFTFAIL=0.732, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 10 Jul 2020 16:50:43 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,171 +105,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SUN Type 4, 5 and 5c keyboards have dip switches to choose the language
-layout of the keyboard. Solaris makes an ioctl to query the value of the
-dipswitches and uses that value to select keyboard layout. Also the SUN
-bios like the one in the file ss5.bin uses this value to support at least
-some keyboard layouts. However, the OpenBIOS provided with qemu is
-hardcoded to allways use an US keyboard layout.
 
-Before this patch, qemu allways gave dip switch value 0x21 (US keyboard),
-this patch uses the command line switch "-k" (keyboard layout) to select
-dip switch value. A table is used to lookup values from arguments like:
+Max Reitz <mreitz@redhat.com> writes:
 
--k fr
--k es
+> Some systems where we run tests on do not have a 4.x bash, so they do
+> not have readarray.  While it looked a bit nicer than messing with
+> `head` and `tail`, we do not really need it, so we might as well not use
+> it.
 
-But the patch also accepts numeric dip switch values directly to the -k
-switch:
+I've fixed the cirrus build failure by brew installing a more recent
+bash. However if we prefer we could do this.
 
--k 0x2b
--k 43
+>
+> Reported-by: Claudio Fontana <cfontana@suse.de>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/common.filter | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
+.filter
+> index 3833206327..345c3ca03e 100644
+> --- a/tests/qemu-iotests/common.filter
+> +++ b/tests/qemu-iotests/common.filter
+> @@ -138,13 +138,13 @@ _do_filter_img_create()
+>      # Split the line into the pre-options part ($filename_part, which
+>      # precedes ", fmt=3D") and the options part ($options, which starts
+>      # with "fmt=3D")
+> -    # (And just echo everything before the first "^Formatting")
+> -    readarray formatting_line < <($SED -e 's/, fmt=3D/\n/')
+> +    read formatting_line
+>=20=20
+> -    filename_part=3D${formatting_line[0]}
+> -    unset formatting_line[0]
+> +    # Split line at the first ", fmt=3D"
+> +    formatting_line=3D$(echo "$formatting_line" | $SED -e 's/, fmt=3D/\n=
+fmt=3D/')
+>=20=20
+> -    options=3D"fmt=3D${formatting_line[@]}"
+> +    filename_part=3D$(echo "$formatting_line" | head -n 1)
+> +    options=3D$(echo "$formatting_line" | tail -n +2)
+>=20=20
+>      # Set grep_data_file to '\|data_file' to keep it; make it empty
+>      # to drop it.
 
-Both values above are the same and select swedish keyboard as explained in
-table 3-15 at
-https://docs.oracle.com/cd/E19683-01/806-6642/new-43/index.html
 
-Unless you want to do a full Solaris installation but happen to have
-access to a bios file, the easiest way to test that the patch works is to:
-
-qemu-system-sparc -k sv -bios /path/to/ss5.bin
-
-If you already happen to have a Solaris installation in a qemu disk image
-file you can easily try different keyboard layouts after this patch is
-applied.
-
-Unfortunately my glib version is too old to compile later versions of qemu
-so even though this patch is made from latest git I have only been able to
-test it myself with qemu version 4.1.1. I think and hope that this patch will
-compile and work also with the latest version of git as it only affects one
-file and there hasn't been much changes to that file since tested version
-4.1.1.
-
-Best regards Henrik
-
-From 2f86bd60750d44206b9181f76115e77b58dff544 Mon Sep 17 00:00:00 2001
-From: Henrik Carlqvist <hc1245@poolhem.se>
-Date: Fri, 10 Jul 2020 19:21:08 +0200
-Subject: [PATCH] Emulating sun keyboard languate layout dip switches, taking
- the value for the dip switches from the "-k" option to qemu.
-
-Signed-off-by: Henrik Carlqvist <hc1245@poolhem.se>
----
- hw/char/escc.c | 74
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed, 73
-insertions(+), 1 deletion(-)
-
-diff --git a/hw/char/escc.c b/hw/char/escc.c
-index 7d16ee8688..7287056b5f 100644
---- a/hw/char/escc.c
-+++ b/hw/char/escc.c
-@@ -30,6 +30,8 @@
- #include "qemu/module.h"
- #include "hw/char/escc.h"
- #include "ui/console.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/cutils.h"
- #include "trace.h"
- 
- /*
-@@ -175,6 +177,7 @@
- #define R_MISC1I 14
- #define R_EXTINT 15
- 
-+static unsigned char sun_keyboard_layout_dip_switch(void);
- static void handle_kbd_command(ESCCChannelState *s, int val);
- static int serial_can_receive(void *opaque);
- static void serial_receive_byte(ESCCChannelState *s, int ch);
-@@ -730,6 +733,75 @@ static QemuInputHandler sunkbd_handler = {
-     .event = sunkbd_handle_event,
- };
- 
-+static unsigned char sun_keyboard_layout_dip_switch(void)
-+{
-+    /* Return the value of the dip-switches in a SUN Type 5 keyboard */
-+    static unsigned char ret = 0xff;
-+
-+    if ((ret == 0xff) && keyboard_layout) {
-+        int i;
-+        struct layout_values {
-+            const char *lang;
-+            unsigned char dip;
-+        } languages[] =
-+    /* Dip values from table 3-16 Layouts for Type 4, 5, and 5c Keyboards */
-+            {
-+                {"en-us", 0x21}, /* U.S.A. (US5.kt) */
-+                                 /* 0x22 is some other US (US_UNIX5.kt)*/
-+                {"fr",    0x23}, /* France (France5.kt) */
-+                {"da",    0x24}, /* Denmark (Denmark5.kt) */
-+                {"de",    0x25}, /* Germany (Germany5.kt) */
-+                {"it",    0x26}, /* Italy (Italy5.kt) */
-+                {"nl",    0x27}, /* The Netherlands (Netherland5.kt) */
-+                {"no",    0x28}, /* Norway (Norway.kt) */
-+                {"pt",    0x29}, /* Portugal (Portugal5.kt) */
-+                {"es",    0x2a}, /* Spain (Spain5.kt) */
-+                {"sv",    0x2b}, /* Sweden (Sweden5.kt) */
-+                {"fr-ch", 0x2c}, /* Switzerland/French (Switzer_Fr5.kt) */
-+                {"de-ch", 0x2d}, /* Switzerland/German (Switzer_Ge5.kt) */
-+                {"en-gb", 0x2e}, /* Great Britain (UK5.kt) */
-+                {"ko",    0x2f}, /* Korea (Korea5.kt) */
-+                {"tw",    0x30}, /* Taiwan (Taiwan5.kt) */
-+                {"ja",    0x31}, /* Japan (Japan5.kt) */
-+                {"fr-ca", 0x32}, /* Canada/French (Canada_Fr5.kt) */
-+                {"hu",    0x33}, /* Hungary (Hungary5.kt) */
-+                {"pl",    0x34}, /* Poland (Poland5.kt) */
-+                {"cz",    0x35}, /* Czech (Czech5.kt) */
-+                {"ru",    0x36}, /* Russia (Russia5.kt) */
-+                {"lv",    0x37}, /* Latvia (Latvia5.kt) */
-+                {"tr",    0x38}, /* Turkey-Q5 (TurkeyQ5.kt) */
-+                {"gr",    0x39}, /* Greece (Greece5.kt) */
-+                {"ar",    0x3a}, /* Arabic (Arabic5.kt) */
-+                {"lt",    0x3b}, /* Lithuania (Lithuania5.kt) */
-+                {"nl-be", 0x3c}, /* Belgium (Belgian5.kt) */
-+                {"be",    0x3c}, /* Belgium (Belgian5.kt) */
-+            };
-+
-+        for (i = 0;
-+             i < sizeof(languages) / sizeof(struct layout_values);
-+             i++) {
-+            if (!strcmp(keyboard_layout, languages[i].lang)) {
-+                ret = languages[i].dip;
-+                return ret;
-+            }
-+        }
-+        /* Found no known language code */
-+
-+        if ((keyboard_layout[0] >= '0') && (keyboard_layout[0] <= '9')) {
-+            unsigned int tmp;
-+            /* As a fallback we also accept numeric dip switch value */
-+            if (!qemu_strtoui(keyboard_layout, NULL, 0, &tmp)) {
-+                ret = (unsigned char)tmp;
-+            }
-+        }
-+    }
-+    if (ret == 0xff) {
-+        /* Final fallback if keyboard_layout was not set or recognized */
-+        ret = 0x21; /* en-us layout */
-+    }
-+    return ret;
-+}
-+
- static void handle_kbd_command(ESCCChannelState *s, int val)
- {
-     trace_escc_kbd_command(val);
-@@ -751,7 +823,7 @@ static void handle_kbd_command(ESCCChannelState *s, int
-val)     case 0xf:
-         clear_queue(s);
-         put_queue(s, 0xfe);
--        put_queue(s, 0x21); /*  en-us layout */
-+        put_queue(s, sun_keyboard_layout_dip_switch());
-         break;
-     default:
-         break;
--- 
-2.14.5
+--=20
+Alex Benn=C3=A9e
 
