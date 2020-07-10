@@ -2,125 +2,120 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDC1C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BF6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:32:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56A6220720
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:30:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BF9820720
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 15:32:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LCwjISlw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A6220720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kd0+rnZ5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BF9820720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtuyN-0001pn-IB
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:29:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58184)
+	id 1jtv13-0003nR-P2
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 11:32:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58808)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtuxX-0001IR-2Q; Fri, 10 Jul 2020 11:29:07 -0400
-Received: from mail-eopbgr140138.outbound.protection.outlook.com
- ([40.107.14.138]:39054 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jtuxJ-0005PD-Vc; Fri, 10 Jul 2020 11:29:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IHL5EEhWc0JEtNhy23K3e05u5pWDpDhPkFhi9y22yubdutvBMbyvV3ZgiYZkCaEOQvM7KGrsJD7zD3M7h1GapibpNoSjBHKecw09KeteRMiAl8CacLONgVMLTJqFJ86bLZLl2LXfNEbfVKcfc8Iced7+TCTWdVYuq84tu1kWs7mF1SkS0RCE9XG9sQMRmWwCme+aEm3FEx0vP16A2tfVCg9Q6u8DRae5JFDBp4Snqvb0sJDjTaeui6LsJgRaFNL01Pa3Fc4McWvvyV9WZv+SWyiwjJMxK3k1TKOVDFtgcJh384zPZpVXpRgmYkOCYoLvx+ABJGD6oN8kHNN8g45uWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joZ3zhj7ihFG7gX5vRd1dZOZXYXFi9vHRS5V6ZZbidY=;
- b=iiQvpSPswPHCF8WAN7G32vBkfbMSMl6jOBMSh5onqaEPBvScZ1K9aet/dObLfjSlgHjuIiB4hG2efNKHmec1h+KAKs/ch0PkYu8rN2qF0Rgkud5m/lqVe96gou3xKhCXRjATuqIIBJNCkxqB6I46E6lxBmnlCOXe18M4tRwW+Yk1yGz2Epni2AcvW2rtdD8FAKds0mcTItVX07o71GGKmqrUX8PyuSt7nRdj0uzaTac+u/RdPWnlGIbaP94nokF8Zzu/0skNomuhJVJdb2Ia2F/BdHpGmchI2aT+a4/8IZ4s5dz1t4py3IAGGujV1sdQsGnt6bAh5kg6Wu9tu4rwGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joZ3zhj7ihFG7gX5vRd1dZOZXYXFi9vHRS5V6ZZbidY=;
- b=LCwjISlwtSRD6gUHWAVbh2CczUVcn1+FFleq2AkqmLT7pWz/dhEX790vJ5z3Yct3yuwPM1T6RxhqHT09AkXZhrmzEyRMA1rwZbiPMS8Nu/SGJqxWZXWfmyNdRAprV9F7qfp70jk1CnybikE1x0QBfeel/gr7Vrh5gs8MD612tWg=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB3864.eurprd08.prod.outlook.com (2603:10a6:20b:8e::28)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Fri, 10 Jul
- 2020 15:28:47 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.021; Fri, 10 Jul 2020
- 15:28:47 +0000
-Subject: Re: [PATCH v7 15/47] block: Use CAFs when working with backing chains
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-16-mreitz@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <3a86ed3d-c249-9692-939d-bc232c7490d7@virtuozzo.com>
-Date: Fri, 10 Jul 2020 18:28:43 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-16-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM3PR05CA0132.eurprd05.prod.outlook.com
- (2603:10a6:207:2::34) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtv0B-0002pk-Ly
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:31:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52215
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jtv07-0005vH-Rn
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 11:31:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594395106;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=2m0tT/DoQUiLcx9IU+4FeGFIfEcfA9kyMxi807l7oD0=;
+ b=Kd0+rnZ5nBu9/cpiSMMmXJugF1Qi5U6QAH4e8ZP0Oe/vJgyY0EpJF3GVjsuwc0T6zJKVpi
+ VGcFbpHlxS/7ZtfDase/lagejd0rRUo04QLg+FzRqWGaE5pbMLWGO6scLI1YEdD6HrvWjI
+ TreH4bKHQB5O9qoZ8A9noB57Kf/w6kg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-221-NbKNEmf0OUS9oc98Qe1MNg-1; Fri, 10 Jul 2020 11:31:43 -0400
+X-MC-Unique: NbKNEmf0OUS9oc98Qe1MNg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 728D3100CCC5;
+ Fri, 10 Jul 2020 15:31:42 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-127.ams2.redhat.com
+ [10.36.113.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 463E95C1BD;
+ Fri, 10 Jul 2020 15:31:41 +0000 (UTC)
+Subject: Re: [PULL v2 00/52] Misc patches for QEMU 5.1 soft freeze
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200708172542.25012-1-pbonzini@redhat.com>
+ <CAFEAcA8b6sn8fXOKwqOF6MvsKT5oKqS+4jjYDPAPvnXmVimLiQ@mail.gmail.com>
+ <9631042d-00e4-2a2e-292b-66ca1b590120@suse.de>
+ <CAFEAcA-UbHpj_xSbqjTsaURt8yPZjuYOmd3pe97vg_G7--17Cw@mail.gmail.com>
+ <e78820bb-af5f-c2a0-7727-1a0caedfa584@suse.de>
+ <CAFEAcA-raDJ2pSUG-OYHcJi_LnQwxMHvcyjsD7+=WxGYcrSz3w@mail.gmail.com>
+ <a8113ed1-c508-0502-4f88-77f875d1a739@redhat.com>
+ <40f4c566-8a5b-c27e-22a7-2a112a0cd77d@suse.de>
+ <c6e3336f-38b8-a8fa-4862-58e6f094711d@redhat.com>
+ <CAFEAcA80XK4voLDj+8kVFcHJb35HT9HL+Qh8kGb3_Qe5Em9ouw@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <adeb1f02-c712-e256-6840-649795fdc3b5@redhat.com>
+Date: Fri, 10 Jul 2020 17:31:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.191) by
- AM3PR05CA0132.eurprd05.prod.outlook.com (2603:10a6:207:2::34) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.20 via Frontend Transport; Fri, 10 Jul 2020 15:28:46 +0000
-X-Originating-IP: [109.252.114.191]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ad193ec7-4fb5-470d-9397-08d824e5f07e
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3864:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB38649B7007DB4D25E252C119F4650@AM6PR08MB3864.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Q+UH8zAFzXw1APiicgTMNlFrSvTXZ1/mMnFYq49XYAhc7iiK23jGBfra137ywSMtub22SWbNe6aq5gPAwXsHOlZuhd0G4kdhKO/3T/V1CtM0VpeVcpLBhNhVm5Y+kUDCaV5EaQIjmEJJA0mj4ZcozNAwstDDEWeWU2RsuL8RKHHEAURunT1r3S+NB/WeZ7uEfpJuQfkxDlaSE/wfEka96aC27dflmrZywBmoka85Hd+F6NZbGN8QqP8Tsz8TUEJhy7a066bMJDbmPa70mf5xpxLBt1dtMarMdEYdo/pNSfZedxdfJsovVuiv4i9I8jkOiDqGsdFELiOH00GWhhXWn3t41DvfOlhfsQPjzIkKIdTF+3s/jSbNGJbn3DUo0HBI
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(376002)(39840400004)(396003)(346002)(136003)(2906002)(6506007)(6512007)(53546011)(86362001)(478600001)(8936002)(16526019)(186003)(26005)(31686004)(83380400001)(4326008)(2616005)(956004)(54906003)(66476007)(316002)(5660300002)(52116002)(66946007)(66556008)(6486002)(44832011)(31696002)(6666004)(36756003)(8676002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 1I2yE9oUGenArO33ag0SoMoXY6BQReI04xzg7CW1Td22Qa5OnF0huqcl+EZKHBvba3zNER4I8txpRklghtnnzttEHth0JLQL0dc1MFBATrqXX2Y64mzIKPOmhkbw3q42Y8nomC18RbRawMhU/vjpPLkARiHfsk6ydusip7zxciGteRpYfpabatKmpr02P2mo+3EpbzcL1T6fCOyTAiMMVqk3gtRoai9IpNmku0+CQWF9NX0leEC8LQW8+q63XhVkfZFvVlSelb4hk6t/4/PUPbYd7OpnScfdvHMjG6sNIIrAaCHTr5px+EsY+X2vWue3AeN2KX5aQe0gmYNlIQuD/SySnRRXXahJ5pqLtNVN3BwTa3+iaw3qMv7/1aY6EhIidD1CjJL/J4VFZtDIDYGij3nW4oJXTBSOTAL++qmIqaRKAcDKJcqQCAJmAZY5nVNcRovBoLyKMYHoXQCE1HdnlGB9wBpDLG48g39Lj3dwMqPQ13UavqcVv2tR6miFkq7I
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad193ec7-4fb5-470d-9397-08d824e5f07e
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 15:28:47.8370 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4ZZUfVEa/VobmxkUzxK2J8vVBbOagDX/ZQHYisgDtD+DETtqeN+oYVf21ax4kZwnO/D8Rbetyu03uxaxO946kbnjyuY/Vgv14qv/+znQWp0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3864
-Received-SPF: pass client-ip=40.107.14.138;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 11:28:48
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA80XK4voLDj+8kVFcHJb35HT9HL+Qh8kGb3_Qe5Em9ouw@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 00:36:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,42 +128,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Claudio Fontana <cfontana@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.06.2020 18:21, Max Reitz wrote:
-> Use child access functions when iterating through backing chains so
-> filters do not break the chain.
->
-> In addition, bdrv_find_overlay() will now always return the actual
-> overlay; that is, it will never return a filter node but only one with a
-> COW backing file (there may be filter nodes between that node and @bs).
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   block.c | 41 +++++++++++++++++++++++++++++------------
->   1 file changed, 29 insertions(+), 12 deletions(-)
->
-> diff --git a/block.c b/block.c
-> index a44af9c3c1..712230ef5c 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -4724,7 +4724,8 @@ int bdrv_change_backing_file(BlockDriverState *bs,
->   }
->   
->   /*
-> - * Finds the image layer in the chain that has 'bs' as its backing file.
-> + * Finds the image layer in the chain that has 'bs' (or a filter on
-> + * top of it) as its backing file.
-One can optionally say "Finds the first non-filter parent of bs in the 
-chain".
->    
+On 10.07.20 17:18, Peter Maydell wrote:
+> On Fri, 10 Jul 2020 at 16:13, Max Reitz <mreitz@redhat.com> wrote:
+>>
+>> On 10.07.20 16:44, Claudio Fontana wrote:
+>>> Speaking of MacOS and CI, commit 57ee95ed4ee7b4c039ec5f0705c45734c56706bc
+>>>
+>>> Author: Max Reitz <mreitz@redhat.com>
+>>> Date:   Thu Jun 25 14:55:30 2020 +0200
+>>>
+>>>     iotests: Make _filter_img_create more active
+>>>
+>>> broke cirrus-ci completely for me due to missing "readarray" builtin.
+>>>
+>>> Maybe it is bash vs zsh?
+>>
+>> Possible, but the iotests depend on bash.  All the iotests shell source
+>> files explicitly reference bash in their shebang line, and so far we’ve
+>> always assumed that they are thus going to be run by bash.
+> 
+> readarray only arrived sometime in bash 4, and the OSX system
+> bash is 3.2.57, so it won't have that builtin.
 
-...
+It arrived with 4.0, actually, which was released 11 years ago.
+I had assumed that would be sufficiently mature.
 
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+So, um, 11 years isn’t sufficiently mature then and I’ll have to work
+around not having readarray for macOS?
+
+Max
 
 
