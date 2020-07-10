@@ -2,126 +2,95 @@ Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 180A2C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA86C433E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:51:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D72A520767
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:49:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BF6820767
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 13:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="yJ/PELET"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D72A520767
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="clqEF4x6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BF6820767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jttP2-0002Ii-Vv
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:49:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60188)
+	id 1jttQv-0003R2-Sh
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 09:51:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jttOU-0001sg-Bp
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:48:50 -0400
-Received: from mail-vi1eur05on2096.outbound.protection.outlook.com
- ([40.107.21.96]:7081 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jttOR-0008RW-Cl
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:48:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N3Xt3g0+Q3yt8UkyZ6qpSNGMrWB8hVKHM9VDyUCjA71aTTUyg5y3Vev2BcEUTAo5g+JiXYT3clC7smCAUW5caWRjKasxeqIf52X584nx8bXjwrucnJtOzEC0w2aBHufHmUxS2211XcKEwp2UoQ81il/yB9stQkCn55O2U9FMyb6/RjZZp8Goa+PKJuUquqZjALq2tLq+HlgbSJmkB1ex56aaHd+R0Wh4G4P6N5OSHG/1TPg/fatr7BablKqO816zyeEGvn4XsgQiNfx5cUfLYmhWgTuMnRAH0QHuVchoPzt1zOBUW7VARKDOw+azWbPG1j2mwQtjrQ7uIEABm6wBGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JT+L9e4pVNWYazPrK0pk5adVFCpZfC1xygKCCdPK148=;
- b=D/dosvIlLR5fmRXwUeMLcHF6lCQ5Yoe4jdwEc2AEfRtVjnV94CBVmDQkce0vcha59lpWhF9Ujp3I5E9TAx88vvP1CzeEa0F6NNpD6wTwc1WNjy9BibmwVAFZ50gptmJgDUSaGJC0UlYIkgOcSTguI2GoO3oNd6PlmyOWhnztv1DSd87615nu+B/0CNMMHw3nrtH5Bzvv+oK2IpzaxxkQFz5wowluKDCJCH3QtOSrFLyrXnp1MvoWdJty3Omvv9ZsLKRK+pmhQlknT1ofMC9VOk4mUz8lFVym4Y3cE8xwlss2ihApSgtValmFaw3lUAcmmWh7NqpsjKFnmFWPEbFzfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JT+L9e4pVNWYazPrK0pk5adVFCpZfC1xygKCCdPK148=;
- b=yJ/PELETAEGwedEuuXhISov5JeF4+G984MxP+LCGK0Vb4hTKcHpcWBmixBr/2HxuhYggIQae4DIaU0pTV5VYn6rDB1T4n9WzRoNRqcW22IqsJP07kws4WUuazCt5yirdX19JsLy2GkZMsPJcKXsDtD4Cc/jazjdxMaMAzxQ1GFM=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
- by AM6PR03MB3510.eurprd03.prod.outlook.com (2603:10a6:209:34::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Fri, 10 Jul
- 2020 13:48:43 +0000
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3174.023; Fri, 10 Jul 2020
- 13:48:43 +0000
-Subject: Re: [PATCH v2 1/2] linux-user: fix the errno value in
- print_syscall_err()
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200708152435.706070-1-laurent@vivier.eu>
- <20200708152435.706070-2-laurent@vivier.eu>
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Message-ID: <b3606000-ef9f-9578-cdc9-f2fdf88fdaff@syrmia.com>
-Date: Fri, 10 Jul 2020 15:48:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200708152435.706070-2-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: AM0PR10CA0031.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::11) To AM6PR03MB5233.eurprd03.prod.outlook.com
- (2603:10a6:20b:d1::19)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jttQN-00031D-Jp
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:50:48 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35488)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jttQL-0000Lr-Iq
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 09:50:47 -0400
+Received: by mail-wm1-x343.google.com with SMTP id l2so6001865wmf.0
+ for <qemu-devel@nongnu.org>; Fri, 10 Jul 2020 06:50:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=FgJh6Kj2zNd8gOIDNj0VrBGIZSq1wKAtrJoYsQP1BbI=;
+ b=clqEF4x6OxpjrjNy19fUfWkRaWSQr6Qz5NvxwVxejQNe/0Z33RF6KxInc2YaPeW39Y
+ cRif9oSu9l4SbOSYBM0av4GULfBIe2de2g3a0b+2PC7BzpntawASfigJi7Xh9TXrJWfE
+ oo3bDJxdd3msbKfR3ADZrrkXBHKKeMzQCWU3JCw0/w28nkCLqmJTFsWi50tzJh3LIJzx
+ sC12fv8o43elRXIyMcbCzvM3l1CuWCueLteDiSGonI8wIfbJyuB4MAhp5s4CJskYdhkG
+ TX3G1bSQoJjhOYDoWNywuYldSiN8WPq/wPD5/6nFfLyn0TCIkeOaQmV2xPrMi2D3RtkS
+ 5UBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=FgJh6Kj2zNd8gOIDNj0VrBGIZSq1wKAtrJoYsQP1BbI=;
+ b=O7HiRqVRTSfPMZ+1QnR/SUhutUEAflEXxL7O5UbMpv+a/ZQdN37BrkiKjOVM2RpzeN
+ t8CO3l5mokTWaLoQ5QKF5wvDmgSVvfo0Y+IbfHfFCBg13abrTrj4274JFEb1w0VogDGM
+ WIJIm/mjAknoxZNs0UHtwLcoDKitH0vQR+rB1wRn1CEIQeKaKpXyKCy35DwHylclYRtv
+ FxTi+Ik2qBqS0taLKpVguyVTaW2hApn/Gc7TimRDr7mFRJsigs41d5hRlOXF4HjAAAGy
+ fuwHf0nJPurns2cmhknwOJN8f/dFkr0+Em5t3QmH/Ln+yykDfu5/Dk4UFpt2C4p90J3X
+ IMxQ==
+X-Gm-Message-State: AOAM532aHMTLnY7/cIgNVHoZqUb5JyoK6rCnmw6Kl8Kc/LfPPFvxtkQn
+ nhDsCCayuVhJbs6DnUR6YV9JTw==
+X-Google-Smtp-Source: ABdhPJxX6frTLlVkTC6zh5XhkGmcRiaOgtHChVaLvhQIT3lcgtFGZtG4BDCBfrlUipHpJ2vWNyIGTQ==
+X-Received: by 2002:a7b:c952:: with SMTP id i18mr5624382wml.65.1594389043799; 
+ Fri, 10 Jul 2020 06:50:43 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v12sm10106409wrt.31.2020.07.10.06.50.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jul 2020 06:50:38 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2F4CE1FF7E;
+ Fri, 10 Jul 2020 14:50:36 +0100 (BST)
+References: <20200707070858.6622-1-alex.bennee@linaro.org>
+ <20200707070858.6622-5-alex.bennee@linaro.org>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: Re: [PULL 04/41] tests/vm: Add configuration to basevm.py
+In-reply-to: <20200707070858.6622-5-alex.bennee@linaro.org>
+Date: Fri, 10 Jul 2020 14:50:36 +0100
+Message-ID: <875zavlbrn.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.43.62] (109.245.225.186) by
- AM0PR10CA0031.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22 via Frontend
- Transport; Fri, 10 Jul 2020 13:48:42 +0000
-X-Originating-IP: [109.245.225.186]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 551a861d-e145-4d8d-b5d3-08d824d7f5a5
-X-MS-TrafficTypeDiagnostic: AM6PR03MB3510:
-X-Microsoft-Antispam-PRVS: <AM6PR03MB35104B0C5F64F6668DAD50EAEB650@AM6PR03MB3510.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: n8QvlwcpvaWCvtFzpZ/USsNake3rma2IDFnYdmdmSSBTeXp7qD5aM5O2TggUKWn43o6SP76gPSu4gXgFuErWJ3STwDR+PIjhYEDnJ4/Wrbsa0LyaPgUsccL9i/2di3h+JjDVmVlOvDsf2Wc5VfeihDypCfnLQvH2OnQsZ1zam5O8vfe+w63rrnS0rUVoXj3xPaC507oEuaOjNwqtm1uzzFEnO61rE1u28NbTVi71uKdEnyYgtfwe4POmqRB21HuCfDpMssiZvo46ow62KzocN7zQMAZlUD2LxvTgENuppf2i07e62MIQwmIwRZmCFixsjmhbJnbEtOxi/xZbE5CUR8Egn5Lg3o+daU74zWBXojdINSgCb+c51Ks2Q+L2mf10
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(376002)(346002)(39830400003)(396003)(136003)(366004)(31686004)(26005)(52116002)(2616005)(6486002)(956004)(5660300002)(66556008)(8676002)(36756003)(86362001)(508600001)(16576012)(316002)(31696002)(83380400001)(8936002)(16526019)(66946007)(66476007)(2906002)(186003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: P1HB9ahDAspTEkxWKcHIr1HQdwa7k4kgLiorQifd7E0pQ+gpoe5t7E39nfgBTJp8bSTH4yuet6++MrFRWQaa2I8RiqBCfu3bHyk9Fq28gw93fvuRcYiVcbrm4jn465lSq2abWTQbfLPqApK2UTzS9ggJsX64JqyZ7JZSrqDROHoLzImOu0wBUT4UkaYVoxudzgE6Pj99zssCNxNmW1Jd/faP/FGkZxwRNfG0TxmDKZ1DdSBiZE8ipg4P4KpMqGw81HBLAXMgujHs75B4G/Ez/URPYpyOIfNuGKBzGW85M/p0p58ZqvoS7j1h1J6yPcQSyt63HBpmVmFO3W1vYOXop+qgrZh/wNYtmU1LUMxedy0KEBrfG82L0nkYyUZuRwfVCrvikXJEncpogW2SA7LNzn8Oqr9VbD9p8CGGNYq4Jtgs85AKSJVF5bdfEroHg3fm6uO6yyMO8aNDPdLaDRf2WFz08NcL2JLFHjQmQJNsk0o=
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 551a861d-e145-4d8d-b5d3-08d824d7f5a5
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 13:48:43.3280 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z0dr9qYsOBBpdToXbb6+3tX6q3DiVuulsJ2Ejr+mLcjqRgvaiGs9wy2KyoFOt+3majad5ct8Lq5Wb9rwhCFryg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB3510
-Received-SPF: pass client-ip=40.107.21.96;
- envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 09:48:45
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -135,38 +104,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Robert Foley <robert.foley@linaro.org>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Peter Puhov <peter.puhov@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 8.7.20. 17:24, Laurent Vivier wrote:
-> errno of the target is returned as a negative value by the syscall,
-> not in the host errno variable.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> From: Robert Foley <robert.foley@linaro.org>
 >
-> The emulation of the target syscall can return an error while the
-> host doesn't set an errno value. Target errnos and host errnos can
-> also differ in some cases.
+> Added use of a configuration to tests/vm/basevm.py.
+> The configuration provides parameters used to configure a VM.
+> This allows for providing alternate configurations to the VM being
+> created/launched. cpu, machine, memory, and NUMA configuration are all
+> examples of configuration which we might want to vary on the VM being cre=
+ated
+> or launched.
+> This will for example allow for creating an aarch64 vm.
 >
-> Fixes: c84be71f6854 ("linux-user: Extend strace support to enable argument printing after syscall execution")
-> Cc: Filip.Bozuta@syrmia.com
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   linux-user/strace.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Message-Id: <20200601211421.1277-3-robert.foley@linaro.org>
+> Message-Id: <20200701135652.1366-7-alex.bennee@linaro.org>
 >
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 5235b2260cdd..b42664bbd180 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -731,7 +731,7 @@ print_syscall_err(abi_long ret)
->   
->       qemu_log(" = ");
->       if (ret < 0) {
-> -        qemu_log("-1 errno=%d", errno);
-> +        qemu_log("-1 errno=%d", (int)-ret);
->           errstr = target_strerror(-ret);
->           if (errstr) {
->               qemu_log(" (%s)", errstr);
-Reviewed-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 5a58e6c39300..cfe20c58f7ef 100644
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -29,16 +29,41 @@ import tempfile
+>  import shutil
+>  import multiprocessing
+>  import traceback
+> -
+> -SSH_KEY =3D open(os.path.join(os.path.dirname(__file__),
+> -               "..", "keys", "id_rsa")).read()
+> -SSH_PUB_KEY =3D open(os.path.join(os.path.dirname(__file__),
+> -                   "..", "keys", "id_rsa.pub")).read()
+> -
+> +import shlex
+> +
+> +SSH_KEY_FILE =3D os.path.join(os.path.dirname(__file__),
+> +               "..", "keys", "id_rsa")
+> +SSH_PUB_KEY_FILE =3D os.path.join(os.path.dirname(__file__),
+> +                   "..", "keys", "id_rsa.pub")
+> +
+> +# This is the standard configuration.
+> +# Any or all of these can be overridden by
+> +# passing in a config argument to the VM constructor.
+> +DEFAULT_CONFIG =3D {
+> +    'cpu'             : "max",
+> +    'machine'         : 'pc',
+> +    'guest_user'      : "qemu",
+> +    'guest_pass'      : "qemupass",
+> +    'root_pass'       : "qemupass",
+> +    'ssh_key_file'    : SSH_KEY_FILE,
+> +    'ssh_pub_key_file': SSH_PUB_KEY_FILE,
+> +    'memory'          : "4G",
+> +    'extra_args'      : [],
+> +    'qemu_args'       : "",
+> +    'dns'             : "",
+> +    'ssh_port'        : 0,
+> +    'install_cmds'    : "",
+> +    'boot_dev_type'   : "block",
+> +    'ssh_timeout'     : 1,
+> +}
+<snip>
+>=20=20
+> -def main(vmcls):
+> +def main(vmcls, config=3DNone):
+>      try:
+> +        if config =3D=3D None:
+> +            config =3D {}
+
+Ahh I think this is where is went wrong - should be config =3D DEFAULT_CONF=
+IG
+
+Just re-running the rest of the vm builds now.
+
+--=20
+Alex Benn=C3=A9e
 
