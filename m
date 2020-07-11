@@ -2,86 +2,87 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81BBBC433E5
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30825C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:12:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FBEF2078B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:10:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC3312078B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:12:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="og6TEkuq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FBEF2078B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kDwqoYsW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC3312078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juDP6-00015P-JR
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 07:10:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52652)
+	id 1juDQG-0003V3-65
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 07:12:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1juDMH-0004Mb-RQ
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:07:53 -0400
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:42192)
+ id 1juDMI-0004Or-RT
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:07:54 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46277)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1juDMG-0006N9-4p
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:07:53 -0400
-Received: by mail-pg1-x52e.google.com with SMTP id m22so3686419pgv.9
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 04:07:51 -0700 (PDT)
+ id 1juDMH-0006NF-7u
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:07:54 -0400
+Received: by mail-pg1-x543.google.com with SMTP id d194so3671193pga.13
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 04:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WZrxDgWWXXP9PmlZyyBGjdv9eqT/iSmUhBtmo9zxmiE=;
- b=og6TEkuqvyL9WqFB2XPRBVNhqgGVqrluIQwOzhZXqjonXxaOtdcemhkx/tVmeHwbqF
- XYvaSJyE1fa6QifMUiBfvlekqTneXmPoBzSZ+N3ANLozuOHHEFaKKFZSLeXUDfOT9Dsa
- GxEnTX3OdAqC8xBpjxhxqfLa/ZU0ypxhiz6nJ6pq94mhN85eGtzz/OBlefvlpC6TVx6J
- UHWx/yaEPwECXR8YeC99yIPCSNvLqavncnOnE9CvEUTnoOKna6cVV0XiQW4w3H6YcM/x
- 9G0BsvtC4Jn3gBnjLnAR4rNiz8OLdwg8vA3z7l0p1/x0/U9Srt06ligpAuhP1d3l39UR
- AGPQ==
+ bh=OxuARGdyDb7zyHOtMNspwtFCmEXAy7U1ZwwaIWB/blY=;
+ b=kDwqoYsWB14d+BYTC97xtvcxfBCNuikRZq1E9RE9DAKwKv/bPFnc9Ta1BnEeaFXi3E
+ H2nEHAaBPn3V1YJgBVyFKQDxtvzeZn2CED7d6cWBHJeJ5dJFSQdsXXMW8rVYJrWyG2PX
+ FTX2OvnL8iBDX3dRN6ylhgNdqihltI38jy0u4F5LW/D4XROzumPao2p2X9HWFkV1pAa+
+ EeWX7kk/Um/IiGIZX1WEwg6mCwwKm0cWAGmQxTWPwEyjmve1hxU7R3oqjpMNSwNy0NzV
+ 40oS3tM6TFDAYEMrdgUOfwZLd3BMn3wummEVnUsZvV1B2i6AsvVGHvkJoBZtXEiS1HEC
+ Vr7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WZrxDgWWXXP9PmlZyyBGjdv9eqT/iSmUhBtmo9zxmiE=;
- b=bYkxVMCguyRZm23dl9EjLF5B6jtm4NmpVois7NNH8Yf+zGjt+mebFftdbqxCnBsLho
- caARUXqDEB9BQQnjV1qgeI0Fj/TXMpaU1GwPBf1r0nOIDiOARawGe4JR0IpMcXO9hZE1
- oxoYSyEkerVSPv5XJBIuI/OG1mAvWgM+/roUWzzsURF5KhsamPbDErSkOszBT8VM4S2H
- a7Yj1wOvJUhcPj4jNNaa/uXptIVl+GjDonxSILfxTCnKPLnONS7W9T0Kpv5RMOAiSfNV
- A4YR5n7NaVS6xBekUXuceGRAqzNNx0H9/x8nfOcdiLpCLeFsUymDEvrUfFcd9H9+pmqV
- DiZQ==
-X-Gm-Message-State: AOAM5324vhfYDlItA5bZ1UnbRS6KLJwoMf9Tssb/0GWHSTLGhpEg+tpd
- Kq34FoyieheIrKsc3yJYkzhUeIXf
-X-Google-Smtp-Source: ABdhPJx91xbPfHduPmKK1qsZU3HwlKROZQ964Sj6EqC8/pdM9ZpyqIOZMfy/DFYTJgvMhloRRZyZcA==
-X-Received: by 2002:a62:6dc3:: with SMTP id
- i186mr43211212pfc.104.1594465670640; 
- Sat, 11 Jul 2020 04:07:50 -0700 (PDT)
+ bh=OxuARGdyDb7zyHOtMNspwtFCmEXAy7U1ZwwaIWB/blY=;
+ b=ksutPO0EPxyCvFgzTL2ImZm2azltvgOM4gL9L9ePzgLj3uhuTEkBv1pt1EQx4Qewse
+ eCR1B4hl7GQatHIDoL9b87/ah7uqyUiYm4/ajvcXhNVw2zwgXxsXUUYSVE7k4c9kAhwB
+ 1N2qHUDmIyMtPVm6agqNrzgufqeqlXvcPyKL2fqzFMKIRz8hqYDVJORNNUtbsPQ5oNfw
+ N8+PSpcroDqXH4y/Qq4km22H/0RcUE345wcs85tsugluzLNcqTfo9QdvzJEKvsBqE9n+
+ 9ykZuBWV+oRqnEFkedvfIgVAunTrjcNglQxxSrZoiG52WIC86QP13Z0i3WrJIig4LRoN
+ 7q/Q==
+X-Gm-Message-State: AOAM533vesmhjPdkexsoB4SESxTiJdbm05M/VjIlr4m/4tyi/4tZn3Mb
+ 2UK41j0oTsn9jmCzls1NL6tTw1t6
+X-Google-Smtp-Source: ABdhPJwzOUGGO07cKInTKYikummepTmep3A40j9AtdAcH/CTuTRjGtADz/HNwxzrvQ1/FHGRmulKGQ==
+X-Received: by 2002:a63:6fcd:: with SMTP id
+ k196mr39887277pgc.251.1594465671747; 
+ Sat, 11 Jul 2020 04:07:51 -0700 (PDT)
 Received: from octofox.hsd1.ca.comcast.net
  ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id m31sm8925826pjb.52.2020.07.11.04.07.49
+ by smtp.gmail.com with ESMTPSA id m31sm8925826pjb.52.2020.07.11.04.07.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Sat, 11 Jul 2020 04:07:50 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 04/22] target/xtensa: add geometry to
- xtensa_get_regfile_by_name
-Date: Sat, 11 Jul 2020 04:06:39 -0700
-Message-Id: <20200711110655.20287-5-jcmvbkbc@gmail.com>
+Subject: [PATCH v4 05/22] target/xtensa: support copying registers up to 64
+ bits wide
+Date: Sat, 11 Jul 2020 04:06:40 -0700
+Message-Id: <20200711110655.20287-6-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200711110655.20287-1-jcmvbkbc@gmail.com>
 References: <20200711110655.20287-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52e;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pg1-x52e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -5
@@ -110,103 +111,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Register file name may not uniquely identify a register file in the set
-of configurations. E.g. floating point registers may have different size
-in different configurations. Use register file geometry as additional
-identifier.
+FLIX dependency breaking code assumes that all registers are 32 bit
+wide. This may not always be correct.
+Extract actual register width from the associated register file and use
+it to create temporaries of correct width and generate correct data
+movement instructions.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- target/xtensa/cpu.h       |  2 +-
- target/xtensa/helper.c    |  4 +++-
- target/xtensa/translate.c | 35 +++++++++++++++++++++++++++--------
- 3 files changed, 31 insertions(+), 10 deletions(-)
+ target/xtensa/cpu.h       |  1 +
+ target/xtensa/translate.c | 26 +++++++++++++++++++++-----
+ 2 files changed, 22 insertions(+), 5 deletions(-)
 
 diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 0c96181212a5..0409aa6189cf 100644
+index 0409aa6189cf..960f6573447f 100644
 --- a/target/xtensa/cpu.h
 +++ b/target/xtensa/cpu.h
-@@ -598,7 +598,7 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+@@ -359,6 +359,7 @@ typedef struct opcode_arg {
+     uint32_t raw_imm;
+     void *in;
+     void *out;
++    uint32_t num_bits;
+ } OpcodeArg;
  
- void xtensa_collect_sr_names(const XtensaConfig *config);
- void xtensa_translate_init(void);
--void **xtensa_get_regfile_by_name(const char *name);
-+void **xtensa_get_regfile_by_name(const char *name, int entries, int bits);
- void xtensa_breakpoint_handler(CPUState *cs);
- void xtensa_register_core(XtensaConfigList *node);
- void xtensa_sim_open_console(Chardev *chr);
-diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index 7073381f03b2..05e2b7f70a1e 100644
---- a/target/xtensa/helper.c
-+++ b/target/xtensa/helper.c
-@@ -133,8 +133,10 @@ static void init_libisa(XtensaConfig *config)
-     config->regfile = g_new(void **, regfiles);
-     for (i = 0; i < regfiles; ++i) {
-         const char *name = xtensa_regfile_name(config->isa, i);
-+        int entries = xtensa_regfile_num_entries(config->isa, i);
-+        int bits = xtensa_regfile_num_bits(config->isa, i);
- 
--        config->regfile[i] = xtensa_get_regfile_by_name(name);
-+        config->regfile[i] = xtensa_get_regfile_by_name(name, entries, bits);
- #ifdef DEBUG
-         if (config->regfile[i] == NULL) {
-             fprintf(stderr, "regfile '%s' not found for %s\n",
+ typedef struct DisasContext DisasContext;
 diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 03d796d7a1ed..9838bf6b3ec5 100644
+index 9838bf6b3ec5..bc01a720719d 100644
 --- a/target/xtensa/translate.c
 +++ b/target/xtensa/translate.c
-@@ -227,24 +227,43 @@ void xtensa_translate_init(void)
-                                "exclusive_val");
- }
+@@ -943,10 +943,10 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
  
--void **xtensa_get_regfile_by_name(const char *name)
-+void **xtensa_get_regfile_by_name(const char *name, int entries, int bits)
- {
-+    char *geometry_name;
-+    void **res;
-+
-     if (xtensa_regfile_table == NULL) {
-         xtensa_regfile_table = g_hash_table_new(g_str_hash, g_str_equal);
-+        /*
-+         * AR is special. Xtensa translator uses it as a current register
-+         * window, but configuration overlays represent it as a complete
-+         * physical register file.
-+         */
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"AR", (void *)cpu_R);
-+                            (void *)"AR 16x32", (void *)cpu_R);
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"MR", (void *)cpu_MR);
-+                            (void *)"AR 32x32", (void *)cpu_R);
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"FR", (void *)cpu_FR);
-+                            (void *)"AR 64x32", (void *)cpu_R);
-+
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"BR", (void *)cpu_BR);
-+                            (void *)"MR 4x32", (void *)cpu_MR);
-+
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"BR4", (void *)cpu_BR4);
-+                            (void *)"FR 16x32", (void *)cpu_FR);
-+
-         g_hash_table_insert(xtensa_regfile_table,
--                            (void *)"BR8", (void *)cpu_BR8);
-+                            (void *)"BR 16x1", (void *)cpu_BR);
-+        g_hash_table_insert(xtensa_regfile_table,
-+                            (void *)"BR4 4x4", (void *)cpu_BR4);
-+        g_hash_table_insert(xtensa_regfile_table,
-+                            (void *)"BR8 2x8", (void *)cpu_BR8);
+         for (opnd = vopnd = 0; opnd < opnds; ++opnd) {
+             void **register_file = NULL;
++            xtensa_regfile rf;
+ 
+             if (xtensa_operand_is_register(isa, opc, opnd)) {
+-                xtensa_regfile rf = xtensa_operand_regfile(isa, opc, opnd);
+-
++                rf = xtensa_operand_regfile(isa, opc, opnd);
+                 register_file = dc->config->regfile[rf];
+ 
+                 if (rf == dc->config->a_regfile) {
+@@ -972,6 +972,9 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+                 if (register_file) {
+                     arg[vopnd].in = register_file[v];
+                     arg[vopnd].out = register_file[v];
++                    arg[vopnd].num_bits = xtensa_regfile_num_bits(isa, rf);
++                } else {
++                    arg[vopnd].num_bits = 32;
+                 }
+                 ++vopnd;
+             }
+@@ -1111,8 +1114,15 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+         for (i = j = 0; i < n_arg_copy; ++i) {
+             if (i == 0 || arg_copy[i].resource != resource) {
+                 resource = arg_copy[i].resource;
+-                temp = tcg_temp_local_new();
+-                tcg_gen_mov_i32(temp, arg_copy[i].arg->in);
++                if (arg_copy[i].arg->num_bits <= 32) {
++                    temp = tcg_temp_local_new_i32();
++                    tcg_gen_mov_i32(temp, arg_copy[i].arg->in);
++                } else if (arg_copy[i].arg->num_bits <= 64) {
++                    temp = tcg_temp_local_new_i64();
++                    tcg_gen_mov_i64(temp, arg_copy[i].arg->in);
++                } else {
++                    g_assert_not_reached();
++                }
+                 arg_copy[i].temp = temp;
+ 
+                 if (i != j) {
+@@ -1143,7 +1153,13 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
      }
--    return (void **)g_hash_table_lookup(xtensa_regfile_table, (void *)name);
-+
-+    geometry_name = g_strdup_printf("%s %dx%d", name, entries, bits);
-+    res = (void **)g_hash_table_lookup(xtensa_regfile_table, geometry_name);
-+    g_free(geometry_name);
-+    return res;
- }
  
- static inline bool option_enabled(DisasContext *dc, int opt)
+     for (i = 0; i < n_arg_copy; ++i) {
+-        tcg_temp_free(arg_copy[i].temp);
++        if (arg_copy[i].arg->num_bits <= 32) {
++            tcg_temp_free_i32(arg_copy[i].temp);
++        } else if (arg_copy[i].arg->num_bits <= 64) {
++            tcg_temp_free_i64(arg_copy[i].temp);
++        } else {
++            g_assert_not_reached();
++        }
+     }
+ 
+     if (dc->base.is_jmp == DISAS_NEXT) {
 -- 
 2.20.1
 
