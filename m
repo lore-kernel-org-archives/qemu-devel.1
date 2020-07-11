@@ -2,89 +2,80 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39504C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06522C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 086EF20725
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:34:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dpRVPyNi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086EF20725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CC9EA20720
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:41:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC9EA20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juKK3-0004R4-Ag
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 14:34:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48714)
+	id 1juKRi-0006Qw-5X
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 14:41:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juKJT-0003v7-K1
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:33:27 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36773)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juKQn-0005zi-0p
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:41:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60922)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juKJQ-0008Br-5W
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:33:26 -0400
-Received: by mail-ot1-x341.google.com with SMTP id 72so6602924otc.3
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 11:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+aYABooH1OESbaFVdKpN9uc4H4yGymKyz0M2s5rGCSQ=;
- b=dpRVPyNi2j324OhciYBIvF09TmZgPkdr0anKtdgtCUpx1tmiuKPe4ZXwBnAiF86m3M
- RXBBENJ2NrLt3wQ5EIJoOuFVCy/Nl0A9OmLI6pDjnl/iLAQ3Eq1xy+5SV4TMEAR2FN6b
- VCjc1yQ39ZEH870XHMlwGS8aBmQ9p+4PJmXArtBu6hkmOFpa/KXQQTt/LLobtzqvFnug
- 7UKErtBINJel63cOQ1bWgAWpHqkrn3L92KWEUlRhIAnuURlEmxMUKr9kNWyQDwh4phkw
- dJsPxGMLW1PhOPW6CjzFeNrtxyO8C7uzE6LKSKOS9AR2tSf0RV5zV+6x6wQATjnSQnfZ
- auwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=+aYABooH1OESbaFVdKpN9uc4H4yGymKyz0M2s5rGCSQ=;
- b=biVgCCRoL+aqucehfvyfQi7Gr3HNUBpBhesC4tZj00Tpmel2qkojRo1a/g0FH7qXyO
- GxKf0yTn3Eh9m6C7GriyH0ZC1SAU5K7pFwZl4iMSMMfCL5RUI0muUCEEPR2kg9CmodrH
- hMNVsyFak1TisNZQ+Q8MJWX2kBkiTJ98Q+TMhnN8vnQwCJoAm11jQFWJ8N+knlBo7a1j
- 5W8GdF0m9HVnjwjsVX4P4ckJ8mmODIomaOwRWgJodQ78f3VFj20SRNHvyjnRnh4f8kKU
- LoNLna6rR+ApuL8dyZe6YChtsyT21v+o4R/Z4CrzvC+EgD74S8cMLnSdpZjFZTBZMYWK
- yyIA==
-X-Gm-Message-State: AOAM530WVI4J27QTPZmRLLKEDGqRudBry+1TNr99gB2y47Mg9bQlJsq3
- EP4Iv0XDHn3oMx3wnlmMjn85lmVAvz/ZIM/zVlnf2A==
-X-Google-Smtp-Source: ABdhPJwkZYPghvqttfzUmMpvQcujg3Xzp4BwWqFj57l1QjKmrVt4antSXsKGi2j+z4KvTuXVZK8weAkRUx9HeX7j50M=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr56355260oto.135.1594492403004; 
- Sat, 11 Jul 2020 11:33:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juKQi-0000bW-IB
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:41:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1juKQg-0004JJ-0O
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 18:40:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 01D3C2E80EC
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 18:40:54 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200628214230.2592-1-peter.maydell@linaro.org>
-In-Reply-To: <20200628214230.2592-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 11 Jul 2020 19:33:12 +0100
-Message-ID: <CAFEAcA_yJZ7TF=xq-q6kpdX965iOZOS6B9kh16EM9Z0zCkVXdA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] hw/arm/palm.c: Fix Coverity issue CID 1421944
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 11 Jul 2020 18:34:27 -0000
+From: Alexander Bulekov <1681439@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr bugs-syssec janitor jnsnow kempniu th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhCAoa2VtcG5pdSk=?=
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <159449246775.12745.14152885399246712247.malone@soybean.canonical.com>
+Subject: [Bug 1681439] Re: qemu-system-x86_64: hw/ide/core.c:685:
+ ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb == NULL' failed.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7cb504325ea9c7183c196b5585edc34c0888e582
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/11 14:40:54
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,30 +84,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 28 Jun 2020 at 22:42, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> As for spitz and tosa, fix the Coverity issue CID 1421944 which
-> points out that memory returned from qemu_allocate_irqs() is leaked
-> by encapsulating the GPIO handling into a simple device.
-> As with the other series, detabify the file first.
->
-> thanks
-> -- PMM
->
-> Peter Maydell (2):
->   hw/arm/palm.c: Detabify
->   hw/arm/palm.c: Encapsulate misc GPIO handling in a device
->
->  hw/arm/palm.c | 111 ++++++++++++++++++++++++++++++++++----------------
->  1 file changed, 77 insertions(+), 34 deletions(-)
->
+Here's a qtest reproducer
 
-ping for code review, anybody?
+cat << EOF | ./i386-softmmu/qemu-system-i386 \
+-M pc,accel=3Dqtest -qtest null -nographic -vga qxl -qtest stdio -nodefault=
+s \
+-drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,format=
+=3Draw \
+-drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,format=
+=3Draw  \
+-device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1 =
 
-thanks
--- PMM
+writel 0x0 0xffffffff
+outw 0x171 0x32a
+outw 0x176 0x3570
+outl 0xcf8 0x80000903
+outl 0xcfc 0x4e002700
+outl 0xcf8 0x80000920
+outb 0xcfc 0x5e
+outb 0x58 0xe1
+outw 0x57 0x0
+EOF
+
+With -trace ide\*:
+[I 1594492439.431181] OPENED
+8666@1594492439.441003:ide_reset IDEstate 0x557f44953598
+8666@1594492439.441084:ide_reset IDEstate 0x557f44953968
+8666@1594492439.441407:ide_reset IDEstate 0x557f44953e88
+8666@1594492439.441484:ide_reset IDEstate 0x557f44954258
+8666@1594492439.442483:ide_reset IDEstate 0x557f44953e88
+8666@1594492439.442548:ide_reset IDEstate 0x557f44954258
+8666@1594492439.444817:ide_reset IDEstate 0x557f44953598
+8666@1594492439.444822:ide_reset IDEstate 0x557f44953968
+8666@1594492439.444824:ide_reset IDEstate 0x557f44953e88
+8666@1594492439.444825:ide_reset IDEstate 0x557f44954258
+[R +0.015229] writel 0x0 0xffffffff
+OK
+[S +0.015321] OK
+[R +0.015328] outw 0x171 0x32a
+8666@1594492439.446534:ide_ioport_write IDE PIO wr @ 0x171 (Features); val =
+0x2a; bus 0x557f44953e00 IDEState 0x557f44953e88
+8666@1594492439.446537:ide_ioport_write IDE PIO wr @ 0x172 (Sector Count); =
+val 0x03; bus 0x557f44953e00 IDEState 0x557f44953e88
+OK
+[S +0.015360] OK
+[R +0.015377] outw 0x176 0x3570
+8666@1594492439.446561:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head); v=
+al 0x70; bus 0x557f44953e00 IDEState 0x557f44953e88
+8666@1594492439.446564:ide_ioport_write IDE PIO wr @ 0x177 (Command); val 0=
+x35; bus 0x557f44953e00 IDEState 0x557f44954258
+8666@1594492439.446581:ide_exec_cmd IDE exec cmd: bus 0x557f44953e00; state=
+ 0x557f44954258; cmd 0x35
+OK
+[S +0.015404] OK
+[R +0.015410] outl 0xcf8 0x80000903
+OK
+[S +0.015413] OK
+[R +0.015429] outl 0xcfc 0x4e002700
+OK
+[S +0.015555] OK
+[R +0.015559] outl 0xcf8 0x80000920
+OK
+[S +0.015561] OK
+[R +0.015563] outb 0xcfc 0x5e
+OK
+[S +0.015663] OK
+[R +0.015667] outb 0x58 0xe1
+8666@1594492439.446896:ide_dma_cb IDEState 0x557f44954258; sector_num=3D1 n=
+=3D259 cmd=3DDMA WRITE
+OK
+[S +0.015801] OK
+[R +0.015806] outw 0x57 0x0
+8666@1594492439.447006:ide_cancel_dma_sync_remaining draining all remaining=
+ requests
+qemu-system-i386: /home/alxndr/Development/qemu/hw/ide/core.c:724: void ide=
+_cancel_dma_sync(IDEState *): Assertion `s->bus->dma->aiocb =3D=3D NULL' fa=
+iled.
+Aborted
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
+
+Title:
+  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
+  `s->bus->dma->aiocb =3D=3D NULL' failed.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+
+      qemu-system-x86_64 \
+          -machine pc-i440fx-2.7,accel=3Dkvm \
+          -m 3072 \
+          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+          -device virtio-net-pci,netdev=3Dhostnet0 \
+  	-vnc :0
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+  QEMU was compiled using:
+
+      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+      make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
 
