@@ -2,83 +2,80 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 866FFC433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 02:01:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A50C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 02:36:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5628E20767
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 02:01:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5628E20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC83B206D9
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 02:36:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC83B206D9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ju4pK-0002f0-Kc
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 22:01:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42364)
+	id 1ju5NI-0001QW-74
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 22:36:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
- id 1ju4oi-0002F9-BL
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 22:00:40 -0400
-Received: from mga05.intel.com ([192.55.52.43]:47996)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
- id 1ju4of-0001Ed-IO
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 22:00:39 -0400
-IronPort-SDR: PN/J4v9meHEh4OXufK/vyHkn3kL+E1DMtU2s+DtrKTUZIKFmUs9G79epYHUuQkgcgvhyjra+Ux
- nisWvS36Z+8w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9678"; a="233198407"
-X-IronPort-AV: E=Sophos;i="5.75,337,1589266800"; d="scan'208";a="233198407"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Jul 2020 19:00:29 -0700
-IronPort-SDR: cQrL9SWMl8xfjBqfGDSd1QaGMG/gGeDoiciitlDaM132yrgMkpopg9eylcZLrpwNd5mR+G+oxH
- 6g+GjAQTR9tg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,337,1589266800"; d="scan'208";a="269231166"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.249.172.8])
- ([10.249.172.8])
- by fmsmga008.fm.intel.com with ESMTP; 10 Jul 2020 19:00:27 -0700
-Subject: Re: [PATCH v5 1/4] target/i386: add missing vmx features for several
- CPU models
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20200619073114.24303-1-chenyi.qiang@intel.com>
- <20200619073114.24303-2-chenyi.qiang@intel.com>
- <20200709221226.GM780932@habkost.net>
- <d3542ac6-9282-ed88-3819-3cc8b3368ee7@intel.com>
- <20200710164832.GR780932@habkost.net>
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-Message-ID: <992b443b-cd59-ba1b-4f14-b111d6e5ffc7@intel.com>
-Date: Sat, 11 Jul 2020 10:00:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1ju5MW-0000vT-3M
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 22:35:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38176)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1ju5MU-0005JZ-7k
+ for qemu-devel@nongnu.org; Fri, 10 Jul 2020 22:35:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ju5MS-0002KF-2n
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 02:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0BA7C2E8025
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 02:35:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200710164832.GR780932@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=192.55.52.43; envelope-from=chenyi.qiang@intel.com;
- helo=mga05.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 22:00:29
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 11 Jul 2020 02:27:45 -0000
+From: Alexander Bulekov <1880539@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+References: <159039895924.7312.8999076686824323072.malonedeb@gac.canonical.com>
+Message-Id: <159443446527.13251.15549023390424273703.malone@gac.canonical.com>
+Subject: [Bug 1880539] Re: I/O write make QXL abort in qxl_set_mode()
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7cfa17f55f67c7c183de8a777f07f82f57f8d9e6
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 22:35:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,43 +84,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Robert Hoo <robert.hu@linux.intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1880539 <1880539@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Here's a qtest reproducer for this:
+cat << EOF | ./i386-softmmu/qemu-system-i386 -M q35,accel=3Dqtest -qtest nu=
+ll -nographic -vga qxl -qtest stdio -nodefaults
+outl 0xcf8 0x80000804
+outb 0xcfc 0xff
+outl 0xcf8 0x80000819
+outl 0xcfc 0x87caff7a
+outb 0x86 0x23
+EOF
 
+-- =
 
-On 7/11/2020 12:48 AM, Eduardo Habkost wrote:
-> On Fri, Jul 10, 2020 at 09:45:49AM +0800, Chenyi Qiang wrote:
->>
->>
->> On 7/10/2020 6:12 AM, Eduardo Habkost wrote:
->>>
->>> I'm very sorry for taking so long to review this.  Question
->>> below:
->>>
->>> On Fri, Jun 19, 2020 at 03:31:11PM +0800, Chenyi Qiang wrote:
->>>> Add some missing VMX features in Skylake-Server, Cascadelake-Server and
->>>> Icelake-Server CPU models based on the output of Paolo's script.
->>>>
->>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->>>
->>> Why are you changing the v1 definition instead adding those new
->>> features in a new version of the CPU model, just like you did in
->>> patch 3/4?
->>>
->>
->> I suppose these missing vmx features are not quite necessary for customers.
->> Just post it here to see if they are worth being added.
->> Adding a new version is reasonable. Is it appropriate to put all the missing
->> features in patch 1/4, 3/4, 4/4 in a same version?
-> 
-> Yes, it would be OK to add only one new version with all the new
-> features.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1880539
 
-OK, I'll do it in the next version of patch.
+Title:
+  I/O write make QXL abort in qxl_set_mode()
+
+Status in QEMU:
+  New
+
+Bug description:
+  libFuzzer found:
+
+  qxl-0: guest bug: qxl_add_memslot: guest_start > guest_end 0xffffffffffff=
+ffff > 0x3ffffff
+  qemu-fuzz-i386: hw/display/qxl.c:1611: void qxl_set_mode(PCIQXLDevice *, =
+unsigned int, int): Assertion `qxl_add_memslot(d, 0, devmem, QXL_SYNC) =3D=
+=3D 0' failed.
+  =3D=3D8134=3D=3D ERROR: libFuzzer: deadly signal
+      #0 0x55fddfcfb3f0 in __sanitizer_print_stack_trace (qemu-fuzz-i386+0x=
+cb13f0)
+      #1 0x55fddfc0a3e1 in fuzzer::PrintStackTrace() (qemu-fuzz-i386+0xbc03=
+e1)
+      #2 0x55fddfbeac6f in fuzzer::Fuzzer::CrashCallback() (qemu-fuzz-i386+=
+0xba0c6f)
+      #3 0x55fddfbeacc3 in fuzzer::Fuzzer::StaticCrashSignalCallback() (qem=
+u-fuzz-i386+0xba0cc3)
+      #4 0x7fd640644c6f  (/lib64/libpthread.so.0+0x12c6f)
+      #5 0x7fd640483e34 in __GI_raise (/lib64/libc.so.6+0x37e34)
+      #6 0x7fd64046e894 in __GI_abort (/lib64/libc.so.6+0x22894)
+      #7 0x7fd64046e768 in __assert_fail_base.cold (/lib64/libc.so.6+0x2276=
+8)
+      #8 0x7fd64047c565 in __GI___assert_fail (/lib64/libc.so.6+0x30565)
+      #9 0x55fde08afd8b in qxl_set_mode (qemu-fuzz-i386+0x1865d8b)
+      #10 0x55fde08b9602 in ioport_write (qemu-fuzz-i386+0x186f602)
+      #11 0x55fddff170a7 in memory_region_write_accessor (qemu-fuzz-i386+0x=
+ecd0a7)
+      #12 0x55fddff16c13 in access_with_adjusted_size (qemu-fuzz-i386+0xecc=
+c13)
+      #13 0x55fddff157b4 in memory_region_dispatch_write (qemu-fuzz-i386+0x=
+ecb7b4)
+
+  Can be reproduce doing "writeb 0x06 0x23" on QXL I/O (PCI BAR #3).
+
+  Command line: 'qemu-system-i386 -display none -M pc -vga qxl'
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1880539/+subscriptions
 
