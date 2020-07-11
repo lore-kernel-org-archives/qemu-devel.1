@@ -2,58 +2,58 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE4CC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 22:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9548CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 22:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB33620725
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 22:01:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB33620725
+	by mail.kernel.org (Postfix) with ESMTPS id 66EE3206A5
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 22:26:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EE3206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juNYy-0006U7-W8
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 18:01:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50720)
+	id 1juNwi-0002aC-Gy
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 18:26:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juNYK-000633-Fd
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 18:01:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49838)
+ id 1juNwB-0002B5-IF
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 18:25:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juNYD-0005VD-Cc
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 18:00:57 -0400
+ id 1juNw9-0007yV-3x
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 18:25:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1juNYB-00035Y-Bv
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 22:00:51 +0000
+ id 1juNw7-0004oH-5W
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 22:25:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 526F32E80EE
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 22:00:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 1A9692E80E7
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 22:25:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 11 Jul 2020 21:52:10 -0000
-From: Simon John <1886318@bugs.launchpad.net>
+Date: Sat, 11 Jul 2020 22:16:43 -0000
+From: Michael Tokarev <1886318@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mark-cave-ayland sej7278
+X-Launchpad-Bug-Commenters: mark-cave-ayland mjt+launchpad-tls sej7278
 X-Launchpad-Bug-Reporter: Simon John (sej7278)
-X-Launchpad-Bug-Modifier: Simon John (sej7278)
+X-Launchpad-Bug-Modifier: Michael Tokarev (mjt+launchpad-tls)
 References: <159394898604.17667.6684490731246411850.malonedeb@soybean.canonical.com>
-Message-Id: <159450433113.12172.8885274593643733408.malone@soybean.canonical.com>
+Message-Id: <159450580313.13087.12065834264206844626.malone@gac.canonical.com>
 Subject: [Bug 1886318] Re: Qemu after v5.0.0 breaks macos guests
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +61,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 45fbeb4e560191af82dfe29b02f93e9e0b81a2b0
+X-Launchpad-Hash: b7b48493335ceb3fd4ed8ba8bb3d4b551188cb2d
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/11 17:41:08
@@ -88,11 +88,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Woohoo! Simply reverting that one commit
-5d971f9e672507210e77d020d89e0e89165c8fc9 from today's master gets me
-running again.
+that's an interesting observation. Thank you for finding this one. It'd
+be much faster to find one of about 10 debian patches which affects this
+but full qemu bisect works too, ofcourse.
 
-Not sure where that leaves us though....?
+Simon, I can't reach you by email, your mailserver apparently
+malfunctioning, - I sent you instructions about how and what to do, but
+all my emails returned back - connections to your mailserver times out
+from a few of networks I have access to.
+
+This commit breaking macos guest is interesting, perhaps we should try
+to fix that for 5.1.. :)
 
 -- =
 
