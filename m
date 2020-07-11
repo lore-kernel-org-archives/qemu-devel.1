@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFDFC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F11C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:18:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 051502078B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:18:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87E122078B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dKkl/VWE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 051502078B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sgx31l7+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87E122078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juDW5-0003S9-9i
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 07:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52786)
+	id 1juDW8-0003Ya-RJ
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 07:18:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1juDMR-0004jz-3A
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:08:04 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41737)
+ id 1juDMT-0004kG-1h
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:08:06 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38935)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1juDMO-0006OT-RZ
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:08:02 -0400
-Received: by mail-pg1-x542.google.com with SMTP id g67so3685871pgc.8
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 04:08:00 -0700 (PDT)
+ id 1juDMR-0006Ot-DS
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:08:04 -0400
+Received: by mail-pg1-x543.google.com with SMTP id z5so3690666pgb.6
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 04:08:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=4jIV5omheeV0T3drxGexigxyJptxU+Y8G8xeDL3SRR8=;
- b=dKkl/VWEQj8wTt58fDoEEJ28qHOc+e02tFCzDkp8aP0ixg/XMQqJuy7Hs9YNWa3vBR
- kquJKe8TWljlfurYSPbkPCXs6pkxNv+4xFIJEUVYwpf/P14Fx7nICoM7wcfeUno4gTvZ
- 7quNOA4gHkXDNn2EfG408xLIobSK7MUKTBwpEORz2pMNEQCzMpmtfEOXFxadguP/RJ4E
- YtLBBkjPVMhOVZ0dNCrv8P4c3rmKLkMfBKymJzGbyi0czjXhFCx+ZnAJ92FDSlPal+jY
- yPzTbr2RDuWvCZOpWzbqEJbqBFrGizysLp00vK29dXkkBr1P0SJ6t/kHu0LaWRiFBwNc
- k1+Q==
+ bh=rzz0QASvhiLiMcKKjELZE5GUtAHuQdcLXEQeVo4joCE=;
+ b=Sgx31l7+EeAk6oQqciSgUdVZvHtlIbCXoUDdBaAG2BZv1RkI+NljW7QDZRPaSv/Kzy
+ Gxtoy+b95ho0P6HxgKmXn6JkZktfGc3TpbbLEznNl7Ms2sVe5dsXJaNJtGKoJgQSvAwJ
+ TeN8smD4hpsnzVJHhe3Pob/W7iB03rqxOZFQp8IIVN/5ev8NLR69KsPbLcKHtKkQLoE0
+ iffcHHHt2sKLwLlVhrDTQHDnwWGUh24zsjkI0RGB4htgGCNEOvZwbA7vpjBc2VThq1DA
+ OHjY16ILDye5VYXdKPKjRwEumAR0Zxv0BKb1PC+fKc0X6na/mai9HZQtaZba3NS5zIuh
+ sRog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=4jIV5omheeV0T3drxGexigxyJptxU+Y8G8xeDL3SRR8=;
- b=R44qjJkzRKcg/Ff7bzRl9l27N6uAv2YLuSzikDsaPPFyPJicFAW6psiw34HjU65HaW
- 1dkMnddHe/xZXR1XivNO8xg3glhGqOqiXBRbZgHmYjef+6K0S02PyP2UQ/zeZbuPkjfT
- 0/rZsAykvv9GbPN4Fpw2xFUMtmYGf2g+8agLSqTXEE5p6CrKF279DZF3UYSbGHo1wiOl
- vV6frV6+8d51h37EfP265XLYmuX5bKQvzVkmchJN0fQTcMfgAsHyobOA6sd1DAt5Xtg/
- WDZ0iawe5rVyx6ykQkVLmCWAzTC7NYQXbLKTFvl38gwgcOAIg6rBxFJMrGYD4T6t2AqW
- 1sqQ==
-X-Gm-Message-State: AOAM530uCLwyefCMOp+Hz9F/+wXrxc7Z/LfLlBG2rv9pxz+A3veefvEA
- PeiIjDCHdlsMOHSMVdmz4EKFtqiG
-X-Google-Smtp-Source: ABdhPJwDBIcYXKKXudOwN8CBjeRPZQx4iRtNJcHeO+2QuTkdfhYwtpm/r2SZ+bfDNPz21qbZYxr40g==
-X-Received: by 2002:a63:fc59:: with SMTP id r25mr38537895pgk.336.1594465679190; 
- Sat, 11 Jul 2020 04:07:59 -0700 (PDT)
+ bh=rzz0QASvhiLiMcKKjELZE5GUtAHuQdcLXEQeVo4joCE=;
+ b=BLxld//DghCGeSOEkkJ+LBqCFpGTTX0h6094jZLG+C4Yik1dMVCVNw+xoPoDRIvLKF
+ MF+DPjQHxGOko2D64XHPOei6WxPzYlEywU+VqUtjfQIzioLRkFwFP8kMLzvtfVn5A4Kg
+ uGyzwmAXqqxCKfcqCvzdxTkDWQGnleoizthhGOeF5hOJOo+5Q/tR9hda9YfWTVBzEag/
+ L21t6j2aodgh4e1guHsrsXzVDANYUDzSoa7/u9v5FXzpo/Fu0RDW7UYvGC7JQX2Wc8K0
+ ZsmNxyiy7Hp1RQ9RNnhPVRYWoiDcK3WOYnvNyKRappnxFXtB3sk/qjUyjdHpYRp9qWaO
+ kE9g==
+X-Gm-Message-State: AOAM533UOpwnrllg6qJ4R+S0CkxJc3+4gAewgUXi25qK47Pn9TotO+DX
+ oxaBKaKcnJZ6d7QXu8eSQMtSkD3H
+X-Google-Smtp-Source: ABdhPJwKhYWuci5jnNBvMEtbjpnrjFgEO6l1tK8//a4DKgArWO32agCCuKiLRlpqG4trhx9+VtIuTg==
+X-Received: by 2002:a65:484c:: with SMTP id i12mr22248900pgs.145.1594465682089; 
+ Sat, 11 Jul 2020 04:08:02 -0700 (PDT)
 Received: from octofox.hsd1.ca.comcast.net
  ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id m31sm8925826pjb.52.2020.07.11.04.07.58
+ by smtp.gmail.com with ESMTPSA id m31sm8925826pjb.52.2020.07.11.04.08.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 11 Jul 2020 04:07:58 -0700 (PDT)
+ Sat, 11 Jul 2020 04:08:01 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 13/22] tests/tcg/xtensa: update test_fp0_arith for DFPU
-Date: Sat, 11 Jul 2020 04:06:48 -0700
-Message-Id: <20200711110655.20287-14-jcmvbkbc@gmail.com>
+Subject: [PATCH v4 16/22] tests/tcg/xtensa: update test_fp1 for DFPU
+Date: Sat, 11 Jul 2020 04:06:51 -0700
+Message-Id: <20200711110655.20287-17-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200711110655.20287-1-jcmvbkbc@gmail.com>
 References: <20200711110655.20287-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -5
@@ -108,418 +108,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DFPU arithmetic opcodes update FSR flags. Add FSR parameters and
-expected FSR register values for the arithmetic tests.
+DFPU sets Invalid flag in FSR when at least one argument of FP
+comparison opcodes is NaN, SNaN for most opcodes, any NaN for olt/ole.
+Add checks for FSR and expected FSR values.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/fpu.h            | 142 ++++++++++++++++++++++++
- tests/tcg/xtensa/test_fp0_arith.S | 178 ++++++++++++++----------------
- 2 files changed, 223 insertions(+), 97 deletions(-)
- create mode 100644 tests/tcg/xtensa/fpu.h
+ tests/tcg/xtensa/test_fp1.S | 62 ++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 28 deletions(-)
 
-diff --git a/tests/tcg/xtensa/fpu.h b/tests/tcg/xtensa/fpu.h
-new file mode 100644
-index 000000000000..42e321747304
---- /dev/null
-+++ b/tests/tcg/xtensa/fpu.h
-@@ -0,0 +1,142 @@
-+#if XCHAL_HAVE_DFP || XCHAL_HAVE_FP_DIV
-+#define DFPU 1
-+#else
-+#define DFPU 0
-+#endif
-+
-+#define FCR_RM_NEAREST 0
-+#define FCR_RM_TRUNC   1
-+#define FCR_RM_CEIL    2
-+#define FCR_RM_FLOOR   3
-+
-+#define FSR__ 0x00000000
-+#define FSR_I 0x00000080
-+#define FSR_U 0x00000100
-+#define FSR_O 0x00000200
-+#define FSR_Z 0x00000400
-+#define FSR_V 0x00000800
-+
-+#define FSR_UI (FSR_U | FSR_I)
-+#define FSR_OI (FSR_O | FSR_I)
-+
-+#define F32_0           0x00000000
-+#define F32_0_5         0x3f000000
-+#define F32_1           0x3f800000
-+#define F32_MAX         0x7f7fffff
-+#define F32_PINF        0x7f800000
-+#define F32_NINF        0xff800000
-+
-+#define F32_DNAN        0x7fc00000
-+#define F32_SNAN(v)     (0x7f800000 | (v))
-+#define F32_QNAN(v)     (0x7fc00000 | (v))
-+
-+#define F32_MINUS       0x80000000
-+
-+#define F64_0           0x0000000000000000
-+#define F64_MIN_NORM    0x0010000000000000
-+#define F64_1           0x3ff0000000000000
-+#define F64_MAX_2       0x7fe0000000000000
-+#define F64_MAX         0x7fefffffffffffff
-+#define F64_PINF        0x7ff0000000000000
-+#define F64_NINF        0xfff0000000000000
-+
-+#define F64_DNAN        0x7ff8000000000000
-+#define F64_SNAN(v)     (0x7ff0000000000000 | (v))
-+#define F64_QNAN(v)     (0x7ff8000000000000 | (v))
-+
-+#define F64_MINUS       0x8000000000000000
-+
-+.macro test_op1_rm op, fr0, fr1, v0, r, sr
-+    movi    a2, 0
-+    wur     a2, fsr
-+    movfp   \fr0, \v0
-+    \op     \fr1, \fr0
-+    check_res \fr1, \r, \sr
-+.endm
-+
-+.macro test_op2_rm op, fr0, fr1, fr2, v0, v1, r, sr
-+    movi    a2, 0
-+    wur     a2, fsr
-+    movfp   \fr0, \v0
-+    movfp   \fr1, \v1
-+    \op     \fr2, \fr0, \fr1
-+    check_res \fr2, \r, \sr
-+.endm
-+
-+.macro test_op3_rm op, fr0, fr1, fr2, fr3, v0, v1, v2, r, sr
-+    movi    a2, 0
-+    wur     a2, fsr
-+    movfp   \fr0, \v0
-+    movfp   \fr1, \v1
-+    movfp   \fr2, \v2
-+    \op     \fr0, \fr1, \fr2
-+    check_res \fr3, \r, \sr
-+.endm
-+
-+.macro test_op1_ex op, fr0, fr1, v0, rm, r, sr
-+    movi    a2, \rm
-+    wur     a2, fcr
-+    test_op1_rm \op, \fr0, \fr1, \v0, \r, \sr
-+    movi    a2, (\rm) | 0x7c
-+    wur     a2, fcr
-+    test_op1_rm \op, \fr0, \fr1, \v0, \r, \sr
-+.endm
-+
-+.macro test_op2_ex op, fr0, fr1, fr2, v0, v1, rm, r, sr
-+    movi    a2, \rm
-+    wur     a2, fcr
-+    test_op2_rm \op, \fr0, \fr1, \fr2, \v0, \v1, \r, \sr
-+    movi    a2, (\rm) | 0x7c
-+    wur     a2, fcr
-+    test_op2_rm \op, \fr0, \fr1, \fr2, \v0, \v1, \r, \sr
-+.endm
-+
-+.macro test_op3_ex op, fr0, fr1, fr2, fr3, v0, v1, v2, rm, r, sr
-+    movi    a2, \rm
-+    wur     a2, fcr
-+    test_op3_rm \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, \r, \sr
-+    movi    a2, (\rm) | 0x7c
-+    wur     a2, fcr
-+    test_op3_rm \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, \r, \sr
-+.endm
-+
-+.macro test_op1 op, fr0, fr1, v0, r0, r1, r2, r3, sr0, sr1, sr2, sr3
-+    test_op1_ex \op, \fr0, \fr1, \v0, 0, \r0, \sr0
-+    test_op1_ex \op, \fr0, \fr1, \v0, 1, \r1, \sr1
-+    test_op1_ex \op, \fr0, \fr1, \v0, 2, \r2, \sr2
-+    test_op1_ex \op, \fr0, \fr1, \v0, 3, \r3, \sr3
-+.endm
-+
-+.macro test_op2 op, fr0, fr1, fr2, v0, v1, r0, r1, r2, r3, sr0, sr1, sr2, sr3
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 0, \r0, \sr0
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 1, \r1, \sr1
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 2, \r2, \sr2
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 3, \r3, \sr3
-+.endm
-+
-+.macro test_op3 op, fr0, fr1, fr2, fr3, v0, v1, v2, r0, r1, r2, r3, sr0, sr1, sr2, sr3
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 0, \r0, \sr0
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 1, \r1, \sr1
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 2, \r2, \sr2
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 3, \r3, \sr3
-+.endm
-+
-+.macro test_op2_cpe op
-+    set_vector  kernel, 2f
-+    movi    a2, 0
-+    wsr     a2, cpenable
-+1:
-+    \op     f2, f0, f1
-+    test_fail
-+2:
-+    rsr     a2, excvaddr
-+    movi    a3, 1b
-+    assert  eq, a2, a3
-+    rsr     a2, exccause
-+    movi    a3, 32
-+    assert  eq, a2, a3
-+
-+    set_vector  kernel, 0
-+    movi    a2, 1
-+    wsr     a2, cpenable
-+.endm
-diff --git a/tests/tcg/xtensa/test_fp0_arith.S b/tests/tcg/xtensa/test_fp0_arith.S
-index 253d033a3398..df870eb7a013 100644
---- a/tests/tcg/xtensa/test_fp0_arith.S
-+++ b/tests/tcg/xtensa/test_fp0_arith.S
+diff --git a/tests/tcg/xtensa/test_fp1.S b/tests/tcg/xtensa/test_fp1.S
+index 6e182e5964bd..77336a3fcf2c 100644
+--- a/tests/tcg/xtensa/test_fp1.S
++++ b/tests/tcg/xtensa/test_fp1.S
 @@ -1,4 +1,5 @@
  #include "macros.inc"
 +#include "fpu.h"
  
- test_suite fp0_arith
+ test_suite fp1
  
-@@ -9,84 +10,18 @@ test_suite fp0_arith
+@@ -9,7 +10,7 @@ test_suite fp1
      wfr     \fr, a2
  .endm
  
--.macro check_res fr, r
-+.macro check_res fr, r, sr
-     rfr     a2, \fr
-     dump    a2
-     movi    a3, \r
-     assert  eq, a2, a3
+-.macro test_ord_ex op, br, fr0, fr1, v0, v1, r
++.macro test_ord_ex op, br, fr0, fr1, v0, v1, r, sr
+     movi    a2, 0
+     wur     a2, fsr
+     movfp   \fr0, \v0
+@@ -20,65 +21,70 @@ test_suite fp1
+     movt    a2, a3, \br
+     assert  eqi, a2, \r
      rur     a2, fsr
--    assert  eqi, a2, 0
--.endm
--
--.macro test_op2_rm op, fr0, fr1, fr2, v0, v1, r
--    movi    a2, 0
--    wur     a2, fsr
--    movfp   \fr0, \v0
--    movfp   \fr1, \v1
--    \op     \fr2, \fr0, \fr1
--    check_res \fr2, \r
--.endm
--
--.macro test_op3_rm op, fr0, fr1, fr2, fr3, v0, v1, v2, r
--    movi    a2, 0
--    wur     a2, fsr
--    movfp   \fr0, \v0
--    movfp   \fr1, \v1
--    movfp   \fr2, \v2
--    \op     \fr0, \fr1, \fr2
--    check_res \fr3, \r
--.endm
--
--.macro test_op2_ex op, fr0, fr1, fr2, v0, v1, rm, r
--    movi    a2, \rm
--    wur     a2, fcr
--    test_op2_rm \op, \fr0, \fr1, \fr2, \v0, \v1, \r
--    movi    a2, (\rm) | 0x7c
--    wur     a2, fcr
--    test_op2_rm \op, \fr0, \fr1, \fr2, \v0, \v1, \r
--.endm
--
--.macro test_op3_ex op, fr0, fr1, fr2, fr3, v0, v1, v2, rm, r
--    movi    a2, \rm
--    wur     a2, fcr
--    test_op3_rm \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, \r
--    movi    a2, (\rm) | 0x7c
--    wur     a2, fcr
--    test_op3_rm \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, \r
--.endm
--
--.macro test_op2 op, fr0, fr1, fr2, v0, v1, r0, r1, r2, r3
--    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 0, \r0
--    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 1, \r1
--    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 2, \r2
--    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 3, \r3
--.endm
--
--.macro test_op3 op, fr0, fr1, fr2, fr3, v0, v1, v2, r0, r1, r2, r3
--    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 0, \r0
--    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 1, \r1
--    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 2, \r2
--    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 3, \r3
--.endm
--
--.macro test_op2_cpe op
--    set_vector  kernel, 2f
--    movi    a2, 0
--    wsr     a2, cpenable
--1:
--    \op     f2, f0, f1
--    test_fail
--2:
--    rsr     a2, excvaddr
--    movi    a3, 1b
 +#if DFPU
 +    movi    a3, \sr
-     assert  eq, a2, a3
--    rsr     a2, exccause
--    movi    a3, 32
--    assert  eq, a2, a3
--
--    set_vector  kernel, 0
--    movi    a2, 1
--    wsr     a2, cpenable
++    assert  eq, a2, a3
 +#else
-+    assert  eqi, a2, 0
+     assert  eqi, a2, 0
 +#endif
  .endm
  
- test add_s
-@@ -94,78 +29,127 @@ test add_s
+-.macro test_ord op, br, fr0, fr1, v0, v1, r
++.macro test_ord op, br, fr0, fr1, v0, v1, r, sr
+     movi    a2, 0
+     wur     a2, fcr
+-    test_ord_ex \op, \br, \fr0, \fr1, \v0, \v1, \r
++    test_ord_ex \op, \br, \fr0, \fr1, \v0, \v1, \r, \sr
+     movi    a2, 0x7c
+     wur     a2, fcr
+-    test_ord_ex \op, \br, \fr0, \fr1, \v0, \v1, \r
++    test_ord_ex \op, \br, \fr0, \fr1, \v0, \v1, \r, \sr
+ .endm
+ 
+-.macro test_ord_all op, aa, ab, ba, aPI, PIa, aN, Na, II, IN, NI
+-    test_ord \op  b0,  f0,  f1, 0x3f800000, 0x3f800000, \aa
+-    test_ord \op  b1,  f2,  f3, 0x3f800000, 0x3fc00000, \ab
+-    test_ord \op  b2,  f4,  f5, 0x3fc00000, 0x3f800000, \ba
+-    test_ord \op  b3,  f6,  f7, 0x3f800000, 0x7f800000, \aPI
+-    test_ord \op  b4,  f8,  f9, 0x7f800000, 0x3f800000, \PIa
+-    test_ord \op  b5, f10, f11, 0x3f800000, 0xffc00001, \aN
+-    test_ord \op  b6, f12, f13, 0x3f800000, 0xff800001, \aN
+-    test_ord \op  b7, f14, f15, 0x3f800000, 0x7f800001, \aN
+-    test_ord \op  b8,  f0,  f1, 0x3f800000, 0x7fc00000, \aN
+-    test_ord \op  b9,  f2,  f3, 0xffc00001, 0x3f800000, \Na
+-    test_ord \op b10,  f4,  f5, 0xff800001, 0x3f800000, \Na
+-    test_ord \op b11,  f6,  f7, 0x7f800001, 0x3f800000, \Na
+-    test_ord \op b12,  f8,  f9, 0x7fc00000, 0x3f800000, \Na
+-    test_ord \op b13, f10, f11, 0x7f800000, 0x7f800000, \II
+-    test_ord \op b14, f12, f13, 0x7f800000, 0x7fc00000, \IN
+-    test_ord \op b15, f14, f15, 0x7fc00000, 0x7f800000, \NI
++.macro test_ord_all op, aa, ab, ba, aPI, PIa, aN, Na, II, IN, NI, qnan_sr
++    test_ord \op  b0,  f0,  f1, 0x3f800000, 0x3f800000, \aa,  FSR__    /*   ord == ord */
++    test_ord \op  b1,  f2,  f3, 0x3f800000, 0x3fc00000, \ab,  FSR__    /*   ord <  ord */
++    test_ord \op  b2,  f4,  f5, 0x3fc00000, 0x3f800000, \ba,  FSR__    /*   ord >  ord */
++    test_ord \op  b3,  f6,  f7, 0x3f800000, 0x7f800000, \aPI, FSR__    /*   ord   +INF */
++    test_ord \op  b4,  f8,  f9, 0x7f800000, 0x3f800000, \PIa, FSR__    /*  +INF    ord */
++    test_ord \op  b5, f10, f11, 0x3f800000, 0xffc00001, \aN,  \qnan_sr /*   ord  -QNaN */
++    test_ord \op  b6, f12, f13, 0x3f800000, 0xff800001, \aN,  FSR_V    /*   ord  -SNaN */
++    test_ord \op  b7, f14, f15, 0x3f800000, 0x7f800001, \aN,  FSR_V    /*   ord  +SNaN */
++    test_ord \op  b8,  f0,  f1, 0x3f800000, 0x7fc00000, \aN,  \qnan_sr /*   ord  +QNaN */
++    test_ord \op  b9,  f2,  f3, 0xffc00001, 0x3f800000, \Na,  \qnan_sr /* -QNaN    ord */
++    test_ord \op b10,  f4,  f5, 0xff800001, 0x3f800000, \Na,  FSR_V    /* -SNaN    ord */
++    test_ord \op b11,  f6,  f7, 0x7f800001, 0x3f800000, \Na,  FSR_V    /* +SNaN    ord */
++    test_ord \op b12,  f8,  f9, 0x7fc00000, 0x3f800000, \Na,  \qnan_sr /* +QNaN    ord */
++    test_ord \op b13, f10, f11, 0x7f800000, 0x7f800000, \II,  FSR__    /*  +INF   +INF */
++    test_ord \op b14, f12, f13, 0x7f800000, 0x7fc00000, \IN,  \qnan_sr /*  +INF  +QNaN */
++    test_ord \op b15, f14, f15, 0x7fc00000, 0x7f800000, \NI,  \qnan_sr /* +QNaN   +INF */
+ .endm
+ 
+ test un_s
+     movi    a2, 1
      wsr     a2, cpenable
- 
-     test_op2 add.s, f0, f1, f2, 0x3fc00000, 0x34400000, \
--        0x3fc00002, 0x3fc00001, 0x3fc00002, 0x3fc00001
-+        0x3fc00002, 0x3fc00001, 0x3fc00002, 0x3fc00001, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
-     test_op2 add.s, f3, f4, f5, 0x3fc00000, 0x34a00000, \
--        0x3fc00002, 0x3fc00002, 0x3fc00003, 0x3fc00002
-+        0x3fc00002, 0x3fc00002, 0x3fc00003, 0x3fc00002, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
- 
-     /* MAX_FLOAT + MAX_FLOAT = +inf/MAX_FLOAT  */
-     test_op2 add.s, f6, f7, f8, 0x7f7fffff, 0x7f7fffff, \
--        0x7f800000, 0x7f7fffff, 0x7f800000, 0x7f7fffff
-+        0x7f800000, 0x7f7fffff, 0x7f800000, 0x7f7fffff, \
-+            FSR_OI,     FSR_OI,     FSR_OI,     FSR_OI
+-    test_ord_all un.s, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1
++    test_ord_all un.s, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, FSR__
  test_end
  
- test add_s_inf
-     /* 1 + +inf = +inf  */
-     test_op2 add.s, f6, f7, f8, 0x3fc00000, 0x7f800000, \
--        0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000
-+        0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, \
-+             FSR__,      FSR__,      FSR__,      FSR__
- 
-     /* +inf + -inf = default NaN */
-     test_op2 add.s, f0, f1, f2, 0x7f800000, 0xff800000, \
--        0x7fc00000, 0x7fc00000, 0x7fc00000, 0x7fc00000
-+        0x7fc00000, 0x7fc00000, 0x7fc00000, 0x7fc00000, \
-+             FSR_V,      FSR_V,      FSR_V,      FSR_V
+ test oeq_s
+-    test_ord_all oeq.s, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0
++    test_ord_all oeq.s, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, FSR__
  test_end
  
--test add_s_nan
--    /* 1 + NaN = NaN  */
-+#if DFPU
-+test add_s_nan_dfpu
-+    /* 1 + QNaN = QNaN  */
-     test_op2 add.s, f9, f10, f11, 0x3fc00000, 0x7fc00001, \
--        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-+    /* 1 + SNaN = QNaN  */
-     test_op2 add.s, f12, f13, f14, 0x3fc00000, 0x7f800001, \
--        0x7f800001, 0x7f800001, 0x7f800001, 0x7f800001
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001, \
-+             FSR_V,      FSR_V,      FSR_V,      FSR_V
- 
--    /* NaN1 + NaN2 = NaN1 */
-+    /* SNaN1 + SNaN2 = QNaN2 */
-+    test_op2 add.s, f15, f0, f1, 0x7f800001, 0x7fbfffff, \
-+        0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, \
-+             FSR_V,      FSR_V,      FSR_V,      FSR_V
-+    test_op2 add.s, f2, f3, f4, 0x7fbfffff, 0x7f800001, \
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001, \
-+             FSR_V,      FSR_V,      FSR_V,      FSR_V
-+    /* QNaN1 + SNaN2 = QNaN2 */
-+    test_op2 add.s, f5, f6, f7, 0x7fc00001, 0x7fbfffff, \
-+        0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, \
-+             FSR_V,      FSR_V,      FSR_V,      FSR_V
-+    /* SNaN1 + QNaN2 = QNaN2 */
-+    test_op2 add.s, f8, f9, f10, 0x7fbfffff, 0x7fc00001, \
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001, \
-+             FSR_V,      FSR_V,      FSR_V,      FSR_V
-+test_end
-+#else
-+test add_s_nan_fpu2k
-+    /* 1 + QNaN = QNaN  */
-+    test_op2 add.s, f9, f10, f11, 0x3fc00000, 0x7fc00001, \
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-+    /* 1 + SNaN = SNaN  */
-+    test_op2 add.s, f12, f13, f14, 0x3fc00000, 0x7f800001, \
-+        0x7f800001, 0x7f800001, 0x7f800001, 0x7f800001, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-+    /* SNaN1 + SNaN2 = SNaN1 */
-     test_op2 add.s, f15, f0, f1, 0x7f800001, 0x7fbfffff, \
--        0x7f800001, 0x7f800001, 0x7f800001, 0x7f800001
-+        0x7f800001, 0x7f800001, 0x7f800001, 0x7f800001, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-     test_op2 add.s, f2, f3, f4, 0x7fbfffff, 0x7f800001, \
--        0x7fbfffff, 0x7fbfffff, 0x7fbfffff, 0x7fbfffff
-+        0x7fbfffff, 0x7fbfffff, 0x7fbfffff, 0x7fbfffff, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-+    /* QNaN1 + SNaN2 = QNaN1 */
-     test_op2 add.s, f5, f6, f7, 0x7fc00001, 0x7fbfffff, \
--        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001, \
-+             FSR__,      FSR__,      FSR__,      FSR__
-+    /* SNaN1 + QNaN2 = SNaN1 */
-     test_op2 add.s, f8, f9, f10, 0x7fbfffff, 0x7fc00001, \
--        0x7fbfffff, 0x7fbfffff, 0x7fbfffff, 0x7fbfffff
-+        0x7fbfffff, 0x7fbfffff, 0x7fbfffff, 0x7fbfffff, \
-+             FSR__,      FSR__,      FSR__,      FSR__
- test_end
-+#endif
- 
- test sub_s
-     test_op2 sub.s, f0, f1, f0, 0x3f800001, 0x33800000, \
--        0x3f800000, 0x3f800000, 0x3f800001, 0x3f800000
-+        0x3f800000, 0x3f800000, 0x3f800001, 0x3f800000, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
-     test_op2 sub.s, f0, f1, f1, 0x3f800002, 0x33800000, \
--        0x3f800002, 0x3f800001, 0x3f800002, 0x3f800001
-+        0x3f800002, 0x3f800001, 0x3f800002, 0x3f800001, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
- 
-     /* norm - norm = denorm */
-     test_op2 sub.s, f6, f7, f8, 0x00800001, 0x00800000, \
--        0x00000001, 0x00000001, 0x00000001, 0x00000001
-+        0x00000001, 0x00000001, 0x00000001, 0x00000001, \
-+             FSR__,      FSR__,      FSR__,      FSR__
+ test ueq_s
+-    test_ord_all ueq.s, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1
++    test_ord_all ueq.s, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, FSR__
  test_end
  
- test mul_s
-     test_op2 mul.s, f0, f1, f2, 0x3f800001, 0x3f800001, \
--        0x3f800002, 0x3f800002, 0x3f800003, 0x3f800002
--
-+        0x3f800002, 0x3f800002, 0x3f800003, 0x3f800002, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
-     /* MAX_FLOAT/2 * MAX_FLOAT/2 = +inf/MAX_FLOAT  */
-     test_op2 mul.s, f6, f7, f8, 0x7f000000, 0x7f000000, \
--        0x7f800000, 0x7f7fffff, 0x7f800000, 0x7f7fffff
-+        0x7f800000, 0x7f7fffff, 0x7f800000, 0x7f7fffff, \
-+            FSR_OI,     FSR_OI,     FSR_OI,     FSR_OI
-     /* min norm * min norm = 0/denorm */
-     test_op2 mul.s, f6, f7, f8, 0x00800001, 0x00800000, \
--        0x00000000, 0x00000000, 0x00000001, 0x00000000
--
-+        0x00000000, 0x00000000, 0x00000001, 0x00000000, \
-+            FSR_UI,     FSR_UI,     FSR_UI,     FSR_UI
-     /* inf * 0 = default NaN */
-     test_op2 mul.s, f6, f7, f8, 0x7f800000, 0x00000000, \
--        0x7fc00000, 0x7fc00000, 0x7fc00000, 0x7fc00000
-+        0x7fc00000, 0x7fc00000, 0x7fc00000, 0x7fc00000, \
-+             FSR_V,      FSR_V,      FSR_V,      FSR_V
+ test olt_s
+-    test_ord_all olt.s, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0
++    test_ord_all olt.s, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, FSR_V
  test_end
  
- test madd_s
-     test_op3 madd.s, f0, f1, f2, f0, 0, 0x3f800001, 0x3f800001, \
--        0x3f800002, 0x3f800002, 0x3f800003, 0x3f800002
-+        0x3f800002, 0x3f800002, 0x3f800003, 0x3f800002, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
+ test ult_s
+-    test_ord_all ult.s, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1
++    test_ord_all ult.s, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, FSR__
  test_end
  
- test msub_s
-     test_op3 msub.s, f0, f1, f2, f0, 0x3f800000, 0x3f800001, 0x3f800001, \
--        0xb4800000, 0xb4800000, 0xb4800000, 0xb4800001
-+        0xb4800000, 0xb4800000, 0xb4800000, 0xb4800001, \
-+             FSR_I,      FSR_I,      FSR_I,      FSR_I
+ test ole_s
+-    test_ord_all ole.s, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0
++    test_ord_all ole.s, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, FSR_V
  test_end
  
- #endif
+ test ule_s
+-    test_ord_all ule.s, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1
++    test_ord_all ule.s, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, FSR__
+ test_end
+ 
+ .macro test_cond op, fr0, fr1, cr, v0, v1, r
 -- 
 2.20.1
 
