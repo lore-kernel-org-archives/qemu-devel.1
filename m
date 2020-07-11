@@ -7,43 +7,44 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E887DC433E3
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D14C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:24:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDC8F207D4
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:23:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDC8F207D4
+	by mail.kernel.org (Postfix) with ESMTPS id C8200207D4
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:24:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8200207D4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juIHW-0007eo-0z
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 12:23:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54682)
+	id 1juIIL-0000rm-3s
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 12:24:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1juIDX-0007cS-O5; Sat, 11 Jul 2020 12:19:11 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:41426)
+ id 1juIDI-0007FT-Ke; Sat, 11 Jul 2020 12:18:56 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40247)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1juIDV-0001M3-Ke; Sat, 11 Jul 2020 12:19:11 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1356943|-1; CH=green; DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.0178803-0.00146885-0.980651;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ id 1juIDD-0001Lq-Ku; Sat, 11 Jul 2020 12:18:56 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_system_inform|0.0023182-0.000295609-0.997386;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01l07381; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
  RN=10; RT=10; SR=0; TI=SMTPD_---.I0GMGMe_1594484317; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
  fp:SMTPD_---.I0GMGMe_1594484317)
  by smtp.aliyun-inc.com(10.147.44.129);
- Sun, 12 Jul 2020 00:18:42 +0800
+ Sun, 12 Jul 2020 00:18:40 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH 09/11] riscv: Define riscv struct reginfo
-Date: Sun, 12 Jul 2020 00:16:53 +0800
-Message-Id: <20200711161655.2856-10-zhiwei_liu@c-sky.com>
+Subject: [PATCH 05/11] riscv: Add RV64D instructions description
+Date: Sun, 12 Jul 2020 00:16:49 +0800
+Message-Id: <20200711161655.2856-6-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200711161655.2856-1-zhiwei_liu@c-sky.com>
 References: <20200711161655.2856-1-zhiwei_liu@c-sky.com>
@@ -57,8 +58,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,46 +79,123 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+For supporting multi-precison, split all 32 fp registers into two groups.
+The RV64D instructions will use only the 16 fp registers selected by
+gfp64().
+
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- risu_reginfo_riscv64.h | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
- create mode 100644 risu_reginfo_riscv64.h
+ rv64.risu | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
 
-diff --git a/risu_reginfo_riscv64.h b/risu_reginfo_riscv64.h
-new file mode 100644
-index 0000000..4536480
---- /dev/null
-+++ b/risu_reginfo_riscv64.h
-@@ -0,0 +1,28 @@
-+/******************************************************************************
-+ * Copyright (c) 2020 T-Head Semiconductor Co., Ltd.
-+ * All rights reserved. This program and the accompanying materials
-+ * are made available under the terms of the Eclipse Public License v1.0
-+ * which accompanies this distribution, and is available at
-+ * http://www.eclipse.org/legal/epl-v10.html
-+ *
-+ * Contributors:
-+ *     LIU Zhiwei(T-Head) - initial implementation
-+ *     based on Peter Maydell's risu_arm.c
-+ *****************************************************************************/
+diff --git a/rv64.risu b/rv64.risu
+index 0dcc9a1..a6fa9fc 100644
+--- a/rv64.risu
++++ b/rv64.risu
+@@ -364,3 +364,103 @@ FCVT_S_L RISCV 1101000 00010 rs1:5 rm:3 rd:5 1010011 \
+ 
+ FCVT_S_LU RISCV 1101000 00011 rs1:5 rm:3 rd:5 1010011 \
+ !constraints { greg($rs1) && gfp32($rd) && grm($rm); }
 +
-+#ifndef RISU_REGINFO_RISCV64_H
-+#define RISU_REGINFO_RISCV64_H
++@RV64D
 +
-+struct reginfo {
-+    uint64_t fault_address;
-+    uint64_t regs[32];
-+    uint64_t fregs[32];
-+    uint64_t pc;
-+    uint32_t flags;
-+    uint32_t faulting_insn;
++FLD RISCV imm:12 rs1:5 011 rd:5 0000111 \
++!constraints { gbase($rs1) && gfp64($rd); } \
++!memory { align(8); reg_plus_imm($rs1, sextract($imm, 12)); }
 +
-+    /* FP */
-+    uint32_t fcsr;
-+};
++FSD RISCV imm5:7 rs2:5 rs1:5 010 imm:5 0100111 \
++!constraints { gbase($rs1) && gfp64($rs2); } \
++!memory { align(8); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
 +
-+#endif /* RISU_REGINFO_RISCV64_H */
++FMADD_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1000011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FMSUB_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1000111 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FNMSUB_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1001011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FNMADD_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1001111 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FADD_D RISCV 0000001 rs2:5 rs1:5 rm:3 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FSUB_D RISCV 0000101 rs2:5 rs1:5 rm:3 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FMUL_D RISCV 0001001 rs2:5 rs1:5 rm:3 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FDIV_D RISCV 0001101 rs2:5 rs1:5 rm:3 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
++
++FSQRT_D RISCV 0101101 00000  rs1:5 rm:3 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rd) && grm($rm); }
++
++FSGNJ_D RISCV 0010001 rs2:5  rs1:5 000 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
++
++FSGNJN_D RISCV 0010001 rs2:5  rs1:5 001 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
++
++FSGNJX_D RISCV 0010001 rs2:5  rs1:5 010 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
++
++FMIN_D RISCV 0010101 rs2:5  rs1:5 000 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
++
++FMAX_D RISCV 0010101 rs2:5  rs1:5 001 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
++
++FCVT_S_D RISCV 0100000 00001 rs1:5 rm:3 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rd) && grm($rm); }
++
++FCVT_D_S RISCV 0100001 00000 rs1:5 rm:3 rd:5 1010011 \
++!constraints { gfp64($rs1) && gfp64($rd) && grm($rm); }
++
++FEQ_D RISCV 1010001 rs2:5 rs1:5 010 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1) && gfp64($rs1); }
++
++FLT_D RISCV 1010001 rs2:5 rs1:5 001 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1) && gfp64($rs1); }
++
++FLE_D RISCV 1010001 rs2:5 rs1:5 000 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1) && gfp64($rs1); }
++
++FCLASS_D RISCV 1110001 00000 rs1:5 001 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1); }
++
++FCVT_W_D RISCV 1100001 00000 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
++
++FCVT_WU_D RISCV 1100001 00001 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
++
++FCVT_D_W RISCV 1101001 00000 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
++
++FCVT_D_WU RISCV 1101001 00001 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
++
++FCVT_L_D RISCV 1100001 00010 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
++
++FCVT_LU_D RISCV 1100001 00011 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
++
++FCVT_D_L RISCV 1101001 00010 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
++
++FCVT_D_LU RISCV 1101001 00011 rs1:5 rm:3 rd:5 1010011 \
++!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
++
++FMV_D_X RISCV 1111001 00000 rs1:5 000 rd:5 1010011 \
++!constraints { greg($rs1) && gfp64($rd); }
++
++FMV_X_D RISCV 1110001 00000 rs1:5 000 rd:5 1010011 \
++!constraints { greg($rd) && gfp64($rs1); }
 -- 
 2.23.0
 
