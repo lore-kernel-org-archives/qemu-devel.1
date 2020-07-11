@@ -8,79 +8,78 @@ X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 870ADC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3EBC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:14:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FC822078B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B77082078B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 11:14:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6isDWKa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC822078B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9lRt6Mu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77082078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juDSL-0006pd-KE
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 07:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52722)
+	id 1juDSb-0007QF-1Q
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 07:14:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1juDML-0004Wb-Qe
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:07:57 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51522)
+ id 1juDMQ-0004ho-0s
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:08:02 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:45508)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1juDMK-0006Nh-0l
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:07:57 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id ls15so3700433pjb.1
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 04:07:55 -0700 (PDT)
+ id 1juDMN-0006OK-NU
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 07:08:01 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id l63so3675252pge.12
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 04:07:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=2vl/rYCgMLXaJUMTeLyqPlVj0/LJH31XeOUQaewsmQ4=;
- b=M6isDWKa34K3GtZV1fKdd5THH0gqOzx5c64h0sYD3EdYN3b15U0CCxya/wpha5yEJH
- GUBiGLJTDIEywvG9jU9rWNsITc4vtbaLPDK4/w2tOSQAZUp3AGoKLYwX5VyXh6qGRPX4
- 74zmlyyTLZvx9xEiUqFLlseXpU/C92Q/1qrk9d7bX1n6P+HFElnVyjb7KtnpdVAV3o1R
- xV5m21fjDsjNOi23+qhqcfu/udRx5/R1INNXoAmoHRj86USzxBMPuuSk4oDRXHXcpPjo
- DE5XGlezmUnuSvei+ySUsqMYBU5I30aTLMqhsmeyamYEUK9s2Kf5+7x96zV7B+CvZSuA
- MRBg==
+ bh=ON8TlGBWP6j9tnyoD1Ob1PnTUOjdjsUaKfXxF5xWLoo=;
+ b=h9lRt6MuTJA+a4wzYaTFmU/HYOt+fNBc2v6pXBQA0DaYayjl1yozzWkbHOdeBO2SRi
+ gcQib5jghLvxNRViRRmN8jry7MHSA50ArQUhXgXecUHpfMEQvJVMcTVG7ChSZOdoJTfd
+ zm3baQG4UCHfyAwZErhwKYa4yR8Yr9MQji5az5QXClPd6DdhqvPNAulwBGLtF39jXbPs
+ 4GcEI+HOWMFK4VcG7PbNiFh25lUUAsKIGj2dupmVMT11aYXcAg3e7Eq6sGi1cziBGhV3
+ nlHoMMSB+2NeDFAhTLAoPerJwXXwy9ZPkjZEojXq15v/iZNt5OYUA4j9BVNDdpkniWIJ
+ MoUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2vl/rYCgMLXaJUMTeLyqPlVj0/LJH31XeOUQaewsmQ4=;
- b=Eia4bFbwA2ppLo4DAtxZGNID8zYeQ+d/f+ntxm0lfI3GIjuB5wE8BzGP1ObzlCmc2R
- 664NfATrRFbiTZ1PMwiTSiTSI3IQ3tcz/6TPcK8ViQ2FxjODbAqK7nkJR5snVTcF+waP
- pCTUOkozPLacZKpD18dO8BXkF0UW0jkKhl3U2NibvQTrV6gTvd2Yz/LZZN3CeuuOAkZr
- dkJHjwYBhTZyGdrmxSuOKOiyN2JPWEsBPS3bjNW57buuQSWt1vLHnN6Nfx3+2MUfB/CY
- hXfX9Ys0JipfVHLB6yKCiCl0o1AYiZzVQUfLq9Dkf7WSiSMgy+XfbQDJY93lQ9tplg8F
- 5F4Q==
-X-Gm-Message-State: AOAM530KvhRxRnNR7d/CHOiRyj1h37QItM1qDicmhfRsVd3JQicl6eHs
- bsSvBJBckSjunKOkbt5b1L3uGqsw
-X-Google-Smtp-Source: ABdhPJxQbyN7rFyS9WdQJNi7UK4Rc8rFZT334MmQCEez1TFblnZm+oQTBBFw4wsA/SaLx/QfR0UGjw==
-X-Received: by 2002:a17:90b:4a0f:: with SMTP id
- kk15mr5832689pjb.213.1594465674591; 
- Sat, 11 Jul 2020 04:07:54 -0700 (PDT)
+ bh=ON8TlGBWP6j9tnyoD1Ob1PnTUOjdjsUaKfXxF5xWLoo=;
+ b=IS8jXDIAzpptLwFQ9gIgL7cRaWHtPYWu3jsibJYmFzuNJ6Z9AzQVKVk14wtG7QYU5n
+ JNMz2RZACIL9aPxXQ5XMVhdeiDGxWPhR4AKL/TNp+gBjmQyhTgakNsF0ipGiJr4Db8Pe
+ c2OI/DxP3BEL89YMlSMpncrdOgoZsivBibb0NMV4jIGSce+PJe0j1BaZZ0bbqIOajBqw
+ xUX0cQI53vZAtI9kABP3Yl57lee0aNWTo6WOSL0YRiTBRA78OyqSkbvaz5zoGPg35GDn
+ zAgS0S8OScJUfsuEmik+e9Nfu83/DT6htr/lqJRl542frh2Pil8fHZdXjOpNye8yesii
+ Eu/g==
+X-Gm-Message-State: AOAM533kmz8hnfkWeolpl3M2oRUYDTqhxnucdNgvl9wql+hP5wgSA8Wk
+ MbEKmWhJkiS4CJou89C4iRN+7FdY
+X-Google-Smtp-Source: ABdhPJyYgksUSkNTz8Eb2FXv1FJEdMqHfMBjGX9gK3moc9+FmK21ZCiw9EtWE2ia/MLFviYfl+d8Rg==
+X-Received: by 2002:a62:158d:: with SMTP id 135mr49283934pfv.287.1594465678315; 
+ Sat, 11 Jul 2020 04:07:58 -0700 (PDT)
 Received: from octofox.hsd1.ca.comcast.net
  ([2601:641:400:e00:19b7:f650:7bbe:a7fb])
- by smtp.gmail.com with ESMTPSA id m31sm8925826pjb.52.2020.07.11.04.07.53
+ by smtp.gmail.com with ESMTPSA id m31sm8925826pjb.52.2020.07.11.04.07.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 11 Jul 2020 04:07:54 -0700 (PDT)
+ Sat, 11 Jul 2020 04:07:57 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 08/22] target/xtensa: don't access BR regfile directly
-Date: Sat, 11 Jul 2020 04:06:43 -0700
-Message-Id: <20200711110655.20287-9-jcmvbkbc@gmail.com>
+Subject: [PATCH v4 12/22] tests/tcg/xtensa: fix test execution on ISS
+Date: Sat, 11 Jul 2020 04:06:47 -0700
+Message-Id: <20200711110655.20287-13-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200711110655.20287-1-jcmvbkbc@gmail.com>
 References: <20200711110655.20287-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pg1-x52d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -5
@@ -89,8 +88,8 @@ X-Spam_bar: /
 X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,155 +108,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-BR registers used in FPU comparison opcodes are available as opcode
-arguments for translators. Use them. This simplifies comparison helpers
-interface and makes them usable in FLIX bundles.
+Space for test results may be allocated in IRAM which is only
+word-accessible. Use full 32-bit words to access test results.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- target/xtensa/fpu_helper.c | 42 +++++++++++++++++---------------------
- target/xtensa/helper.h     | 14 ++++++-------
- target/xtensa/translate.c  | 20 ++++++++++++++----
- 3 files changed, 42 insertions(+), 34 deletions(-)
+ tests/tcg/xtensa/macros.inc | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/xtensa/fpu_helper.c b/target/xtensa/fpu_helper.c
-index 46e231bdaa51..35dacbd14d68 100644
---- a/target/xtensa/fpu_helper.c
-+++ b/target/xtensa/fpu_helper.c
-@@ -120,49 +120,45 @@ float32 HELPER(uitof_s)(CPUXtensaState *env, uint32_t v, uint32_t scale)
-                           (int32_t)scale, &env->fp_status);
- }
+diff --git a/tests/tcg/xtensa/macros.inc b/tests/tcg/xtensa/macros.inc
+index aa8f95bce879..f88937c7bf82 100644
+--- a/tests/tcg/xtensa/macros.inc
++++ b/tests/tcg/xtensa/macros.inc
+@@ -3,7 +3,7 @@
+ .macro test_suite name
+ .data
+ status: .word result
+-result: .space 256
++result: .space 1024
+ .text
+ .global main
+ .align 4
+@@ -25,9 +25,9 @@ main:
+     movi    a3, 0
+     beqz    a2, 2f
+ 1:
+-    l8ui    a1, a0, 0
++    l32i    a1, a0, 0
+     or      a3, a3, a1
+-    addi    a0, a0, 1
++    addi    a0, a0, 4
+     addi    a2, a2, -1
+     bnez    a2, 1b
+ 2:
+@@ -65,7 +65,7 @@ test_\name:
+     reset_ps
+     movi    a2, status
+     l32i    a3, a2, 0
+-    addi    a3, a3, 1
++    addi    a3, a3, 4
+     s32i    a3, a2, 0
+ .endm
  
--static inline void set_br(CPUXtensaState *env, bool v, uint32_t br)
-+uint32_t HELPER(un_s)(CPUXtensaState *env, float32 a, float32 b)
- {
--    if (v) {
--        env->sregs[BR] |= br;
--    } else {
--        env->sregs[BR] &= ~br;
--    }
--}
--
--void HELPER(un_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
--{
--    set_br(env, float32_unordered_quiet(a, b, &env->fp_status), br);
-+    return float32_unordered_quiet(a, b, &env->fp_status);
- }
- 
--void HELPER(oeq_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+uint32_t HELPER(oeq_s)(CPUXtensaState *env, float32 a, float32 b)
- {
--    set_br(env, float32_eq_quiet(a, b, &env->fp_status), br);
-+    return float32_eq_quiet(a, b, &env->fp_status);
- }
- 
--void HELPER(ueq_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+uint32_t HELPER(ueq_s)(CPUXtensaState *env, float32 a, float32 b)
- {
-     FloatRelation v = float32_compare_quiet(a, b, &env->fp_status);
--    set_br(env, v == float_relation_equal || v == float_relation_unordered, br);
-+
-+    return v == float_relation_equal ||
-+           v == float_relation_unordered;
- }
- 
--void HELPER(olt_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+uint32_t HELPER(olt_s)(CPUXtensaState *env, float32 a, float32 b)
- {
--    set_br(env, float32_lt_quiet(a, b, &env->fp_status), br);
-+    return float32_lt_quiet(a, b, &env->fp_status);
- }
- 
--void HELPER(ult_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+uint32_t HELPER(ult_s)(CPUXtensaState *env, float32 a, float32 b)
- {
-     FloatRelation v = float32_compare_quiet(a, b, &env->fp_status);
--    set_br(env, v == float_relation_less || v == float_relation_unordered, br);
-+
-+    return v == float_relation_less ||
-+           v == float_relation_unordered;
- }
- 
--void HELPER(ole_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+uint32_t HELPER(ole_s)(CPUXtensaState *env, float32 a, float32 b)
- {
--    set_br(env, float32_le_quiet(a, b, &env->fp_status), br);
-+    return float32_le_quiet(a, b, &env->fp_status);
- }
- 
--void HELPER(ule_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+uint32_t HELPER(ule_s)(CPUXtensaState *env, float32 a, float32 b)
- {
-     FloatRelation v = float32_compare_quiet(a, b, &env->fp_status);
--    set_br(env, v != float_relation_greater, br);
-+
-+    return v != float_relation_greater;
- }
-diff --git a/target/xtensa/helper.h b/target/xtensa/helper.h
-index bce31cbd9ff1..02c00d8461c0 100644
---- a/target/xtensa/helper.h
-+++ b/target/xtensa/helper.h
-@@ -59,13 +59,13 @@ DEF_HELPER_FLAGS_3(ftoui_s, TCG_CALL_NO_RWG_SE, i32, f32, i32, i32)
- DEF_HELPER_3(itof_s, f32, env, i32, i32)
- DEF_HELPER_3(uitof_s, f32, env, i32, i32)
- 
--DEF_HELPER_4(un_s, void, env, i32, f32, f32)
--DEF_HELPER_4(oeq_s, void, env, i32, f32, f32)
--DEF_HELPER_4(ueq_s, void, env, i32, f32, f32)
--DEF_HELPER_4(olt_s, void, env, i32, f32, f32)
--DEF_HELPER_4(ult_s, void, env, i32, f32, f32)
--DEF_HELPER_4(ole_s, void, env, i32, f32, f32)
--DEF_HELPER_4(ule_s, void, env, i32, f32, f32)
-+DEF_HELPER_3(un_s,  i32, env, f32, f32)
-+DEF_HELPER_3(oeq_s, i32, env, f32, f32)
-+DEF_HELPER_3(ueq_s, i32, env, f32, f32)
-+DEF_HELPER_3(olt_s, i32, env, f32, f32)
-+DEF_HELPER_3(ult_s, i32, env, f32, f32)
-+DEF_HELPER_3(ole_s, i32, env, f32, f32)
-+DEF_HELPER_3(ule_s, i32, env, f32, f32)
- 
- DEF_HELPER_2(rer, i32, env, i32)
- DEF_HELPER_3(wer, void, env, i32, i32)
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 1b643881e6e9..67a92379f9dc 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -6319,7 +6319,7 @@ enum {
- static void translate_compare_s(DisasContext *dc, const OpcodeArg arg[],
-                                 const uint32_t par[])
- {
--    static void (* const helper[])(TCGv_env env, TCGv_i32 bit,
-+    static void (* const helper[])(TCGv_i32 res, TCGv_env env,
-                                    TCGv_i32 s, TCGv_i32 t) = {
-         [COMPARE_UN] = gen_helper_un_s,
-         [COMPARE_OEQ] = gen_helper_oeq_s,
-@@ -6329,10 +6329,22 @@ static void translate_compare_s(DisasContext *dc, const OpcodeArg arg[],
-         [COMPARE_OLE] = gen_helper_ole_s,
-         [COMPARE_ULE] = gen_helper_ule_s,
-     };
--    TCGv_i32 bit = tcg_const_i32(1 << arg[0].imm);
-+    TCGv_i32 zero = tcg_const_i32(0);
-+    TCGv_i32 res = tcg_temp_new_i32();
-+    TCGv_i32 set_br = tcg_temp_new_i32();
-+    TCGv_i32 clr_br = tcg_temp_new_i32();
- 
--    helper[par[0]](cpu_env, bit, arg[1].in, arg[2].in);
--    tcg_temp_free(bit);
-+    tcg_gen_ori_i32(set_br, arg[0].in, 1 << arg[0].imm);
-+    tcg_gen_andi_i32(clr_br, arg[0].in, ~(1 << arg[0].imm));
-+
-+    helper[par[0]](res, cpu_env, arg[1].in, arg[2].in);
-+    tcg_gen_movcond_i32(TCG_COND_NE,
-+                        arg[0].out, res, zero,
-+                        set_br, clr_br);
-+    tcg_temp_free(zero);
-+    tcg_temp_free(res);
-+    tcg_temp_free(set_br);
-+    tcg_temp_free(clr_br);
- }
- 
- static void translate_float_s(DisasContext *dc, const OpcodeArg arg[],
+@@ -78,7 +78,7 @@ test_\name:
+     movi    a2, status
+     l32i    a2, a2, 0
+     movi    a3, 1
+-    s8i     a3, a2, 0
++    s32i    a3, a2, 0
+ #ifdef DEBUG
+     print   failed
+ #endif
 -- 
 2.20.1
 
