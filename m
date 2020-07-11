@@ -2,82 +2,85 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A35F2C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 09:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B458C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 09:06:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BC2D206F0
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 09:06:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B1EB206F0
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 09:06:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbUmCSHp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC2D206F0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8CMyN/A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1EB206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juBT0-0005Pp-JM
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 05:06:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33328)
+	id 1juBT3-0005U1-Ja
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 05:06:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1juBSH-0004cV-9n
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 05:05:57 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:50894)
+ id 1juBSJ-0004ch-1n
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 05:05:59 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38839)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1juBSF-0000zT-CR
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 05:05:56 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id l17so8458026wmj.0
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 02:05:53 -0700 (PDT)
+ id 1juBSH-000126-3U
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 05:05:58 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id z13so8132229wrw.5
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 02:05:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=g3gbtvDzXZmMfsnHf9Cv5rRWMKZmjsqtQ5WH6GtIDLI=;
- b=HbUmCSHpUgVJPOF22kxXH67J9RQ6pboreFlrIqtvnih05Ft6/4pUxnO/bePJ4S5OmW
- zFZT+pF6AwD8jYntXrXmrZeZRn/e+8X3HoQeQBrocdloi+ub842ucmFJfRLOJXdwdlxL
- 3x9HRcgz4TnszVwPG121vt1I7wuH5CizX6vMMR8QxLYtkHot18lYU1uCSqoEPHrpYypS
- abXTpqmagdEQgIJruvOnCpcj37z0kLoWY7UQoV7UC+maMHJI97kBdQmrpQ6D4vz7MNrn
- 81XIYWY+idl9CQ6XVaYSF66JcErOHqDhhjJz2OG3kP1RL3cQ+Rpd5RQVKlwNLlPdjIAn
- p16Q==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ILwfuZng3mf/6wWK7/fGIy33EgQF+ZmkiwNrrxJpLYA=;
+ b=f8CMyN/A2QGikJgPQTN3ztkKljk0RGG0CIsetMXusmp4wfYZljL+Wk+iTiXnPQC2IY
+ 8o8mW9+nT3tP9bsvDfc2DZGBXe25EXQ8YTWesLAyzvACYVC8HKKUMSi5LkO17eNpwSgb
+ KS8XOpAVSVi5UoryaHgsBvwZ9OtMNnXNad60to1XFkwBgQHCszYPl1cb9Q0V7Rwhw+PU
+ PipUl6sHT2P61z3Js1oswLwOBfPO+Gih/0ZdTYrmM2WHSU/5VDvsWtOnne6xMq3wXx63
+ UB5PJAe92gu4mLkyCZVyP93v4CUHYI69QjFk/4G8HcFMzq+nGzVVT+TQ3tugG+yYp02t
+ djYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=g3gbtvDzXZmMfsnHf9Cv5rRWMKZmjsqtQ5WH6GtIDLI=;
- b=fqfst4Qm5JwCzQIvmFXb6RHqJSSj614hordTNPhInLKcffEewkkwDYJ3Bb9aoKXd/6
- eUmL8b0b9vpbLCVYOcyJ1P74WXfx1VlKN20YaNMQX4yTW8QSUCyZ1Ccy8rly5f1QVru3
- ysIbrBUHv1LLtWJMuiBPPP9qYH28dQvVcpXt3RgEAl0kO6BRbTtFwntkSlwjuWM5/b27
- IpV/qbbi4sYZVrar0BnjlCLB2ZCei2h3QCqkQ/gEQyzmjtyd/1GfJbd2tGve/TY2Uh2b
- iYT0qRyrv80xm50jTT8lXM0xjN1g5hFPm9jcC+GqCWyWahuFh+ahYjrcFl+1xXGOEPze
- eTmw==
-X-Gm-Message-State: AOAM530D6F+CF4WHhePMqH/m1gtqxeUbyyuTY74NY/em2xAZPR7V/rNl
- sCw5U4ZlQktOqh0GHENeK3hkkVuz4gw=
-X-Google-Smtp-Source: ABdhPJx9+97w7NKLHApN/RGx0I56K+cfRoVDqPA10zaps/YLRgel/Px8K38/Yua2VvtuLvPtyIOUxg==
-X-Received: by 2002:a1c:dfc5:: with SMTP id w188mr9474494wmg.182.1594458351989; 
- Sat, 11 Jul 2020 02:05:51 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=ILwfuZng3mf/6wWK7/fGIy33EgQF+ZmkiwNrrxJpLYA=;
+ b=t3awwAsY0TZVMbKhpUQIOyaZ8hH5/07J2oOikGzHdFlRTfuuciEUDZ37uy8b4Ud1gw
+ /kOJgfulSWT+WG69jkE7JuUlsw5CoCLkC+RdZ3qY5ekLmjFgkVC0YDFJVYLkZwWHJC6v
+ O6OYgPoH915mmU1TO3N324MCHGwYZWHzLMuOuHBas82hiSrkSe+HV72mbyt/WdgOYYVw
+ J3akPBHCrbk0Xf6O48P1ioElEiwlTpwF3rsi6+arNfB97YAWssmhpLL94rYXWQkgKisK
+ VOGQeyzADQaL/HyC52Hng71V/2G/7oDJ1hWCyNWrI2oak8Tiw5WjWBe0HT+/P1+O7mnJ
+ 0ofw==
+X-Gm-Message-State: AOAM530aYdRKYmlCorwNUOPuTeVyngD+MqDVsOVfiXH8r4sMtdFshlTh
+ 7YhAQ0lZdFU4SVu09GIdOaNAeRhwlZc=
+X-Google-Smtp-Source: ABdhPJy1Pwm3QfTM1Pq6oZaI4S05stOqL0Z8hhl3znJVFgt2uJv9hiDxM90JMrXT1/1RZ6S04bpzLA==
+X-Received: by 2002:adf:f54b:: with SMTP id j11mr71933799wrp.206.1594458355185; 
+ Sat, 11 Jul 2020 02:05:55 -0700 (PDT)
 Received: from localhost.localdomain
  (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id c20sm17253929wrb.65.2020.07.11.02.05.50
+ by smtp.gmail.com with ESMTPSA id c20sm17253929wrb.65.2020.07.11.02.05.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 11 Jul 2020 02:05:51 -0700 (PDT)
+ Sat, 11 Jul 2020 02:05:54 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 00/32] AVR port
-Date: Sat, 11 Jul 2020 11:05:43 +0200
-Message-Id: <20200711090544.29302-1-f4bug@amsat.org>
+Subject: [PULL v3 09/32] target/avr: Add instruction helpers
+Date: Sat, 11 Jul 2020 11:05:44 +0200
+Message-Id: <20200711090544.29302-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200711090544.29302-1-f4bug@amsat.org>
+References: <20200711090544.29302-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -99,179 +102,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Thomas Huth <huth@tuxfamily.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since v2:
+From: Michael Rolnik <mrolnik@gmail.com>
 
-  Removed incorrect cpu_to_le32() call.
+Add helpers for instructions that need to interact with QEMU. Also,
+add stubs for unimplemented instructions. Instructions SPM and WDR
+are left unimplemented because they require emulation of complex
+peripherals. The implementation of instruction SLEEP is very limited
+due to the lack of peripherals to generate wake interrupts. Memory
+access instructions are implemented here because some address ranges
+actually refer to CPU registers.
 
-Since v1:
-
-  Fixed issue on big-endian host reported by Peter Maydell.
-
-Possible false-positives from checkpatch:
-
-  WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-
-The following changes since commit f2a1cf9180f63e88bb38ff21c169da97c3f2bad5:
-
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2020-07-07-v2'=
- into staging (2020-07-10 14:41:23 +0100)
-
-are available in the Git repository at:
-
-  https://gitlab.com/philmd/qemu.git tags/avr-port-20200711
-
-for you to fetch changes up to 19b293472f1514b5424ef4d9b092e02bd9b106c2:
-
-  target/avr/disas: Fix store instructions display order (2020-07-11 11:02:05=
- +0200)
-
-----------------------------------------------------------------
-8bit AVR port from Michael Rolnik.
-
-Michael started to work on the AVR port few years ago [*] and kept
-improving the code over various series.
-
-List of people who help him (in chronological order):
-- Richard Henderson
-- Sarah Harris and Edward Robbins
-- Philippe Mathieu-Daud=C3=A9 and Aleksandar Markovic
-- Pavel Dovgalyuk
-- Thomas Huth
-
-[*] The oldest contribution I could find on the list is from 2016:
-https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg02985.html
-
-----------------------------------------------------------------
-
-Michael Rolnik (25):
-  target/avr: Add basic parameters of the new platform
-  target/avr: Introduce basic CPU class object
-  target/avr: CPU class: Add interrupt handling support
-  target/avr: CPU class: Add memory management support
-  target/avr: CPU class: Add migration support
-  target/avr: CPU class: Add GDB support
-  target/avr: Introduce enumeration AVRFeature
-  target/avr: Add definitions of AVR core types
-  target/avr: Add instruction helpers
-  target/avr: Add instruction translation - Register definitions
-  target/avr: Add instruction translation - Arithmetic and Logic
-    Instructions
-  target/avr: Add instruction translation - Branch Instructions
-  target/avr: Add instruction translation - Data Transfer Instructions
-  target/avr: Add instruction translation - Bit and Bit-test
-    Instructions
-  target/avr: Add instruction translation - MCU Control Instructions
-  target/avr: Add instruction translation - CPU main translation
-    function
-  target/avr: Initialize TCG register variables
-  target/avr: Add support for disassembling via option '-d in_asm'
-  target/avr: Register AVR support with the rest of QEMU
-  tests/machine-none: Add AVR support
-  hw/char: avr: Add limited support for USART peripheral
-  hw/timer: avr: Add limited support for 16-bit timer peripheral
-  hw/misc: avr: Add limited support for power reduction device
-  tests/boot-serial: Test some Arduino boards (AVR based)
-  tests/acceptance: Test the Arduino MEGA2560 board
-
-Philippe Mathieu-Daud=C3=A9 (6):
-  hw/avr: Add support for loading ELF/raw binaries
-  hw/avr: Add some ATmega microcontrollers
-  hw/avr: Add limited support for some Arduino boards
-  target/avr/cpu: Drop tlb_flush() in avr_cpu_reset()
-  target/avr/cpu: Fix $PC displayed address
-  target/avr/disas: Fix store instructions display order
-
-Thomas Huth (1):
-  target/avr: Add section into QEMU documentation
-
- docs/system/target-avr.rst       |   37 +
- docs/system/targets.rst          |    1 +
- configure                        |    7 +
- default-configs/avr-softmmu.mak  |    5 +
- qapi/machine.json                |    3 +-
- hw/avr/atmega.h                  |   48 +
- hw/avr/boot.h                    |   33 +
- include/disas/dis-asm.h          |   19 +
- include/elf.h                    |    4 +
- include/hw/char/avr_usart.h      |   93 +
- include/hw/misc/avr_power.h      |   46 +
- include/hw/timer/avr_timer16.h   |   94 +
- include/sysemu/arch_init.h       |    1 +
- target/avr/cpu-param.h           |   36 +
- target/avr/cpu-qom.h             |   53 +
- target/avr/cpu.h                 |  256 +++
- target/avr/helper.h              |   29 +
- target/avr/insn.decode           |  187 ++
- arch_init.c                      |    2 +
- hw/avr/arduino.c                 |  149 ++
- hw/avr/atmega.c                  |  458 +++++
- hw/avr/boot.c                    |  115 ++
- hw/char/avr_usart.c              |  320 ++++
- hw/misc/avr_power.c              |  113 ++
- hw/timer/avr_timer16.c           |  621 ++++++
- target/avr/cpu.c                 |  366 ++++
- target/avr/disas.c               |  245 +++
- target/avr/gdbstub.c             |   84 +
- target/avr/helper.c              |  348 ++++
- target/avr/machine.c             |  119 ++
- target/avr/translate.c           | 3061 ++++++++++++++++++++++++++++++
- tests/qtest/boot-serial-test.c   |   11 +
- tests/qtest/machine-none-test.c  |    1 +
- MAINTAINERS                      |   30 +
- gdb-xml/avr-cpu.xml              |   49 +
- hw/Kconfig                       |    1 +
- hw/avr/Kconfig                   |    9 +
- hw/avr/Makefile.objs             |    3 +
- hw/char/Kconfig                  |    3 +
- hw/char/Makefile.objs            |    1 +
- hw/misc/Kconfig                  |    3 +
- hw/misc/Makefile.objs            |    2 +
- hw/misc/trace-events             |    4 +
- hw/timer/Kconfig                 |    3 +
- hw/timer/Makefile.objs           |    2 +
- hw/timer/trace-events            |   12 +
- target/avr/Makefile.objs         |   34 +
- tests/acceptance/machine_avr6.py |   50 +
- tests/qtest/Makefile.include     |    2 +
- 49 files changed, 7172 insertions(+), 1 deletion(-)
- create mode 100644 docs/system/target-avr.rst
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 hw/avr/atmega.h
- create mode 100644 hw/avr/boot.h
- create mode 100644 include/hw/char/avr_usart.h
- create mode 100644 include/hw/misc/avr_power.h
- create mode 100644 include/hw/timer/avr_timer16.h
- create mode 100644 target/avr/cpu-param.h
- create mode 100644 target/avr/cpu-qom.h
- create mode 100644 target/avr/cpu.h
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+Message-Id: <20200705140315.260514-10-huth@tuxfamily.org>
+[PMD: Replace cpu_physical_memory() API by address_space_ldst()
+      API to fix running on big-endian host,
+      reported and suggested by Peter Maydell]
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ target/avr/helper.h |  29 ++++++
+ target/avr/helper.c | 209 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 238 insertions(+)
  create mode 100644 target/avr/helper.h
- create mode 100644 target/avr/insn.decode
- create mode 100644 hw/avr/arduino.c
- create mode 100644 hw/avr/atmega.c
- create mode 100644 hw/avr/boot.c
- create mode 100644 hw/char/avr_usart.c
- create mode 100644 hw/misc/avr_power.c
- create mode 100644 hw/timer/avr_timer16.c
- create mode 100644 target/avr/cpu.c
- create mode 100644 target/avr/disas.c
- create mode 100644 target/avr/gdbstub.c
- create mode 100644 target/avr/helper.c
- create mode 100644 target/avr/machine.c
- create mode 100644 target/avr/translate.c
- create mode 100644 gdb-xml/avr-cpu.xml
- create mode 100644 hw/avr/Kconfig
- create mode 100644 hw/avr/Makefile.objs
- create mode 100644 target/avr/Makefile.objs
- create mode 100644 tests/acceptance/machine_avr6.py
 
---=20
+diff --git a/target/avr/helper.h b/target/avr/helper.h
+new file mode 100644
+index 0000000000..8e1ae7fda0
+--- /dev/null
++++ b/target/avr/helper.h
+@@ -0,0 +1,29 @@
++/*
++ * QEMU AVR CPU helpers
++ *
++ * Copyright (c) 2016-2020 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++DEF_HELPER_1(wdr, void, env)
++DEF_HELPER_1(debug, void, env)
++DEF_HELPER_1(break, void, env)
++DEF_HELPER_1(sleep, void, env)
++DEF_HELPER_1(unsupported, void, env)
++DEF_HELPER_3(outb, void, env, i32, i32)
++DEF_HELPER_2(inb, tl, env, i32)
++DEF_HELPER_3(fullwr, void, env, i32, i32)
++DEF_HELPER_2(fullrd, tl, env, i32)
+diff --git a/target/avr/helper.c b/target/avr/helper.c
+index d6985ff3f4..d96d14372b 100644
+--- a/target/avr/helper.c
++++ b/target/avr/helper.c
+@@ -21,6 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
++#include "exec/address-spaces.h"
+ #include "exec/helper-proto.h"
+ 
+ bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+@@ -137,3 +138,211 @@ bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ 
+     return true;
+ }
++
++/*
++ *  helpers
++ */
++
++void helper_sleep(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_HLT;
++    cpu_loop_exit(cs);
++}
++
++void helper_unsupported(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    /*
++     *  I count not find what happens on the real platform, so
++     *  it's EXCP_DEBUG for meanwhile
++     */
++    cs->exception_index = EXCP_DEBUG;
++    if (qemu_loglevel_mask(LOG_UNIMP)) {
++        qemu_log("UNSUPPORTED\n");
++        cpu_dump_state(cs, stderr, 0);
++    }
++    cpu_loop_exit(cs);
++}
++
++void helper_debug(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_break(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_wdr(CPUAVRState *env)
++{
++    CPUState *cs = env_cpu(env);
++
++    /* WD is not implemented yet, placeholder */
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++/*
++ * This function implements IN instruction
++ *
++ * It does the following
++ * a.  if an IO register belongs to CPU, its value is read and returned
++ * b.  otherwise io address is translated to mem address and physical memory
++ *     is read.
++ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++target_ulong helper_inb(CPUAVRState *env, uint32_t port)
++{
++    target_ulong data = 0;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        data = 0xff & (env->rampD >> 16);
++        break;
++    case 0x39: /* RAMPX */
++        data = 0xff & (env->rampX >> 16);
++        break;
++    case 0x3a: /* RAMPY */
++        data = 0xff & (env->rampY >> 16);
++        break;
++    case 0x3b: /* RAMPZ */
++        data = 0xff & (env->rampZ >> 16);
++        break;
++    case 0x3c: /* EIND */
++        data = 0xff & (env->eind >> 16);
++        break;
++    case 0x3d: /* SPL */
++        data = env->sp & 0x00ff;
++        break;
++    case 0x3e: /* SPH */
++        data = env->sp >> 8;
++        break;
++    case 0x3f: /* SREG */
++        data = cpu_get_sreg(env);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        data = address_space_ldub(&address_space_memory,
++                                  OFFSET_IO_REGISTERS + port,
++                                  MEMTXATTRS_UNSPECIFIED, NULL);
++    }
++
++    return data;
++}
++
++/*
++ *  This function implements OUT instruction
++ *
++ *  It does the following
++ *  a.  if an IO register belongs to CPU, its value is written into the register
++ *  b.  otherwise io address is translated to mem address and physical memory
++ *      is written.
++ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
++{
++    data &= 0x000000ff;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
++            env->rampD = (data & 0xff) << 16;
++        }
++        break;
++    case 0x39: /* RAMPX */
++        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
++            env->rampX = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3a: /* RAMPY */
++        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
++            env->rampY = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3b: /* RAMPZ */
++        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
++            env->rampZ = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3c: /* EIDN */
++        env->eind = (data & 0xff) << 16;
++        break;
++    case 0x3d: /* SPL */
++        env->sp = (env->sp & 0xff00) | (data);
++        break;
++    case 0x3e: /* SPH */
++        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
++            env->sp = (env->sp & 0x00ff) | (data << 8);
++        }
++        break;
++    case 0x3f: /* SREG */
++        cpu_set_sreg(env, data);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        address_space_stb(&address_space_memory, OFFSET_IO_REGISTERS + port,
++                          data, MEMTXATTRS_UNSPECIFIED, NULL);
++    }
++}
++
++/*
++ *  this function implements LD instruction when there is a posibility to read
++ *  from a CPU register
++ */
++target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
++{
++    uint8_t data;
++
++    env->fullacc = false;
++
++    if (addr < NUMBER_OF_CPU_REGISTERS) {
++        /* CPU registers */
++        data = env->r[addr];
++    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) {
++        /* IO registers */
++        data = helper_inb(env, addr - NUMBER_OF_CPU_REGISTERS);
++    } else {
++        /* memory */
++        data = address_space_ldub(&address_space_memory, OFFSET_DATA + addr,
++                                  MEMTXATTRS_UNSPECIFIED, NULL);
++    }
++    return data;
++}
++
++/*
++ *  this function implements ST instruction when there is a posibility to write
++ *  into a CPU register
++ */
++void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
++{
++    env->fullacc = false;
++
++    /* Following logic assumes this: */
++    assert(OFFSET_CPU_REGISTERS == OFFSET_DATA);
++    assert(OFFSET_IO_REGISTERS == OFFSET_CPU_REGISTERS +
++                                  NUMBER_OF_CPU_REGISTERS);
++
++    if (addr < NUMBER_OF_CPU_REGISTERS) {
++        /* CPU registers */
++        env->r[addr] = data;
++    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) {
++        /* IO registers */
++        helper_outb(env, addr - NUMBER_OF_CPU_REGISTERS, data);
++    } else {
++        /* memory */
++        address_space_stb(&address_space_memory, OFFSET_DATA + addr, data,
++                          MEMTXATTRS_UNSPECIFIED, NULL);
++    }
++}
+-- 
 2.21.3
 
 
