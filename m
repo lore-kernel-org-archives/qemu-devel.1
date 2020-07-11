@@ -1,4 +1,4 @@
-Return-Path: <SRS0=e3er=AV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 834B5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6465BC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 15:34:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E34A206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jul 2020 16:06:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 960862075F
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 15:34:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="G8KezQCE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E34A206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="C4C4karF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 960862075F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jtvXW-0005Ex-HX
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jul 2020 12:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39820)
+	id 1juHVM-0008Uo-Uo
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 11:33:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jtvWa-0004dE-LY
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:05:20 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:39455)
+ id 1juHUl-00084Q-6s
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 11:32:55 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:12820)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jtvWU-0003SC-PX
- for qemu-devel@nongnu.org; Fri, 10 Jul 2020 12:05:20 -0400
+ id 1juHUg-0004J0-Nm
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 11:32:54 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1594397117; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1594481573; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=StP2I2/iQxWwQRz0ce1Zt499iLx5mHcdA0z7mAt87rM=;
- b=G8KezQCEIpycXL/wGFWXUNxmKGa0H/BSfPw3Bk6dgcjMS4DQE+4DeBDlwAuEnQ666M7K2UNg
- o5T+Eer/BpwFrj8yIdgEGe0Kkuh0icG+CfM3VU//ecXizKpbx9KrJI+oiedxFEjlNwa++9MS
- Ei948wwCxNcwOsI2i98nnhR5yro=
+ Sender; bh=zrJakPrfC9Sz1ANaCiOeeAuarTA4QZ9LjsUTfpO706I=;
+ b=C4C4karF6/dbFc+T7pv5h/YVG/aGt5k8nWyGQ12Cbb4gqcOmc1xXLG7dIAbNC0Ja2L08Vuzt
+ VPJpTDxRTerjgj/tF29MsH+weuGvzyqpJD9OAo28OSH/ImhrrDu6JRtWYvl9hPKYkQmlnEZv
+ lCVsAjuK+92w4yoeHxVIEp4avRo=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (64.90.74.34.bc.googleusercontent.com
- [34.74.90.64]) by smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
- 5f08918d8e36ecda30770a0e (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Fri, 10 Jul 2020 16:04:29 GMT
-Date: Fri, 10 Jul 2020 16:04:28 +0000
-Message-ID: <5f08918c5747b_64d23fd320cba68c655e0@sidekiq-catchall-07-sv-gprd.mail>
-Subject: QEMU | Pipeline #165302224 has failed for master | f2a1cf91
+Received: from mg.gitlab.com (67.90.74.34.bc.googleusercontent.com
+ [34.74.90.67]) by smtp-out-n08.prod.us-west-2.postgun.com with SMTP id
+ 5f09db9a101276849085c47c (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Sat, 11 Jul 2020 15:32:42 GMT
+Date: Sat, 11 Jul 2020 15:32:41 +0000
+Message-ID: <5f09db993b73f_1b8a3fc2aa04813c81316@sidekiq-catchall-05-sv-gprd.mail>
+Subject: QEMU | Pipeline #165534352 has failed for master | 82793715
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5f08918c4c8fa_64d23fd320cba68c654ba";
+ boundary="--==_mimepart_5f09db9930b49_1b8a3fc2aa04813c812c0";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 165302224
+X-GitLab-Pipeline-Id: 165534352
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -69,17 +69,17 @@ X-Auto-Response-Suppress: All
 Received-SPF: pass client-ip=192.237.158.143;
  envelope-from=bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com;
  helo=do158-143.mg.gitlab.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/10 03:08:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/11 03:53:32
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
  HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, MISSING_HEADERS=1.021,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_BL=0.01, RCVD_IN_MSPIKE_L4=1.7,
- REPLYTO_WITHOUT_TO_CC=1.552, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, REPLYTO_WITHOUT_TO_CC=1.552,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,7 +99,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5f08918c4c8fa_64d23fd320cba68c654ba
+----==_mimepart_5f09db9930b49_1b8a3fc2aa04813c812c0
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,16 +111,16 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: f2a1cf91 ( https://gitlab.com/qemu-project/qemu/-/commit/f2a1cf91=
-80f63e88bb38ff21c169da97c3f2bad5 )
-Commit Message: Merge remote-tracking branch 'remotes/armbru/ta...
+Commit: 82793715 ( https://gitlab.com/qemu-project/qemu/-/commit/82793715=
+8b72ce2265841ff528bba3c44a1bfbc8 )
+Commit Message: Merge remote-tracking branch 'remotes/aperard/t...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #165302224 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
-5302224 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #165534352 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
+5534352 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 1 failed build.
 
-Job #633433185 ( https://gitlab.com/qemu-project/qemu/-/jobs/633433185/ra=
+Job #634332364 ( https://gitlab.com/qemu-project/qemu/-/jobs/634332364/ra=
 w )
 
 Stage: test
@@ -155,7 +155,7 @@ qemu-system-i386: falling back to tcg
   TEST    check-qtest-ppc64: tests/qtest/qmp-test
   TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test
   TEST    check-qtest-ppc64: tests/qtest/qom-test
-section_end:1594397067:step_script
+section_end:1594481559:step_script
 =1B[0K=1B[31;1mERROR: Job failed: execution took longer than 1h0m0s secon=
 ds
 =1B[0;m
@@ -168,7 +168,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5f08918c4c8fa_64d23fd320cba68c654ba
+----==_mimepart_5f09db9930b49_1b8a3fc2aa04813c812c0
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -183,7 +183,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #165302224 has failed for master | f2a1cf91</title=
+<title>QEMU | Pipeline #165534352 has failed for master | 82793715</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -351,17 +351,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/f2a1cf9180f63e88=
-bb38ff21c169da97c3f2bad5" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/827937158b72ce22=
+65841ff528bba3c44a1bfbc8" style=3D"color: #3777b0; text-decoration: none;=
 ">
-f2a1cf91
+82793715
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/armbru/ta...
+Merge remote-tracking branch 'remotes/aperard/t...
 </div>
 </td>
 </tr>
@@ -418,9 +418,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/165302224" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/165534352" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#165302224
+#165534352
 </a>
 triggered by
 </td>
@@ -497,7 +497,7 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/633433185" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/634332364" style=3D=
 "color: #3777b0; text-decoration: none;">
 build-disabled
 </a>
@@ -583,5 +583,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5f08918c4c8fa_64d23fd320cba68c654ba--
+----==_mimepart_5f09db9930b49_1b8a3fc2aa04813c812c0--
 
