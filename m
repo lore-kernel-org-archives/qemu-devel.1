@@ -2,63 +2,127 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D14C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E66EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:35:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8200207D4
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:24:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8200207D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2382420786
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 16:35:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RzvrEIdS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2382420786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juIIL-0000rm-3s
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 12:24:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54552)
+	id 1juITL-0003D3-D0
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 12:35:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1juIDI-0007FT-Ke; Sat, 11 Jul 2020 12:18:56 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40247)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1juISj-0002hf-Gf; Sat, 11 Jul 2020 12:34:53 -0400
+Received: from mail-eopbgr10114.outbound.protection.outlook.com
+ ([40.107.1.114]:51749 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1juIDD-0001Lq-Ku; Sat, 11 Jul 2020 12:18:56 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.0023182-0.000295609-0.997386;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01l07381; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.I0GMGMe_1594484317; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.I0GMGMe_1594484317)
- by smtp.aliyun-inc.com(10.147.44.129);
- Sun, 12 Jul 2020 00:18:40 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH 05/11] riscv: Add RV64D instructions description
-Date: Sun, 12 Jul 2020 00:16:49 +0800
-Message-Id: <20200711161655.2856-6-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200711161655.2856-1-zhiwei_liu@c-sky.com>
-References: <20200711161655.2856-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1juISg-00033r-SV; Sat, 11 Jul 2020 12:34:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AHNvXyV/6hIWXj0loHRfOHQnpmv/kTLeK+3UANV4oIYnGlhpkiCK7PqBrmgjkcY58KIKunQl7/Dv1/WhLyXeOGCdrdxREQRcYHxew4V4wkfrU5UyVnOBhmAXEz88KRM6dJ0sVgZ7AHrCkwFJGs7sMRbSpwl0Z3AvwkG6f3rATE/2ndp0kDv3BQfkb1Y/g9klebG8dl4HopuQTrIPqlbP50paxsb1f2WK9ljBH8YW2nm82TfyUAngYotQSZoL0URts6HEuSVCpxmIyrci2TF1HBjf+khjnS6QaEsKkmOdy4FgXZQg/tWfAaUtj7e2yZNQ+ZIoha1vqjay0Ab7guIc0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nphI/bOxZX9e614T9ELhuTPHx4/UnZa4u51t+fy/ziM=;
+ b=Ij7aqz3M+4HAXPozHfEiRre97VoEGfjv0vlELPivuwa8rxTdt1vP/ARuPEoyGooWTOIssSIMcXd8yI3pOHf3gIP5YN5cTHs+hGmB8LA6ojYt47zxCaD9fAvRMYQ5Na3hJbnemFnsSGUgKaZ5grEZh/O9Xkh2/L16qUMdQFKEWaByvB0Mj7a3LwQ4CWlFloIoHZzngp4iETiXMahM24OmDG/GrwkO9kIj/EdNPTdSpRTIVGcir1TbaeJ3wScTLo1IA+w1rhJzjvU8P8B+lgSZpXRz+Xh65PI0x4qiwgO73zHKKxWunqqZ4FGdOG43osON0gJtzeCvUq3tPRV6xBeLww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nphI/bOxZX9e614T9ELhuTPHx4/UnZa4u51t+fy/ziM=;
+ b=RzvrEIdS3XDDUsG3GaNB6+rNHVhrBFHWTveimmkqL+KL96m0g6pnoUzfPZBWnV3GJXRr4/LgC5KlbMBIdQBRvrOxvxnb/DtPO5Nd14oOcgumAtuqIBSq+17UyXLQ0W7JRuCaujpLqIJW4rQjh5AOZYR4jqI7S+L+wYHHoq+rC/0=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0801MB1716.eurprd08.prod.outlook.com (2603:10a6:203:39::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.23; Sat, 11 Jul
+ 2020 16:34:45 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3174.024; Sat, 11 Jul 2020
+ 16:34:45 +0000
+Subject: Re: [PATCH v8 03/10] qcow2_format.py: change Qcow2BitmapExt
+ initialization method
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1593782030-521984-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1593782030-521984-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e10319ea-0a60-3585-8b36-92783dba3862@virtuozzo.com>
+Date: Sat, 11 Jul 2020 19:34:43 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <1593782030-521984-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR01CA0119.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/11 12:18:40
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.157) by
+ AM0PR01CA0119.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20 via Frontend
+ Transport; Sat, 11 Jul 2020 16:34:45 +0000
+X-Originating-IP: [185.215.60.157]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e9200b91-8e03-4dbb-bb42-08d825b85223
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1716:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB1716830978CC90F58E53F57FC1620@AM5PR0801MB1716.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /QlUBH5VDotPBNiK/1zHBv6dICdmACtkNlUs/P731J34Y5EYGk08y0iLd2/1UisTFufxRwcdv5hdZ+4V7+Th9ODPYdkPlV8DDYK74mlAjkzQp6vYhJ28MyLZy1YxdsOoeIyfIK7QKmDj7i+hlTcdCd/I8xwItj3lsUWrG2JKgPCIDrsYTYvYWSFhNYSYGImzWZbHoKI1VdugvPHTz14SpVJ30V9VzwAWqqRpR/vMShXS+wLgRqrVk1Mz9Jm0c4HUHHoWeLYuwg8Nn0c9S+mpt5SwMUVE1SxQ6fDJ4UKfeGbOr47TuFt6sQMggRY4l+oALsPsau4iBfLphRL/ztPrlMwmi+RTZfnMIBQHAB8WFotmmiNKFvc5PYfvgX9pSE1n
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(376002)(346002)(39840400004)(136003)(366004)(31686004)(478600001)(36756003)(8676002)(66476007)(6486002)(5660300002)(8936002)(2906002)(66946007)(31696002)(316002)(52116002)(16576012)(66556008)(16526019)(186003)(2616005)(86362001)(4326008)(107886003)(26005)(83380400001)(956004)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: xnmJZ+rcpYNoHTM/Ib6PZHSqOGVC8C5lL+q1xG7pZZHQ6tkbHgY173tBw1jSghcl4dI4Hb8SvFC9kYIkQlXPc+8mHj6iiYcMptK9Pr0CW7bL1ebg9+eOtf2ZSaiOJRRg+us4ziodbd1S8G/9WosXTpLMvHGH3FG0FS/oS74VYx976Rapn+Twde+iKczT0qoo+QDGDIkTraEbaA1MuFPj+8UqsryruXLPN3ifUizSRiKPgrbteyQpiqZTdPyWRt/+c2ck0epogwVDTny2VWrMlkhFgvEWKPDcNoVLujZxNJPB/XBf6dORb3BpPiAuHKQwyMuZeSgD+7sqJCJlF66V5egZGGtqN+WhsPd0nWTZbLwHxTsmCQKhSl18dBqWizvkqvABLvfytb0I+7J0I2PJOGH/b8TiGrvVEdVpw9vi1vo77VR8YdWpzkt4P6iH0lwRaGRhcM33rqHNorY5WBVMpwlqi8zbijHLuBflGW7TEHm1XE4FGoW2kk29I5h08V6u
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9200b91-8e03-4dbb-bb42-08d825b85223
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2020 16:34:45.7209 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RncYbcytJf+Hh9Etbde/tNtlpfgCg9uhheX5VWpOfpx3LQqLtN07vObzXtgMRpxXfN+zNJORl9kg3muDLeemySBctQ1f0qXJmbKDgDLsloM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1716
+Received-SPF: pass client-ip=40.107.1.114;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/11 12:34:47
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,132 +135,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- wxy194768@alibaba-inc.com, chihmin.chao@sifive.com, wenmeng_zhang@c-sky.com,
- Alistair.Francis@wdc.com, alex.bennee@linaro.org,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For supporting multi-precison, split all 32 fp registers into two groups.
-The RV64D instructions will use only the 16 fp registers selected by
-gfp64().
+03.07.2020 16:13, Andrey Shinkevich wrote:
+> There are two ways to initialize a class derived from Qcow2Struct:
+> 1. Pass a block of binary data to the constructor.
+> 2. Pass the file descriptor to allow reading the file from constructor.
+> Let's change the Qcow2BitmapExt initialization method from 1 to 2 to
+> support a scattered reading in the initialization chain.
+> The implementation comes with the patch that follows.
+> 
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/qcow2_format.py | 14 ++++++++++++--
+>   1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+> index 2f3681b..1435e34 100644
+> --- a/tests/qemu-iotests/qcow2_format.py
+> +++ b/tests/qemu-iotests/qcow2_format.py
+> @@ -63,7 +63,8 @@ class Qcow2StructMeta(type):
+>   
+>   class Qcow2Struct(metaclass=Qcow2StructMeta):
+>   
+> -    """Qcow2Struct: base class for qcow2 data structures
+> +    """
+> +    Qcow2Struct: base class for qcow2 data structures
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- rv64.risu | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 100 insertions(+)
+Unrelated chunk. And why?
 
-diff --git a/rv64.risu b/rv64.risu
-index 0dcc9a1..a6fa9fc 100644
---- a/rv64.risu
-+++ b/rv64.risu
-@@ -364,3 +364,103 @@ FCVT_S_L RISCV 1101000 00010 rs1:5 rm:3 rd:5 1010011 \
- 
- FCVT_S_LU RISCV 1101000 00011 rs1:5 rm:3 rd:5 1010011 \
- !constraints { greg($rs1) && gfp32($rd) && grm($rm); }
-+
-+@RV64D
-+
-+FLD RISCV imm:12 rs1:5 011 rd:5 0000111 \
-+!constraints { gbase($rs1) && gfp64($rd); } \
-+!memory { align(8); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+FSD RISCV imm5:7 rs2:5 rs1:5 010 imm:5 0100111 \
-+!constraints { gbase($rs1) && gfp64($rs2); } \
-+!memory { align(8); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
-+
-+FMADD_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1000011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FMSUB_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1000111 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FNMSUB_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1001011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FNMADD_D RISCV rs3:5 01 rs2:5 rs1:5 rm:3 rd:5 1001111 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FADD_D RISCV 0000001 rs2:5 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FSUB_D RISCV 0000101 rs2:5 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FMUL_D RISCV 0001001 rs2:5 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FDIV_D RISCV 0001101 rs2:5 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd) && grm($rm); }
-+
-+FSQRT_D RISCV 0101101 00000  rs1:5 rm:3 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rd) && grm($rm); }
-+
-+FSGNJ_D RISCV 0010001 rs2:5  rs1:5 000 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
-+
-+FSGNJN_D RISCV 0010001 rs2:5  rs1:5 001 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
-+
-+FSGNJX_D RISCV 0010001 rs2:5  rs1:5 010 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
-+
-+FMIN_D RISCV 0010101 rs2:5  rs1:5 000 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
-+
-+FMAX_D RISCV 0010101 rs2:5  rs1:5 001 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rs2) && gfp64($rd); }
-+
-+FCVT_S_D RISCV 0100000 00001 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rd) && grm($rm); }
-+
-+FCVT_D_S RISCV 0100001 00000 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { gfp64($rs1) && gfp64($rd) && grm($rm); }
-+
-+FEQ_D RISCV 1010001 rs2:5 rs1:5 010 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1) && gfp64($rs1); }
-+
-+FLT_D RISCV 1010001 rs2:5 rs1:5 001 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1) && gfp64($rs1); }
-+
-+FLE_D RISCV 1010001 rs2:5 rs1:5 000 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1) && gfp64($rs1); }
-+
-+FCLASS_D RISCV 1110001 00000 rs1:5 001 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1); }
-+
-+FCVT_W_D RISCV 1100001 00000 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
-+
-+FCVT_WU_D RISCV 1100001 00001 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
-+
-+FCVT_D_W RISCV 1101001 00000 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
-+
-+FCVT_D_WU RISCV 1101001 00001 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
-+
-+FCVT_L_D RISCV 1100001 00010 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
-+
-+FCVT_LU_D RISCV 1100001 00011 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1) && grm($rm); }
-+
-+FCVT_D_L RISCV 1101001 00010 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
-+
-+FCVT_D_LU RISCV 1101001 00011 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { greg($rs1) && gfp64($rd) && grm($rm); }
-+
-+FMV_D_X RISCV 1111001 00000 rs1:5 000 rd:5 1010011 \
-+!constraints { greg($rs1) && gfp64($rd); }
-+
-+FMV_X_D RISCV 1110001 00000 rs1:5 000 rd:5 1010011 \
-+!constraints { greg($rd) && gfp64($rs1); }
+>   
+>       Successors should define fields class variable, which is: list of tuples,
+>       each of three elements:
+> @@ -113,6 +114,9 @@ class Qcow2BitmapExt(Qcow2Struct):
+>           ('u64', '{:#x}', 'bitmap_directory_offset')
+>       )
+>   
+> +    def __init__(self, fd):
+> +        super().__init__(fd=fd)
+
+this does nothing. We inherit the __init__ of super class, no need to define it just to call same __init__.
+
+> +
+>   
+>   QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
+>   
+> @@ -173,7 +177,13 @@ class QcowHeaderExtension(Qcow2Struct):
+>           self.data_str = data_str
+>   
+>           if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
+> -            self.obj = Qcow2BitmapExt(data=self.data)
+> +            assert fd is not None
+> +            position = fd.tell()
+> +            # Step back to reread data
+
+This definitely shows that we are doing something wrong
+
+> +            padded = (self.length + 7) & ~7
+> +            fd.seek(-padded, 1)
+> +            self.obj = Qcow2BitmapExt(fd=fd)
+> +            fd.seek(position)
+>           else:
+>               self.obj = None
+>   
+> 
+
+
 -- 
-2.23.0
-
+Best regards,
+Vladimir
 
