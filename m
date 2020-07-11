@@ -2,47 +2,47 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDA4C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 23:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C16C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 23:31:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E1B0206A5
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 23:06:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1B0206A5
+	by mail.kernel.org (Postfix) with ESMTPS id 828712070B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 23:31:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 828712070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juOZV-0000N0-9U
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 19:06:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59306)
+	id 1juOy0-0003YN-O0
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 19:31:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juOYt-00085L-CB
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 19:05:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53456)
+ id 1juOx9-00036Y-P7
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 19:30:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54880)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juOYr-0003tL-IG
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 19:05:39 -0400
+ id 1juOx7-0006Go-Aq
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 19:30:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1juOYp-0007Fi-Ko
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 23:05:35 +0000
+ id 1juOx5-0000Sv-IY
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 23:30:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 872962E80EF
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 23:05:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 4F82E2E80F1
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 23:30:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 11 Jul 2020 22:57:31 -0000
-From: Simon John <1886318@bugs.launchpad.net>
+Date: Sat, 11 Jul 2020 23:25:17 -0000
+From: Mark Cave-Ayland <1886318@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -51,9 +51,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: mark-cave-ayland mjt+launchpad-tls sej7278
 X-Launchpad-Bug-Reporter: Simon John (sej7278)
-X-Launchpad-Bug-Modifier: Simon John (sej7278)
+X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
 References: <159394898604.17667.6684490731246411850.malonedeb@soybean.canonical.com>
-Message-Id: <159450825194.7979.15124506007869937455.malone@wampee.canonical.com>
+Message-Id: <159450991780.19763.6080957673588613556.malone@chaenomeles.canonical.com>
 Subject: [Bug 1886318] Re: Qemu after v5.0.0 breaks macos guests
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +61,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 02c531f8d66c0463bbe228c5ddeab40766a77de6
+X-Launchpad-Hash: f85645423f195486e6568241482de6edb49cdbfe
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/11 17:41:08
@@ -88,12 +88,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-yup, building debian 5.0-6 package minus that single patch gives me
-working macos catalina again.
+Thanks for the bisection, that's really helpful - that particular patch
+fixes the way in which memory region access sizes are treated as valid.
+The obvious device to look at here is isa-apple-smc since I suspect that
+has less CI coverage.
 
-now just got to figure out why any kernel newer than 5.5 crashes the
-host when using pci passthrough - i don't fancy bisecting a whole
-kernel!
+Looking at the access sizes of all 3 MemoryRegions within
+hw/misc/applesmc.c I think these would now reject all non-byte accesses
+- does the following patch help at all?
+
+
+diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
+index 1c4addb201..7ca89e5e86 100644
+--- a/hw/misc/applesmc.c
++++ b/hw/misc/applesmc.c
+@@ -288,7 +288,7 @@ static const MemoryRegionOps applesmc_data_io_ops =3D {
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+     .impl =3D {
+         .min_access_size =3D 1,
+-        .max_access_size =3D 1,
++        .max_access_size =3D 4,
+     },
+ };
+ =
+
+@@ -298,7 +298,7 @@ static const MemoryRegionOps applesmc_cmd_io_ops =3D {
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+     .impl =3D {
+         .min_access_size =3D 1,
+-        .max_access_size =3D 1,
++        .max_access_size =3D 4,
+     },
+ };
+ =
+
+@@ -308,7 +308,7 @@ static const MemoryRegionOps applesmc_err_io_ops =3D {
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+     .impl =3D {
+         .min_access_size =3D 1,
+-        .max_access_size =3D 1,
++        .max_access_size =3D 4,
+     },
+ };
+ =
+
+
+ATB,
+
+Mark.
 
 -- =
 
