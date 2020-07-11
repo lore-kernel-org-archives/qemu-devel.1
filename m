@@ -2,76 +2,77 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 469B1C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA92BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:50:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17E5F20720
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:44:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE8F720748
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 18:50:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZmdpvNJf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E5F20720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x6VIfj8+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE8F720748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juKUV-0007RB-B1
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 14:44:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50012)
+	id 1juKaG-0000CM-0w
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 14:50:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juKTy-000725-PC
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:44:18 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44531)
+ id 1juKZP-0008CJ-BX
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:49:55 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33686)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juKTw-0000nh-UO
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:44:18 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 5so6579224oty.11
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 11:44:16 -0700 (PDT)
+ id 1juKZL-0001St-PE
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 14:49:55 -0400
+Received: by mail-ot1-x344.google.com with SMTP id h13so6642504otr.0
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 11:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fr0HYMc0KK74eEvMA67oBvTwC/XXaD278hVtjzTdboQ=;
- b=ZmdpvNJfwxKfZPNxG3Ls+5RxH1gLvIEfMHqjTWO7yzDRtB3f5FBOkRGbZSBfCmKga6
- 5gjBOxChu9TY5ZL32a9IWCZFY5Am2lI5PS6pDo0pz3fEYqxZGtup6w0/ayH2hNN9hclE
- T4WJGsZHMnfuTmMv4wXRRZ7aHL1lz9UspY8gO4ITgp7E9SW3d1s4TCWf7w9oyqQlNekS
- H4TFjQbzKwGxg9RE9OD4t9edKBaIWRf4AplzZUqXHxOwiIMAhVk7ExpfoQ9Ald8fJHoc
- 7/PzNzFDJVzDKnxvcgwqrLgw6RFmZY+bz5NvdxfCUMFkmpmW680p1q/Q6AET4Qd7bowJ
- sGpw==
+ :cc; bh=1JS4km9SBlEnJT4zeza3ZxTcviOU4eLTpqow9LADA/I=;
+ b=x6VIfj8+5yYMkvVYWUq+gJm8PAjz3gtrna5BA19TWFLQPcsTCV5K5DwqkKSFUrG27i
+ XUa78+WFgWzT9sphMacnMgDn6hzUCg3n2lCOYrwzjX0N93HwL+0ydUl5URScDv+vxlBZ
+ GAUdH92hEiAZ7eBSaQ5B88FfDoSierPeC2vEh70oYnWiKqgm4tdkvGRTuRyc3yHjludw
+ bKZ+RkOcJ8qVNkdd25VSCHs8udLukIIejErl2PNiMhYZwXnHNe6CGRZE2wc6+ZBuAJvF
+ 9zRtv9BLog4EQ6eP65RDIXGX4ebnssHQEdnMAKBDjy3St0kboraEuaSN/C3RlBO4G6l9
+ L7Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=fr0HYMc0KK74eEvMA67oBvTwC/XXaD278hVtjzTdboQ=;
- b=ttpCBsulxVjWNKcZh7Vm+JTA9Q0/OKhXrTKPqJRZOmUHawJYe0matgl1h4lynuv4lT
- /qal02CrTk2b/IUNMc9S/57FKMZvbVwo69ua+JcO002e7q8e6avPIJEsiZsph9lqskcS
- 8BjH0nLfQwUKgvgOsuNxG81J28kuEtCXNhff08LLHFMqUbfmemsDBrOuRL30ItJX6gMZ
- viQKR+LQAKaVRYDXYvd3huJ9ATr2StfxOULhLqP7hp/6xeVIVe+HNUl5FpwQceZ931uy
- EAN1SjwrcBfxNoda7nUMknyPefN7Zxc7BUD9GnwAQJu94ZCpQItm+sIsARBzuQc7970M
- ODYg==
-X-Gm-Message-State: AOAM5331zIYVtko1ugyZ9a9Dp6Bui0Yfo3KoDQ+X7MF1GeKcUKnn6QM2
- HgkvnyymDCRD1SAGeJ2yuY3JzXNMqK6HW9oycDjypOUk
-X-Google-Smtp-Source: ABdhPJzITQnL7WRP/mACvBpAqHSI+ulCEPEgM5/jIHmJ4WN3KbFUS8ZyOp99p2wQ53Zk9qpRmzJ03QiAUHLg3CWTSLc=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr56385428oto.135.1594493055055; 
- Sat, 11 Jul 2020 11:44:15 -0700 (PDT)
+ bh=1JS4km9SBlEnJT4zeza3ZxTcviOU4eLTpqow9LADA/I=;
+ b=f8EmarStPVMcx/gHBxs+wXyXM4R6Du/twCKXhiNV25Qotltncbyvx64Uos9pQ+X1cM
+ vK4ZAM2pKS88cCKwzRZzW86WAcztSvh3UNDTSUkRsXYod6wTXv5TMpgbajixOQBCvWJ9
+ J6T+YS7C0jc2/7RUNys4hGxV7y5wwR5Yc0EuU/HkGZC5Jwfl7Mv1O4NHsu2+wkFYU0hS
+ wZSwXZi+wDYSpQHJRe63GPxkDKDLmR+lOZAkBP7RfydSgMg7zOrVnI7njgXllpmuElI8
+ S6pNeAx8mQBVRBM0abu/Pgbr86JlIJR7jje9yQKbSeFI37vz0Z0y8khR+T9J9YCiYVI1
+ Vb4A==
+X-Gm-Message-State: AOAM531/E+5+lUi1cd4mn84z5a6sWyv/CzGNRbCz8/7jICtk0qCjICN1
+ yoCQpKXDg3p06yNAy5jvFs7Q7PxePu4DCNOkXwxV0w==
+X-Google-Smtp-Source: ABdhPJzoaEpbt2n05eE2tUh1jGpdxwjmLG7coouBkDalUnLXIgRXSm69kqMQBCqcUrdpCfqbEseCS26ibCsJreM7RKo=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr60553740ota.91.1594493390331; 
+ Sat, 11 Jul 2020 11:49:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200703145614.16684-1-peter.maydell@linaro.org>
-In-Reply-To: <20200703145614.16684-1-peter.maydell@linaro.org>
+References: <20200710233433.19729-1-wentong.wu@intel.com>
+In-Reply-To: <20200710233433.19729-1-wentong.wu@intel.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 11 Jul 2020 19:44:04 +0100
-Message-ID: <CAFEAcA8UpTzG2Loc8sqLcHVHaYLQr9fR=-b28LYhVTgGC_RedQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/9] Build fixes for Haiku
-To: QEMU Developers <qemu-devel@nongnu.org>
+Date: Sat, 11 Jul 2020 19:49:39 +0100
+Message-ID: <CAFEAcA9BfSCUi_LyCkvT7+V1cfhWgbUe2X9du0j-KnUf2bswnw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] target/nios2: add DISAS_NORETURN case for nothing
+ more to generate
+To: Wentong Wu <wentong.wu@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -80,7 +81,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,28 +94,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Carlier <devnexen@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Marek Vasut <marex@denx.de>,
+ Chris Wulff <crwulff@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 3 Jul 2020 at 15:56, Peter Maydell <peter.maydell@linaro.org> wrote:
+On Fri, 10 Jul 2020 at 16:46, Wentong Wu <wentong.wu@intel.com> wrote:
 >
-> This patchset is essentially a resend of David Carlier's build fixes
-> for the Haiku platform. I've taken David's patches and put them together
-> into a set of emails threaded in the way our CI tools expect, as the
-> easiest way to get the patchew robot to run the build tests so we can
-> check they didn't accidentally break one of the BSDs. I've also put
-> in the patch from Gerd that fixes the drm.c issue. I've also expanded
-> on the commit messages for all the patches so that we have a record
-> of why we made the changes if we need to look back at it in future.
+> Add DISAS_NORETURN case for nothing more to generate because at runtime
+> execution will never return from some helper call. And at the same time
+> replace DISAS_UPDATE in t_gen_helper_raise_exception and gen_exception
+> with the newly added DISAS_NORETURN.
 >
-> Assuming no issues turn up, I'll arrange to get these into master
-> at some point before the 5.1 release.
+> Signed-off-by: Wentong Wu <wentong.wu@intel.com>
 
-I've made the minor renames from CONFIG_ to HAVE_ where suggested
-and will put these into the tree via a target-arm pullreq I'm
-planning for Monday.
+Hi; I'm going to pick these up and get them into master.
+
+A couple of notes below for if you plan to submit more
+patches to QEMU in future: these are really just minor
+workflow things, but they do help make our lives easier
+in getting code submissions into the tree.
+
+If people provide you with a Reviewed-by: tag for a patch,
+and you don't change it when you send out an updated
+version, it's helpful if you include that tag in the commit
+message of the revised version you send out. This saves
+people having to remember whether they'd reviewed something
+or not, and means that when applying I don't have to go
+back and look at old versions to see who reviewed what.
+
+Patch series are much easier for our tooling to deal
+with if you send them out with a cover letter email
+(a 0/n email which all the other emails are followups to;
+git format-patch has a '--cover-letter' option which will
+do the right thing here).
+
+We document this kind of workflow stuff here:
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
 thanks
 -- PMM
