@@ -2,103 +2,80 @@ Return-Path: <SRS0=vx8y=AW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA10C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 21:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9B6C433E3
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 21:41:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2373B206A5
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 21:43:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xYOVdjbx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2373B206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B2658206A5
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jul 2020 21:41:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2658206A5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juNGy-0002mI-EW
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 17:43:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48424)
+	id 1juNFj-0001o6-V2
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jul 2020 17:41:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1juNGO-0002Gw-Co
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 17:42:28 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:38184)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juNFB-0001Ou-SL
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 17:41:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48620)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1juNGL-0003UO-TX
- for qemu-devel@nongnu.org; Sat, 11 Jul 2020 17:42:28 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id k5so4179121pjg.3
- for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 14:42:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=WAnM+AEg28RYA/0yqxUHhCYjcfhg0sGRVBIvk6M3zVM=;
- b=xYOVdjbxhN/lKp45Dbc6suFqMijEw5NTs0SFzH2Cgx3udjTGF8GYAnItqYOga74aU3
- ZvAJmWxaJt0NWs7pzvlaWhHpAvFpNj5uRmdEu33Zfx28Svvj+t2lHJ6KT/YmBmiodSTo
- u+jAqHvOtrAzg5vVlV22X9nGtn5JO8pSn8hu9iHRerQFx45yTRSPlb47NJ4P6mTcThWD
- fU/a0vNYyO4r4HEcyFr7JiwO/6Gzeqk4bkMgls4g+voYgb4+pWPl4yf+G9877xo+gBXg
- anpNLFX5lE8arA3Q1vqQ2AydiTmtP2Wwi4EPZVjDe4ZXRcTp1WywPtBzqZI21nnPjhq3
- 9EKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WAnM+AEg28RYA/0yqxUHhCYjcfhg0sGRVBIvk6M3zVM=;
- b=kwg5aHIdgxq0rAmQQ8aHlF9I43s7k3Vl7PDmMvjcCydoIpJfXFfvf0GiYl9UUvGNkp
- itUvNuMCYR21fk2AKnEN2Ayd5gHmex1NlexP58nuv1wQ1Zfo/1npdrXlUFkEa+WUXAbt
- /P3cmHjEhY6kgF24TviK7XWFWgFP7L8kJNEd1LLYtt/9aZOkAg23x3aeO/LfOqgMuMhK
- DkUfXZ9KNpBvruxR+rC7Prf4fhOIDoUBecETuz7BspYE938ybA0yYvSr2Jl2bZDmdV3u
- DK1PhLFN5BfsrsZfWuQ15w/ZK+j29a96hXw/s3llNrr/cPfZfLCzh1rG0BrKagvr14YH
- 1yJQ==
-X-Gm-Message-State: AOAM53371VSYi4a/iy0jHMvxHJeJ9bKcOz8fXWxjU7vlkc9vE+jNMAxx
- DRDW7OJrzB0u/Z92SLXE/cfsCw==
-X-Google-Smtp-Source: ABdhPJw0Ol2Z9UOBsZmqgeBlNoAZjZUdX4T9IWFuLUCP4YeQAg+6ys2Jh/3Mav71XFDf5DTEO3q90g==
-X-Received: by 2002:a17:902:b204:: with SMTP id
- t4mr66587134plr.132.1594503744193; 
- Sat, 11 Jul 2020 14:42:24 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id m1sm9290690pjy.0.2020.07.11.14.42.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 11 Jul 2020 14:42:23 -0700 (PDT)
-Subject: Re: [PATCH v2 01/17] tcg: Introduce target-specific page data for
- user-only
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200605041733.415188-1-richard.henderson@linaro.org>
- <20200605041733.415188-2-richard.henderson@linaro.org>
- <CAFEAcA-qybDD6GWYPFB6tMfTb9Kj+_bCKCxPyDYMZBr8EwbDmQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d5659aa8-1e51-455f-c3be-379e3f224817@linaro.org>
-Date: Sat, 11 Jul 2020 14:42:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juNF7-0003R3-Ob
+ for qemu-devel@nongnu.org; Sat, 11 Jul 2020 17:41:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1juNF5-0001qY-LM
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 21:41:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9E9362E80EE
+ for <qemu-devel@nongnu.org>; Sat, 11 Jul 2020 21:41:07 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-qybDD6GWYPFB6tMfTb9Kj+_bCKCxPyDYMZBr8EwbDmQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 11 Jul 2020 21:34:39 -0000
+From: Simon John <1886318@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mark-cave-ayland sej7278
+X-Launchpad-Bug-Reporter: Simon John (sej7278)
+X-Launchpad-Bug-Modifier: Simon John (sej7278)
+References: <159394898604.17667.6684490731246411850.malonedeb@soybean.canonical.com>
+Message-Id: <159450327987.12745.18288028012768679202.malone@soybean.canonical.com>
+Subject: [Bug 1886318] Re: Qemu after v5.0.0 breaks macos guests
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 22c62de048f7427c111237bd8112922cf81b81b4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/11 17:41:08
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,82 +84,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Stephen Long <steplong@quicinc.com>
+Reply-To: Bug 1886318 <1886318@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/25/20 9:20 AM, Peter Maydell wrote:
-> On Fri, 5 Jun 2020 at 05:17, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> This data can be allocated by page_alloc_target_data() and
->> released by page_set_flags(start, end, prot | PAGE_RESET).
->>
->> This data will be used to hold tag memory for AArch64 MTE.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
-> 
->> @@ -289,6 +295,8 @@ int walk_memory_regions(void *, walk_memory_regions_fn);
->>  int page_get_flags(target_ulong address);
->>  void page_set_flags(target_ulong start, target_ulong end, int flags);
->>  int page_check_range(target_ulong start, target_ulong len, int flags);
->> +void *page_get_target_data(target_ulong address);
->> +void *page_alloc_target_data(target_ulong address, size_t size);
-> 
-> Could we have a doc comment for any new function that's got
-> global scope, please?
-> 
->>  #endif
->>
->>  CPUArchState *cpu_copy(CPUArchState *env);
-> 
->> +void *page_alloc_target_data(target_ulong address, size_t size)
->> +{
->> +    PageDesc *p = page_find(address >> TARGET_PAGE_BITS);
->> +    void *ret = NULL;
->> +
->> +    if (p) {
->> +        ret = p->target_data;
->> +        if (!ret && (p->flags & PAGE_VALID)) {
->> +            p->target_data = ret = g_malloc0(size);
->> +        }
->> +    }
->> +    return ret;
-> 
-> Can a PageDesc validly have p->target_data != NULL but
-> p->flags with PAGE_VALID not set ?
+Thanks Mark, what an interesting exercise that was - and sorry, didn't
+know 5.1 was due.
 
-No.  But we can be called for a page that is not mapped (returning NULL) and
-can be called for a page that already has associated data (returning the old
-value).
+So the git bisect revealed this:
 
-> It's not clear to me why for a !PAGE_VALID page which
-> has target_data already we return that pointer but
-> if it doesn't have any we don't allocate: either
-> "always allocate" or "always return NULL for non-valid pages"
-> would seem more self-consistent.
+$ git bisect good
+5d971f9e672507210e77d020d89e0e89165c8fc9 is the first bad commit
+commit 5d971f9e672507210e77d020d89e0e89165c8fc9
+Author: Michael S. Tsirkin <mst@redhat.com>
+Date:   Wed Jun 10 09:47:49 2020 -0400
 
-I was expecting a non-valid page to have no data.  I will rearrange this to
+    memory: Revert "memory: accept mismatching sizes in memory_region_acces=
+s_valid"
+    =
 
-    ret = NULL;
-    if (p->flags & PAGE_VALID) {
-        ret = p->target_data;
-        if (!ret) {
-            p->target_data = ret = g_malloc0(size);
-        }
-    }
+    Memory API documentation documents valid .min_access_size and .max_acce=
+ss_size
+    fields and explains that any access outside these boundaries is blocked.
+    =
 
-which is probably clearer.
+    This is what devices seem to assume.
+    =
 
->> +        /* FIXME: Move page flags and target_data for each page.  */
-> 
-> Is this something we're going to address later in the patchset?
+    However this is not what the implementation does: it simply
+    ignores the boundaries unless there's an "accepts" callback.
+    =
 
-I had not, but I should.  Will fix.
+    Naturally, this breaks a bunch of devices.
+    =
+
+    Revert to the documented behaviour.
+    =
+
+    Devices that want to allow any access can just drop the valid field,
+    or add the impl field to have accesses converted to appropriate
+    length.
+    =
+
+    Cc: qemu-stable@nongnu.org
+    Reviewed-by: Richard Henderson <rth@twiddle.net>
+    Fixes: CVE-2020-13754
+    Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1842363
+    Fixes: a014ed07bd5a ("memory: accept mismatching sizes in memory_region=
+_access_valid")
+    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+    Message-Id: <20200610134731.1514409-1-mst@redhat.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+ memory.c | 29 +++++++++--------------------
+ 1 file changed, 9 insertions(+), 20 deletions(-)
 
 
-r~
+** Bug watch added: Red Hat Bugzilla #1842363
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1842363
+
+** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2020-13754
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1886318
+
+Title:
+  Qemu after v5.0.0 breaks macos guests
+
+Status in QEMU:
+  New
+
+Bug description:
+  The Debian Sid 5.0-6 qemu-kvm package can no longer get further than
+  the Clover bootloader whereas 5.0-6 and earlier worked fine.
+
+  So I built qemu master from github and it has the same problem,
+  whereas git tag v5.0.0 (or 4.2.1) does not, so something between
+  v5.0.0 release and the last few days has caused the problem.
+
+  Here's my qemu script, pretty standard macOS-Simple-KVM setup on a
+  Xeon host:
+
+  qemu-system-x86_64 \
+      -enable-kvm \
+      -m 4G \
+      -machine q35,accel=3Dkvm \
+      -smp 4,sockets=3D1,cores=3D2,threads=3D2 \
+      -cpu =
+
+  Penryn,vendor=3DGenuineIntel,kvm=3Don,+sse3,+sse4.2,+aes,+xsave,+avx,+xsa=
+veopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc =
+
+  \
+      -device =
+
+  isa-applesmc,osk=3D"ourhardworkbythesewordsguardedpleasedontsteal(c)Apple=
+ComputerInc" =
+
+  \
+      -smbios type=3D2 \
+      -drive if=3Dpflash,format=3Draw,readonly,file=3D"/tmp/OVMF_CODE.fd" \
+      -drive if=3Dpflash,format=3Draw,file=3D"/tmp/macos_catalina_VARS.fd" \
+      -vga qxl \
+      -device ich9-ahci,id=3Dsata \
+      -drive id=3DESP,if=3Dnone,format=3Draw,file=3D/tmp/ESP.img \
+      -device ide-hd,bus=3Dsata.2,drive=3DESP \
+      -drive id=3DInstallMedia,format=3Draw,if=3Dnone,file=3D/tmp/BaseSyste=
+m.img \
+      -device ide-hd,bus=3Dsata.3,drive=3DInstallMedia \
+      -drive id=3DSystemDisk,if=3Dnone,format=3Draw,file=3D/tmp/macos_catal=
+ina.img \
+      -device ide-hd,bus=3Dsata.4,drive=3DSystemDisk \
+      -usb -device usb-kbd -device usb-mouse
+
+  Perhaps something has changed in Penryn support recently, as that's
+  required for macos?
+
+  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D964247
+
+  Also on a related note, kernel 5.6/5.7 (on Debian) hard crashes the
+  host when I try GPU passthrough on macos, whereas Ubuntu20/Win10 work
+  fine - as does 5.5 kernel.
+
+  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D961676
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1886318/+subscriptions
 
