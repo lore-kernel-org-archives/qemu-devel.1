@@ -2,91 +2,79 @@ Return-Path: <SRS0=QItv=AX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9881C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 11:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3F5C433E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 12:11:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A8C62076D
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 11:48:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cutkz5PL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A8C62076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4FB4620720
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 12:11:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FB4620720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juaSe-0004d9-OV
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 07:48:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53628)
+	id 1juapU-0007UD-Hy
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 08:11:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1juaS2-0003uy-8R
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 07:47:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28768
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1juaRy-0007tq-H6
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 07:47:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594554436;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z6bQW/4yOypkVuci4LTEF/9baRaLfPTcymyDVALtpFY=;
- b=Cutkz5PLMGPDLMIrPp0bgHmZFKasxE9JMjPtm0l+7R4kZuszx6E7NU6ShCP7T0XA00fvLR
- BY9OXEkJ5ZHL8hlbfmdKBGa2UoaysgE56LE4Cd7CIT+t0cs328gRAfF/llruh0PIyAIcHM
- LlvKnwFQ1yXEWwkFSj7VMee+utgRhkQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-JrifH-jjMhuuuNOUZlInog-1; Sun, 12 Jul 2020 07:47:15 -0400
-X-MC-Unique: JrifH-jjMhuuuNOUZlInog-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25CAC8064AA;
- Sun, 12 Jul 2020 11:47:14 +0000 (UTC)
-Received: from starship (unknown [10.35.206.221])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C18675BAD5;
- Sun, 12 Jul 2020 11:47:12 +0000 (UTC)
-Message-ID: <476ca0873c38ad1c63be03eae0f626741aac7238.camel@redhat.com>
-Subject: Re: [PATCH] block/amend: Check whether the node exists
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Sun, 12 Jul 2020 14:47:11 +0300
-In-Reply-To: <20200710095037.10885-1-mreitz@redhat.com>
-References: <20200710095037.10885-1-mreitz@redhat.com>
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juaoq-00072c-2f
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 08:10:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60022)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juaon-0001xV-D6
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 08:10:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1juaol-00068i-Eh
+ for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 12:10:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6635B2E804F
+ for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 12:10:51 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 07:24:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 12 Jul 2020 12:02:17 -0000
+From: Simon John <1886318@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mark-cave-ayland mjt+launchpad-tls sej7278
+X-Launchpad-Bug-Reporter: Simon John (sej7278)
+X-Launchpad-Bug-Modifier: Simon John (sej7278)
+References: <159394898604.17667.6684490731246411850.malonedeb@soybean.canonical.com>
+Message-Id: <159455533798.12017.1575984431189756725.malone@soybean.canonical.com>
+Subject: [Bug 1886318] Re: Qemu after v5.0.0 breaks macos guests
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 541af75a6ea654107cbe2e9ffa60f584754ccb06
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 04:40:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,48 +83,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1886318 <1886318@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2020-07-10 at 11:50 +0200, Max Reitz wrote:
-> We should check whether the user-specified node-name actually refers to
-> a node.  The simplest way to do that is to use bdrv_lookup_bs() instead
-> of bdrv_find_node() (the former wraps the latter, and produces an error
-> message if necessary).
-> 
-> Reported-by: Coverity (CID 1430268)
-> Fixes: ced914d0ab9fb2c900f873f6349a0b8eecd1fdbe
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/amend.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/amend.c b/block/amend.c
-> index f4612dcf08..392df9ef83 100644
-> --- a/block/amend.c
-> +++ b/block/amend.c
-> @@ -69,8 +69,12 @@ void qmp_x_blockdev_amend(const char *job_id,
->      BlockdevAmendJob *s;
->      const char *fmt = BlockdevDriver_str(options->driver);
->      BlockDriver *drv = bdrv_find_format(fmt);
-> -    BlockDriverState *bs = bdrv_find_node(node_name);
-> +    BlockDriverState *bs;
->  
-> +    bs = bdrv_lookup_bs(NULL, node_name, errp);
-> +    if (!bs) {
-> +        return;
-> +    }
->  
->      if (!drv) {
->          error_setg(errp, "Block driver '%s' not found or not supported", fmt);
+urgh, that was complicated, think i got it right!
 
-Yep, this looks like a real bug, sorry about that.
+need to look for "[PATCH] Allow acpi-tmr size=3D2" to show up in qemu-
+devel
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+-- =
 
-Best regards,
-	Maxim Levitsky
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1886318
 
+Title:
+  Qemu after v5.0.0 breaks macos guests
+
+Status in QEMU:
+  New
+
+Bug description:
+  The Debian Sid 5.0-6 qemu-kvm package can no longer get further than
+  the Clover bootloader whereas 5.0-6 and earlier worked fine.
+
+  So I built qemu master from github and it has the same problem,
+  whereas git tag v5.0.0 (or 4.2.1) does not, so something between
+  v5.0.0 release and the last few days has caused the problem.
+
+  Here's my qemu script, pretty standard macOS-Simple-KVM setup on a
+  Xeon host:
+
+  qemu-system-x86_64 \
+      -enable-kvm \
+      -m 4G \
+      -machine q35,accel=3Dkvm \
+      -smp 4,sockets=3D1,cores=3D2,threads=3D2 \
+      -cpu =
+
+  Penryn,vendor=3DGenuineIntel,kvm=3Don,+sse3,+sse4.2,+aes,+xsave,+avx,+xsa=
+veopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc =
+
+  \
+      -device =
+
+  isa-applesmc,osk=3D"ourhardworkbythesewordsguardedpleasedontsteal(c)Apple=
+ComputerInc" =
+
+  \
+      -smbios type=3D2 \
+      -drive if=3Dpflash,format=3Draw,readonly,file=3D"/tmp/OVMF_CODE.fd" \
+      -drive if=3Dpflash,format=3Draw,file=3D"/tmp/macos_catalina_VARS.fd" \
+      -vga qxl \
+      -device ich9-ahci,id=3Dsata \
+      -drive id=3DESP,if=3Dnone,format=3Draw,file=3D/tmp/ESP.img \
+      -device ide-hd,bus=3Dsata.2,drive=3DESP \
+      -drive id=3DInstallMedia,format=3Draw,if=3Dnone,file=3D/tmp/BaseSyste=
+m.img \
+      -device ide-hd,bus=3Dsata.3,drive=3DInstallMedia \
+      -drive id=3DSystemDisk,if=3Dnone,format=3Draw,file=3D/tmp/macos_catal=
+ina.img \
+      -device ide-hd,bus=3Dsata.4,drive=3DSystemDisk \
+      -usb -device usb-kbd -device usb-mouse
+
+  Perhaps something has changed in Penryn support recently, as that's
+  required for macos?
+
+  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D964247
+
+  Also on a related note, kernel 5.6/5.7 (on Debian) hard crashes the
+  host when I try GPU passthrough on macos, whereas Ubuntu20/Win10 work
+  fine - as does 5.5 kernel.
+
+  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D961676
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1886318/+subscriptions
 
