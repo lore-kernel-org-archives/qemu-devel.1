@@ -2,79 +2,65 @@ Return-Path: <SRS0=QItv=AX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4C8C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 09:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2E6C433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 10:01:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DFBF206F0
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 09:56:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DFBF206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EF162206F0
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 10:01:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF162206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juYj9-0001oV-E9
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 05:56:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37994)
+	id 1juYnc-0003za-2x
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 06:01:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juYic-0001Ox-KN
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 05:56:22 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48774)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juYia-0004bm-Hr
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 05:56:22 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1juYiY-0003s2-SG
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 09:56:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D4E572E806B
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 09:56:18 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1juYmm-0003Xm-JK
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 06:00:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40908)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1juYmk-0004rT-BD
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 06:00:40 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 7A11AAE84;
+ Sun, 12 Jul 2020 10:00:36 +0000 (UTC)
+To: Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Subject: migration: broken snapshot saves appear on s390 when small fields in
+ migration stream removed
+Message-ID: <8bbafdec-836d-b7de-cab8-7a325b6e238d@suse.de>
+Date: Sun, 12 Jul 2020 12:00:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 12 Jul 2020 09:48:41 -0000
-From: Mark Cave-Ayland <1886318@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mark-cave-ayland mjt+launchpad-tls sej7278
-X-Launchpad-Bug-Reporter: Simon John (sej7278)
-X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
-References: <159394898604.17667.6684490731246411850.malonedeb@soybean.canonical.com>
-Message-Id: <159454732169.12693.18405877124058992451.malone@soybean.canonical.com>
-Subject: [Bug 1886318] Re: Qemu after v5.0.0 breaks macos guests
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 55cfcb0db93c39342867571da9fc6d71a5d0fb77
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 04:40:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 04:51:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,120 +69,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1886318 <1886318@bugs.launchpad.net>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In that case please disregard those patches. Can you try this diff below
-which will log any invalid accesses and see if anything appears on
-stderr?
+Hello all,
 
+during unrelated work for splitting QTest from the TCG instruction counting module,
 
-diff --git a/memory.c b/memory.c
-index 9200b20130..5d1a6d4477 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1354,10 +1354,12 @@ bool memory_region_access_valid(MemoryRegion *mr,
+I encountered what seems to be a migration stream issue, which is apparent only on s390, and only shows in block test 267.
+
+./check -qcow2 267
+
+when it comes to snapshot save and load using backing file.
+
+Here is a minimal reproducer patch that causes the issue on s390 only.
+
+--------------------------------------------cut-------------------------------------------
+diff --git a/cpus.c b/cpus.c
+index 41d1c5099f..443b88697a 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -643,7 +643,7 @@ static void qemu_account_warp_timer(void)
+ 
+ static bool icount_state_needed(void *opaque)
  {
-     if (mr->ops->valid.accepts
-         && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs=
-)) {
-+        fprintf(stderr, "invalid accepts: %s  addr %"PRIx64 " size: %d\n",=
- mr->name, addr, size);
-         return false;
-     }
- =
+-    return use_icount;
++    return 0;
+ }
+ 
+ static bool warp_timer_state_needed(void *opaque)
+--------------------------------------------cut-------------------------------------------
 
-     if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
-+        fprintf(stderr, "invalid aligned: %s  addr %"PRIx64 " size: %d\n",=
- mr->name, addr, size);
-         return false;
-     }
- =
+config.status configure line:
+exec '/home/cfontana/qemu-build/../qemu/configure' '--enable-tcg' '--disable-kvm' '--disable-hax' '--target-list=s390x-softmmu' '--enable-debug'
 
-@@ -1368,6 +1370,7 @@ bool memory_region_access_valid(MemoryRegion *mr,
- =
+$ make check-block
 
-     if (size > mr->ops->valid.max_access_size
-         || size < mr->ops->valid.min_access_size) {
-+        fprintf(stderr, "invalid size: %s  addr %"PRIx64 " size: %d\n", mr=
-->name, addr, size);
-         return false;
-     }
-     return true;
+TEST    iotest-qcow2: 267 [fail]
+QEMU          -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../s390x-softmmu/qemu-system-s390x" -nodefaults -display none -accel qtest
+QEMU_IMG      -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../qemu-img" 
+QEMU_IO       -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../qemu-io"  --cache writeback --aio threads -f qcow2
+QEMU_NBD      -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../qemu-nbd" 
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/s390x s390zp13 5.3.18-21-default
+TEST_DIR      -- /home/cfontana/qemu-build/tests/qemu-iotests/scratch
+SOCK_DIR      -- /tmp/tmp.bLJcJVtzk5
+SOCKET_SCM_HELPER -- /home/cfontana/qemu-build/tests/qemu-iotests/socket_scm_helper
+
+--- /home/cfontana/qemu/tests/qemu-iotests/267.out	2020-07-12 05:10:07.948262675 -0400
++++ /home/cfontana/qemu-build/tests/qemu-iotests/267.out.bad	2020-07-12 05:27:03.358362781 -0400
+@@ -137,6 +137,9 @@
+ ID        TAG                 VM SIZE                DATE       VM CLOCK
+ --        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+ (qemu) loadvm snap0
++Unexpected storage key flag data: 0
++error while loading state for instance 0x0 of device 's390-skeys'
++Error: Error -22 while loading VM state
+ (qemu) quit
+ 
+ 
+-----------
 
 
-ATB,
+Not run: 172 186 192 259 287
+Failures: 267
+Failed 1 of 115 iotests
+make: *** [/home/cfontana/qemu/tests/Makefile.include:880: check-tests/check-block.sh] Error 1
 
-Mark.
+-----------
 
--- =
+Note: only the === -blockdev with a backing file === part of test 267 fails. -blockdev with NBD is ok, like all the rest.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1886318
 
-Title:
-  Qemu after v5.0.0 breaks macos guests
+Interesting facts about s390 in particular: its save/load code includes the transfer of "storage keys",
+which include a buffer of 32768 bytes of keydata in the stream.
 
-Status in QEMU:
-  New
+The code (hw/s390x/s390-skeys.c),
+is modeled similarly to RAM transfer (like in migration/ram.c), with an EOS (end of stream) marker.
 
-Bug description:
-  The Debian Sid 5.0-6 qemu-kvm package can no longer get further than
-  the Clover bootloader whereas 5.0-6 and earlier worked fine.
+Countrary to RAM transfer code though, after qemu_put_be64(f, EOS), the s390 code does not qemu_fflush(f).
 
-  So I built qemu master from github and it has the same problem,
-  whereas git tag v5.0.0 (or 4.2.1) does not, so something between
-  v5.0.0 release and the last few days has caused the problem.
+----------
+Observation: the migration/qemu-file.c shows an IO_BUF_SIZE of 32768.
 
-  Here's my qemu script, pretty standard macOS-Simple-KVM setup on a
-  Xeon host:
+--
 
-  qemu-system-x86_64 \
-      -enable-kvm \
-      -m 4G \
-      -machine q35,accel=3Dkvm \
-      -smp 4,sockets=3D1,cores=3D2,threads=3D2 \
-      -cpu =
+The following workarounds hide the problem (make the test pass):
 
-  Penryn,vendor=3DGenuineIntel,kvm=3Don,+sse3,+sse4.2,+aes,+xsave,+avx,+xsa=
-veopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc =
+1) always including the icount field in the (unrelated) timers field that are sent before in the migration stream (ie not applying the reproducer patch).
 
-  \
-      -device =
+2) increasing the IO_BUF_SIZE also hides the problem:
 
-  isa-applesmc,osk=3D"ourhardworkbythesewordsguardedpleasedontsteal(c)Apple=
-ComputerInc" =
+----------------------cut--------------------------
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index be21518c57..f81d1272eb 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -30,7 +30,7 @@
+ #include "trace.h"
+ #include "qapi/error.h"
+ 
+-#define IO_BUF_SIZE 32768
++#define IO_BUF_SIZE 65536
+ #define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 64)
+ 
+ struct QEMUFile {
+----------------------cut--------------------------
 
-  \
-      -smbios type=3D2 \
-      -drive if=3Dpflash,format=3Draw,readonly,file=3D"/tmp/OVMF_CODE.fd" \
-      -drive if=3Dpflash,format=3Draw,file=3D"/tmp/macos_catalina_VARS.fd" \
-      -vga qxl \
-      -device ich9-ahci,id=3Dsata \
-      -drive id=3DESP,if=3Dnone,format=3Draw,file=3D/tmp/ESP.img \
-      -device ide-hd,bus=3Dsata.2,drive=3DESP \
-      -drive id=3DInstallMedia,format=3Draw,if=3Dnone,file=3D/tmp/BaseSyste=
-m.img \
-      -device ide-hd,bus=3Dsata.3,drive=3DInstallMedia \
-      -drive id=3DSystemDisk,if=3Dnone,format=3Draw,file=3D/tmp/macos_catal=
-ina.img \
-      -device ide-hd,bus=3Dsata.4,drive=3DSystemDisk \
-      -usb -device usb-kbd -device usb-mouse
+3) adding a qemu_fflush in hw/s390x/s390-skeys.c after EOS also "fixes" the problem:
 
-  Perhaps something has changed in Penryn support recently, as that's
-  required for macos?
+----------------------cut--------------------------
+diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+index 1e036cc602..47c9a015af 100644
+--- a/hw/s390x/s390-skeys.c
++++ b/hw/s390x/s390-skeys.c
+@@ -252,6 +252,8 @@ static const TypeInfo qemu_s390_skeys_info = {
+     .class_size    = sizeof(S390SKeysClass),
+ };
+ 
++extern void qemu_fflush(QEMUFile *f);
++
+ static void s390_storage_keys_save(QEMUFile *f, void *opaque)
+ {
+     S390SKeysState *ss = S390_SKEYS(opaque);
+@@ -302,6 +304,7 @@ static void s390_storage_keys_save(QEMUFile *f, void *opaque)
+     g_free(buf);
+ end_stream:
+     qemu_put_be64(f, eos);
++    qemu_fflush(f);
+ }
+ 
+ static int s390_storage_keys_load(QEMUFile *f, void *opaque, int version_id)
+----------------------cut--------------------------
 
-  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D964247
+Do any of you with better understanding of migration/, block and s390 have a suggestion on what could be the issue here,
+and what could be the next step in the investigation?
 
-  Also on a related note, kernel 5.6/5.7 (on Debian) hard crashes the
-  host when I try GPU passthrough on macos, whereas Ubuntu20/Win10 work
-  fine - as does 5.5 kernel.
+Is the fact that migration/ram.c always does fflush after writing the EOS have any relevance here? why does it do it,
+and should s390 code also follow the same pattern?
 
-  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D961676
+Thanks,
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1886318/+subscriptions
+Claudio
+
+
+-- 
+Claudio Fontana
+Engineering Manager Virtualization, SUSE Labs Core
+
+SUSE Software Solutions Italy Srl
 
