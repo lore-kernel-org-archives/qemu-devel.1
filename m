@@ -2,46 +2,46 @@ Return-Path: <SRS0=QItv=AX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB0F8C433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 10:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5159BC433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 10:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BABB1206F0
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 10:41:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BABB1206F0
+	by mail.kernel.org (Postfix) with ESMTPS id 2590220720
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 10:51:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2590220720
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juZQb-0001Kf-2d
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 06:41:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43090)
+	id 1juZaL-0003Xc-85
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 06:51:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juZQ3-0000uu-W4
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 06:41:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52472)
+ id 1juZZN-0002is-An
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 06:50:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53702)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juZQ1-0000vj-5M
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 06:41:15 -0400
+ id 1juZZL-0001lF-KJ
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 06:50:53 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1juZPz-0007AT-5b
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 10:41:11 +0000
+ id 1juZZK-00004w-AU
+ for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 10:50:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 280162E805B
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 10:41:11 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 4D0B22E80ED
+ for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 10:50:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 12 Jul 2020 10:32:30 -0000
+Date: Sun, 12 Jul 2020 10:38:12 -0000
 From: Simon John <1886318@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: mark-cave-ayland mjt+launchpad-tls sej7278
 X-Launchpad-Bug-Reporter: Simon John (sej7278)
 X-Launchpad-Bug-Modifier: Simon John (sej7278)
 References: <159394898604.17667.6684490731246411850.malonedeb@soybean.canonical.com>
-Message-Id: <159454995017.12982.13087204611074398934.malone@gac.canonical.com>
+Message-Id: <159455029207.19199.5478087622685193827.malone@chaenomeles.canonical.com>
 Subject: [Bug 1886318] Re: Qemu after v5.0.0 breaks macos guests
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +61,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2eb1c2c3d42c0b6c1025938d4d06cf9017f83542
+X-Launchpad-Hash: a7464b1b986151a231b547f3c5e8b1e3f48c69c3
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 04:40:51
@@ -88,11 +88,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-i get this over and over (and only this):
+on a hunch, i applied this, and now macos boots (as 2 from acpi-tmr fits
+in the 1-4 range):
 
-invalid size: acpi-tmr addr 0 size: 2
-
-which seems to reside in hw/acpi/core.c
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index f6d9ec4f13..05ff29b9d7 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -527,7 +527,7 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr=
+, uint64_t val,
+ static const MemoryRegionOps acpi_pm_tmr_ops =3D {
+     .read =3D acpi_pm_tmr_read,
+     .write =3D acpi_pm_tmr_write,
+-    .valid.min_access_size =3D 4,
++    .valid.min_access_size =3D 1,
+     .valid.max_access_size =3D 4,
+     .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
 
 -- =
 
