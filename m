@@ -2,110 +2,126 @@ Return-Path: <SRS0=QItv=AX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C65D7C433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 16:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E42C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 16:23:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FE122068F
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 16:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C254D206F4
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 16:23:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IOLkCG/k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE122068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mV/2jJMH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C254D206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jueaA-00029Q-Qc
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 12:12:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41880)
+	id 1juelF-0004Uk-Ub
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 12:23:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jueZd-0001kP-5h
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 12:11:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30921
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jueZa-0005DG-HQ
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 12:11:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594570284;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5Sgrc0YmiBh6uLty5SoOaucHWsYj4SRJO89mpGF9Ygo=;
- b=IOLkCG/kuqZeEeTPokRQ8OV3Nufc9yC/5IxUH7rWifWJxR9LHpfcNLWCHGZWnnrhWAKxCv
- oTrIuWgcJ/ms8zsTL4YLaUKxmCKDjGuDWy5pP8kxs7VDjYIAvnvFmKI/CKMxjMOcSJPC9U
- TRdGAh480ZEFka5bMUEWXwkOo+302QU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-I6otRQozNeyKfjH1A_YSbw-1; Sun, 12 Jul 2020 12:11:22 -0400
-X-MC-Unique: I6otRQozNeyKfjH1A_YSbw-1
-Received: by mail-wr1-f70.google.com with SMTP id y16so14302725wrr.20
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 09:11:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5Sgrc0YmiBh6uLty5SoOaucHWsYj4SRJO89mpGF9Ygo=;
- b=Ns0iFiLCvBmRA/DVAq4fkOBqam0nP8B8dO0vWYy5BrrZQlkJMZp0GprzOEwoG4DaaU
- TNl3QqptZOF/EP/E6jQCsi00Am1jVyHgV5+EOkssUHRFIWLM0hpJZpG6C6hB9vzZcE7p
- PXgJzYyWq4oMnsvfM23jysnhYMsT1X+T90m1FL+YwRzoOgvyXH4TvhwTg2FQ521pO12y
- Cr5XQBDr2bt81Gd0+9mIagGbIecSCiKHv0O7w/92EMt++MPIl3dyIRBQjDVYmaIwaUPD
- vfCeq8EkFHxgFoFFxq2dY9BPNtTAgEviAVuOD1TJavGGo37JI+/TM/vOqF8SEvHgC8oY
- 85zQ==
-X-Gm-Message-State: AOAM532or5J3mO3reBNzyMTuz8Xxlt0JsOezuTcumVs5WlF7xqT88iZ5
- cQ0q4YaS8GpYwu9obm5sTMI/WopVvnvRfHqieZDE6AtKVtfPU+B/1ctejkJvycs2Xy36gZMRIpX
- LW8pS6hjh9VK18ys=
-X-Received: by 2002:a7b:cb46:: with SMTP id v6mr15715640wmj.73.1594570281601; 
- Sun, 12 Jul 2020 09:11:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwgOZmJi+M5DU81LOvaeyKamgDUDR0RhfiDAv8oBaLSO3LN19FivXr0JlR+a9deFha3bCaa1g==
-X-Received: by 2002:a7b:cb46:: with SMTP id v6mr15715620wmj.73.1594570281365; 
- Sun, 12 Jul 2020 09:11:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ef:39d9:1ecb:6054?
- ([2001:b07:6468:f312:ef:39d9:1ecb:6054])
- by smtp.gmail.com with ESMTPSA id r1sm19509652wrw.24.2020.07.12.09.11.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 12 Jul 2020 09:11:20 -0700 (PDT)
-Subject: Re: migration: broken snapshot saves appear on s390 when small fields
- in migration stream removed
-To: Claudio Fontana <cfontana@suse.de>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <8bbafdec-836d-b7de-cab8-7a325b6e238d@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <55c406cd-b9ca-4e9b-0acd-d33cfe2a70e3@redhat.com>
-Date: Sun, 12 Jul 2020 18:11:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1juekR-000441-UO; Sun, 12 Jul 2020 12:22:40 -0400
+Received: from mail-eopbgr70130.outbound.protection.outlook.com
+ ([40.107.7.130]:5830 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1juekP-0007jq-Ig; Sun, 12 Jul 2020 12:22:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BMaugN0ueW+JTu/7JQDzzlLFd6wPRFMEgEUmhrNJpQFYPIWgKi0hkCuTVa1HMXOh/tpymKpx8gbEEtt8IQzPQXpsHBwXNIuxoI6jv/+zjtf2w90viHqTI7RmnDh/ZQdUZS4M5rCIh8o4O9si/pJkPCkF5Jms4NSf1eeJC2h3vvyfI/4bB/M4qT3aN5+vF1fdAf9RTC6Folz6Y7dFLg49uwppsfW614AGo/WrfbRvi/3s1UVMnIWzhorIDIqmolLcDta1B3CD9T5a1h4V7wt6VPEp6mO4Ys09nHqcboanHis1zagnsFgBo/Byej00vR1y3ctaeNJm2dAM+x6CeAZ9rg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pC/4uTJdowER+CYlnYWnz9aOmJd0XsbGYxbE8Zd1MRw=;
+ b=TeXGRlDs7l8ohNBxZB3z8pJbvDLgs3LEn9J38dpX0zu5UFvLu6fMnGGfnQDT70J8r6UnUsYefxLzlNEVoomze2QXhiLMG7Z1t8P5ELPBDVZbvjfhMv8YmYGBvNQgTzk4no+yeqKHMV0Bjs4Tg8IF4BmZUWPZZlJLh0OSAv+uHJeph2y36PT3Ht5+laHFLgj8tH7byALv4jtWO32VF0Jq31DYdMTLr+1G1yUVMbRC3dmFqjcPDLW5p5gqLP01l5/LWG66E8Icm8v18hp/vckcx04HsetCS+poazVUC5AIzedPUwqvITb3oQGMm0bXEDFtfXiQaPKRlkt7lRLCYYZo2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pC/4uTJdowER+CYlnYWnz9aOmJd0XsbGYxbE8Zd1MRw=;
+ b=mV/2jJMHKufm1odeoIX8Djc1mGxUGIwOu/qQO2pJy1M/6Zq0nv3zaXFIWqm+UcpG1eB796IqNBpTVD2B3oEzc2RnUDGPrA6GQJ9ZLNP5Dy2ekFCd29x9InxdtuQpjI7aP8pdk3knl//Pa+byUaBnYvKKbl45MmZLDUHXBjvGawI=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM7PR08MB5445.eurprd08.prod.outlook.com (2603:10a6:20b:10d::7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Sun, 12 Jul
+ 2020 16:07:30 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.025; Sun, 12 Jul 2020
+ 16:07:30 +0000
+Subject: Re: [PATCH v2] scripts/simplebench: compare write request performance
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <1593181915-853845-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <73ac42ec-dc28-c4e6-a555-d9cf11cbeed0@virtuozzo.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <f19f4323-94cb-4404-1530-279d256be46b@virtuozzo.com>
+Date: Sun, 12 Jul 2020 19:07:26 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <73ac42ec-dc28-c4e6-a555-d9cf11cbeed0@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+X-ClientProxiedBy: AM3PR05CA0105.eurprd05.prod.outlook.com
+ (2603:10a6:207:1::31) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
-In-Reply-To: <8bbafdec-836d-b7de-cab8-7a325b6e238d@suse.de>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 12:11:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.191) by
+ AM3PR05CA0105.eurprd05.prod.outlook.com (2603:10a6:207:1::31) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3174.20 via Frontend Transport; Sun, 12 Jul 2020 16:07:28 +0000
+X-Originating-IP: [109.252.114.191]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ca2f9517-78e3-46be-b911-08d8267daddd
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5445:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5445B9E83BA3341924E0B7B9F4630@AM7PR08MB5445.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:983;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5FXCUyOxKiIBMOEntuxMLCAXvCBYGOwDHL1rfN5v34TuEHLrmkiUQTQskOAbcnv47Qa+zJGNZTHR7ySx1XJxRCZyKQQfw45N1tOMInrq8lsZvi6CVyBZNR+n9simgsmiAiaaXEauvjDQ4mbMFp0ilUtUeavSNMa8J6+yqQEotkKfZmhRefa4M09pdM1hSekz++zP1ArMQYb4NIfA9E0N9BNo8CwY0N/wknt0qjLkoAV+j59syG/PaYpoOuOTrqdoT5Qw9vbzGdiyJgLiJsAHqWge8fuSu+qKdxtWeMPh0DlrHFBsU80VFKvOV6l1Naj94UudivNYMEKsWeoH0kqy8sV/MfuweHMg1VZuudYdrp6NGoIlSmAG4UbChKVhMYf9
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(39830400003)(136003)(376002)(366004)(346002)(83380400001)(31686004)(478600001)(4326008)(31696002)(26005)(186003)(16526019)(36756003)(5660300002)(316002)(2616005)(6512007)(6506007)(2906002)(44832011)(86362001)(956004)(53546011)(8676002)(107886003)(66556008)(52116002)(6486002)(8936002)(66946007)(66476007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: Ri+VOsserbptUtgHbxgl/C61VIASQazp6knmSb0+Z4xFQEKonhg+CktuV6TpbykapD9vwETggZi3ifJHeKjao6qJZOw+uw7AGKHJW95+UyvE5lP5bEpIy4DKiZy79Mp3aENUWtuAvETR31Wp3qlJzx4K4GAPRwxsYtnCvn5Tx7fYMh1lNQAMGbwjIEzu3tesxRSIe4i6xut687Fi2y/ThziR8GimPg7CQ92KMySYOXOsaF+tgi+l/WBK+0UH9i1DcaRI+2MJcQWEWKm1lLIsry1MzInAHhHQXnlU1x4mbLdaYafUpd/GJlCNHLOGRwneiArhx6i0xKS/zYmyquRHu5INkEiLDlnkVYvFkMIFVSGOzgahpvh1tR4A30W/tqYFKZx3mPfO1vq+6fl4JXVsea5ADSbM7Jv7ph16EQfB0HSmKB61+tzWgvN3uTyw3/Vz+qbEbpQEzOmlRGel8YGjAo3BvB5BvIu/GCZ4fF9WeaU=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca2f9517-78e3-46be-b911-08d8267daddd
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2020 16:07:30.4370 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0AN4NxAKQXYj4epprbXydqlNgObOUvvwcDZHNBcqAAGWZagjm4uAuMQIAMDzZSekvRt1JcALxPNfu96xfnVjR86UEEwV9BJ/Mu3rxiaBnwI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5445
+Received-SPF: pass client-ip=40.107.7.130;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 12:22:34
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,38 +134,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/07/20 12:00, Claudio Fontana wrote:
-> Note: only the === -blockdev with a backing file === part of test 267 fails. -blockdev with NBD is ok, like all the rest.
-> 
-> 
-> Interesting facts about s390 in particular: its save/load code includes the transfer of "storage keys",
-> which include a buffer of 32768 bytes of keydata in the stream.
-> 
-> The code (hw/s390x/s390-skeys.c),
-> is modeled similarly to RAM transfer (like in migration/ram.c), with an EOS (end of stream) marker.
-> 
-> Countrary to RAM transfer code though, after qemu_put_be64(f, EOS), the s390 code does not qemu_fflush(f).
+On 11.07.2020 16:05, Vladimir Sementsov-Ogievskiy wrote:
+> 26.06.2020 17:31, Andrey Shinkevich wrote:
+>> The script 'bench_write_req.py' allows comparing performances of write
+>> request for two qemu-img binary files.
+>> An example with (qemu-img binary 1) and without (qemu-img binary 2) the
+>> applied patch "qcow2: skip writing zero buffers to empty COW areas"
+>> (git commit ID: c8bb23cbdbe32f5)
+>> The <unaligned> case does not involve the COW optimization.
+>>
+> Good, this proves that c8bb23cbdbe32f5 makes sense.
+>
+>> Suggested-by: Denis V. Lunev <den@openvz.org>
+>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>> v2:
+>>    01: Three more test cases added to the script:
+>>        <simple case>
+>>        <general case>
+>>        <unaligned>
+>>
+>>   scripts/simplebench/bench_write_req.py | 201 
+>> +++++++++++++++++++++++++++++++++
+>>   1 file changed, 201 insertions(+)
+>>   create mode 100755 scripts/simplebench/bench_write_req.py
+>>
+>> diff --git a/scripts/simplebench/bench_write_req.py 
+>> b/scripts/simplebench/bench_write_req.py
+>> new file mode 100755
+>> index 0000000..fe92d01
+>> --- /dev/null
+>> +++ b/scripts/simplebench/bench_write_req.py
+>> @@ -0,0 +1,201 @@
+>
+> Next, I don't understand, are you trying to fill qcow2 image by dd 
+> directly? This is strange. Even if you don't break metadata, you don't 
+> change it, so all cluster will remain empty.
+>
+>
+I have tested and it works as designed.
 
-1) Are there unexpected differences in the migration stream?  That is,
-you could modify qcow2.c to fopen/fwrite/fclose the bytes as they're
-written and read, and see if something does not match.
+This dd command doesn't hurt the metadata and fills the image with 
+random data. The actual disk size becomes about 1G after the dd command.
 
-2) If it matches, are there unexpected differences other than the lack
-of icount section when you apply the reproducer patch?
-
-The fflush part makes me put more hope in the first, but both could help
-you debug it.
-
-Thanks,
-
-Paolo
+Andrey
 
 
