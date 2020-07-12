@@ -2,94 +2,79 @@ Return-Path: <SRS0=QItv=AX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB24DC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 18:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D414FC433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 19:02:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8175206E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 18:45:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hhCS54N8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8175206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9AF5F206F0
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 19:02:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF5F206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jugyO-0001bf-W6
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 14:45:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35312)
+	id 1juhEz-0004sL-QQ
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 15:02:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jugxR-0000le-77
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 14:44:13 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50856
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jugxO-0008QB-HZ
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 14:44:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594579448;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=5rowCU0d8dy8CT3fvR8s8OIjg5s+LA7nX8tMMp+CnKA=;
- b=hhCS54N8My9jWif+X0Gom7ODqljvVpl3QKTzj7GCHPJXFljO1jELMf/8nFOXkQF2JHzTAD
- SVH7401O54cDmXIW7KMwQ64hhVbbbjIvLikdy2x7WlfknZKgz2hYqe5t5Y3ZaMTf9hCDET
- fb/qCefEYJhQOxisudVqsCy2pPDqkNU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-t4hd5M1YP5GC7baZ1l9D0w-1; Sun, 12 Jul 2020 14:44:06 -0400
-X-MC-Unique: t4hd5M1YP5GC7baZ1l9D0w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8C7D106B77D
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 18:44:05 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 28C595D9EF;
- Sun, 12 Jul 2020 18:44:00 +0000 (UTC)
-Subject: Re: [PATCH] tests: improve performance of device-introspect-test
-To: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200709112857.3760116-1-berrange@redhat.com>
- <87mu47gms3.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <c353a610-6989-331c-cb65-a893602a376a@redhat.com>
-Date: Sun, 12 Jul 2020 20:43:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juhDc-00041a-2V
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 15:00:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40066)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1juhDY-0002LT-U3
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 15:00:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1juhDW-00041P-MS
+ for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 19:00:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A7AC52E80E7
+ for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 19:00:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87mu47gms3.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 14:44:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 12 Jul 2020 18:51:19 -0000
+From: Alexander Bulekov <1887303@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+Message-Id: <159457987931.19254.12792549057508161525.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1887303] [NEW] Assertion failure in *bmdma_active_if
+ `bmdma->bus->retry_unit != (uint8_t)-1' failed.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f000e73b47d54a37f321825cbf044243c734a438
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 15:00:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,42 +83,591 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: Bug 1887303 <1887303@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/07/2020 22.03, Markus Armbruster wrote:
-[...]
->   With -m slow, we test 2 * #machines * #devices introspections,
->   i.e. from 132 (tricore) to over 10k (ppc 13046, ppc64 23426, arm
->   82708, aarch64 89760).  Median is ~1600, sum is ~260k.
-> 
->   Except we actually test just 89k now, because the test *fails* for arm
->   and aarch64 after some 500 introspections: introspecting device
->   msf2-soc with machine ast2600-evb makes QEMU terminate unsuccessfully
->   with "Unsupported NIC model: ftgmac100".  Cause: m2sxxx_soc_initfn()
->   calls qemu_check_nic_model().  Goes back to commit 05b7374a58 "msf2:
->   Add EMAC block to SmartFusion2 SoC", merged some ten weeks ago.  This
->   is exactly the kind of mistake the test is designed to catch.  How
->   come it wasn't?  Possibly due to unlucky combination with the slowdown
->   discussed in the next item (but that was less than four weeks ago).
+Public bug reported:
 
-Well, the explanation is simpler: Nobody ran the
-device-introspection-test with the arm target in slow mode! Hardly
-anybody runs the tests with SPEED=slow, and in the CI, we currently only
-run the test in slow mode for the i386-softmmu, ppc64-softmmu and
-mips64-softmmu targets. Simply because testing with arm was toooo slow
-when I wrote that CI script, I didn't want to wait endlessly here.
+Hello,
+Here is a QTest Reproducer:
 
-But now with the speedup patch from Daniel, and maybe with some smarter
-checks in the YML file (I now know that there are things like "only:
-changes:" keywords so we could e.g. only run that test if something in
-hw/arm/* has changed), I think it should be feasible to get this
-included in the CI, too.
+cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
+ -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
+ -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,forma=
+t=3Draw\
+ -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,forma=
+t=3Draw\
+ -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
+outw 0x176 0x3538
+outw 0x376 0x6007
+outw 0x376 0x6b6b
+outw 0x176 0x985c
+outl 0xcf8 0x80000903
+outl 0xcfc 0x2f2931
+outl 0xcf8 0x80000920
+outb 0xcfc 0x6b
+outb 0x68 0x7
+outw 0x176 0x2530
+EOF
 
- Thomas
+Here is the call-stack:
 
+    #8 0x7f00e0443091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/asser=
+t/assert.c:101:3
+    #9 0x55e163f5a1af in bmdma_active_if /home/alxndr/Development/qemu/incl=
+ude/hw/ide/pci.h:59:5
+    #10 0x55e163f5a1af in bmdma_prepare_buf /home/alxndr/Development/qemu/h=
+w/ide/pci.c:132:19
+    #11 0x55e163f4f00d in ide_dma_cb /home/alxndr/Development/qemu/hw/ide/c=
+ore.c:898:17
+    #12 0x55e163de86ad in dma_complete /home/alxndr/Development/qemu/dma-he=
+lpers.c:120:9
+    #13 0x55e163de86ad in dma_blk_cb /home/alxndr/Development/qemu/dma-help=
+ers.c:138:9
+    #14 0x55e1642ade85 in blk_aio_complete /home/alxndr/Development/qemu/bl=
+ock/block-backend.c:1402:9
+    #15 0x55e1642ade85 in blk_aio_complete_bh /home/alxndr/Development/qemu=
+/block/block-backend.c:1412:5
+    #16 0x55e16443556f in aio_bh_call /home/alxndr/Development/qemu/util/as=
+ync.c:136:5
+    #17 0x55e16443556f in aio_bh_poll /home/alxndr/Development/qemu/util/as=
+ync.c:164:13
+    #18 0x55e16440fac3 in aio_dispatch /home/alxndr/Development/qemu/util/a=
+io-posix.c:380:5
+    #19 0x55e164436dac in aio_ctx_dispatch /home/alxndr/Development/qemu/ut=
+il/async.c:306:5
+    #20 0x7f00e16e29ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gn=
+u/libglib-2.0.so.0+0x4e9ed)
+    #21 0x55e164442f2b in glib_pollfds_poll /home/alxndr/Development/qemu/u=
+til/main-loop.c:219:9
+    #22 0x55e164442f2b in os_host_main_loop_wait /home/alxndr/Development/q=
+emu/util/main-loop.c:242:5
+    #23 0x55e164442f2b in main_loop_wait /home/alxndr/Development/qemu/util=
+/main-loop.c:518:11
+    #24 0x55e164376953 in flush_events /home/alxndr/Development/qemu/tests/=
+qtest/fuzz/fuzz.c:47:9
+    #25 0x55e16437b8fa in general_fuzz /home/alxndr/Development/qemu/tests/=
+qtest/fuzz/general_fuzz.c:544:17
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+
+Here is the same assertion failure but triggered through a different
+call-stack:
+
+cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
+ -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
+ -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,forma=
+t=3Draw\
+ -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,forma=
+t=3Draw\
+ -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
+outw 0x171 0x2fe9
+outb 0x177 0xa0
+outl 0x170 0x928
+outl 0x170 0x2b923b31
+outl 0x170 0x800a24d7
+outl 0xcf8 0x80000903
+outl 0xcfc 0x842700
+outl 0xcf8 0x80000920
+outb 0xcfc 0x5e
+outb 0x58 0x7
+outb 0x376 0x5
+outw 0x376 0x11
+outw 0x176 0x3538
+EOF
+
+Call-stack:
+    #8 0x7f00e0443091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/asser=
+t/assert.c:101:3
+    #9 0x55e163f5a622 in bmdma_active_if /home/alxndr/Development/qemu/incl=
+ude/hw/ide/pci.h:59:5
+    #10 0x55e163f5a622 in bmdma_rw_buf /home/alxndr/Development/qemu/hw/ide=
+/pci.c:187:19
+    #11 0x55e163f57577 in ide_atapi_cmd_read_dma_cb /home/alxndr/Developmen=
+t/qemu/hw/ide/atapi.c:375:13
+    #12 0x55e163f44c55 in ide_buffered_readv_cb /home/alxndr/Development/qe=
+mu/hw/ide/core.c:650:9
+    #13 0x55e1642ade85 in blk_aio_complete /home/alxndr/Development/qemu/bl=
+ock/block-backend.c:1402:9
+    #14 0x55e1642ade85 in blk_aio_complete_bh /home/alxndr/Development/qemu=
+/block/block-backend.c:1412:5
+    #15 0x55e16443556f in aio_bh_call /home/alxndr/Development/qemu/util/as=
+ync.c:136:5
+    #16 0x55e16443556f in aio_bh_poll /home/alxndr/Development/qemu/util/as=
+ync.c:164:13
+    #17 0x55e16440fac3 in aio_dispatch /home/alxndr/Development/qemu/util/a=
+io-posix.c:380:5
+    #18 0x55e164436dac in aio_ctx_dispatch /home/alxndr/Development/qemu/ut=
+il/async.c:306:5
+    #19 0x7f00e16e29ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gn=
+u/libglib-2.0.so.0+0x4e9ed)
+    #20 0x55e164442f2b in glib_pollfds_poll /home/alxndr/Development/qemu/u=
+til/main-loop.c:219:9
+    #21 0x55e164442f2b in os_host_main_loop_wait /home/alxndr/Development/q=
+emu/util/main-loop.c:242:5
+    #22 0x55e164442f2b in main_loop_wait /home/alxndr/Development/qemu/util=
+/main-loop.c:518:11
+    #23 0x55e164376953 in flush_events /home/alxndr/Development/qemu/tests/=
+qtest/fuzz/fuzz.c:47:9
+    #24 0x55e16437b8fa in general_fuzz /home/alxndr/Development/qemu/tests/=
+qtest/fuzz/general_fuzz.c:544:17
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+
+The first reproducer with -trace ide*:
+[I 1594579788.601818] OPENED
+26995@1594579788.617583:ide_reset IDEstate 0x565534a7b898
+26995@1594579788.617684:ide_reset IDEstate 0x565534a7bc68
+26995@1594579788.618019:ide_reset IDEstate 0x565534a7c188
+26995@1594579788.618087:ide_reset IDEstate 0x565534a7c558
+26995@1594579788.619271:ide_reset IDEstate 0x565534a7c188
+26995@1594579788.619377:ide_reset IDEstate 0x565534a7c558
+26995@1594579788.623224:ide_reset IDEstate 0x565534a7b898
+26995@1594579788.623267:ide_reset IDEstate 0x565534a7bc68
+26995@1594579788.623273:ide_reset IDEstate 0x565534a7c188
+26995@1594579788.623275:ide_reset IDEstate 0x565534a7c558
+[R +0.023386] outw 0x176 0x3538
+26995@1594579788.625224:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head); =
+val 0x38; bus 0x565534a7c100 IDEState 0x565534a7c188
+26995@1594579788.625228:ide_ioport_write IDE PIO wr @ 0x177 (Command); val =
+0x35; bus 0x565534a7c100 IDEState 0x565534a7c558
+26995@1594579788.625230:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; stat=
+e 0x565534a7c558; cmd 0x35
+[S +0.023416] OK
+[R +0.023442] outw 0x376 0x6007
+26995@1594579788.625263:ide_cmd_write IDE PIO wr @ 0x376 (Device Control); =
+val 0x07; bus 0x565534a7c100
+[S +0.023447] OK
+[R +0.023455] outw 0x376 0x6b6b
+26995@1594579788.625276:ide_cmd_write IDE PIO wr @ 0x376 (Device Control); =
+val 0x6b; bus 0x565534a7c100
+[S +0.023460] OK
+[R +0.023464] outw 0x176 0x985c
+26995@1594579788.625285:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head); =
+val 0x5c; bus 0x565534a7c100 IDEState 0x565534a7c558
+26995@1594579788.625287:ide_ioport_write IDE PIO wr @ 0x177 (Command); val =
+0x98; bus 0x565534a7c100 IDEState 0x565534a7c558
+26995@1594579788.625289:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; stat=
+e 0x565534a7c558; cmd 0x98
+[S +0.023473] OK
+[R +0.023477] outl 0xcf8 0x80000903
+[S +0.023481] OK
+[R +0.023485] outl 0xcfc 0x2f2931
+[S +0.023492] OK
+[R +0.023496] outl 0xcf8 0x80000920
+[S +0.023498] OK
+[R +0.023503] outb 0xcfc 0x6b
+[S +0.023644] OK
+[R +0.023651] outb 0x68 0x7
+26995@1594579788.625548:ide_dma_cb IDEState 0x565534a7c558; sector_num=3D1 =
+n=3D255 cmd=3DDMA WRITE
+[S +0.023809] OK
+[R +0.023817] outw 0x176 0x2530
+26995@1594579788.625638:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head); =
+val 0x30; bus 0x565534a7c100 IDEState 0x565534a7c558
+26995@1594579788.625640:ide_ioport_write IDE PIO wr @ 0x177 (Command); val =
+0x25; bus 0x565534a7c100 IDEState 0x565534a7c558
+26995@1594579788.625642:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; stat=
+e 0x565534a7c558; cmd 0x25
+[S +0.023827] OK
+qemu-system-i386: /home/alxndr/Development/qemu/include/hw/ide/pci.h:59: ID=
+EState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit !=
+=3D (uint8_t)-1' failed.
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+
+The second reproducer with -trace ide*:
+
+[I 1594579681.691528] OPENED
+8293@1594579681.707423:ide_reset IDEstate 0x55fc044c3898
+8293@1594579681.707540:ide_reset IDEstate 0x55fc044c3c68
+8293@1594579681.707902:ide_reset IDEstate 0x55fc044c4188
+8293@1594579681.707969:ide_reset IDEstate 0x55fc044c4558
+8293@1594579681.709859:ide_reset IDEstate 0x55fc044c4188
+8293@1594579681.709976:ide_reset IDEstate 0x55fc044c4558
+8293@1594579681.714051:ide_reset IDEstate 0x55fc044c3898
+8293@1594579681.714073:ide_reset IDEstate 0x55fc044c3c68
+8293@1594579681.714076:ide_reset IDEstate 0x55fc044c4188
+8293@1594579681.714079:ide_reset IDEstate 0x55fc044c4558
+[R +0.024386] outw 0x171 0x2fe9
+8293@1594579681.715950:ide_ioport_write IDE PIO wr @ 0x171 (Features); val =
+0xe9; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+8293@1594579681.715955:ide_ioport_write IDE PIO wr @ 0x172 (Sector Count); =
+val 0x2f; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+OK
+[S +0.024430] OK
+[R +0.024436] outb 0x177 0xa0
+8293@1594579681.715967:ide_ioport_write IDE PIO wr @ 0x177 (Command); val 0=
+xa0; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+8293@1594579681.715970:ide_exec_cmd IDE exec cmd: bus 0x55fc044c4100; state=
+ 0x55fc044c4188; cmd 0xa0
+OK
+[S +0.024444] OK
+[R +0.024448] outl 0x170 0x928
+8293@1594579681.715978:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); val=
+ 0x00000928; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+OK
+[S +0.024453] OK
+[R +0.024456] outl 0x170 0x2b923b31
+8293@1594579681.715986:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); val=
+ 0x2b923b31; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+OK
+[S +0.024460] OK
+[R +0.024464] outl 0x170 0x800a24d7
+8293@1594579681.715994:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); val=
+ 0x800a24d7; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+8293@1594579681.715996:ide_atapi_cmd IDEState: 0x55fc044c4188; cmd: 0x28
+8293@1594579681.716000:ide_atapi_cmd_packet IDEState: 0x55fc044c4188; limit=
+=3D0xeb14 packet: 28 09 00 00 31 3b 92 2b d7 24 0a 80
+8293@1594579681.716004:ide_atapi_cmd_read IDEState: 0x55fc044c4188; read dm=
+a: LBA=3D12603 nb_sectors=3D11223
+OK
+[S +0.024479] OK
+[R +0.024483] outl 0xcf8 0x80000903
+OK
+[S +0.024485] OK
+[R +0.024489] outl 0xcfc 0x842700
+OK
+[S +0.024604] OK
+[R +0.024610] outl 0xcf8 0x80000920
+OK
+[S +0.024613] OK
+[R +0.024616] outb 0xcfc 0x5e
+OK
+[S +0.024720] OK
+[R +0.024726] outb 0x58 0x7
+8293@1594579681.716258:ide_atapi_cmd_read_dma_cb_aio IDEState: 0x55fc044c41=
+88; aio read: lba=3D12603 n=3D64
+OK
+[S +0.024786] OK
+[R +0.024791] outb 0x376 0x5
+8293@1594579681.716322:ide_cmd_write IDE PIO wr @ 0x376 (Device Control); v=
+al 0x05; bus 0x55fc044c4100
+OK
+[S +0.024797] OK
+[R +0.024800] outw 0x376 0x11
+8293@1594579681.716330:ide_cmd_write IDE PIO wr @ 0x376 (Device Control); v=
+al 0x11; bus 0x55fc044c4100
+OK
+[S +0.024804] OK
+[R +0.024807] outw 0x176 0x3538
+8293@1594579681.716337:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head); v=
+al 0x38; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+8293@1594579681.716340:ide_ioport_write IDE PIO wr @ 0x177 (Command); val 0=
+x35; bus 0x55fc044c4100 IDEState 0x55fc044c4558
+8293@1594579681.716342:ide_exec_cmd IDE exec cmd: bus 0x55fc044c4100; state=
+ 0x55fc044c4558; cmd 0x35
+8293@1594579681.716388:ide_dma_cb IDEState 0x55fc044c4558; sector_num=3D504=
+ n=3D257 cmd=3DDMA WRITE
+OK
+[S +0.024882] OK
+qemu-system-i386: /home/alxndr/Development/qemu/include/hw/ide/pci.h:59: ID=
+EState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit !=
+=3D (uint8_t)-1' failed.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1887303
+
+Title:
+  Assertion failure in *bmdma_active_if `bmdma->bus->retry_unit !=3D
+  (uint8_t)-1' failed.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  Here is a QTest Reproducer:
+
+  cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
+   -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
+   -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
+  outw 0x176 0x3538
+  outw 0x376 0x6007
+  outw 0x376 0x6b6b
+  outw 0x176 0x985c
+  outl 0xcf8 0x80000903
+  outl 0xcfc 0x2f2931
+  outl 0xcf8 0x80000920
+  outb 0xcfc 0x6b
+  outb 0x68 0x7
+  outw 0x176 0x2530
+  EOF
+
+  Here is the call-stack:
+
+      #8 0x7f00e0443091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/ass=
+ert/assert.c:101:3
+      #9 0x55e163f5a1af in bmdma_active_if /home/alxndr/Development/qemu/in=
+clude/hw/ide/pci.h:59:5
+      #10 0x55e163f5a1af in bmdma_prepare_buf /home/alxndr/Development/qemu=
+/hw/ide/pci.c:132:19
+      #11 0x55e163f4f00d in ide_dma_cb /home/alxndr/Development/qemu/hw/ide=
+/core.c:898:17
+      #12 0x55e163de86ad in dma_complete /home/alxndr/Development/qemu/dma-=
+helpers.c:120:9
+      #13 0x55e163de86ad in dma_blk_cb /home/alxndr/Development/qemu/dma-he=
+lpers.c:138:9
+      #14 0x55e1642ade85 in blk_aio_complete /home/alxndr/Development/qemu/=
+block/block-backend.c:1402:9
+      #15 0x55e1642ade85 in blk_aio_complete_bh /home/alxndr/Development/qe=
+mu/block/block-backend.c:1412:5
+      #16 0x55e16443556f in aio_bh_call /home/alxndr/Development/qemu/util/=
+async.c:136:5
+      #17 0x55e16443556f in aio_bh_poll /home/alxndr/Development/qemu/util/=
+async.c:164:13
+      #18 0x55e16440fac3 in aio_dispatch /home/alxndr/Development/qemu/util=
+/aio-posix.c:380:5
+      #19 0x55e164436dac in aio_ctx_dispatch /home/alxndr/Development/qemu/=
+util/async.c:306:5
+      #20 0x7f00e16e29ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e9ed)
+      #21 0x55e164442f2b in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #22 0x55e164442f2b in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #23 0x55e164442f2b in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #24 0x55e164376953 in flush_events /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/fuzz.c:47:9
+      #25 0x55e16437b8fa in general_fuzz /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/general_fuzz.c:544:17
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  Here is the same assertion failure but triggered through a different
+  call-stack:
+
+  cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
+   -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
+   -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
+  outw 0x171 0x2fe9
+  outb 0x177 0xa0
+  outl 0x170 0x928
+  outl 0x170 0x2b923b31
+  outl 0x170 0x800a24d7
+  outl 0xcf8 0x80000903
+  outl 0xcfc 0x842700
+  outl 0xcf8 0x80000920
+  outb 0xcfc 0x5e
+  outb 0x58 0x7
+  outb 0x376 0x5
+  outw 0x376 0x11
+  outw 0x176 0x3538
+  EOF
+
+  Call-stack:
+      #8 0x7f00e0443091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/ass=
+ert/assert.c:101:3
+      #9 0x55e163f5a622 in bmdma_active_if /home/alxndr/Development/qemu/in=
+clude/hw/ide/pci.h:59:5
+      #10 0x55e163f5a622 in bmdma_rw_buf /home/alxndr/Development/qemu/hw/i=
+de/pci.c:187:19
+      #11 0x55e163f57577 in ide_atapi_cmd_read_dma_cb /home/alxndr/Developm=
+ent/qemu/hw/ide/atapi.c:375:13
+      #12 0x55e163f44c55 in ide_buffered_readv_cb /home/alxndr/Development/=
+qemu/hw/ide/core.c:650:9
+      #13 0x55e1642ade85 in blk_aio_complete /home/alxndr/Development/qemu/=
+block/block-backend.c:1402:9
+      #14 0x55e1642ade85 in blk_aio_complete_bh /home/alxndr/Development/qe=
+mu/block/block-backend.c:1412:5
+      #15 0x55e16443556f in aio_bh_call /home/alxndr/Development/qemu/util/=
+async.c:136:5
+      #16 0x55e16443556f in aio_bh_poll /home/alxndr/Development/qemu/util/=
+async.c:164:13
+      #17 0x55e16440fac3 in aio_dispatch /home/alxndr/Development/qemu/util=
+/aio-posix.c:380:5
+      #18 0x55e164436dac in aio_ctx_dispatch /home/alxndr/Development/qemu/=
+util/async.c:306:5
+      #19 0x7f00e16e29ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e9ed)
+      #20 0x55e164442f2b in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #21 0x55e164442f2b in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #22 0x55e164442f2b in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #23 0x55e164376953 in flush_events /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/fuzz.c:47:9
+      #24 0x55e16437b8fa in general_fuzz /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/general_fuzz.c:544:17
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  The first reproducer with -trace ide*:
+  [I 1594579788.601818] OPENED
+  26995@1594579788.617583:ide_reset IDEstate 0x565534a7b898
+  26995@1594579788.617684:ide_reset IDEstate 0x565534a7bc68
+  26995@1594579788.618019:ide_reset IDEstate 0x565534a7c188
+  26995@1594579788.618087:ide_reset IDEstate 0x565534a7c558
+  26995@1594579788.619271:ide_reset IDEstate 0x565534a7c188
+  26995@1594579788.619377:ide_reset IDEstate 0x565534a7c558
+  26995@1594579788.623224:ide_reset IDEstate 0x565534a7b898
+  26995@1594579788.623267:ide_reset IDEstate 0x565534a7bc68
+  26995@1594579788.623273:ide_reset IDEstate 0x565534a7c188
+  26995@1594579788.623275:ide_reset IDEstate 0x565534a7c558
+  [R +0.023386] outw 0x176 0x3538
+  26995@1594579788.625224:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0x38; bus 0x565534a7c100 IDEState 0x565534a7c188
+  26995@1594579788.625228:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0x35; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625230:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; st=
+ate 0x565534a7c558; cmd 0x35
+  [S +0.023416] OK
+  [R +0.023442] outw 0x376 0x6007
+  26995@1594579788.625263:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
+; val 0x07; bus 0x565534a7c100
+  [S +0.023447] OK
+  [R +0.023455] outw 0x376 0x6b6b
+  26995@1594579788.625276:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
+; val 0x6b; bus 0x565534a7c100
+  [S +0.023460] OK
+  [R +0.023464] outw 0x176 0x985c
+  26995@1594579788.625285:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0x5c; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625287:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0x98; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625289:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; st=
+ate 0x565534a7c558; cmd 0x98
+  [S +0.023473] OK
+  [R +0.023477] outl 0xcf8 0x80000903
+  [S +0.023481] OK
+  [R +0.023485] outl 0xcfc 0x2f2931
+  [S +0.023492] OK
+  [R +0.023496] outl 0xcf8 0x80000920
+  [S +0.023498] OK
+  [R +0.023503] outb 0xcfc 0x6b
+  [S +0.023644] OK
+  [R +0.023651] outb 0x68 0x7
+  26995@1594579788.625548:ide_dma_cb IDEState 0x565534a7c558; sector_num=3D=
+1 n=3D255 cmd=3DDMA WRITE
+  [S +0.023809] OK
+  [R +0.023817] outw 0x176 0x2530
+  26995@1594579788.625638:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0x30; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625640:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0x25; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625642:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; st=
+ate 0x565534a7c558; cmd 0x25
+  [S +0.023827] OK
+  qemu-system-i386: /home/alxndr/Development/qemu/include/hw/ide/pci.h:59: =
+IDEState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit =
+!=3D (uint8_t)-1' failed.
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  The second reproducer with -trace ide*:
+
+  [I 1594579681.691528] OPENED
+  8293@1594579681.707423:ide_reset IDEstate 0x55fc044c3898
+  8293@1594579681.707540:ide_reset IDEstate 0x55fc044c3c68
+  8293@1594579681.707902:ide_reset IDEstate 0x55fc044c4188
+  8293@1594579681.707969:ide_reset IDEstate 0x55fc044c4558
+  8293@1594579681.709859:ide_reset IDEstate 0x55fc044c4188
+  8293@1594579681.709976:ide_reset IDEstate 0x55fc044c4558
+  8293@1594579681.714051:ide_reset IDEstate 0x55fc044c3898
+  8293@1594579681.714073:ide_reset IDEstate 0x55fc044c3c68
+  8293@1594579681.714076:ide_reset IDEstate 0x55fc044c4188
+  8293@1594579681.714079:ide_reset IDEstate 0x55fc044c4558
+  [R +0.024386] outw 0x171 0x2fe9
+  8293@1594579681.715950:ide_ioport_write IDE PIO wr @ 0x171 (Features); va=
+l 0xe9; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  8293@1594579681.715955:ide_ioport_write IDE PIO wr @ 0x172 (Sector Count)=
+; val 0x2f; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  OK
+  [S +0.024430] OK
+  [R +0.024436] outb 0x177 0xa0
+  8293@1594579681.715967:ide_ioport_write IDE PIO wr @ 0x177 (Command); val=
+ 0xa0; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  8293@1594579681.715970:ide_exec_cmd IDE exec cmd: bus 0x55fc044c4100; sta=
+te 0x55fc044c4188; cmd 0xa0
+  OK
+  [S +0.024444] OK
+  [R +0.024448] outl 0x170 0x928
+  8293@1594579681.715978:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); v=
+al 0x00000928; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+  OK
+  [S +0.024453] OK
+  [R +0.024456] outl 0x170 0x2b923b31
+  8293@1594579681.715986:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); v=
+al 0x2b923b31; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+  OK
+  [S +0.024460] OK
+  [R +0.024464] outl 0x170 0x800a24d7
+  8293@1594579681.715994:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); v=
+al 0x800a24d7; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+  8293@1594579681.715996:ide_atapi_cmd IDEState: 0x55fc044c4188; cmd: 0x28
+  8293@1594579681.716000:ide_atapi_cmd_packet IDEState: 0x55fc044c4188; lim=
+it=3D0xeb14 packet: 28 09 00 00 31 3b 92 2b d7 24 0a 80
+  8293@1594579681.716004:ide_atapi_cmd_read IDEState: 0x55fc044c4188; read =
+dma: LBA=3D12603 nb_sectors=3D11223
+  OK
+  [S +0.024479] OK
+  [R +0.024483] outl 0xcf8 0x80000903
+  OK
+  [S +0.024485] OK
+  [R +0.024489] outl 0xcfc 0x842700
+  OK
+  [S +0.024604] OK
+  [R +0.024610] outl 0xcf8 0x80000920
+  OK
+  [S +0.024613] OK
+  [R +0.024616] outb 0xcfc 0x5e
+  OK
+  [S +0.024720] OK
+  [R +0.024726] outb 0x58 0x7
+  8293@1594579681.716258:ide_atapi_cmd_read_dma_cb_aio IDEState: 0x55fc044c=
+4188; aio read: lba=3D12603 n=3D64
+  OK
+  [S +0.024786] OK
+  [R +0.024791] outb 0x376 0x5
+  8293@1594579681.716322:ide_cmd_write IDE PIO wr @ 0x376 (Device Control);=
+ val 0x05; bus 0x55fc044c4100
+  OK
+  [S +0.024797] OK
+  [R +0.024800] outw 0x376 0x11
+  8293@1594579681.716330:ide_cmd_write IDE PIO wr @ 0x376 (Device Control);=
+ val 0x11; bus 0x55fc044c4100
+  OK
+  [S +0.024804] OK
+  [R +0.024807] outw 0x176 0x3538
+  8293@1594579681.716337:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head);=
+ val 0x38; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  8293@1594579681.716340:ide_ioport_write IDE PIO wr @ 0x177 (Command); val=
+ 0x35; bus 0x55fc044c4100 IDEState 0x55fc044c4558
+  8293@1594579681.716342:ide_exec_cmd IDE exec cmd: bus 0x55fc044c4100; sta=
+te 0x55fc044c4558; cmd 0x35
+  8293@1594579681.716388:ide_dma_cb IDEState 0x55fc044c4558; sector_num=3D5=
+04 n=3D257 cmd=3DDMA WRITE
+  OK
+  [S +0.024882] OK
+  qemu-system-i386: /home/alxndr/Development/qemu/include/hw/ide/pci.h:59: =
+IDEState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit =
+!=3D (uint8_t)-1' failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1887303/+subscriptions
 
