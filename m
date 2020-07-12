@@ -2,79 +2,73 @@ Return-Path: <SRS0=QItv=AX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FFCC433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 11:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F43BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 11:21:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6E232072D
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 11:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6E232072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 653002070B
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 11:21:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653002070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juZtI-0007Q2-68
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 07:11:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48082)
+	id 1jua2g-0004Rk-IZ
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 07:21:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juZsk-0006yv-UI
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 07:10:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55082)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juZsi-00049l-KH
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 07:10:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1juZsg-0001Kn-C1
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 11:10:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4EFC12E80BA
- for <qemu-devel@nongnu.org>; Sun, 12 Jul 2020 11:10:50 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 12 Jul 2020 11:05:45 -0000
-From: Mark Cave-Ayland <1886318@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mark-cave-ayland mjt+launchpad-tls sej7278
-X-Launchpad-Bug-Reporter: Simon John (sej7278)
-X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
-References: <159394898604.17667.6684490731246411850.malonedeb@soybean.canonical.com>
-Message-Id: <159455194555.11910.6436191059008915062.malone@soybean.canonical.com>
-Subject: [Bug 1886318] Re: Qemu after v5.0.0 breaks macos guests
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ba22c82662ca35a469be470547768dc6c863650c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 04:40:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
+ id 1jua1N-0002lV-A5
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 07:19:49 -0400
+Received: from mga03.intel.com ([134.134.136.65]:51218)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
+ id 1jua1K-0004uN-VE
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 07:19:49 -0400
+IronPort-SDR: UcMbQANZNaP+1/TAbQ0J5gOunJkJjKiWl4qbHNyFi4kYYhHDpopDqg285ffX4BuI7Un8dLXyo+
+ 4AM71jcDKpzw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9679"; a="148490147"
+X-IronPort-AV: E=Sophos;i="5.75,343,1589266800"; d="scan'208";a="148490147"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 12 Jul 2020 04:19:41 -0700
+IronPort-SDR: VKt11AE9OESEXiHbzLddfkYZRWsDBHKZjCGxfPULw+ejPnf7ieVMGrBVZmNsy+eJoSr10A8CQ+
+ vgqfGrU1iqRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,343,1589266800"; d="scan'208";a="307121372"
+Received: from jacob-builder.jf.intel.com ([10.7.199.155])
+ by fmsmga004.fm.intel.com with ESMTP; 12 Jul 2020 04:19:40 -0700
+From: Liu Yi L <yi.l.liu@intel.com>
+To: qemu-devel@nongnu.org,
+	alex.williamson@redhat.com,
+	peterx@redhat.com
+Subject: [RFC v8 00/25] intel_iommu: expose Shared Virtual Addressing to VMs
+Date: Sun, 12 Jul 2020 04:25:56 -0700
+Message-Id: <1594553181-55810-1-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
+Received-SPF: pass client-ip=134.134.136.65; envelope-from=yi.l.liu@intel.com;
+ helo=mga03.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 07:19:41
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,94 +77,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1886318 <1886318@bugs.launchpad.net>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com, pbonzini@redhat.com,
+ hao.wu@intel.com, jasowang@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Great work Simon! I'm not an ACPI expert but that certainly seems a
-plausible solution - I'll have to defer the final review to someone else
-though.
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
 
-The quickest way to get this reviewed is to follow the procedure at
-https://wiki.qemu.org/Contribute/SubmitAPatch which is basically send a
-"git format-patch" email to the qemu-devel mailing list. Adding as CC
-the appropriate maintainers shown by running
-"./scripts/get_maintainer.pl /path/to/my.patch" as indicated in Section
-2.1 "CC the relevant maintainer" will help ensure it gets the attention
-of the right people.
+This QEMU series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes.
 
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
 
-ATB,
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
 
-Mark.
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
 
--- =
+This QEMU patchset is aiming for the phase 1 and phase 2. It is based
+on the kernel series below:
+[PATCH v5 00/15] vfio: expose virtual Shared Virtual Addressing to VMs
+https://lore.kernel.org/kvm/1594552870-55687-1-git-send-email-yi.l.liu@intel.com/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1886318
+Patch Overview:
+ 1. patch 0001 - 0002: update kernel header files
+ 2. patch 0003 - 0007: select VFIO_TYPE1_NESTING_IOMMU for vIOMMU built
+                       on IOMMU nesting translation.
+ 3. patch 0008 - 0010: set HostIOMMUContext to vIOMMU.
+ 4. patch 0011 - 0013: allocate PASID for vIOMMU.
+ 5. patch 0014 - 0015: PASID cache management for Intel vIOMMU.
+ 6. patch 0016 - 0020: bind guest page table to host.
+ 7. patch 0021 - 0024: flush first level/stage cache for vIOMMU.
+ 8. patch 0025: expose SVA to VM by x-scalable-mode="modern"
 
-Title:
-  Qemu after v5.0.0 breaks macos guests
+The complete QEMU set can be found in below link:
+https://github.com/luxis1999/qemu.git: vsva_5.8_rc3_qemu_rfcv8
 
-Status in QEMU:
-  New
+Complete kernel can be found in:
+https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.8-rc3-v5
 
-Bug description:
-  The Debian Sid 5.0-6 qemu-kvm package can no longer get further than
-  the Clover bootloader whereas 5.0-6 and earlier worked fine.
+Tests: basci vSVA functionality test, VM reboot/shutdown/crash, kernel build in
+guest, boot VM with vSVA disabled, full comapilation with all archs, passthru
+entire PCI device, passthru Scalable IOV ADI.
 
-  So I built qemu master from github and it has the same problem,
-  whereas git tag v5.0.0 (or 4.2.1) does not, so something between
-  v5.0.0 release and the last few days has caused the problem.
+Regards,
+Yi Liu
 
-  Here's my qemu script, pretty standard macOS-Simple-KVM setup on a
-  Xeon host:
+Changelog:
+	- RFC v7 -> RFC v8:
+	  a) Rebase to latest kernel implementation (5.8-rc3 vsva v5)
+	  RFC v7: https://lore.kernel.org/kvm/1593862609-36135-1-git-send-email-yi.l.liu@intel.com/
 
-  qemu-system-x86_64 \
-      -enable-kvm \
-      -m 4G \
-      -machine q35,accel=3Dkvm \
-      -smp 4,sockets=3D1,cores=3D2,threads=3D2 \
-      -cpu =
+	- RFC v6 -> RFC v7:
+	  a) Rebase to latest kernel implementation (5.8-rc3 vsva)
+	  RFC v6: https://lore.kernel.org/kvm/1591880064-30638-1-git-send-email-yi.l.liu@intel.com/
 
-  Penryn,vendor=3DGenuineIntel,kvm=3Don,+sse3,+sse4.2,+aes,+xsave,+avx,+xsa=
-veopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc =
+	- RFC v5 -> RFC v6:
+	  a) Use RFC instead of formal patch as kernel patch is in progress.
+	  b) Address comments from Peter and Eric.
+	  c) Add get_iommu_attr() to advertise vIOMMU nesting requirement to
+	     VFIO.
+	  d) Update per latest kernel UAPI definition.
+	  e) Add patch 0017 to check iommu nesting cap info in set_iommu().
+	  RFC v5: https://www.spinics.net/lists/kvm/msg211475.html
 
-  \
-      -device =
+	- RFC v4 -> RFC v5:
+	  a) Refactor the vfio HostIOMMUContext init code (patch 0008 - 0009 of v1 series)
+	  b) Refactor the pasid binding handling (patch 0011 - 0016 of v1 series)
+	  RFC v4: https://patchwork.ozlabs.org/cover/1259648/
 
-  isa-applesmc,osk=3D"ourhardworkbythesewordsguardedpleasedontsteal(c)Apple=
-ComputerInc" =
+	- RFC v3.1 -> RFC v4:
+	  a) Implement HostIOMMUContext in QOM manner.
+	  b) Add pci_set/unset_iommu_context() to register HostIOMMUContext to
+	     vIOMMU, thus the lifecircle of HostIOMMUContext is awared in vIOMMU
+	     side. In such way, vIOMMU could use the methods provided by the
+	     HostIOMMUContext safely.
+	  c) Add back patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
+	  RFCv3.1: https://patchwork.kernel.org/cover/11397879/
 
-  \
-      -smbios type=3D2 \
-      -drive if=3Dpflash,format=3Draw,readonly,file=3D"/tmp/OVMF_CODE.fd" \
-      -drive if=3Dpflash,format=3Draw,file=3D"/tmp/macos_catalina_VARS.fd" \
-      -vga qxl \
-      -device ich9-ahci,id=3Dsata \
-      -drive id=3DESP,if=3Dnone,format=3Draw,file=3D/tmp/ESP.img \
-      -device ide-hd,bus=3Dsata.2,drive=3DESP \
-      -drive id=3DInstallMedia,format=3Draw,if=3Dnone,file=3D/tmp/BaseSyste=
-m.img \
-      -device ide-hd,bus=3Dsata.3,drive=3DInstallMedia \
-      -drive id=3DSystemDisk,if=3Dnone,format=3Draw,file=3D/tmp/macos_catal=
-ina.img \
-      -device ide-hd,bus=3Dsata.4,drive=3DSystemDisk \
-      -usb -device usb-kbd -device usb-mouse
+	- RFC v3 -> v3.1:
+	  a) Drop IOMMUContext, and rename DualStageIOMMUObject to HostIOMMUContext.
+	     HostIOMMUContext is per-vfio-container, it is exposed to  vIOMMU via PCI
+	     layer. VFIO registers a PCIHostIOMMUFunc callback to PCI layer, vIOMMU
+	     could get HostIOMMUContext instance via it.
+	  b) Check IOMMU uAPI version by VFIO_CHECK_EXTENSION
+	  c) Add a check on VFIO_PASID_REQ availability via VFIO_GET_IOMMU_IHNFO
+	  d) Reorder the series, put vSVA linux header file update in the beginning
+	     put the x-scalable-mode option mofification in the end of the series.
+	  e) Dropped patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
+	  RFCv3: https://patchwork.kernel.org/cover/11356033/
 
-  Perhaps something has changed in Penryn support recently, as that's
-  required for macos?
+	- RFC v2 -> v3:
+	  a) Introduce DualStageIOMMUObject to abstract the host IOMMU programming
+	  capability. e.g. request PASID from host, setup IOMMU nesting translation
+	  on host IOMMU. The pasid_alloc/bind_guest_page_table/iommu_cache_flush
+	  operations are moved to be DualStageIOMMUOps. Thus, DualStageIOMMUObject
+	  is an abstract layer which provides QEMU vIOMMU emulators with an explicit
+	  method to program host IOMMU.
+	  b) Compared with RFC v2, the IOMMUContext has also been updated. It is
+	  modified to provide an abstract for vIOMMU emulators. It provides the
+	  method for pass-through modules (like VFIO) to communicate with host IOMMU.
+	  e.g. tell vIOMMU emulators about the IOMMU nesting capability on host side
+	  and report the host IOMMU DMA translation faults to vIOMMU emulators.
+	  RFC v2: https://www.spinics.net/lists/kvm/msg198556.html
 
-  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D964247
+	- RFC v1 -> v2:
+	  Introduce IOMMUContext to abstract the connection between VFIO
+	  and vIOMMU emulators, which is a replacement of the PCIPASIDOps
+	  in RFC v1. Modify x-scalable-mode to be string option instead of
+	  adding a new option as RFC v1 did. Refined the pasid cache management
 
-  Also on a related note, kernel 5.6/5.7 (on Debian) hard crashes the
-  host when I try GPU passthrough on macos, whereas Ubuntu20/Win10 work
-  fine - as does 5.5 kernel.
+---
+Eric Auger (1):
+  scripts/update-linux-headers: Import iommu.h
 
-  See also https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D961676
+Liu Yi L (24):
+  header file update VFIO/IOMMU vSVA APIs kernel 5.8-rc3
+  hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
+  hw/pci: introduce pci_device_get_iommu_attr()
+  intel_iommu: add get_iommu_attr() callback
+  vfio: pass nesting requirement into vfio_get_group()
+  vfio: check VFIO_TYPE1_NESTING_IOMMU support
+  hw/iommu: introduce HostIOMMUContext
+  hw/pci: introduce pci_device_set/unset_iommu_context()
+  intel_iommu: add set/unset_iommu_context callback
+  vfio/common: provide PASID alloc/free hooks
+  vfio: init HostIOMMUContext per-container
+  intel_iommu: add virtual command capability support
+  intel_iommu: process PASID cache invalidation
+  intel_iommu: add PASID cache management infrastructure
+  vfio: add bind stage-1 page table support
+  intel_iommu: sync IOMMU nesting cap info for assigned devices
+  intel_iommu: bind/unbind guest page table to host
+  intel_iommu: replay pasid binds after context cache invalidation
+  intel_iommu: do not pass down pasid bind for PASID #0
+  vfio: add support for flush iommu stage-1 cache
+  intel_iommu: process PASID-based iotlb invalidation
+  intel_iommu: propagate PASID-based iotlb invalidation to host
+  intel_iommu: process PASID-based Device-TLB invalidation
+  intel_iommu: modify x-scalable-mode to be string option
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1886318/+subscriptions
+ hw/Makefile.objs                      |    1 +
+ hw/alpha/typhoon.c                    |    6 +-
+ hw/arm/smmu-common.c                  |    6 +-
+ hw/hppa/dino.c                        |    6 +-
+ hw/i386/amd_iommu.c                   |    6 +-
+ hw/i386/intel_iommu.c                 | 1233 ++++++++++++++++++++++++++++++++-
+ hw/i386/intel_iommu_internal.h        |  131 ++++
+ hw/i386/trace-events                  |    6 +
+ hw/iommu/Makefile.objs                |    1 +
+ hw/iommu/host_iommu_context.c         |  171 +++++
+ hw/pci-host/designware.c              |    6 +-
+ hw/pci-host/pnv_phb3.c                |    6 +-
+ hw/pci-host/pnv_phb4.c                |    6 +-
+ hw/pci-host/ppce500.c                 |    6 +-
+ hw/pci-host/prep.c                    |    6 +-
+ hw/pci-host/sabre.c                   |    6 +-
+ hw/pci/pci.c                          |   73 +-
+ hw/ppc/ppc440_pcix.c                  |    6 +-
+ hw/ppc/spapr_pci.c                    |    6 +-
+ hw/s390x/s390-pci-bus.c               |    8 +-
+ hw/vfio/ap.c                          |    2 +-
+ hw/vfio/ccw.c                         |    2 +-
+ hw/vfio/common.c                      |  299 +++++++-
+ hw/vfio/pci.c                         |   26 +-
+ hw/vfio/platform.c                    |    2 +-
+ hw/virtio/virtio-iommu.c              |    6 +-
+ include/hw/i386/intel_iommu.h         |   61 +-
+ include/hw/iommu/host_iommu_context.h |  103 +++
+ include/hw/pci/pci.h                  |   25 +-
+ include/hw/pci/pci_bus.h              |    2 +-
+ include/hw/vfio/vfio-common.h         |    7 +-
+ linux-headers/linux/iommu.h           |  412 +++++++++++
+ linux-headers/linux/vfio.h            |   92 ++-
+ scripts/update-linux-headers.sh       |    2 +-
+ 34 files changed, 2676 insertions(+), 61 deletions(-)
+ create mode 100644 hw/iommu/Makefile.objs
+ create mode 100644 hw/iommu/host_iommu_context.c
+ create mode 100644 include/hw/iommu/host_iommu_context.h
+ create mode 100644 linux-headers/linux/iommu.h
+
+-- 
+2.7.4
+
 
