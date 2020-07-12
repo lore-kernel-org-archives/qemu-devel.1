@@ -2,43 +2,46 @@ Return-Path: <SRS0=QItv=AX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE7BC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 17:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED17C433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 17:50:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A54482067D
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 17:50:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A54482067D
+	by mail.kernel.org (Postfix) with ESMTPS id 5997B2067D
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jul 2020 17:50:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5997B2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jug7q-0004mI-Lf
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 13:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54414)
+	id 1jug7t-0004tN-KC
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 13:50:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jug6P-000396-Hn; Sun, 12 Jul 2020 13:49:25 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60384 helo=relay3.sw.ru)
+ id 1jug6Q-00039S-DK; Sun, 12 Jul 2020 13:49:26 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60378 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jug6N-0001lC-64; Sun, 12 Jul 2020 13:49:24 -0400
+ id 1jug6N-0001lB-6e; Sun, 12 Jul 2020 13:49:26 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jug6B-0005LT-GL; Sun, 12 Jul 2020 20:49:11 +0300
+ id 1jug6B-0005LT-JN; Sun, 12 Jul 2020 20:49:11 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 0/3] scripts/simplebench: add bench_write_req.py test
-Date: Sun, 12 Jul 2020 20:49:15 +0300
-Message-Id: <1594576158-75884-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v4 2/3] scripts/simplebench: allow writing to non-empty image
+Date: Sun, 12 Jul 2020 20:49:17 +0300
+Message-Id: <1594576158-75884-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1594576158-75884-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1594576158-75884-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Received-SPF: pass client-ip=185.231.240.75;
  envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 13:17:17
@@ -66,33 +69,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The script 'bench_write_req.py' allows comparing performances of write request for two
-qemu-img binary files. If you made a change in QEMU code and want to check the write
-requests performance, you will want to build two qemu-img binary files with and without
-your change. Then you specify paths to those binary files and put them as parameters to
-the bench_write_req.py script. You may see other supported parameters in the USAGE help.
+Add 'empty_image' parameter to the function bench_write_req() and to
+the test cases that will allow writing to the non-empty clusters of the
+image if the 'empty_image' parameter set to False.
 
-v4:
-  01: 'if/else requests' blocks moved from patch 0001 to 0003.
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ scripts/simplebench/bench_write_req.py | 27 +++++++++++++++++++++------
+ 1 file changed, 21 insertions(+), 6 deletions(-)
 
-v3: Based on the Vladimir's review
-  01: The test results were amended in the patch description.
-  02: The python format string syntax changed to the newer one f''.
-  03: The 'empty_disk' test parameter fixed to True.
-  04: The function bench_write_req() was supplied with commentary.
-  05: The subprocess.call() was replaced with subprocess.run().
-  06: The exception handling was improved.
-  07: The v2 only patch was split into three in the series.
-
-Andrey Shinkevich (3):
-  scripts/simplebench: compare write request performance
-  scripts/simplebench: allow writing to non-empty image
-  scripts/simplebench: add unaligned data case to bench_write_req
-
- scripts/simplebench/bench_write_req.py | 206 +++++++++++++++++++++++++++++++++
- 1 file changed, 206 insertions(+)
- create mode 100755 scripts/simplebench/bench_write_req.py
-
+diff --git a/scripts/simplebench/bench_write_req.py b/scripts/simplebench/bench_write_req.py
+index a285ef1..f758f90 100755
+--- a/scripts/simplebench/bench_write_req.py
++++ b/scripts/simplebench/bench_write_req.py
+@@ -29,7 +29,7 @@ def bench_func(env, case):
+     """ Handle one "cell" of benchmarking table. """
+     return bench_write_req(env['qemu_img'], env['image_name'],
+                            case['block_size'], case['block_offset'],
+-                           case['requests'])
++                           case['requests'], case['empty_image'])
+ 
+ 
+ def qemu_img_pipe(*args):
+@@ -45,7 +45,8 @@ def qemu_img_pipe(*args):
+     return subp.communicate()[0]
+ 
+ 
+-def bench_write_req(qemu_img, image_name, block_size, block_offset, requests):
++def bench_write_req(qemu_img, image_name, block_size, block_offset, requests,
++                    empty_image):
+     """Benchmark write requests
+ 
+     The function creates a QCOW2 image with the given path/name and fills it
+@@ -58,6 +59,7 @@ def bench_write_req(qemu_img, image_name, block_size, block_offset, requests):
+     block_size   -- size of a block to write to clusters
+     block_offset -- offset of the block in clusters
+     requests     -- number of write requests per cluster
++    empty_image  -- if not True, fills image with random data
+ 
+     Returns {'seconds': int} on success and {'error': str} on failure.
+     Return value is compatible with simplebench lib.
+@@ -96,6 +98,15 @@ def bench_write_req(qemu_img, image_name, block_size, block_offset, requests):
+ 
+     try:
+         qemu_img_pipe(*args_create)
++
++        if not empty_image:
++            dd = ['dd', 'if=/dev/urandom', f'of={image_name}',
++                  f'bs={cluster_size}', f'seek={seek}',
++                  f'count={dd_count}']
++            devnull = open('/dev/null', 'w')
++            subprocess.run(dd, stderr=devnull, stdout=devnull)
++            subprocess.run('sync')
++
+     except OSError as e:
+         os.remove(image_name)
+         return {'error': 'qemu_img create failed: ' + str(e)}
+@@ -130,25 +141,29 @@ if __name__ == '__main__':
+             'id': '<simple case>',
+             'block_size': 0,
+             'block_offset': 0,
+-            'requests': 10
++            'requests': 10,
++            'empty_image': True
+         },
+         {
+             'id': '<general case>',
+             'block_size': 4096,
+             'block_offset': 0,
+-            'requests': 10
++            'requests': 10,
++            'empty_image': True
+         },
+         {
+             'id': '<cluster middle>',
+             'block_size': 4096,
+             'block_offset': 524288,
+-            'requests': 10
++            'requests': 10,
++            'empty_image': True
+         },
+         {
+             'id': '<cluster overlap>',
+             'block_size': 524288,
+             'block_offset': 4096,
+-            'requests': 2
++            'requests': 2,
++            'empty_image': True
+         },
+     ]
+ 
 -- 
 1.8.3.1
 
