@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6480FC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C27C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:31:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EE66206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:30:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EE66206F0
+	by mail.kernel.org (Postfix) with ESMTPS id A9B0D206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:31:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B0D206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jusvA-000432-Dr
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 03:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59522)
+	id 1jusvp-0004wS-Ty
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 03:31:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jussg-0007g8-Ah; Mon, 13 Jul 2020 03:28:06 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35090 helo=relay3.sw.ru)
+ id 1jussj-0007pM-Mn; Mon, 13 Jul 2020 03:28:09 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35084 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jussc-0007TN-Fs; Mon, 13 Jul 2020 03:28:06 -0400
+ id 1jussc-0007TG-H1; Mon, 13 Jul 2020 03:28:09 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jussP-0001Vx-TO; Mon, 13 Jul 2020 10:27:49 +0300
+ id 1jussP-0001Vx-OZ; Mon, 13 Jul 2020 10:27:49 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v9 09/10] qcow2_format.py: collect fields to dump in JSON
- format
-Date: Mon, 13 Jul 2020 10:27:55 +0300
-Message-Id: <1594625276-134500-10-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v9 05/10] qcow2_format.py: Dump bitmap directory information
+Date: Mon, 13 Jul 2020 10:27:51 +0300
+Message-Id: <1594625276-134500-6-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1594625276-134500-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1594625276-134500-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -70,44 +69,150 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As __dict__ is being extended with class members we do not want to
-print, make a light copy of the initial __dict__ and extend the copy
-by adding lists we have to print in the JSON output.
+Read and dump entries from the bitmap directory of QCOW2 image.
+It extends the output in the test case #291.
 
+Header extension:
+magic                     0x23852875 (Bitmaps)
+...
+
+Bitmap name               bitmap-1
+bitmap_table_offset       0xf0000
+bitmap_table_size         1
+flags                     0x2 (['auto'])
+type                      1
+granularity_bits          16
+name_size                 8
+extra_data_size           0
+
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/qemu-iotests/291.out         | 45 ++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/qcow2_format.py | 47 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
 
+diff --git a/tests/qemu-iotests/291.out b/tests/qemu-iotests/291.out
+index 08bfaaa..53a8eeb 100644
+--- a/tests/qemu-iotests/291.out
++++ b/tests/qemu-iotests/291.out
+@@ -33,6 +33,24 @@ reserved32                0
+ bitmap_directory_size     0x40
+ bitmap_directory_offset   0x510000
+ 
++Bitmap name               b1
++bitmap_table_offset       0x4e0000
++bitmap_table_size         1
++flags                     0x0 ([])
++type                      1
++granularity_bits          19
++name_size                 2
++extra_data_size           0
++
++Bitmap name               b2
++bitmap_table_offset       0x500000
++bitmap_table_size         1
++flags                     0x2 (['auto'])
++type                      1
++granularity_bits          16
++name_size                 2
++extra_data_size           0
++
+ 
+ === Bitmap preservation not possible to non-qcow2 ===
+ 
+@@ -98,6 +116,33 @@ reserved32                0
+ bitmap_directory_size     0x60
+ bitmap_directory_offset   0x520000
+ 
++Bitmap name               b1
++bitmap_table_offset       0x470000
++bitmap_table_size         1
++flags                     0x0 ([])
++type                      1
++granularity_bits          19
++name_size                 2
++extra_data_size           0
++
++Bitmap name               b2
++bitmap_table_offset       0x490000
++bitmap_table_size         1
++flags                     0x2 (['auto'])
++type                      1
++granularity_bits          16
++name_size                 2
++extra_data_size           0
++
++Bitmap name               b0
++bitmap_table_offset       0x510000
++bitmap_table_size         1
++flags                     0x0 ([])
++type                      1
++granularity_bits          16
++name_size                 2
++extra_data_size           0
++
+ 
+ === Check bitmap contents ===
+ 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index a9bd5a8..4ce6d95 100644
+index 934062a..1438792 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -109,6 +109,8 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
-         self.__dict__ = dict((field[2], values[i])
-                              for i, field in enumerate(self.fields))
+@@ -129,6 +129,53 @@ class Qcow2BitmapExt(Qcow2Struct):
+         ('u64', '{:#x}', 'bitmap_directory_offset')
+     )
  
-+        self.fields_dict = self.__dict__.copy()
++    def __init__(self, fd):
++        super().__init__(fd=fd)
++        self.read_bitmap_directory(fd)
 +
-     def dump(self, dump_json=None):
-         for f in self.fields:
-             value = self.__dict__[f[2]]
-@@ -139,6 +141,7 @@ class Qcow2BitmapExt(Qcow2Struct):
-         self.bitmap_directory = \
-             [Qcow2BitmapDirEntry(fd, cluster_size=self.cluster_size)
-              for _ in range(self.nb_bitmaps)]
-+        self.fields_dict.update(bitmap_directory=self.bitmap_directory)
++    def read_bitmap_directory(self, fd):
++        fd.seek(self.bitmap_directory_offset)
++        self.bitmap_directory = \
++            [Qcow2BitmapDirEntry(fd) for _ in range(self.nb_bitmaps)]
++
++    def dump(self):
++        super().dump()
++        for entry in self.bitmap_directory:
++            print()
++            entry.dump()
++
++
++class Qcow2BitmapDirEntry(Qcow2Struct):
++
++    fields = (
++        ('u64', '{:#x}', 'bitmap_table_offset'),
++        ('u32', '{}', 'bitmap_table_size'),
++        ('u32', BitmapFlags, 'flags'),
++        ('u8',  '{}', 'type'),
++        ('u8',  '{}', 'granularity_bits'),
++        ('u16', '{}', 'name_size'),
++        ('u32', '{}', 'extra_data_size')
++    )
++
++    def __init__(self, fd):
++        super().__init__(fd=fd)
++        # Seek relative to the current position in the file
++        fd.seek(self.extra_data_size, 1)
++        bitmap_name = fd.read(self.name_size)
++        self.name = bitmap_name.decode('ascii')
++        # Move position to the end of the entry in the directory
++        entry_raw_size = self.bitmap_dir_entry_raw_size()
++        padding = ((entry_raw_size + 7) & ~7) - entry_raw_size
++        fd.seek(padding, 1)
++
++    def bitmap_dir_entry_raw_size(self):
++        return struct.calcsize(self.fmt) + self.name_size + \
++            self.extra_data_size
++
++    def dump(self):
++        print(f'{"Bitmap name":<25} {self.name}')
++        super(Qcow2BitmapDirEntry, self).dump()
++
  
-     def dump(self, dump_json=None):
-         super().dump(dump_json)
-@@ -184,6 +187,7 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
-         table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
-         self.bitmap_table = Qcow2BitmapTable(raw_table=table,
-                                              cluster_size=self.cluster_size)
-+        self.fields_dict.update(bitmap_table=self.bitmap_table)
+ QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
  
-     def dump(self, dump_json=None):
-         print(f'{"Bitmap name":<25} {self.name}')
 -- 
 1.8.3.1
 
