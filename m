@@ -2,86 +2,65 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7565BC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B231C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:30:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 409FE2065F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bk605mYy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409FE2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 139E12065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:30:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 139E12065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzSq-0003u3-BZ
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:29:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36368)
+	id 1juzTK-0004nC-AN
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:30:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzDy-0002vb-H8
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:14:30 -0400
-Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:34131)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzDw-0006z8-Vr
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:14:30 -0400
-Received: by mail-oi1-x22b.google.com with SMTP id e4so11110154oib.1
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:14:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TkmNh43NVj3WoGJiiu5k0+TZepufATIpLLYtyyvfeCA=;
- b=bk605mYyvKAA845UqY6TeMb9Hh/sg3og69Pf6mnbfpE6BaeqYgiriMacoxWMF3arFj
- zjpZvJyB7PNSZ3/yPghNn5khUMoLTquU1P6BolL77UVBLvjFHVN8C4ex3WcbV3oB0ffL
- 6HJ3pXh0cDTlbcyR3kIE0suyDI/OJHr4Tn9cXAi9nN7Hon8ArP33LnYIXtFReUMvIJGC
- ojU2n6FEnSrW8keObRKUUcfessKc6dcUgHSyOAqydvXuxTP5xtxMq0eRkCPpOOJKUNTQ
- eGLCaNAz9LP76UeS3mhk+Ib3oKdCbRutheLCmmUYv2r6q3XW9DE+ZJ3BIhspt3RYZcdB
- sLog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TkmNh43NVj3WoGJiiu5k0+TZepufATIpLLYtyyvfeCA=;
- b=l/NjfZCjdHP7Yxmzb5hYyT7msxNGU3hsvK8iOf5F4L501poHlACOBK77NbakR+2ser
- 7HJcYR61CwRGM9OgLqgdfVxh8X7O5g0LfYmsiBcppL0fZKX68AEt26GZJJFHp0f8EJF4
- 185VzEeo5rDNiX/9s9jSDf4MCnclY7E40T90aWcaLkChAQ9MoXgrviQL97KCbvHhrtsK
- hhO/mvthkZwu5d0CwkCRV1tAj8LLAnvTOSmVPsSpFN43CAcXhZiaHkQ2M7aHcYiAenht
- raTASBhDSymAYR2jou/NmotTlqADswDBWvgDygShwZhjm+5SWV1F7Nypcx1qE1Iezqee
- BrNQ==
-X-Gm-Message-State: AOAM530hLI4UTN1LIXiPxeVx6ay97EpMe/2HOr7q60kWawvuxJficLXn
- LmUjWVGurPZE3nrQzZUkzLFhyji0/o1aNbz1itWC+g==
-X-Google-Smtp-Source: ABdhPJwVceFp+jDRDqXs1b/MRBaRgaqxBSor6Bmbpl49whTxjh/RPSFkWPmH0OOW/SPy4hF0VvmlJviOqSHXGUTiGl8=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr88788oix.48.1594649667728;
- Mon, 13 Jul 2020 07:14:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1juzGQ-0007AD-FB
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:17:02 -0400
+Received: from isrv.corpit.ru ([86.62.121.231]:39765)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1juzGN-0007Mq-Px
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:17:01 -0400
+Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
+ by isrv.corpit.ru (Postfix) with ESMTP id 873E640478;
+ Mon, 13 Jul 2020 17:16:56 +0300 (MSK)
+Received: from [192.168.177.99] (mjt.vpn.tls.msk.ru [192.168.177.99])
+ by tsrv.corpit.ru (Postfix) with ESMTP id 8BA20AE;
+ Mon, 13 Jul 2020 17:16:56 +0300 (MSK)
+Subject: Re: [PATCH] Allow acpi-tmr size=2
+To: "Michael S. Tsirkin" <mst@redhat.com>, Simon John <git@the-jedi.co.uk>
+References: <5f12377f-b640-c4c5-1bcd-858c622c6c31@the-jedi.co.uk>
+ <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
+ <20200713070946-mutt-send-email-mst@kernel.org>
+ <7662bc2c-d958-731a-0882-62c5ab47c7a4@the-jedi.co.uk>
+ <20200713081627-mutt-send-email-mst@kernel.org>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <34d24b3a-75ec-ad94-c61b-2ebe4a0f277a@msgid.tls.msk.ru>
+Date: Mon, 13 Jul 2020 17:16:56 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200713141049.2241-1-kraxel@redhat.com>
- <20200713141049.2241-3-kraxel@redhat.com>
-In-Reply-To: <20200713141049.2241-3-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Jul 2020 15:14:16 +0100
-Message-ID: <CAFEAcA_dBoVh+OYThkJvBPqDs+PY1kAXv1EWZs5B7w9F1yW9Yw@mail.gmail.com>
-Subject: Re: [PULL 2/4] docs/qdev-device-use: Clean up the sentences related
- to -usbdevice
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22b;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200713081627-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=86.62.121.231; envelope-from=mjt@tls.msk.ru;
+ helo=isrv.corpit.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 10:16:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,30 +73,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jul 2020 at 15:12, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> From: Thomas Huth <thuth@redhat.com>
->
-> Most of the -usbdevice paramaters have been removed already. Update
-> the doc accordingly.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> Message-id: 20200710065520.24784-1-thuth@redhat.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  docs/qdev-device-use.txt | 28 +++-------------------------
->  1 file changed, 3 insertions(+), 25 deletions(-)
+13.07.2020 15:17, Michael S. Tsirkin пишет:
+> On Mon, Jul 13, 2020 at 12:46:00PM +0100, Simon John wrote:
+>> I don't profess to understand most of this, I am just a user who found
+>> something didn't work and tracked down the cause with help from the people
+>> on the bugtracker.
+>>
+>> the min=1 and max=4 was chosen as it seems to be set that way in most other
+>> places in the source, and 2 fits in that range.
+>>
+>> so as macos seems to require 2 bytes but spec says 4 (32 bits) would it be
+>> better to set min=2 max=4, given that the original revert seems to be a
+>> security fix?
 
-Side note: ideally we should roll this info into the
-proper docs/system manual at some point...
+It's not about the security fix, it's about the piece in qemu code which
+behaved wrongly for several years, which finally started to actually work.
 
-thanks
--- PMM
+>> this works equally well:
+>>
+>> static const MemoryRegionOps acpi_pm_tmr_ops = {
+>>     .read = acpi_pm_tmr_read,
+>>     .write = acpi_pm_tmr_write,
+>>     .valid.min_access_size = 2,
+>>     .valid.max_access_size = 4,
+>>     .endianness = DEVICE_LITTLE_ENDIAN,
+>> };
+>>
+>> regards.
+>>
+> 
+> Sounds good. And how about also adding:
+
+What this call will receive on a real HW? returning the same 4 bytes
+even when asked for 2 smells wrong, no?
+
+>       .impl.min_access_size = 4,
+
+What does it mean? :)
+
+/mjt
 
