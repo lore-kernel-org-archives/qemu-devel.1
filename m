@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1924C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3D2C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:21:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BBD2205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:21:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187B92065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:21:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R6hKd2cQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BBD2205CB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sRAp3ov4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187B92065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzKd-0006Cq-Nl
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:21:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35028)
+	id 1juzKp-0006iz-Bj
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:21:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAo-0004xD-Qa
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:14 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:36028)
+ id 1juzB3-0005Y0-0c
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:30 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37103)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAn-0006cH-5W
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:14 -0400
-Received: by mail-wm1-x329.google.com with SMTP id 17so13300898wmo.1
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:12 -0700 (PDT)
+ id 1juzB1-0006er-AA
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:28 -0400
+Received: by mail-wm1-x342.google.com with SMTP id o2so13317813wmh.2
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=YOh9GxnhU6vhYDRmyns4fut70z8Xj0qJIqLDkwhxP5o=;
- b=R6hKd2cQL8ycNYwlWaFRQSRFn/2dSE5OaT+BkP/yKQ4FhmXFJl4GU8/WskNDXbIddG
- 0WZCSdD1B2bAcMLC+1AcaC88957vuBT2X4QNGCjYvUu+RkqO+J7y49FsTlb9txoxKAkx
- ie5m4RcZLuK0QlTI2pqcmRGKVHt+DFUmX5t1A/JPkfWOwsEDqi4yMhszn9esMnDrLzZ1
- RpVdp6NS6m7FR4dTPBgl38NBkubNsVWnoknfVXiwf5bq05E9Y3wFfazVNDcvHsgv14y9
- KPsKWhM8uKjrS+3s5NRhtTvpB2AHIYYxZEBCnx1e2RfMAUaOBEE2Ujd3LHjlhKy5EA1z
- vA+w==
+ bh=MtbNrkAMGJhFhtpNvSaktDyVzUetinwB6fus5j2wvXs=;
+ b=sRAp3ov4SdXgLtDoEEDcJ9fWs1Rvra4etIXSnJnXgFxHsGTkpg9JsmmZjklrits0n/
+ +bTAdjGg+SMPc2oglmkcNdxuuPOaCessPCot7cYshRSJIWt4KsJ+vqq6bjtoB1MlYF21
+ Kr6wMejEjX3501If5627+kYnKpZbp7xvW9b4is0VQPk42dv6Z/yhasAV+O8bW/eZS1Ay
+ R9grv1I5leQO5zYrRdNVEx2whoFz+1LNRvdgPewhUPuJRXp7FmUFGajKxhY+viDbp5id
+ Ez0nTaXZaxA6HQEj+dtOq3Ltljr150qtj/aRclmzzgJrwc+HsTdlt2zGJyLs9MIivrnz
+ nqDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=YOh9GxnhU6vhYDRmyns4fut70z8Xj0qJIqLDkwhxP5o=;
- b=UnJeBbAvr58VTzNHTQBY7jjmnvJvKdD7udhyvZK8n5uuH65HtORW04miMeoL3dUe4r
- RuJFg6eg4fnwQ9RLIz2X2kpfv3/sETehdfPwgUyM5ymA8aQqnI/Q0tnkugVm8ES14h+V
- E6cTBUS7NjPPR1tPHtzXPfo+Geald/0REzubEBbtV14ZMXlfZD+erDIjHIkLuWB2U/wy
- 5yqGHoG7dne12HbI97deG6FaHnCbH1ivp/qFGsQLHbQuSfu7enqvVnu2Hg2SkvB6grA9
- bPozCYip1Itrnc36R8a1/fbRT94YJpie2rFDVW722vGr5RjmVIEuutOJcDoCBwYnZGFf
- Caqg==
-X-Gm-Message-State: AOAM532ugV464cJdcmlgzut653GFu9/XP7NNo/9NLvHGgeZgjKVleP5P
- /Er4snTpX5eEobKm/9x0xUkynt0k3mXsTw==
-X-Google-Smtp-Source: ABdhPJy9EpTnc1uqzi5FBvg8S6xdM5ppNmYi3gV9+7pA30VOHcnMpMLCUR1KPyaHNxgfPg9pSYfbyA==
-X-Received: by 2002:a1c:408b:: with SMTP id n133mr173078wma.88.1594649471473; 
- Mon, 13 Jul 2020 07:11:11 -0700 (PDT)
+ bh=MtbNrkAMGJhFhtpNvSaktDyVzUetinwB6fus5j2wvXs=;
+ b=sZYS/ekeaDNjOt8JWgHP3rS4F8NXOIcG2WCHAJQMQNQ7TmzldOy/FAZNRS5D5vSbm7
+ a4avicnUJouDrYG8yzQE3iDi0rC+UjpQ7BP/aIgL+A9rrSLi3juY8eru1DvUif6Us27M
+ axpupRqS7a9ayvnW/4iLj2vVidn960nEFnf0TeJO4vTaIC/AbJfGCWgi4O3TrwD+tU+U
+ GvnA3YTdXtnEpAOTYeAj0X76XIYH0CM46IacdeRea77JPV5bcdDYfzb2+SSfhoDDjODR
+ X8/eY2fwMXQOWSWq/Za5WY4tisFInwztNLSIb0mDexiiIAB+56MXUGXGywk5yFn4cgDZ
+ 080w==
+X-Gm-Message-State: AOAM532ILrvNee8+Ig5JfjJhewmwhJUvPpBXT4GtTmLlw1q6HbPux8Dn
+ q7/Il0QhbTTtz0ggo5wYIxY57sh/4U259g==
+X-Google-Smtp-Source: ABdhPJxofn1lsA/C4ph0noIBzJCWgj5gGY5ttE5GNH1Hkoq2BCiU6qawGlhQs68Owl+tKQ+COqaVSg==
+X-Received: by 2002:a1c:ab84:: with SMTP id u126mr143817wme.43.1594649485699; 
+ Mon, 13 Jul 2020 07:11:25 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.10
+ by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.24
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 07:11:10 -0700 (PDT)
+ Mon, 13 Jul 2020 07:11:25 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/25] Add the ability to change the FEC PHY MDIO device number
- on i.MX6 processor
-Date: Mon, 13 Jul 2020 15:10:43 +0100
-Message-Id: <20200713141104.5139-5-peter.maydell@linaro.org>
+Subject: [PULL 17/25] target/nios2: add DISAS_NORETURN case for nothing more
+ to generate
+Date: Mon, 13 Jul 2020 15:10:56 +0100
+Message-Id: <20200713141104.5139-18-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200713141104.5139-1-peter.maydell@linaro.org>
 References: <20200713141104.5139-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::329;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x329.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,59 +105,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jean-Christophe Dubois <jcd@tribudubois.net>
+From: Wentong Wu <wentong.wu@intel.com>
 
-Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
-Message-id: 05a64e83eb1c0c865ac077b22c599425c024c02c.1593806826.git.jcd@tribudubois.net
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: updated for object_property_set_uint() argument reordering]
+Add DISAS_NORETURN case for nothing more to generate because at runtime
+execution will never return from some helper call. And at the same time
+replace DISAS_UPDATE in t_gen_helper_raise_exception and gen_exception
+with the newly added DISAS_NORETURN.
+
+Signed-off-by: Wentong Wu <wentong.wu@intel.com>
+Message-id: 20200710233433.19729-1-wentong.wu@intel.com
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/fsl-imx6.h | 1 +
- hw/arm/fsl-imx6.c         | 7 +++++++
- 2 files changed, 8 insertions(+)
+ target/nios2/translate.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/arm/fsl-imx6.h b/include/hw/arm/fsl-imx6.h
-index 1ebd7513246..162fe99375d 100644
---- a/include/hw/arm/fsl-imx6.h
-+++ b/include/hw/arm/fsl-imx6.h
-@@ -73,6 +73,7 @@ typedef struct FslIMX6State {
-     MemoryRegion   caam;
-     MemoryRegion   ocram;
-     MemoryRegion   ocram_alias;
-+    uint32_t       phy_num;
- } FslIMX6State;
- 
- 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 0bc9f0b60d1..00dafe3f62d 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -377,6 +377,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-                                             spi_table[i].irq));
-     }
- 
-+    object_property_set_uint(OBJECT(&s->eth), "phy-num", s->phy_num, &err);
-     qdev_set_nic_properties(DEVICE(&s->eth), &nd_table[0]);
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->eth), errp)) {
-         return;
-@@ -449,10 +450,16 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-                                 &s->ocram_alias);
+diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+index 6c34cd31937..00b591cc298 100644
+--- a/target/nios2/translate.c
++++ b/target/nios2/translate.c
+@@ -149,7 +149,7 @@ static void t_gen_helper_raise_exception(DisasContext *dc,
+     tcg_gen_movi_tl(dc->cpu_R[R_PC], dc->pc);
+     gen_helper_raise_exception(dc->cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
+-    dc->is_jmp = DISAS_UPDATE;
++    dc->is_jmp = DISAS_NORETURN;
  }
  
-+static Property fsl_imx6_properties[] = {
-+    DEFINE_PROP_UINT32("fec-phy-num", FslIMX6State, phy_num, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void fsl_imx6_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
+ static bool use_goto_tb(DisasContext *dc, uint32_t dest)
+@@ -802,7 +802,7 @@ static void gen_exception(DisasContext *dc, uint32_t excp)
+     tcg_gen_movi_tl(cpu_R[R_PC], dc->pc);
+     gen_helper_raise_exception(cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
+-    dc->is_jmp = DISAS_UPDATE;
++    dc->is_jmp = DISAS_NORETURN;
+ }
  
-+    device_class_set_props(dc, fsl_imx6_properties);
-     dc->realize = fsl_imx6_realize;
-     dc->desc = "i.MX6 SOC";
-     /* Reason: Uses serial_hd() in the realize() function */
+ /* generate intermediate code for basic block 'tb'.  */
+@@ -877,6 +877,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+         tcg_gen_exit_tb(NULL, 0);
+         break;
+ 
++    case DISAS_NORETURN:
+     case DISAS_TB_JUMP:
+         /* nothing more to generate */
+         break;
 -- 
 2.20.1
 
