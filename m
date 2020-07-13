@@ -2,105 +2,89 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBF5C433E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4043FC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE85B207F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09C2B20758
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:06:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUk7I1sg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE85B207F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q1HBULXJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C2B20758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juvJF-0001tk-Oz
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 06:03:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42718)
+	id 1juvM0-0003Yb-6V
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 06:06:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1juvIW-0001T1-HS
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:02:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21753
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1juvIS-0003Wc-Lx
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:02:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594634571;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/JrJpyJ98cIDfNhcKWqTGGiR+INFTnJ0FGAs2hCGH8Y=;
- b=PUk7I1sg325YwNA9KmAR8GPKrLgW/M5eNRDRtN44ZfJ7SAYxrzvGcwdoEiVhVA7LOhm6XU
- SXsurR59ozUUSbtrHzCO+d/TBaptQT3qQ+k58mSClpBE5raHcAdNHrtSNlCqkLSKwAFP/U
- uzI14i24KPbvu3sLF3VZwRrWQD0UySY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-mn5zVLcMMZm6VGbtqPxkIA-1; Mon, 13 Jul 2020 06:02:49 -0400
-X-MC-Unique: mn5zVLcMMZm6VGbtqPxkIA-1
-Received: by mail-wm1-f69.google.com with SMTP id y204so18056376wmd.2
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 03:02:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1juvLC-0002bv-9a
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:05:42 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45044)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1juvLA-0004Dq-ML
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:05:41 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k6so10470419oij.11
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 03:05:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=eqW9Kj52y69ZnpMGvLNWRCX82+2t7WxidfGVLvjziz8=;
+ b=q1HBULXJB8n69p5SBIZPP0W3Q1xRm1Wo5CdxKLf/e7G5faZTrpmsReixp5tOTZrek6
+ wp+z4BPv6OlN3aZS/vX9GR5ccWHQj2VQBZ+rsF5zENxUfuDj6sI99o3xllW9+K9vctzG
+ /6vy4gGS2eHKGQ7zolBEEYZ4JO2BuXLD0a7dIL/ajSWr14pbBws/iy/NCJPJaWwpzG9I
+ cTb5Kl6zk77wiikl5z54XvEBcqiOXTWdyu+gkKpmu/McTC3653HUa0lQU3E5zRkAA/Rp
+ VYQCT/7LAAF235UYiJ7ropcSF70yn0UktC8PCgLs1ssPQ8x9tpwBmtjeTTX74bhSaGk0
+ FYBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references
- :user-agent:reply-to:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/JrJpyJ98cIDfNhcKWqTGGiR+INFTnJ0FGAs2hCGH8Y=;
- b=pzake3T7zfyxXGqdgF+TRJfBLoyhS0FxGmTBkH6DS3q2VcHXMqVWdFywIqXG3jtSyu
- fPWlhZ7tU0hBDlu3Bccrabj+FSt50ktES1AUGktODO8JuIj4xLiB/w2Oe46MEKK+swld
- 43YuXHSUN95PYEMS5P4iPWJ82ptgX5oIn6Q27wokRzT45G/EKhyyTNn1LPVQd2eWsVlu
- i87yZ8sKUjMjEj9NXFl5cZANN4kzQWtKI0nJtqilNcOpO+I68oJUGoESOr+2SWjln7E6
- 9m/c+TIzSouN6nYsEeBBqNmoBkPPPQHS4bYHfyDDsJ726N9aaY4nFjxMV46EhTgGmEL1
- 9F6Q==
-X-Gm-Message-State: AOAM531SPVostA6kFu79hIczum+uupdsZOD9uGr5PeT8hAX4y/9XjmAF
- CWdDuhP+3dwLfS3Uk+6aYwm54Y/aoGUSsDbgt4dw7lEW5cYgqrBsIp4WpjWHlnP/4fsyNZtoh4I
- oxV6pIjYtLTVu+Hc=
-X-Received: by 2002:adf:e944:: with SMTP id m4mr80825769wrn.252.1594634568819; 
- Mon, 13 Jul 2020 03:02:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYNJ7pk3TVzzMw4PhWd4jYw/D4vHeP0kIUSvE7hGi8A6dWocNmFjN3m8ms9SAM8Xgo3TDgaA==
-X-Received: by 2002:adf:e944:: with SMTP id m4mr80825750wrn.252.1594634568602; 
- Mon, 13 Jul 2020 03:02:48 -0700 (PDT)
-Received: from localhost (trasno.trasno.org. [83.165.45.250])
- by smtp.gmail.com with ESMTPSA id 133sm23279767wme.5.2020.07.13.03.02.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 03:02:47 -0700 (PDT)
-From: Juan Quintela <quintela@redhat.com>
-To: Yi Wang <wang.yi59@zte.com.cn>
-Subject: Re: [PATCH 07/12] vnc: Remove the superfluous break
-In-Reply-To: <1594631086-36509-1-git-send-email-wang.yi59@zte.com.cn> (Yi
- Wang's message of "Mon, 13 Jul 2020 17:04:46 +0800")
-References: <1594631086-36509-1-git-send-email-wang.yi59@zte.com.cn>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Mon, 13 Jul 2020 12:02:46 +0200
-Message-ID: <87imer20mx.fsf@secure.mitica>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eqW9Kj52y69ZnpMGvLNWRCX82+2t7WxidfGVLvjziz8=;
+ b=BIFPzLUMzaw2rjSczkubZovu9/icGyo0twwPXi794zr5y2ninzKD08V21jjrWpkbjo
+ ofQNkXLtaLroy4u6TZ0YnyM+NQT6egxC+13EPVxdbcpnau+Ff+G4dNHzkv01ciFpp+QR
+ V7iOT5fLSzsQuPLmEHygAgGnOj3X3fJvqaURufYr1wtGzfh2DAVpd/QtqXjkETBMOKSB
+ q7ivY4sWpCoWotV6dWs+ZrP7+VD+HRbY8rRkgm7EK0dVVspPCYTk+gxkM8FxKExsHKsO
+ L2cCpo7Td42oNeA0XbkyRIN7FCmCVKPXHRStbxJfVVWFfUGf15gDCT6yjDUd8qcP8lPB
+ XwMw==
+X-Gm-Message-State: AOAM532VSKOKUA6O1/Kv6z5SzXnynnWe/1wp12rl2XxND0J2Lic4W87j
+ tOaDdkOYq9uSgNcEb36TdaS6xOvQSO34SjZ9cK0DVg==
+X-Google-Smtp-Source: ABdhPJxRc/uRhPMqcNoLShXO8PxZAelUzUyOCyNBcT2To2rSiPOBGoiAsmzRBdHgIGVxld0g1zOTxgwbOa3jHqcoQV4=
+X-Received: by 2002:aca:1706:: with SMTP id j6mr12708772oii.146.1594634738340; 
+ Mon, 13 Jul 2020 03:05:38 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <20200628214230.2592-1-peter.maydell@linaro.org>
+ <20200628214230.2592-3-peter.maydell@linaro.org>
+ <4c049b0c-f305-729a-748d-0a7742b496ed@amsat.org>
+In-Reply-To: <4c049b0c-f305-729a-748d-0a7742b496ed@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Jul 2020 11:05:27 +0100
+Message-ID: <CAFEAcA_JCSs6BCCw-MYOO8RcyXQ_iNZ63KjuwqEPM7yuvWsdTA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/arm/palm.c: Encapsulate misc GPIO handling in a
+ device
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=quintela@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,22 +97,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: xue.zhihong@zte.com.cn, wang.liang82@zte.com.cn, qemu-devel@nongnu.org,
- Liao Pingfang <liao.pingfang@zte.com.cn>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yi Wang <wang.yi59@zte.com.cn> wrote:
-> From: Liao Pingfang <liao.pingfang@zte.com.cn>
->
-> Remove the superfluous break, as there is a "return" before.
->
-> Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>a
-> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Mon, 13 Jul 2020 at 09:57, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> Why not make it a generic container in the MachineState and create
+> the container in hw/core/machine.c::machine_initfn()?
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+I don't think we create containers like that for any other
+machine, do we?
 
+thanks
+-- PMM
 
