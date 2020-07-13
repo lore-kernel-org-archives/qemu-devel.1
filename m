@@ -2,87 +2,87 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9168C433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F62C433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:54:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3B112075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA2702067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:54:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S8XVEa2E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3B112075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a4TrF2M9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA2702067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv5Ha-0005Oq-Te
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 16:42:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50606)
+	id 1jv5T0-0007o9-2e
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 16:54:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54250)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jv5H0-0004tu-Pp
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:42:02 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43372)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jv5Gy-0004sT-NY
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:42:02 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 95so10638089otw.10
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 13:42:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mRK/nPxJ28h5nbdqUH91n56We29NY74C6cTjczMQCAo=;
- b=S8XVEa2ELBIekOmEhqYXYqpksdsqYkOIU5qyhQq7uNLJixDF40p9gQ9OYM7EqIUFC7
- GsWQlUgRKzhU9sR8P51TnRKD6aU3Hdt9Br3XnEV7D0K0HKliJLeuyIwaaZWDqiAqwEoy
- iOo6b2sin8K+d1NPKRSnUJbLUEHjQeBT5nVocTLx23Sxuxc3zFLgK/xJpx890ahqi7Lw
- 0PW7NU3llCqE9ajYOTA1q8PQ7y1hSCpoveqzvA2TZFlm0lOwDdOYZ21j3EvVuDfmLywo
- Rzsz3WKPdqedTOrPTUsgpb5YkGU4Sh0BuoO2kfj/z4X12WV3Z10s6hkGKHtVp0qw14n+
- HxGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mRK/nPxJ28h5nbdqUH91n56We29NY74C6cTjczMQCAo=;
- b=jgkGRm8DaR/R45zTUlXNi6KP1AjxNibR6Vts7mgvhI5K8fvg0T2bq7g0Uixfwtqlg/
- p3l0CvJ8+WuTZe2qyXi6nt+yt0WaSnAOSwbLWsfSO3nHSp8tX4NE27Bycc/IGsVfxrkL
- RA7RMh8O+Hnei4A0O+EFtY7VVyaBSc60XfdNe+VoMM2ey7Lu/i4tr4bMFlV/n4Nor23c
- D7yr7CL2FUDbL33IkzdKyxuvOj+DJPy+IkP2fACbVOCjEkf17xKnIYMSELqSZLtY3Ia9
- RgVzM5rk+m//SXnfhUfKXKXecuQXZe1fo/Vw3AZPvJldR/Hc2T3hjsQAL/90yfArjzqG
- LAzg==
-X-Gm-Message-State: AOAM5319s0Ki+KqJVOiLt/2XjpgBqwI8Xyceqi6NIdO85p8TTiku+ZHh
- Rq1feTxc1DFcU6ccnne7O+0Jso175V/NEAWdyA4g5w==
-X-Google-Smtp-Source: ABdhPJzi7j9aJcqTSLOmItH+lnc9yPkvSAWPM2ExsxzAgxlR7oiSeMVSd0Oxi9KmrSa2lhsW4v0MgURc/yb0himjMY0=
-X-Received: by 2002:a9d:7303:: with SMTP id e3mr1194299otk.221.1594672919273; 
- Mon, 13 Jul 2020 13:41:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jv5SR-0007CJ-De
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:53:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59184
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jv5SO-0006TD-Us
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:53:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594673626;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=v9sSQBsMylQlw6uYqoH4gAamVXWlGupiUhylxryIbps=;
+ b=a4TrF2M9nt5hsSAuJ8uuEJnX+CSXKPlQJF5xtH6fclvY4P/JrjJWARHXoydCsA3lhd4U/V
+ kTkVNivUbcUF2cR/veVG07uo/qa+8pjAtgU3h84xmCzjmvgxVspi35+kwUTfl21x+AQkJ6
+ WYsxJpWQ21ysGAroXfG7fxa4+dtqfAk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-GBAld-d1OKKh44buPY6mkQ-1; Mon, 13 Jul 2020 16:53:44 -0400
+X-MC-Unique: GBAld-d1OKKh44buPY6mkQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10C6A800597
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 20:53:44 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA5845D9DC;
+ Mon, 13 Jul 2020 20:53:40 +0000 (UTC)
+Date: Mon, 13 Jul 2020 14:53:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH] vfio: fix use-after-free in display
+Message-ID: <20200713145340.4886d664@x1.home>
+In-Reply-To: <20200713124520.23266-1-kraxel@redhat.com>
+References: <20200713124520.23266-1-kraxel@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20200713183209.26308-1-f4bug@amsat.org>
- <20200713183209.26308-8-f4bug@amsat.org>
-In-Reply-To: <20200713183209.26308-8-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Jul 2020 21:41:48 +0100
-Message-ID: <CAFEAcA-kJQSZ-pudOrgutf24BG3UxA6F2ErocArs=f4sfndvTQ@mail.gmail.com>
-Subject: Re: [PATCH v2 7/9] hw/sd/sdcard: Do not allow invalid SD card sizes
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,88 +95,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Qemu-block <qemu-block@nongnu.org>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jul 2020 at 19:32, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
->
-> QEMU allows to create SD card with unrealistic sizes. This could
-> work, but some guests (at least Linux) consider sizes that are not
-> a power of 2 as a firmware bug and fix the card size to the next
-> power of 2.
->
+On Mon, 13 Jul 2020 14:45:20 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-> +            error_setg(errp, "Invalid SD card size: %s", blk_size_str);
-> +            g_free(blk_size_str);
-> +
-> +            blk_size_str =3D size_to_str(blk_size_aligned);
-> +            error_append_hint(errp,
-> +                              "SD card size has to be a power of 2, e.g.=
- %s.\n"
-> +                              "You can resize disk images with "
-> +                              "'qemu-img resize <imagefile> <new-size>'\=
-n"
-> +                              "(note that this will lose data if you mak=
-e the "
-> +                              "image smaller than it currently is).\n",
-> +                              blk_size_str);
-> +            g_free(blk_size_str);
+> Calling ramfb_display_update() might replace the DisplaySurface with the
+> boot display, which in turn will free the currently active
+> DisplaySurface.
+> 
+> So clear our DisplaySurface pinter (dpy->region.surface pointer) to (a)
+                               ^o
 
-Some places that create multi-line hints with error_append_hint()
-do it by calling it once per line, eg in target/arm/cpu64.c:
-                error_setg(errp, "cannot disable sve128");
-                error_append_hint(errp, "Disabling sve128 results in all "
-                                  "vector lengths being disabled.\n");
-                error_append_hint(errp, "With SVE enabled, at least one "
-                                  "vector length must be enabled.\n");
+> avoid use-after-free and (b) force replacing the boot display with the
+> real display when switching back.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/vfio/display.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+> index a57a22674d62..342054193b3c 100644
+> --- a/hw/vfio/display.c
+> +++ b/hw/vfio/display.c
+> @@ -405,6 +405,7 @@ static void vfio_display_region_update(void *opaque)
+>      if (!plane.drm_format || !plane.size) {
+>          if (dpy->ramfb) {
+>              ramfb_display_update(dpy->con, dpy->ramfb);
+> +            dpy->region.surface = NULL;
+>          }
+>          return;
+>      }
 
-Some places don't, eg in block/vhdx-log.c:
-            error_append_hint(errp,  "To replay the log, run:\n"
-                              "qemu-img check -r all '%s'\n",
-                              bs->filename);
+Tricky, but I think I follow that dpy->region.surface is only ever
+allocated to replace dpy->con->surface, so when ramfb_display_update()
+then replaces and frees dpy->con->surface with dpy->ramfb->ds, that's
+where the object point to by dpy->region.surface was freed.  Right?
 
-Most places terminate with a '\n', but some places don't, eg
-crypto/block-luks.c:
-       error_append_hint(errp, "Failed to write to keyslot %i", keyslot);
-       return -1;
+If so, looks ok to me.  If you're constructing a pull request, I'll
+give you an:
 
-The documentation says
- * May be called multiple times.  The resulting hint should end with a
- * newline.
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
 
-which isn't very clear -- you can call it multiple times, but
-must you, if it's multiline?
+If you need me to send a pull, let me know.  Thanks,
 
-I assume that "should end with a newline" means "must end
-with a newline", and places like block-luks.c are bugs.
+Alex
 
-Markus, do you know what the intended API here is?
-
-It looks like the implementation just tacks the hint
-string onto the end of any existing hint string, in
-which case multiple-line strings are fine and the same
-behaviour as calling the function multiple times.
-(I had assumed we might be accumulating an array of strings,
-or requiring multiline strings to be multiple calls so we
-could have the argument not need to be \n-terminated,
-to match error_setg(), but both those assumptions
-are obviously wrong.)
-
-Anyway, I guess this multiline-message usage is something
-we do already and it will DTRT, so
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-
-thanks
--- PMM
 
