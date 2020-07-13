@@ -2,88 +2,99 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA44C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA669C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 902B020773
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:45:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9597D20771
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:50:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="M2J+OQLc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 902B020773
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUzMsWSB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9597D20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv1aC-0007yZ-SO
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 12:45:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36044)
+	id 1jv1eU-00011S-Tf
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 12:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jv1ZY-0007Qx-N5
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:44:56 -0400
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:39657)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jv1dq-0000Gv-3H; Mon, 13 Jul 2020 12:49:22 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:35627)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jv1ZV-0005sE-IQ
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:44:56 -0400
-Received: by mail-ot1-x32d.google.com with SMTP id 18so9999517otv.6
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 09:44:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jOtSgHvTH7s0OuQ8fbSDZ9rzu8A+YXh1qYNF+PxSMMA=;
- b=M2J+OQLclqqSKITm6iD0W5TdKXGnMlZFShvNrS2Jj0ulCdQaIvsVby23XGEhoETSBR
- VyAC6nfLh1FQjVGJj4Y7Rzi3kUD1PF2EZ9QWR0LHyG9i92PgNbbA5hnrm8ccm/oeXjV7
- mia3tPpW+4j4scRnWGqZDADVCNySDffbGiLI5f/Sou61pRCVKewGBkp7ALa53u1AYEtw
- 9Joknfs424MaiAArIooexW9JAph28wuP+nLfCDFk9F4K5gclKVZhnWGvEZ7tvrn7HduR
- u7DWLfcl69nO72CsDDsDfCzhBp1LA32sLpuntZTMGGFJuyUKLh7kxbCs5r40llttYDCv
- b7eA==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jv1do-0006U2-DU; Mon, 13 Jul 2020 12:49:21 -0400
+Received: by mail-ej1-x643.google.com with SMTP id rk21so18001057ejb.2;
+ Mon, 13 Jul 2020 09:49:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=EySsZI4/pTRSMdnVwthHs4fTAmdWn4xeZCN1brctPzY=;
+ b=eUzMsWSBj6/SoYhJ41PfNAueXK34HQ1V0F+Dvg4jqUlxTPIHdc/Z5gNUGbp6k/Ozmm
+ Ow66eW2lx9hHI405d6WcDrHn/1uQwBJHMfAHjco7+6QkwRc+pewY0GhK72+NJNeQdIvz
+ H3JW93LAWLOWf0kpk395wuRuSWOlB2X8yBXEDOVAxc7blf6pTqwdZUzkAfrjp/W4/3mS
+ komBQHA3aaotlZ8DkMvhbdsLXcVTwra+EQSy/So6fv/il+Af+D+vBKye/lCZQ3rWT2bX
+ 76amWKCqJSC2gnccbKLMJjx/ToBlp1ZE2XTS2KMPe52LQlpCUtg/mLx9+/T3wigvoEsc
+ vX3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jOtSgHvTH7s0OuQ8fbSDZ9rzu8A+YXh1qYNF+PxSMMA=;
- b=WlzOaojlk2X5fTPPzWjbm2MvWWLyCyN0JB99OTY3geNHwk7TSNg2v/09tL/Q+fEukU
- lVkuCbbO7JzF8LqyGJjTR/OInJIM1DQpUtAnOXFu5DJX7kXIZQCf6HAztSRsRKNFJb+0
- VzoN5QiTcq2OtGG/Phex79inF99poAiZlkh0VbtgwRRwphn2W86LPUIt1VrbcHSE79Xz
- r9Ad0FcZpSQ5ZDmWs4onp7ElcFZ3YGZtG23zYKa3H0RnREYYDA1SgRuUKX3H3mfasmsv
- c8RGh3AGRZKKu/lkuGkbJY1FSJK/mDnQC0Y9r1XMU6SRVLtVjoiMXheZjlm/cMPOgDVy
- IyhA==
-X-Gm-Message-State: AOAM531UyE8VrCmHQsmVFcZaY8H8RY0JtimzyqY+yjSvtAnDwHg0i5hk
- EIKXpdCN0C8Y/LufCn2+WxEurh4jQO+GlBf1CnDKJg==
-X-Google-Smtp-Source: ABdhPJyYbENVOPEIXO6NG/1avsukhYQosPNL8BkEJLAYI0vvsDIfkYRhBoZdM/ZOT4lW1fwdDd9HrEIKHFm09NEm/9A=
-X-Received: by 2002:a9d:5f11:: with SMTP id f17mr428531oti.139.1594658692270; 
- Mon, 13 Jul 2020 09:44:52 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EySsZI4/pTRSMdnVwthHs4fTAmdWn4xeZCN1brctPzY=;
+ b=LBJispuzoCcZ4AREvWBdlglLFhH/hPNMHo9yr4dB9TxoE7eVymnexWGa9yEzC8Tqum
+ yTdtDTfgeLN0JO5CM47mKf4KvHh0aNnv7of7ku5wkKw/PDVlzps5MVI1m32wmWMXcXK9
+ drTSGUZMVkaJc24Mo8R+n2NJRfqpQtUGOA6T4PYgMQE3ggi/7wqU4X9Dmi9PeVKkBSIw
+ 6QvfcbGyi3VwUZap+QmxAZ4eNqQe7R/WPrOV4nsg75RbvzBlncxqIIXQiL326qF2s202
+ gpvrDvlnJj3WSfQ9b99WbfOoz3K/a8NXUf28o1OakleG6j0NBvLse9xtXBSWier8SfO2
+ W5ng==
+X-Gm-Message-State: AOAM533WVL967+gTec+brQTepAE4LapSj/gtmvXQ6AMfLOveex0eTGUN
+ VtaPdEgOmz+Qv69Lk6vNP18K+hqDiMo=
+X-Google-Smtp-Source: ABdhPJyTQxHuyzmpEe5qh3a5gf6fzw2K8loa58sTltx6b49uQFdjYXgT41cDVTzwaw6jTv9PyGCz9g==
+X-Received: by 2002:a17:906:40d6:: with SMTP id
+ a22mr613384ejk.133.1594658958353; 
+ Mon, 13 Jul 2020 09:49:18 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id bs18sm11986304edb.38.2020.07.13.09.49.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 13 Jul 2020 09:49:17 -0700 (PDT)
+Subject: Re: [PATCH v3 03/11] hw/sd/sdcard: Do not switch to ReceivingData if
+ address is invalid
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200605102230.21493-1-philmd@redhat.com>
+ <20200605102230.21493-4-philmd@redhat.com>
+ <CAFEAcA-6Vv5Q31Z0bsXPpWanEj8Z0gBeZFWTCrQF3W8RuaQiMQ@mail.gmail.com>
+ <3e682d7b-8d6a-999e-e426-ffcdd0fc323e@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0c3603d0-8343-dde5-ea56-7a6420d07ad6@amsat.org>
+Date: Mon, 13 Jul 2020 18:49:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200710104920.13550-1-frank.chang@sifive.com>
- <CAKmqyKPtKtD=G+tXcd2Y-TM2go1TWbETHK2e3vdN-ehHyHU9-w@mail.gmail.com>
- <CAE_xrPhEW_VSRQVkthwu0NmBQYBZ11phLRgSbFqqFc9wZZ38Xg@mail.gmail.com>
- <4a5140da-eda6-a40a-c803-5094a0d5abea@linaro.org>
-In-Reply-To: <4a5140da-eda6-a40a-c803-5094a0d5abea@linaro.org>
-From: Frank Chang <frank.chang@sifive.com>
-Date: Tue, 14 Jul 2020 00:44:41 +0800
-Message-ID: <CAE_xrPgaMK-vYMDMGHAKq-S9WkjX2d6A34cOWoFLEkmiCb+Ctg@mail.gmail.com>
-Subject: Re: [RFC 00/65] target/riscv: support vector extension v0.9
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000e4217205aa556878"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::32d;
- envelope-from=frank.chang@sifive.com; helo=mail-ot1-x32d.google.com
+In-Reply-To: <3e682d7b-8d6a-999e-e426-ffcdd0fc323e@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,82 +107,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair23@gmail.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Prasad J Pandit <pjp@fedoraproject.org>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e4217205aa556878
-Content-Type: text/plain; charset="UTF-8"
+On 7/13/20 6:36 PM, Philippe Mathieu-Daudé wrote:
+> On 6/15/20 4:06 PM, Peter Maydell wrote:
+>> On Fri, 5 Jun 2020 at 11:25, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>>
+>>> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>
+>>> Only move the state machine to ReceivingData if there is no
+>>> pending error.  This avoids later OOB access while processing
+>>> commands queued.
+>>>
+>>>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+>>>
+>>>   4.3.3 Data Read
+>>>
+>>>   Read command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>>   occurred and no data transfer is performed.
+>>>
+>>>   4.3.4 Data Write
+>>>
+>>>   Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>>>   occurred and no data transfer is performed.
+>>
+>> It's not clear from the spec that this should also
+>> apply to WP_VIOLATION errors. The text about WP_VIOLATION
+>> suggests that it is handled by aborting the data transfer
+>> (ie set the error bit, stay in receive-data state, wait for
+>> a stop command, but ignore all further data transfer),
+>> which is I think distinct from "rejecting" the command.
+>>
+>> If that theory is right then moving the check for the
+>> ADDRESS_ERROR in this patch is correct but the WP_VIOLATION
+>> tests should stay as they are, I think.
+> 
+> I found the correct behavior in table '4.10.1 Card Status':
+> 
+> * OUT_OF_RANGE
+>   ============
+>   Type: E R X
+> 
+>   The command's argument was out of the allowed range for this card.
+> 
+> * ADDRESS_ERROR
+>   =============
+>   Type: E R X
+> 
+>   A misaligned address which did not match the block length was
+>   used in the command.
+> 
+> * WP_VIOLATION
+>   ============
+>   Type: E R X
+> 
+>   Set when the host attempts to write to a protected block or to
+>   the temporary or permanent write protected card.
+> 
+> With 'Type':
+> 
+> - E: Error bit.
+> - R: Detected and set for the actual command response.
+> - X: Detected and set during command execution. The host can get
+>      the status by issuing a command with R1 response.
+> 
+> Block Read
+> ==========
+> [...]
+> When the last block of user area is read using CMD18, the host should
+> ignore OUT_OF_RANGE error that may occur even the sequence is correct.
+> If the host uses partial blocks whose accumulated length is not block
+> aligned and block misalignment is not allowed, the card shall detect
+> a block misalignment at the beginning of the first misaligned block,
+> set the ADDRESS_ERROR error bit in the status register, abort
+> transmission and wait in the Data State for a stop command.
+> 
+> 
+> So I understand we want OUT_OF_RANGE (returned via R1).
 
-On Tue, Jul 14, 2020 at 12:41 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
-
-> On 7/12/20 7:02 PM, Frank Chang wrote:
-> > Does decodetree support any feature for multi-version opcodes?
-> > Or if it can use something like C macros to compile with the opcodes by
-> the vspec
-> > user assigned? If there's any good way to keep both versions, then I can
-> try to
-> > rearrange
-> > my codes to support both vspecs.
->
-> There is a way, using { } to indicate where overlap is allowed.  The
-> trans_*
-> functions checks the ISA version, and return false.  Which causes the next
-> matching overlapping pattern to be used, etc.  Have a look at some of the
-> ARM
-> decodetree files.
->
-> But since Alisair is happy dropping 0.7.1 support, we should do that.  It
-> will
-> be cleaner not to have to retain the backward compatibility.
->
->
-> r~
->
-
-That makes sense to me.
-Thanks to Alisair and Richard's feedback.
-
-Frank Chang
-
---000000000000e4217205aa556878
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Tue, Jul 14, 2020 at 12:41 AM Richard =
-Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.hende=
-rson@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
- solid rgb(204,204,204);padding-left:1ex">On 7/12/20 7:02 PM, Frank Chang w=
-rote:<br>
-&gt; Does decodetree support any feature for multi-version opcodes?<br>
-&gt; Or if it can use something like C macros to compile with the opcodes b=
-y the vspec<br>
-&gt; user assigned? If there&#39;s any good way to keep both versions, then=
- I can try to<br>
-&gt; rearrange<br>
-&gt; my codes to support both vspecs.<br>
-<br>
-There is a way, using { } to indicate where overlap is allowed.=C2=A0 The t=
-rans_*<br>
-functions checks the ISA version, and return false.=C2=A0 Which causes the =
-next<br>
-matching overlapping pattern to be used, etc.=C2=A0 Have a look at some of =
-the ARM<br>
-decodetree files.<br>
-<br>
-But since Alisair is happy dropping 0.7.1 support, we should do that.=C2=A0=
- It will<br>
-be cleaner not to have to retain the backward compatibility.<br>
-<br>
-<br>
-r~<br></blockquote><div><br></div><div>That makes sense to=C2=A0me.</div><d=
-iv>Thanks to=C2=A0Alisair and Richard&#39;s feedback.</div><div><br></div><=
-div>Frank Chang</div></div></div>
-
---000000000000e4217205aa556878--
+We always returned ADDRESS_ERROR and guests never complained, so I don't
+plan to modify this bit for 5.1. What matters is "command is rejected
+if error occurred and no data transfer is performed".
 
