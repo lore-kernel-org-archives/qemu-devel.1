@@ -2,70 +2,88 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD57C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F404C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:28:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50D932072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50D932072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 48CDE2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:28:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FCIEeGK/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48CDE2072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juwcg-00071T-KH
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 07:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43758)
+	id 1juwdH-0007WU-JU
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 07:28:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1juwc3-0006LT-GA
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:27:11 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39730)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1juwc1-0000Wj-FL
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:27:11 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id D8286ADBD;
- Mon, 13 Jul 2020 11:27:08 +0000 (UTC)
-Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200629093504.3228-1-cfontana@suse.de>
- <20200629093504.3228-4-cfontana@suse.de>
- <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
- <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
- <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
- <e9dca3d1-f52d-13ce-2d7d-66958bc15765@suse.de>
- <d0bc3f23-98c0-eadb-55ed-3377f43c494a@suse.de>
- <20200710083356.4c6e9f78.cohuck@redhat.com>
- <c834b040-2365-4c6a-a301-553a1ede3e14@suse.de>
- <20200713125122.647232d0.cohuck@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <d00b0cbf-e698-5c09-d355-22a1ba3c624d@suse.de>
-Date: Mon, 13 Jul 2020 13:27:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1juwcI-0006c1-1B
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:27:26 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45355
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1juwcF-0000Y3-JR
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:27:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594639642;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=cZITXWrl5jpH3CtdAB4/85yeRRg98FkpSpdUkmueBDY=;
+ b=FCIEeGK/TMGqmz0fuLE62MlX7/CrYlUUo1TW25rHdZVr6aIhn9Ml7En3cryRuUgYgUGxOZ
+ urfHHmduxQA90cMFI62YDISirrYMJyD3vt6hijD0H74x2ptKRg5gbDDWPxyQRyPNwCF0tz
+ K+p8OkUZ8X7T2fbAU1XCV6wGEoaE+i8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-IrXl-ZiQNgatb4Z5VglVtg-1; Mon, 13 Jul 2020 07:27:18 -0400
+X-MC-Unique: IrXl-ZiQNgatb4Z5VglVtg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78AD1100CCC1;
+ Mon, 13 Jul 2020 11:27:17 +0000 (UTC)
+Received: from localhost (ovpn-114-66.ams2.redhat.com [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC6EB1001B0B;
+ Mon, 13 Jul 2020 11:27:16 +0000 (UTC)
+Date: Mon, 13 Jul 2020 12:27:15 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 3/5] block: introduce preallocate filter
+Message-ID: <20200713112715.GJ28639@stefanha-x1.localdomain>
+References: <20200620143649.225852-1-vsementsov@virtuozzo.com>
+ <20200620143649.225852-4-vsementsov@virtuozzo.com>
+ <20200708120726.GC459887@stefanha-x1.localdomain>
+ <9a351987-6532-65d8-d144-defd04b5bba4@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20200713125122.647232d0.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 00:02:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+In-Reply-To: <9a351987-6532-65d8-d144-defd04b5bba4@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="SLfjTIIQuAzj8yil"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,114 +96,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>,
- Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
- haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org,
+ Anton.Nefedov@acronis.com, armbru@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/13/20 12:51 PM, Cornelia Huck wrote:
-> On Sat, 11 Jul 2020 13:40:50 +0200
-> Claudio Fontana <cfontana@suse.de> wrote:
-> 
->> I found out something that for me shows that more investigation here is warranted.
->>
->>
->> Here is my latest workaround for the problem:
->>
->>
->>
->> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
->> index 1e036cc602..47c9a015af 100644
->> --- a/hw/s390x/s390-skeys.c
->> +++ b/hw/s390x/s390-skeys.c
->> @@ -252,6 +252,8 @@ static const TypeInfo qemu_s390_skeys_info = {
->>      .class_size    = sizeof(S390SKeysClass),
->>  };
->>  
->> +extern void qemu_fflush(QEMUFile *f);
->> +
->>  static void s390_storage_keys_save(QEMUFile *f, void *opaque)
->>  {
->>      S390SKeysState *ss = S390_SKEYS(opaque);
->> @@ -302,6 +304,7 @@ static void s390_storage_keys_save(QEMUFile *f, void *opaque)
->>      g_free(buf);
->>  end_stream:
->>      qemu_put_be64(f, eos);
->> +    qemu_fflush(f);
->>  }
->>  
->>  static int s390_storage_keys_load(QEMUFile *f, void *opaque, int version_id)
->> ------------------------------------------------------------------------------------
->>
->>
->> I think that this might imply that my patch changing the migration stream has only triggered an existing problem.
-> 
-> Looks a bit like it.
-> 
->>
->> The sympthom is: the load keys code does not see the EOS (byte value 1).
->> It does see the keys (which are all empty in the test, ie 32678 times the byte value 0). 
-> 
-> Yes, that (zero keys) is expected.
-> 
->>
->> The workaround for the sympthom: flush the qemu file after putting the EOS in there.
->>
->>
->> Any ideas on where to investigate next?
-> 
-> Do any other users of the SaveVMHandlers interface see errors as well
-> (or do they do the fflush dance)?
-> 
+--SLfjTIIQuAzj8yil
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi Cornelia,
+On Wed, Jul 08, 2020 at 07:17:52PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> 08.07.2020 15:07, Stefan Hajnoczi wrote:
+> > On Sat, Jun 20, 2020 at 05:36:47PM +0300, Vladimir Sementsov-Ogievskiy =
+wrote:
+> > > It may be used for file-systems with slow allocation.
+> > >=20
+> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+> > > ---
+> > >   qapi/block-core.json |   3 +-
+> > >   block/preallocate.c  | 255 ++++++++++++++++++++++++++++++++++++++++=
++++
+> > >   block/Makefile.objs  |   1 +
+> > >   3 files changed, 258 insertions(+), 1 deletion(-)
+> > >   create mode 100644 block/preallocate.c
+> >=20
+> > Please add documentation to docs/system/qemu-block-drivers.rst.inc
+> > describing the purpose of this block driver and how to use it.
+>=20
+> This implies adding new section "Filters", yes?
 
-just want to point you also to this discussion that I made outside of the context of this particular patch, with a much simpler reproducer:
+Yes, please.
 
-https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03969.html
+> >=20
+> > Since this filter grows the file I guess it's intended to be below an
+> > image format?
+>=20
+> Yes, between format and protocol nodes.
 
-There do not seem to be many users of the "Old style" vmstate_save as it is called in the code.
+Thanks for confirming. Please include this in the documentation. While
+reading the code I was thinking about how this can work if the guest is
+directly exposed to the filter. Users might wonder about the same thing.
 
-I could find only:
+> > > +    /* Length should not have changed */
+> > > +    assert(len =3D=3D bdrv_getlength(bs->file->bs));
+> > > +
+> > > +    start =3D write_zero ? MIN(offset, len) : len;
+> > > +    end =3D QEMU_ALIGN_UP(offset + bytes + s->prealloc_size, s->prea=
+lloc_align);
+> > > +
+> > > +    ret =3D bdrv_co_pwrite_zeroes_locked(bs->file, start, end - star=
+t,
+> > > +                                       BDRV_REQ_NO_FALLBACK, lock);
+> > > +
+> > > +    bdrv_co_range_unlock(lock);
+> >=20
+> > Hmm...if this piece of code is the only user of bdrv_co_range_try_lock(=
+)
+> > then a BDRV_REQ_NO_WAIT flag might be a simpler API.
+> >=20
+> > I thought the lock request would be used to perform multiple operations=
+,
+> > but if it's just for a single operation then I think it's less code and
+> > easier to understand without the lock request.
+>=20
+> Hmm, again, I don't remember exact reasons. Firstly, I was afraid of leng=
+th
+> change during try_lock and have a double check for bdrv_getlength(). Then
+> I decided that it's impossible and change the check to an assertion.
+> Probably, the only reason to leave locked range was "I already have the c=
+ode,
+> it will help with copy-on-read, why not to use it".. OK, I'll try rewrite=
+ it
+> with help of new flag.
 
-fgrep -R -- ".save_state"
+Thanks!
 
-hw/s390x/tod.c:    .save_state = s390_tod_save,
-hw/s390x/s390-skeys.c:    .save_state = s390_storage_keys_save,
-net/slirp.c:    .save_state = net_slirp_state_save,
+Stefan
 
-It is difficult to see what does fflush where, and which methods are supposed to do what,
-because we have quite a few methods in SaveVMHandlers and VMStateDescription.
+--SLfjTIIQuAzj8yil
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Some of the fflushes are just done in the code just after writing the EOS,
-and in some cases there is no fflush after writing the EOS, but there are other methods called at completion time as far as I understand, where the fflush is done.
+-----BEGIN PGP SIGNATURE-----
 
-The issue in the stream seems to appear only just after the s390 keys are written.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8MRRMACgkQnKSrs4Gr
+c8iXpwgAkBxPft2TThw0BGX4YYFlgU2e2kIJZSFMUM8BZsIDTosjthq19vNBwXsx
+BzxyYwRQBDIpEiin60clkSr70iKLVQrNetY0hX0LmhhGgotsv65Vw6f+L4bvzoxc
+0QP0MctBTA2W+H1XB9Qk4jtmasd/MBtceactvlMPF/tMP7e7yM5GeVlPaI1K5GCf
+DQVU0PP8L+7pNo/Ts65vSqA2JRzQ6xnp0zYqM/xoGE3gYoKv9PYRog8inVwsFXsJ
+RFlzzIEMRpYITL/mSH2zcNUvSxzFmAmksGiVF+BlIvtH9g3wybpV99Icn6hqPYJs
+3lPyHqT0mBtUTp9NYHHaiWFTg2NYTg==
+=TTAl
+-----END PGP SIGNATURE-----
 
-Maybe better to continue the discussion at: 
-
-https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03969.html
-
-?
-Otherwise it is fine, I can follow two threads if you prefer so.
-
-Thanks,
-
-Claudio
-
-
-
-
-
+--SLfjTIIQuAzj8yil--
 
 
