@@ -2,40 +2,42 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C31FC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:29:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96253C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:30:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D100820663
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:29:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D100820663
+	by mail.kernel.org (Postfix) with ESMTPS id 6C3C720663
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:30:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C3C720663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv48N-0003kF-6F
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:29:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44330)
+	id 1jv49p-0004hj-Nd
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:30:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv47p-0003Kf-2o
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:28:29 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:53353)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv49D-0004Di-EL
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:29:55 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:55127)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv47n-0007F6-5d
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:28:28 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv49B-0007Ja-Py
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:29:55 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M2fQ9-1jsb1503Kh-004BtE; Mon, 13 Jul 2020 21:28:24 +0200
-Subject: Re: [PATCH] linux-user: Add several IFTUN ioctls
-To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
-References: <20200710195328.587462-1-jkz@google.com>
+ 1MG9wg-1k4uyB1aBA-00GWD4; Mon, 13 Jul 2020 21:29:51 +0200
+Subject: Re: [PATCH v2 1/2] linux-user: fix the errno value in
+ print_syscall_err()
+To: qemu-devel@nongnu.org
+References: <20200708152435.706070-1-laurent@vivier.eu>
+ <20200708152435.706070-2-laurent@vivier.eu>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <c5af9eb0-c01a-b624-e753-f7533e4e2772@vivier.eu>
-Date: Mon, 13 Jul 2020 21:28:23 +0200
+Message-ID: <da10eee0-cc97-70b6-4ce2-70cf7d540841@vivier.eu>
+Date: Mon, 13 Jul 2020 21:29:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200710195328.587462-1-jkz@google.com>
+In-Reply-To: <20200708152435.706070-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:N43pOeOPsDdtrmbqvuRvGTY9qJDRw6laCxzE4zwOpiNvC7Wd5TJ
- MoW9l7RlJ5Cc7jCfypz+RS8DnhWcZdZWFr3jYi495ockZUcGAF5MzDEl7nwADe5B3uxCMNH
- Jh1gtP2QXbq0FEj5dGnuPu3ZvAJ9sDn/l5oiHiN4BSCVhdyOIc1HgMZr52idKlNL7XWBzFY
- OMerGLJU/jiNzoEyBvsxQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2gtjQiOGF9g=:BdKfg+hka6+FP2tFW0/Cdq
- FbvGABSB3Bm5aspJN2aQ/k9Ya8Zo7kKiyMnblXaHZJoZeachyfbJKv6IHpVLYgzUlcchTJr9W
- d6U5dtI05KeF9A33ZkHlWiR+OK9rorHRUqgfgHJPKHgEnt2E/jDN730UKThYmFJxQ+a48rbvm
- CertbHaK/Yeb7U12xKHYV21noFEMTEoTf77IIo5GOfBHPLzBpDszaySxV4tVYLQNvdTu8QlPo
- xBHvKEtAHFMd/5hPdnqCdXGHas6KPB4qrfxrCnvDexLp3bcXZVaxgqCRkkCGnS66H8VWTmBlE
- AakTTOa31A1cmzu4Qe9YHQpt8Qdsg0bKN7lvcT8iWGto4TgV08XIQhZmhgV41sLe1LUreCKzN
- p/AwzJOiLU+dIfy66gxJ72ghafklX91YKEzumyYWnhNuTWKI2uK23RzbLsNhgQdfssEIBXXOF
- +SoPACGedE1ZMoIPHbEMuGiUVD3PNMDXV6/N/4U0N7729pY5Wklkj5Y+LgHocFjFD6SKrUoYJ
- 2KMNnmmn9RivzocFBEHdfn0UPXT/jL7JcTe8r7HdMiRiqxBq3n8kHYKtC5dQCtatUDOv4wOop
- yNCq/E+2wKWTbsgG85UXgN7nmlDE1Nujv6Vkev54Z9qIFiydxmvZazCpu+i0LQIQykVleietU
- 9k+8sjlLvbjoZsAOL/ZH47KnD/h0FtuFowweixd90upK8xtcPsOwMVjkryc6J/JpBJkCyKCBL
- GNvodYnSZYC3H+NiT58ZRwKA/IfrWTCcIQvSmQ1kju5ZQlhs6QnGBQp4SC0QskNPdlvjgHyvO
- oWGY+eFLyEKNG5bIttePLpgymWXLvbX01ZdbEqxSMikLetMX5R2JqTDAy46yZY3pntzk6oa
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:ms4HC2Q441AgZK3JV2ueWYesiri9Wn21M41GXjmQrYoz+5OODVl
+ tUESlg7hm7fUBdcLh20q0hTixZM4SRokhUuOtRRYyh8dE2cQqk7fkPRlMNu+8/7Rdl+81QA
+ DcHXJ641+j+IqG9d8Kn6SoxHf8S2zS17tV2oHTU0/gHk95ozC5tSJFNDXXPW48T6hu1PNnD
+ B7mtU0FmQPdt8fmxAKlAQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ucB5s3UYSz8=:zCROSbzsF7SFAFinbC3oQL
+ IJaA577w2M0SNQToc01wYAtU5B1soUN6HpauxhkLKT0o3ZOrVbpVmfT23Fh3BcYO52u3ypbDR
+ J2TkEgj92ZLsS+tcGUPrPkr5EiOTuU9t7qAfxT+EvEEPzZuS8rHcBAhNg2k63ilm865JerQXZ
+ jbpfBI7OfMS7E9ujTB32DHxTzOh7J3pbvfIv6WG/ROOqLNJEogf7HKlu2+An8HU1mGpTjmHFL
+ Dv1DHLO9URJyEzu0DTip8tFzUXUS3lvASpE2F+kx6zR6cpvsQZjgWndATWzK05CMxMXT4yg4w
+ Ayd3dW+qqsVCxhQ7Zl3HPn0BiQcBRza9skO/sEq07KAj1Eoc2UjTeoBItYz6tzTLhbybwqQd+
+ kqJBxxZFlK5e18A9QifrSvsaGGN95b9x8a9WqR4chk9AlZjtOmSPcgHQ7N2NRbq3JO+YKNjqX
+ kIPs4rkPrpwKckZBVhpjspy8WHJTCwynm/HHnnzvP7xdOpHk39BFs98JOxQDhCQGkI08eZQ8L
+ CwMuyCiDJ8m1hY6DNj6dcOiRGsEE2IDdKHS4LT/nJAW7lkvMt6oukKgODjyo5Hd2zOkwRypFi
+ vufzITeiOaflPl1KP4Nls3skS1KeFAbQJ5Dg92zD49bIsNVhjrkpFWzqHT645qwBaKVw8Gh3m
+ 9aDALb1yPNPN9DuBFvnblD+uUKR4imewjz3rkK/EFcphRY/9cepWxFzDDRXexvUFpDqq3lYN5
+ QtDqO4343iNT40Fgox8vhkBY5OlwEwiljYz/IZlFdfMUSdTppGjQQ8ic5YdISGhTdvzqmOy4N
+ JfPwgSQOJqUULc2LD7VJZ+O57CA2mnxOwlaEiwmX7/TUc+FutOZLjV0Nd2HOfq8iRgVQfsX
+Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:28:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:23:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -127,101 +129,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi
+Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 10/07/2020 à 21:53, Josh Kunz a écrit :
-> This change includes most widely-available if_tun ioctls that are
-> integer typed.
+Le 08/07/2020 à 17:24, Laurent Vivier a écrit :
+> errno of the target is returned as a negative value by the syscall,
+> not in the host errno variable.
 > 
-> Tested by compiling all linux-user emulators. This patch has also been
-> used successfully to run several binaries that utilize these ioctls for
-> several months.
+> The emulation of the target syscall can return an error while the
+> host doesn't set an errno value. Target errnos and host errnos can
+> also differ in some cases.
 > 
-> Linux Header:
-> https://github.com/torvalds/linux/blob/dcde237b9b0eb1d19306e6f48c0a4e058907619f/include/uapi/linux/if_tun.h#L31
-> 
-> Signed-off-by: Josh Kunz <jkz@google.com>
+> Fixes: c84be71f6854 ("linux-user: Extend strace support to enable argument printing after syscall execution")
+> Cc: Filip.Bozuta@syrmia.com
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/ioctls.h       | 20 ++++++++++++++++++++
->  linux-user/syscall.c      |  1 +
->  linux-user/syscall_defs.h | 21 +++++++++++++++++++++
->  3 files changed, 42 insertions(+)
+>  linux-user/strace.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 0713ae1311..9b4a67fe84 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -593,3 +593,23 @@
->    IOCTL(KCOV_DISABLE, 0, TYPE_NULL)
->    IOCTL(KCOV_INIT_TRACE, IOC_R, TYPE_ULONG)
->  #endif
-> +
-> +  IOCTL(TUNGETFEATURES  , IOC_R , TYPE_INT)
-> +  IOCTL(TUNGETIFF       , IOC_R , TYPE_INT)
-> +  IOCTL(TUNGETSNDBUF    , IOC_R , TYPE_INT)
-> +  IOCTL(TUNGETVNETHDRSZ , IOC_R , TYPE_INT)
-> +  IOCTL(TUNGETVNETLE    , IOC_R , TYPE_INT)
-> +  IOCTL(TUNSETDEBUG     , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETGROUP     , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETIFF       , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETIFINDEX   , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETLINK      , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETNOCSUM    , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETOFFLOAD   , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETOWNER     , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETPERSIST   , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETQUEUE     , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETSNDBUF    , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETTXFILTER  , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETVNETHDRSZ , IOC_W , TYPE_INT)
-> +  IOCTL(TUNSETVNETLE    , IOC_W , TYPE_INT)
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 98ea86ca81..4ad4b36a84 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -58,6 +58,7 @@
->  #include <linux/icmpv6.h>
->  #include <linux/errqueue.h>
->  #include <linux/random.h>
-> +#include <linux/if_tun.h>
->  #ifdef CONFIG_TIMERFD
->  #include <sys/timerfd.h>
->  #endif
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 3c261cff0e..833ef68faf 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -859,6 +859,27 @@ struct target_rtc_pll_info {
->  #define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
->  #define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 5235b2260cdd..b42664bbd180 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -731,7 +731,7 @@ print_syscall_err(abi_long ret)
 >  
-> +/* if_tun ioctls */
-> +#define TARGET_TUNGETFEATURES   TARGET_IOR('T', 207, unsigned int)
-> +#define TARGET_TUNGETIFF        TARGET_IOR('T', 210, unsigned int)
-> +#define TARGET_TUNGETSNDBUF     TARGET_IOR('T', 211, int)
-> +#define TARGET_TUNGETVNETHDRSZ  TARGET_IOR('T', 215, int)
-> +#define TARGET_TUNGETVNETLE     TARGET_IOR('T', 221, int)
-> +#define TARGET_TUNSETDEBUG      TARGET_IOW('T', 201, int)
-> +#define TARGET_TUNSETGROUP      TARGET_IOW('T', 206, int)
-> +#define TARGET_TUNSETIFF        TARGET_IOW('T', 202, int)
-> +#define TARGET_TUNSETIFINDEX    TARGET_IOW('T', 218, unsigned int)
-> +#define TARGET_TUNSETLINK       TARGET_IOW('T', 205, int)
-> +#define TARGET_TUNSETNOCSUM     TARGET_IOW('T', 200, int)
-> +#define TARGET_TUNSETOFFLOAD    TARGET_IOW('T', 208, unsigned int)
-> +#define TARGET_TUNSETOWNER      TARGET_IOW('T', 204, int)
-> +#define TARGET_TUNSETPERSIST    TARGET_IOW('T', 203, int)
-> +#define TARGET_TUNSETQUEUE      TARGET_IOW('T', 217, int)
-> +#define TARGET_TUNSETSNDBUF     TARGET_IOW('T', 212, int)
-> +#define TARGET_TUNSETTXFILTER   TARGET_IOW('T', 209, unsigned int)
-> +#define TARGET_TUNSETVNETHDRSZ  TARGET_IOW('T', 216, int)
-> +#define TARGET_TUNSETVNETLE     TARGET_IOW('T', 220, int)
-> +
->  /* Bridging control calls */
->  #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
->  #define TARGET_SIOCSIFBR       0x8941          /* Set bridging options         */
+>      qemu_log(" = ");
+>      if (ret < 0) {
+> -        qemu_log("-1 errno=%d", errno);
+> +        qemu_log("-1 errno=%d", (int)-ret);
+>          errstr = target_strerror(-ret);
+>          if (errstr) {
+>              qemu_log(" (%s)", errstr);
 > 
 
 Applied to my linux-user-for-5.1 branch.
