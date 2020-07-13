@@ -2,93 +2,84 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFA3C433E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930E7C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56997205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C316205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A4UHpJQW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56997205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UdlJ+V45"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C316205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzRs-0002Dx-KJ
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:28:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35490)
+	id 1juzSK-0002tW-Gr
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:29:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzBA-0005iI-7V
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:36 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39747)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzB7-0006gV-LF
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:35 -0400
-Received: by mail-wm1-x334.google.com with SMTP id w3so13308857wmi.4
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=ZsABSf3zCCbs9HoGH03ylmhl0Zn1zbJ1jZgoRtVVq6c=;
- b=A4UHpJQWJpSb5nQvr/LHvEXmi4Zh161aeV+Q0xS4n+PEHCJIiJOZQRVTQEHRcM6ZoH
- PsdZG2TKZNEokz1+spTggjRRAbSx0RTqQfPFSpwvnEeRpSwHqWbTkhxwMQhKbX0LW2dl
- TkvQNxJEMTqEFIJc19HHRi8FCFayLEQIg/Fl9EfIMyvKJiIN4cMHdOXviv3mtiveuSwC
- 4ODkm0LKtOBhqZS07hVqGRWUL+1yCn2FFfSbMpX1bjS+Nz70rbVzEDXpX5kDDDtd6t74
- WP1hh1/IaIuzaBLKleOKTt0/FAKLWcxTv1exXt+S4LIMs10ZZ3kK3syjsZJALwX+OkxN
- TI6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ZsABSf3zCCbs9HoGH03ylmhl0Zn1zbJ1jZgoRtVVq6c=;
- b=nURyN7zXd8yD0ZFy9KHQdbH8kwGq/tQrFZ6dMd4WzghpXHFC4pTNYCMWiDWsYJC71V
- geQgV3gtOLIGhM59RYCHkLWMQ7FKZLfc3in87+6Db6bMVgZo6LjnebdO8N1KMelgUuP7
- Iod8+hu2wMhb2hQBcKstj33LGrUC4ZbbeHdQvj435IcHsFLbw0R6770xD1rziKqWOmR8
- IShq/vJDHTvSWZV7Lvhbv1mZTf7VcS8Y7XbyuAk3qTQfF09i7JxTkcQ1KT5eoS209rVR
- GjPkhMzYID/j9yEJXplNfHm6m120TO15sCoFQIiHOjMtCFzmZvH44+jdtad9bhL+b3py
- +EwA==
-X-Gm-Message-State: AOAM532MegM+AWquw5HujdhYGrJlln98R2M67qeoIpj0rSxCiq2x16jp
- jHg6+ZZyGQ6M0DltiUVFrvj2D6AnnKDcpg==
-X-Google-Smtp-Source: ABdhPJzsWfvRqjbB8X1IAiDuY+ZrUy8qB8k4QQkA9nsnjweohlnzsBg0+NrUFf+s/bS2hKCp7MyZgg==
-X-Received: by 2002:a7b:c09a:: with SMTP id r26mr155599wmh.176.1594649491952; 
- Mon, 13 Jul 2020 07:11:31 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.30
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 07:11:31 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juzKa-0006cr-0m
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:21:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36014
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juzKX-00085L-V8
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:21:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594650077;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XBNUYpnT1IMMAVkq6p8YgAKSruJUdmRCdPkNhXDUC88=;
+ b=UdlJ+V453IjjI9DrJIqaT411xFtmoGDQeeQ47FHdE4pr56D48pKZaBYRlFmZ9zEJCgGY4l
+ FnqNL1TpisiWv+dUatIj6e//2AR//3l+hIjW/freljQCK1ePC4eSOzWVxtUZKoMKkdIiIh
+ R48LpqgPNQJTeqmhNU4HbbMoqcp0XLk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-LftWosHtPXe3JQkMTYutpQ-1; Mon, 13 Jul 2020 10:21:12 -0400
+X-MC-Unique: LftWosHtPXe3JQkMTYutpQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 101EE102C7F3;
+ Mon, 13 Jul 2020 14:21:11 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-112-134.phx2.redhat.com [10.3.112.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AF85B79231;
+ Mon, 13 Jul 2020 14:21:10 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/25] hw/arm/palm.c: Detabify
-Date: Mon, 13 Jul 2020 15:11:02 +0100
-Message-Id: <20200713141104.5139-24-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200713141104.5139-1-peter.maydell@linaro.org>
-References: <20200713141104.5139-1-peter.maydell@linaro.org>
+Subject: [PULL 4/5] iotests.py: QemuIoInteractive: print output on failure
+Date: Mon, 13 Jul 2020 09:21:05 -0500
+Message-Id: <20200713142106.261809-5-eblake@redhat.com>
+In-Reply-To: <20200713142106.261809-1-eblake@redhat.com>
+References: <20200713142106.261809-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,111 +92,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove hard-tabs from palm.c.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20200628214230.2592-2-peter.maydell@linaro.org
+Make it simpler to debug when qemu-io fails due to wrong arguments or
+environment.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200701105331.121670-3-vsementsov@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- hw/arm/palm.c | 64 +++++++++++++++++++++++++--------------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ tests/qemu-iotests/iotests.py | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-index 97ca105d297..569836178f6 100644
---- a/hw/arm/palm.c
-+++ b/hw/arm/palm.c
-@@ -61,21 +61,21 @@ static const MemoryRegionOps static_ops = {
- /* Palm Tunsgten|E support */
- 
- /* Shared GPIOs */
--#define PALMTE_USBDETECT_GPIO	0
--#define PALMTE_USB_OR_DC_GPIO	1
--#define PALMTE_TSC_GPIO		4
--#define PALMTE_PINTDAV_GPIO	6
--#define PALMTE_MMC_WP_GPIO	8
--#define PALMTE_MMC_POWER_GPIO	9
--#define PALMTE_HDQ_GPIO		11
--#define PALMTE_HEADPHONES_GPIO	14
--#define PALMTE_SPEAKER_GPIO	15
-+#define PALMTE_USBDETECT_GPIO   0
-+#define PALMTE_USB_OR_DC_GPIO   1
-+#define PALMTE_TSC_GPIO                 4
-+#define PALMTE_PINTDAV_GPIO     6
-+#define PALMTE_MMC_WP_GPIO      8
-+#define PALMTE_MMC_POWER_GPIO   9
-+#define PALMTE_HDQ_GPIO                 11
-+#define PALMTE_HEADPHONES_GPIO  14
-+#define PALMTE_SPEAKER_GPIO     15
- /* MPU private GPIOs */
--#define PALMTE_DC_GPIO		2
--#define PALMTE_MMC_SWITCH_GPIO	4
--#define PALMTE_MMC1_GPIO	6
--#define PALMTE_MMC2_GPIO	7
--#define PALMTE_MMC3_GPIO	11
-+#define PALMTE_DC_GPIO          2
-+#define PALMTE_MMC_SWITCH_GPIO  4
-+#define PALMTE_MMC1_GPIO        6
-+#define PALMTE_MMC2_GPIO        7
-+#define PALMTE_MMC3_GPIO        11
- 
- static MouseTransformInfo palmte_pointercal = {
-     .x = 320,
-@@ -100,17 +100,17 @@ static struct {
-     int column;
- } palmte_keymap[0x80] = {
-     [0 ... 0x7f] = { -1, -1 },
--    [0x3b] = { 0, 0 },	/* F1	-> Calendar */
--    [0x3c] = { 1, 0 },	/* F2	-> Contacts */
--    [0x3d] = { 2, 0 },	/* F3	-> Tasks List */
--    [0x3e] = { 3, 0 },	/* F4	-> Note Pad */
--    [0x01] = { 4, 0 },	/* Esc	-> Power */
--    [0x4b] = { 0, 1 },	/* 	   Left */
--    [0x50] = { 1, 1 },	/* 	   Down */
--    [0x48] = { 2, 1 },	/*	   Up */
--    [0x4d] = { 3, 1 },	/*	   Right */
--    [0x4c] = { 4, 1 },	/* 	   Centre */
--    [0x39] = { 4, 1 },	/* Spc	-> Centre */
-+    [0x3b] = { 0, 0 },  /* F1   -> Calendar */
-+    [0x3c] = { 1, 0 },  /* F2   -> Contacts */
-+    [0x3d] = { 2, 0 },  /* F3   -> Tasks List */
-+    [0x3e] = { 3, 0 },  /* F4   -> Note Pad */
-+    [0x01] = { 4, 0 },  /* Esc  -> Power */
-+    [0x4b] = { 0, 1 },  /*         Left */
-+    [0x50] = { 1, 1 },  /*         Down */
-+    [0x48] = { 2, 1 },  /*         Up */
-+    [0x4d] = { 3, 1 },  /*         Right */
-+    [0x4c] = { 4, 1 },  /*         Centre */
-+    [0x39] = { 4, 1 },  /* Spc  -> Centre */
- };
- 
- static void palmte_button_event(void *opaque, int keycode)
-@@ -161,13 +161,13 @@ static void palmte_gpio_setup(struct omap_mpu_state_s *cpu)
-                             [PALMTE_MMC_SWITCH_GPIO]));
- 
-     misc_gpio = qemu_allocate_irqs(palmte_onoff_gpios, cpu, 7);
--    qdev_connect_gpio_out(cpu->gpio, PALMTE_MMC_POWER_GPIO,	misc_gpio[0]);
--    qdev_connect_gpio_out(cpu->gpio, PALMTE_SPEAKER_GPIO,	misc_gpio[1]);
--    qdev_connect_gpio_out(cpu->gpio, 11,			misc_gpio[2]);
--    qdev_connect_gpio_out(cpu->gpio, 12,			misc_gpio[3]);
--    qdev_connect_gpio_out(cpu->gpio, 13,			misc_gpio[4]);
--    omap_mpuio_out_set(cpu->mpuio, 1,				misc_gpio[5]);
--    omap_mpuio_out_set(cpu->mpuio, 3,				misc_gpio[6]);
-+    qdev_connect_gpio_out(cpu->gpio, PALMTE_MMC_POWER_GPIO,     misc_gpio[0]);
-+    qdev_connect_gpio_out(cpu->gpio, PALMTE_SPEAKER_GPIO,       misc_gpio[1]);
-+    qdev_connect_gpio_out(cpu->gpio, 11,                        misc_gpio[2]);
-+    qdev_connect_gpio_out(cpu->gpio, 12,                        misc_gpio[3]);
-+    qdev_connect_gpio_out(cpu->gpio, 13,                        misc_gpio[4]);
-+    omap_mpuio_out_set(cpu->mpuio, 1,                           misc_gpio[5]);
-+    omap_mpuio_out_set(cpu->mpuio, 3,                           misc_gpio[6]);
- 
-     /* Reset some inputs to initial state.  */
-     qemu_irq_lower(qdev_get_gpio_in(cpu->gpio, PALMTE_USBDETECT_GPIO));
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 109fb3884a26..2a08fea3c9ec 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -217,7 +217,13 @@ class QemuIoInteractive:
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    universal_newlines=True)
+-        assert self._p.stdout.read(9) == 'qemu-io> '
++        out = self._p.stdout.read(9)
++        if out != 'qemu-io> ':
++            # Most probably qemu-io just failed to start.
++            # Let's collect the whole output and exit.
++            out += self._p.stdout.read()
++            self._p.wait(timeout=1)
++            raise ValueError(out)
+
+     def close(self):
+         self._p.communicate('q\n')
 -- 
-2.20.1
+2.27.0
 
 
