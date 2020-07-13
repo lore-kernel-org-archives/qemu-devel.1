@@ -2,130 +2,97 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED044C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2D3C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:32:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF16E2068F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:32:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="D6aiYB5c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF16E2068F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id 083262068F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:32:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083262068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv4BS-0006FZ-0r
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:32:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44956)
+	id 1jv4BT-0006HZ-AN
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:32:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jv49s-0004xN-0U
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:30:36 -0400
-Received: from mail-bn7nam10on2082.outbound.protection.outlook.com
- ([40.107.92.82]:6156 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jv4AA-0005EC-Lu; Mon, 13 Jul 2020 15:30:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39934
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jv49o-0007cV-VV
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:30:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NBLkxKYas2rzHE0DeieV+QEqL+JIFCqVlL0Hu77jy8CQWM00cDfza+zm0dcCs6QBZkUF0ykDDHhGfOs8l4zddahL6UqopI5AdsDMRWO0gsG1E2fJvH0gWDkp5XtxwDQxFE+63+gQf4uOET7QRjH3J+SwxMCBU+ZjBNT5Q27R/RbTgxw6kYGG3DjVWzbAvUUzfEpZFZzmDjFeAO6+VmhxxOhdozgQHoRtPCDHuLPnOuxOkQh23TyYTYl8c5cxglG5YcQp2IU9ix+hQmygipxelOw9HtBuiMajoNMJT3Ry8L4hzq9DoSMcntQTquNd+tANwz3GLjtLOYGvwXGh6d+RQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=66IcAS+y/DW7bpD2/hoVFHBfcIGXK8aCPp/z/8lcoZM=;
- b=Y32SKvByUXoaBBD2f94JZwRt01Zv2pDGXDlNaUwIJKSvZAmUFeSrJ2lAGhei7RUykzG/Hh/4aAMWucTRTRcl6Gi7CIYeHXO0/NFQpaevu9ENpt3kIrq8yIko7AzzabgkqopFciPD5qMtUgNVh3KDq2Yw7FDOQbAMjU7Abqp3ez8oGfwYzsifqAbKdqCrrNEUzD1WweYYmmMvfu7ottO480KyfcaHmdu8HuMU/loCccVi4E5yEWgTe+WMcPWDJ3AFmyJQBP/WUgDFUPXDxUmjG6bXVLgSMCmZMShwOaFFRoOvBUV1xPAooSQMflQLF++Ek6FL8b/YLeeuxl7IAAhH0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=66IcAS+y/DW7bpD2/hoVFHBfcIGXK8aCPp/z/8lcoZM=;
- b=D6aiYB5cXTSFCz0mn9gQHRw6OXEQ35mnBxOfZsAJsN5wsk8GTyStrxAN6NEkcHT4xgGZY9IgaSUTgDJvHRfX1kyY238uFQt6VNVbPk3eTVdlnKZqKIRrSg/kcbOfeK3W41PzAkOTP7EqgVBs739iqC7Kni3COOa01nhWApvihpE=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SA0PR12MB4350.namprd12.prod.outlook.com (2603:10b6:806:92::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Mon, 13 Jul
- 2020 19:30:30 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3174.025; Mon, 13 Jul 2020
- 19:30:30 +0000
-Subject: RE: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
- CpuInstanceProperties
-To: Igor Mammedov <imammedo@redhat.com>
-References: <159362436285.36204.986406297373871949.stgit@naples-babu.amd.com>
- <159362466108.36204.3751851750959980962.stgit@naples-babu.amd.com>
- <20200713110822.5495e1c6@redhat.com>
- <78809d9f-a491-8c99-3f35-7f012c7d75bf@amd.com>
- <20200713181740.16a357a6@redhat.com>
- <47dc6238-bb71-d679-f58a-f574eb36d572@amd.com>
- <20200713193221.27674630@redhat.com>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <4003b476-afdb-74a1-4f9f-1387aae6c4e8@amd.com>
-Date: Mon, 13 Jul 2020 14:30:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200713193221.27674630@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0201CA0012.namprd02.prod.outlook.com
- (2603:10b6:803:2b::22) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.79] (165.204.77.1) by
- SN4PR0201CA0012.namprd02.prod.outlook.com (2603:10b6:803:2b::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22 via Frontend
- Transport; Mon, 13 Jul 2020 19:30:30 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 4a12b614-e6be-489b-65f7-08d82763342b
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4350:
-X-Microsoft-Antispam-PRVS: <SA0PR12MB435090E1120946A1E749CB0295600@SA0PR12MB4350.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tHRKlyxE4C1dUeRtJtMuiHcXuAEU1GS/k6IGmWOEFjXid0T/h6b9qjxmd/FjbQtn9mehzno5sS32qul/vx0pHNR6IlA5U0DwKE5erDT2/EySlhq1H6Do3qacFbmd2Voj2lz88DznDk0aVmJa1omEEWt+MJRSnFDJ79IZQbEv7UxI6SnfS6HKopfVe9jsnsOGqHT3z3uKZAKPjT90tCv98C4rt5RuLErd+cUAvH/zUQhAuE6FDj4C14HcSxW+9YlPPPt/sfpDf9WGQ8aLbSQRI7XhhIrwQp0Z9uAR477rvz0TlpATg666VjE8NMe+z9vfim4QCo/vvoUSQyljfmSeqrhzVRhlejp0TlHO+DvrnM8ZosG0XaZ7gmie3Mxcr/V21OgzKv2CHnnYS3pnedcu2xC1eSTsbWQLfcPxd1cJLl+aqTCgYf2tmvKPJy2N2yr5lOYpYtQtFVCbTosIBFzdUg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(396003)(39860400002)(376002)(136003)(366004)(478600001)(5660300002)(66476007)(66946007)(66556008)(44832011)(83380400001)(966005)(54906003)(8676002)(186003)(26005)(2906002)(6486002)(2616005)(956004)(53546011)(36756003)(31686004)(86362001)(16526019)(16576012)(30864003)(31696002)(52116002)(6916009)(4326008)(8936002)(316002)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: rJXOaqPHlS8IAYVhSD0hSdfH2P80WFCjPGaX7nfXBcAULtdstWJ1GjvpGyJmvUu5sQsFiEFU9mpBLWqkg6C4vSLSI5QXXOQZ2Pcs38Dac+yRh1hPBHtsK92acknY7DpZs/JXsAKPGQerMLRiQKe8OMZVbPO1Q86XM8Z0T/CWNPbzy//V5TkUKbu6AImB+Ituvs4j3AQ9UuWU7BPtR+xhbHne1AbwZ6hJSMi5M1C3CB5tBje8TSJQSMVWjM9nxTfs3cMvg8m9XbUrrqPHmWmjakPjDSLLU9JrRoGqGZnP1GtOg+ZQNHdt0P5p08uKZW3IH5Swvd4sVK5ieSgqOnrud11I81AAD2byVAeisMHneec13INaBWnhFYSTzTsVJpgjcZge0/PJgjf2qYJbjBOhg3IzlUNpz8qRQRR4NojBWF3jkWbDMb1jSE4Y7eKGt2I+27A87eFRC+jdYJbUesJ24lsUEegoepTrBHkA8/0oYWg=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a12b614-e6be-489b-65f7-08d82763342b
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2020 19:30:30.4939 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jcg3Jt4Vhrs5bt+NtxJAmsL5tRiHKaKqm+DQp6GGiwLEkenOrAYfwfMkUrldt93S
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4350
-Received-SPF: none client-ip=40.107.92.82; envelope-from=Babu.Moger@amd.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:30:31
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jv4A7-0007ey-L5; Mon, 13 Jul 2020 15:30:54 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06DJP9E5022591; Mon, 13 Jul 2020 15:30:43 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32771x9k5t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 13 Jul 2020 15:30:43 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06DJOe7m007827;
+ Mon, 13 Jul 2020 19:30:42 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma02wdc.us.ibm.com with ESMTP id 327ursbhkk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 13 Jul 2020 19:30:42 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06DJUfeS15598050
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 13 Jul 2020 19:30:41 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 568DD6E060;
+ Mon, 13 Jul 2020 19:30:41 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3DEAF6E052;
+ Mon, 13 Jul 2020 19:30:40 +0000 (GMT)
+Received: from [9.65.204.75] (unknown [9.65.204.75])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Mon, 13 Jul 2020 19:30:39 +0000 (GMT)
+From: Lijun Pan <ljp@linux.vnet.ibm.com>
+Message-Id: <17011220-20C0-436C-8106-7398E76B479B@linux.vnet.ibm.com>
+Content-Type: multipart/alternative;
+ boundary="Apple-Mail=_2DF16364-2220-4877-82C1-577807A3016B"
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v3] target/ppc: add vmsumudm vmsumcud instructions
+Date: Mon, 13 Jul 2020 14:30:38 -0500
+In-Reply-To: <20200706075320.GA5996@umbus.fritz.box>
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200623042501.47065-1-ljp@linux.ibm.com>
+ <20200706075320.GA5996@umbus.fritz.box>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-13_15:2020-07-13,
+ 2020-07-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 mlxscore=0
+ mlxlogscore=999 impostorscore=0 malwarescore=0 suspectscore=2 adultscore=0
+ clxscore=1015 bulkscore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007130132
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=ljp@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:30:50
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -139,345 +106,850 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--Apple-Mail=_2DF16364-2220-4877-82C1-577807A3016B
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-> -----Original Message-----
-> From: Igor Mammedov <imammedo@redhat.com>
-> Sent: Monday, July 13, 2020 12:32 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com; qemu-
-> devel@nongnu.org
-> Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
-> CpuInstanceProperties
-> 
-> On Mon, 13 Jul 2020 11:43:33 -0500
-> Babu Moger <babu.moger@amd.com> wrote:
-> 
-> > On 7/13/20 11:17 AM, Igor Mammedov wrote:
-> > > On Mon, 13 Jul 2020 10:02:22 -0500
-> > > Babu Moger <babu.moger@amd.com> wrote:
-> > >
-> > >>> -----Original Message-----
-> > >>> From: Igor Mammedov <imammedo@redhat.com>
-> > >>> Sent: Monday, July 13, 2020 4:08 AM
-> > >>> To: Moger, Babu <Babu.Moger@amd.com>
-> > >>> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
-> > >>> qemu- devel@nongnu.org
-> > >>> Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
-> > >>> CpuInstanceProperties
-> > > [...]
-> > >>>> +
-> > >>>> +/*
-> > >>>> + * Initialize topo_ids from CpuInstanceProperties
-> > >>>> + * node_id in CpuInstanceProperties(or in CPU device) is a sequential
-> > >>>> + * number, but while building the topology
-> > >>>
-> > >>>> we need to separate it for
-> > >>>> + * each socket(mod nodes_per_pkg).
-> > >>> could you clarify a bit more on why this is necessary?
-> > >>
-> > >> If you have two sockets and 4 numa nodes, node_id in
-> > >> CpuInstanceProperties will be number sequentially as 0, 1, 2, 3.
-> > >> But in EPYC topology, it will be  0, 1, 0, 1( Basically mod % number of nodes
-> per socket).
-> > >
-> > > I'm confused, let's suppose we have 2 EPYC sockets with 2 nodes per
-> > > socket so APIC id woulbe be composed like:
-> > >
-> > >  1st socket
-> > >    pkg_id(0) | node_id(0)
-> > >    pkg_id(0) | node_id(1)
-> > >
-> > >  2nd socket
-> > >    pkg_id(1) | node_id(0)
-> > >    pkg_id(1) | node_id(1)
-> > >
-> > > if that's the case, then EPYC's node_id here doesn't look like a
-> > > NUMA node in the sense it's usually used (above config would have 4
-> > > different memory controllers => 4 conventional NUMA nodes).
-> >
-> > EPIC model uses combination of socket id and node id to identify the
-> > numa nodes. So, it internally uses all the information.
-> 
-> well with above values, EPYC's node_id doesn't look like it's specifying a
-> machine numa node, but rather a node index within single socket. In which case,
-> it doesn't make much sense calling it NUMA node_id, it's rather some index
-> within a socket. (it starts looking like terminology is all mixed up)
-> 
-> If you have access to a milti-socket EPYC machine, can you dump and post here
-> its apic ids, pls?
 
-Here is the output from my EPYC machine with 2 sockets and totally 8
-nodes(SMT disabled). The cpus 0-31 are in socket 0 and  cpus 32-63 in
-socket 1.
 
-# lscpu
-Architecture:        x86_64
-CPU op-mode(s):      32-bit, 64-bit
-Byte Order:          Little Endian
-CPU(s):              64
-On-line CPU(s) list: 0-63
-Thread(s) per core:  1
-Core(s) per socket:  32
-Socket(s):           2
-NUMA node(s):        8
-Vendor ID:           AuthenticAMD
-CPU family:          23
-Model:               1
-Model name:          AMD Eng Sample: 1S1901A4VIHF5_30/19_N
-Stepping:            2
-CPU MHz:             2379.233
-CPU max MHz:         1900.0000
-CPU min MHz:         1200.0000
-BogoMIPS:            3792.81
-Virtualization:      AMD-V
-L1d cache:           32K
-L1i cache:           64K
-L2 cache:            512K
-L3 cache:            8192K
-NUMA node0 CPU(s):   0-7
-NUMA node1 CPU(s):   8-15
-NUMA node2 CPU(s):   16-23
-NUMA node3 CPU(s):   24-31
-NUMA node4 CPU(s):   32-39
-NUMA node5 CPU(s):   40-47
-NUMA node6 CPU(s):   48-55
-NUMA node7 CPU(s):   56-63
+> On Jul 6, 2020, at 2:53 AM, David Gibson <david@gibson.dropbear.id.au> =
+wrote:
+>=20
+> On Mon, Jun 22, 2020 at 11:25:01PM -0500, Lijun Pan wrote:
+>> vmsumudm (Power ISA 3.0) - Vector Multiply-Sum Unsigned Doubleword =
+Modulo
+>> VA-form.
+>> vmsumcud (Power ISA 3.1) - Vector Multiply-Sum & write Carry-out =
+Unsigned
+>> Doubleword VA-form.
+>=20
+> If this is only in ISA 3.1, shouldn't it be conditional on some
+> instruction flag for that?
 
-Here is the output of #cpuid  -l 0x8000001e  -r
+I will change to,
 
-You may want to refer
-https://www.amd.com/system/files/TechDocs/54945_3.03_ppr_ZP_B2_pub.zip
-(section 2.1.12.2.1.3 ApicId Enumeration Requirements).
-Note that this is a general guideline. We tried to generalize in qemu as
-much as possible. It is bit complex.
+--- a/target/ppc/translate/vmx-ops.inc.c
++++ b/target/ppc/translate/vmx-ops.inc.c
+@@ -276,6 +276,8 @@ GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),
+GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),
+GEN_VAFORM_PAIRED(vsel, vperm, 21),
+GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),
++GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, PPC2_ISA310),
 
-CPU 0:
-   0x8000001e 0x00: eax=0x00000000 ebx=0x00000100 ecx=0x00000300
-edx=0x00000000
-CPU 1:
-   0x8000001e 0x00: eax=0x00000002 ebx=0x00000101 ecx=0x00000300
-edx=0x00000000
-CPU 2:
-   0x8000001e 0x00: eax=0x00000004 ebx=0x00000102 ecx=0x00000300
-edx=0x00000000
-CPU 3:
-   0x8000001e 0x00: eax=0x00000006 ebx=0x00000103 ecx=0x00000300
-edx=0x00000000
-CPU 4:
-   0x8000001e 0x00: eax=0x00000008 ebx=0x00000104 ecx=0x00000300
-edx=0x00000000
-CPU 5:
-   0x8000001e 0x00: eax=0x0000000a ebx=0x00000105 ecx=0x00000300
-edx=0x00000000
-CPU 6:
-   0x8000001e 0x00: eax=0x0000000c ebx=0x00000106 ecx=0x00000300
-edx=0x00000000
-CPU 7:
-   0x8000001e 0x00: eax=0x0000000e ebx=0x00000107 ecx=0x00000300
-edx=0x00000000
-CPU 8:
-   0x8000001e 0x00: eax=0x00000010 ebx=0x00000108 ecx=0x00000301
-edx=0x00000000
-CPU 9:
-   0x8000001e 0x00: eax=0x00000012 ebx=0x00000109 ecx=0x00000301
-edx=0x00000000
-CPU 10:
-   0x8000001e 0x00: eax=0x00000014 ebx=0x0000010a ecx=0x00000301
-edx=0x00000000
-CPU 11:
-   0x8000001e 0x00: eax=0x00000016 ebx=0x0000010b ecx=0x00000301
-edx=0x00000000
-CPU 12:
-   0x8000001e 0x00: eax=0x00000018 ebx=0x0000010c ecx=0x00000301
-edx=0x00000000
-CPU 13:
-   0x8000001e 0x00: eax=0x0000001a ebx=0x0000010d ecx=0x00000301
-edx=0x00000000
-CPU 14:
-   0x8000001e 0x00: eax=0x0000001c ebx=0x0000010e ecx=0x00000301
-edx=0x00000000
-CPU 15:
-   0x8000001e 0x00: eax=0x0000001e ebx=0x0000010f ecx=0x00000301
-edx=0x00000000
-CPU 16:
-   0x8000001e 0x00: eax=0x00000020 ebx=0x00000110 ecx=0x00000302
-edx=0x00000000
-CPU 17:
-   0x8000001e 0x00: eax=0x00000022 ebx=0x00000111 ecx=0x00000302
-edx=0x00000000
-CPU 18:
-   0x8000001e 0x00: eax=0x00000024 ebx=0x00000112 ecx=0x00000302
-edx=0x00000000
-CPU 19:
-   0x8000001e 0x00: eax=0x00000026 ebx=0x00000113 ecx=0x00000302
-edx=0x00000000
-CPU 20:
-   0x8000001e 0x00: eax=0x00000028 ebx=0x00000114 ecx=0x00000302
-edx=0x00000000
-CPU 21:
-   0x8000001e 0x00: eax=0x0000002a ebx=0x00000115 ecx=0x00000302
-edx=0x00000000
-CPU 22:
-   0x8000001e 0x00: eax=0x0000002c ebx=0x00000116 ecx=0x00000302
-edx=0x00000000
-CPU 23:
-   0x8000001e 0x00: eax=0x0000002e ebx=0x00000117 ecx=0x00000302
-edx=0x00000000
-CPU 24:
-   0x8000001e 0x00: eax=0x00000030 ebx=0x00000118 ecx=0x00000303
-edx=0x00000000
-CPU 25:
-   0x8000001e 0x00: eax=0x00000032 ebx=0x00000119 ecx=0x00000303
-edx=0x00000000
-CPU 26:
-   0x8000001e 0x00: eax=0x00000034 ebx=0x0000011a ecx=0x00000303
-edx=0x00000000
-CPU 27:
-   0x8000001e 0x00: eax=0x00000036 ebx=0x0000011b ecx=0x00000303
-edx=0x00000000
-CPU 28:
-   0x8000001e 0x00: eax=0x00000038 ebx=0x0000011c ecx=0x00000303
-edx=0x00000000
-CPU 29:
-   0x8000001e 0x00: eax=0x0000003a ebx=0x0000011d ecx=0x00000303
-edx=0x00000000
-CPU 30:
-   0x8000001e 0x00: eax=0x0000003c ebx=0x0000011e ecx=0x00000303
-edx=0x00000000
-CPU 31:
-   0x8000001e 0x00: eax=0x0000003e ebx=0x0000011f ecx=0x00000303
-edx=0x00000000
-CPU 32:
-   0x8000001e 0x00: eax=0x00000040 ebx=0x00000100 ecx=0x00000304
-edx=0x00000000
-CPU 33:
-   0x8000001e 0x00: eax=0x00000042 ebx=0x00000101 ecx=0x00000304
-edx=0x00000000
-CPU 34:
-   0x8000001e 0x00: eax=0x00000044 ebx=0x00000102 ecx=0x00000304
-edx=0x00000000
-CPU 35:
-   0x8000001e 0x00: eax=0x00000046 ebx=0x00000103 ecx=0x00000304
-edx=0x00000000
-CPU 36:
-   0x8000001e 0x00: eax=0x00000048 ebx=0x00000104 ecx=0x00000304
-edx=0x00000000
-CPU 37:
-   0x8000001e 0x00: eax=0x0000004a ebx=0x00000105 ecx=0x00000304
-edx=0x00000000
-CPU 38:
-   0x8000001e 0x00: eax=0x0000004c ebx=0x00000106 ecx=0x00000304
-edx=0x00000000
-CPU 39:
-   0x8000001e 0x00: eax=0x0000004e ebx=0x00000107 ecx=0x00000304
-edx=0x00000000
-CPU 40:
-   0x8000001e 0x00: eax=0x00000050 ebx=0x00000108 ecx=0x00000305
-edx=0x00000000
-CPU 41:
-   0x8000001e 0x00: eax=0x00000052 ebx=0x00000109 ecx=0x00000305
-edx=0x00000000
-CPU 42:
-   0x8000001e 0x00: eax=0x00000054 ebx=0x0000010a ecx=0x00000305
-edx=0x00000000
-CPU 43:
-   0x8000001e 0x00: eax=0x00000056 ebx=0x0000010b ecx=0x00000305
-edx=0x00000000
-CPU 44:
-   0x8000001e 0x00: eax=0x00000058 ebx=0x0000010c ecx=0x00000305
-edx=0x00000000
-CPU 45:
-   0x8000001e 0x00: eax=0x0000005a ebx=0x0000010d ecx=0x00000305
-edx=0x00000000
-CPU 46:
-   0x8000001e 0x00: eax=0x0000005c ebx=0x0000010e ecx=0x00000305
-edx=0x00000000
-CPU 47:
-   0x8000001e 0x00: eax=0x0000005e ebx=0x0000010f ecx=0x00000305
-edx=0x00000000
-CPU 48:
-   0x8000001e 0x00: eax=0x00000060 ebx=0x00000110 ecx=0x00000306
-edx=0x00000000
 
-CPU 49:
-   0x8000001e 0x00: eax=0x00000062 ebx=0x00000111 ecx=0x00000306
-edx=0x00000000
-CPU 50:
-   0x8000001e 0x00: eax=0x00000064 ebx=0x00000112 ecx=0x00000306
-edx=0x00000000
-CPU 51:
-   0x8000001e 0x00: eax=0x00000066 ebx=0x00000113 ecx=0x00000306
-edx=0x00000000
-CPU 52:
-   0x8000001e 0x00: eax=0x00000068 ebx=0x00000114 ecx=0x00000306
-edx=0x00000000
-CPU 53:
-   0x8000001e 0x00: eax=0x0000006a ebx=0x00000115 ecx=0x00000306
-edx=0x00000000
-CPU 54:
-   0x8000001e 0x00: eax=0x0000006c ebx=0x00000116 ecx=0x00000306
-edx=0x00000000
-CPU 55:
-   0x8000001e 0x00: eax=0x0000006e ebx=0x00000117 ecx=0x00000306
-edx=0x00000000
-CPU 56:
-   0x8000001e 0x00: eax=0x00000070 ebx=0x00000118 ecx=0x00000307
-edx=0x00000000
-CPU 57:
-   0x8000001e 0x00: eax=0x00000072 ebx=0x00000119 ecx=0x00000307
-edx=0x00000000
-CPU 58:
-   0x8000001e 0x00: eax=0x00000074 ebx=0x0000011a ecx=0x00000307
-edx=0x00000000
-CPU 59:
-   0x8000001e 0x00: eax=0x00000076 ebx=0x0000011b ecx=0x00000307
-edx=0x00000000
-CPU 60:
-   0x8000001e 0x00: eax=0x00000078 ebx=0x0000011c ecx=0x00000307
-edx=0x00000000
-CPU 61:
-   0x8000001e 0x00: eax=0x0000007a ebx=0x0000011d ecx=0x00000307
-edx=0x00000000
-CPU 62:
-   0x8000001e 0x00: eax=0x0000007c ebx=0x0000011e ecx=0x00000307
-edx=0x00000000
-CPU 63:
-   0x8000001e 0x00: eax=0x0000007e ebx=0x0000011f ecx=0x00000307
-edx=0x00000000
+>=20
+> SHould this maybe be integrated into your other series of ISA 3.1
+> instructions.
 
-> 
-> >
-> > >
-> > > I wonder if linux guest actually uses node_id encoded in apic id for
-> > > configuring/checking numa structures, or it just uses whatever ACPI
-> > > SRAT table provided.
-> > >
-> > >>>> + */
-> > >>>> +static inline void x86_init_topo_ids(X86CPUTopoInfo *topo_info,
-> > >>>> +                                     CpuInstanceProperties props,
-> > >>>> +                                     X86CPUTopoIDs *topo_ids) {
-> > >>>> +    topo_ids->smt_id = props.has_thread_id ? props.thread_id : 0;
-> > >>>> +    topo_ids->core_id = props.has_core_id ? props.core_id : 0;
-> > >>>> +    topo_ids->die_id = props.has_die_id ? props.die_id : 0;
-> > >>>> +    topo_ids->node_id = props.has_node_id ?
-> > >>>> +                        props.node_id % MAX(topo_info->nodes_per_pkg, 1) : 0;
-> > >>>> +    topo_ids->pkg_id = props.has_socket_id ? props.socket_id :
-> > >>>> +0; }
-> > >>>>  /*
-> > >>>>   * Make APIC ID for the CPU 'cpu_index'
-> > >>>>   *
-> > >>>>
-> > >>
-> > >
-> >
+I can do that.
+I know some of the v4 patches of the ISA3.1 sereies are already =
+accepted.
+When I resend the v5 of that series, shall I include the already =
+accepted one?
+or just resend the not-accepted-yet patches.
+
+>=20
+>>=20
+>> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+>> ---
+>> v3: implement vmsumudm/vmsumcud through int128 functions,
+>>    suggested by Richard Henderson.
+>>=20
+>> disas/ppc.c                         |  2 ++
+>> target/ppc/helper.h                 |  4 ++-
+>> target/ppc/int_helper.c             | 49 =
+++++++++++++++++++++++++++++-
+>> target/ppc/translate.c              |  1 -
+>> target/ppc/translate/vmx-impl.inc.c | 39 ++++++++++++-----------
+>> target/ppc/translate/vmx-ops.inc.c  |  2 ++
+>> 6 files changed, 76 insertions(+), 21 deletions(-)
+>>=20
+>> diff --git a/disas/ppc.c b/disas/ppc.c
+>> index 63e97cfe1d..bd76fae4c4 100644
+>> --- a/disas/ppc.c
+>> +++ b/disas/ppc.c
+>> @@ -2261,7 +2261,9 @@ const struct powerpc_opcode powerpc_opcodes[] =3D=
+ {
+>> { "vmsumshs",  VXA(4,  41), VXA_MASK,	PPCVEC,		{ VD, =
+VA, VB, VC } },
+>> { "vmsumubm",  VXA(4,  36), VXA_MASK,   PPCVEC,		{ VD, =
+VA, VB, VC } },
+>> { "vmsumuhm",  VXA(4,  38), VXA_MASK,   PPCVEC,		{ VD, =
+VA, VB, VC } },
+>> +{ "vmsumudm",  VXA(4,  35), VXA_MASK,   PPCVEC,         { VD, VA, =
+VB, VC } },
+>> { "vmsumuhs",  VXA(4,  39), VXA_MASK,   PPCVEC,		{ VD, =
+VA, VB, VC } },
+>> +{ "vmsumcud",  VXA(4,  23), VXA_MASK,   PPCVEC,         { VD, VA, =
+VB, VC } },
+>> { "vmulesb",   VX(4,  776), VX_MASK,	PPCVEC,		{ VD, VA, VB } =
+},
+>> { "vmulesh",   VX(4,  840), VX_MASK,	PPCVEC,		{ VD, VA, VB } =
+},
+>> { "vmuleub",   VX(4,  520), VX_MASK,	PPCVEC,		{ VD, VA, VB } =
+},
+>> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+>> index 2dfa1c6942..d540e8f30b 100644
+>> --- a/target/ppc/helper.h
+>> +++ b/target/ppc/helper.h
+>> @@ -263,10 +263,12 @@ DEF_HELPER_3(vpkpx, void, avr, avr, avr)
+>> DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
+>> DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
+>> DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
+>> +DEF_HELPER_5(vmsumudm, void, env, avr, avr, avr, avr)
+>> DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)
+>> DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
+>> DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
+>> -DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
+>> +DEF_HELPER_5(vmsumcud, void, env, avr, avr, avr, avr)
+>> +DEF_HELPER_5(vmladduhm, void, env, avr, avr, avr, avr)
+>> DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
+>> DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, env)
+>> DEF_HELPER_3(lvebx, void, env, avr, tl)
+>> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+>> index be53cd6f68..37ea343cb3 100644
+>> --- a/target/ppc/int_helper.c
+>> +++ b/target/ppc/int_helper.c
+>> @@ -926,7 +926,8 @@ void helper_vmhraddshs(CPUPPCState *env, =
+ppc_avr_t *r, ppc_avr_t *a,
+>>     }
+>> }
+>>=20
+>> -void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, =
+ppc_avr_t *c)
+>> +void helper_vmladduhm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+>> +                      ppc_avr_t *b, ppc_avr_t *c)
+>> {
+>>     int i;
+>>=20
+>> @@ -1064,6 +1065,52 @@ void helper_vmsumuhs(CPUPPCState *env, =
+ppc_avr_t *r, ppc_avr_t *a,
+>>     }
+>> }
+>>=20
+>> +void helper_vmsumudm(CPUPPCState *env, ppc_avr_t *r,
+>> +                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+>> +{
+>> +    Int128 sum;
+>> +    uint64_t lo, hi;
+>> +
+>> +    sum =3D int128_make128(c->VsrD(1), c->VsrD(0));
+>> +
+>> +    mulu64(&lo, &hi, a->VsrD(0), b->VsrD(0));
+>> +    sum =3D int128_add(sum, int128_make128(lo, hi));
+>> +
+>> +    mulu64(&lo, &hi, a->VsrD(1), b->VsrD(1));
+>> +    sum =3D int128_add(sum, int128_make128(lo, hi));
+>> +
+>> +    r->VsrD(0) =3D int128_gethi(sum);
+>> +    r->VsrD(1) =3D int128_getlo(sum);
+>> +}
+>> +
+>> +void helper_vmsumcud(CPUPPCState *env, ppc_avr_t *r,
+>> +                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+>> +{
+>> +    Int128 sum;
+>> +    uint64_t p1lo, p1hi, p2lo, p2hi;
+>> +
+>> +    mulu64(&p1lo, &p1hi, a->VsrD(0), b->VsrD(0));
+>> +    mulu64(&p2lo, &p2hi, a->VsrD(1), b->VsrD(1));
+>> +
+>> +    /* Sum lowest 64-bit elements.  */
+>> +    sum =3D int128_make128(c->VsrD(1), 0);
+>> +    sum =3D int128_add(sum, int128_make128(p1lo, 0));
+>> +    sum =3D int128_add(sum, int128_make128(p2lo, 0));
+>> +
+>> +    /*
+>> +     * Discard low 64-bits, leaving the carry into bit 64.
+>> +     * Then sum the higher 64-bit elements.
+>> +     */
+>> +    sum =3D int128_rshift(sum, 64);
+>> +    sum =3D int128_add(sum, int128_make128(c->VsrD(0), 0));
+>> +    sum =3D int128_add(sum, int128_make128(p1hi, 0));
+>> +    sum =3D int128_add(sum, int128_make128(p2hi, 0));
+>> +
+>> +    /* The result is only the carry into bits 64 & 65. */
+>> +    r->VsrD(1) =3D int128_gethi(sum);
+>> +    r->VsrD(0) =3D 0;
+>> +}
+>> +
+>> #define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast) =
+  \
+>>     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)     =
+  \
+>>     {                                                                 =
+  \
+>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>> index 4ce3d664b5..35ff1aa77e 100644
+>> --- a/target/ppc/translate.c
+>> +++ b/target/ppc/translate.c
+>> @@ -7281,7 +7281,6 @@ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, =
+PPC_ALTIVEC),
+>> GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+>> GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+>> GEN_HANDLER(mtvscr, 0x04, 0x2, 0x19, 0x03ff0000, PPC_ALTIVEC),
+>> -GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x00000000, PPC_ALTIVEC),
+>> #if defined(TARGET_PPC64)
+>> GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, PPC_NONE,
+>>               PPC2_ISA300),
+>> diff --git a/target/ppc/translate/vmx-impl.inc.c =
+b/target/ppc/translate/vmx-impl.inc.c
+>> index 403ed3a01c..520b49a773 100644
+>> --- a/target/ppc/translate/vmx-impl.inc.c
+>> +++ b/target/ppc/translate/vmx-impl.inc.c
+>> @@ -1248,6 +1248,25 @@ static void gen_vsldoi(DisasContext *ctx)
+>>     tcg_temp_free_i32(sh);
+>> }
+>>=20
+>> +#define GEN_VAFORM(name, opc2)                                       =
+   \
+>> +static void glue(gen_, name)(DisasContext *ctx)                      =
+   \
+>> +{                                                                    =
+   \
+>> +    TCGv_ptr ra, rb, rc, rd;                                         =
+   \
+>> +    if (unlikely(!ctx->altivec_enabled)) {                           =
+   \
+>> +        gen_exception(ctx, POWERPC_EXCP_VPU);                        =
+   \
+>> +        return;                                                      =
+   \
+>> +    }                                                                =
+   \
+>> +    ra =3D gen_avr_ptr(rA(ctx->opcode));                             =
+     \
+>> +    rb =3D gen_avr_ptr(rB(ctx->opcode));                             =
+     \
+>> +    rc =3D gen_avr_ptr(rC(ctx->opcode));                             =
+     \
+>> +    rd =3D gen_avr_ptr(rD(ctx->opcode));                             =
+     \
+>> +    gen_helper_##name(cpu_env, rd, ra, rb, rc);                      =
+   \
+>> +    tcg_temp_free_ptr(ra);                                           =
+   \
+>> +    tcg_temp_free_ptr(rb);                                           =
+   \
+>> +    tcg_temp_free_ptr(rc);                                           =
+   \
+>> +    tcg_temp_free_ptr(rd);                                           =
+   \
+>> +}
+>> +
+>> #define GEN_VAFORM_PAIRED(name0, name1, opc2)                         =
+  \
+>> static void glue(gen_, name0##_##name1)(DisasContext *ctx)            =
+  \
+>>     {                                                                 =
+  \
+>> @@ -1272,24 +1291,8 @@ static void glue(gen_, =
+name0##_##name1)(DisasContext *ctx)              \
+>>     }
+>>=20
+>> GEN_VAFORM_PAIRED(vmhaddshs, vmhraddshs, 16)
+>> -
+>> -static void gen_vmladduhm(DisasContext *ctx)
+>> -{
+>> -    TCGv_ptr ra, rb, rc, rd;
+>> -    if (unlikely(!ctx->altivec_enabled)) {
+>> -        gen_exception(ctx, POWERPC_EXCP_VPU);
+>> -        return;
+>> -    }
+>> -    ra =3D gen_avr_ptr(rA(ctx->opcode));
+>> -    rb =3D gen_avr_ptr(rB(ctx->opcode));
+>> -    rc =3D gen_avr_ptr(rC(ctx->opcode));
+>> -    rd =3D gen_avr_ptr(rD(ctx->opcode));
+>> -    gen_helper_vmladduhm(rd, ra, rb, rc);
+>> -    tcg_temp_free_ptr(ra);
+>> -    tcg_temp_free_ptr(rb);
+>> -    tcg_temp_free_ptr(rc);
+>> -    tcg_temp_free_ptr(rd);
+>> -}
+>> +GEN_VAFORM(vmsumcud, 11)
+>> +GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17)
+>>=20
+>> static void gen_vpermr(DisasContext *ctx)
+>> {
+>> diff --git a/target/ppc/translate/vmx-ops.inc.c =
+b/target/ppc/translate/vmx-ops.inc.c
+>> index 84e05fb827..aee23e31c6 100644
+>> --- a/target/ppc/translate/vmx-ops.inc.c
+>> +++ b/target/ppc/translate/vmx-ops.inc.c
+>> @@ -276,6 +276,8 @@ GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),
+>> GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),
+>> GEN_VAFORM_PAIRED(vsel, vperm, 21),
+>> GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),
+>> +GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, PPC_ALTIVEC),
+>> +GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17),
+>>=20
+>> GEN_VXFORM_DUAL(vclzb, vpopcntb, 1, 28, PPC_NONE, PPC2_ALTIVEC_207),
+>> GEN_VXFORM_DUAL(vclzh, vpopcnth, 1, 29, PPC_NONE, PPC2_ALTIVEC_207),
+>=20
+> --=20
+> David Gibson			| I'll have my music baroque, and my =
+code
+> david AT gibson.dropbear.id.au <http://gibson.dropbear.id.au/>	=
+| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson <http://www.ozlabs.org/~dgibson>
+
+--Apple-Mail=_2DF16364-2220-4877-82C1-577807A3016B
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset=us-ascii
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html; =
+charset=3Dus-ascii"></head><body style=3D"word-wrap: break-word; =
+-webkit-nbsp-mode: space; line-break: after-white-space;" class=3D""><br =
+class=3D""><div><br class=3D""><blockquote type=3D"cite" class=3D""><div =
+class=3D"">On Jul 6, 2020, at 2:53 AM, David Gibson &lt;<a =
+href=3D"mailto:david@gibson.dropbear.id.au" =
+class=3D"">david@gibson.dropbear.id.au</a>&gt; wrote:</div><br =
+class=3D"Apple-interchange-newline"><div class=3D""><span =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none; float: none; =
+display: inline !important;" class=3D"">On Mon, Jun 22, 2020 at =
+11:25:01PM -0500, Lijun Pan wrote:</span><br style=3D"caret-color: =
+rgb(0, 0, 0); font-family: Helvetica; font-size: 14px; font-style: =
+normal; font-variant-caps: normal; font-weight: normal; letter-spacing: =
+normal; text-align: start; text-indent: 0px; text-transform: none; =
+white-space: normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><blockquote type=3D"cite" =
+style=3D"font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+orphans: auto; text-align: start; text-indent: 0px; text-transform: =
+none; white-space: normal; widows: auto; word-spacing: 0px; =
+-webkit-text-size-adjust: auto; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D"">vmsumudm (Power ISA 3.0) - Vector =
+Multiply-Sum Unsigned Doubleword Modulo<br class=3D"">VA-form.<br =
+class=3D"">vmsumcud (Power ISA 3.1) - Vector Multiply-Sum &amp; write =
+Carry-out Unsigned<br class=3D"">Doubleword VA-form.<br =
+class=3D""></blockquote><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><span style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;" =
+class=3D"">If this is only in ISA 3.1, shouldn't it be conditional on =
+some</span><br style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;" class=3D""><span style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none; float: none; display: inline !important;" class=3D"">instruction =
+flag for that?</span><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""></div></blockquote><div><br =
+class=3D""></div><div>I will change to,</div><div><br =
+class=3D""></div><div><span style=3D"caret-color: rgb(0, 0, 0); color: =
+rgb(0, 0, 0);" class=3D"">--- =
+a/target/ppc/translate/vmx-ops.inc.c</span><br style=3D"caret-color: =
+rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D""><span style=3D"caret-color:=
+ rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D"">+++ =
+b/target/ppc/translate/vmx-ops.inc.c</span><br style=3D"caret-color: =
+rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D""><span style=3D"caret-color:=
+ rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D"">@@ -276,6 +276,8 @@ =
+GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),</span><br style=3D"caret-color:=
+ rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D""><span =
+style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);" =
+class=3D"">GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),</span><br =
+style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D""><span=
+ style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);" =
+class=3D"">GEN_VAFORM_PAIRED(vsel, vperm, 21),</span><br =
+style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D""><span=
+ style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);" =
+class=3D"">GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),</span><br =
+style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);" class=3D""><span=
+ style=3D"caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);" =
+class=3D"">+GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, =
+PPC2_ISA310),</span></div><div><br class=3D""></div><br =
+class=3D""><blockquote type=3D"cite" class=3D""><div class=3D""><br =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;" class=3D""><span =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none; float: none; =
+display: inline !important;" class=3D"">SHould this maybe be integrated =
+into your other series of ISA 3.1</span><br style=3D"caret-color: rgb(0, =
+0, 0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><span style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;" =
+class=3D"">instructions.</span><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""></div></blockquote><div><br =
+class=3D""></div><div>I can do that.</div><div>I know some of the v4 =
+patches of the ISA3.1 sereies are already accepted.</div><div>When I =
+resend the v5 of that series, shall I include the already accepted =
+one?</div><div>or just resend the not-accepted-yet patches.</div><br =
+class=3D""><blockquote type=3D"cite" class=3D""><div class=3D""><br =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;" =
+class=3D""><blockquote type=3D"cite" style=3D"font-family: Helvetica; =
+font-size: 14px; font-style: normal; font-variant-caps: normal; =
+font-weight: normal; letter-spacing: normal; orphans: auto; text-align: =
+start; text-indent: 0px; text-transform: none; white-space: normal; =
+widows: auto; word-spacing: 0px; -webkit-text-size-adjust: auto; =
+-webkit-text-stroke-width: 0px; text-decoration: none;" class=3D""><br =
+class=3D"">Signed-off-by: Lijun Pan &lt;<a =
+href=3D"mailto:ljp@linux.ibm.com" class=3D"">ljp@linux.ibm.com</a>&gt;<br =
+class=3D"">---<br class=3D"">v3: implement vmsumudm/vmsumcud through =
+int128 functions,<br class=3D"">&nbsp;&nbsp;&nbsp;suggested by Richard =
+Henderson.<br class=3D""><br class=3D"">disas/ppc.c =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| =
+&nbsp;2 ++<br class=3D"">target/ppc/helper.h =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;| &nbsp;4 ++-<br class=3D"">target/ppc/int_helper.c =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| =
+49 ++++++++++++++++++++++++++++-<br class=3D"">target/ppc/translate.c =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;| &nbsp;1 -<br class=3D"">target/ppc/translate/vmx-impl.inc.c | 39 =
+++++++++++++-----------<br class=3D"">target/ppc/translate/vmx-ops.inc.c =
+&nbsp;| &nbsp;2 ++<br class=3D"">6 files changed, 76 insertions(+), 21 =
+deletions(-)<br class=3D""><br class=3D"">diff --git a/disas/ppc.c =
+b/disas/ppc.c<br class=3D"">index 63e97cfe1d..bd76fae4c4 100644<br =
+class=3D"">--- a/disas/ppc.c<br class=3D"">+++ b/disas/ppc.c<br =
+class=3D"">@@ -2261,7 +2261,9 @@ const struct powerpc_opcode =
+powerpc_opcodes[] =3D {<br class=3D"">{ "vmsumshs", &nbsp;VXA(4, =
+&nbsp;41), VXA_MASK,<span class=3D"Apple-tab-span" style=3D"white-space: =
+pre;">	</span>PPCVEC,<span class=3D"Apple-tab-span" style=3D"white-space:=
+ pre;">	</span><span class=3D"Apple-tab-span" style=3D"white-space: =
+pre;">	</span>{ VD, VA, VB, VC } },<br class=3D"">{ "vmsumubm", =
+&nbsp;VXA(4, &nbsp;36), VXA_MASK, &nbsp;&nbsp;PPCVEC,<span =
+class=3D"Apple-tab-span" style=3D"white-space: pre;">	</span><span =
+class=3D"Apple-tab-span" style=3D"white-space: pre;">	</span>{ VD, VA, =
+VB, VC } },<br class=3D"">{ "vmsumuhm", &nbsp;VXA(4, &nbsp;38), =
+VXA_MASK, &nbsp;&nbsp;PPCVEC,<span class=3D"Apple-tab-span" =
+style=3D"white-space: pre;">	</span><span class=3D"Apple-tab-span" =
+style=3D"white-space: pre;">	</span>{ VD, VA, VB, VC } },<br =
+class=3D"">+{ "vmsumudm", &nbsp;VXA(4, &nbsp;35), VXA_MASK, =
+&nbsp;&nbsp;PPCVEC, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ =
+VD, VA, VB, VC } },<br class=3D"">{ "vmsumuhs", &nbsp;VXA(4, &nbsp;39), =
+VXA_MASK, &nbsp;&nbsp;PPCVEC,<span class=3D"Apple-tab-span" =
+style=3D"white-space: pre;">	</span><span class=3D"Apple-tab-span" =
+style=3D"white-space: pre;">	</span>{ VD, VA, VB, VC } },<br =
+class=3D"">+{ "vmsumcud", &nbsp;VXA(4, &nbsp;23), VXA_MASK, =
+&nbsp;&nbsp;PPCVEC, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ =
+VD, VA, VB, VC } },<br class=3D"">{ "vmulesb", &nbsp;&nbsp;VX(4, =
+&nbsp;776), VX_MASK,<span class=3D"Apple-tab-span" style=3D"white-space: =
+pre;">	</span>PPCVEC,<span class=3D"Apple-tab-span" style=3D"white-space:=
+ pre;">	</span><span class=3D"Apple-tab-span" style=3D"white-space: =
+pre;">	</span>{ VD, VA, VB } },<br class=3D"">{ "vmulesh", =
+&nbsp;&nbsp;VX(4, &nbsp;840), VX_MASK,<span class=3D"Apple-tab-span" =
+style=3D"white-space: pre;">	</span>PPCVEC,<span =
+class=3D"Apple-tab-span" style=3D"white-space: pre;">	</span><span =
+class=3D"Apple-tab-span" style=3D"white-space: pre;">	</span>{ VD, VA, =
+VB } },<br class=3D"">{ "vmuleub", &nbsp;&nbsp;VX(4, &nbsp;520), =
+VX_MASK,<span class=3D"Apple-tab-span" style=3D"white-space: pre;">	=
+</span>PPCVEC,<span class=3D"Apple-tab-span" style=3D"white-space: =
+pre;">	</span><span class=3D"Apple-tab-span" style=3D"white-space: =
+pre;">	</span>{ VD, VA, VB } },<br class=3D"">diff --git =
+a/target/ppc/helper.h b/target/ppc/helper.h<br class=3D"">index =
+2dfa1c6942..d540e8f30b 100644<br class=3D"">--- a/target/ppc/helper.h<br =
+class=3D"">+++ b/target/ppc/helper.h<br class=3D"">@@ -263,10 +263,12 @@ =
+DEF_HELPER_3(vpkpx, void, avr, avr, avr)<br =
+class=3D"">DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)<br =
+class=3D"">DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)<br =
+class=3D"">DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)<br =
+class=3D"">+DEF_HELPER_5(vmsumudm, void, env, avr, avr, avr, avr)<br =
+class=3D"">DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)<br =
+class=3D"">DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)<br =
+class=3D"">DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)<br =
+class=3D"">-DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)<br =
+class=3D"">+DEF_HELPER_5(vmsumcud, void, env, avr, avr, avr, avr)<br =
+class=3D"">+DEF_HELPER_5(vmladduhm, void, env, avr, avr, avr, avr)<br =
+class=3D"">DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, =
+i32)<br class=3D"">DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, =
+env)<br class=3D"">DEF_HELPER_3(lvebx, void, env, avr, tl)<br =
+class=3D"">diff --git a/target/ppc/int_helper.c =
+b/target/ppc/int_helper.c<br class=3D"">index be53cd6f68..37ea343cb3 =
+100644<br class=3D"">--- a/target/ppc/int_helper.c<br class=3D"">+++ =
+b/target/ppc/int_helper.c<br class=3D"">@@ -926,7 +926,8 @@ void =
+helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,<br =
+class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;}<br class=3D"">}<br class=3D""><br =
+class=3D"">-void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t =
+*b, ppc_avr_t *c)<br class=3D"">+void helper_vmladduhm(CPUPPCState *env, =
+ppc_avr_t *r, ppc_avr_t *a,<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ppc_avr_t *b, =
+ppc_avr_t *c)<br class=3D"">{<br class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;int =
+i;<br class=3D""><br class=3D"">@@ -1064,6 +1065,52 @@ void =
+helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,<br =
+class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;}<br class=3D"">}<br class=3D""><br =
+class=3D"">+void helper_vmsumudm(CPUPPCState *env, ppc_avr_t *r,<br =
+class=3D"">+ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ppc_avr_t *a, ppc_avr_t =
+*b, ppc_avr_t *c)<br class=3D"">+{<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;Int128 sum;<br class=3D"">+ &nbsp;&nbsp;&nbsp;uint64_t =
+lo, hi;<br class=3D"">+<br class=3D"">+ &nbsp;&nbsp;&nbsp;sum =3D =
+int128_make128(c-&gt;VsrD(1), c-&gt;VsrD(0));<br class=3D"">+<br =
+class=3D"">+ &nbsp;&nbsp;&nbsp;mulu64(&amp;lo, &amp;hi, a-&gt;VsrD(0), =
+b-&gt;VsrD(0));<br class=3D"">+ &nbsp;&nbsp;&nbsp;sum =3D =
+int128_add(sum, int128_make128(lo, hi));<br class=3D"">+<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;mulu64(&amp;lo, &amp;hi, a-&gt;VsrD(1), =
+b-&gt;VsrD(1));<br class=3D"">+ &nbsp;&nbsp;&nbsp;sum =3D =
+int128_add(sum, int128_make128(lo, hi));<br class=3D"">+<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;r-&gt;VsrD(0) =3D int128_gethi(sum);<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;r-&gt;VsrD(1) =3D int128_getlo(sum);<br class=3D"">+}<br=
+ class=3D"">+<br class=3D"">+void helper_vmsumcud(CPUPPCState *env, =
+ppc_avr_t *r,<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ppc_avr_t *a, ppc_avr_t =
+*b, ppc_avr_t *c)<br class=3D"">+{<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;Int128 sum;<br class=3D"">+ &nbsp;&nbsp;&nbsp;uint64_t =
+p1lo, p1hi, p2lo, p2hi;<br class=3D"">+<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;mulu64(&amp;p1lo, &amp;p1hi, a-&gt;VsrD(0), =
+b-&gt;VsrD(0));<br class=3D"">+ &nbsp;&nbsp;&nbsp;mulu64(&amp;p2lo, =
+&amp;p2hi, a-&gt;VsrD(1), b-&gt;VsrD(1));<br class=3D"">+<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;/* Sum lowest 64-bit elements. &nbsp;*/<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;sum =3D int128_make128(c-&gt;VsrD(1), 0);<br =
+class=3D"">+ &nbsp;&nbsp;&nbsp;sum =3D int128_add(sum, =
+int128_make128(p1lo, 0));<br class=3D"">+ &nbsp;&nbsp;&nbsp;sum =3D =
+int128_add(sum, int128_make128(p2lo, 0));<br class=3D"">+<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;/*<br class=3D"">+ &nbsp;&nbsp;&nbsp;&nbsp;* Discard =
+low 64-bits, leaving the carry into bit 64.<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;&nbsp;* Then sum the higher 64-bit elements.<br =
+class=3D"">+ &nbsp;&nbsp;&nbsp;&nbsp;*/<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;sum =3D int128_rshift(sum, 64);<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;sum =3D int128_add(sum, int128_make128(c-&gt;VsrD(0), =
+0));<br class=3D"">+ &nbsp;&nbsp;&nbsp;sum =3D int128_add(sum, =
+int128_make128(p1hi, 0));<br class=3D"">+ &nbsp;&nbsp;&nbsp;sum =3D =
+int128_add(sum, int128_make128(p2hi, 0));<br class=3D"">+<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;/* The result is only the carry into bits 64 &amp; 65. =
+*/<br class=3D"">+ &nbsp;&nbsp;&nbsp;r-&gt;VsrD(1) =3D =
+int128_gethi(sum);<br class=3D"">+ &nbsp;&nbsp;&nbsp;r-&gt;VsrD(0) =3D =
+0;<br class=3D"">+}<br class=3D"">+<br class=3D"">#define =
+VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast) =
+&nbsp;&nbsp;\<br class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;void =
+helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b) =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br =
+class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;{ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">diff --git =
+a/target/ppc/translate.c b/target/ppc/translate.c<br class=3D"">index =
+4ce3d664b5..35ff1aa77e 100644<br class=3D"">--- =
+a/target/ppc/translate.c<br class=3D"">+++ b/target/ppc/translate.c<br =
+class=3D"">@@ -7281,7 +7281,6 @@ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, =
+0x00000001, PPC_ALTIVEC),<br class=3D"">GEN_HANDLER(lvsr, 0x1f, 0x06, =
+0x01, 0x00000001, PPC_ALTIVEC),<br class=3D"">GEN_HANDLER(mfvscr, 0x04, =
+0x2, 0x18, 0x001ff800, PPC_ALTIVEC),<br class=3D"">GEN_HANDLER(mtvscr, =
+0x04, 0x2, 0x19, 0x03ff0000, PPC_ALTIVEC),<br =
+class=3D"">-GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x00000000, =
+PPC_ALTIVEC),<br class=3D"">#if defined(TARGET_PPC64)<br =
+class=3D"">GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, =
+PPC_NONE,<br =
+class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;PPC2_ISA300),<br class=3D"">diff --git =
+a/target/ppc/translate/vmx-impl.inc.c =
+b/target/ppc/translate/vmx-impl.inc.c<br class=3D"">index =
+403ed3a01c..520b49a773 100644<br class=3D"">--- =
+a/target/ppc/translate/vmx-impl.inc.c<br class=3D"">+++ =
+b/target/ppc/translate/vmx-impl.inc.c<br class=3D"">@@ -1248,6 +1248,25 =
+@@ static void gen_vsldoi(DisasContext *ctx)<br =
+class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;tcg_temp_free_i32(sh);<br =
+class=3D"">}<br class=3D""><br class=3D"">+#define GEN_VAFORM(name, =
+opc2) =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+static void glue(gen_, =
+name)(DisasContext *ctx) =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br=
+ class=3D"">+{ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;TCGv_ptr ra, rb, rc, rd; =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;if (unlikely(!ctx-&gt;altivec_enabled)) { =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gen_exception(ctx, =
+POWERPC_EXCP_VPU); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return; =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;} =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ &nbsp;&nbsp;&nbsp;ra =3D =
+gen_avr_ptr(rA(ctx-&gt;opcode)); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;rb =3D gen_avr_ptr(rB(ctx-&gt;opcode)); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;rc =3D gen_avr_ptr(rC(ctx-&gt;opcode)); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;rd =3D gen_avr_ptr(rD(ctx-&gt;opcode)); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;gen_helper_##name(cpu_env, rd, ra, rb, rc); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br=
+ class=3D"">+ &nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(ra); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(rb); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(rc); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+ =
+&nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(rd); =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">+}<br =
+class=3D"">+<br class=3D"">#define GEN_VAFORM_PAIRED(name0, name1, opc2) =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;\<br class=3D"">static void glue(gen_, =
+name0##_##name1)(DisasContext *ctx) =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;\<br class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;{ =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;\<br class=3D"">@@ -1272,24 +1291,8 @@ static =
+void glue(gen_, name0##_##name1)(DisasContext *ctx) =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;\<br class=3D"">&nbsp;&nbsp;&nbsp;&nbsp;}<br class=3D""><br =
+class=3D"">GEN_VAFORM_PAIRED(vmhaddshs, vmhraddshs, 16)<br class=3D"">-<br=
+ class=3D"">-static void gen_vmladduhm(DisasContext *ctx)<br =
+class=3D"">-{<br class=3D"">- &nbsp;&nbsp;&nbsp;TCGv_ptr ra, rb, rc, =
+rd;<br class=3D"">- &nbsp;&nbsp;&nbsp;if =
+(unlikely(!ctx-&gt;altivec_enabled)) {<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gen_exception(ctx, =
+POWERPC_EXCP_VPU);<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return;<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;}<br class=3D"">- &nbsp;&nbsp;&nbsp;ra =3D =
+gen_avr_ptr(rA(ctx-&gt;opcode));<br class=3D"">- &nbsp;&nbsp;&nbsp;rb =3D =
+gen_avr_ptr(rB(ctx-&gt;opcode));<br class=3D"">- &nbsp;&nbsp;&nbsp;rc =3D =
+gen_avr_ptr(rC(ctx-&gt;opcode));<br class=3D"">- &nbsp;&nbsp;&nbsp;rd =3D =
+gen_avr_ptr(rD(ctx-&gt;opcode));<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;gen_helper_vmladduhm(rd, ra, rb, rc);<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(ra);<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(rb);<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(rc);<br class=3D"">- =
+&nbsp;&nbsp;&nbsp;tcg_temp_free_ptr(rd);<br class=3D"">-}<br =
+class=3D"">+GEN_VAFORM(vmsumcud, 11)<br =
+class=3D"">+GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17)<br class=3D""><br =
+class=3D"">static void gen_vpermr(DisasContext *ctx)<br class=3D"">{<br =
+class=3D"">diff --git a/target/ppc/translate/vmx-ops.inc.c =
+b/target/ppc/translate/vmx-ops.inc.c<br class=3D"">index =
+84e05fb827..aee23e31c6 100644<br class=3D"">--- =
+a/target/ppc/translate/vmx-ops.inc.c<br class=3D"">+++ =
+b/target/ppc/translate/vmx-ops.inc.c<br class=3D"">@@ -276,6 +276,8 @@ =
+GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),<br =
+class=3D"">GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),<br =
+class=3D"">GEN_VAFORM_PAIRED(vsel, vperm, 21),<br =
+class=3D"">GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),<br =
+class=3D"">+GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, =
+PPC_ALTIVEC),<br class=3D"">+GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, =
+17),<br class=3D""><br class=3D"">GEN_VXFORM_DUAL(vclzb, vpopcntb, 1, =
+28, PPC_NONE, PPC2_ALTIVEC_207),<br class=3D"">GEN_VXFORM_DUAL(vclzh, =
+vpopcnth, 1, 29, PPC_NONE, PPC2_ALTIVEC_207),<br =
+class=3D""></blockquote><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><span style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;" =
+class=3D"">--<span class=3D"Apple-converted-space">&nbsp;</span></span><br=
+ style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;" class=3D""><span =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none; float: none; =
+display: inline !important;" class=3D"">David Gibson</span><span =
+class=3D"Apple-tab-span" style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+pre; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;">	</span><span class=3D"Apple-tab-span" style=3D"caret-color: =
+rgb(0, 0, 0); font-family: Helvetica; font-size: 14px; font-style: =
+normal; font-variant-caps: normal; font-weight: normal; letter-spacing: =
+normal; text-align: start; text-indent: 0px; text-transform: none; =
+white-space: pre; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;">	</span><span class=3D"Apple-tab-span" =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: pre; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;">	=
+</span><span style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; =
+font-size: 14px; font-style: normal; font-variant-caps: normal; =
+font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none; float: none; display: inline !important;" class=3D"">| I'll have =
+my music baroque, and my code</span><br style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><span style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;" =
+class=3D"">david AT<span =
+class=3D"Apple-converted-space">&nbsp;</span></span><a =
+href=3D"http://gibson.dropbear.id.au/" style=3D"font-family: Helvetica; =
+font-size: 14px; font-style: normal; font-variant-caps: normal; =
+font-weight: normal; letter-spacing: normal; orphans: auto; text-align: =
+start; text-indent: 0px; text-transform: none; white-space: normal; =
+widows: auto; word-spacing: 0px; -webkit-text-size-adjust: auto; =
+-webkit-text-stroke-width: 0px;" class=3D"">gibson.dropbear.id.au</a><span=
+ class=3D"Apple-tab-span" style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+pre; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;">	</span><span style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none; float: none; display: inline !important;" class=3D"">| minimalist, =
+thank you. &nbsp;NOT _the_ _other_</span><br style=3D"caret-color: =
+rgb(0, 0, 0); font-family: Helvetica; font-size: 14px; font-style: =
+normal; font-variant-caps: normal; font-weight: normal; letter-spacing: =
+normal; text-align: start; text-indent: 0px; text-transform: none; =
+white-space: normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><span class=3D"Apple-tab-span" =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: pre; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;">	=
+</span><span class=3D"Apple-tab-span" style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+pre; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;">	</span><span class=3D"Apple-tab-span" style=3D"caret-color: =
+rgb(0, 0, 0); font-family: Helvetica; font-size: 14px; font-style: =
+normal; font-variant-caps: normal; font-weight: normal; letter-spacing: =
+normal; text-align: start; text-indent: 0px; text-transform: none; =
+white-space: pre; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;">	</span><span class=3D"Apple-tab-span" =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: pre; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;">	=
+</span><span style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; =
+font-size: 14px; font-style: normal; font-variant-caps: normal; =
+font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none; float: none; display: inline !important;" class=3D"">| _way_ =
+_around_!</span><br style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;" class=3D""><a href=3D"http://www.ozlabs.org/~dgibson" =
+style=3D"font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+orphans: auto; text-align: start; text-indent: 0px; text-transform: =
+none; white-space: normal; widows: auto; word-spacing: 0px; =
+-webkit-text-size-adjust: auto; -webkit-text-stroke-width: 0px;" =
+class=3D"">http://www.ozlabs.org/~dgibson</a></div></blockquote></div><br =
+class=3D""></body></html>=
+
+--Apple-Mail=_2DF16364-2220-4877-82C1-577807A3016B--
 
 
