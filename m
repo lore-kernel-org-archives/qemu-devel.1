@@ -2,85 +2,53 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE75C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A308EC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:23:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51F422067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:57:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0p0kkcM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51F422067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D057206F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:23:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D057206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv1le-0002ty-KX
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 12:57:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39514)
+	id 1jv2BH-0006cb-Pk
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 13:23:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jv1l1-0002UQ-2D
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:56:47 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27850
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jv1ky-0007rX-EN
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:56:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594659403;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=X1FJQeaTOIgHy3nBz/pffDMJv5BxjWnXhQ39QhULKEo=;
- b=X0p0kkcMH+0r73Q/dZT73o7plMNiwvLtYhdj8jNs9M8sHNbUwhEU5kqKCb/jyU26OZxeFN
- Jmx/AWPT6HqhWveY/tJ7QUce4e91D260Q9IDPlytbiErA6OAyVDojK5hudRLGUhWJXxiqT
- L1hm3S7Rr1CxU1p+lxGrPlftYqrntFU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-363-Cx8Y3EEDPj28u3fxeiECPQ-1; Mon, 13 Jul 2020 12:56:41 -0400
-X-MC-Unique: Cx8Y3EEDPj28u3fxeiECPQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C14C800400;
- Mon, 13 Jul 2020 16:56:40 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-91.ams2.redhat.com [10.36.114.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 543305D9DC;
- Mon, 13 Jul 2020 16:56:39 +0000 (UTC)
-Date: Mon, 13 Jul 2020 18:56:37 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Nir Soffer <nsoffer@redhat.com>
-Subject: Re: [PATCH for-5.1 1/2] block: Require aligned image size to avoid
- assertion failure
-Message-ID: <20200713165637.GH10318@linux.fritz.box>
-References: <20200710142149.40962-1-kwolf@redhat.com>
- <20200710142149.40962-2-kwolf@redhat.com>
- <CAMRbyyux0eQo8vmz4JB8pT_1i4PJviQJPKiaJC6ehwjLhc649A@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAMRbyyux0eQo8vmz4JB8pT_1i4PJviQJPKiaJC6ehwjLhc649A@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jv2AL-0005pN-Ps; Mon, 13 Jul 2020 13:22:57 -0400
+Received: from relay.sw.ru ([185.231.240.75]:46752 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jv2AI-00039H-Ev; Mon, 13 Jul 2020 13:22:56 -0400
+Received: from [172.16.25.136] (helo=localhost.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jv2A2-0007MZ-JI; Mon, 13 Jul 2020 20:22:38 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v5] scripts/simplebench: compare write request performance
+Date: Mon, 13 Jul 2020 20:22:45 +0300
+Message-Id: <1594660965-159653-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 13:22:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,35 +61,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: den@openvz.org, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ andrey.shinkevich@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 13.07.2020 um 18:33 hat Nir Soffer geschrieben:
-> On Fri, Jul 10, 2020 at 5:22 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> >
-> > Unaligned requests will automatically be aligned to bl.request_alignment
-> > and we don't want to extend requests to access space beyond the end of
-> > the image, so it's required that the image size is aligned.
-> >
-> > With write requests, this could cause assertion failures like this if
-> > RESIZE permissions weren't requested:
-> >
-> > qemu-img: block/io.c:1910: bdrv_co_write_req_prepare: Assertion `end_sector <= bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
-> >
-> > This was e.g. triggered by qemu-img converting to a target image with 4k
-> > request alignment when the image was only aligned to 512 bytes, but not
-> > to 4k.
-> 
-> Was it on NFS? Shouldn't this be fix by the next patch then?
+The script 'bench_write_req.py' allows comparing performances of write
+request for two qemu-img binary files.
+An example with (qemu-img binary 1) and without (qemu-img binary 2) the
+applied patch "qcow2: skip writing zero buffers to empty COW areas"
+(git commit ID: c8bb23cbdbe32f5) has the following results:
 
-Patch 2 makes the problem go away for NFS because NFS doesn't even
-require the 4k alignment. But on storage that legitimately needs 4k
-alignment (or possibly other filesystems that are misdetected), you
-would still hit the same problem.
+SSD:
+----------------  -------------------  -------------------
+                  <qemu-img binary 1>  <qemu-img binary 2>
+<cluster front>   0.10 +- 0.00         8.16 +- 0.65
+<cluster middle>  0.10 +- 0.00         7.37 +- 1.10
+<cross cluster>   7.40 +- 1.08         21.97 +- 4.19
+<cluster 64K>     2.14 +- 0.94         8.48 +- 1.66
+----------------  -------------------  -------------------
+HDD:
+----------------  -------------------  -------------------
+                  <qemu-img binary 1>  <qemu-img binary 2>
+<cluster front>   2.30 +- 0.01         6.19 +- 0.06
+<cluster middle>  2.20 +- 0.09         6.20 +- 0.06
+<cross cluster>   8.32 +- 0.16         8.26 +- 0.14
+<cluster 64K>     8.20 +- 0.05         6.26 +- 0.10
+----------------  -------------------  -------------------
 
-Kevin
+Suggested-by: Denis V. Lunev <den@openvz.org>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+v5:
+  01: 'cluster_size' made variable.
+  02: <simple case> deleted as duplicated.
+  03: A case with cluster size 64K was added.
+  04: The comments amended as Vladimir suggested.
+  05: Superfluous variables removed.
+  06: 'finally' block removed from function bench_write_req()
+  07: The names of test cases changed.
+  08: The 'block_size' of <cross cluster> set to the cluster size.
+
+ scripts/simplebench/bench_write_req.py | 170 +++++++++++++++++++++++++++++++++
+ 1 file changed, 170 insertions(+)
+ create mode 100755 scripts/simplebench/bench_write_req.py
+
+diff --git a/scripts/simplebench/bench_write_req.py b/scripts/simplebench/bench_write_req.py
+new file mode 100755
+index 0000000..7665c4b
+--- /dev/null
++++ b/scripts/simplebench/bench_write_req.py
+@@ -0,0 +1,170 @@
++#!/usr/bin/env python3
++#
++# Test to compare performance of write requests for two qemu-img binary files.
++#
++# The idea of the test comes from intention to check the benefit of c8bb23cbdbe
++# "qcow2: skip writing zero buffers to empty COW areas".
++#
++# Copyright (c) 2020 Virtuozzo International GmbH.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++
++import sys
++import os
++import subprocess
++import simplebench
++
++
++def bench_func(env, case):
++    """ Handle one "cell" of benchmarking table. """
++    return bench_write_req(env['qemu_img'], env['image_name'],
++                           case['block_size'], case['block_offset'],
++                           case['cluster_size'])
++
++
++def qemu_img_pipe(*args):
++    '''Run qemu-img and return its output'''
++    subp = subprocess.Popen(list(args),
++                            stdout=subprocess.PIPE,
++                            stderr=subprocess.STDOUT,
++                            universal_newlines=True)
++    exitcode = subp.wait()
++    if exitcode < 0:
++        sys.stderr.write('qemu-img received signal %i: %s\n'
++                         % (-exitcode, ' '.join(list(args))))
++    return subp.communicate()[0]
++
++
++def bench_write_req(qemu_img, image_name, block_size, block_offset,
++                    cluster_size):
++    """Benchmark write requests
++
++    The function creates a QCOW2 image with the given path/name. Then it runs
++    the 'qemu-img bench' command and makes series of write requests on the
++    image clusters. Finally, it returns the total time of the write operations
++    on the disk.
++
++    qemu_img     -- path to qemu_img executable file
++    image_name   -- QCOW2 image name to create
++    block_size   -- size of a block to write to clusters
++    block_offset -- offset of the block in clusters
++    cluster_size -- size of the image cluster
++
++    Returns {'seconds': int} on success and {'error': str} on failure.
++    Return value is compatible with simplebench lib.
++    """
++
++    if not os.path.isfile(qemu_img):
++        print(f'File not found: {qemu_img}')
++        sys.exit(1)
++
++    image_dir = os.path.dirname(os.path.abspath(image_name))
++    if not os.path.isdir(image_dir):
++        print(f'Path not found: {image_name}')
++        sys.exit(1)
++
++    image_size = 1024 * 1024 * 1024
++
++    args_create = [qemu_img, 'create', '-f', 'qcow2', '-o',
++                   f'cluster_size={cluster_size}',
++                   image_name, str(image_size)]
++
++    count = int(image_size / cluster_size) - 1
++    step = str(cluster_size)
++
++    args_bench = [qemu_img, 'bench', '-w', '-n', '-t', 'none', '-c',
++                  str(count), '-s', f'{block_size}', '-o', str(block_offset),
++                  '-S', step, '-f', 'qcow2', image_name]
++
++    try:
++        qemu_img_pipe(*args_create)
++    except OSError as e:
++        os.remove(image_name)
++        return {'error': 'qemu_img create failed: ' + str(e)}
++
++    try:
++        ret = qemu_img_pipe(*args_bench)
++    except OSError as e:
++        os.remove(image_name)
++        return {'error': 'qemu_img bench failed: ' + str(e)}
++
++    os.remove(image_name)
++
++    if 'seconds' in ret:
++        ret_list = ret.split()
++        index = ret_list.index('seconds.')
++        return {'seconds': float(ret_list[index-1])}
++    else:
++        return {'error': 'qemu_img bench failed: ' + ret}
++
++
++if __name__ == '__main__':
++
++    if len(sys.argv) < 4:
++        program = os.path.basename(sys.argv[0])
++        print(f'USAGE: {program} <path to qemu-img binary file> '
++              '<path to another qemu-img to compare performance with> '
++              '<full or relative name for QCOW2 image to create>')
++        exit(1)
++
++    # Test-cases are "rows" in benchmark resulting table, 'id' is a caption
++    # for the row, other fields are handled by bench_func.
++    test_cases = [
++        {
++            'id': '<cluster front>',
++            'block_size': 4096,
++            'block_offset': 0,
++            'cluster_size': 1048576
++        },
++        {
++            'id': '<cluster middle>',
++            'block_size': 4096,
++            'block_offset': 524288,
++            'cluster_size': 1048576
++        },
++        {
++            'id': '<cross cluster>',
++            'block_size': 1048576,
++            'block_offset': 4096,
++            'cluster_size': 1048576
++        },
++        {
++            'id': '<cluster 64K>',
++            'block_size': 4096,
++            'block_offset': 0,
++            'cluster_size': 65536
++        },
++   ]
++
++    # Test-envs are "columns" in benchmark resulting table, 'id is a caption
++    # for the column, other fields are handled by bench_func.
++    # Set the paths below to desired values
++    test_envs = [
++        {
++            'id': '<qemu-img binary 1>',
++            'qemu_img': f'{sys.argv[1]}',
++            'image_name': f'{sys.argv[3]}'
++        },
++        {
++            'id': '<qemu-img binary 2>',
++            'qemu_img': f'{sys.argv[2]}',
++            'image_name': f'{sys.argv[3]}'
++        },
++    ]
++
++    result = simplebench.bench(bench_func, test_envs, test_cases, count=3,
++                               initial_run=False)
++    print(simplebench.ascii(result))
+-- 
+1.8.3.1
 
 
