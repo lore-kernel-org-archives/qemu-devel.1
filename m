@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB87C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 780D5C433E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:03:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1EA12068F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:03:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EA12068F
+	by mail.kernel.org (Postfix) with ESMTPS id 44F602068F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:03:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44F602068F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zte.com.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juuNK-0003rz-69
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:03:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52388)
+	id 1juuNL-0003v8-GU
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:03:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <wang.yi59@zte.com.cn>)
- id 1juuLA-00083y-VJ
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:01:36 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:51779 helo=mxct.zte.com.cn)
+ id 1juuLj-0000qu-23
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:02:11 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:31244)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <wang.yi59@zte.com.cn>)
- id 1juuL9-00032w-4D
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:01:36 -0400
+ id 1juuLh-00035r-7n
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:02:10 -0400
 Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
- by Forcepoint Email with ESMTPS id 14ED8607D8A12010C3CA
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:01:31 +0800 (CST)
+ by Forcepoint Email with ESMTPS id 407ED1282E4B1340294B
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:02:06 +0800 (CST)
 Received: from notes_smtp.zte.com.cn (notessmtp.zte.com.cn [10.30.1.239])
- by mse-fl2.zte.com.cn with ESMTP id 06D91RYX036458
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:01:27 +0800 (GMT-8)
+ by mse-fl2.zte.com.cn with ESMTP id 06D925Eh037440
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:02:05 +0800 (GMT-8)
  (envelope-from wang.yi59@zte.com.cn)
 Received: from fox-host8.localdomain ([10.74.120.8])
  by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
- with ESMTP id 2020071317013254-4267728 ;
- Mon, 13 Jul 2020 17:01:32 +0800 
+ with ESMTP id 2020071317021029-4267738 ;
+ Mon, 13 Jul 2020 17:02:10 +0800 
 From: Yi Wang <wang.yi59@zte.com.cn>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/12] migration/migration.c: Remove superfluous breaks
-Date: Mon, 13 Jul 2020 17:04:38 +0800
-Message-Id: <1594631078-36453-1-git-send-email-wang.yi59@zte.com.cn>
+Subject: [PATCH 08/12] block/vmdk: Remove superfluous breaks
+Date: Mon, 13 Jul 2020 17:05:07 +0800
+Message-Id: <1594631107-36574-1-git-send-email-wang.yi59@zte.com.cn>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release
- 8.5.3FP6|November 21, 2013) at 2020-07-13 17:01:32,
+ 8.5.3FP6|November 21, 2013) at 2020-07-13 17:02:10,
  Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2020-07-13 17:01:28
+ 2020-07-13 17:02:06
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-MAIL: mse-fl2.zte.com.cn 06D91RYX036458
-Received-SPF: pass client-ip=202.103.147.169;
- envelope-from=wang.yi59@zte.com.cn; helo=mxct.zte.com.cn
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 05:01:13
+X-MAIL: mse-fl2.zte.com.cn 06D925Eh037440
+Received-SPF: pass client-ip=63.217.80.70; envelope-from=wang.yi59@zte.com.cn;
+ helo=mxhk.zte.com.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 04:59:57
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
 X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,31 +93,29 @@ Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
 Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- migration/migration.c | 2 --
- 1 file changed, 2 deletions(-)
+ block/vmdk.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 92e44e0..2fd5fbb 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -985,7 +985,6 @@ static void fill=5Fsource=5Fmigration=5Finfo(MigrationI=
-nfo *info)
-         /* no migration has happened ever */
-         /* do not overwrite destination migration status */
-         return;
--        break;
-     case MIGRATION=5FSTATUS=5FSETUP:
-         info->has=5Fstatus =3D true;
-         info->has=5Ftotal=5Ftime =3D false;
-@@ -1104,7 +1103,6 @@ static void fill=5Fdestination=5Fmigration=5Finfo(Mig=
-rationInfo *info)
-     switch (mis->state) {
-     case MIGRATION=5FSTATUS=5FNONE:
-         return;
--        break;
-     case MIGRATION=5FSTATUS=5FSETUP:
-     case MIGRATION=5FSTATUS=5FCANCELLING:
-     case MIGRATION=5FSTATUS=5FCANCELLED:
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 28cec50..8f222e3 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1053,14 +1053,11 @@ static int vmdk=5Fopen=5Fsparse(BlockDriverState *b=
+s, BdrvChild *file, int flags,
+     switch (magic) {
+         case VMDK3=5FMAGIC:
+             return vmdk=5Fopen=5Fvmfs=5Fsparse(bs, file, flags, errp);
+-            break;
+         case VMDK4=5FMAGIC:
+             return vmdk=5Fopen=5Fvmdk4(bs, file, flags, options, errp);
+-            break;
+         default:
+             error=5Fsetg(errp, "Image not in VMDK format");
+             return -EINVAL;
+-            break;
+     }
+ }
+=20
 --=20
 2.9.5
 
