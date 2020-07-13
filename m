@@ -2,65 +2,61 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A13C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC60C433E3
 	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 05:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E6D52073A
+	by mail.kernel.org (Postfix) with ESMTPS id 6667B20724
 	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 05:16:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="kbEhojsJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E6D52073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Tc3+91Pi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6667B20724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juqpS-0000sL-T3
+	id 1juqpS-0000qh-I8
 	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 01:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34546)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1juqnz-0007u8-4A; Mon, 13 Jul 2020 01:15:07 -0400
-Received: from ozlabs.org ([203.11.71.1]:55825)
+ id 1juqnz-0007u7-0S; Mon, 13 Jul 2020 01:15:07 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:34013)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1juqnw-0008R4-DU; Mon, 13 Jul 2020 01:15:06 -0400
+ id 1juqnw-0008R3-DJ; Mon, 13 Jul 2020 01:15:06 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B4sK83kpDz9sQt; Mon, 13 Jul 2020 15:14:52 +1000 (AEST)
+ id 4B4sK84sZyz9sDX; Mon, 13 Jul 2020 15:14:52 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1594617292;
- bh=Cmq0Wioc83FgaqZSiKWmUqPb4Mh8jfPSL28gqUB7D1c=;
+ bh=an3pZDkzsoje/U3I9hRAVbqqaAQpLW2w9TQVSofFI0U=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=kbEhojsJjcIpa+Ve7El1E56II2zblc06KGnu4jCeULJJpMXN4UCLsxykKmyOMJF2Z
- 87AzrpmBM6aMHmsXPrXPx349W4moVV+yftqeYWGFAzbFt+cMrkJcNN7QQBnWwbi4C7
- TEhnyqggX0JmIK14+56Tv0lgBwjvsdvC3zJwgtks=
-Date: Mon, 13 Jul 2020 14:53:30 +1000
+ b=Tc3+91PiOCDAWacrXT4EDaH6umhzJk91IyE7i4b/xg47ohG1bFWGlaPpKv2M7gUdj
+ Yip9biHUrDYRlsZqKZg34dQwxQE6kJPGNPnSYAVZuPvLwJGAT0X0bq7AtBtRpq12PZ
+ SN0gL5NUaFLtvwhD7KH1OOY67SpeqzqqF4dB505k=
+Date: Mon, 13 Jul 2020 15:14:00 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v3 4/4] spapr: Forbid nested KVM-HV in pre-power9 compat
- mode
-Message-ID: <20200713045330.GK2666@umbus.fritz.box>
-References: <159188280345.70166.14940592691021389043.stgit@bahia.lan>
- <159188283391.70166.16995399489383620172.stgit@bahia.lan>
- <20200613071804.GE5861@umbus.fritz.box>
- <20200615112031.679512c3@bahia.lan>
- <20200703161924.7131e87f@bahia.lan>
+To: Lijun Pan <ljp@linux.ibm.com>
+Subject: Re: [PATCH v4 06/11] Update PowerPC AT_HWCAP2 definition
+Message-ID: <20200713051400.GA93134@umbus.fritz.box>
+References: <20200701234344.91843-1-ljp@linux.ibm.com>
+ <20200701234344.91843-7-ljp@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="VSVNCtZB1QZ8vhj+"
+ protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
 Content-Disposition: inline
-In-Reply-To: <20200703161924.7131e87f@bahia.lan>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200701234344.91843-7-ljp@linux.ibm.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -80,74 +76,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---VSVNCtZB1QZ8vhj+
+--dDRMvlgZJXvWKvBx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 03, 2020 at 04:19:24PM +0200, Greg Kurz wrote:
-> On Mon, 15 Jun 2020 11:20:31 +0200
-> Greg Kurz <groug@kaod.org> wrote:
+On Wed, Jul 01, 2020 at 06:43:41PM -0500, Lijun Pan wrote:
+> Add PPC2_FEATURE2_ARCH_3_10 to the PowerPC AT_HWCAP2 definitions.
 >=20
-> > On Sat, 13 Jun 2020 17:18:04 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
-> > > On Thu, Jun 11, 2020 at 03:40:33PM +0200, Greg Kurz wrote:
-> > > > Nested KVM-HV only works on POWER9.
-> > > >=20
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> > >=20
-> > > Hrm.  I have mixed feelings about this.  It does bring forward an
-> > > error that we'd otherwise only discover when we try to load the kvm
-> > > module in the guest.
-> > >=20
-> > > On the other hand, it's kind of a layering violation - really it's
-> > > KVM's business to report what it can and can't do, rather than having
-> > > qemu anticipate it.
-> > >=20
-> >=20
-> > Agreed and it seems that we can probably get KVM to report that
-> > already. I'll have closer look.
-> >=20
+> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+> ---
+> v4: add missing changes, and split to 5/11, 6/11, 7/11
+> v3: use tcg_gen_gvec_mul()
+> v2: fix coding style
+>     use Power ISA 3.1 flag
 >=20
-> Checking the KVM_CAP_PPC_NESTED_HV extension only reports what the host
-> supports. It can't reasonably take into account that we're going to
-> switch vCPUs in some compat mode later on. KVM could possibly check
-> that it has a vCPU in pre-power9 compat mode when we try to enable
-> the capability and fail... but it would be a layering violation all
-> the same. The KVM that doesn't like pre-power9 CPUs isn't the one in
-> the host, it is the one in the guest, and it's not even directly
-> related to the CPU type but to the MMU mode currently in use:
+>  include/elf.h | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> long kvmhv_nested_init(void)
-> {
-> 	long int ptb_order;
-> 	unsigned long ptcr;
-> 	long rc;
->=20
-> 	if (!kvmhv_on_pseries())
-> 		return 0;
-> =3D=3D>	if (!radix_enabled())
-> 		return -ENODEV;
->=20
-> We cannot know either for sure the MMU mode the guest will run in
-> when we enable the nested cap during the initial machine reset.
-> So it seems we cannot do anything better than denylisting well
-> known broken setups, in which case QEMU seems a better fit than
-> KVM.
->=20
-> Makes sense ?
+> diff --git a/include/elf.h b/include/elf.h
+> index 8fbfe60e09..1858b95acf 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -554,6 +554,7 @@ typedef struct {
+>  #define PPC_FEATURE2_HTM_NOSC           0x01000000
+>  #define PPC_FEATURE2_ARCH_3_00          0x00800000
+>  #define PPC_FEATURE2_HAS_IEEE128        0x00400000
+> +#define PPC_FEATURE2_ARCH_3_10          0x00200000
+> =20
+>  /* Bits present in AT_HWCAP for Sparc.  */
 
-Yeah, good points.
+
+Um.. in the corresponding #defines in the kernel 0x00200000 is given
+to PPC_FEATURE2_DARN, and several more bits are allocated past that
+point.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -155,25 +123,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VSVNCtZB1QZ8vhj+
+--dDRMvlgZJXvWKvBx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8L6MgACgkQbDjKyiDZ
-s5KOrw/+ISJIK+8Q0SwAQS1tt3Vh08oUk+ymyRkAzWs0Te+JCWnO1mYkmmdtPmdQ
-IeOL07KKqecYXee+uQa+E5C22hMPr3bkMJ6honVneb1+wJwkKcZRnsldeiKV+iTB
-OfmHy9IOfJ1YaD5s3Yq38NLo9HhsdXWfYoHMyDS8eEj7A+jPidnaBQ5G0L9IwZPg
-NkBhY/4L/1EuMcKnWHygiDsLVGthqq7NAq7jEoo/I5MeRP2F+XJmV7MoFpPRnR1q
-GqsKz3wxUaj5/L3yqTteVETQDIDv94hKsmLY5ur0Fab2lg+s2UmuKekxwhlzRcps
-wl80bs4JiYFyjjM/M2jIpVfVN4JZk2phpnnqhLk3/rEjHZSt+q5CiIYcxWSbiyF6
-9/MT0rJUHlvQdMrLCmw+Jo8mzjd/Pih67tInWO3xMWSrURLr3AjDGwzHSuQZ0kJ4
-Mk7L3JkhIVDscmN/Xr5BNX4QAidnlHaljMa1Ah+gXqpMVZMfiteovnY/i4ZgORqE
-/hTX9dI/gzNnUiLqyqjOhLoLet+whEgB1yIhcAQswOffiwbE55jgQ0JLgck6QuhW
-lfKTd3nHFXt8Tkx3ovUoP8a1EJn89qbIZ3750sXnPqeXvw/tXJELLv1XpqG6o3MD
-p+hNRP4ZHvKvXUzYEpLS9fDLPLxWKr6oSe2dRXJU9M6Ou8yQAZY=
-=ow3Q
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8L7ZgACgkQbDjKyiDZ
+s5LJqg//Ympr+XTrwDnz4ISbva4Z08u/RO+FYZn0BcX67WLD0sWC8eMr+FGTkgKb
+QGe40AXZ6RSPS1AE6mgx8RHpGeKNZddjEQ1RfQOC+xAWFkOsUFTz/OuYIY46WFJT
+XBP8FubVBWKLodjlL0STpLlE0HpMca7DaIu1nYNsZNovEAOYA8fSz9LIscoSGVed
+FbSrexIJ3sSY968dVSw48YDPvZj44uES1O0UL898oe/guGbo9I9HU4KYOLlwRsJs
+uvWiIeEODyF/W4EwUUwtL008z+Ve00BTa4Aa7boIv0fmgEyz37n3FvQEVv7ZWoP6
+jELqc+9JtWVQK/N5ObPeS8fjpjIfyZnZUaDKMsWW+VCKu1rSktf/XBRO8Em4+RpZ
+Hg4mqNeKjIwGuAM+WMUZ5GbgQQaBrNudaDxSba1A5DNtMn1EOCNR2VpMr1GL2e+V
+s6dJlruF7dVakYJAGU11y6hrMD9HIwnMl0yYi3XfWU57FohRTqhOMTaQVosZoqN3
+u0Ay3GSNNMDtirFCLwUNbFNrxGnh/4bYE4pchQ6fQ+PLbNbFHHG/YX5s98XdWAMi
+0JRubfO9Gytbz5zG1UVhFz48EREHujKRLLLCYoJkBxCKfCt14jR6jglUIoJXkPvy
+ApynogHhusUg9pmHLkcwdj76+nOLxVOcW4IEEH5WG18umJbPx4M=
+=xM1k
 -----END PGP SIGNATURE-----
 
---VSVNCtZB1QZ8vhj+--
+--dDRMvlgZJXvWKvBx--
 
