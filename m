@@ -2,93 +2,83 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3746AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:55:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED72C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:56:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 019B72068F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:55:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CE1720702
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:56:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Bo5KGrvy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 019B72068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="ZL0m7DJf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE1720702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juuEu-0002hf-5Q
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 04:55:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51006)
+	id 1juuGQ-0003kW-Bg
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 04:56:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chirantan@google.com>)
- id 1juuEN-0002JD-1O
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:54:35 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:40606)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chirantan@google.com>)
- id 1juuEL-000294-De
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:54:34 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id 133so6046778ybu.7
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 01:54:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2zr3G2whJ2dYSC9oe3BTN0sDp3h6IsEmVrP5S8XUwHA=;
- b=Bo5KGrvy/Qb+MDrk/9R7pPrs9xyo7BeDDpRrgspaSzNMlp3+5YqUQKsLZs/aNMiIh2
- GJzIhXsfpz+i1PAYAxwRZVwfv5zGOuCkgtgyrYxbX6Xxlm3PKK7ProvTWmWr7Nh5Iri1
- Rua345MWk8R/zxemnIWNMTOSTirUh6lakDccA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2zr3G2whJ2dYSC9oe3BTN0sDp3h6IsEmVrP5S8XUwHA=;
- b=CiLU8Cw9lInnUG34eY6lIOfDgraNh7efv4sf6ZLLI9YkC4OottwxsgsMbtCKuBgIKo
- YwNB5TcIxzu8VIGiXbPXWzCt0XkyE35gkwq6aNvDkxyJYgHZDA+9bW8YDLt/M0R3KVHJ
- Ro/YhdMyuUZBh0+9UFzL3XMkuKj3U8gbLnXMYI4pZRXFao/yHKd8vmiifC+SXd0ea21+
- 7+izYnhtP8A43kykaljCKLbwrVD51JBQI79O6968ZKiXnLiF0i3ekF9sKo6qU6xAJYd2
- FIxVDLRQkJxULkVfmrzFzD1qbD8yVYTRnf6RlE+yDQzSfWaGuI6PnuIpW0sur+fgZRWL
- F3AQ==
-X-Gm-Message-State: AOAM533M46tzkPa+0Conp1ZfUfK2Gt/BHDN+22bhmlM0gPoVzgfpSCYB
- 4AFQSOfKzsX+PQh2RYW4DHGPQ8jP/QsYZSClkF0pIg==
-X-Google-Smtp-Source: ABdhPJwon9gF1a5O+EQ4B5FQTSLdOKPPuV73ZY20NRkocU4R6p9hBGYQaXdLdH2HUQT4Go4gox/1l5pul7HzclAfMdA=
-X-Received: by 2002:a25:df81:: with SMTP id
- w123mr129770269ybg.428.1594630470970; 
- Mon, 13 Jul 2020 01:54:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1juuFs-0003Jq-90; Mon, 13 Jul 2020 04:56:08 -0400
+Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:57128)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1juuFo-0002Pf-7s; Mon, 13 Jul 2020 04:56:06 -0400
+Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
+ (sas1-ec30c78b6c5b.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id CED142E14D8;
+ Mon, 13 Jul 2020 11:55:57 +0300 (MSK)
+Received: from sas1-9998cec34266.qloud-c.yandex.net
+ (sas1-9998cec34266.qloud-c.yandex.net [2a02:6b8:c14:3a0e:0:640:9998:cec3])
+ by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ hkkE5fbXGW-tvs8lLHk; Mon, 13 Jul 2020 11:55:57 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1594630557; bh=aHjgfp0mBn7IWNKm/Ay5CV7aDQ30MJz/9mRhB0ljBHI=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=ZL0m7DJfNKbva2cPMVbVyq8+fRjBK2N4qyeZd+9Z1oR1aCjUtP8qNh6Y5veWU4sj6
+ Z40c/Rofo6NGx0xviX9j1+nXHTIs9kM7gVhnLJBaxK1jQXBocPcj6vNG2CzrC48uYc
+ 8+nPg/tIuslVe81XAyO+cX/YTziQoJb7gv1vS88A=
+Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:1226::1:10])
+ by sas1-9998cec34266.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ mhmbOxMXo1-tukelUQu; Mon, 13 Jul 2020 11:55:56 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+From: Alexey Kirillov <lekiravi@yandex-team.ru>
+To: 
+Subject: [PATCH 1/1] configure: fix incorrect have_keyring check
+Date: Mon, 13 Jul 2020 11:55:28 +0300
+Message-Id: <20200713085528.5608-1-lekiravi@yandex-team.ru>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200416164907.244868-1-stefanha@redhat.com>
- <20200618190816.GD3814@redhat.com>
- <20200618191655.GI2769@work-vm> <20200618192717.GE3814@redhat.com>
- <CAJFHJrrJzPLatNvw2xC3WYLbzCW0+DB+4UczQHGPBF9p+WGYQA@mail.gmail.com>
- <20200619191540.GI3154@redhat.com>
- <CAJFHJroGNbfO-tXqrod_snCHcnN4NKjX8t9LTeroyiNEwjtVcQ@mail.gmail.com>
- <20200625125508.GB149340@redhat.com>
-In-Reply-To: <20200625125508.GB149340@redhat.com>
-From: Chirantan Ekbote <chirantan@chromium.org>
-Date: Mon, 13 Jul 2020 17:54:19 +0900
-Message-ID: <CAJFHJrpwvEMa_OkxRg3XHXp+=Wuzwwc8shhCZd3xDsmVVJG7aw@mail.gmail.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-To: Vivek Goyal <vgoyal@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=chirantan@google.com; helo=mail-yb1-xb41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -94
-X-Spam_score: -9.5
-X-Spam_bar: ---------
-X-Spam_report: (-9.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=95.108.205.193;
+ envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 04:55:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,60 +87,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 25, 2020 at 9:55 PM Vivek Goyal <vgoyal@redhat.com> wrote:
->
-> On Thu, Jun 25, 2020 at 12:19:39PM +0900, Chirantan Ekbote wrote:
-> [..]
-> > > Chirantan,
-> > >
-> > > So you ended up renaming all "trusted", "security" and "system" xattrs?
-> > > Only "user" xattrs are complete passthrough?
-> > >
-> >
-> > No, we only rename "security" xattrs (except for selinux).
-> >
-> > >
-> > > IOW, security.selinux will be renamed to user.virtiofs.security.selinux
-> > > on host?
-> > >
-> >
-> > We don't relabel security.selinux because it only requires CAP_FOWNER
-> > in the process's user namespace and it also does its own MAC-based
-> > checks.  Also we have some tools that label files beforehand so it
-> > seemed easier to leave them unchanged.
->
-> If we rename selinux xattr also, then we can support selinux both in
-> guest and host and they both can have their own independent policies.
->
+In some shells, we can't use == sign (as example, in dash).
 
-This works as long as you don't need to support setfscreatecon, which
-exists to guarantee that an inode is atomically created with the
-correct selinux context.  It's kind of possible for files with
-O_TMPFILE + fsetxattr + linkat but there is no equivalent for
-directories.  You're basically forced to create the directory and then
-set the xattr and while it's possible to prevent other threads in the
-server from seeing the unfinished directories with a rwlock or similar
-there is no protection against power loss.  If the machine loses power
-after the directory is created but before the selinux xattr is set
-then that directory will have the wrong selinux context and the guest
-would need to run restorecon at boot to assign the correct label.
+Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Otherwise we either have to disable selinux on host (if we want to
-> support it in guest) or somehow guest and how policies will have
-> to know about each other and be able to work together (which will
-> be hard for a generic use case).
+diff --git a/configure b/configure
+index 31e2ddbf28..f65914f98f 100755
+--- a/configure
++++ b/configure
+@@ -6486,7 +6486,7 @@ EOF
+ fi
+ if test "$secret_keyring" != "no"
+ then
+-    if test "$have_keyring" == "yes"
++    if test "$have_keyring" = "yes"
+     then
+ 	secret_keyring=yes
+     else
+-- 
+2.25.1
 
-Yes, I agree this is hard to do for a generic case but unfortunately
-the more I understand how selinux works the less I feel that it works
-well with a passthrough style file system.  As you said it either
-needs to be turned off on the host or the host and guest need to work
-together.
-
-Chirantan
 
