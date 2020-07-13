@@ -2,97 +2,99 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43527C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 438B9C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F2662067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:38:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uMzM7m7r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2662067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1CABC2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:39:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CABC2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv4HY-0006Z2-97
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:38:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48182)
+	id 1jv4I0-0007lB-CI
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:39:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv4GR-0005Aj-NY
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:37:23 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:34407)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv4GP-0000rJ-K4
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:37:23 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id cv18so277996pjb.1
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 12:37:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=8dSFPC2TqmapCBW8WPoAAHp112NndR+7CwAV2qvOd6w=;
- b=uMzM7m7rXvoRXf0KHwK0pWkynApGtmeY0b9iCmK1r+g1wKUT2ZsbIKvF14PcG2CQZ3
- E9IJSUdKDzNEV9zNSZbAZHUeOwB4rhyZ4+n1TAbDqy6Z96Olm6VwxfrF5sFETj1PGEo7
- qZb0CmPnt+TOr55/T/9SsgPG97doEoQ/z73bub8dkEfhb6vKRDZUXo/ZqG3aKfZnBGNJ
- ydvX3/09rbYXH4hCqDrbrcelvRohc+vU1D5tSooG10+SVtmWCoSzYqGN6hQLOFStEPk/
- 1VbSSRJ2GSqp63cdmt6jUQY+0s+cLbP/hqDSWbg5mRlLNgmJcUfwjkbW5zlpziQqHzcT
- Fq4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8dSFPC2TqmapCBW8WPoAAHp112NndR+7CwAV2qvOd6w=;
- b=Dd8jEKy8XPZ21Dx9duUibfh2YYFJecSrU1J31QU2T0IsyjpZTCvouOMIevT2NGNbwW
- 9lx2H+e3sk533eOSt/Jm+2Wwl49TvIZCtqBUdckJDEXt++rM/H5+WsijpJ3W8z+nciXL
- ETziJqV70HQcpad+j8y3lECXHoD1tPo0xFeaJSfeSNXGpL73xD94ayUXXKELdYM//bfs
- RBNgVKjEJm/hrajedK784Z6m3oIZhFxevJVxn92/wuVKz8EF2h26FTOFEsNMb6n09fLo
- iHSI0bWHajT+fTNHM2zm8pyAeENyUM6j/sEFTHT4UWJcC1TZtoEr3UmIjxWL9FXXWqnW
- BVMg==
-X-Gm-Message-State: AOAM533Z9ZCiEHupiRitT92fvkZiCftum9Irx1/pOiAvyf5M1dgdyPg8
- /8oKk/LHDqYtN1DaaaEcvQJcFg==
-X-Google-Smtp-Source: ABdhPJyKIbXka88XbQ4eYvXZUgNu85s9NlS0KzCbrAF1xVvJ8jnVhJ8skvSeUtxsGsN1gATI1lPEEg==
-X-Received: by 2002:a17:90b:234f:: with SMTP id
- ms15mr890276pjb.7.1594669040190; 
- Mon, 13 Jul 2020 12:37:20 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id t188sm15641037pfc.198.2020.07.13.12.37.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 12:37:19 -0700 (PDT)
-Subject: Re: [RFC PATCH 8/8] fpu/softfloat: define misc operation for bfloat16
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org
-References: <20200712234521.3972-1-zhiwei_liu@c-sky.com>
- <20200712234521.3972-9-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d4937836-a4b5-4258-bafb-7545658ea872@linaro.org>
-Date: Mon, 13 Jul 2020 12:37:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200712234521.3972-9-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jv4Gz-0006AZ-Ty; Mon, 13 Jul 2020 15:37:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10462
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jv4Gy-00012e-9u; Mon, 13 Jul 2020 15:37:57 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06DJWOn8045097; Mon, 13 Jul 2020 15:37:52 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32771x9s99-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 13 Jul 2020 15:37:52 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06DJZshl002254;
+ Mon, 13 Jul 2020 19:37:51 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma03dal.us.ibm.com with ESMTP id 327528q3t5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 13 Jul 2020 19:37:51 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06DJbmbE26542438
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 13 Jul 2020 19:37:48 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 77B7A6E04C;
+ Mon, 13 Jul 2020 19:37:50 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id ABCE86E053;
+ Mon, 13 Jul 2020 19:37:49 +0000 (GMT)
+Received: from [9.65.204.75] (unknown [9.65.204.75])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Mon, 13 Jul 2020 19:37:49 +0000 (GMT)
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v4 11/11] target/ppc: add vdiv{su}{wd} vmod{su}{wd}
+ instructions
+From: Lijun Pan <ljp@linux.vnet.ibm.com>
+In-Reply-To: <20200701234715.91893-2-ljp@linux.ibm.com>
+Date: Mon, 13 Jul 2020 14:37:49 -0500
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Message-Id: <BFFE9C21-6005-4F51-BCDC-0B1B73EA437C@linux.vnet.ibm.com>
+References: <20200701234715.91893-1-ljp@linux.ibm.com>
+ <20200701234715.91893-2-ljp@linux.ibm.com>
+To: Lijun Pan <ljp@linux.ibm.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-13_16:2020-07-13,
+ 2020-07-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 mlxscore=0
+ mlxlogscore=940 impostorscore=0 malwarescore=0 suspectscore=0 adultscore=0
+ clxscore=1015 bulkscore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007130136
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=ljp@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:30:50
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,22 +107,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, alex.bennee@linaro.org, wxy194768@alibaba-inc.com
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/12/20 4:45 PM, LIU Zhiwei wrote:
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+
+
+> On Jul 1, 2020, at 6:47 PM, Lijun Pan <ljp@linux.ibm.com> wrote:
+> 
+> vdivsw: Vector Divide Signed Word
+> vdivuw: Vector Divide Unsigned Word
+> vdivsd: Vector Divide Signed Doubleword
+> vdivud: Vector Divide Unsigned Doubleword
+> vmodsw: Vector Modulo Signed Word
+> vmoduw: Vector Modulo Unsigned Word
+> vmodsd: Vector Modulo Signed Doubleword
+> vmodud: Vector Modulo Unsigned Doubleword
+> 
+> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
 > ---
->  fpu/softfloat-specialize.inc.c | 38 +++++++++++++++++++++++++++++++
->  include/fpu/softfloat.h        | 41 ++++++++++++++++++++++++++++++++++
->  2 files changed, 79 insertions(+)
+> v4: add a comment on undefined result of divide operation.
+>    fix if(){} coding style issue, remove blank line.
+> v3: add missing divided-by-zero, divided-by-(-1) handling
+> v2: fix coding style
+>    use Power ISA 3.1 flag
+> 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-s/brain floating-point/bfloat16/.
+Any feedback on this one?
 
+Thanks,
+Lijun
 
-r~
 
