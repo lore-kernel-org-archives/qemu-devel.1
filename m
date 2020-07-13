@@ -2,99 +2,70 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A21FC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BBDC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:16:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2580520674
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:16:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vi42Pd4A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2580520674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9084320674
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:16:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9084320674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv4rv-0004Z5-Em
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 16:16:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36394)
+	id 1jv4sf-0005U3-TJ
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 16:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jv4rE-000415-Vz
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:15:25 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42086)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jv4rD-0008J5-AH
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:15:24 -0400
-Received: by mail-wr1-x442.google.com with SMTP id o11so18219920wrv.9
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 13:15:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=k7DPCYQx572bkc9WwhMkLsvPaoXCN9yZVp6NJ6XcYXs=;
- b=Vi42Pd4AEK5hSjAMgqFMzWcuzQ5wP2LNwSmfIdV1lKW++f7yTGikJ9FbAZ6Cd3JYeS
- pOBPk7RPHD2nRBW/qGT7QHP5hEy9eP/5nQgRcaVpip37qy4pkhg2hvgJhXECCnLY2Yak
- 1iYHUJsfGPKX9LjBfLpaAAoIj1nFEYBHNlAj+KcnPp1ohEcez7s/Gl0oVz+ChSgOdxhr
- EMQwd9Yqr/XDbdq5GS5YVFxNc8pDBbDVhcgw6DnYuLUnlDs+vGMHGLbr3b5EQ3mnJfbA
- 3mnVB7SAuiVyQYrY2QR6ojY67EjRH3RVw7Tb1lwywqIo61a2Nz/7cnShRjkgK8Cs64+l
- l8DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=k7DPCYQx572bkc9WwhMkLsvPaoXCN9yZVp6NJ6XcYXs=;
- b=berqGBT7NJt59LCIKeIw9cyNrNbmrlmGKrtB/FmNfuH/lk4ufh7LrQH5VvnTHpaWU2
- Ot4BU5zpeQn5fStPEfbIlA0bgQYmDxZj0NAiE0n2VobVSdTWTTz0U8/vfoqXj47hMSuU
- LJqRML3tIDTS0GiiPW1viV1SfH4RT0XP0ptRskHZTDSFbfr8kTHIFzYLck3ix1uDsVRC
- TibctPtsHDlTmmXKMUHCLKlNzwj0GjVwE/T3YpKX/LpSzYmKJsKEJiOAx4VWO+G6A7um
- VaTJSmVEmkwUy5WYY5uM9/XHQDQK5fWWJZggH7PcpX+JgHiRscWkQ2xdnBTsuGzp/o8f
- motA==
-X-Gm-Message-State: AOAM533yyXIGfPhL2Ey4XBkJr4fQdMXKmXmqipsUfpxjX70i8L/jd8RU
- jnvF4b/1g05EZVALFD4X5og=
-X-Google-Smtp-Source: ABdhPJzGYY+EeZAyphhVKGa1aifN2Y4cOJGJrtxxziiDOc4X9rzDyBREREu1+iypVVGcsZvrwUlExQ==
-X-Received: by 2002:adf:e90d:: with SMTP id f13mr1177481wrm.146.1594671321488; 
- Mon, 13 Jul 2020 13:15:21 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 2sm841749wmo.44.2020.07.13.13.15.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 13:15:20 -0700 (PDT)
-Subject: Re: [PATCH v2 01/11] configure: remove all dependencies on a
- (re)configure
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200713200415.26214-1-alex.bennee@linaro.org>
- <20200713200415.26214-2-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5de536a4-bef7-c8bc-e6a1-dbaf95e58d51@amsat.org>
-Date: Mon, 13 Jul 2020 22:15:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jv4rz-0004m9-GU
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:16:11 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:39075)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jv4rv-0008Rz-Ku
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:16:11 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.09523118|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_enroll_verification|0.289673-0.00181386-0.708513;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=5; RT=5; SR=0; TI=SMTPD_---.I1F2QrG_1594671357; 
+Received: from 192.168.3.36(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.I1F2QrG_1594671357)
+ by smtp.aliyun-inc.com(10.147.40.26); Tue, 14 Jul 2020 04:15:59 +0800
+Subject: Re: [RFC PATCH 2/8] fpu/softfloat: use the similiar logic to
+ recognize sNaN and qNaN
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200712234521.3972-1-zhiwei_liu@c-sky.com>
+ <20200712234521.3972-3-zhiwei_liu@c-sky.com>
+ <9a213775-58f4-a4d3-a61e-469d0f33913d@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <c0855a9a-2137-4d5e-424e-7d13fa348946@c-sky.com>
+Date: Tue, 14 Jul 2020 04:15:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200713200415.26214-2-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <9a213775-58f4-a4d3-a61e-469d0f33913d@linaro.org>
+Content-Type: multipart/alternative;
+ boundary="------------2171984D8789A62D2E4C35BD"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 16:16:00
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,79 +78,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- richard.henderson@linaro.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org, peter.puhov@linaro.org,
- kuhn.chenqun@huawei.com, aurelien@aurel32.net
+Cc: wenmeng_zhang@c-sky.com, alex.bennee@linaro.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/13/20 10:04 PM, Alex Bennée wrote:
-> The previous code was brittle and missed cases such as the mipn32
-> variants which for some reason has the 64 bit syscalls. This leads to
-> a number of binary targets having deps lines like:
-> 
->   all.clang-sanitizer/mipsn32el-linux-user/linux-user/signal.d
->   140:  /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h \
->   455:/home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:
-> 
->   all.clang-sanitizer/mipsn32el-linux-user/linux-user/syscall.d
->   146:  /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h \
->   485:/home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:
-> 
-> which in turn would trigger the re-generation of syscall_nr.h in the
-> source tree (thanks to generic %/syscall_nr.h rules). The previous
-> code attempts to clean it out but misses edge cases but fails.
-> 
-> After spending a day trying to understand how this was happening I'm
-> unconvinced that there are not other such breakages possible with this
-> "caching". As we add more auto-generated code to the build it is likely
-> to trip up again. Apply a hammer to the problem.
-> 
-> Fixes: 91e5998f18 (which fixes 5f29856b852d and 4d6a835dea47)
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This is a multi-part message in MIME format.
+--------------2171984D8789A62D2E4C35BD
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> ---
->  configure | 15 ++++++---------
->  1 file changed, 6 insertions(+), 9 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index bc3b9ad931..e1de2f5b24 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1955,23 +1955,20 @@ EOF
->  exit 0
->  fi
->  
-> -# Remove old dependency files to make sure that they get properly regenerated
-> -rm -f */config-devices.mak.d
-> -
->  # Remove syscall_nr.h to be sure they will be regenerated in the build
->  # directory, not in the source directory
->  for arch in alpha hppa m68k xtensa sh4 microblaze arm ppc s390x sparc sparc64 \
->      i386 x86_64 mips mips64 ; do
->      # remove the file if it has been generated in the source directory
->      rm -f "${source_path}/linux-user/${arch}/syscall_nr.h"
-> -    # remove the dependency files
-> -    for target in ${arch}*-linux-user ; do
-> -        test -d "${target}" && find "${target}" -type f -name "*.d" \
-> -             -exec grep -q "${source_path}/linux-user/${arch}/syscall_nr.h" {} \; \
-> -             -print | while read file ; do rm "${file}" "${file%.d}.o" ; done
-> -    done
->  done
->  
-> +# Clean out all old dependency files. As more files are generated we
-> +# run the risk of old dependencies triggering generation in the wrong
-> +# places. Previous brittle attempts to be surgical tend to miss edge
-> +# cases leading to wasted time and much confusion.
-> +find -type f -name "*.d" -exec rm -f {} \;
-> +
->  if test -z "$python"
->  then
->      error_exit "Python not found. Use --python=/path/to/python"
-> 
+
+On 2020/7/14 3:17, Richard Henderson wrote:
+> On 7/12/20 4:45 PM, LIU Zhiwei wrote:
+>> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+>> ---
+>>   fpu/softfloat-specialize.inc.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fpu/softfloat-specialize.inc.c b/fpu/softfloat-specialize.inc.c
+>> index 034d18199c..6b778a7830 100644
+>> --- a/fpu/softfloat-specialize.inc.c
+>> +++ b/fpu/softfloat-specialize.inc.c
+>> @@ -292,7 +292,7 @@ bool float32_is_quiet_nan(float32 a_, float_status *status)
+>>       if (snan_bit_is_one(status)) {
+>>           return (((a >> 22) & 0x1FF) == 0x1FE) && (a & 0x003FFFFF);
+>>       } else {
+>> -        return ((uint32_t)(a << 1) >= 0xFF800000);
+>> +        return ((a >> 22) & 0x1FF) == 0x1FF;
+>>       }
+>>   #endif
+>>   }
+> I don't see a reason for this.  The previous was a bug, but this isn't.
+It's not a bug,  just a clean up.
+
+As you can see, we have already recognized a quiet nan by
+
+  if (snan_bit_is_one(status)) {
+          return (((a >> 22) & 0x1FF) == 0x1FE) && (a & 0x003FFFFF);
+  }
+
+We need not to give another method to recognize it again.
+
+Zhiwei
+>
+> r~
+
+
+--------------2171984D8789A62D2E4C35BD
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <br>
+    <br>
+    <div class="moz-cite-prefix">On 2020/7/14 3:17, Richard Henderson
+      wrote:<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:9a213775-58f4-a4d3-a61e-469d0f33913d@linaro.org">
+      <pre class="moz-quote-pre" wrap="">On 7/12/20 4:45 PM, LIU Zhiwei wrote:
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">Signed-off-by: LIU Zhiwei <a class="moz-txt-link-rfc2396E" href="mailto:zhiwei_liu@c-sky.com">&lt;zhiwei_liu@c-sky.com&gt;</a>
+---
+ fpu/softfloat-specialize.inc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/fpu/softfloat-specialize.inc.c b/fpu/softfloat-specialize.inc.c
+index 034d18199c..6b778a7830 100644
+--- a/fpu/softfloat-specialize.inc.c
++++ b/fpu/softfloat-specialize.inc.c
+@@ -292,7 +292,7 @@ bool float32_is_quiet_nan(float32 a_, float_status *status)
+     if (snan_bit_is_one(status)) {
+         return (((a &gt;&gt; 22) &amp; 0x1FF) == 0x1FE) &amp;&amp; (a &amp; 0x003FFFFF);
+     } else {
+-        return ((uint32_t)(a &lt;&lt; 1) &gt;= 0xFF800000);
++        return ((a &gt;&gt; 22) &amp; 0x1FF) == 0x1FF;
+     }
+ #endif
+ }
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+I don't see a reason for this.  The previous was a bug, but this isn't.
+</pre>
+    </blockquote>
+    It's not a bug,  just a clean up.   <br>
+    <br>
+    As you can see, we have already recognized a quiet nan by <br>
+    <pre> if (snan_bit_is_one(status)) {
+         return (((a &gt;&gt; 22) &amp; 0x1FF) == 0x1FE) &amp;&amp; (a &amp; 0x003FFFFF);
+ }
+
+</pre>
+    We need not to give another method to recognize it again.<br>
+    <br>
+    Zhiwei<br>
+    <blockquote type="cite"
+      cite="mid:9a213775-58f4-a4d3-a61e-469d0f33913d@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+
+r~
+</pre>
+    </blockquote>
+    <br>
+  </body>
+</html>
+
+--------------2171984D8789A62D2E4C35BD--
 
