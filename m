@@ -2,43 +2,47 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E14C0C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6480FC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:30:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4A50206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:30:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A50206F0
+	by mail.kernel.org (Postfix) with ESMTPS id 3EE66206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 07:30:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EE66206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jusv9-00042h-Vd
+	id 1jusvA-000432-Dr
 	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 03:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59500)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jussf-0007fh-Or; Mon, 13 Jul 2020 03:28:05 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35076 helo=relay3.sw.ru)
+ id 1jussg-0007g8-Ah; Mon, 13 Jul 2020 03:28:06 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35090 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jussc-0007TE-CC; Mon, 13 Jul 2020 03:28:05 -0400
+ id 1jussc-0007TN-Fs; Mon, 13 Jul 2020 03:28:06 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jussP-0001Vx-IK; Mon, 13 Jul 2020 10:27:49 +0300
+ id 1jussP-0001Vx-TO; Mon, 13 Jul 2020 10:27:49 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v9 00/10] iotests: Dump QCOW2 dirty bitmaps metadata
-Date: Mon, 13 Jul 2020 10:27:46 +0300
-Message-Id: <1594625276-134500-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v9 09/10] qcow2_format.py: collect fields to dump in JSON
+ format
+Date: Mon, 13 Jul 2020 10:27:55 +0300
+Message-Id: <1594625276-134500-10-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1594625276-134500-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1594625276-134500-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Received-SPF: pass client-ip=185.231.240.75;
  envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 03:27:59
@@ -66,32 +70,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add dirty bitmap information to QCOW2 metadata dump in the qcow2_format.py.
+As __dict__ is being extended with class members we do not want to
+print, make a light copy of the initial __dict__ and extend the copy
+by adding lists we have to print in the JSON output.
 
-v9:
-  01: In patch 0003, removed explicit constructor in the class Qcow2BitmapExt.
-  02: In patch 0004, the format string was changed.
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/qcow2_format.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index a9bd5a8..4ce6d95 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -109,6 +109,8 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
+         self.__dict__ = dict((field[2], values[i])
+                              for i, field in enumerate(self.fields))
  
-
-Andrey Shinkevich (10):
-  qcow2: Fix capitalization of header extension constant.
-  qcow2_format.py: make printable data an extension class member
-  qcow2_format.py: change Qcow2BitmapExt initialization method
-  qcow2_format.py: dump bitmap flags in human readable way.
-  qcow2_format.py: Dump bitmap directory information
-  qcow2_format.py: pass cluster size to substructures
-  qcow2_format.py: Dump bitmap table serialized entries
-  qcow2.py: Introduce '-j' key to dump in JSON format
-  qcow2_format.py: collect fields to dump in JSON format
-  qcow2_format.py: support dumping metadata in JSON format
-
- block/qcow2.c                      |   2 +-
- docs/interop/qcow2.txt             |   2 +-
- tests/qemu-iotests/291.out         |  90 ++++++++++++++++
- tests/qemu-iotests/qcow2.py        |  19 +++-
- tests/qemu-iotests/qcow2_format.py | 213 ++++++++++++++++++++++++++++++++++---
- 5 files changed, 304 insertions(+), 22 deletions(-)
-
++        self.fields_dict = self.__dict__.copy()
++
+     def dump(self, dump_json=None):
+         for f in self.fields:
+             value = self.__dict__[f[2]]
+@@ -139,6 +141,7 @@ class Qcow2BitmapExt(Qcow2Struct):
+         self.bitmap_directory = \
+             [Qcow2BitmapDirEntry(fd, cluster_size=self.cluster_size)
+              for _ in range(self.nb_bitmaps)]
++        self.fields_dict.update(bitmap_directory=self.bitmap_directory)
+ 
+     def dump(self, dump_json=None):
+         super().dump(dump_json)
+@@ -184,6 +187,7 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+         table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
+         self.bitmap_table = Qcow2BitmapTable(raw_table=table,
+                                              cluster_size=self.cluster_size)
++        self.fields_dict.update(bitmap_table=self.bitmap_table)
+ 
+     def dump(self, dump_json=None):
+         print(f'{"Bitmap name":<25} {self.name}')
 -- 
 1.8.3.1
 
