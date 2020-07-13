@@ -2,94 +2,116 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BAAC433E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30533C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08C252067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF6382067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:09:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="cV0siqCb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08C252067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cNaqssj5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6382067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juuR9-0002EY-8D
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:07:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52822)
+	id 1juuSe-0004hB-8Q
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:09:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1juuMm-000359-B7
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:03:16 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:46502)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1juuMj-0003GE-Qc
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:03:16 -0400
-Received: by mail-pl1-x643.google.com with SMTP id k5so5228854plk.13
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 02:03:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ljbStgVPKQLMncSWWDOHpWU1IWdz6ynrE8VPIm4gFP4=;
- b=cV0siqCbknAJIHBjgKJOWeNPJo1jUBbVEM7BJViYlfa77VlOZw++L5/aVTUQujt5gr
- VRRAy9g/39OkhnJxG2F9DcFIuGONoyQSWNxES2K+YzBxn8HFnzXtpwxjgo0f2+zvn9QD
- tKqE5kHkAnTG6rW4wgEOzucqRUe6gkdm3SfDE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ljbStgVPKQLMncSWWDOHpWU1IWdz6ynrE8VPIm4gFP4=;
- b=pKgsrJGDhj2IJzHOE2JFhqIkAyFJz7rTWMXoDpJH5gHp2Z67LLd5uN28Hg7OwGWH2d
- vxKrNZhAH1ETd11uBifjWpc9o/hWP5Jal2RBr4tg1SePEuVO+t7Mn1TQ9GjhNebBXKGm
- fSriBIrfMb0FdZQIBiFZvoX52JHvjvs80LKOQeBIXV2Vwhl4QyPGPpT/p4DxnEXEnzF6
- AtJtTrixOowWVMuPHUve0mFi3xeYGVU4h9P4tEJioJAwHYd++UAFdB07vPPTT9swFh3M
- db/hYaTXen9lgYaiS77qmyRIhZqJynLStNK0uo4zLzoUdNeZSWqqEZXqd15MxuPc1jh9
- 7f1A==
-X-Gm-Message-State: AOAM5321xGP0Xt1/UEhB4oWfqkOCtDezi6xxGoCJdaBqFYxZcJQ2k1h/
- aQBBMfxkTYiHEVDkYUtpGQGH+g==
-X-Google-Smtp-Source: ABdhPJzVI2wMGZGtQYrn5bhr/ipm0XsSOW+7W6YWXZ2Z7lHk9sRFhOldh6nObdvzssUYpJ+TqIMt1w==
-X-Received: by 2002:a17:90a:fe6:: with SMTP id
- 93mr18529544pjz.145.1594630991481; 
- Mon, 13 Jul 2020 02:03:11 -0700 (PDT)
-Received: from Jing-Weide-MacBook-Pro-3.local
- (202-39-79-13.HINET-IP.hinet.net. [202.39.79.13])
- by smtp.gmail.com with ESMTPSA id 22sm13683667pfh.157.2020.07.13.02.03.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 02:03:10 -0700 (PDT)
-Subject: Re: [PATCH v1 1/1] migration/colo.c: migrate dirty ram pages before
- colo checkpoint
-To: qemu-devel@nongnu.org
-References: <20200621021004.5559-1-dereksu@qnap.com>
- <20200621021004.5559-2-dereksu@qnap.com>
-From: Derek Su <dereksu@qnap.com>
-Message-ID: <889b6747-e379-04ab-f0df-ef4332545557@qnap.com>
-Date: Mon, 13 Jul 2020 17:03:08 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1juuRx-0003lD-7H
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:08:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53092
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1juuRv-0003xX-Jz
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:08:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594631314;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=nae06tulrNcCMSoWToDgtOXfS35+WK71CsORxBCNEtM=;
+ b=cNaqssj5CMkpfRB5tpVrmESh0FhTDbYbWPKUCrv8rqcBEIj/12EdrNZuKiBTHrdOWz2TeL
+ Wsgu0usb+l80v3oSDTvmLGiLFhYynd1HicCt/uNcspPjB/TOW8b4ZMxU/1GWo9yppYlPDP
+ bqbYB2G4unSh1APqY1JWJcwHFLankNs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-czbeJlzxPIWke8gXJzAbOw-1; Mon, 13 Jul 2020 05:08:32 -0400
+X-MC-Unique: czbeJlzxPIWke8gXJzAbOw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2187F10059B4;
+ Mon, 13 Jul 2020 09:08:31 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-8.ams2.redhat.com
+ [10.36.113.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 144756FEDF;
+ Mon, 13 Jul 2020 09:08:29 +0000 (UTC)
+Subject: Re: [PATCH for-5.1] file-posix: Mitigate file fragmentation with
+ extent size hints
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200707142329.48303-1-kwolf@redhat.com>
+ <20200707161741.GG7002@linux.fritz.box>
+ <451ed32d-72e8-0238-8793-f5a80ae991c4@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2974eb09-24fe-58b0-65d4-5cb550ed08f1@redhat.com>
+Date: Mon, 13 Jul 2020 11:08:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200621021004.5559-2-dereksu@qnap.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=dereksu@qnap.com; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <451ed32d-72e8-0238-8793-f5a80ae991c4@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="wsqBl2dv2dQPdYxVxUMvqaOGpFa0mwgyM"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,340 +124,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, dgilbert@redhat.com, quintela@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wsqBl2dv2dQPdYxVxUMvqaOGpFa0mwgyM
+Content-Type: multipart/mixed; boundary="WG4Xmzkt21pibBJVy3Do8aUyslqAYz6c2"
 
-Ping...
+--WG4Xmzkt21pibBJVy3Do8aUyslqAYz6c2
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Anyone have comments about this path?
-To reduce the downtime during checkpoints, the patch tries to migrate 
-memory page as many as possible just before entering COLO state.
+On 10.07.20 18:12, Max Reitz wrote:
+> On 07.07.20 18:17, Kevin Wolf wrote:
+>> Am 07.07.2020 um 16:23 hat Kevin Wolf geschrieben:
+>>> Espeically when O_DIRECT is used with image files so that the page cach=
+e
+>>> indirection can't cause a merge of allocating requests, the file will
+>>> fragment on the file system layer, with a potentially very small
+>>> fragment size (this depends on the requests the guest sent).
+>>>
+>>> On Linux, fragmentation can be reduced by setting an extent size hint
+>>> when creating the file (at least on XFS, it can't be set any more after
+>>> the first extent has been allocated), basically giving raw files a
+>>> "cluster size" for allocation.
+>>>
+>>> This adds an create option to set the extent size hint, and changes the
+>>> default from not setting a hint to setting it to 1 MB. The main reason
+>>> why qcow2 defaults to smaller cluster sizes is that COW becomes more
+>>> expensive, which is not an issue with raw files, so we can choose a
+>>> larger file. The tradeoff here is only potentially wasted disk space.
+>>>
+>>> For qcow2 (or other image formats) over file-posix, the advantage shoul=
+d
+>>> even be greater because they grow sequentially without leaving holes, s=
+o
+>>> there won't be wasted space. Setting even larger extent size hints for
+>>> such images may make sense. This can be done with the new option, but
+>>> let's keep the default conservative for now.
+>>>
+>>> The effect is very visible with a test that intentionally creates a
+>>> badly fragmented file with qemu-img bench (the time difference while
+>>> creating the file is already remarkable) and then looks at the number o=
+f
+>>> extents and the take a simple "qemu-img map" takes.
+>>>
+>>> Without an extent size hint:
+>>>
+>>>     $ ./qemu-img create -f raw -o extent_size_hint=3D0 ~/tmp/test.raw 1=
+0G
+>>>     Formatting '/home/kwolf/tmp/test.raw', fmt=3Draw size=3D10737418240=
+ extent_size_hint=3D0
+>>>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -=
+S 8192 -o 0
+>>>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (st=
+arting at offset 0, step size 8192)
+>>>     Run completed in 25.848 seconds.
+>>>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -=
+S 8192 -o 4096
+>>>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (st=
+arting at offset 4096, step size 8192)
+>>>     Run completed in 19.616 seconds.
+>>>     $ filefrag ~/tmp/test.raw
+>>>     /home/kwolf/tmp/test.raw: 2000000 extents found
+>>>     $ time ./qemu-img map ~/tmp/test.raw
+>>>     Offset          Length          Mapped to       File
+>>>     0               0x1e8480000     0               /home/kwolf/tmp/tes=
+t.raw
+>>>
+>>>     real    0m1,279s
+>>>     user    0m0,043s
+>>>     sys     0m1,226s
+>>>
+>>> With the new default extent size hint of 1 MB:
+>>>
+>>>     $ ./qemu-img create -f raw -o extent_size_hint=3D1M ~/tmp/test.raw =
+10G
+>>>     Formatting '/home/kwolf/tmp/test.raw', fmt=3Draw size=3D10737418240=
+ extent_size_hint=3D1048576
+>>>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -=
+S 8192 -o 0
+>>>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (st=
+arting at offset 0, step size 8192)
+>>>     Run completed in 11.833 seconds.
+>>>     $ ./qemu-img bench -f raw -t none -n -w ~/tmp/test.raw -c 1000000 -=
+S 8192 -o 4096
+>>>     Sending 1000000 write requests, 4096 bytes each, 64 in parallel (st=
+arting at offset 4096, step size 8192)
+>>>     Run completed in 10.155 seconds.
+>>>     $ filefrag ~/tmp/test.raw
+>>>     /home/kwolf/tmp/test.raw: 178 extents found
+>>>     $ time ./qemu-img map ~/tmp/test.raw
+>>>     Offset          Length          Mapped to       File
+>>>     0               0x1e8480000     0               /home/kwolf/tmp/tes=
+t.raw
+>>>
+>>>     real    0m0,061s
+>>>     user    0m0,040s
+>>>     sys     0m0,014s
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>
+>> I also need to squash in a few trivial qemu-iotests updates, for which I
+>> won't send a v2:
+>=20
+> The additional specifications in 243 make it print a warning on tmpfs
+> (because the option doesn=E2=80=99t work there).  I suppose the same may =
+be true
+> on other filesystems as well.  Should it be filtered out?
 
-Thanks.
+This patch also breaks 059, 106, and 175.
 
-Regards,
-Derek
+Max
 
-On 2020/6/21 上午10:10, Derek Su wrote:
-> To reduce the guest's downtime during checkpoint, migrate dirty
-> ram pages as many as possible before colo checkpoint.
-> 
-> If the iteration count reaches COLO_RAM_MIGRATE_ITERATION_MAX or
-> ram pending size is lower than 'x-colo-migrate-ram-threshold',
-> stop the ram migration and colo checkpoint.
-> 
-> Signed-off-by: Derek Su <dereksu@qnap.com>
-> ---
->   migration/colo.c       | 79 ++++++++++++++++++++++++++++++++++++++++++
->   migration/migration.c  | 20 +++++++++++
->   migration/trace-events |  2 ++
->   monitor/hmp-cmds.c     |  8 +++++
->   qapi/migration.json    | 18 ++++++++--
->   5 files changed, 125 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/colo.c b/migration/colo.c
-> index ea7d1e9d4e..a0c71d7c56 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -46,6 +46,13 @@ static Notifier packets_compare_notifier;
->   static COLOMode last_colo_mode;
->   
->   #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
-> +#define COLO_RAM_MIGRATE_ITERATION_MAX 10
-> +
-> +typedef enum {
-> +    COLO_MIG_ITERATE_RESUME = 0,  /* Resume migration iteration */
-> +    COLO_MIG_ITERATE_BREAK  = 1,  /* Break migration loop */
-> +} COLOMigIterateState;
-> +
->   
->   bool migration_in_colo_state(void)
->   {
-> @@ -398,6 +405,68 @@ static uint64_t colo_receive_message_value(QEMUFile *f, uint32_t expect_msg,
->       return value;
->   }
->   
-> +static int colo_migrate_ram_iteration(MigrationState *s, Error **errp)
-> +{
-> +    int64_t threshold_size = s->parameters.x_colo_migrate_ram_threshold;
-> +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
-> +    Error *local_err = NULL;
-> +    int ret;
-> +
-> +    if (threshold_size == 0) {
-> +        return COLO_MIG_ITERATE_BREAK;
-> +    }
-> +
-> +    qemu_savevm_state_pending(s->to_dst_file, threshold_size,
-> +                              &pend_pre, &pend_compat, &pend_post);
-> +    pending_size = pend_pre + pend_compat + pend_post;
-> +
-> +    trace_colo_migrate_pending(pending_size, threshold_size,
-> +                               pend_pre, pend_compat, pend_post);
-> +
-> +    /* Still a significant amount to transfer */
-> +    if (pending_size && pending_size >= threshold_size) {
-> +        colo_send_message(s->to_dst_file, COLO_MESSAGE_MIGRATE_RAM, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return COLO_MIG_ITERATE_BREAK;
-> +        }
-> +
-> +        qemu_savevm_state_iterate(s->to_dst_file, false);
-> +        qemu_put_byte(s->to_dst_file, QEMU_VM_EOF);
-> +
-> +        ret = qemu_file_get_error(s->to_dst_file);
-> +        if (ret < 0) {
-> +            error_setg_errno(errp, -ret, "Failed to send dirty pages");
-> +            return COLO_MIG_ITERATE_BREAK;
-> +        }
-> +
-> +        return COLO_MIG_ITERATE_RESUME;
-> +    }
-> +
-> +    trace_colo_migration_low_pending(pending_size);
-> +
-> +    return COLO_MIG_ITERATE_BREAK;
-> +}
-> +
-> +static void colo_migrate_ram_before_checkpoint(MigrationState *s, Error **errp)
-> +{
-> +    Error *local_err = NULL;
-> +    int iterate_count = 0;
-> +
-> +    while (iterate_count++ < COLO_RAM_MIGRATE_ITERATION_MAX) {
-> +        COLOMigIterateState state;
-> +
-> +        state = colo_migrate_ram_iteration(s, &local_err);
-> +        if (state == COLO_MIG_ITERATE_BREAK) {
-> +            if (local_err) {
-> +                error_propagate(errp, local_err);
-> +            }
-> +
-> +            return;
-> +        }
-> +    };
-> +}
-> +
->   static int colo_do_checkpoint_transaction(MigrationState *s,
->                                             QIOChannelBuffer *bioc,
->                                             QEMUFile *fb)
-> @@ -405,6 +474,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
->       Error *local_err = NULL;
->       int ret = -1;
->   
-> +    colo_migrate_ram_before_checkpoint(s, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
->       colo_send_message(s->to_dst_file, COLO_MESSAGE_CHECKPOINT_REQUEST,
->                         &local_err);
->       if (local_err) {
-> @@ -819,6 +893,11 @@ static void colo_wait_handle_message(MigrationIncomingState *mis,
->       case COLO_MESSAGE_CHECKPOINT_REQUEST:
->           colo_incoming_process_checkpoint(mis, fb, bioc, errp);
->           break;
-> +    case COLO_MESSAGE_MIGRATE_RAM:
-> +        if (qemu_loadvm_state_main(mis->from_src_file, mis) < 0) {
-> +            error_setg(errp, "Load ram failed");
-> +        }
-> +        break;
->       default:
->           error_setg(errp, "Got unknown COLO message: %d", msg);
->           break;
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 481a590f72..390937ae5d 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -88,6 +88,7 @@
->   
->   /* The delay time (in ms) between two COLO checkpoints */
->   #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
-> +#define DEFAULT_COLO_MIGRATE_RAM_THRESHOLD (100 * 1024 * 1024UL)
->   #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
->   #define DEFAULT_MIGRATE_MULTIFD_COMPRESSION MULTIFD_COMPRESSION_NONE
->   /* 0: means nocompress, 1: best speed, ... 9: best compress ratio */
-> @@ -800,6 +801,9 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->       params->downtime_limit = s->parameters.downtime_limit;
->       params->has_x_checkpoint_delay = true;
->       params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
-> +    params->has_x_colo_migrate_ram_threshold = true;
-> +    params->x_colo_migrate_ram_threshold =
-> +            s->parameters.x_colo_migrate_ram_threshold;
->       params->has_block_incremental = true;
->       params->block_incremental = s->parameters.block_incremental;
->       params->has_multifd_channels = true;
-> @@ -1223,6 +1227,8 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
->   
->       /* x_checkpoint_delay is now always positive */
->   
-> +    /* x_colo_migrate_ram_threshold is zero or positive */
-> +
->       if (params->has_multifd_channels && (params->multifd_channels < 1)) {
->           error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
->                      "multifd_channels",
-> @@ -1356,6 +1362,11 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
->           dest->x_checkpoint_delay = params->x_checkpoint_delay;
->       }
->   
-> +    if (params->has_x_colo_migrate_ram_threshold) {
-> +        dest->x_colo_migrate_ram_threshold =
-> +            params->x_colo_migrate_ram_threshold;
-> +    }
-> +
->       if (params->has_block_incremental) {
->           dest->block_incremental = params->block_incremental;
->       }
-> @@ -1463,6 +1474,11 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
->           }
->       }
->   
-> +    if (params->has_x_colo_migrate_ram_threshold) {
-> +        s->parameters.x_colo_migrate_ram_threshold =
-> +                params->x_colo_migrate_ram_threshold;
-> +    }
-> +
->       if (params->has_block_incremental) {
->           s->parameters.block_incremental = params->block_incremental;
->       }
-> @@ -3622,6 +3638,9 @@ static Property migration_properties[] = {
->       DEFINE_PROP_UINT32("x-checkpoint-delay", MigrationState,
->                         parameters.x_checkpoint_delay,
->                         DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
-> +    DEFINE_PROP_UINT64("x-colo-migrate-ram-threshold", MigrationState,
-> +                      parameters.x_colo_migrate_ram_threshold,
-> +                      DEFAULT_COLO_MIGRATE_RAM_THRESHOLD),
->       DEFINE_PROP_UINT8("multifd-channels", MigrationState,
->                         parameters.multifd_channels,
->                         DEFAULT_MIGRATE_MULTIFD_CHANNELS),
-> @@ -3724,6 +3743,7 @@ static void migration_instance_init(Object *obj)
->       params->has_max_bandwidth = true;
->       params->has_downtime_limit = true;
->       params->has_x_checkpoint_delay = true;
-> +    params->has_x_colo_migrate_ram_threshold = true;
->       params->has_block_incremental = true;
->       params->has_multifd_channels = true;
->       params->has_multifd_compression = true;
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 4ab0a503d2..32bf42cdb3 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -295,6 +295,8 @@ migration_tls_incoming_handshake_complete(void) ""
->   colo_vm_state_change(const char *old, const char *new) "Change '%s' => '%s'"
->   colo_send_message(const char *msg) "Send '%s' message"
->   colo_receive_message(const char *msg) "Receive '%s' message"
-> +colo_migrate_pending(uint64_t size, uint64_t max, uint64_t pre, uint64_t compat, uint64_t post) "pending size %" PRIu64 " max %" PRIu64 " (pre = %" PRIu64 " compat=%" PRIu64 " post=%" PRIu64 ")"
-> +colo_migration_low_pending(uint64_t pending) "%" PRIu64
->   
->   # colo-failover.c
->   colo_failover_set_state(const char *new_state) "new state %s"
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index e03adf0d4d..ebca533960 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -450,6 +450,10 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->           monitor_printf(mon, "%s: %u\n",
->               MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELAY),
->               params->x_checkpoint_delay);
-> +        assert(params->has_x_colo_migrate_ram_threshold);
-> +        monitor_printf(mon, "%s: %" PRIu64 "\n",
-> +            MigrationParameter_str(MIGRATION_PARAMETER_X_COLO_MIGRATE_RAM_THRESHOLD),
-> +            params->x_colo_migrate_ram_threshold);
->           assert(params->has_block_incremental);
->           monitor_printf(mon, "%s: %s\n",
->               MigrationParameter_str(MIGRATION_PARAMETER_BLOCK_INCREMENTAL),
-> @@ -1330,6 +1334,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->           p->has_x_checkpoint_delay = true;
->           visit_type_int(v, param, &p->x_checkpoint_delay, &err);
->           break;
-> +    case MIGRATION_PARAMETER_X_COLO_MIGRATE_RAM_THRESHOLD:
-> +        p->has_x_colo_migrate_ram_threshold = true;
-> +        visit_type_int(v, param, &p->x_colo_migrate_ram_threshold, &err);
-> +        break;
->       case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
->           p->has_block_incremental = true;
->           visit_type_bool(v, param, &p->block_incremental, &err);
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index d5000558c6..30576c038c 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -600,6 +600,9 @@
->   # @x-checkpoint-delay: The delay time (in ms) between two COLO checkpoints in
->   #                      periodic mode. (Since 2.8)
->   #
-> +# @x-colo-migrate-ram-threshold: the threshold (in bytes) of the COLO ram migration's
-> +#                                pending size before COLO checkpoint. (Since 5.0)
-> +#
->   # @block-incremental: Affects how much storage is migrated when the
->   #                     block migration capability is enabled.  When false, the entire
->   #                     storage backing chain is migrated into a flattened image at
-> @@ -651,7 +654,8 @@
->              'cpu-throttle-initial', 'cpu-throttle-increment',
->              'cpu-throttle-tailslow',
->              'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth',
-> -           'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-> +           'downtime-limit', 'x-checkpoint-delay',
-> +           'x-colo-migrate-ram-threshold', 'block-incremental',
->              'multifd-channels',
->              'xbzrle-cache-size', 'max-postcopy-bandwidth',
->              'max-cpu-throttle', 'multifd-compression',
-> @@ -740,6 +744,9 @@
->   #
->   # @x-checkpoint-delay: the delay time between two COLO checkpoints. (Since 2.8)
->   #
-> +# @x-colo-migrate-ram-threshold: the threshold in bytes of the COLO ram migration's
-> +#                                pending size before COLO checkpoint. (Since 5.0)
-> +#
->   # @block-incremental: Affects how much storage is migrated when the
->   #                     block migration capability is enabled.  When false, the entire
->   #                     storage backing chain is migrated into a flattened image at
-> @@ -804,6 +811,7 @@
->               '*max-bandwidth': 'int',
->               '*downtime-limit': 'int',
->               '*x-checkpoint-delay': 'int',
-> +            '*x-colo-migrate-ram-threshold': 'int',
->               '*block-incremental': 'bool',
->               '*multifd-channels': 'int',
->               '*xbzrle-cache-size': 'size',
-> @@ -915,6 +923,9 @@
->   #
->   # @x-checkpoint-delay: the delay time between two COLO checkpoints. (Since 2.8)
->   #
-> +# @x-colo-migrate-ram-threshold: the threshold in bytes of the COLO ram migration's
-> +#                                pending size before COLO checkpoint. (Since 5.0)
-> +#
->   # @block-incremental: Affects how much storage is migrated when the
->   #                     block migration capability is enabled.  When false, the entire
->   #                     storage backing chain is migrated into a flattened image at
-> @@ -978,6 +989,7 @@
->               '*max-bandwidth': 'size',
->               '*downtime-limit': 'uint64',
->               '*x-checkpoint-delay': 'uint32',
-> +            '*x-colo-migrate-ram-threshold': 'uint64',
->               '*block-incremental': 'bool' ,
->               '*multifd-channels': 'uint8',
->               '*xbzrle-cache-size': 'size',
-> @@ -1116,12 +1128,14 @@
->   #
->   # @vmstate-loaded: VM's state has been loaded by SVM.
->   #
-> +# @migrate-ram: Send dirty pages as many as possible before COLO checkpoint.
-> +#
->   # Since: 2.8
->   ##
->   { 'enum': 'COLOMessage',
->     'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-reply',
->               'vmstate-send', 'vmstate-size', 'vmstate-received',
-> -            'vmstate-loaded' ] }
-> +            'vmstate-loaded', 'migrate-ram' ] }
->   
->   ##
->   # @COLOMode:
-> 
+
+--WG4Xmzkt21pibBJVy3Do8aUyslqAYz6c2--
+
+--wsqBl2dv2dQPdYxVxUMvqaOGpFa0mwgyM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8MJIwACgkQ9AfbAGHV
+z0CaPAgAsWe9T69smVTeh2RHhpqcEMuIdoF5d3d6FcnTT27ic8srwNNCdCyc+IOO
+9zGRHm+lsmFkT/6Kx2Yr3/oSaUUrVqPnw4zW3PC8JWEEU7hM1huwQQf8OWB8TMrk
+F5Z30P2Tt7raCZph12s55dBgaiGlCrHDWhd/BrRcqTf9HiVeFTXRakyrFRzD49Qd
+16o4KBp34dl0EdPk3W6AO/eJV/NFaveXPn/NzXmAQUedTRCRkBDjGOkPsEPi7giE
+FNLTIZe3ceP9JiRJxKcR8uQiCLlx7uHf6j2B9nllVhrs6uInZ6ieYcvHkE7WXwUO
+Ztl1VvbbXIk63PTf/5mpw2h4IDX/YQ==
+=ojS/
+-----END PGP SIGNATURE-----
+
+--wsqBl2dv2dQPdYxVxUMvqaOGpFa0mwgyM--
 
 
