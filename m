@@ -2,103 +2,97 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA05C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C21B7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:51:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31C3E206F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:55:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9352B2075D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:51:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfJ5z18a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31C3E206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="anpuXNVo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9352B2075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv2fi-0000cH-Fn
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 13:55:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57442)
+	id 1jv2bW-0004or-R9
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 13:51:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jv2ci-0005X6-Fd
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 13:52:16 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60964
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jv2cg-0007RH-Ku
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 13:52:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594662733;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yfIb0WoSohr36CI5PC7CR58EVtgqFNPY3VFIqPoN2Bk=;
- b=YfJ5z18aVeJMuzoV4UnSh76FjT5HrU2gqf3h1KyBcV6gP180c1cI4Vz42KikZcM78Qnbn6
- bQKq3NAaSMMpY5R/Y7cVFE6k67dRMk/M65QEJim5iP+I6MVa50Xg63urLtp+rrim4XyyRc
- 6IQi0PIaYZN4LZHjzWzjEfjUs6Yq/lk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-Ia-HrFD1Nfm1t5ogk9_9Yg-1; Mon, 13 Jul 2020 13:52:12 -0400
-X-MC-Unique: Ia-HrFD1Nfm1t5ogk9_9Yg-1
-Received: by mail-wm1-f69.google.com with SMTP id f68so378990wmf.1
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 10:52:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jv2aj-0003xm-Hz; Mon, 13 Jul 2020 13:50:13 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:39352)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jv2ah-00071l-Lf; Mon, 13 Jul 2020 13:50:13 -0400
+Received: by mail-ej1-x644.google.com with SMTP id w6so18246416ejq.6;
+ Mon, 13 Jul 2020 10:50:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=w9ccvdUWDcNVWONo+PyLnO9BNyxcXjYmLZoFSnV+chE=;
+ b=anpuXNVoQpGcH/XOkY+aPAX1aQyNL5B24WPNQb2SGHVr52SnNABB6zhwM75ply4Gzg
+ dekhTgXVk6ZKA1/MMAY9217DdATG8oSWRF/emmZWGbejrmIVR2OC4RZ9vxAIGQh63nsc
+ hYhhOAat98RuaQF0xcBtvt9hRhEUPdQDFxEUDimCcbFdoUX5+u4O4KDwvke3XTZcen4L
+ WcCG4Aq1juZJx/ke7HZywCHk2BAtAtn5Oohp9Gh3WX3PpcrnDLrP3uYrIk4oo5o8Rq3J
+ pHKOA3Cwyo39xogoa4/HRYnfzvQp00u/CDr1alU5lamJyEyiqdGez2an6PtOMfYGgQyw
+ biaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=yfIb0WoSohr36CI5PC7CR58EVtgqFNPY3VFIqPoN2Bk=;
- b=P90DZpZ4zZ/Afak/kEt000Glyvt5n0J3YcKKeb6Ac6LXrgV9UQzIb7O6pSJD+rWd6w
- LuLpjCc8wH8KFVkY12LRtcoGjdMfKUvvbYaHkz7DcNWaTiHF2gT6qi8elCZ8EqVQps7d
- hsUNNVo880I+twFVvr/Kb2F7BglCpaLV8cZwYWp2AsSOjfJtXOuqY/U6h0lx2LnkKr6N
- YAF/QjylC1mrZFCILjE6MoKEv80d/EmWHHpEQkJgq04No2F7qI+goZJ8ljnv8SiWcu5U
- gtRquSaVviXo5YlTnmBoK7MdBpOaWI8MQ2WIR2t8k9Y7GiBSqsmlKwjFJom1NY2Zaik3
- aVDw==
-X-Gm-Message-State: AOAM530fMLBMCflLc9ziJ7bm8sW0p4epsG8fz9gL7IiqsWmw6X1TF8ko
- buF3kR2yzQQnlKTMjlgPbC8gLi0e8juxRcnXN9Jh05ee462xArbQ3OGCqme+uOY+RjfLJkuvLOY
- M0w7DwFOU1OoqpjA=
-X-Received: by 2002:a1c:7d85:: with SMTP id y127mr534972wmc.181.1594662731086; 
- Mon, 13 Jul 2020 10:52:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw8ZHSSxvUnW14VOVhay51BUI2J9kmtKvDzwiwHAWmvd3Kl5O/n3T8iGVZTiuIufJoh3yKtYQ==
-X-Received: by 2002:a1c:7d85:: with SMTP id y127mr534951wmc.181.1594662730918; 
- Mon, 13 Jul 2020 10:52:10 -0700 (PDT)
-Received: from localhost (trasno.trasno.org. [83.165.45.250])
- by smtp.gmail.com with ESMTPSA id o9sm24308346wrs.1.2020.07.13.10.52.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 10:52:10 -0700 (PDT)
-From: Juan Quintela <quintela@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/3] migration/savevm: respect qemu_fclose() error code in
- save_snapshot()
-Date: Mon, 13 Jul 2020 19:52:05 +0200
-Message-Id: <20200713175206.13659-3-quintela@redhat.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20200713175206.13659-1-quintela@redhat.com>
-References: <20200713175206.13659-1-quintela@redhat.com>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=w9ccvdUWDcNVWONo+PyLnO9BNyxcXjYmLZoFSnV+chE=;
+ b=O/l8L1k+f4+0K+1Iut6FnIt4R2w49YFzrQhGEfUqqsgTFixr2joWFp/i1oDtOmud/I
+ bm7xLEuIHLHcW9S28kTSr5+EeHspHw7GaEZS3qUGSgUGlzEQPgYuHbrP0gDYUKo1JyvQ
+ lzDeKXCoSX1QFFEPXLCnnNoEYCaoOW/IrwvqIOTT00p+h+2RE/DxK5EwJE+TCpPqRAhi
+ 09Ma2+TsNvg9XO2lvYGeJtVwtMEZC7CYFFziiviQpyZBfoMbtO0PvDSbgiS+SbnHJWuy
+ I8qhJU2PVlQB8tFNzZUAV07CBN7Y12M53YByFVLcsVb1eYqmB/itx7DWFISAMBOF5E+l
+ kcrQ==
+X-Gm-Message-State: AOAM530mcMJmcj5nd7PqmOAjYYZ/I/H4AKzk0i/79WMkizBPwN8V4O7v
+ 5Knr3vgrLx9ZXLehbUE9J7ltjaIFydI=
+X-Google-Smtp-Source: ABdhPJxQwqz2hDAIDfYCtM6vKbAda/vWic8rWMnWj4n6AWbbUqMEH74Thxgzyg1wZgxEXJuom5iW5w==
+X-Received: by 2002:a17:906:5f98:: with SMTP id
+ a24mr790290eju.241.1594662609843; 
+ Mon, 13 Jul 2020 10:50:09 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id x16sm12040058edr.52.2020.07.13.10.50.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 13 Jul 2020 10:50:09 -0700 (PDT)
+Subject: Re: [PATCH v5 06/11] hw/arm: Load -bios image as a boot ROM for
+ npcm7xx
+To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org
+References: <20200709003608.3834629-1-hskinnemoen@google.com>
+ <20200709003608.3834629-7-hskinnemoen@google.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f88fae50-cb96-f5db-4820-24667bd8dacc@amsat.org>
+Date: Mon, 13 Jul 2020 19:50:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=quintela@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200709003608.3834629-7-hskinnemoen@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,70 +105,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, quintela@trasno.org,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Denis V. Lunev" <den@openvz.org>
+On 7/9/20 2:36 AM, Havard Skinnemoen wrote:
+> If a -bios option is specified on the command line, load the image into
+> the internal ROM memory region, which contains the first instructions
+> run by the CPU after reset.
+> 
+> A minimal Apache-2.0-licensed boot ROM can be found at
+> 
+> https://github.com/google/vbootrom
+> 
+> It is by no means feature complete, but it is enough to launch the
+> Nuvoton bootblock[1] from offset 0 in the flash, which in turn will
+> launch u-boot and finally the Linux kernel.
 
-qemu_fclose() could return error, f.e. if bdrv_co_flush() will return
-the error.
+Peter, should we include it as submodule with the compiled blob in
+pc-bios/?
 
-This validation will become more important once we will start waiting of
-asynchronous IO operations, started from bdrv_write_vmstate(), which are
-coming soon.
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Fam Zheng <fam@euphon.net>
-CC: Juan Quintela <quintela@redhat.com>
-CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/savevm.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 6e01724605..45c9dd9d8a 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2635,7 +2635,7 @@ int save_snapshot(const char *name, Error **errp)
- {
-     BlockDriverState *bs, *bs1;
-     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
--    int ret = -1;
-+    int ret = -1, ret2;
-     QEMUFile *f;
-     int saved_vm_running;
-     uint64_t vm_state_size;
-@@ -2719,10 +2719,14 @@ int save_snapshot(const char *name, Error **errp)
-     }
-     ret = qemu_savevm_state(f, errp);
-     vm_state_size = qemu_ftell(f);
--    qemu_fclose(f);
-+    ret2 = qemu_fclose(f);
-     if (ret < 0) {
-         goto the_end;
-     }
-+    if (ret2 < 0) {
-+        ret = ret2;
-+        goto the_end;
-+    }
- 
-     /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
-      * for itself.  BDRV_POLL_WHILE() does not support nested locking because
--- 
-2.25.4
-
+> 
+> [1] https://github.com/Nuvoton-Israel/bootblock
+> 
+> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> ---
+>  hw/arm/npcm7xx_boards.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
+> index d78d9f991b..80cf1535f1 100644
+> --- a/hw/arm/npcm7xx_boards.c
+> +++ b/hw/arm/npcm7xx_boards.c
+> @@ -19,8 +19,11 @@
+>  #include "hw/arm/boot.h"
+>  #include "hw/arm/npcm7xx.h"
+>  #include "hw/core/cpu.h"
+> +#include "hw/loader.h"
+>  #include "qapi/error.h"
+> +#include "qemu-common.h"
+>  #include "qemu/units.h"
+> +#include "sysemu/sysemu.h"
+>  
+>  #define NPCM750_EVB_POWER_ON_STRAPS 0x00001ff7
+>  #define QUANTA_GSJ_POWER_ON_STRAPS 0x00001fff
+> @@ -34,6 +37,25 @@ static struct arm_boot_info npcm7xx_binfo = {
+>      .board_id           = -1,
+>  };
+>  
+> +static void npcm7xx_load_bootrom(NPCM7xxState *soc)
+> +{
+> +    if (bios_name) {
+> +        g_autofree char *filename = NULL;
+> +        int ret;
+> +
+> +        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> +        if (!filename) {
+> +            error_report("Could not find ROM image '%s'", bios_name);
+> +            exit(1);
+> +        }
+> +        ret = load_image_mr(filename, &soc->irom);
+> +        if (ret < 0) {
+> +            error_report("Failed to load ROM image '%s'", filename);
+> +            exit(1);
+> +        }
+> +    }
+> +}
+> +
+>  static void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
+>  {
+>      NPCM7xxClass *sc = NPCM7XX_GET_CLASS(soc);
+> @@ -73,6 +95,7 @@ static void npcm750_evb_init(MachineState *machine)
+>      npcm7xx_connect_dram(soc, machine->ram);
+>      qdev_realize(DEVICE(soc), NULL, &error_abort);
+>  
+> +    npcm7xx_load_bootrom(soc);
+>      npcm7xx_load_kernel(machine, soc);
+>  }
+>  
+> @@ -84,6 +107,7 @@ static void quanta_gsj_init(MachineState *machine)
+>      npcm7xx_connect_dram(soc, machine->ram);
+>      qdev_realize(DEVICE(soc), NULL, &error_abort);
+>  
+> +    npcm7xx_load_bootrom(soc);
+>      npcm7xx_load_kernel(machine, soc);
+>  }
+>  
+> 
 
