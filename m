@@ -2,78 +2,80 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16498C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:32:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:32:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D969320720
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CD9420720
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 20:32:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dC4mSrjL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D969320720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QKhSqlFk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CD9420720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv57c-0002fA-48
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 16:32:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44800)
+	id 1jv57h-0002n9-Lv
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 16:32:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jv56t-0001rf-Da
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:31:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36253
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jv571-0001wb-HP
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:31:43 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58027
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jv56q-0002pY-Q6
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:31:34 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jv56z-0002rc-To
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 16:31:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594672291;
+ s=mimecast20190719; t=1594672301;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=npXcZB1oEpTEYQh+i59P7qcGIdfEjSPDVH3ZHWjVmAs=;
- b=dC4mSrjLy7rEGIZMDOcnFU33uboFPvLdt+RaSfQ3aJyXlacso4xfC5wAMe1UDPNxjw1FbJ
- O/dUfGmQxMisVuptYZY19bZHDUQS230qnH5CTxXg0LHAPJKlGcD5elHHioT1v79OkEVpgp
- yJ0AwhdHkgx03n4WeE0+HaZ7/AK3C/g=
+ bh=AnK8O7cUzkeBBB7zAK2UzndYow2mZh8HUQVIMK230gE=;
+ b=QKhSqlFkdmeQbXKpNQXgv0WPrS9bvjRetJILWNu+BvnZ9XVHZdT0GDocdOXq7KDeUDIWUm
+ CqSdfB7B7njfJWjFVporGzNQxOtZRrEPGIv9n4rbsr9BBMkd2o20n4XF5HbQq58LYn5j6A
+ MC9D5l3TmNo2zN9xL8rvDRDUP4Ta8jI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-rIIvEY8NMFeyKyec2NibYw-1; Mon, 13 Jul 2020 16:31:29 -0400
-X-MC-Unique: rIIvEY8NMFeyKyec2NibYw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-80-WpwlFGPQOrqK8-1xQU5NQA-1; Mon, 13 Jul 2020 16:31:38 -0400
+X-MC-Unique: WpwlFGPQOrqK8-1xQU5NQA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1092107ACCA;
- Mon, 13 Jul 2020 20:31:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B94AA100A91D;
+ Mon, 13 Jul 2020 20:31:37 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-112-247.rdu2.redhat.com
  [10.10.112.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DA362DE81;
- Mon, 13 Jul 2020 20:31:00 +0000 (UTC)
-Date: Mon, 13 Jul 2020 16:30:58 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B561C78A45;
+ Mon, 13 Jul 2020 20:31:33 +0000 (UTC)
+Date: Mon, 13 Jul 2020 16:31:31 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 03/12] python/machine.py: Add _early_cleanup hook
-Message-ID: <20200713203058.GA2949886@localhost.localdomain>
+Subject: Re: [PATCH v5 04/12] python/machine.py: Perform early cleanup for
+ wait() calls, too
+Message-ID: <20200713203131.GA2958592@localhost.localdomain>
 References: <20200710050649.32434-1-jsnow@redhat.com>
- <20200710050649.32434-4-jsnow@redhat.com>
+ <20200710050649.32434-5-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200710050649.32434-4-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200710050649.32434-5-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="J/dobhs11T7y2rNN"
+ protocol="application/pgp-signature"; boundary="VbJkn9YxBvnuCH5J"
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=crosa@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=crosa@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -104,62 +106,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---J/dobhs11T7y2rNN
+--VbJkn9YxBvnuCH5J
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 10, 2020 at 01:06:40AM -0400, John Snow wrote:
-> Some parts of cleanup need to occur prior to shutdown, otherwise
-> shutdown might break. Move this into a suitably named method/callback.
+On Fri, Jul 10, 2020 at 01:06:41AM -0400, John Snow wrote:
+> This is primarily for consistency, and is a step towards wait() and
+> shutdown() sharing the same implementation so that the two cleanup paths
+> cannot diverge.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  python/qemu/machine.py | 24 +++++++++++++++---------
->  1 file changed, 15 insertions(+), 9 deletions(-)
->=20
-> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> index 938c891b1d..4280aab380 100644
-> --- a/python/qemu/machine.py
-> +++ b/python/qemu/machine.py
-> @@ -354,16 +354,9 @@ def _launch(self):
->                                         close_fds=3DFalse)
->          self._post_launch()
-> =20
-> -    def wait(self):
-> +    def _early_cleanup(self) -> None:
-
-Inaugurating type hints "around here", huh? :)
-
-WRT method name, up to the end of this series, this method is only about
-closing the console socket, so *maybe* just name it accordingly and move
-on to an abstract method name when/if the need arises?
-
-Either way,
+>  python/qemu/machine.py | 1 +
+>  1 file changed, 1 insertion(+)
+>
 
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 Tested-by: Cleber Rosa <crosa@redhat.com>
 
---J/dobhs11T7y2rNN
+--VbJkn9YxBvnuCH5J
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8MxIAACgkQZX6NM6Xy
-CfOpVA//ftl/w4VHckzC91FpNUMIFIggQQZtQHEOkNgDodb1Ir4tkK4Df9tYog2O
-wumYd8aDQj0UrNLih6xhFMlemMqCi5zeKtJAM3ZZj857N9rB0275RDx2d4ViL+vJ
-iX65WtnDJx7pU9H/oQZWZR+OVFyGDyrGA4Yk9ZKCfZK1IycdRdd3t721p0kRv0qv
-xTQvjHV1aAVaHFfdNbRRoScw/TzlMtCnQPA9lzpOKge+oxKCTtulaDR3FIpNc/B2
-8Fw4fCRqZcuxPBtZ13YPqGaCiNgrDJvdXeIcVrHFHxXchxZhq6XgpUUvqdjbIiFE
-gE5WqKeXfTSAJ6U/sxgHJl0ja+3Bnq3HT0hNRRvd5Imxsl4247sWAho5Q9abCWhp
-HeecsZQeFxSAg+0fYkUVXZr5Oh+RE7Do2qgYrOMiOvsk2ws9ClNM8SR4T+41dzlB
-nMyJXV9+6RmOuiUiparVJ/MWDNH7L8YM8Dxz9lX0GQ7SFko+NH+EMbT5sWVMDuwY
-TYVzEIjnd4VbWEDZIfvseAKMzDRMOqiiiqqY08PWoknt6SgaeH5+IYxecpDypp7K
-xn5p94LleJNEkZE5moCN3KYXaO0HpuphSQl4KVqHrkNqKIIMSpWt5mjADeW3wJ1L
-M+3CSjkyUsGfyTpSKz/CR1SG2uaSk8KKYYsSHC89xJyDVrTZcUs=
-=3yK6
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8MxKMACgkQZX6NM6Xy
+CfOtxA/9EQEBdwQPTOvMhRcBqofiwFLa+MLcNvgouDjP4IBh40by+bmWq/aSa8Mi
+b97Fi3kem8zM3imy2kX3VsqozB5HfJkwCVo+O/hgUK8S9WE1gq8Ds0SD6GWGEVBe
+ux9bD6ydIIJ9TThhMkX1sD1bkOJ53r0LM9h0xO232+5+iO6iCc/AQFfSjbCY8rXJ
+UkLQYIzAE0bz4NTzbeMwuSTATTFn4ZZ0Dii7GA3eSGEWFWxOv3s60DH9tMqH6rGS
+0VhS6lsYYQJkfSMV7+lTsWL4oMIGYCkLCk4TcAVrmlB1mIyn4ySJbgNJIV3xFqst
+8brqkI8knj4MCyVwkFY6zJXj0Role/OiGmxVw6xrfbZE2/TkQP9PiZNy3tu9biYZ
+6z3g6DZZjaRl6VFMK77Hi/wu2e4PE88caPfiLivNL1/f7mCcn2Ok6TfYdMYi7GZ0
+TDPEUFpmPvUX48hf2XwFcmAeEanQNjzMgtYFaI+A3JKAEHmm/glplgrGXTQKuhMs
+KYw19dxSM+VDDsz5yvXENqRZRz88X79h3tfn8sS4qx1dMGaFaSzIt+do3V9Cl6mO
+T3K+h1MoKPkg5QMqwCnsRjWRR5ffFqWlVCGLAurrI9gSPneYLrtZ1EWLVWqrWLD+
+4qmEfOcCL+mI1SGtDhcGhmDUeHE7F/lxZNw8bHQC5pNva6WxuLQ=
+=nvc3
 -----END PGP SIGNATURE-----
 
---J/dobhs11T7y2rNN--
+--VbJkn9YxBvnuCH5J--
 
 
