@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0BAC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:27:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 563AEC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:28:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D33E2075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:27:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E8B220758
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:28:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GkPGz4yz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D33E2075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ax2ZSF0O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E8B220758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juukL-000860-TM
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:27:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57614)
+	id 1juulD-0000Xr-Ec
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:28:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1juujX-0007hF-G4
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:26:47 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52634
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1juukY-0008RF-Lk
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:27:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32103
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1juujV-00068v-VC
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:26:47 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1juukX-0006D3-1F
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:27:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594632405;
+ s=mimecast20190719; t=1594632467;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hjVeyg5H+ZR/YT424IuBew1KjIlsRliGgM3PoQkLXOQ=;
- b=GkPGz4yzTQs3i6knuLCll4EwW7Y9XBvfgl8eD4BZHofD1WL/9n/3wipNJ3MUTVFQwWogSL
- vzjEg9IpKiKL3PPAPmzvdliPsEcmuy4/wn6CWFj7ojbOJz0B//rAizoyHMIh2sA2fh4aet
- ewoFDoCTRr5InH0PZc8Ee3De1sOWjR0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-fKYML-4qOTuc2G0OjQ3SSQ-1; Mon, 13 Jul 2020 05:26:43 -0400
-X-MC-Unique: fKYML-4qOTuc2G0OjQ3SSQ-1
-Received: by mail-wr1-f69.google.com with SMTP id d11so17103517wrw.12
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 02:26:43 -0700 (PDT)
+ bh=sTIazqGpZiAQAERBVHdd9Ch4Swo9KZuxFcOhQFeCPdM=;
+ b=ax2ZSF0OIkd3U94zHqGAiDMKbZOpyFqvhJ46y1xOQOyoGs5zSPHlPC0C9BqsI5syk4VuaF
+ hoyqZOFaG/mIfwcdRtW2wX1y5n7cikOtGo+aSn9cIRfRR+wNFackXfd3QSZZ2xjr15QBYJ
+ EtsC3D7SqvH2EQyHMG5DyFNwxYcvnpE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-cP9Q323BNPO7MzXhfpFAVA-1; Mon, 13 Jul 2020 05:27:44 -0400
+X-MC-Unique: cP9Q323BNPO7MzXhfpFAVA-1
+Received: by mail-wm1-f69.google.com with SMTP id f68so15816609wmf.1
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 02:27:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=hjVeyg5H+ZR/YT424IuBew1KjIlsRliGgM3PoQkLXOQ=;
- b=PRDAS+VHhbVAFxw87Juibmf34yGIRSKnQ4vp6OLXvmlz0E2e5MY0ykJAYOR/nuKF9Q
- /P0c5JPRhB1OA8GRP7rd2iymLtdy3xNi3yat6XG8zFSvFly00XyvecVADiYNCA6I1A33
- UqBm94XdlK8Ttogf5M7w07YygFcXWZKXX21s7rb6qXUSMdMQj2d4kY/22zZmDCoRC+4i
- +G/as6h2iXGoOR8HuCWrCkLDVM1yQtr+V46tZN/W+Z5WzE+E2uY61905a54mVYh/mDYM
- 5rIXFjJ0FPRiJV0kuzNczYRy1RF/JxWULx8VtEla+wo1njvREIV7c3FmaVkHYzDv+Ntl
- uN4A==
-X-Gm-Message-State: AOAM530zkrMvTuydwGB9Z1F5ftz+xIQRukqbJbSwLG/iZDxwACSwWF3h
- Qwhqn8dp+3yINQ6nQB1jswe04o0Re8gx0nYGqzprkgNsXL46KynjmV1+BGHWM77N4GW/zJRgXgP
- K/32cgS5WhwTJ8BM=
-X-Received: by 2002:a7b:c246:: with SMTP id b6mr19119209wmj.161.1594632402401; 
- Mon, 13 Jul 2020 02:26:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy7M4ZlNqD5riCIxwZ95MNXozDvTB+1Ns+wiZajT09KsrDWjYUkWGsoLenXA9pLrZYqreDYAQ==
-X-Received: by 2002:a7b:c246:: with SMTP id b6mr19119190wmj.161.1594632402166; 
- Mon, 13 Jul 2020 02:26:42 -0700 (PDT)
+ bh=sTIazqGpZiAQAERBVHdd9Ch4Swo9KZuxFcOhQFeCPdM=;
+ b=iVGKVREaDT2HqKPI839FfKdOvK5EOVWnc40jSnZoUzrBPezkTWLEd1pDKhLhIuYEML
+ LgH3/CKlJrkKrWf83rmESrQUAQEoS0YBo457ejIwlGIp/ZI577SVSkVSf2s81rgZBp3V
+ rAJIqJ6SWzC0j70I6F1JGKp1cYkyx/73tXcM3HSs7XIbAq0gQfDwf8QVUrM4mcHijThd
+ nFoOWc0b1Xk5BPPH9igohN3u1UHwBT1SsAJ4d6RKGiADkJglr0R+zZ9xJMrMUwC2/Raw
+ 4ri7cRhBmPEHgrL7HP1YEEpAIjiddX7eg3E4OkaBj7VTcWidW1cxpVEPLn86XLR71Bjw
+ cMnw==
+X-Gm-Message-State: AOAM533KK3Q0y5LWbFm+EhwShc3Vb2js7sMIcflHxmIvlyEq53+D0Tou
+ Iud1Ay8puhpAO3zbz87cc/nCBZb7lKmZQ5H5Zv2opXmuA3MXyVS/0LV47qalg+LBanmYBGeKS1e
+ nRomM802rLH9NQVo=
+X-Received: by 2002:a5d:408c:: with SMTP id o12mr78664122wrp.412.1594632462976; 
+ Mon, 13 Jul 2020 02:27:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzgnPfIVcUHbD/HdfW+oTWkjXtQmdkIA9VVnQBltqI0Y861XzoZCBrvWAeiS43k7J6Cc404mA==
+X-Received: by 2002:a5d:408c:: with SMTP id o12mr78664106wrp.412.1594632462802; 
+ Mon, 13 Jul 2020 02:27:42 -0700 (PDT)
 Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id z8sm22153127wmg.39.2020.07.13.02.26.41
+ by smtp.gmail.com with ESMTPSA id o21sm21612301wmh.18.2020.07.13.02.27.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 02:26:41 -0700 (PDT)
-Subject: Re: [PATCH v5 02/12] python/machine.py: Close QMP socket in cleanup
+ Mon, 13 Jul 2020 02:27:42 -0700 (PDT)
+Subject: Re: [PATCH v5 05/12] python/machine.py: Prohibit multiple shutdown()
+ calls
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20200710050649.32434-1-jsnow@redhat.com>
- <20200710050649.32434-3-jsnow@redhat.com>
+ <20200710050649.32434-6-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,20 +103,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <5ea7a530-87c4-e52f-a67b-5458cbd28d03@redhat.com>
-Date: Mon, 13 Jul 2020 11:26:40 +0200
+Message-ID: <01728ed7-4e4a-7589-c226-ac0e6ca3138c@redhat.com>
+Date: Mon, 13 Jul 2020 11:27:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200710050649.32434-3-jsnow@redhat.com>
+In-Reply-To: <20200710050649.32434-6-jsnow@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 03:20:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -146,13 +147,18 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/10/20 7:06 AM, John Snow wrote:
-> It's not important to do this before waiting for the process to exit, so
-> it can be done during generic post-shutdown cleanup.
+> If the VM is not launched, don't try to shut it down. As a change,
+> _post_shutdown now unconditionally also calls _early_cleanup in order to
+> offer comprehensive object cleanup in failure cases.
+> 
+> As a courtesy, treat it as a NOP instead of rejecting it as an
+> error. This is slightly nicer for acceptance tests where vm.shutdown()
+> is issued unconditionally in tearDown callbacks.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  python/qemu/machine.py | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  python/qemu/machine.py | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
