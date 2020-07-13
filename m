@@ -2,91 +2,62 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A00C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A92C2C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EDBB2072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:43:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eV+2SWR/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EDBB2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C10A20720
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:51:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C10A20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=the-jedi.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juyjY-0006mk-RC
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 09:43:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54828)
+	id 1juyrK-0001wj-A2
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 09:51:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juyio-00069n-2c
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 09:42:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38340
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juyik-0002TV-NH
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 09:42:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594647733;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4fz4XLSMYHab7YkI9XdcPqrXwKOcAMBs8OscbehF4I8=;
- b=eV+2SWR/ySvQpCOiAK+k8MwD2+gSJWuY6P6/XOibK2XsmWHDos9glq6Kg9l4NQSJ1HD5kJ
- 5GqP462ZU2PwUsqrs7H4nnJuTDFgHtWCv6w1y+iFaa8KMGBY6lHk7UWenNxE+NOI/Vl+VB
- v85ZDKKuBD4iO19qt+TiT/L/R91mTAg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-AC_57N6kPUyTLWM9qJKoCw-1; Mon, 13 Jul 2020 09:42:08 -0400
-X-MC-Unique: AC_57N6kPUyTLWM9qJKoCw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9179D100AA3F;
- Mon, 13 Jul 2020 13:42:07 +0000 (UTC)
-Received: from [10.3.112.134] (ovpn-112-134.phx2.redhat.com [10.3.112.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 604046147C;
- Mon, 13 Jul 2020 13:41:58 +0000 (UTC)
-Subject: Re: [PATCH v2 5/5] iotests: test shutdown when bitmap is exported
- through NBD
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200701105331.121670-1-vsementsov@virtuozzo.com>
- <20200701105331.121670-6-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5c3f97b0-3bf5-3d83-1a70-17ced4a8be91@redhat.com>
-Date: Mon, 13 Jul 2020 08:41:57 -0500
+ (Exim 4.90_1) (envelope-from <git@the-jedi.co.uk>)
+ id 1juyqf-0001WQ-NW
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 09:50:25 -0400
+Received: from vps.the-jedi.co.uk ([93.93.130.107]:34750)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <git@the-jedi.co.uk>)
+ id 1juyqc-0003fv-Vn
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 09:50:25 -0400
+Received: by vps.the-jedi.co.uk (Postfix, from userid 111)
+ id 396B742D1E; Mon, 13 Jul 2020 14:50:21 +0100 (BST)
+Received: from [192.168.0.5] (host86-179-4-163.range86-179.btcentralplus.com
+ [86.179.4.163])
+ by vps.the-jedi.co.uk (Postfix) with ESMTPSA id 11166400BA
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 14:50:20 +0100 (BST)
+To: qemu-devel@nongnu.org
+References: 
+Subject: Re: [PATCH] Allow acpi-tmr size=2
+From: Simon John <git@the-jedi.co.uk>
+Message-ID: <76222a42-823f-7f37-e9c9-4c50a5a5ce42@the-jedi.co.uk>
+Date: Mon, 13 Jul 2020 14:50:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200701105331.121670-6-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=93.93.130.107; envelope-from=git@the-jedi.co.uk;
+ helo=vps.the-jedi.co.uk
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 09:50:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,37 +70,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org,
- stefanha@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/20 5:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Test shutdown when bitmap is exported through NBD and active client
-> exists. The previous patch fixes a crash, provoked by this scenario.
+On Mon, 13 Jul 2020 08:17:41 -0400, Michael S. Tsirkin wrote:
+
+> Sounds good. And how about also adding:
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/299     | 65 ++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/299.out | 10 ++++++
->   tests/qemu-iotests/group   |  1 +
->   3 files changed, 76 insertions(+)
->   create mode 100644 tests/qemu-iotests/299
->   create mode 100644 tests/qemu-iotests/299.out
+>       .impl.min_access_size = 4,
+> 
+> ?
 
-I confirmed that by temporarily applying this out of order (well, 
-sinking 3/5 last) does indeed provoke the failure, so:
+Yes, this works too - what does that do?
 
-Tested-by: Eric Blake <eblake@redhat.com>
+static const MemoryRegionOps acpi_pm_tmr_ops = {
+     .read = acpi_pm_tmr_read,
+     .write = acpi_pm_tmr_write,
+     .valid.min_access_size = 2,
+     .valid.max_access_size = 4,
+     .impl.min_access_size = 4,
+     .impl.max_access_size = 4,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+};
 
-and the test is simple enough:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Regards.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Simon John
 
