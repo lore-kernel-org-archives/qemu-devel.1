@@ -2,90 +2,89 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93100C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C185C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5574D20B80
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:49:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 168E720656
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:59:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p5l9A/3B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5574D20B80
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tMUPlLic"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 168E720656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv6KD-0007JZ-H3
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 17:49:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44798)
+	id 1jv6Tn-0001OS-Cn
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 17:59:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv6Jg-0006u2-84
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 17:48:52 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42987)
+ id 1jv6Sv-0000xO-P7
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 17:58:25 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38185)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv6Je-0006li-EM
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 17:48:51 -0400
-Received: by mail-pf1-x444.google.com with SMTP id 1so6621526pfn.9
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 14:48:49 -0700 (PDT)
+ id 1jv6Sr-0008I1-VR
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 17:58:25 -0400
+Received: by mail-pg1-x541.google.com with SMTP id e8so6648012pgc.5
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 14:58:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=82fsQZMrFOltw2iNmOUVipl+oK8+TPJWEBYmit5bM3M=;
- b=p5l9A/3B6gxCwRrAquC5Y9onkrWvkpPi6SCPHrNqH59+jKqEA/tSqGo8/oZ3l1n8Jn
- 7e0q9S7rzVa5eBqwDu7PULqPAzKBudTun0b+eDUWFBEITXnouVzXRpHZSD5mJoMhx61m
- G9kZGPkzYTCCFN+qcDho+5GHuQUkupOYpL6yGmNhCCZ4OZi6uNq+mP85R2kTArkDN6om
- I03Ovge5BjOe0mGILedwRr3v3wW6vU1+/0HINFV/kvKYqHJnKYxyVn4rHcr3c9l1mNbX
- h6/OyhAaV0gIdhZbROs1n4ecZRLChWIm/CBKFprPw41evUKClFXbmN04ad8on/7S2RMo
- f3UQ==
+ bh=ecJ2PD0sI5G7QUUH1Q9l3wOICmPtbiE1cArCriZj56o=;
+ b=tMUPlLic1HBYADFoc9t+Ib69r4GcrZCE1pJVQMeR0yHnWWLC74vWuL2iEbz225UyRw
+ JrLWC2B6urhQsMDMwwyGripOTW2RwBXWIIxnspEsoVpVOsuQNjWd+xATAMcBYmKqCdhx
+ 2AFaMYSUli+NN/3svl2lVS2f5gabAYO72HIiMqoIDC6LI571P2FzxlLHJOm0Q4cR00Ju
+ dc08d8IA7Xnj4CrPNhy87PSNo9hvea5SGsgPUlcJC/WeRSwvnqeUqwrQJk8kRc7eM9TO
+ WdQRrRzzpcGIoDeSA+6N2z3gouC7a5qJcVJcHQVGFVSjT8FgLMmtjyH29RhS6h0Yatxr
+ 5QDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=82fsQZMrFOltw2iNmOUVipl+oK8+TPJWEBYmit5bM3M=;
- b=O4YHihSJsdhX2mQ3FMZOLVIejDcf7WBVYhoASbV2Kxrm5K8TQ+EbP3YVKYx1+Lov57
- p8B2OSVmUcftDT2ljNmXH+zyrz+pnMiGzhG4LRX3mwA/NSqpf9soUJcH5xVLJYWB3koq
- 0197DR+rT4XvB1p5WpnrqcE9GKl0SFvN0ra94havs6arHVjF9flRdHqBJH5OcXks7kj4
- /Iiq5Ehd/DfZhLp/uenH0eHOi5tkjWLwAIok+mB25Bqok3dYT6J//hyPtVTPqkDgtFss
- 3bnUyguwI+V7I9k66DeWMLpS8fTiyKIwDYeaNTw/8DBAVNRq0gkHef1BsS7i6SFQvq8k
- zQsw==
-X-Gm-Message-State: AOAM531ardGz6nCBETyG0X1taEBePfZP9KGEOJ7dt6atiySbtjwpyrS1
- UEDbAfshnhPHokCunrwRb/oXEw==
-X-Google-Smtp-Source: ABdhPJxrCxaVeanztGSP6biGtefZNAlAuUHwJ7d7Uk8m0uDgCyP1J+3zL1Q8yBW1at7bqUR2XeloHw==
-X-Received: by 2002:a05:6a00:843:: with SMTP id
- q3mr1556961pfk.107.1594676928550; 
- Mon, 13 Jul 2020 14:48:48 -0700 (PDT)
+ bh=ecJ2PD0sI5G7QUUH1Q9l3wOICmPtbiE1cArCriZj56o=;
+ b=COn5y6pgU4ss44pRXJcnZPmXpjsZAUkgwb79jBtBAywtgs4Qb1PmDYMLPMJX0MYso/
+ pVXHSiEdBGUbAFln/Sf5LT5yiAOF6l71eeXZIb2MVlGAu/Qt+Zq3LPKiDdjn/sJbWKOZ
+ U2IBGgh6sHSnhrIOK6IZsPyTTmHY/B7D1AwsDpLkaDr1ujiWU3FzsU6h+WUU+As2kHnz
+ fOdfeFSVODAsTcgNQw/z3wwUL6DEqg51ylZwPahr8IjftjI45XvbyxqZ0/oAQgdYw6Is
+ 9WjgYE1+qEZ7Ja1v157KUh3wd0mFTeY+WSxTlPmefwheQ7JlDwRYNgwkewd3k92lICzP
+ y7nw==
+X-Gm-Message-State: AOAM5334XZsjbFWqbMU5E5eKl9GXIFAJ4UJRIe2cMSH/niz9VQjrE7kp
+ af5bAS4P4Mp+KZ6L6CJtYGF1gw==
+X-Google-Smtp-Source: ABdhPJxdYW5KfKntSYXjRMvv3rM5bSTdiWofRc9ZI/Bln6qDkshFXQssI+yCwiHeIaVnYLucc9JEJQ==
+X-Received: by 2002:a62:794e:: with SMTP id u75mr1674918pfc.298.1594677500427; 
+ Mon, 13 Jul 2020 14:58:20 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id k8sm16719419pfu.68.2020.07.13.14.48.47
+ by smtp.gmail.com with ESMTPSA id i125sm13872885pgd.21.2020.07.13.14.58.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 14:48:47 -0700 (PDT)
-Subject: Re: [RFC PATCH 5/8] fpu/softfloat: define brain floating-point types
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org
-References: <20200712234521.3972-1-zhiwei_liu@c-sky.com>
- <20200712234521.3972-6-zhiwei_liu@c-sky.com>
- <1c090feb-0101-ce1a-af8e-2f7e45fd5053@linaro.org>
- <710a32d0-9289-a3b1-9dd2-59a09125c162@c-sky.com>
+ Mon, 13 Jul 2020 14:58:19 -0700 (PDT)
+Subject: Re: [PATCH v2 06/11] cputlb: ensure we save the IOTLB data in case of
+ reset
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200713200415.26214-1-alex.bennee@linaro.org>
+ <20200713200415.26214-7-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a94cdb80-4ac6-326d-5829-e2b707ba4784@linaro.org>
-Date: Mon, 13 Jul 2020 14:48:46 -0700
+Message-ID: <a56f924b-7d2b-f962-4219-33a1a3964bcb@linaro.org>
+Date: Mon, 13 Jul 2020 14:58:17 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <710a32d0-9289-a3b1-9dd2-59a09125c162@c-sky.com>
+In-Reply-To: <20200713200415.26214-7-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,28 +106,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, alex.bennee@linaro.org, wxy194768@alibaba-inc.com
+Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
+ Paolo Bonzini <pbonzini@redhat.com>, f4bug@amsat.org, robhenry@microsoft.com,
+ aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
+ peter.puhov@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
+ aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/13/20 1:22 PM, LIU Zhiwei wrote:
-> Should we just make bfloat16 different or remove all other references?
-
-If you have time to do a global remove, I would be grateful.  Otherwise, let's
-just make bfloat16 different.
-
-
->> The word "brain" is better translated as "neural-network" in english.
-> Do you mean the comment here should be
+On 7/13/20 1:04 PM, Alex Bennée wrote:
+> Any write to a device might cause a re-arrangement of memory
+> triggering a TLB flush and potential re-size of the TLB invalidating
+> previous entries. This would cause users of qemu_plugin_get_hwaddr()
+> to see the warning:
 > 
-> +/*
-> + * Software neural-network floating-point types
-> + */
+>   invalid use of qemu_plugin_get_hwaddr
+> 
+> because of the failed tlb_lookup which should always succeed. To
+> prevent this we save the IOTLB data in case it is later needed by a
+> plugin doing a lookup.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Yes, thanks.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 r~
-
 
