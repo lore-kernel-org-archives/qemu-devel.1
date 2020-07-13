@@ -2,85 +2,89 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 954D7C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 268B3C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:52:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 628CA20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E446C20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:52:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kf9QJcm7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628CA20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cfKDeWtR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E446C20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv0nQ-00085T-NC
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 11:55:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50808)
+	id 1jv0ka-00072m-63
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 11:52:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jv0mh-0007f8-U6
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:54:27 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:39836)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jv0mg-0007wa-6p
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:54:27 -0400
-Received: by mail-ej1-x644.google.com with SMTP id w6so17776784ejq.6
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 08:54:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Mrd9Zm92CktrNp5kQQxcVTDgdNGmZdF8lBIIoEaQxjE=;
- b=kf9QJcm77sz0INFEdsKYst6DQZcFxKJQ/B/J82ye6y/5A3umzdUWIIiVmBV7V/LgKH
- bikznVkVTF/afqBhU1E4KPJj2HloskvuQaeGu3T3hEUL3dKL7SEWEOSWSH8iSU0v5LO9
- tHmG/DNOYAhJaJYx5EpS6RI3U05A1LtK937TNyPG0jRuKvC2QztsovxVtzVYXGTHYd0D
- KG+0AttEeap5iGRzBzOvXccnj7oXHyKMzODoxv4mf+MLMKaI1FrDKZpangy1MLn+Kvyl
- WiWmLzVZq5NpeaLqq/Y+g74QAnMwExV4BJ3MHaVuV2KWwc6MPa+O4d9dRdzo499+6eDT
- bZKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Mrd9Zm92CktrNp5kQQxcVTDgdNGmZdF8lBIIoEaQxjE=;
- b=K/8TqbOX9zmCV2wLjUBEmUmtJL1+0FG/1ZsVyOmJ5vgmp4/klPCFjAcXMGX3X001aq
- bZKC9fuA/smK/FM+GreplYMs2qFtbvUzl3XL/YLcM8Vx9Y5WGC1SaE6VI4i1PU8x1dPA
- pII6LHSumCaFJD3mPfwz/dmr0OmaGwO+bQ7lUMuCsOMr9GNFNGIoJjzZ+4xWkpHKxtvc
- 2O+0p+SA+xbZF+84e3e99sEIpV4DUtaBNZmlR3Y4mqrGTHmlhUe5qEveOQ+Wq1potsTJ
- PufWdey75BA/lZzNhD/gExhmEa+ggL+D6gkRR9IlhYOTZ4VKNbV1SSVIwDlk/GggL/uh
- 8f2w==
-X-Gm-Message-State: AOAM531MnuD1/q6OIyjse/w/x+uKyvVLWPY2yd2c/EQowqEDJdmndaTY
- AWjfn1+Erzrt5Cyym9td3fTbSrvlctkstjRCEZY=
-X-Google-Smtp-Source: ABdhPJzCEKVF6cJQ33hA9GXIPpBwsAb8KRxw/Mk7x8eRYZIVtwrGy2WPs/atgDNJxO2f115PS0hKr8ed8eJPviLwz8c=
-X-Received: by 2002:a17:906:2988:: with SMTP id
- x8mr391203eje.141.1594655664251; 
- Mon, 13 Jul 2020 08:54:24 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jv0jW-0006ZQ-RK
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:51:10 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52129
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jv0jP-0007fY-VS
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:51:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594655462;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3vsqsfFCZTVQG0neIpQgF1lkBj+N8YXUMrTxcNBKEjs=;
+ b=cfKDeWtRzpyrDB+e+BZPMvOPNsk+tWehHpYJMcNGXxXF1+CxOfwdJMsLvKZIZ3R2yns7uT
+ wIZPXJdx3/nV/XFxTfgG7E32aU484MiRbEtb/xDXsdpm2602PlauzThRaWxqL2qGP1e2LS
+ VW1Y0ajeTfB6fwfAkzIU5LqfBWoi+SI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-_ifLNb1_MTWkPP1gshK5NA-1; Mon, 13 Jul 2020 11:51:00 -0400
+X-MC-Unique: _ifLNb1_MTWkPP1gshK5NA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8CF9800597;
+ Mon, 13 Jul 2020 15:50:59 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 376DA6FEDF;
+ Mon, 13 Jul 2020 15:50:58 +0000 (UTC)
+Date: Mon, 13 Jul 2020 17:50:53 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 20/25] x86: Fix x86_cpu_new() error API violations
+Message-ID: <20200713175053.2dd20026@redhat.com>
+In-Reply-To: <875zbeugvl.fsf@dusky.pond.sub.org>
+References: <20200624083737.3086768-1-armbru@redhat.com>
+ <20200624083737.3086768-21-armbru@redhat.com>
+ <20200624161703.153c7905@redhat.com>
+ <875zbeugvl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20200625045011.1075314-1-arilou@gmail.com>
- <20200713104402.38e8369e@redhat.com>
-In-Reply-To: <20200713104402.38e8369e@redhat.com>
-From: Jon Doron <arilou@gmail.com>
-Date: Mon, 13 Jul 2020 18:54:12 +0300
-Message-ID: <CAP7QCog6RbTiXD-+yK=UF7P-Z4R9CQQLqeS6CAj7qeuJqvg6QA@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] hyperv: vmbus: ACPI various corrections
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000068279305aa54b4ff"
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=arilou@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,105 +97,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rvkagan@yandex-team.ru, pbonzini@redhat.com,
- "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
- QEMU <qemu-devel@nongnu.org>, vkuznets@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000068279305aa54b4ff
-Content-Type: text/plain; charset="UTF-8"
+On Fri, 26 Jun 2020 14:54:38 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-Sure thing I'll try to take a look at it this weekend.
+> Igor Mammedov <imammedo@redhat.com> writes:
+> 
+> > On Wed, 24 Jun 2020 10:37:32 +0200
+> > Markus Armbruster <armbru@redhat.com> wrote:
+> >  
+> >> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+> >> pointer to a variable containing NULL.  Passing an argument of the
+> >> latter kind twice without clearing it in between is wrong: if the
+> >> first call sets an error, it no longer points to NULL for the second
+> >> call.
+> >> 
+> >> x86_cpu_new() is wrong that way: it passes &local_err to
+> >> object_property_set_uint() without checking it, and then to
+> >> qdev_realize().  Harmless, because the former can't actually fail
+> >> here.
+> >> 
+> >> Fix by checking for failure right away.  While there, replace
+> >> qdev_realize(); object_unref() by qdev_realize_and_unref().
+> >> 
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Cc: Richard Henderson <rth@twiddle.net>
+> >> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> ---
+> >>  hw/i386/x86.c | 12 +++---------
+> >>  1 file changed, 3 insertions(+), 9 deletions(-)
+> >> 
+> >> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> >> index 34229b45c7..3a7029e6db 100644
+> >> --- a/hw/i386/x86.c
+> >> +++ b/hw/i386/x86.c
+> >> @@ -118,16 +118,10 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+> >>  
+> >>  void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
+> >>  {
+> >> -    Object *cpu = NULL;
+> >> -    Error *local_err = NULL;
+> >> +    Object *cpu = object_new(MACHINE(x86ms)->cpu_type);
+> >>  
+> >> -    cpu = object_new(MACHINE(x86ms)->cpu_type);
+> >> -
+> >> -    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+> >> -    qdev_realize(DEVICE(cpu), NULL, &local_err);
+> >> -
+> >> -    object_unref(cpu);
+> >> -    error_propagate(errp, local_err);
+> >> +    object_property_set_uint(cpu, apic_id, "apic-id", &error_abort);  
+> > it may fail here if user specified wrong cpu flags, but there is nothing we can do to fix it.  
+> 
+> Really?
+> 
+> object_property_set_uint() fails when property "apic-id" doesn't exist,
+> has no ->set() method, or its ->set() fails.
+> 
+> Property "apic-id" is defined in x86_cpu_properties[] as
+> 
+>     DEFINE_PROP_UINT32("apic-id", X86CPU, apic_id, UNASSIGNED_APIC_ID),
+> 
+> This means "apic-id" exists, and its ->set() is set_uint32().  That
+> leaves only set_uint32() as possible source of failure.
+> 
+> It fails when
+> 
+> * the device is already realized: programming error
+> 
+> * the value to be stored is not an integer: object_property_set_uint()
+>   makes it one, can't fail
+> 
+> * the value is not representable as uint32_t: @api_id is declared as
+>   int64_t, but:
+> 
+>   - pc_hot_add_cpu() passes x86_cpu_apic_id_from_index(), which is
+>     uint32_t, converted to int64_t.  Can't fail.
+> 
+>   - x86_cpus_init() passes possible_cpus->cpus[i].arch_id, which is
+>     uint64_t.  Is this the "if user specified wrong cpu flags" case?
 
-Jon.
+looking more on it, object_property_set_uint() can't really fail
 
-On Mon, Jul 13, 2020, 11:44 Igor Mammedov <imammedo@redhat.com> wrote:
+>   Aside: should the integer types be cleaned up?
 
-> On Thu, 25 Jun 2020 07:50:09 +0300
-> Jon Doron <arilou@gmail.com> wrote:
->
-> > After doing further tests and looking at the latest HyperV ACPI DSDT.
-> > Do minor fix to our VMBus ACPI entry.
->
-> Jon,
-> vmbus feature needs a testcase, could you look into it please?
-> (see tests/qtest/bios-tables-test.c for an example.
-> also look into comment blob at the top for the propper process
-> for acpi patches/tests)
->
->
-> > v4:
-> > * Removed the patch which adds _ADR definition to the VMBus
-> > * Correct the change which moves the VMBus under the SB
-> >
-> > v3:
-> > Removed accidental change for the dct submodule head
-> >
-> > v2:
-> > Renamed irq0 to irq now that there is a single IRQ required
-> >
-> > Jon Doron (2):
-> >   hyperv: vmbus: Remove the 2nd IRQ
-> >   acpi: i386: Move VMBus DSDT entry to SB
-> >
-> >  hw/hyperv/vmbus.c                |  3 +--
-> >  hw/i386/acpi-build.c             | 16 ++++++++--------
-> >  include/hw/hyperv/vmbus-bridge.h |  3 +--
-> >  3 files changed, 10 insertions(+), 12 deletions(-)
-> >
->
->
+apic_id is x86 specific subset of .arch_id.
+The later is used by other targets which may need larger than 32bit integer
+(if I recall correctly virt-arm uses 64bit id). 
 
---00000000000068279305aa54b4ff
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto">Sure thing I&#39;ll try to take a look at it this weekend=
-.<div dir=3D"auto"><br></div><div dir=3D"auto">Jon.=C2=A0</div></div><br><d=
-iv class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jul =
-13, 2020, 11:44 Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">im=
-ammedo@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote"=
- style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On=
- Thu, 25 Jun 2020 07:50:09 +0300<br>
-Jon Doron &lt;<a href=3D"mailto:arilou@gmail.com" target=3D"_blank" rel=3D"=
-noreferrer">arilou@gmail.com</a>&gt; wrote:<br>
-<br>
-&gt; After doing further tests and looking at the latest HyperV ACPI DSDT.<=
-br>
-&gt; Do minor fix to our VMBus ACPI entry.<br>
-<br>
-Jon,<br>
-vmbus feature needs a testcase, could you look into it please? <br>
-(see tests/qtest/bios-tables-test.c for an example.<br>
-also look into comment blob at the top for the propper process<br>
-for acpi patches/tests)<br>
-<br>
-<br>
-&gt; v4:<br>
-&gt; * Removed the patch which adds _ADR definition to the VMBus<br>
-&gt; * Correct the change which moves the VMBus under the SB<br>
-&gt; <br>
-&gt; v3:<br>
-&gt; Removed accidental change for the dct submodule head<br>
-&gt; <br>
-&gt; v2:<br>
-&gt; Renamed irq0 to irq now that there is a single IRQ required<br>
-&gt; <br>
-&gt; Jon Doron (2):<br>
-&gt;=C2=A0 =C2=A0hyperv: vmbus: Remove the 2nd IRQ<br>
-&gt;=C2=A0 =C2=A0acpi: i386: Move VMBus DSDT entry to SB<br>
-&gt; <br>
-&gt;=C2=A0 hw/hyperv/vmbus.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 3 +--<br>
-&gt;=C2=A0 hw/i386/acpi-build.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0| 16 ++++++++--------<br>
-&gt;=C2=A0 include/hw/hyperv/vmbus-bridge.h |=C2=A0 3 +--<br>
-&gt;=C2=A0 3 files changed, 10 insertions(+), 12 deletions(-)<br>
-&gt; <br>
-<br>
-</blockquote></div>
+> To assess the bug's impact, we need to know when the other call in this
+> error pileup fails.  If we can make both fail, we have a crash bug.
+> Else, we have a harmless API violation.
+> 
+> Any ideas on how to make the qdev_realize() fail?
+qemu CLI case
+  QEMU -cpu qemu64,enforce,topoext
 
---00000000000068279305aa54b4ff--
+legacy hotplug case:
+  QEMU -smp 1,maxcpus=2
+  (monitor) cpu-add 1
+  (monitor) cpu-add 1  <= fail
+ 
+
+
 
