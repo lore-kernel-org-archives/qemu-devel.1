@@ -2,109 +2,96 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB4BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:13:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2608C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:09:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E9BA2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:13:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E9BA2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id B92F82067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:09:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPbfZcI+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B92F82067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juuWj-0001Yv-Ta
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:13:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54916)
+	id 1juuSP-0004Ik-0m
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:09:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hca@linux.ibm.com>)
- id 1juuW7-00012o-Eg; Mon, 13 Jul 2020 05:12:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54200
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hca@linux.ibm.com>)
- id 1juuW5-0004U1-GC; Mon, 13 Jul 2020 05:12:55 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06D92YU8011410; Mon, 13 Jul 2020 05:12:51 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 327tn93vmc-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 13 Jul 2020 05:12:50 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06D965Rl022758;
- Mon, 13 Jul 2020 05:12:50 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 327tn93vkn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 13 Jul 2020 05:12:50 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06D95dSE031229;
- Mon, 13 Jul 2020 09:12:48 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com
- (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
- by ppma04ams.nl.ibm.com with ESMTP id 32752820yn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 13 Jul 2020 09:12:48 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06D9CjrT57933840
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 13 Jul 2020 09:12:45 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C9C4B4C044;
- Mon, 13 Jul 2020 09:12:45 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 528574C050;
- Mon, 13 Jul 2020 09:12:45 +0000 (GMT)
-Received: from osiris (unknown [9.171.14.89])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Mon, 13 Jul 2020 09:12:45 +0000 (GMT)
-Date: Mon, 13 Jul 2020 11:12:43 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH RFC 2/5] s390x: implement diag260
-Message-ID: <20200713091243.GB4359@osiris>
-References: <20200708185135.46694-1-david@redhat.com>
- <20200708185135.46694-3-david@redhat.com>
- <efe7e845-2e0f-96ba-7e29-c6ac74db9e2f@de.ibm.com>
- <c86e5b12-883a-8522-a15c-9af3804e003c@redhat.com>
- <a337aa94-cd0a-de6f-70df-35428b3e3a3a@redhat.com>
- <0e04ce47-b761-27c3-bc80-ba8338d4253e@redhat.com>
- <20200710151816.GC14845@osiris>
- <10bdd986-c474-278d-ed6a-193d9a45fe33@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1juuRm-0003Yl-Cy
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:08:26 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35560)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1juuRk-0003wZ-Qg
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:08:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z2so15191108wrp.2
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 02:08:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Lx+ilzxa45X1M9ISx7QGCxwG+gFynzXKt0VbUiDnuT0=;
+ b=BPbfZcI+QNqOarjxwBGnMtvrCiDDwbSL/f0yPyGYT/DMsPz6+IKi9c9i7858Q3XPrh
+ dbFuz5CpMnOAoHJf7ki7et68e6kPmG9wNudTXq7y15y8C99U17E9CUlTZrbjpNnzu/6/
+ TObovqfCV+UHPyiUC/87s/jb93PkzbizxJWZiHj4Bpagicc64tLml8Asd25gL5LlofVA
+ B4ahfmu9McdAP94uzLSWq+niog/5qWWtownVKZR0RdQyYPqaom1nf+u+Cze0krqRX14a
+ p66/LJBbCws4b7dAfqpePH34IMWFU7l+Xvg6BBwGB6EIT7+76hpBzZt5nsJpsJRPALZA
+ WlVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Lx+ilzxa45X1M9ISx7QGCxwG+gFynzXKt0VbUiDnuT0=;
+ b=C45M77UV93nYeCPjFRte5U/K+o0Xh9YzSCCauReE/zHS4jsekBTqbhsbfhz06xJg15
+ XJQQDoY2Ums3PS1vSP0ERkt7NajXa5RI+JL/dzdfphFRE8nu9yxVk6uDaZYhmk4Zs3MA
+ WD2lBNnxYgRTAPqnlSkVI/mfIYG7GEKOUipC9dtuyreOY/cYK/MOjLdTU0Gy7UTak0GE
+ u2+ziOVEmRrvu89nLEMz8uSRAhnfEmevu9xx/ooq4H+VCHYKHo6eU1PIzt/CaEz4YYfD
+ ZnISac+PxiUQ4rvEwUBGI6ARhe6efLrGFdKwww29WbGx5eCFYBr/QHP5QWphuvcBdAnO
+ qqWQ==
+X-Gm-Message-State: AOAM530HNkBUhkyjQZxGeEgr/TeMpeW/lBqa0UQmA6tSfzYnbmxYKJnt
+ rdl0+uDfOleCjkBwm3/8IwM=
+X-Google-Smtp-Source: ABdhPJyza+rUWQyjv9D36J9m/5WRyAE4TTA/bQwcL8pivfshGm0WQmM7m7L1JCPI2guyi97aPZnwKg==
+X-Received: by 2002:adf:f14c:: with SMTP id y12mr77440531wro.30.1594631303212; 
+ Mon, 13 Jul 2020 02:08:23 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id x1sm22119034wrp.10.2020.07.13.02.08.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 13 Jul 2020 02:08:22 -0700 (PDT)
+Subject: Re: [PATCH 05/12] virtfs-proxy-helper: Remove the superfluous break
+To: Yi Wang <wang.yi59@zte.com.cn>, qemu-devel@nongnu.org
+References: <1594631070-36397-1-git-send-email-wang.yi59@zte.com.cn>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9fbd45d9-08fc-bdee-9726-ef09c46eec10@amsat.org>
+Date: Mon, 13 Jul 2020 11:08:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <10bdd986-c474-278d-ed6a-193d9a45fe33@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-13_04:2020-07-10,
- 2020-07-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- priorityscore=1501 adultscore=0 bulkscore=0 spamscore=0 phishscore=0
- impostorscore=0 suspectscore=0 lowpriorityscore=0 clxscore=1015 mlxscore=0
- mlxlogscore=889 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007130066
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=hca@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 04:43:47
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1594631070-36397-1-git-send-email-wang.yi59@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,56 +104,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: xue.zhihong@zte.com.cn, wang.liang82@zte.com.cn,
+ Liao Pingfang <liao.pingfang@zte.com.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 10, 2020 at 05:24:07PM +0200, David Hildenbrand wrote:
-> On 10.07.20 17:18, Heiko Carstens wrote:
-> > On Fri, Jul 10, 2020 at 02:12:33PM +0200, David Hildenbrand wrote:
-> >>> Note: Reading about diag260 subcode 0xc, we could modify Linux to query
-> >>> the maximum possible pfn via diag260 0xc. Then, we maybe could avoid
-> >>> indicating maxram size via SCLP, and keep diag260-unaware OSs keep
-> >>> working as before. Thoughts?
-> >>
-> >> Implemented it, seems to work fine.
-> > 
-> > The returned value would not include standby/reserved memory within
-> > z/VM. So this seems not to work.
+On 7/13/20 11:04 AM, Yi Wang wrote:
+> From: Liao Pingfang <liao.pingfang@zte.com.cn>
 > 
-> Which value exactly are you referencing? diag 0xc returns two values.
-> One of them seems to do exactly what we need.
+> Remove the superfluous break, as there is a "return" before it.
 > 
-> See
-> https://github.com/davidhildenbrand/linux/commit/a235f9fb20df7c04ae89bc0d134332d1a01842c7
-> 
-> for my current Linux approach.
-> 
-> > Also: why do you want to change this
-> 
-> Which change exactly do you mean?
-> 
-> If we limit the value returned via SCLP to initial memory, we cannot
-> break any guest (e.g., Linux pre 4.2, kvm-unit-tests). diag260 is then
-> purely optional.
+> Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
+> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org> 
 
-Ok, now I see the context. Christian added my just to cc on this
-specific patch.
-So if I understand you correctly, then you want to use diag 260 in
-order to figure out how much memory is _potentially_ available for a
-guest?
+Hmm I never reviewed this patch, only the openrisc one:
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04078.html
 
-This does not fit to the current semantics, since diag 260 returns the
-address of the highest *currently* accessible address. That is: it
-does explicitly *not* include standby memory or anything else that
-might potentially be there.
+Something is wrong in your workflow, you are posting each patch as
+a new thread. You might be missing the --cc-cover option, see:
+https://wiki.qemu.org/Contribute/SubmitAPatch#Use_git_format-patch
 
-So you would need a different interface to tell the guest about your
-new hotplug memory interface. If sclp does not work, then maybe a new
-diagnose(?).
+> ---
+>  fsdev/virtfs-proxy-helper.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+> index de061a8..e68acc1 100644
+> --- a/fsdev/virtfs-proxy-helper.c
+> +++ b/fsdev/virtfs-proxy-helper.c
+> @@ -825,7 +825,6 @@ static int process_reply(int sock, int type,
+>          break;
+>      default:
+>          return -1;
+> -        break;
+>      }
+>      return 0;
+>  }
+> 
+
 
