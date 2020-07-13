@@ -7,73 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0464C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E2FC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB51E2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:27:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65A952067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:27:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+Z+SrrJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB51E2067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KKfDRbI1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65A952067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jutnv-0006WH-0S
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 04:27:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43176)
+	id 1jutnz-0006eL-Mb
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 04:27:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jutm0-0002qr-5t
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:25:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38429
- helo=us-smtp-1.mimecast.com)
+ id 1jutm8-0003C9-1K
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:25:24 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29678
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jutly-0006fo-9K
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:25:15 -0400
+ id 1jutm6-0006kv-CP
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:25:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594628713;
+ s=mimecast20190719; t=1594628721;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1epJmthCF0SmeWNqNIUBFrgi1eFoj9KTSUPZRQHPQxU=;
- b=J+Z+SrrJSyvTXhV68KhGHt+0qlsc8dCkvRIDGKlNds5y2pINDzsaW4XrFmZMmqEBpP0mfV
- vDA8y5lGGSQpOmohELWpMOzNqWSaKyIVmx5ujNNdjAVtLtJsHEuR03LXkaY+676WD3EWWl
- +sOLQ8yunxGl9oQF+6LWXDkNXGsoN5o=
+ bh=sn5Y93DXoZh5bTRQprBPuxRGtm7UyZpjjTTy9gBsWBg=;
+ b=KKfDRbI1UqL80nizdh6oURUJjVP2dPu0isYRZQr2nvPzn4HocHy2V1NlrLqpg24Ypkz63I
+ YJ123OU5bm0k/2t+qCLzbc3x0apjoEcIpZkOBg2Vy1owqpr0W+MKe4Y+F6Uw1kzVGkqSnD
+ 3NW4UDa6X0Wf6J9k9xkW6JTT0eSqjEw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-oEnHjsONMpqPLS-aENn1hA-1; Mon, 13 Jul 2020 04:25:12 -0400
-X-MC-Unique: oEnHjsONMpqPLS-aENn1hA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-418-XWG-C2SNM0aMKOPD7034xw-1; Mon, 13 Jul 2020 04:25:20 -0400
+X-MC-Unique: XWG-C2SNM0aMKOPD7034xw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DEDAE91A
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 08:25:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EA17800685
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 08:25:19 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.45])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C44B60BF3;
- Mon, 13 Jul 2020 08:25:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A43842DE71;
+ Mon, 13 Jul 2020 08:25:15 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 5/8] tests/test-char: Remove unused "chardev/char-mux.h" include
-Date: Mon, 13 Jul 2020 12:24:21 +0400
-Message-Id: <20200713082424.2947383-6-marcandre.lureau@redhat.com>
+Subject: [PULL 6/8] chardev: Restrict msmouse / wctablet / testdev to system
+ emulation
+Date: Mon, 13 Jul 2020 12:24:22 +0400
+Message-Id: <20200713082424.2947383-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20200713082424.2947383-1-marcandre.lureau@redhat.com>
 References: <20200713082424.2947383-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=marcandre.lureau@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=marcandre.lureau@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -104,28 +106,30 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-This test never required "chardev/char-mux.h", remove it.
+The msmouse / wctablet / testdev character devices are only
+used by system emulation. Remove them from user mode and tools.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200423202112.644-3-philmd@redhat.com>
+Message-Id: <20200423202112.644-4-philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- tests/test-char.c | 1 -
- 1 file changed, 1 deletion(-)
+ chardev/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 9d8746414d7..614bdac2df8 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -6,7 +6,6 @@
- #include "qemu/option.h"
- #include "qemu/sockets.h"
- #include "chardev/char-fe.h"
--#include "chardev/char-mux.h"
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-char.h"
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index 3a58c9d329d..62ec0a33235 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -17,7 +17,7 @@ chardev-obj-y += char-udp.o
+ chardev-obj-$(CONFIG_WIN32) += char-win.o
+ chardev-obj-$(CONFIG_WIN32) += char-win-stdio.o
+ 
+-common-obj-y += msmouse.o wctablet.o testdev.o
++common-obj-$(CONFIG_SOFTMMU) += msmouse.o wctablet.o testdev.o
+ 
+ ifeq ($(CONFIG_BRLAPI),y)
+ common-obj-m += baum.o
 -- 
 2.27.0.221.ga08a83db2b
 
