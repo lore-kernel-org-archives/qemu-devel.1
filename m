@@ -2,91 +2,73 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED35C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:19:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4327CC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:21:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77FAC2072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:19:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qVYohas5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77FAC2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1CE4B205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:21:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE4B205CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzIs-0003QD-Pg
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:19:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35190)
+	id 1juzKW-0005xO-8q
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:21:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAy-0005Lz-6J
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:24 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:40406)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAw-0006dl-1b
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:23 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id f2so16675636wrp.7
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=UrTMYXsKYBCCeeRev7zn6zcrL7aDFdGahwfyK1NLkvM=;
- b=qVYohas5ocgS+RPL4ScujKXWa7XMktaIgmOG5itxCIqEX572fGuYFPZRiYAlD15Owx
- YvyFhZysgv+8kDLIrjPXj5VeiJWzNGPEbR+GlG1j/ip2kzAo38PVgcqth/3GTZL0tDmb
- XIyeKdFeSs9WG7xAcdK/RAw3fdflNbH+SjJ6Uu7OtnSTGY8iW/oQqCaCNEaNB/mEEoNO
- OTUpyLe+8//pjl1T3QiUT32KgW+af+SfS8b6Wu7MsqumMunrv4ZWTLfzNKyQeTiCC5nh
- IiW1liofaDZvZhZ/PWwOUCC7ojuPPg1SGHMprtajVYTycyseZOvxHIhs7lRYvKetMEDJ
- 8WdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=UrTMYXsKYBCCeeRev7zn6zcrL7aDFdGahwfyK1NLkvM=;
- b=MFt46zilwXHz6p/C74/5gMCTkJUPPFS2ESXLImocdsYrA6W3w/HQHx5OW2yqoaVQEq
- 1OhWo09AyMIaQGhHAIA57zPgsYG3VvxRz1JW+5ezCWR2K7rYYEEGxoGXEHjoWQ4YR6+N
- GB9r+hAX1/GBo0DgIkhObxIGnohA0WQINoxoxJ98F2fZ3SMeTr9XgA0glvC4Unkt3V6q
- emfMbYdIhjtI6e+qrSRjELPOdHm1mrIvGW3nCqxzQH4izjkJOC/DOvMG0/eajyeFwLi6
- 97FYnSNdQ4Jdra+Qi86uQxnIN59RTf1V080YS95corMkiNI89+Wl0zKG74Vhjf7GALmJ
- N2ig==
-X-Gm-Message-State: AOAM533/nUy9NuygEx/jfVcFzwa2iCYjYwF003SCETshGJIZXfdhIds4
- iAi+47QsoD7WJ3GpuRxDKO7S9CBxZEDGtA==
-X-Google-Smtp-Source: ABdhPJwziGWE9XzWIU/f90OxiQRLIoF00f7buY96Vn9KONEvkYNIZlUQJB1FqQVvtIl3m4VH/5ilkw==
-X-Received: by 2002:adf:dd4a:: with SMTP id u10mr78795904wrm.169.1594649480342; 
- Mon, 13 Jul 2020 07:11:20 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.19
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 07:11:19 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 12/25] osdep.h: For Haiku, define SIGIO as equivalent to SIGPOLL
-Date: Mon, 13 Jul 2020 15:10:51 +0100
-Message-Id: <20200713141104.5139-13-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200713141104.5139-1-peter.maydell@linaro.org>
-References: <20200713141104.5139-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1juzJE-0004Dh-KF
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:19:56 -0400
+Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:52394)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1juzJC-0007na-Ed
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:19:56 -0400
+Received: from player778.ha.ovh.net (unknown [10.110.115.91])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 095D5146E61
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 16:19:50 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player778.ha.ovh.net (Postfix) with ESMTPSA id 4C0AF1455718C;
+ Mon, 13 Jul 2020 14:19:43 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G002f4ce4a81-69c6-402d-9314-f1e4916fb6b6,29C60B8BFD44B6CD822E82BF6A6060F4508BB267)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] hw/net/ftgmac100: Fix integer overflow in
+ ftgmac100_do_tx()
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Mauro Matteo Cascella <mcascell@redhat.com>
+References: <20200710085417.638904-1-mcascell@redhat.com>
+ <CAFEAcA-pRXOz5JVcwHa8=oaeogwaOK0YVXYQiJUpdM_rFZ+QTA@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d7affe2b-0a2c-4e06-a874-daccf16bd136@kaod.org>
+Date: Mon, 13 Jul 2020 16:19:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <CAFEAcA-pRXOz5JVcwHa8=oaeogwaOK0YVXYQiJUpdM_rFZ+QTA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7891995398697618332
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrvdekgdejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephfffgeelfeejudevuedvvdeigeduteetveffhfffudeggfegleeljeeuieefuedvnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=178.33.111.180; envelope-from=clg@kaod.org;
+ helo=1.mo173.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 10:19:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,43 +82,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David CARLIER <devnexen@gmail.com>
+On 7/10/20 1:33 PM, Peter Maydell wrote:
+> On Fri, 10 Jul 2020 at 09:56, Mauro Matteo Cascella <mcascell@redhat.com> wrote:
+>>
+>> An integer overflow issue was reported by Mr. Ziming Zhang, CC'd here. It
+>> occurs while inserting the VLAN tag in packets whose length is less than
+>> 12 bytes, as (len-12) is passed to memmove() without proper checking.
+>> This patch is intended to fix this issue by checking the minimum
+>> Ethernet frame size during packet transmission.
+>>
+>> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+>> Signed-off-by: Mauro Matteo Cascella <mcascell@redhat.com>
+>> ---
+>>  hw/net/ftgmac100.c | 14 ++++++++++++++
+>>  1 file changed, 14 insertions(+)
+>>
+>> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+>> index 043ba61b86..bcf4d84aea 100644
+>> --- a/hw/net/ftgmac100.c
+>> +++ b/hw/net/ftgmac100.c
+>> @@ -238,6 +238,11 @@ typedef struct {
+>>   */
+>>  #define FTGMAC100_MAX_FRAME_SIZE    9220
+>>
+>> +/*
+>> + * Min frame size
+>> + */
+>> +#define FTGMAC100_MIN_FRAME_SIZE    64
+>> +
+>>  /* Limits depending on the type of the frame
+>>   *
+>>   *   9216 for Jumbo frames (+ 4 for VLAN)
+>> @@ -507,6 +512,15 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
+>>          }
+>>
+>>          len = FTGMAC100_TXDES0_TXBUF_SIZE(bd.des0);
+>> +
+>> +        /* drop small packets */
+>> +        if (bd.des0 & FTGMAC100_TXDES0_FTS &&
+>> +            len < FTGMAC100_MIN_FRAME_SIZE) {
+>> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too small: %d bytes\n",
+>> +                          __func__, len);
+>> +            break;
+>> +        }
+>> +
+> 
+> Andrew, Cedric: do you have the datasheet for this devic? Do you
+> know if we should also be flagging the error back to the
+> guest somehow?
 
-Haiku doesn't provide SIGIO; fix this up in osdep.h by defining it as
-equal to SIGPOLL.
+zero is the only invalid size of a transmit buffer and the specs does
+not have any special information on which bit to raise in that case.
 
-Signed-off-by: David Carlier <devnexen@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200703145614.16684-6-peter.maydell@linaro.org
-[PMM: Expanded commit message]
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/qemu/osdep.h | 4 ++++
- 1 file changed, 4 insertions(+)
+I think FTGMAC100_INT_NO_NPTXBUF (transmit buffer unavailable) is our 
+best option and we should add an extra 'len == 0' test in front of 
+the dma_memory_read() call to raise it. A zero length is not considered 
+bogus by dma_memory_read() it seems. Is address zero considered bogus ? 
+If not, we need to check that also. 
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 14059bce5a7..979a4039841 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -432,6 +432,10 @@ void qemu_anon_ram_free(void *ptr, size_t size);
- #define HAVE_CHARDEV_PARPORT 1
- #endif
- 
-+#if defined(__HAIKU__)
-+#define SIGIO SIGPOLL
-+#endif
-+
- #if defined(CONFIG_LINUX)
- #ifndef BUS_MCEERR_AR
- #define BUS_MCEERR_AR 4
--- 
-2.20.1
+The code doing the memmove() should be protected by a check on the 
+length, 'sizeof(struct eth_header)' or ETH_HLEN. That will fix the 
+integer overflow. 
+
+For clarity, we could replace 12 and 16 by a L2 header size: 
+'sizeof(struct eth_header)' and 
+'sizeof(struct eth_header) + sizeof(struct vlan_header)'. It can be
+done later.
+
+Thanks,
+
+C. 
+
+
+> I think a 'break' here means we'll never update the
+> descriptor flags to hand it back to the guest, which
+> is probably not what the hardware does.
+> 
+> thanks
+> -- PMM
+> 
 
 
