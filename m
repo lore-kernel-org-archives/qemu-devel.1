@@ -2,97 +2,121 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0081DC433EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F13C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C49D620663
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:21:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lWGmNan+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C49D620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A034220663
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:22:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A034220663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv41Q-0004aR-0Y
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:21:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42682)
+	id 1jv41s-0005G9-To
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:22:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv40c-0003WD-UZ
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:21:02 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42318)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv40a-0006R9-Ae
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:21:02 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m22so6448657pgv.9
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 12:20:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Kgo4BLot8UMYU8cwfO6GPhprIl7fX/sQxBzvNfxI/7M=;
- b=lWGmNan+bkn4C2074Riu4TfGrxBwnHKG3aKTO97dQkHlppwKX0EqjHWm4dXgxdONTG
- y/UMF8gvC9wtR++j4UuPWg9/5AnmsTdZnLi6VHXDpoC3OdaFBm/YUx6WmDFyDhNSNhWn
- ZOkO9ZHAK1U6QG1/FcfOfYJhbLW1Ffb5NZy2PvOfu0imL4oMtT3bMk8v5kiXME2KMN9U
- vd6NuyGUXF7+fh0lriaL9FNZyhQHEPYpmgVh1rZGp0PTi6eINMB1biH0CO7IJKuPTqDa
- rRDKPDmxXulAUIxDtv61TUdjmlTTj0OODasHqNl0ylnLpUoKpkVktD7giASERVpJNWEX
- 8CQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Kgo4BLot8UMYU8cwfO6GPhprIl7fX/sQxBzvNfxI/7M=;
- b=g/VEp01hldvjzfhW+Ij3M1PLyGI6fEBcIalUBh4lcZ+oMWGKJPb3Q0/XglAfWM8Fzc
- QKM+3WnU6aFBFii3f1czXSsFVXEl3PUQ+BbifhHtJcGCqmOjl9icidIRGY7rRGLQrlCN
- F6NYssmEZU7LRX0g7GuU28ahYR2MuVqDzlCLWZ9+UjTvHT4B5QRnHaGzv0asUvgNmhA/
- /IKdqhMW/ml5WqveEsTy9FLJ09OeslsTN2fPLObE2eh7wa4oZendBOJc6Cir+87weMZS
- ynat+f5P80bpy92Bte8vxyC0V02tjW7dz25R8QI8UxrI/2EGAknhas+LXPqt9hznVDxz
- L7JA==
-X-Gm-Message-State: AOAM530CuGJvst3ZjrSlzus0J2I4Hjzwn1pgO2A0j+Z2iS6QOlMEP3wG
- wssfVaTpHhApA3IZ372RKoloBA==
-X-Google-Smtp-Source: ABdhPJwj3pP9QOD7cprY+mQi04JWa+BO+wMVRGOyuh0fZPuVzD8+2Zxj9hORHMCk5YVwZNznhChD3g==
-X-Received: by 2002:a63:9d45:: with SMTP id i66mr550705pgd.25.1594668058728;
- Mon, 13 Jul 2020 12:20:58 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id k26sm14092145pgt.90.2020.07.13.12.20.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 12:20:57 -0700 (PDT)
-Subject: Re: [RFC PATCH 3/8] fpu/softfloat: add FloatFmt for bfloat16
-From: Richard Henderson <richard.henderson@linaro.org>
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org
-References: <20200712234521.3972-1-zhiwei_liu@c-sky.com>
- <20200712234521.3972-4-zhiwei_liu@c-sky.com>
- <c8fa12f7-6200-4eea-b965-c5e4b2915800@linaro.org>
-Message-ID: <6d79072c-ee36-1030-2c11-e2a272bb1b9d@linaro.org>
-Date: Mon, 13 Jul 2020 12:20:56 -0700
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv418-0004LX-Ub
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:21:34 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:45703)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv417-0006Uh-0a
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:21:34 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MHWvH-1k8UGf2S3N-00DbIz; Mon, 13 Jul 2020 21:21:20 +0200
+Subject: Re: [PATCH v3 1/2] linux-user: refactor ipc syscall
+From: Laurent Vivier <laurent@vivier.eu>
+To: Matus Kysel <mkysel@tachyum.com>, riku.voipio@iki.fi, qemu-devel@nongnu.org
+References: <20200626124612.58593-1-mkysel@tachyum.com>
+ <20200626124612.58593-2-mkysel@tachyum.com>
+ <b45a9fe1-ba32-8792-67e4-aececeee7227@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <de129f21-114e-2dd4-6ca6-89ce53e0c138@vivier.eu>
+Date: Mon, 13 Jul 2020 21:21:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <c8fa12f7-6200-4eea-b965-c5e4b2915800@linaro.org>
+In-Reply-To: <b45a9fe1-ba32-8792-67e4-aececeee7227@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:rFIJsNHgkugRQJLP6YChm8hUgGkQ9Ovs7nH5o7Ga2iooT1XPyub
+ bzI3tKQsbfqRQgKTJCqTjT1OpO1xr2z7VS+Z7SX9MGnnby+gnmNNdYwGi6Ls++EnbGLzxSk
+ 618TmK0glbqP4XQCCjyqnKpzalYf8xpaPypWEoqXTZLbhvF97FvvGsW55XDu6u6yNbRBAbn
+ R/u9r0PQbzEOE5qtE8U2w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ezLIlKruMOU=:OrNAO1zi4V1bWX08CSfAXx
+ K5T6YJrniG/FW1tazE53yYzQ7GcpNJqXjXQoOjZF57f5AaTCuavEOqEzoN+45WFMDlGXCBfoE
+ hnVXhOi9YSQ3n0BhQyb5ci5YU8BnQynR5Y+33IYvPHuOwvToO7TMvTBriMo85erAbEwzgI1LU
+ JspwwI8VyjOw0icKytnZfr7Rpmf3j7SbC8xllu7TcEXgfmfc54eKWSHri6vuiPqcKIwMDA6uh
+ c4hJqpKHWpuq14NLejaM8dRsAO0DBPxs1HMZQYC2AmtYGhIaDYaAUzAJjEx2W2n/Og/b7XzL1
+ 0QwyBfSatVMaan9278cd+pvj5VfQvbLjQZS7YbeN3GJp5gGkxAaZyJvdDpxMVL0ozOLRduZZP
+ f84qlajAyzts5/jknavFemKScwOsg4lrR483KwI6eGgDeTBVjxv1vVYHX50WZcEBwS/CHtmpK
+ 97R/wMQNwtz3sNwwsrz+Jypl39nh6uJneUPzOTaQhmNCbzWgJklABpTnPHtN5lz4QyNXKywb0
+ jHWfY1U3E7Iu8Z6pWTNNCjnFOkLOL/VE/D3HPu1cr7RUbBe/KndbGnhdpZYc8EbhbVx6y1YEn
+ uXqg4mpsYFnW49XlQYJsUKrUgZdK5JuUUFIR0bMSFdgb0ugI445sigkMPjIEfI2dLwCiWDbhu
+ S7uKqortvGSYh6rbzqSZMhzx8bG6EoAf7JB4zkvQHFtyB22KYf/kFvECpH3lMPjSUx51VPcA9
+ glPLRTFiYGK/gis1shx7kZnHCyZK+aB8EVpY1/8/vMsXh14QaWR0Kdl+g5DdM4goGvjMh2XsP
+ WJBFrq9Zl4gVcL333G33YP04foL7DVhhbeRPJ7fl/ca/DTsD+SiMNiT3rzoPiPE6AUImwwR
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:21:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,23 +129,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, alex.bennee@linaro.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/13/20 12:18 PM, Richard Henderson wrote:
-> On 7/12/20 4:45 PM, LIU Zhiwei wrote:
->> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Le 10/07/2020 à 14:46, Laurent Vivier a écrit :
+> Le 26/06/2020 à 14:46, Matus Kysel a écrit :
+>> Refactoring ipc syscall for s390x and SPARC, so it matches glibc implementation
+>>
+>> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
 >> ---
->>  fpu/softfloat.c | 4 ++++
->>  1 file changed, 4 insertions(+)
+>>  linux-user/syscall.c | 26 +++++++++++++++++++++++++-
+>>  1 file changed, 25 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 97de9fb5c9..990412733b 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -814,9 +814,14 @@ safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
+>>                const struct timespec *, req, struct timespec *, rem)
+>>  #endif
+>>  #ifdef __NR_ipc
+>> +#ifdef __s390x__
+>> +safe_syscall5(int, ipc, int, call, long, first, long, second, long, third,
+>> +              void *, ptr)
+>> +#else
+>>  safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
+>>                void *, ptr, long, fifth)
+>>  #endif
+>> +#endif
+>>  #ifdef __NR_msgsnd
+>>  safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
+>>                int, flags)
+>> @@ -4053,8 +4058,13 @@ static inline abi_long do_msgsnd(int msqid, abi_long msgp,
+>>  #endif
+>>  #ifdef __NR_ipc
+>>      if (ret == -TARGET_ENOSYS) {
+>> +#ifdef __s390x__
+>> +        ret = get_errno(safe_ipc(IPCOP_msgsnd, msqid, msgsz, msgflg,
+>> +                                 host_mb));
+>> +#else
+>>          ret = get_errno(safe_ipc(IPCOP_msgsnd, msqid, msgsz, msgflg,
+>>                                   host_mb, 0));
+>> +#endif
+>>      }
+>>  #endif
+>>      g_free(host_mb);
+>> @@ -4063,6 +4073,20 @@ static inline abi_long do_msgsnd(int msqid, abi_long msgp,
+>>      return ret;
+>>  }
+>>  
+>> +#ifdef __NR_ipc
+>> +#if defined(__sparc__)
+>> +/* SPARC for msgrcv it does not use the kludge on final 2 arguments.  */
+>> +#define MSGRCV_ARGS(__msgp, __msgtyp) __msgp, __msgtyp
+>> +#elif defined(__s390x__)
+>> +/* The s390 sys_ipc variant has only five parameters.  */
+>> +#define MSGRCV_ARGS(__msgp, __msgtyp) \
+>> +    ((long int[]){(long int)__msgp, __msgtyp})
+>> +#else
+>> +#define MSGRCV_ARGS(__msgp, __msgtyp) \
+>> +    ((long int[]){(long int)__msgp, __msgtyp}), 0
+>> +#endif
+>> +#endif
+>> +
+>>  static inline abi_long do_msgrcv(int msqid, abi_long msgp,
+>>                                   ssize_t msgsz, abi_long msgtyp,
+>>                                   int msgflg)
+>> @@ -4091,7 +4115,7 @@ static inline abi_long do_msgrcv(int msqid, abi_long msgp,
+>>  #ifdef __NR_ipc
+>>      if (ret == -TARGET_ENOSYS) {
+>>          ret = get_errno(safe_ipc(IPCOP_CALL(1, IPCOP_msgrcv), msqid, msgsz,
+>> -                        msgflg, host_mb, msgtyp));
+>> +                        msgflg, MSGRCV_ARGS(host_mb, msgtyp)));
+>>      }
+>>  #endif
+>>  
+>>
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> This patch breaks build because there is safe_ipc() that is not updated
+> to use only 5 arguments with s390x. This is updated in the next patch so
+> the build in the end works, but it breaks bisect so you should fix that.
+> 
+> Otherwise:
+> 
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> 
+> Thanks,
+> Laurent
+> 
 
-Actually, it occurs to me that clang probably warns for unused variable.  This
-will need merging with a patch that uses it.
+I have merged PATH 1 and 2 and applied to my linux-user-for-5.1 branch.
 
-
-r~
+Thanks,
+Laurent
 
