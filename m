@@ -2,88 +2,86 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DAC5C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11751C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:43:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CE16206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC69C206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:43:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KarJaQIo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CE16206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="OXVqy0/f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC69C206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juv3y-00068U-ME
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35882)
+	id 1juuzr-0004jl-3h
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:43:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1juv2p-0005Tg-M8
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:46:43 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49847
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1juv2n-0000bo-B7
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:46:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594633600;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=B0Oe5UV2qyeUG9Z0o/6/qc3LlnZaZG6gs7b/Di/jHF4=;
- b=KarJaQIo1zHWIl/CsbwDzNwl5/BAlK256h/dXO5BJK5uz3ztgCUP26nhOQWx2SWA7tLGN5
- jp6kBhjC1SF/gcwfRjFXu2JObjzx/DaiV7H0GWxIylUbBe6SkqYDmu68zxRQQd3Mh6Hy2a
- 6w6xwWwPUPKg4iwzdkxcwBqe46RUkik=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-SmNjCEALNaCu-3G69JToMA-1; Mon, 13 Jul 2020 05:46:38 -0400
-X-MC-Unique: SmNjCEALNaCu-3G69JToMA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1juuwA-0007o3-Nu
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:39:50 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:33862 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1juuw8-0007zd-Lo
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:39:50 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 57FEE4C895;
+ Mon, 13 Jul 2020 09:39:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1594633184;
+ x=1596447585; bh=A0NE5T2IKT7eWNWzpzPEIe66YY1+D8nFbfC/FpbocNk=; b=
+ OXVqy0/fDsgT1MRATcp67HNl3anPNIT1AE4DYWe7VjFXOduXnBcnlkejo+gqS1xS
+ npMs5KIAa+ZUrFrfeV/WCzJK2HEHcFzYDeCyincZKN93yoTWCxt6CFluuUH7LfA/
+ cDVni/9yIerxDNIsHV3qsv3Py3aLAHlAW9/owddfKKY=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pjC0m-UsepAf; Mon, 13 Jul 2020 12:39:44 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DB3E8015F4;
- Mon, 13 Jul 2020 09:46:34 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
- [10.36.115.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 303A327DE7C;
- Mon, 13 Jul 2020 09:46:24 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 1CA893EBB1; Mon, 13 Jul 2020 11:46:24 +0200 (CEST)
-Date: Mon, 13 Jul 2020 11:46:24 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 00/26] hw/usb: Give it love, reduce 'hw/usb.h' inclusion
- out of hw/usb/
-Message-ID: <20200713094624.occmvxdb56kvbqy2@sirius.home.kraxel.org>
-References: <20200704144943.18292-1-f4bug@amsat.org>
+ by mta-01.yadro.com (Postfix) with ESMTPS id 144424C894;
+ Mon, 13 Jul 2020 12:39:44 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Mon, 13
+ Jul 2020 12:39:43 +0300
+Date: Mon, 13 Jul 2020 12:39:43 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3] i386: hvf: Implement CPU kick
+Message-ID: <20200713093943.GA90799@SPB-NB-133.local>
+References: <20200702105721.75333-1-r.bolshakov@yadro.com>
+ <fa29e532-a891-cf61-a8a2-af5e36e7834f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200704144943.18292-1-f4bug@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <fa29e532-a891-cf61-a8a2-af5e36e7834f@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 05:39:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,65 +94,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Huacai Chen <chenhc@lemote.com>, Stefano Stabellini <sstabellini@kernel.org>,
- xen-devel@lists.xenproject.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- Paul Durrant <paul@xen.org>, Magnus Damm <magnus.damm@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Leif Lindholm <leif@nuviainc.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Paul Zimmerman <pauldzim@gmail.com>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Cameron Esfahani <dirty@apple.com>, Claudio Fontana <cfontana@suse.de>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 04, 2020 at 04:49:17PM +0200, Philippe Mathieu-Daudé wrote:
-> Hi,
+On Thu, Jul 02, 2020 at 02:42:45PM +0200, Paolo Bonzini wrote:
+> On 02/07/20 12:57, Roman Bolshakov wrote:
+> > There's still a small chance of kick loss, on user-to-kernel border
+> > between atomic_mb_set's just before the entry to hv_vcpu_run and just
+> > after it.
 > 
-> This is the second time I try to replace a magic typename string
-> by a constant, and Zoltan warns me this is counter productive as
-> "hw/usb.h" pulls in an insane amount of code.
+> Good point, but we can fix it.
 > 
-> Time to give the usb subsystem some love and move forward.
+> > -static void dummy_signal(int sig)
+> > +static void hvf_handle_ipi(int sig)
+> >  {
+> > +    CPUState *cpu = pthread_getspecific(hvf_cpu);
 > 
-> This series can be decomposed as follow:
+> You can use current_cpu here.  If it's NULL, just return (it's a
+> per-thread variable).
 > 
->  1-2:    preliminary machine cleanups (arm/ppc)
->  3-13:   usb related headers cleanups
->  14-15:  usb quirks cleanup
->  16-18:  refactor usb_get_dev_path() to add usb_get_port_path()
->  19:     let spapr use usb_get_port_path() to make USBDevice opaque
->  20:     extract the public USB API (for machine/board/soc)
->  21:     make the older "usb.h" internal to hw/usb/
->  22-25:  use TYPENAME definitions
->  26:     cover dwc2 in MAINTAINERS
+> > +    X86CPU *x86_cpu = X86_CPU(cpu);
+> > +    CPUX86State *env = &x86_cpu->env;
+> > +
+> > +    if (!atomic_xchg(&env->hvf_in_guest, false)) {
 > 
-> Please review.
+> Here, thinking more about it, we need not write hvf_in_guest, so:
+> 
+> 	/* Write cpu->exit_request before reading env->hvf_in_guest.  */
+> 	smp_mb();
+> 	if (!atomic_read(&env->hvf_in_guest)) {
+> 		...
+> 	}
+> 
+> > +        wvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS,
+> > +              rvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS)
+> > +                | VMCS_PIN_BASED_CTLS_VMX_PREEMPT_TIMER);
+> > +    }
+> >  }
+> >  
+> >  int hvf_init_vcpu(CPUState *cpu)
+> > @@ -631,7 +650,9 @@ int hvf_vcpu_exec(CPUState *cpu)
+> >              return EXCP_HLT;
+> >          }
+> >  
+> > +        atomic_mb_set(&env->hvf_in_guest, true);
+> >          hv_return_t r  = hv_vcpu_run(cpu->hvf_fd);
+> > +        atomic_mb_set(&env->hvf_in_guest, false);
+> 
+> 
+> And here you can do instead:
+> 
+> 	atomic_set(&env->hvf_in_guest, true);
+> 	/* Read cpu->exit_request after writing env->hvf_in_guest.  */
+> 	smp_mb();
+> 	if (atomic_read(&cpu->exit_request)) {
+> 	    qemu_mutex_lock_iothread();
+> 	    atomic_set(&env->hvf_in_guest, false);
+> 	    return EXCP_INTERRUPT;
+> 	}
+> 	hv_return_t r  = hv_vcpu_run(cpu->hvf_fd);
+> 	atomic_store_release(&env->hvf_in_guest, false);
+> 
+> This matching "write A/smp_mb()/read B" and "write B/smp_mb()/read A" is
+> a very common idiom for lock-free signaling between threads.
+> 
 
-Looks good overall, I don't fell like squeezing this into 5.1 though.
-Can you repost (with the few comments addressed) once 5.2 is open for
-development in roughly a month?
+Hi Paolo,
 
-thanks,
-  Gerd
+Thanks for the feedback and the guidelines. I think I've got the idea:
 
+exit_request is the way to record the fact of kick request even if it
+was sent outside of hv_vcpu_run().
+
+Best regards,
+Roman
 
