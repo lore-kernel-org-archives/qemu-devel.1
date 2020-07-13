@@ -4,77 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C07C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B662C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:57:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1FC020758
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:57:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43FAF20758
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:57:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X5jZiLBo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1FC020758
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0teUb3g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43FAF20758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juw8s-0001ib-3O
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 06:57:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60900)
+	id 1juw8v-0001tC-Gc
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 06:57:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1juw7d-0008S1-SB
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:55:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32304
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1juw7k-0000BX-0J
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:55:52 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20752
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1juw7c-0003w9-91
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:55:45 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1juw7i-0003xT-4c
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:55:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594637743;
+ s=mimecast20190719; t=1594637749;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1+JSHYb737LZqhaYjYC2+OkHdZ5z7XT1MwUYgTFntwI=;
- b=X5jZiLBoZyIJt+eHhkTdGYHn5A4C9xdlSegejSyT8OQKHUjkh6fd/HWzqV9a2T0vvqhrRC
- Ahk/LueKSL4VIf/iHhFViSVDr9KgkpwF+ypp5kVsONr7Ma+cI2o2J1HE6L1LXqRE4sUbm3
- cAWGCbd8m0uchNfzkZ/f/ba9WBx6+dY=
+ bh=bgSJHUk50WsVUywUJl51sQnhEuKpjZ1TmWz6VxDAHSI=;
+ b=L0teUb3gaOGdD96ukrmrdQwPryQhoGb1neQzSpiv/BAdCrniClYN4m88vhoWGIRgdI5dOm
+ c/ASGxHR6bv+zbB1V6laH0tUW9UEQ0GPFogfbAStaPJtyG4JvIWNDr0q4FZCXEm0zYvPtN
+ HQe4utAPFeZ97ZHER/2Z6HkDGbra6Uk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-ddaxHFoBMsKkkFfYcDHHNQ-1; Mon, 13 Jul 2020 06:55:41 -0400
-X-MC-Unique: ddaxHFoBMsKkkFfYcDHHNQ-1
+ us-mta-416-PE_VUdsOMIaQP3KlI1gtOw-1; Mon, 13 Jul 2020 06:55:44 -0400
+X-MC-Unique: PE_VUdsOMIaQP3KlI1gtOw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49B291902EA0;
- Mon, 13 Jul 2020 10:55:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32DCA100AA21;
+ Mon, 13 Jul 2020 10:55:43 +0000 (UTC)
 Received: from thuth.com (ovpn-112-125.ams2.redhat.com [10.36.112.125])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 47CCE27CCC;
- Mon, 13 Jul 2020 10:55:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5994B27CCC;
+ Mon, 13 Jul 2020 10:55:42 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 2/9] configure: do not clobber CFLAGS with --enable-fuzzing
-Date: Mon, 13 Jul 2020 12:55:27 +0200
-Message-Id: <20200713105534.10872-3-thuth@redhat.com>
+Subject: [PULL 4/9] tests/qtest/fuzz: Add missing spaces in description
+Date: Mon, 13 Jul 2020 12:55:29 +0200
+Message-Id: <20200713105534.10872-5-thuth@redhat.com>
 In-Reply-To: <20200713105534.10872-1-thuth@redhat.com>
 References: <20200713105534.10872-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 03:20:22
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -95,42 +93,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Bulekov <alxndr@bu.edu>
+There should be a space between "forking" and "for".
 
-When configuring with --enable-fuzzing, we overwrote the CFLAGS
-added by all the preceding checks. Instead of overwriting CFLAGS, append
-the ones we need.
-
-Fixes: adc28027ff ("fuzz: add configure flag --enable-fuzzing")
-Reported-by: Li Qiang <liq3ea@163.com>
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-Message-Id: <20200708200104.21978-2-alxndr@bu.edu>
-Tested-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Message-Id: <20200709083719.22221-1-thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qtest/fuzz/virtio_scsi_fuzz.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index f59418f6de..69a89113f7 100755
---- a/configure
-+++ b/configure
-@@ -7926,7 +7926,7 @@ if test "$fuzzing" = "yes" ; then
-   if test "$have_fuzzer" = "yes"; then
-     FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
-     FUZZ_CFLAGS=" -fsanitize=address,fuzzer"
--    CFLAGS=" -fsanitize=address,fuzzer-no-link"
-+    CFLAGS="$CFLAGS -fsanitize=address,fuzzer-no-link"
-   else
-     error_exit "Your compiler doesn't support -fsanitize=address,fuzzer"
-     exit 1
+diff --git a/tests/qtest/fuzz/virtio_scsi_fuzz.c b/tests/qtest/fuzz/virtio_scsi_fuzz.c
+index 51dce491ab..3a9ea13736 100644
+--- a/tests/qtest/fuzz/virtio_scsi_fuzz.c
++++ b/tests/qtest/fuzz/virtio_scsi_fuzz.c
+@@ -191,7 +191,7 @@ static void register_virtio_scsi_fuzz_targets(void)
+ {
+     fuzz_add_qos_target(&(FuzzTarget){
+                 .name = "virtio-scsi-fuzz",
+-                .description = "Fuzz the virtio-scsi virtual queues, forking"
++                .description = "Fuzz the virtio-scsi virtual queues, forking "
+                                 "for each fuzz run",
+                 .pre_vm_init = &counter_shm_init,
+                 .pre_fuzz = &virtio_scsi_pre_fuzz,
+@@ -202,7 +202,7 @@ static void register_virtio_scsi_fuzz_targets(void)
+ 
+     fuzz_add_qos_target(&(FuzzTarget){
+                 .name = "virtio-scsi-flags-fuzz",
+-                .description = "Fuzz the virtio-scsi virtual queues, forking"
++                .description = "Fuzz the virtio-scsi virtual queues, forking "
+                 "for each fuzz run (also fuzzes the virtio flags)",
+                 .pre_vm_init = &counter_shm_init,
+                 .pre_fuzz = &virtio_scsi_pre_fuzz,
 -- 
 2.18.1
 
