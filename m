@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC30C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCA6C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:09:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3E4C2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:11:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8BA20758
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:09:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="CDKV8yqi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3E4C2067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="hRPkjIuS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8BA20758
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juuUc-0007SL-OL
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:11:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54124)
+	id 1juvP3-0006g8-Es
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 06:09:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1juuT0-0005TH-Ai
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:09:42 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:14415)
+ id 1juvO7-0005wS-OQ
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:08:43 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:32042)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1juuSs-00041W-MO
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:09:41 -0400
+ id 1juvO0-0004k4-5D
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:08:43 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1594631374; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1594634916; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=qHQMdKfEH7Qz9z5wqx4GQ5yaA3CD5X43DnzrhxYy7kg=;
- b=CDKV8yqi7gJYQDDviX3k1cA+QC659pE+WpeXtOV1I9GYF3ryNRkQO/r0TantS868MMBYrwfU
- 6LOlMcQc5EzxhlO4/y3v88VNnyNOHu7hftNw8e3XSHE65/3ewV7zBnEU0d/QpbnmEpIex9s9
- sLoiUzn4r7XqXAmhpufwf5z9mtg=
+ Sender; bh=1NV/exfVQX311Zpmob6I7pMD6tRbE9ELbNxQ2VURSuk=;
+ b=hRPkjIuSOzADL17BMdkuVdsKqSvWUYZp4PRFr0/UQeHHFTKbk9U9gSutfBtGw/TZ1wLC71kh
+ 1YrLocMmQOd+m27vIpLD305nCG8JKwUh56zarKfNQH6j1CpIfanr0lhoSD+JiDpbpdlo7R50
+ GyTeqEqeIRfKEu+uqHxnahO6Oow=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (65.90.74.34.bc.googleusercontent.com
- [34.74.90.65]) by smtp-out-n03.prod.us-west-2.postgun.com with SMTP id
- 5f0c24c98e36ecda3091e512 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Mon, 13 Jul 2020 09:09:29 GMT
-Date: Mon, 13 Jul 2020 09:09:27 +0000
-Message-ID: <5f0c24c7d010f_532a3fad1f25214412939c@sidekiq-catchall-02-sv-gprd.mail>
+Received: from mg.gitlab.com (64.90.74.34.bc.googleusercontent.com
+ [34.74.90.64]) by smtp-out-n02.prod.us-east-1.postgun.com with SMTP id
+ 5f0c32a0f9ca681bd04b11e8 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Mon, 13 Jul 2020 10:08:32 GMT
+Date: Mon, 13 Jul 2020 10:08:32 +0000
+Message-ID: <5f0c32a02fd60_5ed13fa0c2d7d44c17994d@sidekiq-catchall-04-sv-gprd.mail>
 Subject: QEMU | Pipeline #165884817 has failed for master | 9f526fce
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5f0c24c7a05e6_532a3fad1f25214412929f";
+ boundary="--==_mimepart_5f0c32a017f48_5ed13fa0c2d7d44c1798ba";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
@@ -71,15 +71,14 @@ Received-SPF: pass client-ip=192.237.158.143;
  helo=do158-143.mg.gitlab.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 04:41:16
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
  HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, MISSING_HEADERS=1.021,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, REPLYTO_WITHOUT_TO_CC=1.552,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, REPLYTO_WITHOUT_TO_CC=1.552, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,7 +98,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5f0c24c7a05e6_532a3fad1f25214412929f
+----==_mimepart_5f0c32a017f48_5ed13fa0c2d7d44c1798ba
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -120,7 +119,7 @@ Pipeline #165884817 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
 5884817 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 23 failed builds.
 
-Job #635521969 ( https://gitlab.com/qemu-project/qemu/-/jobs/635521969/ra=
+Job #635642708 ( https://gitlab.com/qemu-project/qemu/-/jobs/635642708/ra=
 w )
 
 Stage: containers-layer2
@@ -153,16 +152,16 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-alpha-cross', '-f', '/tmp/docker_build5sle6las/tmpwfhth8rm.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build5sle6las']=
+ebian-alpha-cross', '-f', '/tmp/docker_build1a5pi9sj/tmpofu6xuyg.docker',=
+ '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build1a5pi9sj']=
 ' returned non-zero exit status 1.
-section_end:1594631136:step_script
-=1B[0Ksection_start:1594631136:after_script
+section_end:1594634906:step_script
+=1B[0Ksection_start:1594634906:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594631137:after_script
+section_end:1594634907:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -1186,7 +1185,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5f0c24c7a05e6_532a3fad1f25214412929f
+----==_mimepart_5f0c32a017f48_5ed13fa0c2d7d44c1798ba
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -1515,7 +1514,7 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/635521969" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/635642708" style=3D=
 "color: #3777b0; text-decoration: none;">
 alpha-debian-cross-container
 </a>
@@ -1549,9 +1548,9 @@ urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
 d '['docker', 'build', '-t', 'qemu/debian-alpha-cross', '-f', '/tmp/docke=
-r_build5sle6las/tmpwfhth8rm.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_build5sle6las']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594631136" data=
+r_build1a5pi9sj/tmpofu6xuyg.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_build1a5pi9sj']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594634906" data=
 -section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
 cyan term-bold section section-header js-s-after-script">Running after_sc=
 ript</span><span class=3D"section section-header js-s-after-script"><br /=
@@ -3282,5 +3281,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5f0c24c7a05e6_532a3fad1f25214412929f--
+----==_mimepart_5f0c32a017f48_5ed13fa0c2d7d44c1798ba--
 
