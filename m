@@ -2,64 +2,115 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBA0C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A39C433E8
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:53:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3183920738
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:46:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3183920738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id E4CDD20738
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:53:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LmG73E83"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4CDD20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juwul-0006vD-Hp
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 07:46:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49296)
+	id 1jux1n-0001F3-77
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 07:53:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1juwtz-0006To-VZ
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:45:44 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51348)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1juwtx-00033P-UZ
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:45:43 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id B102CAC12;
- Mon, 13 Jul 2020 11:45:42 +0000 (UTC)
-Subject: Re: migration: broken snapshot saves appear on s390 when small fields
- in migration stream removed
-From: Claudio Fontana <cfontana@suse.de>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <8bbafdec-836d-b7de-cab8-7a325b6e238d@suse.de>
- <20200713110333.GE3122@work-vm>
- <c5878d54-e8b5-b1e7-a664-2d2ab36015e6@suse.de>
-Message-ID: <9ceaa7bd-99f8-5a88-a149-df1f81ff0857@suse.de>
-Date: Mon, 13 Jul 2020 13:45:40 +0200
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jux0u-0000bx-Cn
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:52:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45003
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jux0r-00045z-RP
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:52:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594641168;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=BpfBiXg9VJ+uUM2hIrwkONnCVTKe0GYBhSCo1btAlOU=;
+ b=LmG73E83NDxquU//6GDpcWz7i+uOG6HXAiDBa6dQqzdPiCmKA3JANqLLdayQaAOW2i4Tir
+ Edddw9XjD0p3Zi7e6Mq1IcBEW45vHCBV2/tbD8FYagIuXvow4YesA9/RicxlqAPqcIEvIp
+ GsDJzB2QPPZXZqgE2JAECR1wRglX4yM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-Ni0S3eb-OV6YTFAhMxMf8Q-1; Mon, 13 Jul 2020 07:52:45 -0400
+X-MC-Unique: Ni0S3eb-OV6YTFAhMxMf8Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AD841902EA0;
+ Mon, 13 Jul 2020 11:52:44 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-8.ams2.redhat.com
+ [10.36.113.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 18EB619C66;
+ Mon, 13 Jul 2020 11:52:42 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 1/2] block: Require aligned image size to avoid
+ assertion failure
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200710142149.40962-1-kwolf@redhat.com>
+ <20200710142149.40962-2-kwolf@redhat.com>
+ <e608699f-b2c2-d7a0-cb59-703832ae732a@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a8f4fcbc-1b31-d4ae-03df-1b5b6351c35e@redhat.com>
+Date: Mon, 13 Jul 2020 13:52:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <c5878d54-e8b5-b1e7-a664-2d2ab36015e6@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 00:02:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+In-Reply-To: <e608699f-b2c2-d7a0-cb59-703832ae732a@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="D64I87dHdRQPV5aK8SJCBlZYUF3nxT8mu"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 03:20:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,217 +123,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: nsoffer@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/13/20 1:39 PM, Claudio Fontana wrote:
-> Hello,
-> 
-> On 7/13/20 1:03 PM, Dr. David Alan Gilbert wrote:
->> * Claudio Fontana (cfontana@suse.de) wrote:
->>> Hello all,
->>>
->>> during unrelated work for splitting QTest from the TCG instruction counting module,
->>>
->>> I encountered what seems to be a migration stream issue, which is apparent only on s390, and only shows in block test 267.
->>>
->>> ./check -qcow2 267
->>>
->>> when it comes to snapshot save and load using backing file.
->>>
->>> Here is a minimal reproducer patch that causes the issue on s390 only.
->>>
->>> --------------------------------------------cut-------------------------------------------
->>> diff --git a/cpus.c b/cpus.c
->>> index 41d1c5099f..443b88697a 100644
->>> --- a/cpus.c
->>> +++ b/cpus.c
->>> @@ -643,7 +643,7 @@ static void qemu_account_warp_timer(void)
->>>  
->>>  static bool icount_state_needed(void *opaque)
->>>  {
->>> -    return use_icount;
->>> +    return 0;
->>>  }
->>
->> That's weird; I mean that's just turning a subsection on and off;
->> so you'd hope if this is a test that generates it's own snapshot and
->> then uses it then it should be consistent.
-> 
-> Indeed.
-> 
->>
->>>  static bool warp_timer_state_needed(void *opaque)
->>> --------------------------------------------cut-------------------------------------------
->>>
->>> config.status configure line:
->>> exec '/home/cfontana/qemu-build/../qemu/configure' '--enable-tcg' '--disable-kvm' '--disable-hax' '--target-list=s390x-softmmu' '--enable-debug'
->>>
->>> $ make check-block
->>>
->>> TEST    iotest-qcow2: 267 [fail]
->>> QEMU          -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../s390x-softmmu/qemu-system-s390x" -nodefaults -display none -accel qtest
->>> QEMU_IMG      -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../qemu-img" 
->>> QEMU_IO       -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../qemu-io"  --cache writeback --aio threads -f qcow2
->>> QEMU_NBD      -- "/home/cfontana/qemu-build/tests/qemu-iotests/../../qemu-nbd" 
->>> IMGFMT        -- qcow2 (compat=1.1)
->>> IMGPROTO      -- file
->>> PLATFORM      -- Linux/s390x s390zp13 5.3.18-21-default
->>> TEST_DIR      -- /home/cfontana/qemu-build/tests/qemu-iotests/scratch
->>> SOCK_DIR      -- /tmp/tmp.bLJcJVtzk5
->>> SOCKET_SCM_HELPER -- /home/cfontana/qemu-build/tests/qemu-iotests/socket_scm_helper
->>>
->>> --- /home/cfontana/qemu/tests/qemu-iotests/267.out	2020-07-12 05:10:07.948262675 -0400
->>> +++ /home/cfontana/qemu-build/tests/qemu-iotests/267.out.bad	2020-07-12 05:27:03.358362781 -0400
->>> @@ -137,6 +137,9 @@
->>>  ID        TAG                 VM SIZE                DATE       VM CLOCK
->>>  --        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
->>>  (qemu) loadvm snap0
->>> +Unexpected storage key flag data: 0
->>> +error while loading state for instance 0x0 of device 's390-skeys'
->>> +Error: Error -22 while loading VM state
->>>  (qemu) quit
->>>  
->>>  
->>> -----------
->>>
->>>
->>> Not run: 172 186 192 259 287
->>> Failures: 267
->>> Failed 1 of 115 iotests
->>> make: *** [/home/cfontana/qemu/tests/Makefile.include:880: check-tests/check-block.sh] Error 1
->>>
->>> -----------
->>>
->>> Note: only the === -blockdev with a backing file === part of test 267 fails. -blockdev with NBD is ok, like all the rest.
->>>
->>>
->>> Interesting facts about s390 in particular: its save/load code includes the transfer of "storage keys",
->>> which include a buffer of 32768 bytes of keydata in the stream.
->>>
->>> The code (hw/s390x/s390-skeys.c),
->>> is modeled similarly to RAM transfer (like in migration/ram.c), with an EOS (end of stream) marker.
->>>
->>> Countrary to RAM transfer code though, after qemu_put_be64(f, EOS), the s390 code does not qemu_fflush(f).
->>>
->>> ----------
->>> Observation: the migration/qemu-file.c shows an IO_BUF_SIZE of 32768.
->>>
->>> --
->>>
->>> The following workarounds hide the problem (make the test pass):
->>>
->>> 1) always including the icount field in the (unrelated) timers field that are sent before in the migration stream (ie not applying the reproducer patch).
->>>
->>> 2) increasing the IO_BUF_SIZE also hides the problem:
->>>
->>> ----------------------cut--------------------------
->>> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
->>> index be21518c57..f81d1272eb 100644
->>> --- a/migration/qemu-file.c
->>> +++ b/migration/qemu-file.c
->>> @@ -30,7 +30,7 @@
->>>  #include "trace.h"
->>>  #include "qapi/error.h"
->>>  
->>> -#define IO_BUF_SIZE 32768
->>> +#define IO_BUF_SIZE 65536
->>>  #define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 64)
->>>  
->>>  struct QEMUFile {
->>> ----------------------cut--------------------------
->>>
->>> 3) adding a qemu_fflush in hw/s390x/s390-skeys.c after EOS also "fixes" the problem:
->>>
->>> ----------------------cut--------------------------
->>> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
->>> index 1e036cc602..47c9a015af 100644
->>> --- a/hw/s390x/s390-skeys.c
->>> +++ b/hw/s390x/s390-skeys.c
->>> @@ -252,6 +252,8 @@ static const TypeInfo qemu_s390_skeys_info = {
->>>      .class_size    = sizeof(S390SKeysClass),
->>>  };
->>>  
->>> +extern void qemu_fflush(QEMUFile *f);
->>> +
->>>  static void s390_storage_keys_save(QEMUFile *f, void *opaque)
->>>  {
->>>      S390SKeysState *ss = S390_SKEYS(opaque);
->>> @@ -302,6 +304,7 @@ static void s390_storage_keys_save(QEMUFile *f, void *opaque)
->>>      g_free(buf);
->>>  end_stream:
->>>      qemu_put_be64(f, eos);
->>> +    qemu_fflush(f);
->>>  }
->>>  
->>>  static int s390_storage_keys_load(QEMUFile *f, void *opaque, int version_id)
->>> ----------------------cut--------------------------
->>>
->>> Do any of you with better understanding of migration/, block and s390 have a suggestion on what could be the issue here,
->>> and what could be the next step in the investigation?
->>>
->>> Is the fact that migration/ram.c always does fflush after writing the EOS have any relevance here? why does it do it,
->>> and should s390 code also follow the same pattern?
->>
->> I didn't think it was required.
->> And qemu_put_buffer loops if needed and calls qemu_fflush internally.
-> 
-> This detail probably does not help in this case, because the buffer itself is fine (32678 zero bytes is actually correct).
-> 
-> The End Of Stream marker written just after with qemu_put_be64 is not ok,
-> and anything past that point is just a whole bunch of zeroes in the stream when we hookup the calls to
-> 
-> qcow2_co_pwritev_task and qcow2_co_preadv_task
-> 
-> (see my response to Paolo in this thread).
-> 
-> 
->> It's possible here that the storage key code is just the canary - the
->> first thing that detects that the stream is invalid after it all goes
->> wrong.
-> 
-> Seems the exact opposite to me, ie, the stream seems just fine up to the point where the EOS marker after the keydata in "s390-skeys" should be.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D64I87dHdRQPV5aK8SJCBlZYUF3nxT8mu
+Content-Type: multipart/mixed; boundary="2robvpGC5GrEOTAdhUdr9RLVOoFH3MptO"
 
-Ah I might have misunderstood what you wrote there, you mean that the stream became invalid, and this just happened in the context of s390-skeys right..
+--2robvpGC5GrEOTAdhUdr9RLVOoFH3MptO
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-To me it also looks like an underlying issue, not really related to skeys in particular, just that they exercise the underlying machinery is a very peculiar way,
-in terms or field positions, sizes etc.
+On 13.07.20 13:19, Max Reitz wrote:
+> On 10.07.20 16:21, Kevin Wolf wrote:
+>> Unaligned requests will automatically be aligned to bl.request_alignment
+>> and we don't want to extend requests to access space beyond the end of
+>> the image, so it's required that the image size is aligned.
+>>
+>> With write requests, this could cause assertion failures like this if
+>> RESIZE permissions weren't requested:
+>>
+>> qemu-img: block/io.c:1910: bdrv_co_write_req_prepare: Assertion `end_sec=
+tor <=3D bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
+>>
+>> This was e.g. triggered by qemu-img converting to a target image with 4k
+>> request alignment when the image was only aligned to 512 bytes, but not
+>> to 4k.
+>>
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>>  block.c | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
+>=20
+> (I think we had some proposal like this before, but I can=E2=80=99t find =
+it,
+> unfortunately...)
 
-Ciao,
+(Ah, here it is:
 
-Claudio
+https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg03077.html
 
-> 
-> Thanks!
-> 
-> Claudio
-> 
->>
->> Dave
->>
->>
->>> Thanks,
->>>
->>> Claudio
->>>
->>>
->>> -- 
->>> Claudio Fontana
->>> Engineering Manager Virtualization, SUSE Labs Core
->>>
->>> SUSE Software Solutions Italy Srl
->>>
->> --
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>
->>
-> 
-> 
+(Which interestingly teases yet another mysterious =E2=80=9Cwe had a discus=
+sion
+on this before=E2=80=9D...))
+
+> I can=E2=80=99t see how with this patch you could create qcow2 images and=
+ then
+> use them with direct I/O, because AFAICS, qemu-img create doesn=E2=80=99t=
+ allow
+> specifying caching options, so AFAIU you=E2=80=99re stuck with:
+>=20
+> $ ./qemu-img create -f qcow2 /mnt/tmp/foo.qcow2 1M
+> Formatting '/mnt/tmp/foo.qcow2', fmt=3Dqcow2 cluster_size=3D65536
+> compression_type=3Dzlib size=3D1048576 lazy_refcounts=3Doff refcount_bits=
+=3D16
+>=20
+> $ sudo ./qemu-io -t none /mnt/tmp/foo.qcow2
+> qemu-io: can't open device /mnt/tmp/foo.qcow2: Image size is not a
+> multiple of request alignment
+>=20
+> (/mnt/tmp is a filesystem on a =E2=80=9Closetup -b 4096=E2=80=9D device.)
+>=20
+> Or you use blockdev-create, that seems to work (because of course you
+> can set the cache mode on the protocol node when you open it for
+> formatting).  But, well, I think there should be a working qemu-img
+> create case.
+>=20
+> Also, I=E2=80=99m afraid of breaking existing use cases with this patch (=
+just
+> qemu-img create + using the image with cache=3Dnone).
+>=20
+> Max
+>=20
+
+
+
+--2robvpGC5GrEOTAdhUdr9RLVOoFH3MptO--
+
+--D64I87dHdRQPV5aK8SJCBlZYUF3nxT8mu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8MSwkACgkQ9AfbAGHV
+z0AL7AgAiz4nr+5liEdufT6VbD+wS5hE5/qC2HsyNlgdvdy0XO0VHByEabd1wdGV
+aDGhunroFd5LhY8hkfZOSFDc633ZUtJMoQRtV47UABs4QmOuqNAl1PWBTP4wht7q
++vS4KDOXQOqSyZOX974/NL67ig5/mL+w8AGvJ72LgQ4YPTbRq2ThyanJgS7Cg6wF
+Y5s3ey8n5pGZ6bAxCMHqLQCp5DEFZSKhF532I0KYkfpuIFBisI/tztkFWJo2QFp3
+bLEqoKorWl2HGoxdKUk/RlR1GuCSgMQVpMqDo8O3zSGKXE0EblZB5i7wUsLHqJDb
+skFDwWlyHZmsEzfLIjBrzsorHZtaVw==
+=yDJy
+-----END PGP SIGNATURE-----
+
+--D64I87dHdRQPV5aK8SJCBlZYUF3nxT8mu--
 
 
