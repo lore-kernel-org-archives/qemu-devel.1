@@ -2,43 +2,42 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F13C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C80C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A034220663
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:22:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A034220663
+	by mail.kernel.org (Postfix) with ESMTPS id 5E2B120663
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:22:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E2B120663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv41s-0005G9-To
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:22:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42830)
+	id 1jv42P-0006Vy-ML
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:22:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv418-0004LX-Ub
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:21:34 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:45703)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv41e-0005HL-Ln
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:22:06 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:35777)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv417-0006Uh-0a
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:21:34 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv41c-0006W7-Kk
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:22:06 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MHWvH-1k8UGf2S3N-00DbIz; Mon, 13 Jul 2020 21:21:20 +0200
-Subject: Re: [PATCH v3 1/2] linux-user: refactor ipc syscall
-From: Laurent Vivier <laurent@vivier.eu>
+ 1MVuXT-1kKfUi0tZF-00RohF; Mon, 13 Jul 2020 21:21:53 +0200
+Subject: Re: [PATCH v3 2/2] linux-user: support of semtimedop syscall
 To: Matus Kysel <mkysel@tachyum.com>, riku.voipio@iki.fi, qemu-devel@nongnu.org
 References: <20200626124612.58593-1-mkysel@tachyum.com>
- <20200626124612.58593-2-mkysel@tachyum.com>
- <b45a9fe1-ba32-8792-67e4-aececeee7227@vivier.eu>
+ <20200626124612.58593-3-mkysel@tachyum.com>
+From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
  WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
@@ -81,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <de129f21-114e-2dd4-6ca6-89ce53e0c138@vivier.eu>
-Date: Mon, 13 Jul 2020 21:21:19 +0200
+Message-ID: <e1b2e842-f022-b4f9-0227-b0a1fb6f7186@vivier.eu>
+Date: Mon, 13 Jul 2020 21:21:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <b45a9fe1-ba32-8792-67e4-aececeee7227@vivier.eu>
+In-Reply-To: <20200626124612.58593-3-mkysel@tachyum.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:rFIJsNHgkugRQJLP6YChm8hUgGkQ9Ovs7nH5o7Ga2iooT1XPyub
- bzI3tKQsbfqRQgKTJCqTjT1OpO1xr2z7VS+Z7SX9MGnnby+gnmNNdYwGi6Ls++EnbGLzxSk
- 618TmK0glbqP4XQCCjyqnKpzalYf8xpaPypWEoqXTZLbhvF97FvvGsW55XDu6u6yNbRBAbn
- R/u9r0PQbzEOE5qtE8U2w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ezLIlKruMOU=:OrNAO1zi4V1bWX08CSfAXx
- K5T6YJrniG/FW1tazE53yYzQ7GcpNJqXjXQoOjZF57f5AaTCuavEOqEzoN+45WFMDlGXCBfoE
- hnVXhOi9YSQ3n0BhQyb5ci5YU8BnQynR5Y+33IYvPHuOwvToO7TMvTBriMo85erAbEwzgI1LU
- JspwwI8VyjOw0icKytnZfr7Rpmf3j7SbC8xllu7TcEXgfmfc54eKWSHri6vuiPqcKIwMDA6uh
- c4hJqpKHWpuq14NLejaM8dRsAO0DBPxs1HMZQYC2AmtYGhIaDYaAUzAJjEx2W2n/Og/b7XzL1
- 0QwyBfSatVMaan9278cd+pvj5VfQvbLjQZS7YbeN3GJp5gGkxAaZyJvdDpxMVL0ozOLRduZZP
- f84qlajAyzts5/jknavFemKScwOsg4lrR483KwI6eGgDeTBVjxv1vVYHX50WZcEBwS/CHtmpK
- 97R/wMQNwtz3sNwwsrz+Jypl39nh6uJneUPzOTaQhmNCbzWgJklABpTnPHtN5lz4QyNXKywb0
- jHWfY1U3E7Iu8Z6pWTNNCjnFOkLOL/VE/D3HPu1cr7RUbBe/KndbGnhdpZYc8EbhbVx6y1YEn
- uXqg4mpsYFnW49XlQYJsUKrUgZdK5JuUUFIR0bMSFdgb0ugI445sigkMPjIEfI2dLwCiWDbhu
- S7uKqortvGSYh6rbzqSZMhzx8bG6EoAf7JB4zkvQHFtyB22KYf/kFvECpH3lMPjSUx51VPcA9
- glPLRTFiYGK/gis1shx7kZnHCyZK+aB8EVpY1/8/vMsXh14QaWR0Kdl+g5DdM4goGvjMh2XsP
- WJBFrq9Zl4gVcL333G33YP04foL7DVhhbeRPJ7fl/ca/DTsD+SiMNiT3rzoPiPE6AUImwwR
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:6iB+4bS0ToYUPBmHbuINJqJhURL4xGx/oTsjFA6XGDHZQGXKlFy
+ AGq3GJfg0Lv4o5UvZnLplTHRxD/hArwjEqqtB/RwZxpWboxnW9nVRsWciW1sZdgVyeVb+wi
+ /ByRfIWvE7D2dqJhLsqcXfDgByD0AQ7rwP0M8SJvnb4k4WFpFfMonCEL/fN4/9xLqoALOOo
+ RoRjohRusnD0HmSdI4BsA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/dFuJyW3iOc=:ZconO1Kf8eRcQ1zp5Lh02q
+ gvegv0JZSY8uSwnJP4OZMktDiXljHwPEeTmmmeqTdLIMW0VFCTQcLXVGjnLBDb7+58TLL8MsD
+ YmYSM9f1wAlEuUqkmA0bTTW3F9TYQu90JEn1TXt7+enHxkZ6Y5c7OyYT9K3o5ruGquXqGvDsn
+ hxz2JIWXfDSZJuSCL+I2Px/6nV3ogrdV9h9GBF6C6FWaCVGNGx5jm1PnRvuV2kjHYGat7X09u
+ fW02NVG9mf0g0J4kqyFKsPJ8YGY++UkGw0OdAW6Hg+A/sx2YiFx8+C0xah0j/p77pdCFa5xpo
+ 1WCaTWWR5HvT+pjZGZrgc6ysBzEEwxi0Do77dq+OSWMIK1EMhR5KDfPzPcwoz6mISVKy/czg9
+ OA1c/kGcJldtTViVkZfDzqEs8JJQThG6zy+lV9ZqSygYUVkASNZfASZyxa6ZQ6tunVzaEWsB4
+ 3AVORCAWbsEquwBB5qVIxgXAComYVhKkWSDkmSm4qtAzMDV68NkmCtOgb0iQTUvSsGALNlqzr
+ OHZ5BJYtgbwQyxmQVeprhMziEdqDsJAmi/xy56kE4ADzIuQ0MQplanY7/5ujT2EnZodu5vz7E
+ K8oUJ/w2bN25eNEjO9BNaBOb0ZFsqS8QuMKLycvXKWDlp+eLlZu61CGlEJ2x1CsKzAN3t86kQ
+ x7erG9PABlS4QCE1szWwBAX7gCcTSlqgfEjZx0yx7gPfMWpcUSiyhGR91axBYNjidwoU97oQb
+ zfKCHiMcNO8KYdToKZMq8UdC+6+I/+5wMz0is09KlbTjMY9HVQNpo6EHWMZDXnnk/X8QsX4Bz
+ FXFV4MNmqomEGdtknyEWyHhjKzprzEjBLGOln9rDUE+cP/26WWicRKxpfh3c/K3e2/zr29m
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:21:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:22:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -133,90 +132,122 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 10/07/2020 à 14:46, Laurent Vivier a écrit :
-> Le 26/06/2020 à 14:46, Matus Kysel a écrit :
->> Refactoring ipc syscall for s390x and SPARC, so it matches glibc implementation
->>
->> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
->> ---
->>  linux-user/syscall.c | 26 +++++++++++++++++++++++++-
->>  1 file changed, 25 insertions(+), 1 deletion(-)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 97de9fb5c9..990412733b 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -814,9 +814,14 @@ safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
->>                const struct timespec *, req, struct timespec *, rem)
->>  #endif
->>  #ifdef __NR_ipc
->> +#ifdef __s390x__
->> +safe_syscall5(int, ipc, int, call, long, first, long, second, long, third,
->> +              void *, ptr)
->> +#else
->>  safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
->>                void *, ptr, long, fifth)
->>  #endif
->> +#endif
->>  #ifdef __NR_msgsnd
->>  safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
->>                int, flags)
->> @@ -4053,8 +4058,13 @@ static inline abi_long do_msgsnd(int msqid, abi_long msgp,
->>  #endif
->>  #ifdef __NR_ipc
->>      if (ret == -TARGET_ENOSYS) {
->> +#ifdef __s390x__
->> +        ret = get_errno(safe_ipc(IPCOP_msgsnd, msqid, msgsz, msgflg,
->> +                                 host_mb));
->> +#else
->>          ret = get_errno(safe_ipc(IPCOP_msgsnd, msqid, msgsz, msgflg,
->>                                   host_mb, 0));
->> +#endif
->>      }
->>  #endif
->>      g_free(host_mb);
->> @@ -4063,6 +4073,20 @@ static inline abi_long do_msgsnd(int msqid, abi_long msgp,
->>      return ret;
->>  }
->>  
->> +#ifdef __NR_ipc
->> +#if defined(__sparc__)
->> +/* SPARC for msgrcv it does not use the kludge on final 2 arguments.  */
->> +#define MSGRCV_ARGS(__msgp, __msgtyp) __msgp, __msgtyp
->> +#elif defined(__s390x__)
->> +/* The s390 sys_ipc variant has only five parameters.  */
->> +#define MSGRCV_ARGS(__msgp, __msgtyp) \
->> +    ((long int[]){(long int)__msgp, __msgtyp})
->> +#else
->> +#define MSGRCV_ARGS(__msgp, __msgtyp) \
->> +    ((long int[]){(long int)__msgp, __msgtyp}), 0
->> +#endif
->> +#endif
->> +
->>  static inline abi_long do_msgrcv(int msqid, abi_long msgp,
->>                                   ssize_t msgsz, abi_long msgtyp,
->>                                   int msgflg)
->> @@ -4091,7 +4115,7 @@ static inline abi_long do_msgrcv(int msqid, abi_long msgp,
->>  #ifdef __NR_ipc
->>      if (ret == -TARGET_ENOSYS) {
->>          ret = get_errno(safe_ipc(IPCOP_CALL(1, IPCOP_msgrcv), msqid, msgsz,
->> -                        msgflg, host_mb, msgtyp));
->> +                        msgflg, MSGRCV_ARGS(host_mb, msgtyp)));
->>      }
->>  #endif
->>  
->>
+Le 26/06/2020 à 14:46, Matus Kysel a écrit :
+> We should add support of semtimedop syscall as new version of glibc
+> 2.31 uses semop based on semtimedop
+> (commit: https://gitlab.com/freedesktop-sdk/mirrors/sourceware/glibc/-/commit/765cdd0bffd77960ae852104fc4ea5edcdb8aed3 ).
 > 
-> This patch breaks build because there is safe_ipc() that is not updated
-> to use only 5 arguments with s390x. This is updated in the next patch so
-> the build in the end works, but it breaks bisect so you should fix that.
+> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
+> ---
+>  linux-user/syscall.c | 58 +++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 52 insertions(+), 6 deletions(-)
 > 
-> Otherwise:
-> 
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> 
-> Thanks,
-> Laurent
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 990412733b..538a7e673c 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1232,7 +1232,8 @@ static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
+>      defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6) || \
+>      defined(TARGET_NR_nanosleep) || defined(TARGET_NR_clock_settime) || \
+>      defined(TARGET_NR_utimensat) || defined(TARGET_NR_mq_timedsend) || \
+> -    defined(TARGET_NR_mq_timedreceive)
+> +    defined(TARGET_NR_mq_timedreceive) || defined(TARGET_NR_ipc) || \
+> +    defined(TARGET_NR_semop) || defined(TARGET_NR_semtimedop)
+>  static inline abi_long target_to_host_timespec(struct timespec *host_ts,
+>                                                 abi_ulong target_addr)
+>  {
+> @@ -3880,25 +3881,53 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
+>      return 0;
+>  }
+>  
+> -static inline abi_long do_semop(int semid, abi_long ptr, unsigned nsops)
+> +#if defined(TARGET_NR_ipc) || defined(TARGET_NR_semop) || \
+> +    defined(TARGET_NR_semtimedop)
+> +
+> +/*
+> + * This macro is required to handle the s390 variants, which passes the
+> + * arguments in a different order than default.
+> + */
+> +#ifdef __s390x__
+> +#define SEMTIMEDOP_IPC_ARGS(__nsops, __sops, __timeout) \
+> +  (__nsops), (__timeout), (__sops)
+> +#else
+> +#define SEMTIMEDOP_IPC_ARGS(__nsops, __sops, __timeout) \
+> +  (__nsops), 0, (__sops), (__timeout)
+> +#endif
+> +
+> +static inline abi_long do_semtimedop(int semid,
+> +                                     abi_long ptr,
+> +                                     unsigned nsops,
+> +                                     abi_long timeout)
+>  {
+>      struct sembuf sops[nsops];
+> +    struct timespec ts, *pts = NULL;
+>      abi_long ret;
+>  
+> +    if (timeout) {
+> +        pts = &ts;
+> +        if (target_to_host_timespec(pts, timeout)) {
+> +            return -TARGET_EFAULT;
+> +        }
+> +    }
+> +
+>      if (target_to_host_sembuf(sops, ptr, nsops))
+>          return -TARGET_EFAULT;
+>  
+>      ret = -TARGET_ENOSYS;
+>  #ifdef __NR_semtimedop
+> -    ret = get_errno(safe_semtimedop(semid, sops, nsops, NULL));
+> +    ret = get_errno(safe_semtimedop(semid, sops, nsops, pts));
+>  #endif
+>  #ifdef __NR_ipc
+>      if (ret == -TARGET_ENOSYS) {
+> -        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid, nsops, 0, sops, 0));
+> +        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid,
+> +                                 SEMTIMEDOP_IPC_ARGS(nsops, sops, (long)pts)));
+>      }
+>  #endif
+>      return ret;
+>  }
+> +#endif
+>  
+>  struct target_msqid_ds
+>  {
+> @@ -4393,7 +4422,20 @@ static abi_long do_ipc(CPUArchState *cpu_env,
+>  
+>      switch (call) {
+>      case IPCOP_semop:
+> -        ret = do_semop(first, ptr, second);
+> +        ret = do_semtimedop(first, ptr, second, 0);
+> +        break;
+> +    case IPCOP_semtimedop:
+> +    /*
+> +     * The s390 sys_ipc variant has only five parameters instead of six
+> +     * (as for default variant) and the only difference is the handling of
+> +     * SEMTIMEDOP where on s390 the third parameter is used as a pointer
+> +     * to a struct timespec where the generic variant uses fifth parameter.
+> +     */
+> +#if defined(TARGET_S390X)
+> +        ret = do_semtimedop(first, ptr, second, third);
+> +#else
+> +        ret = do_semtimedop(first, ptr, second, fifth);
+> +#endif
+>          break;
+>  
+>      case IPCOP_semget:
+> @@ -9644,7 +9686,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>  #endif
+>  #ifdef TARGET_NR_semop
+>      case TARGET_NR_semop:
+> -        return do_semop(arg1, arg2, arg3);
+> +        return do_semtimedop(arg1, arg2, arg3, 0);
+> +#endif
+> +#ifdef TARGET_NR_semtimedop
+> +    case TARGET_NR_semtimedop:
+> +        return do_semtimedop(arg1, arg2, arg3, arg4);
+>  #endif
+>  #ifdef TARGET_NR_semctl
+>      case TARGET_NR_semctl:
 > 
 
 I have merged PATH 1 and 2 and applied to my linux-user-for-5.1 branch.
