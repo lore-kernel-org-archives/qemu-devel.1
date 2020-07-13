@@ -2,91 +2,68 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F464C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF38C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:11:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE91120771
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:08:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYPhSkRI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE91120771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C0008206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 13:11:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0008206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=the-jedi.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juyC5-0002HG-4c
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 09:08:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44512)
+	id 1juyF7-0003Vm-1b
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 09:11:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juyBO-0001Q6-HT
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 09:07:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34152
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juyBM-0005gx-8e
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 09:07:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594645663;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iZv+/897dEYxHH38koVHsQt2j6mrKHLYD+HCBmomtPU=;
- b=XYPhSkRIIjlHtUTdtaH7ZK25cndg7WR9uA/k3ranC5Ai17W8Id97J0CemYCVG/nyXH/9Ct
- yhnUdH8Gcpae6mqzjf5q5v2fs+JZ+vdro9j8EHRfoKNuFMJIuh5+6nsc3j9V3aFym1gW04
- h12j7GeTUISoILp1pFbZD9wIwbfWlco=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-G0UXFKTGOYeWRemLL-lIzQ-1; Mon, 13 Jul 2020 09:07:39 -0400
-X-MC-Unique: G0UXFKTGOYeWRemLL-lIzQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E60C3E93F;
- Mon, 13 Jul 2020 13:07:37 +0000 (UTC)
-Received: from [10.3.112.134] (ovpn-112-134.phx2.redhat.com [10.3.112.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B15F106F770;
- Mon, 13 Jul 2020 13:07:37 +0000 (UTC)
-Subject: Re: [PATCH v2 4/5] iotests.py: filter_testfiles(): filter SOCK_DIR too
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200701105331.121670-1-vsementsov@virtuozzo.com>
- <20200701105331.121670-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <63b3acac-9501-d80b-79e1-97115cbad32b@redhat.com>
-Date: Mon, 13 Jul 2020 08:07:36 -0500
+ (Exim 4.90_1) (envelope-from <git@the-jedi.co.uk>)
+ id 1juwtk-0006S5-H9
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:45:28 -0400
+Received: from vps.the-jedi.co.uk ([93.93.130.107]:34578)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <git@the-jedi.co.uk>)
+ id 1juwti-00031q-7y
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:45:28 -0400
+Received: by vps.the-jedi.co.uk (Postfix, from userid 111)
+ id 00D5442D19; Mon, 13 Jul 2020 12:45:23 +0100 (BST)
+Received: from [192.168.0.5] (host86-179-4-163.range86-179.btcentralplus.com
+ [86.179.4.163])
+ by vps.the-jedi.co.uk (Postfix) with ESMTPSA id 980134242D;
+ Mon, 13 Jul 2020 12:45:21 +0100 (BST)
+Subject: Re: [PATCH] Allow acpi-tmr size=2
+To: "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+References: <5f12377f-b640-c4c5-1bcd-858c622c6c31@the-jedi.co.uk>
+ <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
+ <20200713070946-mutt-send-email-mst@kernel.org>
+From: Simon John <git@the-jedi.co.uk>
+Message-ID: <7662bc2c-d958-731a-0882-62c5ab47c7a4@the-jedi.co.uk>
+Date: Mon, 13 Jul 2020 12:46:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200701105331.121670-5-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200713070946-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 03:20:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=93.93.130.107; envelope-from=git@the-jedi.co.uk;
+ helo=vps.the-jedi.co.uk
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 07:45:24
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Mon, 13 Jul 2020 09:10:50 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,42 +75,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org,
- stefanha@redhat.com, mreitz@redhat.com
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/1/20 5:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/iotests.py | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
+I don't profess to understand most of this, I am just a user who found 
+something didn't work and tracked down the cause with help from the 
+people on the bugtracker.
+
+the min=1 and max=4 was chosen as it seems to be set that way in most 
+other places in the source, and 2 fits in that range.
+
+so as macos seems to require 2 bytes but spec says 4 (32 bits) would it 
+be better to set min=2 max=4, given that the original revert seems to be 
+a security fix?
+
+this works equally well:
+
+static const MemoryRegionOps acpi_pm_tmr_ops = {
+     .read = acpi_pm_tmr_read,
+     .write = acpi_pm_tmr_write,
+     .valid.min_access_size = 2,
+     .valid.max_access_size = 4,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+};
+
+regards.
+
+
+
+On 13/07/2020 12:14, Michael S. Tsirkin wrote:
+> On Mon, Jul 13, 2020 at 10:20:12AM +0300, Michael Tokarev wrote:
+>> 12.07.2020 15:00, Simon John wrote:
+>>> macos guests no longer boot after commit 5d971f9e672507210e77d020d89e0e89165c8fc9
+>>>
+>>> acpi-tmr needs 2 byte memory accesses, so breaks as that commit only allows 4 bytes.
+>>>
+>>> Fixes: 5d971f9e672507210e7 (memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
+>>> Buglink: https://bugs.launchpad.net/qemu/+bug/1886318
+>>
+>> Actually this fixes 77d58b1e47c8d1c661f98f12b47ab519d3561488
+>> Author: Gerd Hoffmann <kraxel@redhat.com>
+>> Date:   Thu Nov 22 12:12:30 2012 +0100
+>> Subject: apci: switch timer to memory api
+>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>
+>> because this is the commit which put min_access_size = 4 in there
+>> (5d971f9e672507210e7 is just a messenger, actual error were here
+>> earlier but it went unnoticed).
+>>
+>> While min_access_size=4 was most likely an error, I wonder why
+>> we use 1 now, while the subject says it needs 2? What real min
+>> size is here for ACPI PM timer?
+>>
+>> /mjt
+> 
+> 
+> Well the ACPI spec 1.0b says
+> 
+> 4.7.3.3 Power Management Timer (PM_TMR)
+> 
+> ...
+> 
+> This register is accessed as 32 bits.
+> 
+> and this text is still there in 6.2.
+> 
+> 
+> So it's probably worth it to cite this in the commit log
+> and explain it's a spec violation.
+> I think it's better to be restrictive and only allow the
+> minimal variation from spec - in this case I guess this means 2 byte
+> reads.
+> 
+> In any case pls do include an explanation for why you picked
+> one over the other.
+> 
+>>
+>>> Signed-off-by: Simon John <git@the-jedi.co.uk>
+>>> ---
+>>> Â hw/acpi/core.c | 2 +-
+>>> Â 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+>>> index f6d9ec4f13..05ff29b9d7 100644
+>>> --- a/hw/acpi/core.c
+>>> +++ b/hw/acpi/core.c
+>>> @@ -527,7 +527,7 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
+>>> Â static const MemoryRegionOps acpi_pm_tmr_ops = {
+>>> Â Â Â Â  .read = acpi_pm_tmr_read,
+>>> Â Â Â Â  .write = acpi_pm_tmr_write,
+>>> -Â Â Â  .valid.min_access_size = 4,
+>>> +Â Â Â  .valid.min_access_size = 1,
+>>> Â Â Â Â  .valid.max_access_size = 4,
+>>> Â Â Â Â  .endianness = DEVICE_LITTLE_ENDIAN,
+>>> Â };
 > 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index ac9d199a1e..31d4b105ca 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -345,8 +345,9 @@ def filter_qmp(qmsg, filter_fn):
->       return qmsg
->   
->   def filter_testfiles(msg):
-> -    prefix = os.path.join(test_dir, "%s-" % (os.getpid()))
-> -    return msg.replace(prefix, 'TEST_DIR/PID-')
-> +    pref1 = os.path.join(test_dir, "%s-" % (os.getpid()))
-> +    pref2 = os.path.join(sock_dir, "%s-" % (os.getpid()))
-> +    return msg.replace(pref1, 'TEST_DIR/PID-').replace(pref2, 'SOCK_DIR/PID-')
->   
->   def filter_qmp_testfiles(qmsg):
->       def _filter(_key, value):
-> 
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Simon John
 
