@@ -2,90 +2,89 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9CDC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 786A0C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70E442065D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4063B2065D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 08:49:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/stMGSe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70E442065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l1hHxefU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4063B2065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juu8q-000538-KU
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 04:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49192)
+	id 1juu9U-00062D-G1
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 04:49:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1juu8G-0004cz-3j
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:48:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25328
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1juu8E-0001HD-BJ
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:48:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594630093;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=m9q8hfSo4mXqUoJ6qEV3kAmJEkcjrF04P+COcILsugU=;
- b=U/stMGSeKZagVvP4/Q72hoD1X8HmY5FUy3mzj37evMM/4sBzYFzpMLpXg3l9wL7U2DchqY
- I5nMh9BKmi59D6h5PMZpKtmQ/IosvikZUXnDwv9A88EnxipiZY0V4ojj4vFgysJgGnBX8H
- RK3VIUVSlb5955Pu4ostqq04/zHFUxI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-5bEbt6VIMvuj_XWe7Fruxg-1; Mon, 13 Jul 2020 04:48:05 -0400
-X-MC-Unique: 5bEbt6VIMvuj_XWe7Fruxg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACDF2800685
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 08:48:04 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.36])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D9F6B60BF3;
- Mon, 13 Jul 2020 08:48:02 +0000 (UTC)
-Date: Mon, 13 Jul 2020 09:47:59 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] tests: improve performance of device-introspect-test
-Message-ID: <20200713084759.GA4044570@redhat.com>
-References: <20200709112857.3760116-1-berrange@redhat.com>
- <87mu47gms3.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1juu8h-000539-3D
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:48:43 -0400
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:41552)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1juu8e-0001Ju-PK
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 04:48:42 -0400
+Received: by mail-ot1-x32c.google.com with SMTP id a21so8930895otq.8
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 01:48:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=J677XKowMiQfVwJh+f34zWIkGK4QKNIfX3aF+9SXTq4=;
+ b=l1hHxefUynJpjWX3VNlUPeRd7pWMdChsFwu9tww3kyL9xY8qr736bTrAemzgttJ3UN
+ cn20Hxtx/9xv8WVQY36TJhK/qedkgSZTM+sXbEm2CpbznazTPqpl6T50qMI9b81IrKbj
+ TYTpHL41hy1pZXEiphzVro1xQuoGjJ8wdSqMoBywltilulKbOo0crD1FvtLnpFNevg6m
+ Ue+KeS5FdC8MG8UigP9+99bwgKLN6I3/hDecqtU9Y0NlAxJwuiTZWuv/iw+T47ooMQLy
+ L4TXNBoHmQz5ABKq3QbJrDTZL/PNchPkkq2G5uHhoGs7Ltg2A9pWT2jQIi4qWHo7SmCg
+ zYVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=J677XKowMiQfVwJh+f34zWIkGK4QKNIfX3aF+9SXTq4=;
+ b=AwfT2mSbKAogfv0hXu5I8dbiAR0U9Hpc+0lv/c3yUrzpm2XG3zyZMX6Zq3h8igCP7X
+ CJDEU9M4Kf654DX6HvB+VWo+zPi3V1DbRqElqZ8uNLyknRW9WF6mcslZK6ubCBHsiTAi
+ IuOfk7sm2xz6WlQvpS5htK6FW6t0KRnzkhOeaCyjgFkLsFScGnT9koHC8CB0bNFYSSvx
+ MsSqr+Bg0vM5Nv6VIEISTu7SkZnw1LsARkYWv8IVb60SGqSockwFgHL5E4ekphytjO23
+ dcJJ4kzRwrtcnjBflWI/gZnqBgoldXPqjYflscbaOiQ8RdLqCmtu9zGboN0TQqu3tC0r
+ YCBw==
+X-Gm-Message-State: AOAM532SUp/DwYDo2uLBQTvZKO826kxSJXtq5Bn9SVxHwNVS1aeB+Xtg
+ VKeRonHNsQfNsEC/Ah3ioHSwkXWBApz9jra2rErfow==
+X-Google-Smtp-Source: ABdhPJwFOds3yCmqiJvOGImYiArpHKv9v+WtUqKi511mmn7WXejUKgOfnLUNSkorXc+Y8EE5HmtOIljfickI6mVNcak=
+X-Received: by 2002:a9d:7303:: with SMTP id e3mr60380446otk.221.1594630119335; 
+ Mon, 13 Jul 2020 01:48:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87mu47gms3.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 03:20:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
+ <5bf99e61-8aa2-53f0-0157-52becec1df26@redhat.com>
+ <019332f6-c925-fc3f-6e0e-5d02513b28dd@redhat.com>
+In-Reply-To: <019332f6-c925-fc3f-6e0e-5d02513b28dd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Jul 2020 09:48:28 +0100
+Message-ID: <CAFEAcA_cJNQrd7JjaDUAgZJ+H_k6QriZrm7zAFJFpeqeFVgQgA@mail.gmail.com>
+Subject: Re: Migrating custom qemu.org infrastructure to GitLab
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x32c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,66 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ Cleber Rosa <cleber@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 10, 2020 at 10:03:56PM +0200, Markus Armbruster wrote:
-> Daniel P. Berrangé <berrange@redhat.com> writes:
-> 
-> > Total execution time with "-m slow" and x86_64 QEMU, drops from 3
-> > minutes 15 seconds, down to 54 seconds.
+On Mon, 13 Jul 2020 at 09:39, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 7/10/20 4:04 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>
+> > 7/ License Compliance
 > >
-> > Individual tests drop from 17-20 seconds, down to 3-4 seconds.
-> 
-> Nice!
-> 
-> A few observations on this test (impatient readers may skip to
-> "Conclusions"):
+> > https://docs.gitlab.com/ee/user/compliance/license_compliance/
+>
+> WRT IRC feedback QEMU licensing is a lost cause, I can not tell,
+> but I think if GitLab has scripts to take care of it, it is an
+> improvement over what we have now:
 
-snip
+The docs say it only supports C programs that use the Conan
+package manager. We don't, we just use configure to find and
+link against our external dependencies.
 
-> * The number of known device types varies between targets from 33
->   (tricore) to several hundreds (x86_64+i386: 421, ppc 593, arm 667,
->   aarch64 680, ppc64 689).  Median is 215, sum is 7485.
+>   b) New contributions will be checked for correct license by
+>      a machine, so reviewer can focus on other topics.
 
-snip
+The documentation doesn't say anything about it handling license
+checking on contributions to the project itself. It looks like
+it's mainly intended for "I have a javascript project that
+pulls in 5000 tiny dependencies from npm, I want to know that
+none of them is accidentally using a license that's not compatible
+with the project's license". That's not a problem QEMU has.
 
-> * The test matrix is *expensive*.  Testing even a simple QMP query is
->   when you do it a quarter million times.  ARM is the greediest pig by
->   far (170k introspections, almost two thirds of the total!), followed
->   by ppc (36k), x86 (12k) and mips (11k).  Ideas on trimming excess are
->   welcome.  I'm not even sure anymore this should be a qtest.
-
-We have 70 arm machines, 667 devices. IIUC we are roughly testing every
-device against everything machine. 46,690 tests.
-
-Most of the time devices are going to behave identically regardless of
-which machine type is used. The trouble is some machines are different
-enough that they can genuinely trigger different behaviour. It isn't
-possible to slim the (machine, device) expansion down programatically
-while still exercising the interesting combinations unless we get alot
-more advanced.
-
-eg if a have a PCI device, we only need test it in one PCI based machine,
-and only need test it on one non-PCI based machine.
-
-I would be interesting to actually get some CPU profiling data for
-this test to see if it points out anything interesting about where the
-time is being spent. Even if we don't reduce the complexity, reducing
-a time factor will potentially greatly help. 
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+thanks
+-- PMM
 
