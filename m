@@ -2,84 +2,86 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 930E7C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7565BC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C316205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 409FE2065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:29:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UdlJ+V45"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C316205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bk605mYy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409FE2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzSK-0002tW-Gr
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38262)
+	id 1juzSq-0003u3-BZ
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:29:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juzKa-0006cr-0m
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:21:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36014
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1juzKX-00085L-V8
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:21:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594650077;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XBNUYpnT1IMMAVkq6p8YgAKSruJUdmRCdPkNhXDUC88=;
- b=UdlJ+V453IjjI9DrJIqaT411xFtmoGDQeeQ47FHdE4pr56D48pKZaBYRlFmZ9zEJCgGY4l
- FnqNL1TpisiWv+dUatIj6e//2AR//3l+hIjW/freljQCK1ePC4eSOzWVxtUZKoMKkdIiIh
- R48LpqgPNQJTeqmhNU4HbbMoqcp0XLk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-LftWosHtPXe3JQkMTYutpQ-1; Mon, 13 Jul 2020 10:21:12 -0400
-X-MC-Unique: LftWosHtPXe3JQkMTYutpQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 101EE102C7F3;
- Mon, 13 Jul 2020 14:21:11 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-112-134.phx2.redhat.com [10.3.112.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AF85B79231;
- Mon, 13 Jul 2020 14:21:10 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 4/5] iotests.py: QemuIoInteractive: print output on failure
-Date: Mon, 13 Jul 2020 09:21:05 -0500
-Message-Id: <20200713142106.261809-5-eblake@redhat.com>
-In-Reply-To: <20200713142106.261809-1-eblake@redhat.com>
-References: <20200713142106.261809-1-eblake@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1juzDy-0002vb-H8
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:14:30 -0400
+Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:34131)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1juzDw-0006z8-Vr
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:14:30 -0400
+Received: by mail-oi1-x22b.google.com with SMTP id e4so11110154oib.1
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:14:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TkmNh43NVj3WoGJiiu5k0+TZepufATIpLLYtyyvfeCA=;
+ b=bk605mYyvKAA845UqY6TeMb9Hh/sg3og69Pf6mnbfpE6BaeqYgiriMacoxWMF3arFj
+ zjpZvJyB7PNSZ3/yPghNn5khUMoLTquU1P6BolL77UVBLvjFHVN8C4ex3WcbV3oB0ffL
+ 6HJ3pXh0cDTlbcyR3kIE0suyDI/OJHr4Tn9cXAi9nN7Hon8ArP33LnYIXtFReUMvIJGC
+ ojU2n6FEnSrW8keObRKUUcfessKc6dcUgHSyOAqydvXuxTP5xtxMq0eRkCPpOOJKUNTQ
+ eGLCaNAz9LP76UeS3mhk+Ib3oKdCbRutheLCmmUYv2r6q3XW9DE+ZJ3BIhspt3RYZcdB
+ sLog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TkmNh43NVj3WoGJiiu5k0+TZepufATIpLLYtyyvfeCA=;
+ b=l/NjfZCjdHP7Yxmzb5hYyT7msxNGU3hsvK8iOf5F4L501poHlACOBK77NbakR+2ser
+ 7HJcYR61CwRGM9OgLqgdfVxh8X7O5g0LfYmsiBcppL0fZKX68AEt26GZJJFHp0f8EJF4
+ 185VzEeo5rDNiX/9s9jSDf4MCnclY7E40T90aWcaLkChAQ9MoXgrviQL97KCbvHhrtsK
+ hhO/mvthkZwu5d0CwkCRV1tAj8LLAnvTOSmVPsSpFN43CAcXhZiaHkQ2M7aHcYiAenht
+ raTASBhDSymAYR2jou/NmotTlqADswDBWvgDygShwZhjm+5SWV1F7Nypcx1qE1Iezqee
+ BrNQ==
+X-Gm-Message-State: AOAM530hLI4UTN1LIXiPxeVx6ay97EpMe/2HOr7q60kWawvuxJficLXn
+ LmUjWVGurPZE3nrQzZUkzLFhyji0/o1aNbz1itWC+g==
+X-Google-Smtp-Source: ABdhPJwVceFp+jDRDqXs1b/MRBaRgaqxBSor6Bmbpl49whTxjh/RPSFkWPmH0OOW/SPy4hF0VvmlJviOqSHXGUTiGl8=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr88788oix.48.1594649667728;
+ Mon, 13 Jul 2020 07:14:27 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+References: <20200713141049.2241-1-kraxel@redhat.com>
+ <20200713141049.2241-3-kraxel@redhat.com>
+In-Reply-To: <20200713141049.2241-3-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Jul 2020 15:14:16 +0100
+Message-ID: <CAFEAcA_dBoVh+OYThkJvBPqDs+PY1kAXv1EWZs5B7w9F1yW9Yw@mail.gmail.com>
+Subject: Re: [PULL 2/4] docs/qdev-device-use: Clean up the sentences related
+ to -usbdevice
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::22b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,47 +94,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Mon, 13 Jul 2020 at 15:12, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> From: Thomas Huth <thuth@redhat.com>
+>
+> Most of the -usbdevice paramaters have been removed already. Update
+> the doc accordingly.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Message-id: 20200710065520.24784-1-thuth@redhat.com
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  docs/qdev-device-use.txt | 28 +++-------------------------
+>  1 file changed, 3 insertions(+), 25 deletions(-)
 
-Make it simpler to debug when qemu-io fails due to wrong arguments or
-environment.
+Side note: ideally we should roll this info into the
+proper docs/system manual at some point...
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200701105331.121670-3-vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/iotests.py | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 109fb3884a26..2a08fea3c9ec 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -217,7 +217,13 @@ class QemuIoInteractive:
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT,
-                                    universal_newlines=True)
--        assert self._p.stdout.read(9) == 'qemu-io> '
-+        out = self._p.stdout.read(9)
-+        if out != 'qemu-io> ':
-+            # Most probably qemu-io just failed to start.
-+            # Let's collect the whole output and exit.
-+            out += self._p.stdout.read()
-+            self._p.wait(timeout=1)
-+            raise ValueError(out)
-
-     def close(self):
-         self._p.communicate('q\n')
--- 
-2.27.0
-
+thanks
+-- PMM
 
