@@ -2,164 +2,126 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFC3C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:13:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67285C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E85E72065D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CAAA2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:16:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HslWZ81y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E85E72065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="bTpWy2pW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CAAA2072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv096-0001iK-WA
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 11:13:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37734)
+	id 1jv0C1-0003KI-8n
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 11:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jv088-0000sB-A8
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:12:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51464
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jv086-0001mQ-MA
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:12:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594653149;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ULBx+pphuO6tBbkN/XmJ9rg32DbiNzOZ3j+QLibST5g=;
- b=HslWZ81yUxVwr3wm4/3Ocsk22gc7U2op2pD8aPGXi/OMG2Jfa+Yiibsbk0GDbFKv9T7Fu+
- M681TjV/MuMQuNNXFmageBzDsuAtV1VpUWF96CVXdKbV5IF5lwTHujSFhngQc3NjE8VDlp
- NAxzdUzxmKyXmBIl039PQ3CUAmPChfE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-FkSetmbaN3CG9P7YyMrtDg-1; Mon, 13 Jul 2020 11:12:27 -0400
-X-MC-Unique: FkSetmbaN3CG9P7YyMrtDg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFBA918C63FD;
- Mon, 13 Jul 2020 15:12:08 +0000 (UTC)
-Received: from [10.10.113.141] (ovpn-113-141.rdu2.redhat.com [10.10.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B90F6766E3;
- Mon, 13 Jul 2020 15:12:03 +0000 (UTC)
-Subject: Re: [PATCH v5 09/12] tests/acceptance: Don't test reboot on cubieboard
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200710050649.32434-1-jsnow@redhat.com>
- <20200710050649.32434-10-jsnow@redhat.com>
- <3df55357-12c0-61da-976e-651ae8c97f1a@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <98ac50bb-005f-5e3b-be10-f70353b14c39@redhat.com>
-Date: Mon, 13 Jul 2020 11:12:03 -0400
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1jv0BA-0002rY-GH
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:15:41 -0400
+Received: from mail-eopbgr700075.outbound.protection.outlook.com
+ ([40.107.70.75]:39841 helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1jv0B7-0002Fo-JE
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:15:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hlxte2ZdYcSlhOocshp8CgCPR2VoKkg+8gXvSHzOUMAGROj/lu5N2JbX2NQpiOzoLIUb64yZvpeLk7mNRjohjfNggiI6Ax25bIyn0OujVlMzI1rsDr2iaXTE5UspX2bES1elzg5rTMIe9Doy6gaJ4f2tSBqXUFN9NfWeNxjl31wnOGcG83Ai7fffyBjil/0+qJMDRIQ/v7TEcKdTAvUUx5TxOegfjw1T/ZPjfKapQTSXbfR0+FIaP8zjY41INRAQjGW5c+v740bumwn+gDW3y74teblMBIsQDiM8/FVgsWh0lQrW1DuTKnpQXvt/moHTpEZ5l+8zt7O4tU10CL6wXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vnNy2nZb4cLSefZQJ8kTeVQmvvqAhL2tjmidWhEMHgA=;
+ b=XJprMnifxCxekc9tGMKz8CI4jtG4KYeQJR8zOkXeZh/SKuph6AdhQ/lPTpi9hS5Ro0ny+gF0ff/TcxsH4D1/QJntFXX2Ds+a6ajVxx4HL2J6SU9QDCc4e/WpQmQyWHMXhGHM4T1zEcHFtSb0/PTJX/qWXooHAu7Zmgg2RiUuw7Vk/eSH7weMI7xI56kKf9ykCzuQAaPeDeeFVhyHgV7vkyRFxLAJqzDZTu+r0m0b5I82130J1zjismV9vOYTNCc3DriyoDRIOHUcNMuZwXz9Fg25Xld7B1v8PXtL9LSb+qFRMPFzuoRZtWjGi8YpqqupaOjxj4pMq2EN9BHRtWxMow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vnNy2nZb4cLSefZQJ8kTeVQmvvqAhL2tjmidWhEMHgA=;
+ b=bTpWy2pWs094CMCu+8X2V8AioCqlCY2X6gkxqJup9YfgSLFVmCAfvRdkKQhq8XMHxc3ufnkwk99+BkENhsGuxhGfc4NuzWlHnqxq+ddawhtBvN+4GNwTWCCjURhHibEFTLHB4vZoiblC65rt0KaID7toIqxxKcCPwlBmY6xtXKI=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SA0PR12MB4463.namprd12.prod.outlook.com (2603:10b6:806:92::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.24; Mon, 13 Jul
+ 2020 15:00:33 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3174.025; Mon, 13 Jul 2020
+ 15:00:32 +0000
+Subject: RE: [PATCH v2 2/3] hw/i386: Build apic_id from CpuInstanceProperties
+To: Igor Mammedov <imammedo@redhat.com>
+References: <159362436285.36204.986406297373871949.stgit@naples-babu.amd.com>
+ <159362466828.36204.14044362989991188460.stgit@naples-babu.amd.com>
+ <20200713111527.23bf98a8@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <13317f5e-7bd6-8e12-efba-c1d01b3ebc32@amd.com>
+Date: Mon, 13 Jul 2020 10:00:30 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <3df55357-12c0-61da-976e-651ae8c97f1a@redhat.com>
+ Thunderbird/68.10.0
+In-Reply-To: <20200713111527.23bf98a8@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR07CA0125.namprd07.prod.outlook.com
+ (2603:10b6:3:13e::15) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.79] (165.204.77.1) by
+ DM5PR07CA0125.namprd07.prod.outlook.com (2603:10b6:3:13e::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3174.21 via Frontend Transport; Mon, 13 Jul 2020 15:00:31 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 4f5eb613-728c-40d2-c4e2-08d8273d7d70
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4463:
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4463DB490F6E56F1BA3AB44B95600@SA0PR12MB4463.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1284;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +zd9KmMzXKhG3c9R7RvN78yqtF4Bg09BZrJnHBxAkYOVl1LTOGM/m/rIWZn/DpMD9PE/3/gHHu3gp0fkSBH1umfeo7rv3C7c+Ji0ROcnli5yRJkkuXZgRAb0he+UtFC8fn9t5lXcW2iYetXPItYHIMCBb1cVV6nGO9s/QIxg/0wY9Pt7WsUIYZfcBNhJgBrE/wf7RZGbMFZZEkVREAHL5jMcb8zbe4Ao5JsU2H6DJlVykw9m33bN1+x4vYxwllHufHngHgU1k28N5XKeltdbGbhO4T1JazKMVDG/in6V7MG7A1suOiDp/1sQ4+yP7Qd6wu7B1BpKgpjjguGXYzdtY9vIQSkYvVcNNb6PuLm6k3boI21ow5bMM0qZtPtKhcqP
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(396003)(376002)(136003)(39860400002)(366004)(478600001)(31686004)(5660300002)(316002)(54906003)(8676002)(16576012)(6486002)(53546011)(4326008)(26005)(6916009)(8936002)(36756003)(186003)(30864003)(44832011)(16526019)(956004)(2616005)(2906002)(52116002)(66946007)(66556008)(66476007)(83380400001)(31696002)(86362001)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: /G3+D2mK+u3eex7mTNhAqTImicVGSyfJe0wRTPjxqcfRrKIbsblUo5QSrK8gcuBGLqBr682bR4v1JXSsleH39Kmg3gpw5TE9Rqg+rCH5WQTMl+IJFyBXhA9nHXa1rl9Ant+LhX8bjNc2ZdSOpyWvt+7gRaPmuBnipwZ61h0xsPr+Alg99TDCJ37f/YIFYpi5/PDslSVfXFbvBD4N0ngpkyOxozGkGB1ErI4OES4ueK3ymTODYO6Ip77HEVGJ9tlhvmrj60LdjeMDLok7ZnTJnggfyzcYqOrPZtoqbcCfS4HXIPcAgjaOZ6ADp9GkcU4rxkmHBmAIcrKNpeS1+6MooEMh3fDaCfRPumgI6w1CHqbczJpn75K9NIPfH7XPyaZZai8/O/CkS3NMBqwPIIF3dqQzmdAwXIZV4C49mkif+NvW5UInIb22/GRzFP3dHcSqur4VS5b01sgRZntsKza/DXRt7Y4A3eAQ9NKSP49A7ss=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f5eb613-728c-40d2-c4e2-08d8273d7d70
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2020 15:00:32.5954 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: swkbVTCxJLTjowMlZY9RRKaT1IHAIKOvP7ovnZL088P/ZWwev8daTT4romnVEtAH
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4463
+Received-SPF: none client-ip=40.107.70.75; envelope-from=Babu.Moger@amd.com;
+ helo=NAM04-SN1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 11:15:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -172,84 +134,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 7/13/20 5:56 AM, Philippe Mathieu-Daudé wrote:
-> On 7/10/20 7:06 AM, John Snow wrote:
->> cubieboard does not have a functioning reboot, it halts and QEMU does
->> not exit.
->>
->> vm.shutdown() is modified in a forthcoming patch that makes it less tolerant
->> of race conditions on shutdown; tests should consciously decide to WAIT
->> or to SHUTDOWN qemu.
->>
->> So long as this test is attempting to reboot, the correct choice would
->> be to WAIT for the VM to exit. However, since that's broken, we should
->> SHUTDOWN instead.
->>
->> SHUTDOWN is indeed what already happens when the test performs teardown,
->> however, if anyone fixes cubieboard reboot in the future, this test will
->> develop a new race condition that might be hard to debug.
->>
->> Therefore: remove the reboot test and make it obvious that the VM is
->> still running when the test concludes, where the test teardown will do
->> the right thing.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  tests/acceptance/boot_linux_console.py | 8 ++------
->>  1 file changed, 2 insertions(+), 6 deletions(-)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
->> index 5867ef760c..8b8b828bc5 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -508,9 +508,7 @@ def test_arm_cubieboard_initrd(self):
->>                                                  'Allwinner sun4i/sun5i')
->>          exec_command_and_wait_for_pattern(self, 'cat /proc/iomem',
->>                                                  'system-control@1c00000')
->> -        exec_command_and_wait_for_pattern(self, 'reboot',
->> -                                                'reboot: Restarting system')
->> -        # NB: Do not issue vm.wait() here, cubieboard's reboot does not exit!
->> +        # cubieboard's reboot is not functioning; omit reboot test.
->>  
->>      def test_arm_cubieboard_sata(self):
->>          """
->> @@ -553,9 +551,7 @@ def test_arm_cubieboard_sata(self):
->>                                                  'Allwinner sun4i/sun5i')
->>          exec_command_and_wait_for_pattern(self, 'cat /proc/partitions',
->>                                                  'sda')
->> -        exec_command_and_wait_for_pattern(self, 'reboot',
->> -                                                'reboot: Restarting system')
->> -        # NB: Do not issue vm.wait() here, cubieboard's reboot does not exit!
->> +        # cubieboard's reboot is not functioning; omit reboot test.
->>  
->>      def test_arm_orangepi(self):
->>          """
->>
+> -----Original Message-----
+> From: Igor Mammedov <imammedo@redhat.com>
+> Sent: Monday, July 13, 2020 4:15 AM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com; qemu-
+> devel@nongnu.org
+> Subject: Re: [PATCH v2 2/3] hw/i386: Build apic_id from CpuInstanceProperties
 > 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> On Wed, 01 Jul 2020 12:31:08 -0500
+> Babu Moger <babu.moger@amd.com> wrote:
 > 
-> Note, if I do the pull request, I might reorder this one before the
-> previous one "tests/acceptance: wait() instead of shutdown() where
-> appropriate".
+> > Build apic_id from CpuInstanceProperties if numa configured.
+> > Use the node_id from user provided numa information. This will avoid
+> > conflicts between numa information and apic_id generated.
+> >
+> > Re-arranged the code little bit to make sure CpuInstanceProperties is
+> > initialized before calling.
+> >
+> > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > ---
+> >  hw/i386/pc.c               |    6 +++++-
+> >  hw/i386/x86.c              |   19 +++++++++++++------
+> >  include/hw/i386/topology.h |   14 +++++++++++---
+> >  include/hw/i386/x86.h      |    6 ++++--
+> >  tests/test-x86-cpuid.c     |   39 ++++++++++++++++++++-------------------
+> >  5 files changed, 53 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c index d103b8c0ab..e613b2299f
+> > 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -800,13 +800,17 @@ void pc_smp_parse(MachineState *ms, QemuOpts
+> > *opts)  void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error
+> > **errp)  {
+> >      X86MachineState *x86ms = X86_MACHINE(ms);
+> > -    int64_t apic_id = x86_cpu_apic_id_from_index(x86ms, id);
+> > +    CpuInstanceProperties props;
+> > +    int64_t apic_id;
+> >      Error *local_err = NULL;
+> >
+> >      if (id < 0) {
+> >          error_setg(errp, "Invalid CPU id: %" PRIi64, id);
+> >          return;
+> >      }
+> > +    props = ms->possible_cpus->cpus[id].props;
+> > +
+> > +    apic_id = x86_cpu_apic_id_from_index(x86ms, id, props);
+> >
+> >      if (apic_id >= ACPI_CPU_HOTPLUG_ID_LIMIT) {
+> >          error_setg(errp, "Unable to add CPU: %" PRIi64 diff --git
+> > a/hw/i386/x86.c b/hw/i386/x86.c index 34229b45c7..7554416ae0 100644
+> > --- a/hw/i386/x86.c
+> > +++ b/hw/i386/x86.c
+> > @@ -93,7 +93,8 @@ static void x86_set_epyc_topo_handlers(MachineState
+> *machine)
+> >   * all CPUs up to max_cpus.
+> >   */
+> >  uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+> > -                                    unsigned int cpu_index)
+> > +                                    unsigned int cpu_index,
+> > +                                    CpuInstanceProperties props)
+> >  {
+> >      X86MachineClass *x86mc = X86_MACHINE_GET_CLASS(x86ms);
+> >      X86CPUTopoInfo topo_info;
+> > @@ -102,7 +103,7 @@ uint32_t
+> > x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+> >
+> >      init_topo_info(&topo_info, x86ms);
+> >
+> > -    correct_id = x86ms->apicid_from_cpu_idx(&topo_info, cpu_index);
+> > +    correct_id = x86ms->apicid_from_cpu_idx(&topo_info, cpu_index,
+> > + props);
+> >      if (x86mc->compat_apic_id_mode) {
+> >          if (cpu_index != correct_id && !warned && !qtest_enabled()) {
+> >              error_report("APIC IDs set in compatibility mode, "
+> > @@ -136,6 +137,8 @@ void x86_cpus_init(X86MachineState *x86ms, int
+> default_cpu_version)
+> >      const CPUArchIdList *possible_cpus;
+> >      MachineState *ms = MACHINE(x86ms);
+> >      MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+> > +    CpuInstanceProperties props;
+> > +
+> >
+> >      /* Check for apicid encoding */
+> >      if (cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type)) { @@ -144,6
+> > +147,8 @@ void x86_cpus_init(X86MachineState *x86ms, int
+> > default_cpu_version)
+> >
+> >      x86_cpu_set_default_version(default_cpu_version);
+> >
+> > +    possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > +
+> >      /*
+> >       * Calculates the limit to CPU APIC ID values
+> >       *
+> > @@ -152,13 +157,15 @@ void x86_cpus_init(X86MachineState *x86ms, int
+> default_cpu_version)
+> >       *
+> >       * This is used for FW_CFG_MAX_CPUS. See comments on
+> fw_cfg_arch_create().
+> >       */
+> > -    x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+> > -                                                      ms->smp.max_cpus - 1) + 1;
+> > -    possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > +    props = ms->possible_cpus->cpus[ms->smp.max_cpus - 1].props;
+> >
+> > +    x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+> > +                                                      ms->smp.max_cpus - 1,
+> > +                                                      props) + 1;
+> >      for (i = 0; i < ms->possible_cpus->len; i++) {
+> > +        props = ms->possible_cpus->cpus[i].props;
+> >          ms->possible_cpus->cpus[i].arch_id =
+> > -            x86_cpu_apic_id_from_index(x86ms, i);
+> > +            x86_cpu_apic_id_from_index(x86ms, i, props);
+> >      }
+> >
+> >      for (i = 0; i < ms->smp.cpus; i++) { diff --git
+> > a/include/hw/i386/topology.h b/include/hw/i386/topology.h index
+> > 7cb21e9c82..a800fc905f 100644
+> > --- a/include/hw/i386/topology.h
+> > +++ b/include/hw/i386/topology.h
+> > @@ -221,10 +221,17 @@ static inline void
+> x86_init_topo_ids(X86CPUTopoInfo *topo_info,
+> >   * 'cpu_index' is a sequential, contiguous ID for the CPU.
+> >   */
+> >  static inline apic_id_t x86_apicid_from_cpu_idx_epyc(X86CPUTopoInfo
+> *topo_info,
+> > -                                                     unsigned cpu_index)
+> > +                                                     unsigned cpu_index,
+> > +
+> > + CpuInstanceProperties props)
+> >  {
+> >      X86CPUTopoIDs topo_ids;
+> > -    x86_topo_ids_from_idx_epyc(topo_info, cpu_index, &topo_ids);
+> > +
+> > +    if (props.has_node_id) {
+> > +        x86_init_topo_ids(topo_info, props, &topo_ids);
+> > +    } else {
+> > +        x86_topo_ids_from_idx_epyc(topo_info, cpu_index, &topo_ids);
+> why this branch is needed?
+
+I have added it to make sure to handle the case if this function is called
+without initializing the props. I have to check if that case can happen.
+
 > 
-
-you could -- in practice it didn't seem to matter. I tested both with
-and without this patch.
-
-I was just trying to isolate each intentional semantic change as its own
-commit so it could be observed/understood/debated.
-
---js
+> > +    }
+> > +
+> >      return x86_apicid_from_topo_ids_epyc(topo_info, &topo_ids);  }
+> >  /* Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID @@
+> > -280,7 +287,8 @@ static inline void x86_topo_ids_from_apicid(apic_id_t
+> apicid,
+> >   * 'cpu_index' is a sequential, contiguous ID for the CPU.
+> >   */
+> >  static inline apic_id_t x86_apicid_from_cpu_idx(X86CPUTopoInfo *topo_info,
+> > -                                                unsigned cpu_index)
+> > +                                                unsigned cpu_index,
+> > +                                                CpuInstanceProperties
+> > + props)
+> >  {
+> >      X86CPUTopoIDs topo_ids;
+> >      x86_topo_ids_from_idx(topo_info, cpu_index, &topo_ids); diff
+> > --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h index
+> > b79f24e285..3109f39554 100644
+> > --- a/include/hw/i386/x86.h
+> > +++ b/include/hw/i386/x86.h
+> > @@ -65,7 +65,8 @@ typedef struct {
+> >
+> >      /* Apic id specific handlers */
+> >      uint32_t (*apicid_from_cpu_idx)(X86CPUTopoInfo *topo_info,
+> > -                                    unsigned cpu_index);
+> > +                                    unsigned cpu_index,
+> > +                                    CpuInstanceProperties props);
+> >      void (*topo_ids_from_apicid)(apic_id_t apicid, X86CPUTopoInfo
+> *topo_info,
+> >                                   X86CPUTopoIDs *topo_ids);
+> >      apic_id_t (*apicid_from_topo_ids)(X86CPUTopoInfo *topo_info, @@
+> > -93,7 +94,8 @@ typedef struct {  void init_topo_info(X86CPUTopoInfo
+> > *topo_info, const X86MachineState *x86ms);
+> >
+> >  uint32_t x86_cpu_apic_id_from_index(X86MachineState *pcms,
+> > -                                    unsigned int cpu_index);
+> > +                                    unsigned int cpu_index,
+> > +                                    CpuInstanceProperties props);
+> >
+> >  void x86_cpu_new(X86MachineState *pcms, int64_t apic_id, Error
+> > **errp);  void x86_cpus_init(X86MachineState *pcms, int
+> > default_cpu_version); diff --git a/tests/test-x86-cpuid.c
+> > b/tests/test-x86-cpuid.c index 049030a50e..a1308e214b 100644
+> > --- a/tests/test-x86-cpuid.c
+> > +++ b/tests/test-x86-cpuid.c
+> > @@ -29,6 +29,7 @@
+> >  static void test_topo_bits(void)
+> >  {
+> >      X86CPUTopoInfo topo_info = {0};
+> > +    CpuInstanceProperties props = {0};
+> >
+> >      /* simple tests for 1 thread per core, 1 core per die, 1 die per package */
+> >      topo_info = (X86CPUTopoInfo) {0, 1, 1, 1}; @@ -37,10 +38,10 @@
+> > static void test_topo_bits(void)
+> >      g_assert_cmpuint(apicid_die_width(&topo_info), ==, 0);
+> >
+> >      topo_info = (X86CPUTopoInfo) {0, 1, 1, 1};
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0), ==, 0);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1), ==, 1);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2), ==, 2);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 3), ==, 3);
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0, props), ==, 0);
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1, props), ==, 1);
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2, props), ==, 2);
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 3, props),
+> > + ==, 3);
+> >
+> >
+> >      /* Test field width calculation for multiple values @@ -92,38
+> > +93,38 @@ static void test_topo_bits(void)
+> >      g_assert_cmpuint(apicid_pkg_offset(&topo_info), ==, 5);
+> >
+> >      topo_info = (X86CPUTopoInfo) {0, 1, 6, 3};
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0), ==, 0);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1), ==, 1);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2), ==, 2);
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0, props), ==, 0);
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1, props), ==, 1);
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2, props),
+> > + ==, 2);
+> >
+> >      topo_info = (X86CPUTopoInfo) {0, 1, 6, 3};
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 0), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 0,
+> > + props), ==,
+> >                       (1 << 2) | 0);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 1), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 1,
+> > + props), ==,
+> >                       (1 << 2) | 1);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 2), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 2,
+> > + props), ==,
+> >                       (1 << 2) | 2);
+> >
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 0), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 0,
+> > + props), ==,
+> >                       (2 << 2) | 0);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 1), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 1,
+> > + props), ==,
+> >                       (2 << 2) | 1);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 2), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 2,
+> > + props), ==,
+> >                       (2 << 2) | 2);
+> >
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 0), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 0,
+> > + props), ==,
+> >                       (5 << 2) | 0);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 1), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 1,
+> > + props), ==,
+> >                       (5 << 2) | 1);
+> > -    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 2), ==,
+> > +    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 2,
+> > + props), ==,
+> >                       (5 << 2) | 2);
+> >
+> >      g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info,
+> > -                     1 * 6 * 3 + 0 * 3 + 0), ==, (1 << 5));
+> > +                     1 * 6 * 3 + 0 * 3 + 0, props), ==, (1 << 5));
+> >      g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info,
+> > -                     1 * 6 * 3 + 1 * 3 + 1), ==, (1 << 5) | (1 << 2) | 1);
+> > +                     1 * 6 * 3 + 1 * 3 + 1, props), ==, (1 << 5) | (1
+> > + << 2) | 1);
+> >      g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info,
+> > -                     3 * 6 * 3 + 5 * 3 + 2), ==, (3 << 5) | (5 << 2) | 2);
+> > +                     3 * 6 * 3 + 5 * 3 + 2, props), ==, (3 << 5) | (5
+> > + << 2) | 2);
+> >  }
+> >
+> >  int main(int argc, char **argv)
+> >
 
 
