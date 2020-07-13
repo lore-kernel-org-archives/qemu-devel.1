@@ -2,82 +2,84 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7BC9C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B1FC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:17:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CEFF2072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71DA820738
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:17:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pa87KSmq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CEFF2072D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sLUUjYtI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DA820738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzHB-00088Q-Sz
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:17:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34988)
+	id 1juzHD-0008Bn-Mn
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:17:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAm-0004rk-Jb
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:12 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:51358)
+ id 1juzBB-0005jF-MD
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:38 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33081)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAj-0006bZ-G1
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:12 -0400
-Received: by mail-wm1-x336.google.com with SMTP id 22so13464788wmg.1
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:09 -0700 (PDT)
+ id 1juzB8-0006gr-I9
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:37 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a6so111533wmm.0
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=HdNJ20eMAOaPbQ6G50C4oWU8DxNiUlxGWU4qkJAbt7M=;
- b=Pa87KSmqoZ8CIvJHzE4x9k/grgosYSd89sd7flN5vAo4/A/Dczidg7HDI3vA3E0fmc
- EIDHFG5V8geP8VehXPbu5442XVpnQUL/OBv8A3s7AXR8B86viLtKM6dd2U2se1zwRebe
- zpiJw/wf7xvqGtl6d7rWfgyDXiPEL9PPjZoJT5oIz+HnIKbM2xCd7lLGMaACANN1qjoG
- i+Hl4I1Bet9Y1rbZzpHyaCnhbXWHdx0XhjTMB1wn5LElq0bLskgN2ucdP54ZXdWgDTGX
- 9T8BLh2uyusPiM4yd7vEjNGv+DSrDYezaTEaE9P0s3fqh/KiyqE3Hkq9Vz0jteoqYMTA
- 2Ukg==
+ bh=MHD7c88AS73IuJuFfkFyKX8KupwIl5bGxCUU0rAKXto=;
+ b=sLUUjYtIOlNpoLaIRb6P8zx9S5We4EbkWWunsl/AIIcroJxu86F8sp77NgNewtn8Ut
+ DcfqX+/GuxmzJpQNzglh//w/AdtW9gXNDlkGu4pC9S1OHdSfRAbWv4krH0uSww4xE6NB
+ JpbP8lzZmEb0UhWKy/1k8t4uFvFRZqGSso4U1Cw7quMe1a1OGVm7YME3nl3R/4ZAMJ/h
+ wiZABDJcW5w+L9Wtyyf8Qrl2gyzGoaf2D6tpBwbcJ1/bhMjOVrPKfIaRWpJr5RFmOMf6
+ n32OeF6CIvGhuWP7mykrK5CkPrMcVKCUluT/6oAqU5dwSOqzTREZJDgozYyX9OKHIfI1
+ /Ppg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=HdNJ20eMAOaPbQ6G50C4oWU8DxNiUlxGWU4qkJAbt7M=;
- b=dfSMR/uM/6Fhx00R7QuE0iaqtD5MZbGdPteNwDQ2gR+hbo6u2kDLoL8tv7RUYITygU
- 0Xyr+mXcQQSpAJ+ucfFTMp8nQl+lD4jVigAU2UgtDzfbHZs6pRBAb/G43h/YsrtLkr8k
- Wj/KS+OLYb43FLYMNIH58SuF1RBhMJZSQ2dpF+PKazASPv/UGm/6VC+gGwira0cIxcj9
- IVEmckAevaydpJdtEZqz/aL9Sp4PdAPD4MH5HUC3aC5suw4Kog8qfo/3+ONoA9W/EWcd
- 4h5/LpjlSmJJEkjFQ5pSbzmrZv2+bY2WkIL03RoSrVjy/WpUiKjHJ6B/sW+TtQYtVqNX
- tMFg==
-X-Gm-Message-State: AOAM532P1zfcY5xQHmE6RWdKSSzE0x9ICezmqlJtwI7bP4NdyFBLJ0AN
- Fts8uQtaOklbHXV6v0+rEUR/zUTQ7VSvJQ==
-X-Google-Smtp-Source: ABdhPJzZwJFP5I85T7S9uLj6BSfpNT7hWHa6lFnf/7z0Sk4BT36cNMYt6Tt83CjPzvcN2MOp/bGkFg==
-X-Received: by 2002:a1c:6246:: with SMTP id w67mr177258wmb.42.1594649467242;
- Mon, 13 Jul 2020 07:11:07 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=MHD7c88AS73IuJuFfkFyKX8KupwIl5bGxCUU0rAKXto=;
+ b=SZmmraBVGKqeVWMPYNqAkGoiA4vTjFLEA2/HqHbCQxwzhyxyuEJl/D0nlHGl36DeBi
+ 4pbXGHJiSOMQII0SKrNiW/CcKhYJxF+eYtn67bdAaxPGKIMCuslIqvzy2RWqoURaDxci
+ UXBB4ZF2qLWnQya0RTwQnw9jKzPxQ54WueAtrIqloEUWoQhEoA6eYoezpCRD3FfISL6X
+ 5FdM+RJFeDs/cfxtduB8LqXjUaJlX7hoOe4vGJ/8JzePsEowZ6FjxhUKSCsb3+E7fOxY
+ KHl9KflKFGJiXkQ4xk8UCSgHlao060A4DmFyVwNAHDIj3l867iCdnXmgKEZBPw5cFhby
+ MT4w==
+X-Gm-Message-State: AOAM533CvhmOEj4VEVRWtqtmjTed360nIpL/FtatfbIc4uvbc+RGhYGD
+ nARc8VLZvSO836fE6Zrpn1AHBorfKdUg2g==
+X-Google-Smtp-Source: ABdhPJz0ulzWaddPZjAzpsR5Fl+fTgFtErTrGFby9FpHRnXjoaXOEw6i/ZzWAU5UZ2eLE69eQiUTnA==
+X-Received: by 2002:a1c:7d55:: with SMTP id y82mr174023wmc.72.1594649493014;
+ Mon, 13 Jul 2020 07:11:33 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.06
+ by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.32
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 07:11:06 -0700 (PDT)
+ Mon, 13 Jul 2020 07:11:32 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/25] target-arm queue
-Date: Mon, 13 Jul 2020 15:10:39 +0100
-Message-Id: <20200713141104.5139-1-peter.maydell@linaro.org>
+Subject: [PULL 24/25] hw/arm/palm.c: Encapsulate misc GPIO handling in a device
+Date: Mon, 13 Jul 2020 15:11:03 +0100
+Message-Id: <20200713141104.5139-25-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200713141104.5139-1-peter.maydell@linaro.org>
+References: <20200713141104.5139-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x336.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,103 +105,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Last lot of target-arm changes to squeeze in before rc1:
- * various minor Arm bug fixes
- * David Carlier's Haiku build portability fixes
- * Wentong Wu's fixes for icount handling in the nios2 target
+Replace the free-floating set of IRQs and palmte_onoff_gpios()
+function with a simple QOM device that encapsulates this
+behaviour.
 
-The following changes since commit 00ce6c36b35e0eb8cc5d68a28f288a6335848813:
+This fixes Coverity issue CID 1421944, which points out that
+the memory returned by qemu_allocate_irqs() is leaked.
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-07-13' into staging (2020-07-13 13:01:30 +0100)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20200628214230.2592-3-peter.maydell@linaro.org
+---
+ hw/arm/palm.c | 61 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 52 insertions(+), 9 deletions(-)
 
-are available in the Git repository at:
+diff --git a/hw/arm/palm.c b/hw/arm/palm.c
+index 569836178f6..e7bc9ea4c6a 100644
+--- a/hw/arm/palm.c
++++ b/hw/arm/palm.c
+@@ -124,6 +124,21 @@ static void palmte_button_event(void *opaque, int keycode)
+                         !(keycode & 0x80));
+ }
+ 
++/*
++ * Encapsulation of some GPIO line behaviour for the Palm board
++ *
++ * QEMU interface:
++ *  + unnamed GPIO inputs 0..6: for the various miscellaneous input lines
++ */
++
++#define TYPE_PALM_MISC_GPIO "palm-misc-gpio"
++#define PALM_MISC_GPIO(obj) \
++    OBJECT_CHECK(PalmMiscGPIOState, (obj), TYPE_PALM_MISC_GPIO)
++
++typedef struct PalmMiscGPIOState {
++    SysBusDevice parent_obj;
++} PalmMiscGPIOState;
++
+ static void palmte_onoff_gpios(void *opaque, int line, int level)
+ {
+     switch (line) {
+@@ -151,23 +166,44 @@ static void palmte_onoff_gpios(void *opaque, int line, int level)
+     }
+ }
+ 
++static void palm_misc_gpio_init(Object *obj)
++{
++    DeviceState *dev = DEVICE(obj);
++
++    qdev_init_gpio_in(dev, palmte_onoff_gpios, 7);
++}
++
++static const TypeInfo palm_misc_gpio_info = {
++    .name = TYPE_PALM_MISC_GPIO,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(PalmMiscGPIOState),
++    .instance_init = palm_misc_gpio_init,
++    /*
++     * No class init required: device has no internal state so does not
++     * need to set up reset or vmstate, and has no realize method.
++     */
++};
++
+ static void palmte_gpio_setup(struct omap_mpu_state_s *cpu)
+ {
+-    qemu_irq *misc_gpio;
++    DeviceState *misc_gpio;
++
++    misc_gpio = sysbus_create_simple(TYPE_PALM_MISC_GPIO, -1, NULL);
+ 
+     omap_mmc_handlers(cpu->mmc,
+                     qdev_get_gpio_in(cpu->gpio, PALMTE_MMC_WP_GPIO),
+                     qemu_irq_invert(omap_mpuio_in_get(cpu->mpuio)
+                             [PALMTE_MMC_SWITCH_GPIO]));
+ 
+-    misc_gpio = qemu_allocate_irqs(palmte_onoff_gpios, cpu, 7);
+-    qdev_connect_gpio_out(cpu->gpio, PALMTE_MMC_POWER_GPIO,     misc_gpio[0]);
+-    qdev_connect_gpio_out(cpu->gpio, PALMTE_SPEAKER_GPIO,       misc_gpio[1]);
+-    qdev_connect_gpio_out(cpu->gpio, 11,                        misc_gpio[2]);
+-    qdev_connect_gpio_out(cpu->gpio, 12,                        misc_gpio[3]);
+-    qdev_connect_gpio_out(cpu->gpio, 13,                        misc_gpio[4]);
+-    omap_mpuio_out_set(cpu->mpuio, 1,                           misc_gpio[5]);
+-    omap_mpuio_out_set(cpu->mpuio, 3,                           misc_gpio[6]);
++    qdev_connect_gpio_out(cpu->gpio, PALMTE_MMC_POWER_GPIO,
++                          qdev_get_gpio_in(misc_gpio, 0));
++    qdev_connect_gpio_out(cpu->gpio, PALMTE_SPEAKER_GPIO,
++                          qdev_get_gpio_in(misc_gpio, 1));
++    qdev_connect_gpio_out(cpu->gpio, 11, qdev_get_gpio_in(misc_gpio, 2));
++    qdev_connect_gpio_out(cpu->gpio, 12, qdev_get_gpio_in(misc_gpio, 3));
++    qdev_connect_gpio_out(cpu->gpio, 13, qdev_get_gpio_in(misc_gpio, 4));
++    omap_mpuio_out_set(cpu->mpuio, 1, qdev_get_gpio_in(misc_gpio, 5));
++    omap_mpuio_out_set(cpu->mpuio, 3, qdev_get_gpio_in(misc_gpio, 6));
+ 
+     /* Reset some inputs to initial state.  */
+     qemu_irq_lower(qdev_get_gpio_in(cpu->gpio, PALMTE_USBDETECT_GPIO));
+@@ -276,3 +312,10 @@ static void palmte_machine_init(MachineClass *mc)
+ }
+ 
+ DEFINE_MACHINE("cheetah", palmte_machine_init)
++
++static void palm_register_types(void)
++{
++    type_register_static(&palm_misc_gpio_info);
++}
++
++type_init(palm_register_types)
+-- 
+2.20.1
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200713
-
-for you to fetch changes up to 756f739b1682bf131994ec96dad7fbdf8b54493a:
-
-  hw/arm/aspeed: Do not create and attach empty SD cards by default (2020-07-13 14:36:12 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * hw/arm/bcm2836: Remove unused 'cpu_type' field
- * target/arm: Fix mtedesc for do_mem_zpz
- * Add the ability to change the FEC PHY MDIO device number on i.MX25/i.MX6/i.MX7
- * target/arm: Don't do raw writes for PMINTENCLR
- * virtio-iommu: Fix coverity issue in virtio_iommu_handle_command()
- * build: Fix various issues with building on Haiku
- * target/nios2: fix wrctl behaviour when using icount
- * hw/arm/tosa: Encapsulate misc GPIO handling in a device
- * hw/arm/palm.c: Encapsulate misc GPIO handling in a device
- * hw/arm/aspeed: Do not create and attach empty SD cards by default
-
-----------------------------------------------------------------
-Aaron Lindsay (1):
-      target/arm: Don't do raw writes for PMINTENCLR
-
-David CARLIER (8):
-      build: Enable BSD symbols for Haiku
-      util/qemu-openpty.c: Don't assume pty.h is glibc-only
-      build: Check that mlockall() exists
-      osdep.h: Always include <sys/signal.h> if it exists
-      osdep.h: For Haiku, define SIGIO as equivalent to SIGPOLL
-      bswap.h: Include <endian.h> on Haiku for bswap operations
-      util/compatfd.c: Only include <sys/syscall.h> if CONFIG_SIGNALFD
-      util/oslib-posix.c: Implement qemu_init_exec_dir() for Haiku
-
-Eric Auger (1):
-      virtio-iommu: Fix coverity issue in virtio_iommu_handle_command()
-
-Gerd Hoffmann (1):
-      util/drm: make portable by avoiding struct dirent d_type
-
-Jean-Christophe Dubois (3):
-      Add the ability to change the FEC PHY MDIO device number on i.MX25 processor
-      Add the ability to change the FEC PHY MDIO device number on i.MX6 processor
-      Add the ability to change the FEC PHY MDIO devices numbers on i.MX7 processor
-
-Peter Maydell (4):
-      hw/arm/tosa.c: Detabify
-      hw/arm/tosa: Encapsulate misc GPIO handling in a device
-      hw/arm/palm.c: Detabify
-      hw/arm/palm.c: Encapsulate misc GPIO handling in a device
-
-Philippe Mathieu-Daudé (2):
-      hw/arm/bcm2836: Remove unused 'cpu_type' field
-      hw/arm/aspeed: Do not create and attach empty SD cards by default
-
-Richard Henderson (1):
-      target/arm: Fix mtedesc for do_mem_zpz
-
-Wentong Wu (4):
-      target/nios2: add DISAS_NORETURN case for nothing more to generate
-      target/nios2: in line the semantics of DISAS_UPDATE with other targets
-      target/nios2: Use gen_io_start around wrctl instruction
-      hw/nios2: exit to main CPU loop only when unmasking interrupts
-
- configure                   |  38 ++++++++++++-
- include/hw/arm/bcm2836.h    |   1 -
- include/hw/arm/fsl-imx25.h  |   1 +
- include/hw/arm/fsl-imx6.h   |   1 +
- include/hw/arm/fsl-imx7.h   |   1 +
- include/qemu/bswap.h        |   2 +
- include/qemu/osdep.h        |   6 +-
- hw/arm/aspeed.c             |   9 +--
- hw/arm/fsl-imx25.c          |   7 +++
- hw/arm/fsl-imx6.c           |   7 +++
- hw/arm/fsl-imx7.c           |   9 +++
- hw/arm/palm.c               | 111 +++++++++++++++++++++++++------------
- hw/arm/tosa.c               | 132 +++++++++++++++++++++++++++++---------------
- hw/nios2/cpu_pic.c          |   3 +-
- hw/virtio/virtio-iommu.c    |   1 +
- hw/xen/xen-legacy-backend.c |   1 -
- os-posix.c                  |   4 ++
- target/arm/helper.c         |   4 +-
- target/arm/translate-sve.c  |   2 +-
- target/nios2/translate.c    |  12 +++-
- util/compatfd.c             |   2 +
- util/drm.c                  |  19 +++++--
- util/oslib-posix.c          |  20 ++++++-
- util/qemu-openpty.c         |   2 +-
- 24 files changed, 292 insertions(+), 103 deletions(-)
 
