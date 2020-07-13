@@ -7,90 +7,89 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C77FC433ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B98E4C433F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:59:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AF6F2076D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:59:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8690E20791
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 15:59:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q0b8ioRw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF6F2076D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ds6fGxyp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8690E20791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv0rb-0001s4-NC
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 11:59:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51684)
+	id 1jv0ra-0001o1-Pt
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 11:59:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jv0ql-0000Yz-KT
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:58:39 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34543
- helo=us-smtp-1.mimecast.com)
+ id 1jv0qk-0000Y2-P3
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:58:38 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40397
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jv0qk-0008Nx-1x
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:58:39 -0400
+ id 1jv0qj-0008Nr-2X
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 11:58:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1594655916;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FSXs5uHMzPA+HV1XAvpWMRauXPt+1ol/OUGDFgw63qY=;
- b=Q0b8ioRw3zJKf0baRevOZM9QuR9pJEGKnZ7K6lHkNfHVzsdL21TxvjTvmIP1CGL2UxRTf+
- /ZS/vIt+qZFdRDFXCxxiCo/1DNXvQOB0kL0iYvB0V7URbAa/2mNDh65U9BredN8bDFzKt9
- QlcekQ0FHG9c4DmXAOpWPQbBNZLHw4I=
+ bh=yfIb0WoSohr36CI5PC7CR58EVtgqFNPY3VFIqPoN2Bk=;
+ b=Ds6fGxypeEvmPXzJzhyZj0s/uHE/CRtJz2UckmmQ9nwP8JiKLQityH+UylrPPXqtFBIma8
+ ikrmZ7EdTdid3EqVDhIRoGmFgrZ69jHCmwHDP/acitgsoUc5VVvAjHf4GoHEqSeteRS33I
+ SK1PAkS9gSEQOzHhJJwFiiOFxPfNX7E=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-kgmh5IuKOhq_JHMb-VvZMA-1; Mon, 13 Jul 2020 11:58:35 -0400
-X-MC-Unique: kgmh5IuKOhq_JHMb-VvZMA-1
-Received: by mail-wr1-f70.google.com with SMTP id j5so17968268wro.6
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 08:58:35 -0700 (PDT)
+ us-mta-430-YjIe9dGrPGun1hwmcQLQNA-1; Mon, 13 Jul 2020 11:58:33 -0400
+X-MC-Unique: YjIe9dGrPGun1hwmcQLQNA-1
+Received: by mail-wr1-f70.google.com with SMTP id o12so17940952wrj.23
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 08:58:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FSXs5uHMzPA+HV1XAvpWMRauXPt+1ol/OUGDFgw63qY=;
- b=nLodB/yMkr3Fiktrpn2kDXrIYf1ZrY1/qQSIy0i1xddB5TzG6CMP/a0LnFSvRvvO3f
- YxB3Jd0OgZx2HSuAPppJ5jOUOc05W6fMZ0L+HkYYa42x2NEbgdej4UWRnQDZohqN0qjP
- +/X4OrVfhac2EqR1bhRWz+s9yl8uY2RAbLna6cKh9wTleE4XB5gO1tJasmR56HhNuPw4
- 8T4trIwTCQRLLpVgZsKPG+gCQG//AF77UZ+1zJUpHKH0kQG5lmkkkf0yQXNrKYl/rphx
- /OC1Ewd+ujSssKHqEux6DIWnmvO0eAytAWms+FDA1zHh6PE9qMzq9L/78d0I+CfU/8qD
- 0EaA==
-X-Gm-Message-State: AOAM530aphkqoUCRkeea/455rYYkvUGAC+yM777l6+9vqxL87DK+ePzC
- qyNJOeRbA0rWkowBP1KEU0PJP2krqLzlN749q7J0fqgGqvfbT7jTeajgqEa6O3fCEV+zSPRsorB
- S8NefAaDix7tz7fQ=
-X-Received: by 2002:adf:e908:: with SMTP id f8mr14594wrm.3.1594655913768;
- Mon, 13 Jul 2020 08:58:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxTvkKMxKz1a0w2g1oG1cIZ8bxmtRL9oMzRNquu1xdFxvz2QOZW+Rw4VD8eorJGp7RbKw8UzQ==
-X-Received: by 2002:adf:e908:: with SMTP id f8mr14582wrm.3.1594655913590;
- Mon, 13 Jul 2020 08:58:33 -0700 (PDT)
-Received: from localhost (trasno.trasno.org. [83.165.45.250])
- by smtp.gmail.com with ESMTPSA id b10sm38018wmj.30.2020.07.13.08.58.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=yfIb0WoSohr36CI5PC7CR58EVtgqFNPY3VFIqPoN2Bk=;
+ b=eqMeIieGsgBAM0gZoxOEcTKtoC9Tqs0iysly7ruL0uKyOCIhuLZheEnnqH+desF8XJ
+ msRhLm4GyZAGwEZuBxnghN783bsIFhzx4xGSW5ORlTbCNmM7Qxyk3ly3iYONkGYiH4w5
+ Vrpz78eiUBwO+n0DX8Cijpue0e6yCU6GwPlPswNYUl3azMfFCEQUHD2s96nSeKAgwtKw
+ uaZdk4N1Bj6xXV3zs05VIU+1FNYlyIDLdyEgbW/o304vfsoT0KB2sY0B//6T3P6Tzo9I
+ co+lHYiStcXPABJP5C+DUG5qgfBxzfjOzUckS19ggP1YGLJO/QNFffwEBIlX/1brNEMX
+ MGlg==
+X-Gm-Message-State: AOAM530A4Pytisrl/zKTtHkmJG3v8zzbo8ff4xx0lHHlYnHrCZqCOdK5
+ VeRedLofBM4USGO2bgGUI5G3ahx63haEjimjbMcK46fI8nhVEebHfAzCIPMYMMwjSoqAsvo0iQZ
+ CsUZ5+vfRwTx6Jvw=
+X-Received: by 2002:adf:e908:: with SMTP id f8mr14499wrm.3.1594655912208;
  Mon, 13 Jul 2020 08:58:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNXxqqrcgO97UOuRrER8Upn6tGlILYBCjh2rRzabhqc6jPKUjS50FIurvJRtjVJqzBNf0t4A==
+X-Received: by 2002:adf:e908:: with SMTP id f8mr14484wrm.3.1594655911974;
+ Mon, 13 Jul 2020 08:58:31 -0700 (PDT)
+Received: from localhost (trasno.trasno.org. [83.165.45.250])
+ by smtp.gmail.com with ESMTPSA id f14sm27075926wro.90.2020.07.13.08.58.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jul 2020 08:58:31 -0700 (PDT)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/3] migration/migration.c: Remove superfluous breaks
-Date: Mon, 13 Jul 2020 17:58:27 +0200
-Message-Id: <20200713155827.10670-4-quintela@redhat.com>
+Subject: [PATCH v2 2/3] migration/savevm: respect qemu_fclose() error code in
+ save_snapshot()
+Date: Mon, 13 Jul 2020 17:58:26 +0200
+Message-Id: <20200713155827.10670-3-quintela@redhat.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200713155827.10670-1-quintela@redhat.com>
 References: <20200713155827.10670-1-quintela@redhat.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=quintela@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=quintela@redhat.com;
- helo=us-smtp-1.mimecast.com
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
@@ -112,49 +111,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yi Wang <wang.yi59@zte.com.cn>, Thomas Huth <thuth@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  Juan Quintela <quintela@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, quintela@trasno.org,
- Liao Pingfang <liao.pingfang@zte.com.cn>
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, quintela@trasno.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liao Pingfang <liao.pingfang@zte.com.cn>
+From: "Denis V. Lunev" <den@openvz.org>
 
-Remove superfluous breaks, as there is a "return" before them.
+qemu_fclose() could return error, f.e. if bdrv_co_flush() will return
+the error.
 
-Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This validation will become more important once we will start waiting of
+asynchronous IO operations, started from bdrv_write_vmstate(), which are
+coming soon.
+
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Reviewed-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Fam Zheng <fam@euphon.net>
+CC: Juan Quintela <quintela@redhat.com>
+CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.c | 2 --
- 1 file changed, 2 deletions(-)
+ migration/savevm.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 08519de56f..2ed9923227 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -986,7 +986,6 @@ static void fill_source_migration_info(MigrationInfo *info)
-         /* no migration has happened ever */
-         /* do not overwrite destination migration status */
-         return;
--        break;
-     case MIGRATION_STATUS_SETUP:
-         info->has_status = true;
-         info->has_total_time = false;
-@@ -1105,7 +1104,6 @@ static void fill_destination_migration_info(MigrationInfo *info)
-     switch (mis->state) {
-     case MIGRATION_STATUS_NONE:
-         return;
--        break;
-     case MIGRATION_STATUS_SETUP:
-     case MIGRATION_STATUS_CANCELLING:
-     case MIGRATION_STATUS_CANCELLED:
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 6e01724605..45c9dd9d8a 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2635,7 +2635,7 @@ int save_snapshot(const char *name, Error **errp)
+ {
+     BlockDriverState *bs, *bs1;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+-    int ret = -1;
++    int ret = -1, ret2;
+     QEMUFile *f;
+     int saved_vm_running;
+     uint64_t vm_state_size;
+@@ -2719,10 +2719,14 @@ int save_snapshot(const char *name, Error **errp)
+     }
+     ret = qemu_savevm_state(f, errp);
+     vm_state_size = qemu_ftell(f);
+-    qemu_fclose(f);
++    ret2 = qemu_fclose(f);
+     if (ret < 0) {
+         goto the_end;
+     }
++    if (ret2 < 0) {
++        ret = ret2;
++        goto the_end;
++    }
+ 
+     /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
+      * for itself.  BDRV_POLL_WHILE() does not support nested locking because
 -- 
 2.25.4
 
