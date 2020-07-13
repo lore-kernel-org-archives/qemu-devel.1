@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D9EC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:02:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5EBDC433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:03:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0B2D2068F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:02:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0B2D2068F
+	by mail.kernel.org (Postfix) with ESMTPS id 8DFEB2068F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:03:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DFEB2068F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zte.com.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juuLz-0000wZ-42
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:02:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52328)
+	id 1juuMm-0002iI-SD
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:03:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <wang.yi59@zte.com.cn>)
- id 1juuKl-0007TQ-Fj
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:01:11 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:61362)
+ id 1juuKV-00078W-TV
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:00:55 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:6852)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <wang.yi59@zte.com.cn>)
- id 1juuKj-00031R-2C
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:01:11 -0400
+ id 1juuKU-0002yv-2G
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:00:55 -0400
 Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
- by Forcepoint Email with ESMTPS id D0F37B6504EBCF242284
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:01:06 +0800 (CST)
-Received: from notes_smtp.zte.com.cn (notes_smtp.zte.com.cn [10.30.1.239])
- by mse-fl1.zte.com.cn with ESMTP id 06D90wmO092226
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:00:58 +0800 (GMT-8)
+ by Forcepoint Email with ESMTPS id C5957DC9731B8C955124
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:00:49 +0800 (CST)
+Received: from notes_smtp.zte.com.cn (notessmtp.zte.com.cn [10.30.1.239])
+ by mse-fl1.zte.com.cn with ESMTP id 06D90YPu091483
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:00:34 +0800 (GMT-8)
  (envelope-from wang.yi59@zte.com.cn)
 Received: from fox-host8.localdomain ([10.74.120.8])
  by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
- with ESMTP id 2020071317010326-4267714 ;
- Mon, 13 Jul 2020 17:01:03 +0800 
+ with ESMTP id 2020071317003980-4267709 ;
+ Mon, 13 Jul 2020 17:00:39 +0800 
 From: Yi Wang <wang.yi59@zte.com.cn>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/12] tcg/riscv: Remove superfluous breaks
-Date: Mon, 13 Jul 2020 17:04:04 +0800
-Message-Id: <1594631044-36284-1-git-send-email-wang.yi59@zte.com.cn>
+Subject: [PATCH 02/12] target/ppc: Remove superfluous breaks
+Date: Mon, 13 Jul 2020 17:03:45 +0800
+Message-Id: <1594631025-36219-1-git-send-email-wang.yi59@zte.com.cn>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release
- 8.5.3FP6|November 21, 2013) at 2020-07-13 17:01:03,
+ 8.5.3FP6|November 21, 2013) at 2020-07-13 17:00:39,
  Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2020-07-13 17:00:59
+ 2020-07-13 17:00:36
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-MAIL: mse-fl1.zte.com.cn 06D90wmO092226
+X-MAIL: mse-fl1.zte.com.cn 06D90YPu091483
 Received-SPF: pass client-ip=63.217.80.70; envelope-from=wang.yi59@zte.com.cn;
  helo=mxhk.zte.com.cn
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 04:59:57
@@ -93,25 +93,40 @@ Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
 Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=20
 ---
- tcg/riscv/tcg-target.inc.c | 2 --
- 1 file changed, 2 deletions(-)
+ target/ppc/misc=5Fhelper.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 2bc0ba7..3c11ab8 100644
---- a/tcg/riscv/tcg-target.inc.c
-+++ b/tcg/riscv/tcg-target.inc.c
-@@ -502,10 +502,8 @@ static bool patch=5Freloc(tcg=5Finsn=5Funit *code=5Fpt=
-r, int type,
-         break;
-     case R=5FRISCV=5FJAL:
-         return reloc=5Fjimm20(code=5Fptr, (tcg=5Finsn=5Funit *)value);
+diff --git a/target/ppc/misc=5Fhelper.c b/target/ppc/misc=5Fhelper.c
+index 55b68d1..e43a3b4 100644
+--- a/target/ppc/misc=5Fhelper.c
++++ b/target/ppc/misc=5Fhelper.c
+@@ -234,25 +234,20 @@ target=5Fulong helper=5Fclcs(CPUPPCState *env, uint32=
+=5Ft arg)
+     case 0x0CUL:
+         /* Instruction cache line size */
+         return env->icache=5Fline=5Fsize;
 -        break;
-     case R=5FRISCV=5FCALL:
-         return reloc=5Fcall(code=5Fptr, (tcg=5Finsn=5Funit *)value);
+     case 0x0DUL:
+         /* Data cache line size */
+         return env->dcache=5Fline=5Fsize;
+-        break;
+     case 0x0EUL:
+         /* Minimum cache line size */
+         return (env->icache=5Fline=5Fsize < env->dcache=5Fline=5Fsize) ?
+             env->icache=5Fline=5Fsize : env->dcache=5Fline=5Fsize;
+-        break;
+     case 0x0FUL:
+         /* Maximum cache line size */
+         return (env->icache=5Fline=5Fsize > env->dcache=5Fline=5Fsize) ?
+             env->icache=5Fline=5Fsize : env->dcache=5Fline=5Fsize;
 -        break;
      default:
-         tcg=5Fabort();
+         /* Undefined */
+         return 0;
+-        break;
      }
+ }
+=20
 --=20
 2.9.5
 
