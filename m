@@ -2,62 +2,62 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D93DFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 05:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEAF6C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 05:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD71320724
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 05:18:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD71320724
+	by mail.kernel.org (Postfix) with ESMTPS id 7EB0520674
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 05:36:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB0520674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juqrC-0002wl-1a
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 01:18:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34670)
+	id 1jur8T-0005np-KO
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 01:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juqoe-0008Vh-LM
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 01:15:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57710)
+ id 1jur7b-000514-Qt
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 01:35:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59630)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1juqoc-0000Fv-JM
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 01:15:48 -0400
+ id 1jur7a-0002bC-5E
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 01:35:23 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1juqoa-0008JE-89
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 05:15:44 +0000
+ id 1juqVV-0006xm-0I
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:56:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 34C222E8025
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 05:15:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0073A2E80BA
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:56:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jul 2020 05:07:06 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1840719@bugs.launchpad.net>
+Date: Mon, 13 Jul 2020 04:48:06 -0000
+From: Roman Bolshakov <1840719@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
  assignee=roolebo@gmail.com; 
-X-Launchpad-Bug-Tags: bios floppy i386 testcase
+X-Launchpad-Bug-Tags: bios floppy x86
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: philmd roolebo
 X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Roman Bolshakov (roolebo)
 References: <156625651066.23088.12772675524876649281.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159461682658.12802.17418183832474992910.launchpad@soybean.canonical.com>
+Message-Id: <159461568702.12480.16685379081141400046.malone@gac.canonical.com>
 Subject: [Bug 1840719] Re: win98se floppy fails to boot with isapc machine
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 737a6446adc807928697c7c8b279932737b9a18c
+X-Launchpad-Hash: 4de289c886bee5e15b7ab7c11f0ffd8a741cf474
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 00:11:00
@@ -93,8 +93,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags removed: x86
-** Tags added: i386 testcase
+The commit fixes the issue in master branch:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dde15df5ead400b7c3d0cf21c8=
+164a7686dc81933
+
+The fix is going to be released in 5.1
+
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
 -- =
 
