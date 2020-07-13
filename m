@@ -7,35 +7,36 @@ X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E324C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8E4C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:27:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34B9820663
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:24:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B9820663
+	by mail.kernel.org (Postfix) with ESMTPS id 41A4C20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:27:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41A4C20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv43t-0008Ey-I6
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:24:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43278)
+	id 1jv46R-00010i-Jm
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:27:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv43I-0007i1-VJ
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:23:49 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:60073)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv45X-0000Pn-Cu
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:26:07 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:58651)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv43H-0006hB-97
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:23:48 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jv45V-00070M-KV
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:26:07 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MQ5f4-1kH79E0m6S-00M1d1; Mon, 13 Jul 2020 21:23:44 +0200
-Subject: Re: [PATCH] linux-user: Fix Coverity CID 1430271 / CID 1430272
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MpDeD-1kenuV0xSB-00qfz6 for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020
+ 21:26:04 +0200
+Subject: Re: [PATCH 1/2] linux-user: add new netlink types
 To: qemu-devel@nongnu.org
-References: <20200709200010.1016741-1-laurent@vivier.eu>
+References: <20200709072332.890440-1-laurent@vivier.eu>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,32 +80,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <cc4420a7-96ec-0342-2689-32e5196fa823@vivier.eu>
-Date: Mon, 13 Jul 2020 21:23:43 +0200
+Message-ID: <4e5413cc-6c9e-cf96-e515-6bd2b4af1d01@vivier.eu>
+Date: Mon, 13 Jul 2020 21:26:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200709200010.1016741-1-laurent@vivier.eu>
+In-Reply-To: <20200709072332.890440-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:35czsbEJcac9DVPl3+vnLUWDD9ZDObAXdKSLYzad+3p1uaBXrZL
- v5960jK12YfzD9nEIUpS4mMDanhbmCtaV4nTCBYDOZasl3dQ0DRXO286IRrd0qVc+WjzNAq
- s0VabYLkh3ksv3wm93uSqShiFrTNbdp2vYzHw2Ens/ZYRhRWj9RqP4nMFqg5CLtv1T86CZ1
- XUGlqYObxJPRWtvAnANTA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:l84p6Qzo5Oo=:vWU5wz4ApWqvhFI1gPtjOI
- h/+h4ajFrzNN8Yw+bkPw7llBZjTeDtSbPqiWOkfFGqMNFuYtBUlRelBRi1c95MaJNBeP4yt3X
- 86YinhqvLJXFSYm9HPXgdFn3dC3IkrPzP0y9v75eLP4t5oubu5nWpgfZtwwsHg5CzvLYgUoQk
- RBLVreEBwLgGhXCOIEPYhrtVNnUH+EtcAyl12vgCxJqvPt7QmfZpqodDofVSUrxRNXxswNd+Q
- sV7rQ7SvTSlK9O0AeoWwGn/HWONdN+n5tksea24emOiaQ6bwLFD5vrbOXf56Q5BID8oEs36UO
- +GqRB1+hOM0xwiXvlP5PRo9jAZlQJeiKsazyy7+CiZ/Iqw55IU92CNNjbKodkBqfLfWheIOvG
- rcAdwD6RvDMVoRtbcL7DsbViHqLIA2/AWrvyo7CrjG5ekOIomvha93o1PnU43iHcXoBsOG5g+
- HtZEgqpEAi2hUWnWFPVEVNUE8B5OZBkjKGMp1KQ2xXDFfJ1NRCZB7BJ03zrbft8Xucy0C5FCV
- 2LkJFw/LQaOEt43JworRDpM4c2yD/X3unmrlXjcdoVbqVX/SkCwc4fCA8A0dgCqdv0UDwJmUS
- KOZz8nqa0o2yeyyUKU5NCBg10A3AG6l30fA88zpAW0RR2nqizxUu2URytl4F1XW8xJtFCGU5A
- G03ZhiCXGUKoYkIsP21fTt0wu941TrLz1TjXIG2m8xpu0EiUI+SSyyaiq+013i1MzWYPwTInE
- Nmy1KseSS+km3RCmtXSOu6i7WbAgLyteAeHuvNzJxLLHO5zdO68TUu/wvQscuw0XBTrAbcYGR
- iGmz1TYM9RrOlIQ90ukZz9pW+SET1R7L0CcQlvHvLbUo8KHmws3EMZBUuFF+DA40BxilKFV
+X-Provags-ID: V03:K1:HImkxFguiOkZYVKF4C1th4OrFy4+FSRWdVCtHvM7/RzEgOAXWIy
+ i9koCFIsrxrm6toZjj2JPJ+01lZH+9oIJplsXv2ApFDMh0FbQGe1ERxgASMjVxiIMNf1LNI
+ MXDHQN87qm7ZV39XY8jMIahn2hKaxw51de63Vm/DgOiuSbrli0neC6DnlhcfX3zQ20yU3ia
+ SrgLE3lid9i4mtwE5YbDQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:g2Dpek8OYVU=:+n+17CVNNOC8vv+meu4iS3
+ unogzena8jOexcVyz2uaUNNbpG40JQCtk9DTDPSKErh3MCI3fOefJf7zMv706/tOduqYfoiPm
+ iDMkg84pxEEaga3SJj8QouoUOiOD5iVbj/hMVpnJHESYOLi9V3GvXKIPhRp5RgLryIiaLgTCf
+ f7yJadbDtU4FdKY4rVk+ZOymumhFczGRU4ysyeGnkrdGAuQaAvO/OqsNXCZFCXbSBbyJBAuV6
+ EJz8dqH05lp+3rdikB8osSAIUvLlJdgsceaI0LPaKIHC4RrA0i4zOiY2bQ++FkP1QsN5xsGzW
+ EPzfDpRsy+fD4uRRgrTF0fk2mGkVoqe9DN41lKyWQ9YFpLwauVmumsEBJLD96pnUSSXdlzWw+
+ e5UJ9daCGuUdNDvUzcSgAQAt2wkXmOFvmNXve0sciUw0zxFiZfZ0xtK2xVHkPBBZI9nP16xVu
+ digKH9PBzq0xX/hhoRuLaoA91daSdFAr2YSPxowxKcwEz/0e6fObJwCcf0fQanIZ9DktCbdav
+ K4M7jLxx+tYY45nF0ETlb2148hjhtIgLcdm+wOQQDCentvvzLjbUucf1Upj7JFLmy1gd4HMS/
+ kzVeH2I6Jpj41TZEstqNpaEuFc656CNXCczdQHetoaZ9T+j8qJAqn0b3URIvBL0RKVt270sCy
+ I7VeXNnTOwbi53U50Eb7UMSuIbCVwLHOk0bEeA14KN7x+KFQloF7l3ud4AlH4lFnTqEwkqNmp
+ qqq2zudYSru4zoUGAJzlcPigfTanzj+FvHPCb6NDbyzMTd56d1lfZrWR1vXkqpNqPossKgoeE
+ hBUAsZVE3FbNyOF2r1B0WfBjg57v7U2AuM5inZ2BXhgbYdPTnZGa9DQvhwJ7F14s56DCoyC
 Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:23:45
@@ -127,89 +128,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/07/2020 à 22:00, Laurent Vivier a écrit :
-> In new functions print_ioctl() and print_syscall_ret_ioctl(), we don't
-> check if lock_user() returns NULL and this would cause a segfault in
-> thunk_print().
+Le 09/07/2020 à 09:23, Laurent Vivier a écrit :
+> Only implement IFLA_PERM_ADDRESS to fix the following error:
 > 
-> If lock_user() returns NULL don't call thunk_print() but prints only the
-> value of the (invalid) pointer.
+>   Unknown host QEMU_IFLA type: 54
 > 
-> Tested with:
+> The couple of other ones, IFLA_PROP_LIST and IFLA_ALT_IFNAME, have
+> been introduced to be used with RTM_NEWLINKPROP, RTM_DELLINKPROP and
+> RTM_GETLINKPROP that are not implemented by QEMU.
 > 
->     # cat ioctl.c
->     #include <unistd.h>
->     #include <sys/ioctl.h>
-> 
->     int main(void)
->     {
->         int ret;
-> 
->         ret = ioctl(STDOUT_FILENO, TCGETS, 0xdeadbeef);
->         ret = ioctl(STDOUT_FILENO, TCSETSF, 0xdeadbeef);
->         return 0;
->     }
->     # QEMU_STRACE= ./ioctl
->     ...
->     578 ioctl(1,TCGETS,0xdeadbeef) = -1 errno=2 (Bad address)
->     578 ioctl(1,TCSETSF,0xdeadbeef) = -1 errno=2 (Bad address)
->     ...
->     # QEMU_STRACE= passwd
->     ...
->     623 ioctl(0,TCGETS,0x3fffed04) = 0 ({})
->     623 ioctl(0,TCSETSF,{}) = 0
->     ...
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Fixes: 79482e5987c8 ("linux-user: Add strace support for printing arguments of ioctl()")
 > Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/strace.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
+>  linux-user/fd-trans.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 5235b2260cdd..39554d903911 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -889,8 +889,12 @@ print_syscall_ret_ioctl(const struct syscallname *name, abi_long ret,
->              arg_type++;
->              target_size = thunk_type_size(arg_type, 0);
->              argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
-> -            thunk_print(argptr, arg_type);
-> -            unlock_user(argptr, arg2, target_size);
-> +            if (argptr) {
-> +                thunk_print(argptr, arg_type);
-> +                unlock_user(argptr, arg2, target_size);
-> +            } else {
-> +                print_pointer(arg2, 1);
-> +            }
->              qemu_log(")");
->          }
->      }
-> @@ -3119,8 +3123,12 @@ print_ioctl(const struct syscallname *name,
->                      arg_type++;
->                      target_size = thunk_type_size(arg_type, 0);
->                      argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
-> -                    thunk_print(argptr, arg_type);
-> -                    unlock_user(argptr, arg2, target_size);
-> +                    if (argptr) {
-> +                        thunk_print(argptr, arg_type);
-> +                        unlock_user(argptr, arg2, target_size);
-> +                    } else {
-> +                        print_pointer(arg2, 1);
-> +                    }
->                      break;
->                  }
->                  break;
+> diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
+> index c0687c52e62b..5d49a53552b2 100644
+> --- a/linux-user/fd-trans.c
+> +++ b/linux-user/fd-trans.c
+> @@ -133,6 +133,9 @@ enum {
+>      QEMU_IFLA_NEW_IFINDEX,
+>      QEMU_IFLA_MIN_MTU,
+>      QEMU_IFLA_MAX_MTU,
+> +    QEMU_IFLA_PROP_LIST,
+> +    QEMU_IFLA_ALT_IFNAME,
+> +    QEMU_IFLA_PERM_ADDRESS,
+>      QEMU___IFLA_MAX
+>  };
+>  
+> @@ -807,6 +810,7 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
+>      /* binary stream */
+>      case QEMU_IFLA_ADDRESS:
+>      case QEMU_IFLA_BROADCAST:
+> +    case QEMU_IFLA_PERM_ADDRESS:
+>      /* string */
+>      case QEMU_IFLA_IFNAME:
+>      case QEMU_IFLA_QDISC:
 > 
 
-Applied to my linux-user-for-5.1 branch.
+Applied to my linux-user-for5.1 branch.
 
 Thanks,
 Laurent
