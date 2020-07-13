@@ -2,86 +2,95 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97DCC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E80C433E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6F99206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4289720738
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlU0QmVp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6F99206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MiUrCMFk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4289720738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv103-00013L-0S
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 12:08:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53940)
+	id 1jv16J-0002TF-BV
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 12:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jv0zB-0000Yz-Hm; Mon, 13 Jul 2020 12:07:22 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:42322)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jv0z9-000125-0c; Mon, 13 Jul 2020 12:07:21 -0400
-Received: by mail-il1-x144.google.com with SMTP id t27so11602237ill.9;
- Mon, 13 Jul 2020 09:07:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HpNwDkjbAjSXBiPl0FouqOW2uw+pxK/VxO7S+jX4ZS4=;
- b=GlU0QmVpHJ4uDJJ+w93sYtHjcLLH7kFM8hzdiCkYnS81L1ffWskK/Wql8wDwN0P5EN
- eXi47/6CQ4ZzsbrF5axBVLrriicnR35DUx5FjknecqozBiYAhI9ssrDzr5Eyckf7blsG
- PQ1sCDzIMpbO1cfDYBZMSSYCKCDEiY8wrM0RWJtGtZzygtk7zznAqNTkqceLbSAoxfi0
- pCYFv9u9YCDPAu8RgeWETFV1UVIhwqofIqvSW29lzmGyqNOR7TVd18CPiGQzKEgPLXYO
- BI6EFnntSwO0PsF9+OibSRsO7pW20IKYBSxEgjQnR2CrQ/vU72FIeSug8JVRVoBimLEo
- mnog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HpNwDkjbAjSXBiPl0FouqOW2uw+pxK/VxO7S+jX4ZS4=;
- b=pIGH+YLlTvqOJqS4UB6njgVIrniZeS/Oqr4JJWV27gMJzPb551l7TgWotsChhHPvqz
- 3Qel0Ys3cRC3RpKxjepwomhdWUx6/cE1KL+aKte3D3y7IboyOfn6cySO2zL01vjc095f
- 949eWczVPNmXWUX/VBHczZizDYCmL5rluCe+mI0bfrrLoedXk0XdUj8lCgtyeRcCK09z
- TTfKjDuvwUUNY/i5/9tLw1uU1bIg+GcMQaoE9VpEbuXQWNzSlZhxxKuVB/5WHMOdAGji
- iIS+ryBB8KlcMxZuE1VlibuYx7lJMS+IolrGOeUXb4gpQ708alpeYZDqQ4iJMWm1G0Gq
- J1bQ==
-X-Gm-Message-State: AOAM533EQZB88eCXRH9tDQpT4eV9lYBjyt+P8AqDxpFUkJoySdraCaPX
- bWB5NXoub51OhfxZ0/VHHd/T/gtR7mzKXSnuiS0=
-X-Google-Smtp-Source: ABdhPJzF9C64BKYuYbqrHztblyhP/FTVGXLzp/QTaaTLCDqiTO0d4N1EWg9+MgX9JCr9OISEYJT0sn79O22Ry7/+eTY=
-X-Received: by 2002:a92:bb84:: with SMTP id x4mr402400ilk.177.1594656437199;
- Mon, 13 Jul 2020 09:07:17 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jv15X-00022I-SA
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:13:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36820
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jv15V-0001pe-QB
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:13:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594656833;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xK7xO62aVLhEUjBnQAV0nOy790uANdTaqPs7msW2hAo=;
+ b=MiUrCMFkao7NIxkPR3vCYnmhKzrXRbMwBb05hObbZW86rXUZqqbIrgnwwjXdj+QQ9JRv0R
+ Dpzc5ifMNuONAzkEdmpvO8gEOLr3O/Bj/H96DB91/0ob0+XkWJi/Q2is+dZhqd68diHkN8
+ w+gkrBldHyngpi+NbMOwGk10CGb5xgE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-BThBusI8NUSD8hEYTCnrzA-1; Mon, 13 Jul 2020 12:13:50 -0400
+X-MC-Unique: BThBusI8NUSD8hEYTCnrzA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 641CD18FF67C;
+ Mon, 13 Jul 2020 16:13:44 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1015E1001281;
+ Mon, 13 Jul 2020 16:13:43 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 696BC11384A6; Mon, 13 Jul 2020 18:13:42 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: David Gibson <dgibson@redhat.com>
+Subject: Re: Slow down with: 'Make "info qom-tree" show children sorted'
+References: <20200527084754.7531-1-armbru@redhat.com>
+ <20200527084754.7531-3-armbru@redhat.com>
+ <49bea110-0a3d-5a40-6647-67b116fb41b5@redhat.com>
+ <5e967e5f-8ae5-01cc-0dfe-f22e0f03b6b3@redhat.com>
+ <87y2nvanya.fsf@dusky.pond.sub.org>
+ <794f6901-5fe3-f7a1-45e7-f277f687cb6b@redhat.com>
+ <87v9iz7cxl.fsf@dusky.pond.sub.org>
+ <20200713111344.23c1b313@umbus.fritz.box>
+Date: Mon, 13 Jul 2020 18:13:42 +0200
+In-Reply-To: <20200713111344.23c1b313@umbus.fritz.box> (David Gibson's message
+ of "Mon, 13 Jul 2020 11:13:44 +1000")
+Message-ID: <874kqbbdft.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200710104920.13550-1-frank.chang@sifive.com>
- <CAKmqyKPtKtD=G+tXcd2Y-TM2go1TWbETHK2e3vdN-ehHyHU9-w@mail.gmail.com>
- <CAE_xrPhEW_VSRQVkthwu0NmBQYBZ11phLRgSbFqqFc9wZZ38Xg@mail.gmail.com>
-In-Reply-To: <CAE_xrPhEW_VSRQVkthwu0NmBQYBZ11phLRgSbFqqFc9wZZ38Xg@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 13 Jul 2020 08:57:19 -0700
-Message-ID: <CAKmqyKO8Hw+RmcjycODbpW18z+3MTxR3wKMz0i3dD0WBS+YFwA@mail.gmail.com>
-Subject: Re: [RFC 00/65] target/riscv: support vector extension v0.9
-To: Frank Chang <frank.chang@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,194 +103,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ berrange@redhat.com, ehabkost@redhat.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>,
+ =?utf-8?Q?C=C3=A9dr?= =?utf-8?Q?ic?= Le Goater <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jul 12, 2020 at 7:02 PM Frank Chang <frank.chang@sifive.com> wrote:
->
-> On Sat, Jul 11, 2020 at 5:53 AM Alistair Francis <alistair23@gmail.com> wrote:
->>
->> On Fri, Jul 10, 2020 at 5:59 AM <frank.chang@sifive.com> wrote:
->> >
->> > From: Frank Chang <frank.chang@sifive.com>
->> >
->> > This patchset implements the vector extension v0.9 for RISC-V on QEMU.
->> >
->> > This patchset is sent as RFC because RVV v0.9 is still in draft state.
->> > However, as RVV v1.0 should be ratified soon and there shouldn't be
->> > critical changes between RVV v1.0 and RVV v0.9. We would like to have
->> > the community to review RVV v0.9 implementations. Once RVV v1.0 is
->> > ratified, we will then upgrade to RVV v1.0.
->> >
->> > You can change the cpu argument: vext_spec to v0.9 (i.e. vext_spec=v0.9)
->> > to run with RVV v0.9 instructions.
->>
->> Hello,
->>
->> First off thanks for the patches!
->>
->> QEMU has a policy of accepting draft specs as experimental. We
->> currently support the v0.7.1 Vector extension for example, so this
->> does not need to be an RFC and can be a full patch series that can be
->> merged into master.
->>
->> I have applied the first few patches (PR should be out next week) and
->> they should be in the QEMU 5.1 release. QEMU is currently in a freeze
->> so I won't be able to merge this series for 5.1. In saying that please
->> feel free to continue to send patches to the list, they can still be
->> reviewed.
->>
->> In general we would need to gracefully handle extension upgrades and
->> maintain backwards compatibility. This same principle doesn't apply to
->> experimental features though (such as the vector extension) so you are
->> free to remove support for the v0.7.1. For users who want v0.7.1
->> support they can always use the QEMU 5.1. release. Just make sure that
->> your series does not break bisectability.
->>
->> Thanks again for the patches!
->>
->> Alistair
->
->
-> Hi Alistair,
->
-> Thanks for the review.
->
-> Currently I would prefer to drop 0.7.1 support because I don't know if there's
-> a good way to keep both 0.7.1 and 0.9 opcodes. I'm afraid it would cause the
-> encoding overlap while compiling with decodetree.
+David Gibson <dgibson@redhat.com> writes:
 
-That's fine. The plan was always to only support one version of a
-draft extension (and none when the final spec is frozen).
-
+> On Tue, 07 Jul 2020 14:00:06 +0200
+> Markus Armbruster <armbru@redhat.com> wrote:
 >
-> Does decodetree support any feature for multi-version opcodes?
-
-I'm not sure, but we don't want to deal with the maintenance burden of
-two draft extensions anyway.
-
-> Or if it can use something like C macros to compile with the opcodes by the vspec
-> user assigned? If there's any good way to keep both versions, then I can try to rearrange
-> my codes to support both vspecs.
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>=20
+>> > On 07/07/20 07:33, Markus Armbruster wrote: =20
+>> >> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>> >>  =20
+>> >>> On 7/7/20 6:45 AM, Thomas Huth wrote: =20
+>> >>>> On 27/05/2020 10.47, Markus Armbruster wrote: =20
+>> >>>>> "info qom-tree" prints children in unstable order.  This is a pain
+>> >>>>> when diffing output for different versions to find change.  Print =
+it
+>> >>>>> sorted.
+>> >>>>>
+>> >>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> >>>>> ---
+>> >>>>>  qom/qom-hmp-cmds.c | 24 ++++++++++++++++--------
+>> >>>>>  1 file changed, 16 insertions(+), 8 deletions(-) =20
+>> >>>>
+>> >>>>  Hi Markus,
+>> >>>>
+>> >>>> this patch causes a slow down of the qtests which becomes quite mas=
+sive
+>> >>>> when e.g. using the ppc64 and thourough testing. When I'm running
+>> >>>>
+>> >>>> QTEST_QEMU_BINARY=3D"ppc64-softmmu/qemu-system-ppc64" time \
+>> >>>> ./tests/qtest/device-introspect-test -m slow | tail -n 10
+>> >>>>
+>> >>>> the test runs for ca. 6m40s here before the patch got applied, and =
+for
+>> >>>> mor than 20 minutes after the patch got applied! =20
+>> >>=20
+>> >> That's surprising. =20
+>> >
+>> > It's a bit surprising indeed, but on the other hand using
+>> > g_queue_insert_sorted results in a quadratic loop. =20
+>>=20
+>> The surprising part is that n turns out to be large enough for n^2 to
+>> matter *that* much.
 >
-> Otherwise, I'll keep on my current approach to drop the support of v0.7.1 as the way
-> Richard has mentioned:
-> If you don't want to simultaneously support 0.7.1 and 0.9/1.0, then you should
-> simply remove 0.7.1 in the first patch, so that there's no confusion.
+> Is this another consequence of the ludicrous number of QOM objects we
+> create for LMB DRCs (one for every 256MiB of guest RAM)?  Avoiding that
+> is on my list.
 
-That sounds good :)
+You're talking about machine pseries, I presume.  With
+print_qom_composition() patched to print the number of children, I get
 
-Alistair
+    $ echo -e 'info qom-tree\nq' | ../qemu/bld/ppc64-softmmu/qemu-system-pp=
+c64 -S -display none -M pseries -accel qtest -monitor stdio | grep '###' | =
+sort | uniq -c | sort -k 3n
+        360 ### 0 children
+          5 ### 1 children
+          5 ### 2 children
+          2 ### 3 children
+          1 ### 4 children
+          1 ### 15 children
+          1 ### 16 children
+          1 ### 18 children
+          1 ### 37 children
+          1 ### 266 children
 
->
-> Any suggestion would be appreciated.
->
-> Thanks
-> --
-> Frank Chang
->
->>
->> >
->> > Chih-Min Chao (2):
->> >   fpu: fix float16 nan check
->> >   fpu: add api to handle alternative sNaN propagation
->> >
->> > Frank Chang (58):
->> >   target/riscv: fix rsub gvec tcg_assert_listed_vecop assertion
->> >   target/riscv: correct the gvec IR called in gen_vec_rsub16_i64()
->> >   target/riscv: fix return value of do_opivx_widen()
->> >   target/riscv: fix vill bit index in vtype register
->> >   target/riscv: remove vsll.vi, vsrl.vi, vsra.vi insns from using gvec
->> >   target/riscv: rvv-0.9: remove MLEN calculations
->> >   target/riscv: rvv-0.9: add fractional LMUL, VTA and VMA
->> >   target/riscv: rvv-0.9: update check functions
->> >   target/riscv: rvv-0.9: configure instructions
->> >   target/riscv: rvv-0.9: stride load and store instructions
->> >   target/riscv: rvv-0.9: index load and store instructions
->> >   target/riscv: rvv-0.9: fix address index overflow bug of indexed
->> >     load/store insns
->> >   target/riscv: rvv-0.9: fault-only-first unit stride load
->> >   target/riscv: rvv-0.9: amo operations
->> >   target/riscv: rvv-0.9: load/store whole register instructions
->> >   target/riscv: rvv-0.9: update vext_max_elems() for load/store insns
->> >   target/riscv: rvv-0.9: take fractional LMUL into vector max elements
->> >     calculation
->> >   target/riscv: rvv-0.9: floating-point square-root instruction
->> >   target/riscv: rvv-0.9: floating-point classify instructions
->> >   target/riscv: rvv-0.9: mask population count instruction
->> >   target/riscv: rvv-0.9: find-first-set mask bit instruction
->> >   target/riscv: rvv-0.9: set-X-first mask bit instructions
->> >   target/riscv: rvv-0.9: iota instruction
->> >   target/riscv: rvv-0.9: element index instruction
->> >   target/riscv: rvv-0.9: integer scalar move instructions
->> >   target/riscv: rvv-0.9: floating-point scalar move instructions
->> >   target/riscv: rvv-0.9: whole register move instructions
->> >   target/riscv: rvv-0.9: integer extension instructions
->> >   target/riscv: rvv-0.9: single-width averaging add and subtract
->> >     instructions
->> >   target/riscv: rvv-0.9: integer add-with-carry/subtract-with-borrow
->> >   target/riscv: rvv-0.9: narrowing integer right shift instructions
->> >   target/riscv: rvv-0.9: widening integer multiply-add instructions
->> >   target/riscv: rvv-0.9: quad-widening integer multiply-add instructions
->> >   target/riscv: rvv-0.9: integer merge and move instructions
->> >   target/riscv: rvv-0.9: single-width saturating add and subtract
->> >     instructions
->> >   target/riscv: rvv-0.9: integer comparison instructions
->> >   target/riscv: rvv-0.9: floating-point compare instructions
->> >   target/riscv: rvv-0.9: single-width integer reduction instructions
->> >   target/riscv: rvv-0.9: widening integer reduction instructions
->> >   target/riscv: rvv-0.9: mask-register logical instructions
->> >   target/riscv: rvv-0.9: register gather instructions
->> >   target/riscv: rvv-0.9: slide instructions
->> >   target/riscv: rvv-0.9: floating-point slide instructions
->> >   target/riscv: rvv-0.9: narrowing fixed-point clip instructions
->> >   target/riscv: rvv-0.9: floating-point move instructions
->> >   target/riscv: rvv-0.9: floating-point/integer type-convert
->> >     instructions
->> >   target/riscv: rvv-0.9: single-width floating-point reduction
->> >   target/riscv: rvv-0.9: widening floating-point reduction instructions
->> >   target/riscv: rvv-0.9: single-width scaling shift instructions
->> >   target/riscv: rvv-0.9: remove widening saturating scaled multiply-add
->> >   target/riscv: rvv-0.9: remove vmford.vv and vmford.vf
->> >   target/riscv: rvv-0.9: remove integer extract instruction
->> >   target/riscv: rvv-0.9: floating-point min/max instructions
->> >   target/riscv: rvv-0.9: widening floating-point/integer type-convert
->> >   target/riscv: rvv-0.9: narrowing floating-point/integer type-convert
->> >   softfloat: add fp16 and uint8/int8 interconvert functions
->> >   target/riscv: use softfloat lib float16 comparison functions
->> >   target/riscv: bump to RVV 0.9
->> >
->> > Kito Cheng (1):
->> >   fpu: implement full set compare for fp16
->> >
->> > LIU Zhiwei (4):
->> >   target/riscv: rvv-0.9: add vcsr register
->> >   target/riscv: rvv-0.9: add vector context status
->> >   target/riscv: rvv-0.9: update mstatus_vs by tb_flags
->> >   target/riscv: rvv-0.9: add vlenb register
->> >
->> >  fpu/softfloat-specialize.inc.c          |    4 +-
->> >  fpu/softfloat.c                         |  342 +++-
->> >  include/fpu/softfloat.h                 |   22 +
->> >  target/riscv/cpu.c                      |    9 +-
->> >  target/riscv/cpu.h                      |   68 +-
->> >  target/riscv/cpu_bits.h                 |    9 +
->> >  target/riscv/cpu_helper.c               |   13 +
->> >  target/riscv/csr.c                      |   53 +-
->> >  target/riscv/helper.h                   |  507 +++--
->> >  target/riscv/insn32-64.decode           |   18 +-
->> >  target/riscv/insn32.decode              |  282 +--
->> >  target/riscv/insn_trans/trans_rvv.inc.c | 2468 ++++++++++++++---------
->> >  target/riscv/internals.h                |   18 +-
->> >  target/riscv/translate.c                |   43 +-
->> >  target/riscv/vector_helper.c            | 2349 +++++++++++----------
->> >  15 files changed, 3833 insertions(+), 2372 deletions(-)
->> >
->> > --
->> > 2.17.1
->> >
->> >
+The outlier is
+
+        /device[5] (spapr-pci-host-bridge)
+
+due to its 256 spapr-drc-pci children.
+
+I found quite a few machines with similar outliers.  ARM machines nuri
+and smdkc210 together take the cake: they each have a node with 513
+children.
+
+My stupid n^2 sort is unnoticable in normal, human usage even for n=3D513.
+
+>                 Though avoiding a n^2 behaviour here is probably a good
+> idea anyway.
+
+Agreed.
+
 
