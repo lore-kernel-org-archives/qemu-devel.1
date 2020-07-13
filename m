@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FDFAC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 04:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B87C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 04:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA1592070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 04:11:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1592070B
+	by mail.kernel.org (Postfix) with ESMTPS id 163E32075D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 04:21:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 163E32075D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jupon-0007vV-7o
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 00:11:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54094)
+	id 1jupy8-0001Cy-3I
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 00:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jupo3-0007UM-W2
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 00:11:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48998)
+ id 1jupxZ-0000kt-4I
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 00:20:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50612)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jupo1-00084R-JM
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 00:11:07 -0400
+ id 1jupxW-0000mE-VB
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 00:20:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jupnv-0002KU-R1
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:10:59 +0000
+ id 1jupxU-0003Kl-SD
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:20:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CADF62E80EE
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:10:59 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id D2FB22E80EE
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:20:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jul 2020 03:59:59 -0000
-From: Launchpad Bug Tracker <1805256@bugs.launchpad.net>
+Date: Mon, 13 Jul 2020 04:12:00 -0000
+From: Rafael David Tinoco <1805256@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=kunpeng920; status=Triaged; importance=Undecided;
@@ -78,9 +78,9 @@ X-Launchpad-Bug-Commenters: andrew-cloke brian-murray dannf ikepanhc iveskim
  jan-glauber-i janitor jnsnow kongzizaixian lizhengui paelzer philmd
  rafaeldtinoco sil2100 ubuntu-sru-bot ying-fang
 X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
 References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <159461280318.7950.9049306501032419536.launchpad@ackee.canonical.com>
+Message-Id: <159461352100.13304.7502560418131260829.malone@gac.canonical.com>
 Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
  Aarch64 when converting images
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -89,7 +89,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6d3868d1b4942019f21bcabfbaa0f57cf955108c
+X-Launchpad-Hash: 73f9210076fad0b4afcec4265ee716e89033ef49
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 00:11:00
@@ -116,9 +116,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Merge proposal linked:
-   https://code.launchpad.net/~rafaeldtinoco/ubuntu/+source/qemu/+git/qemu/=
-+merge/387269
+Worked being done for the Bionic SRU:
+
+BUG: https://bugs.launchpad.net/qemu/+bug/1805256
+(fix for the bionic regression demonstrated at LP: #1885419)
+PPA: https://launchpad.net/~rafaeldtinoco/+archive/ubuntu/lp1805256-bionic
+MERGE: https://tinyurl.com/y8sucs6x
+
+Merge proposal currently going under review, tests and discussions.
 
 -- =
 
