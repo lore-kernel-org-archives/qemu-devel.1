@@ -2,87 +2,87 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DB5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D418C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:58:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F2742075D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:56:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2897F2075D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:58:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s0carylU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F2742075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZsgVvH6V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2897F2075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzsN-0007SL-T5
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60232)
+	id 1juzuR-0000xh-B8
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:58:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzrn-0006w1-DA
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:55:39 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:46212)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzrl-0006jl-I1
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:55:39 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id n24so9696646otr.13
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:55:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=K5DvJoOrRLyu5LahzgFXop71HKHgfXuE/+mfhqn1DX8=;
- b=s0carylUeLcDFIYBm3XD1LhpsbA9rrDZQPm7PlXLFFnaW1BrHnKRClm3pf7iSKJtbK
- npKGqOMW6lYyYlKKXZYE8xChDU8eSLjWtim42IsOKAtgTcJ10Y4rKxjlxsfG/42Ar6X2
- sQIrLqU0J10Ji6KVJhQrDh/1AIlO/CAnhP/cxY14cG0JzQuj6E1KUWuMjwc9SpngL08K
- sN0364GNBFf9zNfqg576VZc13tbH3hegcFHoHZlDD3Qn6dfPBKdPTKpQhW7nlgX/TzEW
- 1Oz19sxOUD3uiAVQjgcTkmm/EBnaCc/3vPWQGehjW+n+L/qXALVZIGZt5y8gKQ961JRH
- sdxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=K5DvJoOrRLyu5LahzgFXop71HKHgfXuE/+mfhqn1DX8=;
- b=KQ0hEx/MRfwavbg3nFgTJqQqbiMBq/0VOVnK8alYTvs7UjSdhKBV7PgIBBPxzTrkWY
- TFXogg7dAiltQJzA5pC9WrEnikgdgaWogXWSoxHdqQt5t2RbNR1BN1REpA/Z4GzxIW1w
- 9ZfRZfgvBoZbKhsmNXxfJ89+cIc8DKvLZOdA6HW4dD0RjkEnQIgkl7t9KqaI1ZuZnQoF
- v81qb0S/jukzifr2QCYT87Ojbzg8e5Q48vd0hTamLxjdtb6O/FgXm76l1QoB5o2V7RKc
- XzAaZimzXgku07P+jiWqHc4thz+uwMZKVu6uxKQNtaII7NOXaW5YxPUlaj9PY654PBq3
- hmJQ==
-X-Gm-Message-State: AOAM533PXgFlkO+LQbabHgr8rT3c2RUSgJOfD3h5ZYNdYmg96lVg9w3d
- fVxmv8xpe+2ZQGXwlhIut3Tz1mXx9na1YejXNx7jjg==
-X-Google-Smtp-Source: ABdhPJwHMlPmg767bcz81BZGfjh6WeqXbEO/j595vlXPbxBwDd2ltf0gLx3KnBq/5Rv/MPDCKHH6Q4WNEDPQTZclTks=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr67304005ota.91.1594652135962; 
- Mon, 13 Jul 2020 07:55:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1juztN-00082r-Bo
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:57:17 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56798
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1juztL-0006wW-Ii
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:57:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594652234;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1MGf5zK1eJqK9CxGDyrfBY/PulcYs01nTjng6qcipBI=;
+ b=ZsgVvH6Vm2FJBjZDiqDeKocQddDbo1gcCVWt5DdCXC5zYGpDY/8CaLpfChBeCQncT/tCyP
+ 1Eem5csbk7cyNa4CYPsU5z7GWP44/Eiy81dEJe8BvCX52kM/0W5brgjnhMeGtnWyk5Nnxp
+ sjJFTkdT9kJ1HC1Vl0lzxZtJjTc8pDo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-xrHM4m0RMaWEvFBp21Cb8A-1; Mon, 13 Jul 2020 10:57:12 -0400
+X-MC-Unique: xrHM4m0RMaWEvFBp21Cb8A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7099B8027FE;
+ Mon, 13 Jul 2020 14:57:10 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 57A9C5C1BB;
+ Mon, 13 Jul 2020 14:56:57 +0000 (UTC)
+Date: Mon, 13 Jul 2020 16:56:54 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [RFC PATCH 4/5] hw/i386/acpi-build: Turn off support of PCIe
+ native hot-plug and SHPC in _OSC
+Message-ID: <20200713165654.1f78af8f@redhat.com>
+In-Reply-To: <20200708224615.114077-5-jusual@redhat.com>
+References: <20200708224615.114077-1-jusual@redhat.com>
+ <20200708224615.114077-5-jusual@redhat.com>
 MIME-Version: 1.0
-References: <20200704163927.28188-1-philmd@redhat.com>
- <20200704163927.28188-4-philmd@redhat.com>
- <CAFEAcA8v2rEC0T_=D1Bat9DQJ=YS57fRUDDQyFdxJsEB=OEPMw@mail.gmail.com>
- <17fd7aea-cc7e-c17a-5748-88dd0d106317@redhat.com>
-In-Reply-To: <17fd7aea-cc7e-c17a-5748-88dd0d106317@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Jul 2020 15:55:24 +0100
-Message-ID: <CAFEAcA8=zLbv6yVxuED_kNgrWGVtmoE++ORHp6SGOdo6Mo2yMg@mail.gmail.com>
-Subject: Re: [PULL 3/5] softmmu/vl: Let -fw_cfg option take a 'gen_id' argument
-To: Laszlo Ersek <lersek@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::32b;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x32b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,19 +96,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jul 2020 at 15:50, Laszlo Ersek <lersek@redhat.com> wrote:
-> Ugh, I should have noticed that in review. I'm sorry.
+On Thu,  9 Jul 2020 00:46:14 +0200
+Julia Suvorova <jusual@redhat.com> wrote:
 
-No worries, catching this kind of thing is what static
-analysers are for :-)
+> Other methods may be used if the system is capable of this and the _OSC bit
+> is set. Disable them explicitly to force ACPI PCI hot-plug use. The older
+> versions will still use PCIe native.
+> 
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> ---
+>  hw/i386/acpi-build.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 5c5ad88ad6..0e2891c3ea 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1599,6 +1599,7 @@ static Aml *build_q35_osc_method(AcpiPmInfo *pm)
+>      Aml *method;
+>      Aml *a_cwd1 = aml_name("CDW1");
+>      Aml *a_ctrl = aml_local(0);
+> +    unsigned osc_ctrl;
+>  
+>      method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+>      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+> @@ -1612,9 +1613,12 @@ static Aml *build_q35_osc_method(AcpiPmInfo *pm)
+>  
+>      /*
+>       * Always allow native PME, AER (no dependencies)
+> -     * Allow SHPC (PCI bridges can have SHPC controller)
+> +     * Need to disable native and SHPC hot-plug to use acpihp
+> +     *
+> +     * PCI Firmware Specification, Revision 3.2
+seems incomplete, were you going to point to a concrete chapter that requires this change?
 
--- PMM
+>       */
+> -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
+> +    osc_ctrl = pm->pcihp_bridge_en ? 0x1C : 0x1F;
+Since you are touching this, how about converting this magic number to
+something more readable?
+i.e.
+            set_bit(ACPI_OSC_SHPC_EN,  osc_ctrl)
+          or
+            osc_ctrl |= BIT(SOME_FEATURE)
+
+> +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(osc_ctrl), a_ctrl));
+>  
+>      if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
+>      /* Unknown revision */
+> @@ -1696,7 +1700,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+>          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+>          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+> -        aml_append(dev, build_q35_osc_method());
+> +        aml_append(dev, build_q35_osc_method(pm));
+>          aml_append(sb_scope, dev);
+>          aml_append(dsdt, sb_scope);
+>  
+> @@ -1771,7 +1775,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>              if (pci_bus_is_express(bus)) {
+>                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
+>                  aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+> -                aml_append(dev, build_q35_osc_method());
+> +                aml_append(dev, build_q35_osc_method(pm));
+>              } else {
+>                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+>              }
+
 
