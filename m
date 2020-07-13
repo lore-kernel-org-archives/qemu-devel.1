@@ -2,46 +2,46 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D376C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 00:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F743C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 00:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30F09206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 00:41:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F09206F0
+	by mail.kernel.org (Postfix) with ESMTPS id 04855206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 00:36:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04855206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jumX1-0001rk-Hx
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 20:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50892)
+	id 1jumSg-00077D-8b
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jul 2020 20:36:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jumWS-0001SZ-FJ
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 20:40:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44352)
+ id 1jumNJ-0006Ih-FX
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 20:31:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43692)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jumWQ-0005tI-MB
- for qemu-devel@nongnu.org; Sun, 12 Jul 2020 20:40:44 -0400
+ id 1jumNG-0004gX-Vz
+ for qemu-devel@nongnu.org; Sun, 12 Jul 2020 20:31:17 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jumWO-0005j5-UX
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 00:40:40 +0000
+ id 1jumNF-00052p-25
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 00:31:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D908A2E80BA
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 00:40:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id CAA032E804F
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 00:31:12 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jul 2020 00:27:37 -0000
+Date: Mon, 13 Jul 2020 00:17:30 -0000
 From: JuanPabloCuervo <1887318@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,16 +52,15 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: audioprof2002
 X-Launchpad-Bug-Reporter: JuanPabloCuervo (audioprof2002)
 X-Launchpad-Bug-Modifier: JuanPabloCuervo (audioprof2002)
-References: <159459945016.20204.12821765315233915598.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159460005742.11965.5284650809973032479.malone@soybean.canonical.com>
-Subject: [Bug 1887318] Re: impossible to install in OSX Yosemite 10.10.5
+Message-Id: <159459945016.20204.12821765315233915598.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1887318] [NEW] impossible to install in OSX Yosemite 10.10.5
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2f7ee9b9bbe64dbb69e0cce4e59a1a70d498c153
+X-Launchpad-Hash: 7e0b8257a2993f713e6aa03ae6501412b7e213d8
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/12 20:31:13
@@ -88,25 +87,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://github.com/Homebrew/brew/issues/7667
+Public bug reported:
 
-https://security.stackexchange.com/questions/232445/https-connection-to-
-specific-sites-fail-with-curl-on-macos
+the Brew method has glib problems, glib is impossible to install.
+the MacPorts method has a very long .log file.
 
-This is a Cat & Mouse game...
-Catch 22...
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-its Not a Brew problemm
-is Not a glib problem,
-is not a git problem,
-so we dont care...
-its an Apple problem,
-Apple does Not care.
-
-End of Story.
-
-** Bug watch added: github.com/Homebrew/brew/issues #7667
-   https://github.com/Homebrew/brew/issues/7667
+** Attachment added: "main.log"
+   https://bugs.launchpad.net/bugs/1887318/+attachment/5392136/+files/main.=
+log
 
 -- =
 
