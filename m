@@ -2,89 +2,89 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B53C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26FD4C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:15:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F251A20758
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E59CE206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 11:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUDe+XPu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F251A20758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NSWc3FlG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59CE206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juwGH-0003IP-7m
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 07:04:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34650)
+	id 1juwQO-0007sn-6k
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 07:15:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1juwDt-0000jA-SH
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:02:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53988
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1juwPj-0007Sx-VW
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:14:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24775
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1juwDr-00053l-R9
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:02:13 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1juwPh-00070t-7h
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 07:14:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594638130;
+ s=mimecast20190719; t=1594638863;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fRF8uZm4rnD0AkZpdkMnnDf26Vaep2LDxP4/uTxLlRw=;
- b=dUDe+XPuN6oLbijKlZPHzokVu6uuorYx6LGXDTaGipSBdzIRhPK50loeyxVbDIZvUVlauf
- a6nm1qJ0UPWMg6w0j5eSR+8tJ5LE3SvayXo8S7a6XyBtPBvcxr3XvBITrgCFRTviV6Bc8S
- FNyaYMcXYWb6pgaq+GHtvGD3hYdVL24=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-tZpQ-BzjPKCpXpilbHkSjw-1; Mon, 13 Jul 2020 07:02:02 -0400
-X-MC-Unique: tZpQ-BzjPKCpXpilbHkSjw-1
-Received: by mail-wm1-f70.google.com with SMTP id 65so18311087wmd.8
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:02:02 -0700 (PDT)
+ bh=9yJxjN2eK2C/RtbAhcih8fYRhZsxSSIJoRDR+ygJPZ0=;
+ b=NSWc3FlGhOCZWOP+VRgBD7CnaAO7913+r6qXgLfoaq+0GveRGDeF0TzfDLOvI9IJmCKj7h
+ f3j4ihXPW1UrQlr92kXI4urFxtWzLLLNfZeY3Vb/p/xCFLfaKjZlN6OQ2qDK3a0Zm65c16
+ c4HN5A3zLAhVkiWICZomaCvJvjqe7kw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-3Y341XyLNpGUJwd3ZcNP8w-1; Mon, 13 Jul 2020 07:14:19 -0400
+X-MC-Unique: 3Y341XyLNpGUJwd3ZcNP8w-1
+Received: by mail-wr1-f72.google.com with SMTP id s16so17393131wrv.1
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 04:14:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=fRF8uZm4rnD0AkZpdkMnnDf26Vaep2LDxP4/uTxLlRw=;
- b=P+YhOAYZk7WhxdyBB04Rf0VLqbHT8E+8jgkHaAg+VB2A0jejlaOfuSZv4zCfn4N+oE
- MOtAAax121tkF7HRiNEowQtIo2+WZnT0KEh3qdFbf+prf9KhhPNzTPTf9zgMoepRJIth
- knHtwiAJapcyrxBSuxHusj8Q4RrFMtUhPuUcU0513Y8UEdp7NCUHzhZAtkCBiqXPifeh
- 2kNnrnFxQ6cCD7ypDN4ya60E7YWhMVq+U1wleogUBBwBU96kui5Grm39BZ/5GZUTTKtc
- aWWHVO3lw7TfvQIN7Z1P5uMH7/cVRRj34wzR/IaqGoyCoof0Cb5kHWUxXR6KGdlfif+B
- 4QsQ==
-X-Gm-Message-State: AOAM533bgUKKheiiXY2JWDBFnxwoas2qRoHzhvi6w6VMGs0VHYvkUlWr
- yMEx0cTiNv+jgVasr0ylwCwPDdz2nTncOEk1WgEFgwJ/Plepl7JOaljkY93zR7YHjn/kf3rFV7p
- NirN9lP5emDxmbWc=
-X-Received: by 2002:adf:b1ca:: with SMTP id r10mr52972666wra.150.1594638121626; 
- Mon, 13 Jul 2020 04:02:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx7gbXXJkTRPARQXe+EchFs+oZM71HNgqGxcQiO0uYXIA3eHn3bl4ZSSlkSUbO8ZckwIRGqHQ==
-X-Received: by 2002:adf:b1ca:: with SMTP id r10mr52972645wra.150.1594638121416; 
- Mon, 13 Jul 2020 04:02:01 -0700 (PDT)
+ bh=NpTWVJsF5mPjoZtLMQOdwBipVAebIZ+sY13ywG6j7qo=;
+ b=MzP5oQczP3OcjqVbSTv1ridQTV1Yf/uZjNB1AA18bokS4JMR7zPYQWrxwWsyUtMMZZ
+ sMLjQZDaXe9T+bEUucUlJDW7udY6U5xbvrM8DG2NO7QW/r/pdh9apIecvC5Mc+C1kJm9
+ V8AQIs5ROegEj3EIYo2G6S+rCrdmQpwciR2VTpXpUNRScpnC0fVqdBpIE7eVjW9TmoWV
+ AXkbU11kBoTh/+MZ75Ce2aSVQqkyj/YCH14XXq0l/Oqbz6CaVL59Z3KDg2nt4AfxMP2Y
+ XJoeMpb9xogNNIVUrxQvkxg4zW8MKqdGrANFK/TFYnXO8edpa1ZNhr5rOZyUO2jpIELN
+ CUMg==
+X-Gm-Message-State: AOAM5334TFrlPqJrJY9jHu+Tn943gIqbMXVm94hSAzEf++WnWAkv4arQ
+ jBvf62zBnHMahhYd18ZdOwa5m/mpM3OYzI4gO7yizAwj7pIIzq0QbBkt9J9QnvcT6AHe4Y/GLi/
+ PPx+99PqVGJIawRw=
+X-Received: by 2002:a5d:42c8:: with SMTP id t8mr75810962wrr.23.1594638858096; 
+ Mon, 13 Jul 2020 04:14:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJziHGKYA1ttybZawIhwKv+312YiNjlLRoLmelUapdedOMMaSKiSnCJcZruRvIVUi63dj4EFuw==
+X-Received: by 2002:a5d:42c8:: with SMTP id t8mr75810946wrr.23.1594638857829; 
+ Mon, 13 Jul 2020 04:14:17 -0700 (PDT)
 Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
- by smtp.gmail.com with ESMTPSA id 78sm15826868wma.31.2020.07.13.04.01.57
+ by smtp.gmail.com with ESMTPSA id d201sm21441221wmd.34.2020.07.13.04.14.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 04:02:00 -0700 (PDT)
-Date: Mon, 13 Jul 2020 07:01:51 -0400
+ Mon, 13 Jul 2020 04:14:17 -0700 (PDT)
+Date: Mon, 13 Jul 2020 07:14:01 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Michael Tokarev <mjt@tls.msk.ru>
 Subject: Re: [PATCH] Allow acpi-tmr size=2
-Message-ID: <20200713070038-mutt-send-email-mst@kernel.org>
+Message-ID: <20200713070946-mutt-send-email-mst@kernel.org>
 References: <5f12377f-b640-c4c5-1bcd-858c622c6c31@the-jedi.co.uk>
  <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
- <33bd2c28-8671-a552-61b2-08f5cd1c082d@msgid.tls.msk.ru>
 MIME-Version: 1.0
-In-Reply-To: <33bd2c28-8671-a552-61b2-08f5cd1c082d@msgid.tls.msk.ru>
+In-Reply-To: <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
@@ -116,52 +116,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 13, 2020 at 10:43:19AM +0300, Michael Tokarev wrote:
-> 13.07.2020 10:20, Michael Tokarev пишет:
-> > 12.07.2020 15:00, Simon John wrote:
-> >> macos guests no longer boot after commit 5d971f9e672507210e77d020d89e0e89165c8fc9
-> >>
-> >> acpi-tmr needs 2 byte memory accesses, so breaks as that commit only allows 4 bytes.
-> >>
-> >> Fixes: 5d971f9e672507210e7 (memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
-> >> Buglink: https://bugs.launchpad.net/qemu/+bug/1886318
+On Mon, Jul 13, 2020 at 10:20:12AM +0300, Michael Tokarev wrote:
+> 12.07.2020 15:00, Simon John wrote:
+> > macos guests no longer boot after commit 5d971f9e672507210e77d020d89e0e89165c8fc9
 > > 
-> > Actually this fixes 77d58b1e47c8d1c661f98f12b47ab519d3561488
-> > Author: Gerd Hoffmann <kraxel@redhat.com>
-> > Date:   Thu Nov 22 12:12:30 2012 +0100
-> > Subject: apci: switch timer to memory api
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > acpi-tmr needs 2 byte memory accesses, so breaks as that commit only allows 4 bytes.
 > > 
-> > because this is the commit which put min_access_size = 4 in there
-> > (5d971f9e672507210e7 is just a messenger, actual error were here
-> > earlier but it went unnoticed).
-> > 
-> > While min_access_size=4 was most likely an error, I wonder why
-> > we use 1 now, while the subject says it needs 2? What real min
-> > size is here for ACPI PM timer?
+> > Fixes: 5d971f9e672507210e7 (memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1886318
 > 
-> Actually it is more twisted than that. We can't just change the size,
-> we must update the corresponding code too.
+> Actually this fixes 77d58b1e47c8d1c661f98f12b47ab519d3561488
+> Author: Gerd Hoffmann <kraxel@redhat.com>
+> Date:   Thu Nov 22 12:12:30 2012 +0100
+> Subject: apci: switch timer to memory api
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > 
+> because this is the commit which put min_access_size = 4 in there
+> (5d971f9e672507210e7 is just a messenger, actual error were here
+> earlier but it went unnoticed).
 > 
-> static uint64_t acpi_pm_tmr_read(void *opaque, hwaddr addr, unsigned width)
-> {
->     return acpi_pm_tmr_get(opaque);
-> }
-> 
-> note the actual read function does not even know neither the requested
-> address nor the requested width, it assumes the min/max constraints
-> are enforced and the read goes to all 4 bytes. If this pm timer can
-> be read byte-by-byte, we should return the right byte of the value,
-> not always the whole value.
+> While min_access_size=4 was most likely an error, I wonder why
+> we use 1 now, while the subject says it needs 2? What real min
+> size is here for ACPI PM timer?
 > 
 > /mjt
 
 
-I think that specifying .impl.min_access_size is a way to do that easily
-without major code changes.
+Well the ACPI spec 1.0b says
 
--- 
-MST
+4.7.3.3 Power Management Timer (PM_TMR)
+
+...
+
+This register is accessed as 32 bits.
+
+and this text is still there in 6.2.
+
+
+So it's probably worth it to cite this in the commit log
+and explain it's a spec violation.
+I think it's better to be restrictive and only allow the
+minimal variation from spec - in this case I guess this means 2 byte
+reads.
+
+In any case pls do include an explanation for why you picked
+one over the other.
+
+> 
+> > Signed-off-by: Simon John <git@the-jedi.co.uk>
+> > ---
+> >  hw/acpi/core.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> > index f6d9ec4f13..05ff29b9d7 100644
+> > --- a/hw/acpi/core.c
+> > +++ b/hw/acpi/core.c
+> > @@ -527,7 +527,7 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
+> >  static const MemoryRegionOps acpi_pm_tmr_ops = {
+> >      .read = acpi_pm_tmr_read,
+> >      .write = acpi_pm_tmr_write,
+> > -    .valid.min_access_size = 4,
+> > +    .valid.min_access_size = 1,
+> >      .valid.max_access_size = 4,
+> >      .endianness = DEVICE_LITTLE_ENDIAN,
+> >  };
 
 
