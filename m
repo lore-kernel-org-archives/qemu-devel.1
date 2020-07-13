@@ -2,97 +2,90 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C21B7C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 798B2C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9352B2075D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49C1220738
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 17:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="anpuXNVo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9352B2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u+0FuobU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C1220738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv2bW-0004or-R9
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 13:51:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56592)
+	id 1jv2j9-0003PK-JS
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 13:58:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jv2aj-0003xm-Hz; Mon, 13 Jul 2020 13:50:13 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:39352)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jv2i8-00026Q-Ah
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 13:57:52 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54175)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jv2ah-00071l-Lf; Mon, 13 Jul 2020 13:50:13 -0400
-Received: by mail-ej1-x644.google.com with SMTP id w6so18246416ejq.6;
- Mon, 13 Jul 2020 10:50:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=w9ccvdUWDcNVWONo+PyLnO9BNyxcXjYmLZoFSnV+chE=;
- b=anpuXNVoQpGcH/XOkY+aPAX1aQyNL5B24WPNQb2SGHVr52SnNABB6zhwM75ply4Gzg
- dekhTgXVk6ZKA1/MMAY9217DdATG8oSWRF/emmZWGbejrmIVR2OC4RZ9vxAIGQh63nsc
- hYhhOAat98RuaQF0xcBtvt9hRhEUPdQDFxEUDimCcbFdoUX5+u4O4KDwvke3XTZcen4L
- WcCG4Aq1juZJx/ke7HZywCHk2BAtAtn5Oohp9Gh3WX3PpcrnDLrP3uYrIk4oo5o8Rq3J
- pHKOA3Cwyo39xogoa4/HRYnfzvQp00u/CDr1alU5lamJyEyiqdGez2an6PtOMfYGgQyw
- biaw==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jv2i6-00084Q-Ox
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 13:57:52 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j18so513432wmi.3
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 10:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Vbg5izYI34iu471XO9N3fvyaBGXDvlDeLjxYI4mvRCM=;
+ b=u+0FuobU1Y3BTd3hEBc1kkmy2svengzkeVkGXZ8NMqG8lD+muXu76tpV/Ct9VQxUjr
+ Q+snIzeXADa44BKIqam3k1gUzFcYgjtXANiruLPgpI2X03ZDUe13f9LKUlbIUnCsaf5M
+ jmwnbriQudARFzocY4uGQapNgcbXllouJiMUIrKev0DTOQszf4CyQEp+35lF/gMYHIdu
+ ewNpf9NXguuTH50gj4Uxt/EqF5o3J4XW0ikyn+cgGfEbEgDmgYXdLTZbC5JF1yvs9zVw
+ M1nIIx6IXn2EMUL3sIXxwmyKplR1lnU7YI8/hsjbO899b2m+oqmP54zCO8XrSPRC13JO
+ helA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=w9ccvdUWDcNVWONo+PyLnO9BNyxcXjYmLZoFSnV+chE=;
- b=O/l8L1k+f4+0K+1Iut6FnIt4R2w49YFzrQhGEfUqqsgTFixr2joWFp/i1oDtOmud/I
- bm7xLEuIHLHcW9S28kTSr5+EeHspHw7GaEZS3qUGSgUGlzEQPgYuHbrP0gDYUKo1JyvQ
- lzDeKXCoSX1QFFEPXLCnnNoEYCaoOW/IrwvqIOTT00p+h+2RE/DxK5EwJE+TCpPqRAhi
- 09Ma2+TsNvg9XO2lvYGeJtVwtMEZC7CYFFziiviQpyZBfoMbtO0PvDSbgiS+SbnHJWuy
- I8qhJU2PVlQB8tFNzZUAV07CBN7Y12M53YByFVLcsVb1eYqmB/itx7DWFISAMBOF5E+l
- kcrQ==
-X-Gm-Message-State: AOAM530mcMJmcj5nd7PqmOAjYYZ/I/H4AKzk0i/79WMkizBPwN8V4O7v
- 5Knr3vgrLx9ZXLehbUE9J7ltjaIFydI=
-X-Google-Smtp-Source: ABdhPJxQwqz2hDAIDfYCtM6vKbAda/vWic8rWMnWj4n6AWbbUqMEH74Thxgzyg1wZgxEXJuom5iW5w==
-X-Received: by 2002:a17:906:5f98:: with SMTP id
- a24mr790290eju.241.1594662609843; 
- Mon, 13 Jul 2020 10:50:09 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id x16sm12040058edr.52.2020.07.13.10.50.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 10:50:09 -0700 (PDT)
-Subject: Re: [PATCH v5 06/11] hw/arm: Load -bios image as a boot ROM for
- npcm7xx
-To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org
-References: <20200709003608.3834629-1-hskinnemoen@google.com>
- <20200709003608.3834629-7-hskinnemoen@google.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f88fae50-cb96-f5db-4820-24667bd8dacc@amsat.org>
-Date: Mon, 13 Jul 2020 19:50:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=Vbg5izYI34iu471XO9N3fvyaBGXDvlDeLjxYI4mvRCM=;
+ b=h6iJjXxOQu9mAtl74gc7C401kV3Ctwz/tAKjyX7a3MHww/FvQRudacJmHhZiLAEAPy
+ 2oqZKjgk5jrPPvEG8fOnz77d96drTZ7mzeSR6PrH/SLivKl7VfcuXeap2ACczV/shAWo
+ 7fX+khNRYgNp02kC2zHn+0pGiLc2CSKjhSOsEKH5vUvssEtc45Gdn9PcyTCViMkG47yK
+ Zar4HtW8D6jUcrA6Je4e6gS3leFTqOa5eSC5bBFSTpQr0+hQPW2ZnDhMtnd4KcROiFB5
+ IGkqIhcgSQSiXyCyf6HBrgPWWK0xFyHD4QK1Bbgg86Tv/av7Y0dFnk2lWZD7IF3381Q0
+ 64+g==
+X-Gm-Message-State: AOAM531FQJWOURf8DMBtYSJVqAN9C+Lk6xeovl8pgpKxzmJ9yuSJlZAT
+ 0GAe2jHDwB0digJiVq0Exy/o0x6J+H+1AQ==
+X-Google-Smtp-Source: ABdhPJxagE2NiaWUMK8FKOY0It+glK4voBtoa9gsIvkqXQH5a9n4K8zKgkA6cuSKeIZYotc4kyaXxA==
+X-Received: by 2002:a1c:1fc2:: with SMTP id f185mr606953wmf.0.1594663068575;
+ Mon, 13 Jul 2020 10:57:48 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id j4sm25723721wrp.51.2020.07.13.10.57.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jul 2020 10:57:47 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH for-5.1 0/4] Document virt and a few other Arm boards
+Date: Mon, 13 Jul 2020 18:57:42 +0100
+Message-Id: <20200713175746.5936-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200709003608.3834629-7-hskinnemoen@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,94 +98,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/9/20 2:36 AM, Havard Skinnemoen wrote:
-> If a -bios option is specified on the command line, load the image into
-> the internal ROM memory region, which contains the first instructions
-> run by the CPU after reset.
-> 
-> A minimal Apache-2.0-licensed boot ROM can be found at
-> 
-> https://github.com/google/vbootrom
-> 
-> It is by no means feature complete, but it is enough to launch the
-> Nuvoton bootblock[1] from offset 0 in the flash, which in turn will
-> launch u-boot and finally the Linux kernel.
+This series adds some documentation to the system manual for
+previously undocumented Arm board types.
 
-Peter, should we include it as submodule with the compiled blob in
-pc-bios/?
+The first 3 patches are very minimalist documentation of the
+canon-a1000, collie and gumstix board families.  The info was
+obtained by looking at source code comments, a brief scan of what
+kinds of devices the code was creating, and sometimes the cover
+letter for the patch series that added the board. The level
+of documentation here doesn't seem fantastically useful but
+on the other hand it's no worse than that we have for some
+existing boards (eg cheetah) and it would be nice to eventually
+get to complete coverage of all the arm board types. But
+I figured some feedback on whether this level of documentation
+was worth doing was worthwhile before I tried to add it for
+any of the other board types.
 
-> 
-> [1] https://github.com/Nuvoton-Israel/bootblock
-> 
-> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
-> ---
->  hw/arm/npcm7xx_boards.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
-> index d78d9f991b..80cf1535f1 100644
-> --- a/hw/arm/npcm7xx_boards.c
-> +++ b/hw/arm/npcm7xx_boards.c
-> @@ -19,8 +19,11 @@
->  #include "hw/arm/boot.h"
->  #include "hw/arm/npcm7xx.h"
->  #include "hw/core/cpu.h"
-> +#include "hw/loader.h"
->  #include "qapi/error.h"
-> +#include "qemu-common.h"
->  #include "qemu/units.h"
-> +#include "sysemu/sysemu.h"
->  
->  #define NPCM750_EVB_POWER_ON_STRAPS 0x00001ff7
->  #define QUANTA_GSJ_POWER_ON_STRAPS 0x00001fff
-> @@ -34,6 +37,25 @@ static struct arm_boot_info npcm7xx_binfo = {
->      .board_id           = -1,
->  };
->  
-> +static void npcm7xx_load_bootrom(NPCM7xxState *soc)
-> +{
-> +    if (bios_name) {
-> +        g_autofree char *filename = NULL;
-> +        int ret;
-> +
-> +        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-> +        if (!filename) {
-> +            error_report("Could not find ROM image '%s'", bios_name);
-> +            exit(1);
-> +        }
-> +        ret = load_image_mr(filename, &soc->irom);
-> +        if (ret < 0) {
-> +            error_report("Failed to load ROM image '%s'", filename);
-> +            exit(1);
-> +        }
-> +    }
-> +}
-> +
->  static void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
->  {
->      NPCM7xxClass *sc = NPCM7XX_GET_CLASS(soc);
-> @@ -73,6 +95,7 @@ static void npcm750_evb_init(MachineState *machine)
->      npcm7xx_connect_dram(soc, machine->ram);
->      qdev_realize(DEVICE(soc), NULL, &error_abort);
->  
-> +    npcm7xx_load_bootrom(soc);
->      npcm7xx_load_kernel(machine, soc);
->  }
->  
-> @@ -84,6 +107,7 @@ static void quanta_gsj_init(MachineState *machine)
->      npcm7xx_connect_dram(soc, machine->ram);
->      qdev_realize(DEVICE(soc), NULL, &error_abort);
->  
-> +    npcm7xx_load_bootrom(soc);
->      npcm7xx_load_kernel(machine, soc);
->  }
->  
-> 
+Finally, patch 4 is more meaty: it documents the "virt" board
+(which was a pretty embarrassing omission from the docs given
+that it is the standard board type that we recommend for
+Arm guests these days). I have attempted to fold in the info
+on the board from https://wiki.qemu.org/Documentation/Platforms/ARM
+where appropriate.
+
+Peter Maydell (4):
+  docs/system: Briefly document canon-a1100 board
+  docs/system: Briefly document collie board
+  docs/system: Briefly document gumstix boards
+  docs/system: Document the arm virt board
+
+ docs/system/arm/collie.rst  |  16 ++++
+ docs/system/arm/digic.rst   |  11 +++
+ docs/system/arm/gumstix.rst |  21 +++++
+ docs/system/arm/virt.rst    | 157 ++++++++++++++++++++++++++++++++++++
+ docs/system/target-arm.rst  |   4 +
+ MAINTAINERS                 |   4 +
+ 6 files changed, 213 insertions(+)
+ create mode 100644 docs/system/arm/collie.rst
+ create mode 100644 docs/system/arm/digic.rst
+ create mode 100644 docs/system/arm/gumstix.rst
+ create mode 100644 docs/system/arm/virt.rst
+
+-- 
+2.20.1
+
 
