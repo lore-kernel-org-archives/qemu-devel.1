@@ -2,91 +2,95 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_MIME_MALF,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8A5C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C71C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 473F3206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:24:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8B1E206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 10:26:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMEx/x2k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 473F3206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/MWaJGT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B1E206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juvd9-0005DN-Ho
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 06:24:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49242)
+	id 1juvfY-0006Op-1t
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 06:26:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1juvcI-0004iW-7z
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:23:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36363
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1juvcG-0006tm-64
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:23:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594635799;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=doNLK45oL7Oj0/W43KozYwT6JjYjHO02eLKhQUgRoDg=;
- b=RMEx/x2kTKBadIY+AqO/d1ybO+XzLki4ydivaOOtKGAGTAhKQRy+MqdvxtC0ivv9NJu+Bn
- GizYjI100a6438avbaZkIdYJXSqkuqCi3vNrfig5U+wGKISqQnxKwHDZcecwPLYaVvbrcq
- LoynrEt8t8kUivB5YE03q6dI9o4YwCA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-NrmS-x3pPUuC27OrpEIS0w-1; Mon, 13 Jul 2020 06:23:16 -0400
-X-MC-Unique: NrmS-x3pPUuC27OrpEIS0w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07D7880B713;
- Mon, 13 Jul 2020 10:23:14 +0000 (UTC)
-Received: from localhost (ovpn-114-66.ams2.redhat.com [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E63986149D;
- Mon, 13 Jul 2020 10:22:53 +0000 (UTC)
-Date: Mon, 13 Jul 2020 11:22:52 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v5 3/5] virtio-scsi: default num_queues to -smp N
-Message-ID: <20200713102252.GF28639@stefanha-x1.localdomain>
-References: <20200706135650.438362-1-stefanha@redhat.com>
- <20200706135650.438362-4-stefanha@redhat.com>
- <20200707174453.50c3ec85.cohuck@redhat.com>
- <20200708130526.GD487183@stefanha-x1.localdomain>
- <20200708185012.470125bb.cohuck@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20200708185012.470125bb.cohuck@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="L2Brqb15TUChFOBK"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <programmingkidx@gmail.com>)
+ id 1juveW-0005qV-QW
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:25:41 -0400
+Received: from mail-qk1-x734.google.com ([2607:f8b0:4864:20::734]:46358)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <programmingkidx@gmail.com>)
+ id 1juveR-0007NI-VK
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 06:25:40 -0400
+Received: by mail-qk1-x734.google.com with SMTP id r22so11586994qke.13
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 03:25:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:message-id:from:subject:date:to;
+ bh=IYL1nK9dC92a5r+6Cm64AE5ZsIv1DYyxirNbK9t28vw=;
+ b=U/MWaJGTMJNlhPMLNvpbyrEi/G27rCkiYdqSM9xlY339oeqqvo/U/6nyHHSC9YWcMv
+ vdGAFqW4+dAE7jx5EgNon1ugK7+uegTWjt3lnsqUOdqEOISU+xl30oihISqY/J6xX8OS
+ JLycz9PEcI4KnJX+8ekquBiGM2F5lsgAHpMcoD0B6feEORynJkQjMYwjUI2TcRTFQtyQ
+ OVk9oz2E0gNwkM8ejOeiSIrBLZk0xl0h7rwgU/TwTQwrbOqd41IgPmS1joJMl7DkHS3I
+ IkN/S5Qu7Gs/EfFHYQAYLhu9veZA2QCsPPg34pE+xfzm5L+mKsqT26A3O+eEY0O66ICM
+ USXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:message-id
+ :from:subject:date:to;
+ bh=IYL1nK9dC92a5r+6Cm64AE5ZsIv1DYyxirNbK9t28vw=;
+ b=PvhCDbnW9Janxgyun4s/uhYGKjGQEe1q2+iAlz5j70ANooVc11v/janPNxPFqA7O5a
+ rKG1MSK+teOcPniIOel6DUkcMImNNwxmNWEoVeuiTnZnNkEixPSEyH6bQGlIvfP/HAXm
+ GU/6wEc8MwnIisKQEM37L0ymdwmjAi20mUn8Tusfz3XvKsXsynnC335b8xrayIENbV7u
+ NaqZ+t9EDw5r2JaiNKzrBpsCIfiJfaUOsB+qpzsv/Eog3iN0b9tGFShw4vMWP2TbkIA3
+ FFNQDJlM7/fLj1UpmdJ1u8/g/xTeTpoUiUaaFxwphpWSko9Kzd+O8XzmPsVQ1YMmZMER
+ zAyA==
+X-Gm-Message-State: AOAM533UDVbchqBA/hE7dMXxBLVdWfMyM9xj7Eet6BeQP7ju9aCktMlI
+ szPZUJTpVfpjo1Ge9Ajh79Vbg+Cs
+X-Google-Smtp-Source: ABdhPJyT4uIZRIkS+Vu8upwSlj/+7aKaSBPUQ4+GI4dYpOOk5bGRmYbY3ipwq65gzH55rk/EA676yA==
+X-Received: by 2002:a05:620a:a56:: with SMTP id
+ j22mr78338281qka.193.1594635928754; 
+ Mon, 13 Jul 2020 03:25:28 -0700 (PDT)
+Received: from [192.168.0.8] (d149-67-30-58.try.wideopenwest.com.
+ [67.149.58.30])
+ by smtp.gmail.com with ESMTPSA id v184sm18721923qki.12.2020.07.13.03.25.27
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Mon, 13 Jul 2020 03:25:28 -0700 (PDT)
+Mime-Version: 1.0 (Apple Message framework v753.1)
+In-Reply-To: <mailman.2146.1594605768.2305.qemu-devel@nongnu.org>
+References: <mailman.2146.1594605768.2305.qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary=Apple-Mail-1-920166
+Message-Id: <1435E68C-6844-455C-9A86-62835A7A1E2E@gmail.com>
+From: G 3 <programmingkidx@gmail.com>
+Subject: Re: [Bug 1887318] [NEW] impossible to install in OSX Yosemite 10.10.5
+Date: Mon, 13 Jul 2020 06:25:26 -0400
+To: qemu-devel@nongnu.org,
+ JuanPabloCuervo <1887318@bugs.launchpad.net>
+X-Mailer: Apple Mail (2.753.1)
+Received-SPF: pass client-ip=2607:f8b0:4864:20::734;
+ envelope-from=programmingkidx@gmail.com; helo=mail-qk1-x734.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, T_MIME_MALF=0.01,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,93 +103,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>, qemu-devel@nongnu.org,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---L2Brqb15TUChFOBK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+
+--Apple-Mail-1-920166
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=US-ASCII;
+	delsp=yes;
+	format=flowed
+
+
+On Jul 12, 2020, at 10:02 PM, qemu-devel-request@nongnu.org wrote:
+
+> Message: 6
+> Date: Mon, 13 Jul 2020 00:17:30 -0000
+> From: JuanPabloCuervo <1887318@bugs.launchpad.net>
+> To: qemu-devel@nongnu.org
+> Subject: [Bug 1887318] [NEW] impossible to install in OSX Yosemite
+> 	10.10.5
+> Message-ID:
+> 	 
+> <159459945016.20204.12821765315233915598.malonedeb@chaenomeles.canonic 
+> al.com>
+> 	
+> Content-Type: text/plain; charset="utf-8"
+>
+> Public bug reported:
+>
+> the Brew method has glib problems, glib is impossible to install.
+> the MacPorts method has a very long .log file.
+>
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>
+> ** Attachment added: "main.log"
+>    https://bugs.launchpad.net/bugs/1887318/+attachment/5392136/ 
+> +files/main.log
+>
+> -- 
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1887318
+>
+> Title:
+>   impossible to install in OSX Yosemite 10.10.5
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   the Brew method has glib problems, glib is impossible to install.
+>   the MacPorts method has a very long .log file.
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1887318/+subscriptions
+
+This is why we need installer files for QEMU. They make life so much  
+easier than building from source.
+
+
+--Apple-Mail-1-920166
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset=US-ASCII
 
-On Wed, Jul 08, 2020 at 06:50:12PM +0200, Cornelia Huck wrote:
-> On Wed, 8 Jul 2020 14:05:26 +0100
-> Stefan Hajnoczi <stefanha@redhat.com> wrote:
->=20
-> > On Tue, Jul 07, 2020 at 05:44:53PM +0200, Cornelia Huck wrote:
-> > > On Mon,  6 Jul 2020 14:56:48 +0100
-> > > Stefan Hajnoczi <stefanha@redhat.com> wrote:
->=20
-> > > > diff --git a/hw/virtio/virtio-scsi-pci.c b/hw/virtio/virtio-scsi-pc=
-i.c
-> > > > index 3ff9eb7ef6..fa4b3bfb50 100644
-> > > > --- a/hw/virtio/virtio-scsi-pci.c
-> > > > +++ b/hw/virtio/virtio-scsi-pci.c
-> > > > @@ -46,13 +46,17 @@ static void virtio_scsi_pci_realize(VirtIOPCIPr=
-oxy *vpci_dev, Error **errp)
-> > > >  {
-> > > >      VirtIOSCSIPCI *dev =3D VIRTIO_SCSI_PCI(vpci_dev);
-> > > >      DeviceState *vdev =3D DEVICE(&dev->vdev);
-> > > > -    VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(vdev);
-> > > >      DeviceState *proxy =3D DEVICE(vpci_dev);
-> > > > +    VirtIOSCSIConf *conf =3D &dev->vdev.parent_obj.conf;
-> > > >      char *bus_name;
-> > > > =20
-> > > > +    if (conf->num_queues =3D=3D VIRTIO_SCSI_AUTO_NUM_QUEUES) {
-> > > > +        conf->num_queues =3D
-> > > > +            virtio_pci_optimal_num_queues(VIRTIO_SCSI_VQ_NUM_FIXED=
-);
-> > > > +    }
-> > > > +
-> > > >      if (vpci_dev->nvectors =3D=3D DEV_NVECTORS_UNSPECIFIED) {
-> > > > -        vpci_dev->nvectors =3D vs->conf.num_queues +
-> > > > -                             VIRTIO_SCSI_VQ_NUM_FIXED + 1;
-> > > > +        vpci_dev->nvectors =3D conf->num_queues + VIRTIO_SCSI_VQ_N=
-UM_FIXED + 1;
-> > > >      }
-> > > > =20
-> > > >      /* =20
-> > >=20
-> > > One corner case where the setup may end up being a bit odd is a
-> > > situation where nvectors was specified, but num_queues was not, and t=
-he
-> > > device suddenly ends up with more queues than vectors. But I don't se=
-e
-> > > a reason why you would want to specify nvectors but not num_queues in=
- a
-> > > real word scenario, so I think we can ignore that corner case. =20
-> >=20
-> > I agree, I've ignored that case. Other options include printing a
-> > warning or even an error when num_queues disagrees with nvectors.
->=20
-> I think an error would be too harsh, but a warning sounds useful.
+<html><body style=3D"word-wrap: break-word; -webkit-nbsp-mode: space; =
+-webkit-line-break: after-white-space; ">
+<br><div><div>On Jul 12, 2020, at 10:02 PM, <a =
+href=3D"mailto:qemu-devel-request@nongnu.org">qemu-devel-request@nongnu.or=
+g</a> wrote:</div><br class=3D"Apple-interchange-newline"><blockquote =
+type=3D"cite"><p style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font =
+face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px Helvetica">Message: =
+6</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font =
+face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px Helvetica">Date: =
+Mon, 13 Jul 2020 00:17:30 -0000</font></p> <p style=3D"margin: 0.0px =
+0.0px 0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: =
+12.0px Helvetica">From: JuanPabloCuervo &lt;<a =
+href=3D"mailto:1887318@bugs.launchpad.net">1887318@bugs.launchpad.net</a>&=
+gt;</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font =
+face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px Helvetica">To: <a =
+href=3D"mailto:qemu-devel@nongnu.org">qemu-devel@nongnu.org</a></font></p>=
+ <p style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">Subject: [Bug 1887318] [NEW] =
+impossible to install in OSX Yosemite</font></p> <p style=3D"margin: =
+0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" =
+style=3D"font: 12.0px Helvetica"><span class=3D"Apple-tab-span" =
+style=3D"white-space:pre">	</span>10.10.5</font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">Message-ID:</font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica"><span class=3D"Apple-tab-span"=
+ style=3D"white-space:pre">	</span>&lt;<a =
+href=3D"mailto:159459945016.20204.12821765315233915598.malonedeb@chaenomel=
+es.canonical.com">159459945016.20204.12821765315233915598.malonedeb@chaeno=
+meles.canonical.com</a>&gt;</font></p> <p style=3D"margin: 0.0px 0.0px =
+0.0px 0.0px; min-height: 14.0px"><font face=3D"Helvetica" size=3D"3" =
+style=3D"font: 12.0px Helvetica"><span class=3D"Apple-tab-span" =
+style=3D"white-space:pre">	</span></font></p> <p style=3D"margin: =
+0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" =
+style=3D"font: 12.0px Helvetica">Content-Type: text/plain; =
+charset=3D"utf-8"</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px; font: 12.0px Helvetica; min-height: 14.0px"><br></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">Public bug =
+reported:</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px 0.0px; font: =
+12.0px Helvetica; min-height: 14.0px"><br></p> <p style=3D"margin: 0.0px =
+0.0px 0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: =
+12.0px Helvetica">the Brew method has glib problems, glib is impossible =
+to install.</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica">the MacPorts method has a very long .log file.</font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; =
+min-height: 14.0px"><br></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica">** Affects: qemu</font></p> <p style=3D"margin: 0.0px 0.0px =
+0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica"><span class=3D"Apple-converted-space">&nbsp;&nbsp; &nbsp; =
+</span>Importance: Undecided</font></p> <p style=3D"margin: 0.0px 0.0px =
+0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica"><span class=3D"Apple-converted-space">&nbsp;&nbsp; &nbsp; =
+&nbsp; &nbsp; </span>Status: New</font></p> <p style=3D"margin: 0.0px =
+0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px"><br></p> =
+<p style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">** Attachment added: =
+"main.log"</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font =
+face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px Helvetica"><span =
+class=3D"Apple-converted-space">&nbsp;&nbsp; </span><a =
+href=3D"https://bugs.launchpad.net/bugs/1887318/+attachment/5392136/+files=
+/main.log">https://bugs.launchpad.net/bugs/1887318/+attachment/5392136/+fi=
+les/main.log</a></font></p> <p style=3D"margin: 0.0px 0.0px 0.0px 0.0px; =
+font: 12.0px Helvetica; min-height: 14.0px"><br></p> <p style=3D"margin: =
+0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" =
+style=3D"font: 12.0px Helvetica">--<span =
+class=3D"Apple-converted-space">&nbsp;</span></font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">You received this bug =
+notification because you are a member of qemu-</font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">devel-ml, which is =
+subscribed to QEMU.</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica"><a =
+href=3D"https://bugs.launchpad.net/bugs/1887318">https://bugs.launchpad.ne=
+t/bugs/1887318</a></font></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px; font: 12.0px Helvetica; min-height: 14.0px"><br></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">Title:</font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica"><span =
+class=3D"Apple-converted-space">&nbsp; </span>impossible to install in =
+OSX Yosemite 10.10.5</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px; font: 12.0px Helvetica; min-height: 14.0px"><br></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">Status in QEMU:</font></p> =
+<p style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica"><span =
+class=3D"Apple-converted-space">&nbsp; </span>New</font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; =
+min-height: 14.0px"><br></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica">Bug description:</font></p> <p style=3D"margin: 0.0px 0.0px =
+0.0px 0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica"><span class=3D"Apple-converted-space">&nbsp; </span>the Brew =
+method has glib problems, glib is impossible to install.</font></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica"><span =
+class=3D"Apple-converted-space">&nbsp; </span>the MacPorts method has a =
+very long .log file.</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px; font: 12.0px Helvetica; min-height: 14.0px"><br></p> <p =
+style=3D"margin: 0.0px 0.0px 0.0px 0.0px"><font face=3D"Helvetica" =
+size=3D"3" style=3D"font: 12.0px Helvetica">To manage notifications =
+about this bug go to:</font></p> <p style=3D"margin: 0.0px 0.0px 0.0px =
+0.0px"><font face=3D"Helvetica" size=3D"3" style=3D"font: 12.0px =
+Helvetica"><a =
+href=3D"https://bugs.launchpad.net/qemu/+bug/1887318/+subscriptions">https=
+://bugs.launchpad.net/qemu/+bug/1887318/+subscriptions</a></font></p> =
+</blockquote><br></div><div>This is why we need installer files for =
+QEMU. They make life so much easier than building from =
+source.</div><br></body></html>=
 
-I'll send this as a separate patch because at least virtio-serial is
-also affected.
-
-Stefan
-
---L2Brqb15TUChFOBK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8MNfwACgkQnKSrs4Gr
-c8h+fgf9HcG/hdStDn1snAk3gPe+Ox1TSVoGxXprmPDWbILvTXLC9kLl1lzKC+Hq
-KAB946Rj1ThKKn5x6Ko1cZz03nhEZiNwgxFAAg3+xDpc48p01nmFqVb7qxmr5V3L
-WetIsCAK98wihbGQHVwA7p4ewZgfwYNSIuR7sitVyuxwmCS602D9MOl9kgfhE1PU
-oSI0o/zyWCzGNnzmmHFVgSTM0HX6SJWX88ooN+Z3rtUiqgcYtAxX4a0Ue0EMwAuV
-VLSntjei6EZXmEEbHkSX14hCzi+ETAhJosBatsVDTF5pyp+jqzPHhBGmdn+UbxS1
-DBRxX8XKKtAFcSRsjNHYd9X5X7nMaA==
-=zF0X
------END PGP SIGNATURE-----
-
---L2Brqb15TUChFOBK--
-
+--Apple-Mail-1-920166--
 
