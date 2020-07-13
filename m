@@ -2,97 +2,72 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F23FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 23:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1A4C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 23:41:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31AEE20DD4
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 23:33:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qjQgEVlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31AEE20DD4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 52FCE2137B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 23:41:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52FCE2137B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv7wp-0005CC-GH
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 19:33:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59302)
+	id 1jv84o-0007hL-LR
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 19:41:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jv7wG-0004ml-Le
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 19:32:48 -0400
-Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:44419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jv7wE-0006dK-Je
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 19:32:48 -0400
-Received: by mail-qk1-x72f.google.com with SMTP id b4so13991674qkn.11
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 16:32:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:mime-version:content-transfer-encoding:from:user-agent:to
- :references:in-reply-to:message-id:subject:date;
- bh=jB4Na2I+RzzcHynLRGT1+tYGRte+XMBUQR5alBy/49c=;
- b=qjQgEVlOS3kx4yy3VIw/CbzNbgRRBQX5gx/fy1gnYtwp1ZyKwUH0q6rF7JCGcfvgzz
- MApJgn7LvDvZI6B5/EoGQME37IjEw7S+ODRNLYrCWbf7yKiKu4dG4Kp0FnohpTOk7Cw/
- KARenFihIuGwQAahUOCYTD79DWtRhEpCsZovmVwVzwWGTzk8RoRkLUea+JUTWLziRt4D
- h7+g7tuUEJClnePTGaMwxVZVA3IdItLj2Cp/SJUkku3197GHbfKd1VVGarzWl+I6iQ6x
- O5Qs4jNMPCJa5J/BcWrk4M+NtJC9UkinNErqiOm1Gp+C8gwpU/Fj459F1qenUuW7+qku
- S+sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:mime-version:content-transfer-encoding
- :from:user-agent:to:references:in-reply-to:message-id:subject:date;
- bh=jB4Na2I+RzzcHynLRGT1+tYGRte+XMBUQR5alBy/49c=;
- b=MMc3yR++AAWkzFCc7Fy3yPQpdVJbiwERqVF0P0hN1wnHMDGWywxiFcP/jCpsTfrXwz
- cnRHZBIbi6OdSb7sPdV9Bh1iyQbsAYUj1jHICjZ3C1qSXiZkzy17sGWX2Iueo9fO2rBG
- j2yKpg1coVZPJGGa+OGzp8e832Lkijwm9xUt98DDdNYfQzwZTEcYzLgysgGRr/8irxCt
- PWLbtzk36NqGDEFdy2NT+zAVbD3GHUFPTEC0EjbzrJU6mkivIOJMRUg08Ug7nfl8pAZ8
- 0TnjKstg+gUft3iOvyTxFz4i/N/TDkCt3J4lvwOtWJD3hZZMGF5sPIbh8GHtzHYGKpmW
- 5/Yw==
-X-Gm-Message-State: AOAM532esh8uSoia29m8fhg8kfr4lELwmH90cBgywWHuUmVH2k679U26
- IyRIZpSRihmzNiHjq7ADUls=
-X-Google-Smtp-Source: ABdhPJx928G0WXzReiVq69BCMfdym+xS94njloBav+ApPREFc2DoirECNswDePxVD3t7jyawW1oR8Q==
-X-Received: by 2002:a37:a78c:: with SMTP id q134mr2102716qke.368.1594683164820; 
- Mon, 13 Jul 2020 16:32:44 -0700 (PDT)
-Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
- [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id r188sm19352391qkf.128.2020.07.13.16.32.43
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 13 Jul 2020 16:32:43 -0700 (PDT)
-Content-Type: text/plain; charset="utf-8"
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jv84F-0007GE-4R
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 19:41:03 -0400
+Received: from mga02.intel.com ([134.134.136.20]:33068)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jv84C-0007qs-9D
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 19:41:02 -0400
+IronPort-SDR: K/hsMzxmlklLCqD1DR/SFb8vXReb5x/kGsYyIb0o4IMLpnyYUDQPp/nKK8LCJKEKecx+v60Dw/
+ YGGt+F4ba+Vg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="136906924"
+X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; d="scan'208";a="136906924"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 13 Jul 2020 16:40:55 -0700
+IronPort-SDR: 1h4vH42+Z+z04lQiJsHsZ/SrGC+OgsckHNxN2wpcL/TuqQCZFhkeb9V8EMvow3MFHWYQN5Jmel
+ VTJOyInCWhbg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; d="scan'208";a="299353622"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga002.jf.intel.com with ESMTP; 13 Jul 2020 16:40:50 -0700
+Date: Tue, 14 Jul 2020 07:29:57 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: devel@ovirt.org, openstack-discuss@lists.openstack.org,
+ libvir-list@redhat.com
+Subject: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200713232957.GD5955@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-User-Agent: alot/0.7
-To: =?utf-8?b?5p6X5aWV5biG?= <19210240159@fudan.edu.cn>,
- =?utf-8?q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
-References: <42a0ee9.78e1.1733dd8c113.Coremail.19210240159@fudan.edu.cn>
- <6160dba5-fd15-2467-fe53-14c391b2ce30@redhat.com>
-In-Reply-To: <6160dba5-fd15-2467-fe53-14c391b2ce30@redhat.com>
-Message-ID: <159468002764.10357.15734052139800834298@sif>
-Subject: Re: cve patch wanted
-Date: Mon, 13 Jul 2020 17:40:27 -0500
-Received-SPF: pass client-ip=2607:f8b0:4864:20::72f;
- envelope-from=flukshun@gmail.com; helo=mail-qk1-x72f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=134.134.136.20; envelope-from=yan.y.zhao@intel.com;
+ helo=mga02.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 19:40:55
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,54 +80,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: shaohe.feng@intel.com, corbet@lwn.net, kevin.tian@intel.com,
+ berrange@redhat.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ cohuck@redhat.com, jian-feng.ding@intel.com, qemu-devel@nongnu.org,
+ kwankhede@nvidia.com, dgilbert@redhat.com, bao.yumeng@zte.com.cn,
+ alex.williamson@redhat.com, zhenyuw@linux.intel.com, smooney@redhat.com,
+ xin-ran.wang@intel.com, dinechin@redhat.com, hejie.xu@intel.com,
+ intel-gvt-dev@lists.freedesktop.org, eauger@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Quoting Philippe Mathieu-Daud=C3=A9 (2020-07-13 03:16:37)
-> Hi,
-> =
+hi folks,
+we are defining a device migration compatibility interface that helps upper
+layer stack like openstack/ovirt/libvirt to check if two devices are
+live migration compatible.
+The "devices" here could be MDEVs, physical devices, or hybrid of the two.
+e.g. we could use it to check whether
+- a src MDEV can migrate to a target MDEV,
+- a src VF in SRIOV can migrate to a target VF in SRIOV,
+- a src MDEV can migration to a target VF in SRIOV.
+  (e.g. SIOV/SRIOV backward compatibility case)
 
-> On 7/11/20 2:28 PM, =E6=9E=97=E5=A5=95=E5=B8=86 wrote:
-> > Hello
-> > =C2=A0 =C2=A0I am a student from Fudan University in China. I am doing =
-research on
-> > CVE patch recently. But i can not find the PATCH COMMIT of
-> > CVE-2019-12247 cve-2019-12155 cve-2019-6778.Can you give me the commit
-> > fix this cve?
-> =
+The upper layer stack could use this interface as the last step to check
+if one device is able to migrate to another device before triggering a real
+live migration procedure.
+we are not sure if this interface is of value or help to you. please don't
+hesitate to drop your valuable comments.
 
-> * CVE-2019-12247
-> =
 
-> I don't know about this one, maybe related to CVE-2018-12617 fixed
-> by commit 1329651fb4 ("qga: Restrict guest-file-read count to 48 MB")
-> Cc'ing Michael for CVE-2019-12247.
+(1) interface definition
+The interface is defined in below way:
 
-For CVE-2019-12247 is was determined the existing limits for input to
-QEMU's QMP parser make it non-exploitable:
+             __    userspace
+              /\              \
+             /                 \write
+            / read              \
+   ________/__________       ___\|/_____________
+  | migration_version |     | migration_version |-->check migration
+  ---------------------     ---------------------   compatibility
+     device A                    device B
 
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1712834
 
-A patch to enforce/document some set limits rather than relying on
-parser error messages (like what was done with 1329651fb4 for CVE-2018-1261=
-7)
-might be nice, but it doesn't appear to be a security risk.
+a device attribute named migration_version is defined under each device's
+sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/migration_version).
+userspace tools read the migration_version as a string from the source device,
+and write it to the migration_version sysfs attribute in the target device.
 
-> =
+The userspace should treat ANY of below conditions as two devices not compatible:
+- any one of the two devices does not have a migration_version attribute
+- error when reading from migration_version attribute of one device
+- error when writing migration_version string of one device to
+  migration_version attribute of the other device
 
-> * CVE-2019-12155
-> =
+The string read from migration_version attribute is defined by device vendor
+driver and is completely opaque to the userspace.
+for a Intel vGPU, string format can be defined like
+"parent device PCI ID" + "version of gvt driver" + "mdev type" + "aggregator count".
 
-> I don't have access to the information (still marked 'private'
-> one year after), but I *guess* it has been fixed by commit
-> d52680fc93 ("qxl: check release info object").
-> Cc'ing Gerd and Prasad.
-> =
+for an NVMe VF connecting to a remote storage. it could be
+"PCI ID" + "driver version" + "configured remote storage URL"
 
-> * CVE-2019-6778
-> =
+for a QAT VF, it may be
+"PCI ID" + "driver version" + "supported encryption set".
 
-> This one is in SLiRP, Cc'ing Samuel and Marc-Andr=C3=A9.
->=20
+(to avoid namespace confliction from each vendor, we may prefix a driver name to
+each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_8-1)
+
+
+(2) backgrounds
+
+The reason we hope the migration_version string is opaque to the userspace
+is that it is hard to generalize standard comparing fields and comparing
+methods for different devices from different vendors.
+Though userspace now could still do a simple string compare to check if
+two devices are compatible, and result should also be right, it's still
+too limited as it excludes the possible candidate whose migration_version
+string fails to be equal.
+e.g. an MDEV with mdev_type_1, aggregator count 3 is probably compatible
+with another MDEV with mdev_type_3, aggregator count 1, even their
+migration_version strings are not equal.
+(assumed mdev_type_3 is of 3 times equal resources of mdev_type_1).
+
+besides that, driver version + configured resources are all elements demanding
+to take into account.
+
+So, we hope leaving the freedom to vendor driver and let it make the final decision
+in a simple reading from source side and writing for test in the target side way.
+
+
+we then think the device compatibility issues for live migration with assigned
+devices can be divided into two steps:
+a. management tools filter out possible migration target devices.
+   Tags could be created according to info from product specification.
+   we think openstack/ovirt may have vendor proprietary components to create
+   those customized tags for each product from each vendor.
+   e.g.
+   for Intel vGPU, with a vGPU(a MDEV device) in source side, the tags to
+   search target vGPU are like:
+   a tag for compatible parent PCI IDs,
+   a tag for a range of gvt driver versions,
+   a tag for a range of mdev type + aggregator count
+
+   for NVMe VF, the tags to search target VF may be like:
+   a tag for compatible PCI IDs,
+   a tag for a range of driver versions,
+   a tag for URL of configured remote storage.
+
+b. with the output from step a, openstack/ovirt/libvirt could use our proposed
+   device migration compatibility interface to make sure the two devices are
+   indeed live migration compatible before launching the real live migration
+   process to start stream copying, src device stopping and target device
+   resuming.
+   It is supposed that this step would not bring any performance penalty as
+   -in kernel it's just a simple string decoding and comparing
+   -in openstack/ovirt, it could be done by extending current function
+    check_can_live_migrate_destination, along side claiming target resources.[1]
+
+
+[1] https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/libvirt-neutron-sriov-livemigration.html
+
+Thanks
+Yan
+
 
