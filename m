@@ -2,76 +2,120 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4351BC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0BAC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:27:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3BFF20758
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:25:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D33E2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 09:27:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6sYa3Wi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3BFF20758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GkPGz4yz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D33E2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juui6-00077Q-4Y
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:25:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57156)
+	id 1juukL-000860-TM
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 05:27:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1juuhX-0006gp-QN
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:24:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27299
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1juujX-0007hF-G4
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:26:47 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52634
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1juuhU-0005pK-V8
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:24:43 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1juujV-00068v-VC
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 05:26:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594632279;
+ s=mimecast20190719; t=1594632405;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tyj9qbHdEeCooNaLdeP/RYJF19Go4GbR6S1MoHuwDZ8=;
- b=d6sYa3Wit0BnwGivS+Bvp8QAO8nI9tlt7vM0UBmp+01PAEPsy6VqgYYE5pcFCza+9TTpfd
- HlBUZtmDA5uuTKC1fm5JI029LucEZzAwa7ByreiU5uZMD7K0DH/QIVoJN0R0LQj/0mUPx3
- anMz0Ylo1eyMH7VTWzHn5aoYF4hRBaw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-8i5i5RG5OTuY7DSsKv8Gxg-1; Mon, 13 Jul 2020 05:24:36 -0400
-X-MC-Unique: 8i5i5RG5OTuY7DSsKv8Gxg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 197DA10059A9;
- Mon, 13 Jul 2020 09:24:35 +0000 (UTC)
-Received: from gondolin (ovpn-113-13.ams2.redhat.com [10.36.113.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 38DAE6FEDF;
- Mon, 13 Jul 2020 09:24:34 +0000 (UTC)
-Date: Mon, 13 Jul 2020 11:24:31 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2] docs/system/s390x: Improve the 3270 documentation
-Message-ID: <20200713112431.7db66007.cohuck@redhat.com>
-In-Reply-To: <20200713075112.442-1-thuth@redhat.com>
-References: <20200713075112.442-1-thuth@redhat.com>
-Organization: Red Hat GmbH
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=hjVeyg5H+ZR/YT424IuBew1KjIlsRliGgM3PoQkLXOQ=;
+ b=GkPGz4yzTQs3i6knuLCll4EwW7Y9XBvfgl8eD4BZHofD1WL/9n/3wipNJ3MUTVFQwWogSL
+ vzjEg9IpKiKL3PPAPmzvdliPsEcmuy4/wn6CWFj7ojbOJz0B//rAizoyHMIh2sA2fh4aet
+ ewoFDoCTRr5InH0PZc8Ee3De1sOWjR0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-fKYML-4qOTuc2G0OjQ3SSQ-1; Mon, 13 Jul 2020 05:26:43 -0400
+X-MC-Unique: fKYML-4qOTuc2G0OjQ3SSQ-1
+Received: by mail-wr1-f69.google.com with SMTP id d11so17103517wrw.12
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 02:26:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=hjVeyg5H+ZR/YT424IuBew1KjIlsRliGgM3PoQkLXOQ=;
+ b=PRDAS+VHhbVAFxw87Juibmf34yGIRSKnQ4vp6OLXvmlz0E2e5MY0ykJAYOR/nuKF9Q
+ /P0c5JPRhB1OA8GRP7rd2iymLtdy3xNi3yat6XG8zFSvFly00XyvecVADiYNCA6I1A33
+ UqBm94XdlK8Ttogf5M7w07YygFcXWZKXX21s7rb6qXUSMdMQj2d4kY/22zZmDCoRC+4i
+ +G/as6h2iXGoOR8HuCWrCkLDVM1yQtr+V46tZN/W+Z5WzE+E2uY61905a54mVYh/mDYM
+ 5rIXFjJ0FPRiJV0kuzNczYRy1RF/JxWULx8VtEla+wo1njvREIV7c3FmaVkHYzDv+Ntl
+ uN4A==
+X-Gm-Message-State: AOAM530zkrMvTuydwGB9Z1F5ftz+xIQRukqbJbSwLG/iZDxwACSwWF3h
+ Qwhqn8dp+3yINQ6nQB1jswe04o0Re8gx0nYGqzprkgNsXL46KynjmV1+BGHWM77N4GW/zJRgXgP
+ K/32cgS5WhwTJ8BM=
+X-Received: by 2002:a7b:c246:: with SMTP id b6mr19119209wmj.161.1594632402401; 
+ Mon, 13 Jul 2020 02:26:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy7M4ZlNqD5riCIxwZ95MNXozDvTB+1Ns+wiZajT09KsrDWjYUkWGsoLenXA9pLrZYqreDYAQ==
+X-Received: by 2002:a7b:c246:: with SMTP id b6mr19119190wmj.161.1594632402166; 
+ Mon, 13 Jul 2020 02:26:42 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id z8sm22153127wmg.39.2020.07.13.02.26.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 13 Jul 2020 02:26:41 -0700 (PDT)
+Subject: Re: [PATCH v5 02/12] python/machine.py: Close QMP socket in cleanup
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200710050649.32434-1-jsnow@redhat.com>
+ <20200710050649.32434-3-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <5ea7a530-87c4-e52f-a67b-5458cbd28d03@redhat.com>
+Date: Mon, 13 Jul 2020 11:26:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200710050649.32434-3-jsnow@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 03:20:22
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -79,7 +123,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,71 +136,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jul 2020 09:51:12 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> There is some additional information about the 3270 support in our Wiki
-> at https://wiki.qemu.org/Features/3270 - so let's include this information
-> into the main documentation now to have one single source of information
-> (the Wiki page could later be removed).
+On 7/10/20 7:06 AM, John Snow wrote:
+> It's not important to do this before waiting for the process to exit, so
+> it can be done during generic post-shutdown cleanup.
 > 
-> While at it, I also shortened the lines of the first example a little bit.
-> Otherwise they showed up with a horizontal scrollbar in my Firefox browser.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  v2:
->  - Added the changes that have been suggested by Cornelia
->  - Talk about "Linux kernel" instead of just saying "kernel", just in case.
+>  python/qemu/machine.py | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
->  docs/system/s390x/3270.rst | 43 ++++++++++++++++++++++++++++++++------
->  1 file changed, 37 insertions(+), 6 deletions(-)
 
-(...)
-
-> @@ -29,4 +39,25 @@ Example configuration
->  
->      systemctl start serial-getty@3270-tty1.service
->  
-> -This should get you an addtional tty for logging into the guest.
-> +  This should get you an addtional tty for logging into the guest.
-
-While you're at it,
-
-s/addtional/additional/
-
-> +
-> +* If you want to use the 3270 device as the Linux kernel console instead of
-> +  an additional tty, you can also append ``conmode=3270 condev=000a`` to
-> +  the guest's kernel command line. The kernel then should use the 3270 as
-> +  console after the next boot.
-> +
-> +Restrictions
-> +------------
-> +
-> +3270 support is very basic. In particular:
-> +
-> +* Only one 3270 device is supported.
-> +
-> +* It has only been tested with Linux guests and the x3270 emulator.
-> +
-> +* TLS/SSL is not supported.
-> +
-> +* Resizing on reattach is not supported.
-> +
-> +* Multiple commands in one inbound buffer (for example, when the reset key
-> +  is pressed while the network is slow) are not supported.
-
-Looks good.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
-(Feel free to send it yourself if you have some patches in your queue, I
-don't have anything for s390x right now.)
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
