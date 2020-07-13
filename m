@@ -2,95 +2,90 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E80C433E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5D0C433E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4289720738
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:14:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2CC872076D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 16:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MiUrCMFk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4289720738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KVsRwm19"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC872076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv16J-0002TF-BV
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 12:14:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55776)
+	id 1jv185-0003a2-Gs
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 12:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jv15X-00022I-SA
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:13:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36820
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jv15V-0001pe-QB
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:13:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594656833;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xK7xO62aVLhEUjBnQAV0nOy790uANdTaqPs7msW2hAo=;
- b=MiUrCMFkao7NIxkPR3vCYnmhKzrXRbMwBb05hObbZW86rXUZqqbIrgnwwjXdj+QQ9JRv0R
- Dpzc5ifMNuONAzkEdmpvO8gEOLr3O/Bj/H96DB91/0ob0+XkWJi/Q2is+dZhqd68diHkN8
- w+gkrBldHyngpi+NbMOwGk10CGb5xgE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-BThBusI8NUSD8hEYTCnrzA-1; Mon, 13 Jul 2020 12:13:50 -0400
-X-MC-Unique: BThBusI8NUSD8hEYTCnrzA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 641CD18FF67C;
- Mon, 13 Jul 2020 16:13:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1015E1001281;
- Mon, 13 Jul 2020 16:13:43 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 696BC11384A6; Mon, 13 Jul 2020 18:13:42 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: David Gibson <dgibson@redhat.com>
-Subject: Re: Slow down with: 'Make "info qom-tree" show children sorted'
-References: <20200527084754.7531-1-armbru@redhat.com>
- <20200527084754.7531-3-armbru@redhat.com>
- <49bea110-0a3d-5a40-6647-67b116fb41b5@redhat.com>
- <5e967e5f-8ae5-01cc-0dfe-f22e0f03b6b3@redhat.com>
- <87y2nvanya.fsf@dusky.pond.sub.org>
- <794f6901-5fe3-f7a1-45e7-f277f687cb6b@redhat.com>
- <87v9iz7cxl.fsf@dusky.pond.sub.org>
- <20200713111344.23c1b313@umbus.fritz.box>
-Date: Mon, 13 Jul 2020 18:13:42 +0200
-In-Reply-To: <20200713111344.23c1b313@umbus.fritz.box> (David Gibson's message
- of "Mon, 13 Jul 2020 11:13:44 +1000")
-Message-ID: <874kqbbdft.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jv17P-00032m-1i
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:15:51 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42374)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jv17N-00025l-Aq
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 12:15:50 -0400
+Received: by mail-ot1-x344.google.com with SMTP id g37so9928713otb.9
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 09:15:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=orzPIWVnwHo2G6bvPdgUpXbljgj2/uj4fcJ5AHejZmE=;
+ b=KVsRwm197wKiC4TuP3EuldNzv4nyRYmF+iYL3uIc15hcVMYyKg74UU4R42PfxTuJIb
+ WZ9KE4VFyVyN9ou/cHSbJLhBM1stFjOBsJZCrqDSR9qd8aBBkv2fEunGzyCe7cbKqjZ+
+ 8ksPcv9d/NB2XOv0vGbUCXNCWt1XmOkNkjH4/wpwkme20bhCoPLN3W8qPR3J4VXwWTtw
+ joj2z3Manvq2XOndisG0AC9yfLIm3pLII5ca4aYNVHEJ/lhXmUVEZVRhT324sqEx7XJ1
+ UJUG96mE2m1GJJdYj93XlGEswRCSxrR8jfZdq3XOYi2vpWE/wqaH5H0bADNqujtqTfDH
+ trTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=orzPIWVnwHo2G6bvPdgUpXbljgj2/uj4fcJ5AHejZmE=;
+ b=OlxfvS4FBFo37DtdQpb5IAMNL8oi77LxaWjosfzmiov3x4n7D4sOvvDbsfESUgOBbL
+ oahqyj1sOVkKpjuPv8RFxumAjYJCd+tfm0VRoiuy6eetuFUmy87NcrMSMNuhJDB7/sFh
+ xuzuZA39G08wk1AkHximU4VZwMpfelBmhWKll8rbqNyYesxnXMTezlD+kGJRF0aVji8O
+ /A4lPuqLRxGIUt+2YHXlivpO57KxLff7yZ18porQPD1ydE/If/dQIuZT2MFK1PU5f/OE
+ IVrceXKi8xbZ+288tscZapjJL1TwYFeU/LGYUzNiNQkwRjkc87CawDH1v/XkFTcCAoU4
+ 28Og==
+X-Gm-Message-State: AOAM530MqQRHua5Pv0KzxkR09KkQ760kWwWUwUG6/V+iSYkIvZQZ9eS4
+ diRNGDr9bYuDp8D6m+trww/jMKwuW659C57BfaJA+A==
+X-Google-Smtp-Source: ABdhPJyish8FYRhh+aJVJq2cYZj0S6VVHVgHPB70TyTYkt199MmQdZPZqv7RqxBmjWpAxykXkaF/6gfUkRTm7/jeVjM=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr294919ota.91.1594656947378; 
+ Mon, 13 Jul 2020 09:15:47 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <20200710085417.638904-1-mcascell@redhat.com>
+ <CAFEAcA-pRXOz5JVcwHa8=oaeogwaOK0YVXYQiJUpdM_rFZ+QTA@mail.gmail.com>
+ <d7affe2b-0a2c-4e06-a874-daccf16bd136@kaod.org>
+In-Reply-To: <d7affe2b-0a2c-4e06-a874-daccf16bd136@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Jul 2020 17:15:36 +0100
+Message-ID: <CAFEAcA9=_RC0w-EgjdPw=UWXZ-ufHjkeDWTMj_jXfSQL8G9GHA@mail.gmail.com>
+Subject: Re: [PATCH] hw/net/ftgmac100: Fix integer overflow in
+ ftgmac100_do_tx()
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 02:19:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,97 +98,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- berrange@redhat.com, ehabkost@redhat.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>,
- =?utf-8?Q?C=C3=A9dr?= =?utf-8?Q?ic?= Le Goater <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ Mauro Matteo Cascella <mcascell@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Gibson <dgibson@redhat.com> writes:
-
-> On Tue, 07 Jul 2020 14:00:06 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
+On Mon, 13 Jul 2020 at 15:19, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 7/10/20 1:33 PM, Peter Maydell wrote:
+> > Andrew, Cedric: do you have the datasheet for this device? Do you
+> > know if we should also be flagging the error back to the
+> > guest somehow?
 >
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>=20
->> > On 07/07/20 07:33, Markus Armbruster wrote: =20
->> >> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->> >>  =20
->> >>> On 7/7/20 6:45 AM, Thomas Huth wrote: =20
->> >>>> On 27/05/2020 10.47, Markus Armbruster wrote: =20
->> >>>>> "info qom-tree" prints children in unstable order.  This is a pain
->> >>>>> when diffing output for different versions to find change.  Print =
-it
->> >>>>> sorted.
->> >>>>>
->> >>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> >>>>> ---
->> >>>>>  qom/qom-hmp-cmds.c | 24 ++++++++++++++++--------
->> >>>>>  1 file changed, 16 insertions(+), 8 deletions(-) =20
->> >>>>
->> >>>>  Hi Markus,
->> >>>>
->> >>>> this patch causes a slow down of the qtests which becomes quite mas=
-sive
->> >>>> when e.g. using the ppc64 and thourough testing. When I'm running
->> >>>>
->> >>>> QTEST_QEMU_BINARY=3D"ppc64-softmmu/qemu-system-ppc64" time \
->> >>>> ./tests/qtest/device-introspect-test -m slow | tail -n 10
->> >>>>
->> >>>> the test runs for ca. 6m40s here before the patch got applied, and =
-for
->> >>>> mor than 20 minutes after the patch got applied! =20
->> >>=20
->> >> That's surprising. =20
->> >
->> > It's a bit surprising indeed, but on the other hand using
->> > g_queue_insert_sorted results in a quadratic loop. =20
->>=20
->> The surprising part is that n turns out to be large enough for n^2 to
->> matter *that* much.
->
-> Is this another consequence of the ludicrous number of QOM objects we
-> create for LMB DRCs (one for every 256MiB of guest RAM)?  Avoiding that
-> is on my list.
+> zero is the only invalid size of a transmit buffer and the specs does
+> not have any special information on which bit to raise in that case.
 
-You're talking about machine pseries, I presume.  With
-print_qom_composition() patched to print the number of children, I get
+I found a datasheet which might or might not be the equivalent
+bit of hardware -- does your datasheet have a note on the
+TXBUF_SIZE field of a tx descriptor that says "When the size is 0,
+the descriptor would be discarded" ? (Though I found another
+random doc that just says it's illegal...)
 
-    $ echo -e 'info qom-tree\nq' | ../qemu/bld/ppc64-softmmu/qemu-system-pp=
-c64 -S -display none -M pseries -accel qtest -monitor stdio | grep '###' | =
-sort | uniq -c | sort -k 3n
-        360 ### 0 children
-          5 ### 1 children
-          5 ### 2 children
-          2 ### 3 children
-          1 ### 4 children
-          1 ### 15 children
-          1 ### 16 children
-          1 ### 18 children
-          1 ### 37 children
-          1 ### 266 children
+> I think FTGMAC100_INT_NO_NPTXBUF (transmit buffer unavailable) is our
+> best option and we should add an extra 'len =3D=3D 0' test in front of
+> the dma_memory_read() call to raise it. A zero length is not considered
+> bogus by dma_memory_read() it seems.
 
-The outlier is
+My best guess at "what the hardware does" here would be:
+ * TXBUF_SIZE in a tx descriptor can be anything: the h/w
+   would happily allow you to assemble a tx packet with a
+   whole series of 1-byte sized buffers, each with its own
+   tx descriptor
+ * zero-byte tx descriptors might just be marked "done" and
+   skipped over since they have no actual data
+ * any checking on max/min lengths would be done
+   only on the accumulated total-packet length (we do this
+   this way already for the frame-too-big check)
+ * I suspect "transmit buffer unavailable" means "the ethernet
+   controller needs more data but the next tx descriptor
+   is still marked as owned by the guest" -- this is certainly
+   what we currently do with it, and that doesn't seem like
+   the best thing to signal for the "tx packet too small"
+   case. It's possible that the hardware simply sends out a
+   runt packet of some form if the software tells it to do
+   that. My vote would be for handling it with XPKT_LOST,
+   the same way we do for over-large frames. This probably
+   is not what the hardware does but at least it's a
+   coherent thing that the guest might be expecting to have
+   happen for a tx attempt and it matches the fact that we
+   really are not going to put it on the 'wire'.
 
-        /device[5] (spapr-pci-host-bridge)
+Side note: I suspect that any failures from
+dma_memory_read() and dma_memory_write() should be
+reported as AHB_ERR (currently we have a mix of
+ignoring them or using NO_NPTXBUF).
 
-due to its 256 spapr-drc-pci children.
+(It would in theory be possible to test some of these edge
+cases on real hardware, but that kind of bare-metal test
+case is usually a pain to put together and way overkill
+for this situation, so I don't think we should bother.)
 
-I found quite a few machines with similar outliers.  ARM machines nuri
-and smdkc210 together take the cake: they each have a node with 513
-children.
+> Is address zero considered bogus ?
+> If not, we need to check that also.
 
-My stupid n^2 sort is unnoticable in normal, human usage even for n=3D513.
+Writes to address 0 are fine, it is not a special physical address.
 
->                 Though avoiding a n^2 behaviour here is probably a good
-> idea anyway.
-
-Agreed.
-
+thanks
+-- PMM
 
