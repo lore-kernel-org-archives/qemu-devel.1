@@ -2,43 +2,47 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36DE0C433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0706C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:40:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D184208FE
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:39:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D184208FE
+	by mail.kernel.org (Postfix) with ESMTPS id B489120B80
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 21:40:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B489120B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv6At-0007I3-BD
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 17:39:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40498)
+	id 1jv6C3-00014o-1A
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 17:40:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jv685-0002zI-9q; Mon, 13 Jul 2020 17:36:53 -0400
-Received: from relay.sw.ru ([185.231.240.75]:52826 helo=relay3.sw.ru)
+ id 1jv683-0002vS-DG; Mon, 13 Jul 2020 17:36:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:52834 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jv680-000529-4P; Mon, 13 Jul 2020 17:36:52 -0400
+ id 1jv680-00052E-0C; Mon, 13 Jul 2020 17:36:51 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jv67m-0000E2-4s; Tue, 14 Jul 2020 00:36:34 +0300
+ id 1jv67m-0000E2-AU; Tue, 14 Jul 2020 00:36:34 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v10 00/10] iotests: Dump QCOW2 dirty bitmaps metadata
-Date: Tue, 14 Jul 2020 00:36:33 +0300
-Message-Id: <1594676203-436999-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v10 04/10] qcow2_format.py: dump bitmap flags in human
+ readable way.
+Date: Tue, 14 Jul 2020 00:36:37 +0300
+Message-Id: <1594676203-436999-5-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1594676203-436999-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1594676203-436999-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Received-SPF: pass client-ip=185.231.240.75;
  envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 17:36:45
@@ -47,7 +51,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -66,33 +70,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add dirty bitmap information to QCOW2 metadata dump in the qcow2_format.py.
+Introduce the class BitmapFlags that parses a bitmap flags mask.
 
-v10:
-  01: The modification of the 291.out was removed.
-  02: Qcow2BitmapExt modified to take control over file cursor position while
-      reading the bitmap extension data from the file (suggested by Vladimir).
-  03: The format string for bitmap flags output modified
-      (suggested by Vladimir).
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/qcow2_format.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Andrey Shinkevich (10):
-  qcow2: Fix capitalization of header extension constant.
-  qcow2_format.py: make printable data an extension class member
-  qcow2_format.py: change Qcow2BitmapExt initialization method
-  qcow2_format.py: dump bitmap flags in human readable way.
-  qcow2_format.py: Dump bitmap directory information
-  qcow2_format.py: pass cluster size to substructures
-  qcow2_format.py: Dump bitmap table serialized entries
-  qcow2.py: Introduce '-j' key to dump in JSON format
-  qcow2_format.py: collect fields to dump in JSON format
-  qcow2_format.py: support dumping metadata in JSON format
-
- block/qcow2.c                      |   2 +-
- docs/interop/qcow2.txt             |   2 +-
- tests/qemu-iotests/qcow2.py        |  19 +++-
- tests/qemu-iotests/qcow2_format.py | 223 +++++++++++++++++++++++++++++++++----
- 5 files changed, 218 insertions(+), 28 deletions(-)
-
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index cbaffc4..e77c831 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -40,6 +40,22 @@ class Flags64(Qcow2Field):
+         return str(bits)
+ 
+ 
++class BitmapFlags(Qcow2Field):
++
++    flags = {
++        0x1: 'in-use',
++        0x2: 'auto'
++    }
++
++    def __str__(self):
++        bits = []
++        for bit in range(64):
++            flag = self.value & (1 << bit)
++            if flag:
++                bits.append(self.flags.get(flag, f'bit-{bit}'))
++        return f'{self.value:#x} ({bits})'
++
++
+ class Enum(Qcow2Field):
+ 
+     def __str__(self):
 -- 
 1.8.3.1
 
