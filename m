@@ -2,96 +2,98 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 373F8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 463F2C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:21:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03FAF20738
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:19:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AaICnYEn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03FAF20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 155BC20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 19:21:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 155BC20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv3zN-0002UB-CN
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42018)
+	id 1jv40q-0003a1-Cp
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 15:21:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42582)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv3yj-0001wS-5R
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:19:05 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42879)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jv3yh-00065M-MY
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 15:19:04 -0400
-Received: by mail-pf1-x442.google.com with SMTP id 1so6428191pfn.9
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 12:19:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Cz9UW3BFGXzAicalZC8X4be/s5r70xCB4y1DOAG0154=;
- b=AaICnYEn67RB0QU8U7nR7Q8yEPPKlPR2jF5kLBJZgUtLzlchvnoIiuiZDvOQ+LjRhd
- NYYTls+qiaYucwISu5z8i5cayMsWDqD9tkGJuZkYGR8OhBIzjiLLIwRdHGAa84eBkFeU
- WFUVvOlbWVzlRHFglisPSQq0ud7gQ9TMd6CYBWblxw82fd5KzV7K8fCUA2JuLw0wEGRU
- cnxpZ1YnQN+aIs5X9Xosb4sp1YqEAGLYrG9wuJe0n3a26/oSA6GclGSFt9GUh+FNXdW0
- K20CLrw+VJWUZv/0G0z0vcYnP8QJGC2ZGcbMupapzvjbCFnMiD/z/Cj75WKcpHufq0H2
- 7n+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Cz9UW3BFGXzAicalZC8X4be/s5r70xCB4y1DOAG0154=;
- b=ZJogr8+ZiwH0vOsE2Oz99JxQ417+E/i8ojfsIBl+iOipOVs9uowCAiTE4hX5VYIEjr
- U0wGgXLFhJfJIxamYKPHpPxG+9NRNpdTxL3ZLs+Ld7sVH0kAF7NHAGlfx8Wh1A/z8p53
- 8nFI7S5QP+uUVfEtlAalyKkBTLQrDcvriiOOXNvX4TsKgmcwsNQKhNtK7JdekJMHon/S
- w/hPJ0E8uFbac+NQQhBq48rWl2Yw8i4iFMDYaHMEg3xHIsouR+BBpHRRdDHOoV3AOXV4
- P9vQnlkc/gicslQTaJLEupc0s3ZhiOqxWHst7KVcICd5tt1H+Z494i4MsPFVunphkd47
- 1NrA==
-X-Gm-Message-State: AOAM531vjHAcCBIwqsC9jz8NWXTa82FnuGDzky5EnKu1Kxx7FqkrIFZk
- mDjZhbPxBr6eYIHFy8xLNkhn3A==
-X-Google-Smtp-Source: ABdhPJwXddZh5GBRUuRFsVjriOTF09lZMRisjpJbSYB6tWMllNFZw3hC+F1x6uvMrYe41fs2bTNacA==
-X-Received: by 2002:a63:571b:: with SMTP id l27mr526167pgb.417.1594667942283; 
- Mon, 13 Jul 2020 12:19:02 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 127sm13646668pgf.5.2020.07.13.12.19.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jul 2020 12:19:01 -0700 (PDT)
-Subject: Re: [RFC PATCH 3/8] fpu/softfloat: add FloatFmt for bfloat16
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org
-References: <20200712234521.3972-1-zhiwei_liu@c-sky.com>
- <20200712234521.3972-4-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c8fa12f7-6200-4eea-b965-c5e4b2915800@linaro.org>
-Date: Mon, 13 Jul 2020 12:18:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200712234521.3972-4-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jv40C-0002yS-7B; Mon, 13 Jul 2020 15:20:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63746)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jv40A-0006Ki-9S; Mon, 13 Jul 2020 15:20:35 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06DJ2JkL119658; Mon, 13 Jul 2020 15:20:25 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3278qsqahd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 13 Jul 2020 15:20:25 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06DJJLMi023989;
+ Mon, 13 Jul 2020 19:20:24 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma04dal.us.ibm.com with ESMTP id 327528y0x4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 13 Jul 2020 19:20:24 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06DJKN6j23134596
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 13 Jul 2020 19:20:23 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3D2836E04E;
+ Mon, 13 Jul 2020 19:20:23 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4C8AB6E05D;
+ Mon, 13 Jul 2020 19:20:22 +0000 (GMT)
+Received: from [9.65.204.75] (unknown [9.65.204.75])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Mon, 13 Jul 2020 19:20:22 +0000 (GMT)
+From: Lijun Pan <ljp@linux.vnet.ibm.com>
+Message-Id: <BDB7FF22-BF16-45B7-B67E-94DD415A5E5C@linux.vnet.ibm.com>
+Content-Type: multipart/alternative;
+ boundary="Apple-Mail=_245D0A6E-143A-437C-9E43-556D5EF9E0FA"
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v4 06/11] Update PowerPC AT_HWCAP2 definition
+Date: Mon, 13 Jul 2020 14:20:20 -0500
+In-Reply-To: <20200713051400.GA93134@umbus.fritz.box>
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200701234344.91843-1-ljp@linux.ibm.com>
+ <20200701234344.91843-7-ljp@linux.ibm.com>
+ <20200713051400.GA93134@umbus.fritz.box>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-13_15:2020-07-13,
+ 2020-07-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 malwarescore=0
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 spamscore=0
+ priorityscore=1501 mlxlogscore=999 phishscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007130132
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=ljp@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 15:20:32
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,18 +106,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, alex.bennee@linaro.org, wxy194768@alibaba-inc.com
+Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/12/20 4:45 PM, LIU Zhiwei wrote:
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> ---
->  fpu/softfloat.c | 4 ++++
->  1 file changed, 4 insertions(+)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+--Apple-Mail=_245D0A6E-143A-437C-9E43-556D5EF9E0FA
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-r~
+
+
+> On Jul 13, 2020, at 12:14 AM, David Gibson =
+<david@gibson.dropbear.id.au> wrote:
+>=20
+> On Wed, Jul 01, 2020 at 06:43:41PM -0500, Lijun Pan wrote:
+>> Add PPC2_FEATURE2_ARCH_3_10 to the PowerPC AT_HWCAP2 definitions.
+>>=20
+>> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+>> ---
+>> v4: add missing changes, and split to 5/11, 6/11, 7/11
+>> v3: use tcg_gen_gvec_mul()
+>> v2: fix coding style
+>>    use Power ISA 3.1 flag
+>>=20
+>> include/elf.h | 1 +
+>> 1 file changed, 1 insertion(+)
+>>=20
+>> diff --git a/include/elf.h b/include/elf.h
+>> index 8fbfe60e09..1858b95acf 100644
+>> --- a/include/elf.h
+>> +++ b/include/elf.h
+>> @@ -554,6 +554,7 @@ typedef struct {
+>> #define PPC_FEATURE2_HTM_NOSC           0x01000000
+>> #define PPC_FEATURE2_ARCH_3_00          0x00800000
+>> #define PPC_FEATURE2_HAS_IEEE128        0x00400000
+>> +#define PPC_FEATURE2_ARCH_3_10          0x00200000
+>>=20
+>> /* Bits present in AT_HWCAP for Sparc.  */
+>=20
+>=20
+> Um.. in the corresponding #defines in the kernel 0x00200000 is given
+> to PPC_FEATURE2_DARN, and several more bits are allocated past that
+> point.
+>=20
+
+Then what do you recommend to use?
+
+Thanks,
+Lijun
+
+
+--Apple-Mail=_245D0A6E-143A-437C-9E43-556D5EF9E0FA
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset=us-ascii
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html; =
+charset=3Dus-ascii"></head><body style=3D"word-wrap: break-word; =
+-webkit-nbsp-mode: space; line-break: after-white-space;" class=3D""><br =
+class=3D""><div><br class=3D""><blockquote type=3D"cite" class=3D""><div =
+class=3D"">On Jul 13, 2020, at 12:14 AM, David Gibson &lt;<a =
+href=3D"mailto:david@gibson.dropbear.id.au" =
+class=3D"">david@gibson.dropbear.id.au</a>&gt; wrote:</div><br =
+class=3D"Apple-interchange-newline"><div class=3D""><span =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+14px; font-style: normal; font-variant-caps: normal; font-weight: =
+normal; letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none; float: none; =
+display: inline !important;" class=3D"">On Wed, Jul 01, 2020 at =
+06:43:41PM -0500, Lijun Pan wrote:</span><br style=3D"caret-color: =
+rgb(0, 0, 0); font-family: Helvetica; font-size: 14px; font-style: =
+normal; font-variant-caps: normal; font-weight: normal; letter-spacing: =
+normal; text-align: start; text-indent: 0px; text-transform: none; =
+white-space: normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><blockquote type=3D"cite" =
+style=3D"font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+orphans: auto; text-align: start; text-indent: 0px; text-transform: =
+none; white-space: normal; widows: auto; word-spacing: 0px; =
+-webkit-text-size-adjust: auto; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D"">Add PPC2_FEATURE2_ARCH_3_10 to the =
+PowerPC AT_HWCAP2 definitions.<br class=3D""><br class=3D"">Signed-off-by:=
+ Lijun Pan &lt;<a href=3D"mailto:ljp@linux.ibm.com" =
+class=3D"">ljp@linux.ibm.com</a>&gt;<br class=3D"">---<br class=3D"">v4: =
+add missing changes, and split to 5/11, 6/11, 7/11<br class=3D"">v3: use =
+tcg_gen_gvec_mul()<br class=3D"">v2: fix coding style<br =
+class=3D"">&nbsp;&nbsp;&nbsp;use Power ISA 3.1 flag<br class=3D""><br =
+class=3D"">include/elf.h | 1 +<br class=3D"">1 file changed, 1 =
+insertion(+)<br class=3D""><br class=3D"">diff --git a/include/elf.h =
+b/include/elf.h<br class=3D"">index 8fbfe60e09..1858b95acf 100644<br =
+class=3D"">--- a/include/elf.h<br class=3D"">+++ b/include/elf.h<br =
+class=3D"">@@ -554,6 +554,7 @@ typedef struct {<br class=3D"">#define =
+PPC_FEATURE2_HTM_NOSC =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0x01000000<br =
+class=3D"">#define PPC_FEATURE2_ARCH_3_00 =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0x00800000<br =
+class=3D"">#define PPC_FEATURE2_HAS_IEEE128 =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0x00400000<br =
+class=3D"">+#define PPC_FEATURE2_ARCH_3_10 =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0x00200000<br =
+class=3D""><br class=3D"">/* Bits present in AT_HWCAP for Sparc. =
+&nbsp;*/<br class=3D""></blockquote><br style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><br style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><span style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;" =
+class=3D"">Um.. in the corresponding #defines in the kernel 0x00200000 =
+is given</span><br style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;" class=3D""><span style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none; float: none; display: inline !important;" class=3D"">to =
+PPC_FEATURE2_DARN, and several more bits are allocated past =
+that</span><br style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;" class=3D""><span style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 14px; font-style: normal; font-variant-caps: =
+normal; font-weight: normal; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none; float: none; display: inline !important;" =
+class=3D"">point.</span><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 14px; font-style: normal; =
+font-variant-caps: normal; font-weight: normal; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;" class=3D""><br class=3D""></div></blockquote><br =
+class=3D""></div><div>Then what do you recommend to use?</div><div><br =
+class=3D""></div><div>Thanks,</div><div>Lijun</div><br =
+class=3D""></body></html>=
+
+--Apple-Mail=_245D0A6E-143A-437C-9E43-556D5EF9E0FA--
+
 
