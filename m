@@ -4,79 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EE7C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1995EC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:14:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F6422072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:13:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D96FA2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:14:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u7pW8AJ1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F6422072D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="US0dj16d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D96FA2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzDO-0001IZ-Nn
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:13:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34964)
+	id 1juzDe-0001jM-06
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:14:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAl-0004p1-FT
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:11 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:51348)
+ id 1juzAt-00057b-2L
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:19 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:54279)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1juzAj-0006bf-TH
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:11 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id 22so13464827wmg.1
- for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:09 -0700 (PDT)
+ id 1juzAr-0006cz-EY
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:11:18 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id o8so13447686wmh.4
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:11:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=pLks78n58shGUjzr8qBFjGZdlcgPpzMamGTQB7aIdDA=;
- b=u7pW8AJ1B/B6IQLXN4VlTtF7clsKz3z6EEfBUzxcfzC3jZ5n0pavb4g/Bh6oZMy4ds
- lVi4Ndil7QjEOg81o2jMqfVZf4yLUPcy72ePf1Sad0UAVzDiVbviiXgFi7NP6HeDSK2+
- bErOHofLuIrZLWklRv2f7ZkGvAKhL+rdILkkiuqmSJ6GncjiuehFDkab8mmi77WX+CZF
- 9kPxAylsVqZb1xyyCD/rz4ColoMcaZqRCPLiTvP+DzEzyvddbuqUZBOJr9ZOONxp39IG
- 0Bzsebpdyp/9+k93WvcYydPRYHImPc+4hEAhjCIEnSwj3jQIl+cgp0zb8V/3cFLebTKz
- rC1g==
+ bh=sfF8uQlqTNWoN2CdQI+dtwBm9efGllQvPXBr2wV3kLI=;
+ b=US0dj16dEkO0ktvMnbDhVuqDO02RSgEe/Ta3ul4SP1KC5WwifjnEPHaFuE32KG4oZ5
+ uaqCNi86EZXW+5gG9zp1XsHVe9NVlbIk1MxjPcGKHMoTNtNIxBz93ARAjMYrgGKYEDXy
+ 2Qsn4gOOhjNMBV3JabWNY0ACj6qsisDRJ2uoBf8VtvotuPCmeHtNiULI5JVpR4jnp54T
+ BC9bMTiMOquxI8o72yQRP69zDuz5zrQtOMkt44aPQPsr8gGBGUbEzXCY8RWTi53moXMj
+ 0iUPcd/2ZtzNAfYG7ghFDs+b4TKj4ebS1EgrgFLxDDf8kEtjuTPtQ7QApCOo79kAlzsG
+ c4LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=pLks78n58shGUjzr8qBFjGZdlcgPpzMamGTQB7aIdDA=;
- b=lkwF82EC1fxObAukDOoITWXoDdHLgye6WfgVTtTLAHTgzxd94Mtf4REhawuCxqsY4N
- besrYuL5DHJW/JNb0gh6n8yq7HYdxTBRP/0pjnVLFeIjpllxgcJgK7caPDExH2AzbXOs
- CzlHeDb8SWVx5vVmGiHcydOu3KnXW3GioToLxU3pjlZVD4korYS3O4axnpdTb1SkMIu9
- 6byT599Olii5sUVKB6TOMbIwu+BtcfNfyyK8c59pKzIXywjUC264KZY3LRgwqaMWLxJj
- 0UEh6Ga7Hpq7xjbwFNrlrFoz7ZmBKfgRttMXg6I9vZu8/D9cD4qvVeIqbGHbUsqbjaBr
- OwrA==
-X-Gm-Message-State: AOAM531XKPmKfTdGegrX+qiBUnHR05HCbTdGLSsANnX9H6bFWsB7lsKL
- zDX8Q/D1vN+GiyNi3guBUehGKJOOks1+gQ==
-X-Google-Smtp-Source: ABdhPJwup1qHjh0JyICExvF/CzgW5/yp4rHvlF7BJhYpxD7aA0BG/eNmdfuu1hWb7cxmlUPFLSqKZw==
-X-Received: by 2002:a1c:2349:: with SMTP id j70mr182163wmj.22.1594649468170;
- Mon, 13 Jul 2020 07:11:08 -0700 (PDT)
+ bh=sfF8uQlqTNWoN2CdQI+dtwBm9efGllQvPXBr2wV3kLI=;
+ b=OfRxx4PpRvHCLxxIY9dX6O/K9VvHtvJMsLQoT5k0B0snh/lPDPPOc8HosDUJ8+PNcf
+ p7MXGM3nLmFMFnuxwtMEJSAe9EGQn6jXjtZ8EfOG3vXGQGYsw5UDJkGpvBQ7IpId3Yhq
+ QSy24mEmSoYgzEgnis4HBd8ZhXPtusaPOiOKFaFva6+Q9dPWcZz5RMEyNlD0wPQxDFHv
+ yBWFiBJ6lX0EXg7yR8iREYxlqiibjiksCeJ1dcTdlo7xBYIQmpGzM9CHH71f214nIVuc
+ y3nCE3AF0nOWvj98CMXWgbSEihM9v4IYqiJifCyq4O/A4qZyD4y7ViH+UnRtcQC7ylbx
+ +FLw==
+X-Gm-Message-State: AOAM5301zdCMqmZnU1JMS92DaIA34S9y97yaKsj0KFK09Bf9/wSbes6Z
+ cDbJy2EirCxsMOOm9cBtN58q78GyP7uf8g==
+X-Google-Smtp-Source: ABdhPJwFsqbxFSYynaCP8JTXsVave4PZgk2aLEyHocgUg4KsebCG3mh/7fJ5C4I4qe2GA8L0pJzAXg==
+X-Received: by 2002:a1c:5453:: with SMTP id p19mr137616wmi.41.1594649475872;
+ Mon, 13 Jul 2020 07:11:15 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.07
+ by smtp.gmail.com with ESMTPSA id c136sm24031297wmd.10.2020.07.13.07.11.14
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jul 2020 07:11:07 -0700 (PDT)
+ Mon, 13 Jul 2020 07:11:15 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/25] hw/arm/bcm2836: Remove unused 'cpu_type' field
-Date: Mon, 13 Jul 2020 15:10:40 +0100
-Message-Id: <20200713141104.5139-2-peter.maydell@linaro.org>
+Subject: [PULL 08/25] build: Enable BSD symbols for Haiku
+Date: Mon, 13 Jul 2020 15:10:47 +0100
+Message-Id: <20200713141104.5139-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200713141104.5139-1-peter.maydell@linaro.org>
 References: <20200713141104.5139-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
  envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32b.google.com
@@ -105,33 +104,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: David CARLIER <devnexen@gmail.com>
 
-The 'cpu_type' has been moved from BCM283XState to BCM283XClass
-in commit 210f47840d, but we forgot to remove the old variable.
-Do it now.
+Tell Haiku to provide various BSD functions by setting BSD_SOURCE
+and linking libbsd.
 
-Fixes: 210f47840d ("hw/arm/bcm2836: Hardcode correct CPU type")
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200703200459.23294-1-f4bug@amsat.org
+Signed-off-by: David Carlier <devnexen@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20200703145614.16684-2-peter.maydell@linaro.org
+[PMM: expanded commit message]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/bcm2836.h | 1 -
- 1 file changed, 1 deletion(-)
+ configure | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index 024af8aae4f..79dfff9d734 100644
---- a/include/hw/arm/bcm2836.h
-+++ b/include/hw/arm/bcm2836.h
-@@ -33,7 +33,6 @@ typedef struct BCM283XState {
-     DeviceState parent_obj;
-     /*< public >*/
- 
--    char *cpu_type;
-     uint32_t enabled_cpus;
- 
-     struct {
+diff --git a/configure b/configure
+index 9b6ab9d3ca3..c70b43d1394 100755
+--- a/configure
++++ b/configure
+@@ -904,8 +904,8 @@ SunOS)
+ ;;
+ Haiku)
+   haiku="yes"
+-  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
+-  LIBS="-lposix_error_mapper -lnetwork $LIBS"
++  QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS -DBSD_SOURCE $QEMU_CFLAGS"
++  LIBS="-lposix_error_mapper -lnetwork -lbsd $LIBS"
+ ;;
+ Linux)
+   audio_drv_list="try-pa oss"
 -- 
 2.20.1
 
