@@ -2,88 +2,93 @@ Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D418C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4301CC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2897F2075D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:58:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 054CD2075D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 14:59:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZsgVvH6V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2897F2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QAYMMGdX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054CD2075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1juzuR-0000xh-B8
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:58:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60704)
+	id 1juzve-0002HP-93
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 10:59:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1juztN-00082r-Bo
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:57:17 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56798
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1juztL-0006wW-Ii
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:57:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594652234;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1MGf5zK1eJqK9CxGDyrfBY/PulcYs01nTjng6qcipBI=;
- b=ZsgVvH6Vm2FJBjZDiqDeKocQddDbo1gcCVWt5DdCXC5zYGpDY/8CaLpfChBeCQncT/tCyP
- 1Eem5csbk7cyNa4CYPsU5z7GWP44/Eiy81dEJe8BvCX52kM/0W5brgjnhMeGtnWyk5Nnxp
- sjJFTkdT9kJ1HC1Vl0lzxZtJjTc8pDo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-xrHM4m0RMaWEvFBp21Cb8A-1; Mon, 13 Jul 2020 10:57:12 -0400
-X-MC-Unique: xrHM4m0RMaWEvFBp21Cb8A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7099B8027FE;
- Mon, 13 Jul 2020 14:57:10 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 57A9C5C1BB;
- Mon, 13 Jul 2020 14:56:57 +0000 (UTC)
-Date: Mon, 13 Jul 2020 16:56:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Julia Suvorova <jusual@redhat.com>
-Subject: Re: [RFC PATCH 4/5] hw/i386/acpi-build: Turn off support of PCIe
- native hot-plug and SHPC in _OSC
-Message-ID: <20200713165654.1f78af8f@redhat.com>
-In-Reply-To: <20200708224615.114077-5-jusual@redhat.com>
-References: <20200708224615.114077-1-jusual@redhat.com>
- <20200708224615.114077-5-jusual@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1juzuG-00013y-OZ
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:58:12 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39329)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1juzuE-000724-O3
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 10:58:12 -0400
+Received: by mail-wr1-x444.google.com with SMTP id q5so16916143wru.6
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 07:58:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=zjzJwG+hzX+Xi4FXzxMFQFE1NjjjSG71gG40wiP+lds=;
+ b=QAYMMGdX5UCPBnIyngsxzUjKEq4Krs8j1zv8rTzNc15x8nFhqCnyOJ4tmu/filXhjd
+ vg+JopimTl79sBUtYzREFrVxBnutRJi0lK1kMHb/XxS7FyUJ+MqXj6LK9BMbTjcD+eGU
+ hVB/wFumz94CNjAr9N8QRiTkIIPAnLW8TTXqN46BQnEr7dfvqmpLYxr5+rN711JGyUOU
+ sohul8l46CrlWHPjHT9qd1l+ncw3uZ1zmwuP6dJGD2ktza71HcduOfxRbEYMoDH22Gj5
+ t5DT9YBBe2WgWVPtBBg/uNUgoF0Fnq8pyVOdtpQ1n7YQdJDm1fYUuu8ozw2E6Byd96Gt
+ Q0VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=zjzJwG+hzX+Xi4FXzxMFQFE1NjjjSG71gG40wiP+lds=;
+ b=QBjoF7M9XrV6DrG0tVxCB5z9N5lWmqIMj4HzKA24Pvevk7/340dBhQ/mSPIfY/aWbF
+ yba7EYn2hn+Jqu7FOQwn8cFSRuBTXJCgWon9m9x2jMayW8TXlxCjroyMm79d3JSEfE8s
+ LVh3hPmUPpAF0ycBVl4JChMIgNgSPlwBprXV/g4c7qp+RrsZ4vL1qa+udJNVn8yJG01+
+ BjMhGUeRUaL5zUdHuiQ8X3j2viFQ9CdQufIiSbA4cDbj682Pr1y+f7f3QZrCBt4Zxr7X
+ zrfPD3JzKjibUGTNIVCf1hQYf0edpk/seAfmtbtkmA00XYi70lHd+CpxSptZb3Nq9HtL
+ 6QiQ==
+X-Gm-Message-State: AOAM533Zb5cLfBIshazwJaEMWZ1yep7k9tYX1m8c4zdjNnd8Hgn7brl6
+ qpXaJ5EZyFVNYrzwVMBdbx9APA==
+X-Google-Smtp-Source: ABdhPJzKuCpjKIajxCw83Taz0lXEJreq7YcP5J0vwG0dNBzavemBr9qF/T4x/RWCtF2JrvqlM1vRTw==
+X-Received: by 2002:adf:f104:: with SMTP id r4mr83820168wro.90.1594652288900; 
+ Mon, 13 Jul 2020 07:58:08 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o9sm23694247wrs.1.2020.07.13.07.58.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jul 2020 07:58:07 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2B9DE1FF7E;
+ Mon, 13 Jul 2020 15:58:06 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] docker.py: fix fetching of FROM layers
+Date: Mon, 13 Jul 2020 15:58:01 +0100
+Message-Id: <20200713145801.29278-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 01:36:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,76 +101,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org, Fam Zheng <fam@euphon.net>, berrange@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  9 Jul 2020 00:46:14 +0200
-Julia Suvorova <jusual@redhat.com> wrote:
+This worked on a system that was already bootstrapped because the
+stage 2 images already existed even if they wouldn't be used. What we
+should have pulled down was the FROM line containers first because
+building on gitlab doesn't have the advantage of using our build
+system to build the pre-requisite bits.
 
-> Other methods may be used if the system is capable of this and the _OSC bit
-> is set. Disable them explicitly to force ACPI PCI hot-plug use. The older
-> versions will still use PCIe native.
-> 
-> Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> ---
->  hw/i386/acpi-build.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 5c5ad88ad6..0e2891c3ea 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1599,6 +1599,7 @@ static Aml *build_q35_osc_method(AcpiPmInfo *pm)
->      Aml *method;
->      Aml *a_cwd1 = aml_name("CDW1");
->      Aml *a_ctrl = aml_local(0);
-> +    unsigned osc_ctrl;
->  
->      method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
->      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
-> @@ -1612,9 +1613,12 @@ static Aml *build_q35_osc_method(AcpiPmInfo *pm)
->  
->      /*
->       * Always allow native PME, AER (no dependencies)
-> -     * Allow SHPC (PCI bridges can have SHPC controller)
-> +     * Need to disable native and SHPC hot-plug to use acpihp
-> +     *
-> +     * PCI Firmware Specification, Revision 3.2
-seems incomplete, were you going to point to a concrete chapter that requires this change?
+We still pull the image we want to build just in case we can use the
+cached data.
 
->       */
-> -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
-> +    osc_ctrl = pm->pcihp_bridge_en ? 0x1C : 0x1F;
-Since you are touching this, how about converting this magic number to
-something more readable?
-i.e.
-            set_bit(ACPI_OSC_SHPC_EN,  osc_ctrl)
-          or
-            osc_ctrl |= BIT(SOME_FEATURE)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/docker.py | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-> +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(osc_ctrl), a_ctrl));
->  
->      if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
->      /* Unknown revision */
-> @@ -1696,7 +1700,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
->          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
-> -        aml_append(dev, build_q35_osc_method());
-> +        aml_append(dev, build_q35_osc_method(pm));
->          aml_append(sb_scope, dev);
->          aml_append(dsdt, sb_scope);
->  
-> @@ -1771,7 +1775,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->              if (pci_bus_is_express(bus)) {
->                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
->                  aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
-> -                aml_append(dev, build_q35_osc_method());
-> +                aml_append(dev, build_q35_osc_method(pm));
->              } else {
->                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
->              }
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 2d67bbd15a..c9f20d8d09 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -306,14 +306,18 @@ class Docker(object):
+         checksum = _text_checksum(_dockerfile_preprocess(dockerfile))
+ 
+         if registry is not None:
+-            # see if we can fetch a cache copy, may fail...
+-            pull_args = ["pull", "%s/%s" % (registry, tag)]
+-            if self._do(pull_args, quiet=quiet) == 0:
++            sources = re.findall("FROM qemu\/(.*)", dockerfile)
++            # Fetch any cache layers we can, may fail
++            for s in sources:
++                pull_args = ["pull", "%s/qemu/%s" % (registry, s)]
++                if self._do(pull_args, quiet=quiet) != 0:
++                    registry = None
++                    break
++            # Make substitutions
++            if registry is not None:
+                 dockerfile = dockerfile.replace("FROM qemu/",
+                                                 "FROM %s/qemu/" %
+                                                 (registry))
+-            else:
+-                registry = None
+ 
+         tmp_df = tempfile.NamedTemporaryFile(mode="w+t",
+                                              encoding='utf-8',
+@@ -339,6 +343,8 @@ class Docker(object):
+             build_args += ["--build-arg", "BUILDKIT_INLINE_CACHE=1"]
+ 
+         if registry is not None:
++            pull_args = ["pull", "%s/%s" % (registry, tag)]
++            self._do(pull_args, quiet=quiet)
+             cache = "%s/%s" % (registry, tag)
+             build_args += ["--cache-from", cache]
+         build_args += argv
+-- 
+2.20.1
 
 
