@@ -2,80 +2,96 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CAEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3ADC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:58:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9C982145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:56:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9C982145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2C3032145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:58:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eDbtbg29"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C3032145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvFnq-00048F-94
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56954)
+	id 1jvFpP-0005Nx-HD
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:58:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jvFmy-0003JA-Fb
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:55:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36612)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jvFmw-0005Fr-B2
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:55:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jvFmu-0004nu-By
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:55:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 58BDA2E804E
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:55:40 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvFom-0004yd-Vr
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:57:38 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49136
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvFok-0005U4-3C
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:57:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594713452;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AJuzeen2J9oH/kM1HYcS+neMEfRiIn7Nm//XepiXBok=;
+ b=eDbtbg29zkHzLfDmQBnZUMWUBbS5FwhquzlwdPjCjeEQV9X3TjBmzEIUtW486q+9raXhyA
+ e4I+JU8D94GVN2lFGj4D943vcLYpqrE4B989qIsAu1LTNAfJlaY139D0M7W3p4UZQMKuYO
+ iCfWrVA5Dyp+hHl1nfFx/rSDTfSGDoU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-450-wHJTVjilOAG5K0JLFC16dQ-1; Tue, 14 Jul 2020 03:57:31 -0400
+X-MC-Unique: wHJTVjilOAG5K0JLFC16dQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89D4D800400
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:57:30 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 54F835C1B2;
+ Tue, 14 Jul 2020 07:57:30 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D8394105A45D; Tue, 14 Jul 2020 09:57:28 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH] tests: improve performance of device-introspect-test
+References: <20200709112857.3760116-1-berrange@redhat.com>
+ <87mu47gms3.fsf@dusky.pond.sub.org>
+ <20200713084759.GA4044570@redhat.com>
+Date: Tue, 14 Jul 2020 09:57:28 +0200
+In-Reply-To: <20200713084759.GA4044570@redhat.com> ("Daniel P. =?utf-8?Q?B?=
+ =?utf-8?Q?errang=C3=A9=22's?=
+ message of "Mon, 13 Jul 2020 09:47:59 +0100")
+Message-ID: <87h7ua8r6f.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jul 2020 07:48:52 -0000
-From: Martin Grigorov <1884719@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier martingrigorov stefanha
-X-Launchpad-Bug-Reporter: Martin Grigorov (martingrigorov)
-X-Launchpad-Bug-Modifier: Martin Grigorov (martingrigorov)
-References: <159289799812.6175.17000319886186623286.malonedeb@soybean.canonical.com>
-Message-Id: <159471293258.13569.12288666476368228026.malone@gac.canonical.com>
-Subject: [Bug 1884719] Re: Function not implemented when using libaio
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 612b38f2192dd75b5e7481b7468bacbc9eed5e46
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:55:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,184 +100,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884719 <1884719@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laurent,
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-I am not familiar with the internals of QEMU but if you point me to the
-source code of similar functionality I could try!
+> On Fri, Jul 10, 2020 at 10:03:56PM +0200, Markus Armbruster wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>>=20
+>> > Total execution time with "-m slow" and x86_64 QEMU, drops from 3
+>> > minutes 15 seconds, down to 54 seconds.
+>> >
+>> > Individual tests drop from 17-20 seconds, down to 3-4 seconds.
+>>=20
+>> Nice!
+>>=20
+>> A few observations on this test (impatient readers may skip to
+>> "Conclusions"):
+>
+> snip
+>
+>> * The number of known device types varies between targets from 33
+>>   (tricore) to several hundreds (x86_64+i386: 421, ppc 593, arm 667,
+>>   aarch64 680, ppc64 689).  Median is 215, sum is 7485.
+>
+> snip
+>
+>> * The test matrix is *expensive*.  Testing even a simple QMP query is
+>>   when you do it a quarter million times.  ARM is the greediest pig by
+>>   far (170k introspections, almost two thirds of the total!), followed
+>>   by ppc (36k), x86 (12k) and mips (11k).  Ideas on trimming excess are
+>>   welcome.  I'm not even sure anymore this should be a qtest.
+>
+> We have 70 arm machines, 667 devices. IIUC we are roughly testing every
+> device against everything machine. 46,690 tests.
+>
+> Most of the time devices are going to behave identically regardless of
+> which machine type is used. The trouble is some machines are different
+> enough that they can genuinely trigger different behaviour. It isn't
+> possible to slim the (machine, device) expansion down programatically
+> while still exercising the interesting combinations unless we get alot
+> more advanced.
+>
+> eg if a have a PCI device, we only need test it in one PCI based machine,
+> and only need test it on one non-PCI based machine.
 
-Thanks!
+The trouble is .instance_init() can do anything, and can therefore
+interact badly with anything.
 
--- =
+Example: m2sxxx_soc_initfn() of device type "msf2-soc" messes with
+nd_table[0].  That's wrong.  The test doesn't catch it with machine type
+"none", where nd_table[0] is blank.  It does catch it with machine type
+"ast2600-evb", because aspeed_machine_init() puts something incompatible
+into nd_table[0], which makes m2sxxx_soc_initfn() crash.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884719
+"msf2-soc" is not a PCI device, but if it was, then the two machines
+(with and without PCI) picked for testing PCI devices may well both
+leave nd_table[0] blank, and therefore not catch the bug.
 
-Title:
-  Function not implemented when using libaio
+Some instances of "device code does stuff it should not" could be
+prevented by making interfaces inaccessible there.  We'd have to
+identify device code first.  The hw/BASE-ARCH/ contain both boards and
+devices.  Possibly even in the same .c.
 
-Status in QEMU:
-  New
+> I would be interesting to actually get some CPU profiling data for
+> this test to see if it points out anything interesting about where the
+> time is being spent. Even if we don't reduce the complexity, reducing
+> a time factor will potentially greatly help.=20
 
-Bug description:
-  Hello
+Hunch: when we want to test device instantiation and finalization for a
+million (give or take) combinations of board x device, testing them one
+by one with QMP might be a bad idea.
 
-  I experience "Function not implemented" errors when trying to use
-  Linux libaio library in foreign architecture, e.g. aarch64.
-
-  I've faced this problem while using https://github.com/multiarch/qemu-use=
-r-static, i.e. Docker+QEMU. =
-
-  I understand that I do not use plain QEMU and you may count this report a=
-s a "distribution of QEMU"! Just let me know what are the steps to test it =
-with plain QEMU and I will test and update this ticket!
-
-  =
-
-  Here are the steps to reproduce the issue:
-
-  1) On x86_64 machine register QEMU:
-
-      `docker run -it --rm --privileged multiarch/qemu-user-static
-  --reset --credential yes --persistent yes`
-
-  2) Start a Docker image with foreign CPU architecture, e.g. aarch64
-
-      `docker run -it arm64v8/centos:8 bash`
-
-  3) Inside the Docker container install GCC and libaio
-
-      `yum install gcc libaio libaio-devel`
-
-  4) Compile the following C program
-
-  ```
-  #include <stdio.h>
-  #include <errno.h>
-  #include <libaio.h>
-  #include <stdlib.h>
-
-  struct io_control {
-      io_context_t ioContext;
-  };
-
-  int main() {
-      int queueSize =3D 10;
-
-      struct io_control * theControl =3D (struct io_control *) malloc(sizeo=
-f(struct io_control));
-      if (theControl =3D=3D NULL) {
-          printf("theControl is NULL");
-          return 123;
-      }
-
-      int res =3D io_queue_init(queueSize, &theControl->ioContext);
-      io_queue_release(theControl->ioContext);
-      free(theControl);
-      printf("res is: %d", res);
-  }
-  ```
-
-      ```
-      cat > test.c
-          [PASTE THE CODE ABOVE HERE]
-      ^D
-      ```
-
-      `gcc test.c -o out -laio && ./out`
-
-  =
-
-  When executed directly on aarch64 machine (i.e. without emulation) or on =
-x86_64 Docker image (e.g. centos:8) it prints `res is: 0`, i.e. it successf=
-ully initialized a LibAIO queue.
-
-  But when executed on Docker image with foreign/emulated CPU
-  architecture it prints `res is: -38` (ENOSYS). `man io_queue_init`
-  says that error ENOSYS is returned when "Not implemented."
-
-  Environment:
-
-  QEMU version: 5.0.0.2  (https://github.com/multiarch/qemu-user-static/blo=
-b/master/.travis.yml#L24-L28)
-  Container application: Docker
-  Output of `docker --version`:
-
-  ```
-  Client:
-   Version:           19.03.8
-   API version:       1.40
-   Go version:        go1.13.8
-   Git commit:        afacb8b7f0
-   Built:             Wed Mar 11 23:42:35 2020
-   OS/Arch:           linux/amd64
-   Experimental:      false
-
-  Server:
-   Engine:
-    Version:          19.03.8
-    API version:      1.40 (minimum version 1.12)
-    Go version:       go1.13.8
-    Git commit:       afacb8b7f0
-    Built:            Wed Mar 11 22:48:33 2020
-    OS/Arch:          linux/amd64
-    Experimental:     false
-   containerd:
-    Version:          1.3.3-0ubuntu2
-    GitCommit:        =
-
-   runc:
-    Version:          spec: 1.0.1-dev
-    GitCommit:        =
-
-   docker-init:
-    Version:          0.18.0
-    GitCommit:        =
-
-  ```
-
-  Same happens with Ubuntu (arm64v8/ubuntu:focal).
-
-  I've tried to `strace` it but :
-
-  ```
-  /usr/bin/strace: ptrace(PTRACE_TRACEME, ...): Function not implemented
-  /usr/bin/strace: PTRACE_SETOPTIONS: Function not implemented
-  /usr/bin/strace: detach: waitpid(112): No child processes
-  /usr/bin/strace: Process 112 detached
-  ```
-
-  Here are the steps to reproduce the problem with strace:
-
-       ```
-       docker run --rm -it --security-opt seccomp:unconfined --security-opt=
- apparmor:unconfined --privileged --cap-add ALL arm64v8/centos:8 bash
-
-       yum install -y strace`
-
-       strace echo Test
-       ```
-
-  Note: I used --privileged, disabled seccomp and apparmor, and added
-  all capabilities
-
-  Disabling security solves the "Permission denied" problem but then
-  comes the "Not implemented" one.
-
-  =
-
-  Any idea what could be the problem and how to work it around ?
-  I've googled a lot but I wasn't able to find any problems related to liba=
-io on QEMU.
-
-  Thank you!
-  Martin
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884719/+subscriptions
 
