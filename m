@@ -2,88 +2,96 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BBACC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 02:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB6BC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 02:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B65A2192A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 02:51:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 739E7208FE
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 02:58:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eizsSLL5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B65A2192A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QGDO7pCG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 739E7208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvB2N-0002VS-Ml
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 22:51:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42088)
+	id 1jvB8s-0004Rw-QC
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 22:58:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvB1f-00020R-IY
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 22:50:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60137
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvB1d-0008Uy-Ux
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 22:50:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594695032;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=6HJdoRYTxbgbLGEn/vtzAVrOqJDzDSDg7cohe8kS9QQ=;
- b=eizsSLL52XBae5cEKshP9ozxES27lNxRz5Y9hw8N8JB4OsGJQ7JsuX7eXrEeSbQcy+3YfP
- xpuv9rKSowTzPP0yyPUUKa+ajqDm+Ume/NmWVutges+oua2npk+og/p9AJAvp8r4HqhtCX
- APtSwHVVSgDlQ37NftIajzvA0mgOGeQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-2zl71xzlNEifyK7J2soqcw-1; Mon, 13 Jul 2020 22:50:30 -0400
-X-MC-Unique: 2zl71xzlNEifyK7J2soqcw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BECD107ACCA;
- Tue, 14 Jul 2020 02:50:29 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-112-247.rdu2.redhat.com
- [10.10.112.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C97AD60BEC;
- Tue, 14 Jul 2020 02:50:25 +0000 (UTC)
-Date: Mon, 13 Jul 2020 22:50:24 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 06/12] python/machine.py: Add a configurable timeout
- to shutdown()
-Message-ID: <20200714025024.GB2983508@localhost.localdomain>
-References: <20200710050649.32434-1-jsnow@redhat.com>
- <20200710050649.32434-7-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jvB84-0003rV-4F
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 22:57:12 -0400
+Received: from mail-ua1-x942.google.com ([2607:f8b0:4864:20::942]:42556)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jvB80-0002q4-AG
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 22:57:11 -0400
+Received: by mail-ua1-x942.google.com with SMTP id u33so2813039uad.9
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 19:57:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=mE7dPvO1CgW3ZPUxyh6bx2v0qVFfOnWcTV5dKbi21t8=;
+ b=QGDO7pCGZBcvnfGmerp+DPxdKbaYedYpQaVm87Rn8bV6onLO+rNA0pqQL1RbHJvslo
+ diW44N/AvKezUVJYAEBiANUSeqiXLZR6a9vIR+ONRcbh+xfyq/SEukKDMm+XsCdv8s+6
+ PmEeUYvFXtaDt9/jvcXRYjihL+QBIZS2N1DR9D/xBz+7wdfsTzFceL51sk8c8o0PO7I4
+ 8w9TU4qbdQm3fmKJqe8DpRzn7EUpXaqb1BnPBrDam8qDGwdLwNERF4Ki9L97H3aShLql
+ SlRM9pknC3k0ONvkaondzQBn6nT/dXNKaE9v5kWAHjfRCOUxMk0+VyfHuton6dM5Z4L+
+ p3TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=mE7dPvO1CgW3ZPUxyh6bx2v0qVFfOnWcTV5dKbi21t8=;
+ b=Pmg4BQfrY2+clu5ZgMy5B/QH/PtL8GlP+qWtkn2KSmv6lfAeb0KfmTV1oLI9c0C8nj
+ f2YEs+lCvfoZmVn6tCqp2N+F4EA1/+M2tkX/I3B8x+68h1Lmodk4sR7Voqyqn9BLSea/
+ 5JcwZZPtgUqeIietItksgoKa/DMzE0MohqVF7WKL/IFKG4c1NjfyxePP61mPF87ElH7/
+ vlXeg3xfUU+mEOcdFYNgHQEkILs3GHHJedN/aLd8Pcdw8rWvJr8xnE1+W8pFvhO8zgk3
+ BqMCtZOvl3nkzbqQYBlyvWN2p1yE8xqZWGCF+iu7awDCWllPa7JE0suCfyWd95l9yl+5
+ uA1g==
+X-Gm-Message-State: AOAM530pocsdLeeWP4u0nSGXdka0BOu2bNjvkcqYPCsnvklKIT5bPq62
+ V3cGPPzfpnGGtEHVNNjwNTzHMhJ76z4RYb3efsSQtw==
+X-Google-Smtp-Source: ABdhPJwAwwJAHq+HBz2FKv6MZ7TK+0xDlwkKT3/rKbXPEhAlhcn2N/O8UORgmr0BjNoiOahvlCW52wViF29mSPS6dAE=
+X-Received: by 2002:ab0:6ec6:: with SMTP id c6mr2208310uav.7.1594695426609;
+ Mon, 13 Jul 2020 19:57:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200710050649.32434-7-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="DKU6Jbt7q3WqK7+M"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=crosa@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+References: <20200709003608.3834629-1-hskinnemoen@google.com>
+ <20200709003608.3834629-11-hskinnemoen@google.com>
+ <109d52ed-65bf-0fcc-98f1-47b7a6671d0b@kaod.org>
+In-Reply-To: <109d52ed-65bf-0fcc-98f1-47b7a6671d0b@kaod.org>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Mon, 13 Jul 2020 19:56:55 -0700
+Message-ID: <CAFQmdRZcygskP3iwss01-Jz67yjAP_JENXjWM2Bp8U=DRzxR0Q@mail.gmail.com>
+Subject: Re: [PATCH v5 10/11] hw/arm: Wire up BMC boot flash for npcm750-evb
+ and quanta-gsj
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, 
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, 
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, CS20 KFTing <kfting@nuvoton.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::942;
+ envelope-from=hskinnemoen@google.com; helo=mail-ua1-x942.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,53 +104,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---DKU6Jbt7q3WqK7+M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jul 13, 2020 at 7:57 AM C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> On 7/9/20 2:36 AM, Havard Skinnemoen wrote:
+> > This allows these NPCM7xx-based boards to boot from a flash image, e.g.
+> > one built with OpenBMC. For example like this:
+> >
+> > IMAGE=3D${OPENBMC}/build/tmp/deploy/images/gsj/image-bmc
+> > qemu-system-arm -machine quanta-gsj -nographic \
+> >       -bios ~/qemu/bootrom/npcm7xx_bootrom.bin \
+> >       -drive file=3D${IMAGE},if=3Dmtd,bus=3D0,unit=3D0,format=3Draw,sna=
+pshot=3Don
+> >
+> > Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+> > Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+>
+> May be we don't need to create the flash object if dinfo is NULL.
 
-On Fri, Jul 10, 2020 at 01:06:43AM -0400, John Snow wrote:
-> Three seconds is hardcoded. Use it as a default parameter instead, and us=
-e that
-> value for both waits that may occur in the function.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  python/qemu/machine.py | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+It's soldered on the board, so you can't really boot the board without
+it. But if you think it's better to remove it altogether if we don't
+have an image to load into it, I can do that.
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>
+> Nice !
+>
+> We need a SPI controller model and a network device model now.
 
---DKU6Jbt7q3WqK7+M
-Content-Type: application/pgp-signature; name="signature.asc"
+Yeah, and i2c, PWM, GPIO, etc., but if you're referring to the kernel
+crash, see below.
 
------BEGIN PGP SIGNATURE-----
+> npcm7xx_bootrom.bin is a bit of a pain. Could we include it in
+> the QEMU roms ?
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8NHW8ACgkQZX6NM6Xy
-CfOvoA//fIvGp3C0UrYmJquGYW4KvnWlRnpKw4vvfu7s7BheIvew3xjTR9GPIAqs
-aXr93TWkdAHinsRh0S2lYJp1l4ZcGzYA/mQkqeB6G4ahgFbT3Q+/dUCoKELhdYMx
-Rki5EejAOjvAaEG50CPp3MyfdVTLowef5IWmebnj2K3bpCTg4jm0wqwXQQimk6Ii
-iWOBlMlSg9Fhj8+vRtNwnBNxl1yZMMFMifD3QflYy6Iwn/CSImvtezBhOqAMNoLS
-A/SGzagVu/6Z6mHTsdLkHW+uyC6Hq4rJhLer4CJZgQFkChPGvIPqh91yVP8ZrUl1
-w7xP+9RDJ65hzcJzuxsPZVZdlhU0CyyGQKHGLvhJH9nwfsG9aw5p4ykR4W8bLogZ
-CJEgCK+NMTz7+uTX+oMKM8ofqsOIUGjcUljnojGDa0tVR3+3S9ukaIFG8AvFTDzI
-iLppLr30PtSxdRItZLg3orNv8KExrIli+a887C/CeqjhFrWMS9mPHeAClvoN+HTf
-v0SnIPIswLxIvlqrsQtESfECVrICzkkRaizkNuG2qnbqY/giYE+G2MunyPOJ9yIk
-TfpwsOMXqCHF7359Q9AhC4uje1xBo94HOYGRbLVgl3UkE8KoOEYaiQqXknGlbTU+
-ME3g1w5hPP9NyuLGpEZpKPVuxreb6sOLQIWCQM1OzKm8TI4vmHI=
-=1Lq9
------END PGP SIGNATURE-----
+Yeah, I was planning to include this in v6.
 
---DKU6Jbt7q3WqK7+M--
+> spi_master spi0: /ahb/fiu@fb000000/spi-nor@0 has no valid 'spi-max-freque=
+ncy' property (-22)
+> spi_master spi0: Failed to create SPI device for /ahb/fiu@fb000000/spi-no=
+r@0
 
+This is a device tree bug:
+
+https://github.com/hskinnemoen/openbmc/commit/99b172f88002f4fac939f85debe11=
+87b9c569871
+
+> libphy: Fixed MDIO Bus: probed
+> 8<--- cut here ---
+> Unable to handle kernel paging request at virtual address fffffffe
+
+I believe this is a kernel bug:
+
+https://github.com/hskinnemoen/openbmc/commit/77e9f58ba157eabc976f15fa49892=
+128fe2b2382
+
+I needed two additional patches to get all the way to the login prompt:
+
+https://github.com/hskinnemoen/openbmc/commits/20200711-gsj-qemu-0
 
