@@ -2,101 +2,69 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2BBC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C135C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:41:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BEED21897
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:41:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LKqpfL5a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEED21897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA22F21897
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:41:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA22F21897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvGV0-0000cK-Ge
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 04:41:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38162)
+	id 1jvGVF-0000zw-35
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 04:41:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvGTr-0007WX-Pv
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:40:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23400
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvGTp-0002Yj-PP
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:40:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594716000;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=kd4iuf4IjSbHo0EgXv7qhcEtyWLyr+ddAYdcYHg+010=;
- b=LKqpfL5ah5a2BdXFCyOnNw1OuPzzIpAfcDP3Fe3H9bWDCXc+ooojWLm3Ad/H0UTn9ipHmJ
- XAXk8U819o3K+WOtMe22I3F0b1cIlNXMhUOGOBNVwSzxdlAZSl7BxkKoNxDLoUmUlLdpsr
- e74GIb53Mv9p7MKbxLhnEXyWfcH96dI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240--Y9RVrDFOiGJJVPmBSIVQg-1; Tue, 14 Jul 2020 04:39:58 -0400
-X-MC-Unique: -Y9RVrDFOiGJJVPmBSIVQg-1
-Received: by mail-wr1-f71.google.com with SMTP id c6so20720478wru.7
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 01:39:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=kd4iuf4IjSbHo0EgXv7qhcEtyWLyr+ddAYdcYHg+010=;
- b=gq9ewePiICXYcOqCsCBYdpn9/t2YioVe/u6ik7NDT0YdH9IgSLa61sMqvyKfNZVap/
- QBKngx9+jNyD4r85tMBcXbi+APnSbGd4qw9PU9HA2JNmH4+sDS3dER4fg544+S12xKNX
- QT//HcYrbk1O+FXQbhQ/vFERkDFO30lactAJ8XbwiFJF/R+2owGbnVbGNlw1X5iP8O+m
- knNp5jFmhx2Hl15xyzYldZ+Fhg50BlXT+w+u+q6/QAqaJUt/mSxlfg7qZXy5GUz5wp1X
- Vn3AnvXbkkAJHqxgtMIdQANC7kTeOzgNzGwkebtSxluZpmpFtuJpGU/kmuxZRb0GQsX/
- pW+g==
-X-Gm-Message-State: AOAM530QT69udDyV6kcmjyYZkmR7HQWasEslmmXxto5Nlb/wuY27KNGW
- lBIPo95R4miU+XHP8cRDAWQjrQVmsfWyBr7ny6r6bc/PhJftAmgjvWmXjCywPUpTvMMEZe/XlBs
- phRXLvwf1+TJJoaQ=
-X-Received: by 2002:a5d:688d:: with SMTP id h13mr3737301wru.303.1594715997740; 
- Tue, 14 Jul 2020 01:39:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwVeZzXD+xUni72PzBOxZPWt0vI4N8JB8h2ezYSQran3b53GtUd0czoU6JXjFz5r95U60pPHA==
-X-Received: by 2002:a5d:688d:: with SMTP id h13mr3737288wru.303.1594715997532; 
- Tue, 14 Jul 2020 01:39:57 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
- by smtp.gmail.com with ESMTPSA id r28sm27457519wrr.20.2020.07.14.01.39.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jul 2020 01:39:56 -0700 (PDT)
-Date: Tue, 14 Jul 2020 04:39:53 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [RFC PATCH 4/5] hw/i386/acpi-build: Turn off support of PCIe
- native hot-plug and SHPC in _OSC
-Message-ID: <20200714040118-mutt-send-email-mst@kernel.org>
-References: <20200708224615.114077-1-jusual@redhat.com>
- <20200708224615.114077-5-jusual@redhat.com>
- <20200713165654.1f78af8f@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20200713165654.1f78af8f@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+ (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
+ id 1jvGU1-0007jI-HP
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:40:13 -0400
+Received: from mga12.intel.com ([192.55.52.136]:43778)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chenyi.qiang@intel.com>)
+ id 1jvGTy-0002ZH-Ki
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:40:13 -0400
+IronPort-SDR: xBkMvAj/v2Lfzt49MBYZN1rSC6Z9Wb3D9K1K2yNs+QSnWrtuU2WeSTrU5W6RD9h2gV5L+AiU1j
+ tD5J/1U/mQZA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="128407132"
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; d="scan'208";a="128407132"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 Jul 2020 01:40:07 -0700
+IronPort-SDR: XdSkIQCDl8e0uvczau/C+Tn+6Yba+KCvbcwgI4+ZCY44tE4ba4gAC8AvMgAnJqavbBd1gcgVBr
+ 7oaTQEA9YWFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; d="scan'208";a="299464832"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
+ by orsmga002.jf.intel.com with ESMTP; 14 Jul 2020 01:40:06 -0700
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
+Subject: [PATCH v6 1/3] target/i386: add fast short REP MOV support
+Date: Tue, 14 Jul 2020 16:41:46 +0800
+Message-Id: <20200714084148.26690-2-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200714084148.26690-1-chenyi.qiang@intel.com>
+References: <20200714084148.26690-1-chenyi.qiang@intel.com>
+Received-SPF: pass client-ip=192.55.52.136;
+ envelope-from=chenyi.qiang@intel.com; helo=mga12.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 04:40:06
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,106 +77,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
+ Robert Hoo <robert.hu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 13, 2020 at 04:56:54PM +0200, Igor Mammedov wrote:
-> On Thu,  9 Jul 2020 00:46:14 +0200
-> Julia Suvorova <jusual@redhat.com> wrote:
-> 
-> > Other methods may be used if the system is capable of this and the _OSC bit
-> > is set. Disable them explicitly to force ACPI PCI hot-plug use. The older
-> > versions will still use PCIe native.
+For CPUs support fast short REP MOV[CPUID.(EAX=7,ECX=0):EDX(bit4)], e.g
+Icelake and Tigerlake, expose it to the guest VM.
 
-Do we need that later part btw?
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+---
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-> > 
-> > Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> > ---
-> >  hw/i386/acpi-build.c | 12 ++++++++----
-> >  1 file changed, 8 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index 5c5ad88ad6..0e2891c3ea 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -1599,6 +1599,7 @@ static Aml *build_q35_osc_method(AcpiPmInfo *pm)
-> >      Aml *method;
-> >      Aml *a_cwd1 = aml_name("CDW1");
-> >      Aml *a_ctrl = aml_local(0);
-> > +    unsigned osc_ctrl;
-> >  
-> >      method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
-> >      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
-> > @@ -1612,9 +1613,12 @@ static Aml *build_q35_osc_method(AcpiPmInfo *pm)
-> >  
-> >      /*
-> >       * Always allow native PME, AER (no dependencies)
-> > -     * Allow SHPC (PCI bridges can have SHPC controller)
-> > +     * Need to disable native and SHPC hot-plug to use acpihp
-> > +     *
-> > +     * PCI Firmware Specification, Revision 3.2
-
-I don't think you have to add a reference as part of this patchset.
-The spec in question documents _OSC so it's not a bad idea to
-add it, but it's a bit more work, e.g. we generally try to list
-the earliest spec that documents the given feature, since
-So I suspect this is 3.0 actually.
-
-
-> seems incomplete, were you going to point to a concrete chapter that requires this change?
-
-
-It doesn't as such. A better description would be:
-
-/ * Guests seem to generally prefer native hotplug control. As we want them to
-  * use ACPI, don't enable it.
-  */
-
-
-
-> >       */
-> > -    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
-> > +    osc_ctrl = pm->pcihp_bridge_en ? 0x1C : 0x1F;
-> Since you are touching this, how about converting this magic number to
-> something more readable?
-> i.e.
->             set_bit(ACPI_OSC_SHPC_EN,  osc_ctrl)
->           or
->             osc_ctrl |= BIT(SOME_FEATURE)
-> 
-
-... if there is such a macro. If not I suspect it's better as a comment:
-
-	0x10 /* PCI Express Capability Structure control */ |
-	0x80 /* PCI Express Advanced Error Reporting control */ |
-	0x40 /* PCI Express Native Power Management Events control */
-
-
-
-> > +    aml_append(if_ctx, aml_and(a_ctrl, aml_int(osc_ctrl), a_ctrl));
-> >  
-> >      if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
-> >      /* Unknown revision */
-> > @@ -1696,7 +1700,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> >          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
-> >          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-> >          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
-> > -        aml_append(dev, build_q35_osc_method());
-> > +        aml_append(dev, build_q35_osc_method(pm));
-> >          aml_append(sb_scope, dev);
-> >          aml_append(dsdt, sb_scope);
-> >  
-> > @@ -1771,7 +1775,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> >              if (pci_bus_is_express(bus)) {
-> >                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
-> >                  aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
-> > -                aml_append(dev, build_q35_osc_method());
-> > +                aml_append(dev, build_q35_osc_method(pm));
-> >              } else {
-> >                  aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
-> >              }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1e5123251d..55e063babe 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -984,7 +984,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .type = CPUID_FEATURE_WORD,
+         .feat_names = {
+             NULL, NULL, "avx512-4vnniw", "avx512-4fmaps",
+-            NULL, NULL, NULL, NULL,
++            "fsrm", NULL, NULL, NULL,
+             "avx512-vp2intersect", NULL, "md-clear", NULL,
+             NULL, NULL, "serialize", NULL,
+             "tsx-ldtrk", NULL, NULL /* pconfig */, NULL,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 37fffa5cac..e1a5c174dc 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -775,6 +775,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4VNNIW     (1U << 2)
+ /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS     (1U << 3)
++/* Fast Short Rep Mov */
++#define CPUID_7_0_EDX_FSRM              (1U << 4)
+ /* AVX512 Vector Pair Intersection to a Pair of Mask Registers */
+ #define CPUID_7_0_EDX_AVX512_VP2INTERSECT (1U << 8)
+ /* SERIALIZE instruction */
+-- 
+2.17.1
 
 
