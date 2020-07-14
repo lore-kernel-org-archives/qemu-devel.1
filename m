@@ -2,121 +2,117 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDD1C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:24:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78209C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:24:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE925221FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:24:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42659221FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:24:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RJbpfDM/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE925221FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGL3vb6i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42659221FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvNj3-00027d-4J
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:24:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59660)
+	id 1jvNiw-0001qI-HS
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:24:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jvNhk-0000JB-MU; Tue, 14 Jul 2020 12:22:52 -0400
-Received: from mail-db8eur05on2116.outbound.protection.outlook.com
- ([40.107.20.116]:22897 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jvNhh-0002R9-Ax; Tue, 14 Jul 2020 12:22:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e2VtDr2ukOYJCa7L/ACCe2MSjhjX6aulGxJ8F40TmZWfzIY6wlDrsyZFjNlp2oj+k0dXlALHPp7SeVUnoi6utxoGrP3e/+FDHrBEOv+R6gyRpUIFOGZWd8rTwEjcbLsiTCw2ATjddomeCguylyOu8Z/DwCCm/HIZMU+GnZeEJ+jcEByWyNoalWXPa2ePuu8u/B1Y68lZdVA1J8dv7Ffixhs+hC3gOAlLVMNFNz1kxLjdLkgZlb1J/pBH5e2hfFynqFXqG+1GBx5ZXRJ4mJNjOIMSw6UkKhm4L/5W7aL6A/jPx2v4hh/S11ontL00N5ZzfkfkrH7e5Uo4HYzltMAihw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Li6L8i6c58kAZeLEmnCo2oVl1HTRNQCwNF74/vT2TBw=;
- b=MHdJY8rU5CuhwEu4Qut5O9ur6eYhETtc9tYdVMfnhuCVo2A/DWoHrv/uERd/M/cNfqFyGOtvnxG4ihthtDquoXUrucdChw+jVKX0CbN9TD8dvpGUsA/PjlRNUdS1kwA6YBLGrbxBSv4fIXotu5RhlycgGLIEIf935Di1u//gk1R5xYYBjr8QsMblRJwPvKnqCzl9PHc6KprHlz3I4xBpLDwJ1Uf891MZ7o1VLauQcSWHpXQTD10VejwwR5IHKa0oP46+02GRwJ0ALmf5M/qhGM+FH5b/q7njk6+cbZhwRG4CpSFRfyxYr0VB5TqCNOtxpKvA/3m0ucWz6yOfSjx4sA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Li6L8i6c58kAZeLEmnCo2oVl1HTRNQCwNF74/vT2TBw=;
- b=RJbpfDM/cbet5pzq2eeR1I5TFpcYBBuUN7Bd20TplDi2PppceGOpwBB81Ch7xKotG8tRCw5EZd9QOP2LXxYC6L9gUs9p1CcwthokN3e+TwbIeSCzYmU0js0IsyAsk6MtM9Gvf5C3Ns++isIYJGK6/Zerx32FXoQiKF48UO2JoLc=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB2982.eurprd08.prod.outlook.com (2603:10a6:209:43::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Tue, 14 Jul
- 2020 16:22:46 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3174.025; Tue, 14 Jul 2020
- 16:22:46 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 for-5.1 0/2] Fix crash due to NBD export leak
-Date: Tue, 14 Jul 2020 19:22:32 +0300
-Message-Id: <20200714162234.13113-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM4PR0101CA0075.eurprd01.prod.exchangelabs.com
- (2603:10a6:200:41::43) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jvNhc-00005e-4Q
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:22:44 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43661
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jvNhX-0002QQ-CD
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:22:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594743758;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Mpy5RV5N/DfFVmLEE51dbX+YEXY2DH+wpwyn0M09OEc=;
+ b=YGL3vb6ivVvrdNoV9d4Al70TyskiTlxFohOuaL5gnTPl1t3BWpCsy+8IzeBm4W6arx3XlJ
+ rFnqUJH/BdcZP9CTDwFgTHNmG62xaJzD9DL3cNiUt8UjKElqDGgPTQakJsQRk3DLvunnqo
+ yrx8WCgLJ9s5nbOdu2uIBxZelVkTQOY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-dcqMXx3JNIOl7KM6_JUBkQ-1; Tue, 14 Jul 2020 12:22:36 -0400
+X-MC-Unique: dcqMXx3JNIOl7KM6_JUBkQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21A86107ACCA;
+ Tue, 14 Jul 2020 16:22:35 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-179.ams2.redhat.com
+ [10.36.113.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E1F7810013C0;
+ Tue, 14 Jul 2020 16:22:33 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 1/2] block: Require aligned image size to avoid
+ assertion failure
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200710142149.40962-1-kwolf@redhat.com>
+ <20200710142149.40962-2-kwolf@redhat.com>
+ <e608699f-b2c2-d7a0-cb59-703832ae732a@redhat.com>
+ <20200713142949.GD10318@linux.fritz.box>
+ <b91329db-303f-41ab-5638-3ec7543b55ac@redhat.com>
+ <20200714110837.GB5120@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <af19cad2-f718-c17b-5856-ed0c8cbd3db3@redhat.com>
+Date: Tue, 14 Jul 2020 18:22:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.164) by
- AM4PR0101CA0075.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::43) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17 via Frontend
- Transport; Tue, 14 Jul 2020 16:22:45 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.164]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9589bed0-4024-48c2-0a2d-08d82812249a
-X-MS-TrafficTypeDiagnostic: AM6PR08MB2982:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB2982BA24A821E79C9FE91E24C1610@AM6PR08MB2982.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OgOOnv8qwUFxnMcZYmKnqF2z+qR+6fF9dE3V5R6HIkF5zdYHiNxtpI99DYYr9zShOEdnOUGSDrX1meWuDSJwjPuV05Tu0sMt3Dgbqg84bbh5YRNqTUkrB9SUnj4vDu0F3yYmMOXfE293wQyUYCS76LvWl4hIXsu3M8wR6d6FxNn0bXIRzsEomOfHy2SlhirAA3VCzAyvYrAAToa5U5eABVffBYfyi1vePe73t4rHAOPeyUgr//hqCTF9uRAv76cN93p453sYiEGz6rTeR8WgLfqAm8fM8QHcqIyIn7fNCI3MPp5DazI7O8I3c2flQTIpOmQtmXhspd3Ms3KN0klmgg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(366004)(346002)(39840400004)(396003)(136003)(86362001)(6512007)(8676002)(6916009)(6486002)(5660300002)(66946007)(107886003)(8936002)(2906002)(6506007)(66476007)(36756003)(66556008)(26005)(956004)(186003)(52116002)(16526019)(478600001)(1076003)(6666004)(316002)(2616005)(4326008)(83380400001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 0n2dbxBrFtXWbO9hNIwwi/D2vi+2EpZCfVVQUvACfTra8juTlLqMJQm8vMoP8Vu5a7fcJmHKwfRZ5+0TCVvBDwcElVhOPk/xiA6vKpMMecW1nG7Ctnv5HdEHwpVZLpFpj7lWxz98F3LhxO3aFSfMwFS9X9N3BlrAdpZk4qDdgUvtl4jYZqEYqFhGEunrdSLK3TZwyijsh0xD4P9N0abUcgsY+zjj1AnL8WPoN7ac6FwLIb3TKxN9CyDJhhXQIOZFFMaRRblyiUn9pq+BPb5IDdha0c3585A+VK984p89mjeIlHEONTKu5GZTfHFqav5zzSMGU8wkLbSpak+6nUm4h0lDf0YbaXv4rX1uoJnxsIQ+o/DyZlEqECTuAcqNlby1eRlYxhPuEZ7f5logbZvNJhQJtuj+OTat+Nj1F5II1G9IyF8Wks9t5vx7Pj+Z32f0K8LqLIdEsH8ePRznMEAYDsCohRpZHuCZ+d378Of+s6waZvu2QIwtW3vKbEoPAu8U
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9589bed0-4024-48c2-0a2d-08d82812249a
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2020 16:22:46.3354 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AsA895igr/J592GWslyLVYBHlrkO2vhVsPGFxQjk3+jtq9Y0jRpvDNepJOao4yJfsLVKIrkkrlnKy5HEemJm4o4nX7fTh+fiZz4PzX89Wz4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2982
-Received-SPF: pass client-ip=40.107.20.116;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 12:22:47
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <20200714110837.GB5120@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="SBYMjjVjhz5fH1u3dCLWfxisLLsvqGm4h"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 12:02:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,45 +125,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: nsoffer@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SBYMjjVjhz5fH1u3dCLWfxisLLsvqGm4h
+Content-Type: multipart/mixed; boundary="DagZXzHRKhfTu0xU2V737vjBWE6NN5Jjf"
 
-We've faced crash bug, which is reproducing on master branch as well.
-The case is described in 01, where fix is suggested.
-New iotest in 02 crashes without that fix.
+--DagZXzHRKhfTu0xU2V737vjBWE6NN5Jjf
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-v3: resend for convenience, as all preparatory patches are merged.
-01-02: add Eric's r-b and t-b marks
+On 14.07.20 13:08, Kevin Wolf wrote:
+> Am 14.07.2020 um 11:56 hat Max Reitz geschrieben:
+>> On 13.07.20 16:29, Kevin Wolf wrote:
+>>> Am 13.07.2020 um 13:19 hat Max Reitz geschrieben:
+>>>> On 10.07.20 16:21, Kevin Wolf wrote:
+>>>>> Unaligned requests will automatically be aligned to bl.request_alignm=
+ent
+>>>>> and we don't want to extend requests to access space beyond the end o=
+f
+>>>>> the image, so it's required that the image size is aligned.
+>>>>>
+>>>>> With write requests, this could cause assertion failures like this if
+>>>>> RESIZE permissions weren't requested:
+>>>>>
+>>>>> qemu-img: block/io.c:1910: bdrv_co_write_req_prepare: Assertion `end_=
+sector <=3D bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
+>>>>>
+>>>>> This was e.g. triggered by qemu-img converting to a target image with=
+ 4k
+>>>>> request alignment when the image was only aligned to 512 bytes, but n=
+ot
+>>>>> to 4k.
+>>>>>
+>>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>>>> ---
+>>>>>  block.c | 10 ++++++++++
+>>>>>  1 file changed, 10 insertions(+)
+>>>>
+>>>> (I think we had some proposal like this before, but I can=E2=80=99t fi=
+nd it,
+>>>> unfortunately...)
+>>>>
+>>>> I can=E2=80=99t see how with this patch you could create qcow2 images =
+and then
+>>>> use them with direct I/O, because AFAICS, qemu-img create doesn=E2=80=
+=99t allow
+>>>> specifying caching options, so AFAIU you=E2=80=99re stuck with:
+>>>>
+>>>> $ ./qemu-img create -f qcow2 /mnt/tmp/foo.qcow2 1M
+>>>> Formatting '/mnt/tmp/foo.qcow2', fmt=3Dqcow2 cluster_size=3D65536
+>>>> compression_type=3Dzlib size=3D1048576 lazy_refcounts=3Doff refcount_b=
+its=3D16
+>>>>
+>>>> $ sudo ./qemu-io -t none /mnt/tmp/foo.qcow2
+>>>> qemu-io: can't open device /mnt/tmp/foo.qcow2: Image size is not a
+>>>> multiple of request alignment
+>>>>
+>>>> (/mnt/tmp is a filesystem on a =E2=80=9Closetup -b 4096=E2=80=9D devic=
+e.)
+>>>
+>>> Hm, that looks like some regrettable collateral damage...
+>>>
+>>> Well, you could argue that we should be writing full L1 tables with zer=
+o
+>>> padding instead of just the used part. I thought we had fixed this long
+>>> ago. But looks like we haven't.
+>>
+>> That would help for the standard case.  It wouldn=E2=80=99t when the clu=
+ster
+>> size is smaller than the request alignment, which, while maybe not
+>> important, would still be a shame.
+>=20
+> I don't think it would be unreasonable to require a cluster size that is
+> a multiple of the logical block size of your host storage if you want to
+> use O_DIRECT.
 
-====
+True.
 
-This is a crash-fix, so it would be good to fix in 5.1. Still neither
-Eric nor I are sure in patch 01: is AIO_WAIT_WHILE used correctly?
+> But we have unaligned images in practice, so this is pure theory anyway.
 
-====
+Hm.  Maybe it would help to just adjust the error message to instruct
+the user to resize the image to fit the request alignment?  (e.g. =E2=80=9C=
+is
+not a multiple of the request alignment %u (try resizing the image to
+%llu bytes)=E2=80=9D)
 
-Side note: this AIO_WAIT_WHILE may be long, if nbd reconnect is enabled
-and connection failed recently. Still it's another story: I think we
-actually should disable reconnect in bdrv_close, before drain.
+>>> But we should still avoid crashing in other cases, so what is the
+>>> difference between both? Is it just that qcow2 has the RESIZE permissio=
+n
+>>> anyway so it doesn't matter?
+>>
+>> I assume so.
+>>
+>>> If so, maybe attaching to a block node with WRITE, but not RESIZE is
+>>> what needs to fail when the image size is unaligned?
+>>
+>> That sounds reasonable.
+>>
+>> The obvious question is what happens when the RESIZE capability is
+>> removed.  Dropping capabilities may never fail =E2=80=93 I suppose we co=
+uld
+>> force-keep the RESIZE capability for such nodes?
+>=20
+> It's not nice, but I think we already have this kind of behaviour for
+> unlocking failures. So yes, that sounds like an option.
+>=20
+>> Or we could immediately align such files to the block size once they
+>> are opened (with the RESIZE capability).
+>=20
+> Automatically resizing the image file is obviously harmless for qcow2
+> images, but it would be a guest-visible change for raw images. It might
+> be better to avoid this.
 
-Vladimir Sementsov-Ogievskiy (2):
-  nbd: make nbd_export_close_all() synchronous
-  iotests: test shutdown when bitmap is exported through NBD
+Well, it seems to be what already happens if the guest device has taken
+the RESIZE capability (i.e., whenever there=E2=80=99s no failing assertion)=
+.
+The only difference that appears to me is just that it happens only when
+writing to the end of the image instead of unconditionally when opening it.
 
- nbd/server.c               |  8 +++++
- tests/qemu-iotests/299     | 65 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/299.out | 10 ++++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 84 insertions(+)
- create mode 100644 tests/qemu-iotests/299
- create mode 100644 tests/qemu-iotests/299.out
+Max
 
--- 
-2.21.0
+
+--DagZXzHRKhfTu0xU2V737vjBWE6NN5Jjf--
+
+--SBYMjjVjhz5fH1u3dCLWfxisLLsvqGm4h
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8N28gACgkQ9AfbAGHV
+z0DBqwgAj4yFIYAMKsLKSu7iurkzYE7lIThc3SmFL0OJkOEsjHNWjB4yq5J+kjW5
+eP++eZWi8NZ/MHdIuEZI3sRjYFtPcGZz3m3asatx5D940e7ITqQgKI27pPj2SJ9g
+EyECuY+b8TATxoQbbu/fsD31p9hXUPL4QyyVs24YLxvHiIVxmA4b35tqOvJhbY+J
+v02XCZ5ZJBUfLYVSykpdIXIrSr2LkeILj+bqCaKEx2q2ezaXbh5OOUcmCIBm6K90
+67Ebi0i9loAh6Z6ItqgfhgPFIYQby7CJTtG6FFh+dTB2lpaEWJ0Awzp+9nzI9NaM
+Fpr6RaJWOBOMqsYw7lXpamT2FO3JQA==
+=PSEf
+-----END PGP SIGNATURE-----
+
+--SBYMjjVjhz5fH1u3dCLWfxisLLsvqGm4h--
 
 
