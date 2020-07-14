@@ -2,85 +2,92 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE53C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABCCC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42CA1206F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:25:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 090DD206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:21:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JHKsFvlS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42CA1206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d3DX0v4k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 090DD206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvRUA-0007Ur-Gu
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 16:25:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34058)
+	id 1jvRR0-0004V3-BA
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 16:21:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jvRQw-0004mD-QB
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:21:46 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:36557)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jvRQ9-0003Ap-0R
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:20:57 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:40296)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jvRQu-0006Xa-S1
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:21:46 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id h17so6118oie.3
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 13:21:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=v/JxJn/f5c+VU0jMhChoGMEE3awzEh5qpKUL03d6ABc=;
- b=JHKsFvlSOD+Q0wiqFXTbEzWijlXvN5Hwj8AxIk3pvQj16QJTA8YSZAlh8HZDvGED5G
- dtTWQpzb9NBJl6x5+rZO7QVeBU341Ohxp/zVUHx0xxHheBvoP+1muDDfBc2l25fVErru
- HQYTmeTS3UhihRrhOlN5wQFRKIlImdcnvTZePTAMQp/wpe+UTvJ2H2Bzj+K/xZ0eZSWa
- OTPh30hFwfOl76CvnWZn479DeGg1jznFHerhmYLNWButWPYqbZylgak3iru4je3vdtrD
- rc73Kgwj2IR5sOzRN+yQiIQ8UNr7d20qpuHs/1nwRvkjZ4+9dcBJ/TDPpLtYYA6Qq90P
- Qxwg==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jvRQ7-0006Td-DU
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:20:56 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id f2so32760wrp.7
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 13:20:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nlUGA/l9KHjOACUxwV12D0UYc6yzxeVSlKZBFjnWV4w=;
+ b=d3DX0v4kk5uaBV9xetFw+5p504+Wt+hQMii/Ch3MrNCISkYd8ZBB0WaF0lAra1hVKD
+ zQ4WwDP7gBgArR5SChE4hobe4jYdLmn6s+rem/ZdOiimckpG6ZoJaTFjpvCvhsX4LGbP
+ ltjicr7qBi58mlUYduVpGZ2KzAUzWNhci9QpnAF5PrIZg1FD/VZrNAcnNNDFCvJZoPum
+ j35TqGu97mFR2N3O8zRoviv6den3wEkeysxjXlUMC93mYLEDtovVdTE03IcMnU52x2lK
+ EI1yaPm47yRCGbI4IIwtMohCORF7lnDDxnchS+RrNoRZ3K8peCZer7nw+BeLyAvKMytx
+ pq3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=v/JxJn/f5c+VU0jMhChoGMEE3awzEh5qpKUL03d6ABc=;
- b=BFhExdwfUleS+dCEI/NmV4BhfeTQ7AYbrOkARpw7QlQQZEwpMno/baYgmpOsZUcaeT
- Syb+FZMxxk0HCRxEwAtAOHmBojP7SZX9JJQVhQOFaMKxjPrxw5i/5LhWYEVC6Z9PpREc
- Fictv8tPqbLc3BdYQ7jRx+l4JIk43RGdfRORhOf5yrsXyn56OUw7RQrxiMpcMQi+imvA
- dZaYbhQSknWGTOaPNGXfCdUEVP764bPf7vPnJJAkoy+6KxVX15NNmC0VkLkOCv0SABeI
- /ZTrzezaIYMtEMajiFChBcaiQh27IBj2mr7uj1fSEHe+rayPJKBIWdYNdkqh/LkJnh/T
- +Z3g==
-X-Gm-Message-State: AOAM533TVkxG+5+GODp6QHJHZwD/Z9usYdhFFwQ6bTh/EFHSZgXm4RxJ
- TnHYe9qccwdKXOKN3TUGNupQHQ9zHlziG+RjimSc6LrG
-X-Google-Smtp-Source: ABdhPJzSQq4WbHtTaWkTAsYz0+vpF1PqHfbLHCU8bmaNe6J4YzwuCn8Kmlnubip3s4mYyhh0yu34nM+HW0xjkRh8U+o=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr4854447oix.48.1594758103289;
- Tue, 14 Jul 2020 13:21:43 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=nlUGA/l9KHjOACUxwV12D0UYc6yzxeVSlKZBFjnWV4w=;
+ b=hjTCP7DZLGYEi6xHEmWXFypoNi/T1sqX7LmJkyvCOmQPOt7K3wE7Q8+VaLWl6HkRp3
+ 5WLQhcVHRbHv7ya6vOrBSu5mE+OR2Q7jhL+Xm941gzYdLuqoAAmO/qpnarvhx6t7T0hJ
+ cgWfMM3KBcftitzb1+Kjb0dJiHfRr8asJD4pCG2penf1p20sm98IzYgKmx+7BECslgqY
+ AatBHIoLYQE75Q+9Rd94vk3Q17uXoJxhqTIews18AN/qs76jdcb1BdtWKu3IxC6T+usm
+ n1PvfopZL2Ej1AELHTz+FV6dpUw8rzaw3cyh/I9kjdMY/2SBeq58kmlphuCf9WvNQBn8
+ o22w==
+X-Gm-Message-State: AOAM533MCuygebyurhd9ew8TRP833lDeUFKNkQe9O1Tn9ADw5iX3QnqW
+ k51Cf2S7+UuENx2NwwLizO215gJ/IC8=
+X-Google-Smtp-Source: ABdhPJwnxwXDKRHFUTWpO5uZeUDn3vgzfxNMm1rH/mgZxkJk3fjUkvMMXwQUYh/FgZDHkBTSvbAKRQ==
+X-Received: by 2002:adf:8024:: with SMTP id 33mr8196331wrk.117.1594758053292; 
+ Tue, 14 Jul 2020 13:20:53 -0700 (PDT)
+Received: from localhost.localdomain
+ (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id 138sm7245217wmb.1.2020.07.14.13.20.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jul 2020 13:20:52 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/3] MIPS patches for 5.1
+Date: Tue, 14 Jul 2020 22:20:48 +0200
+Message-Id: <20200714202051.13549-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <20200714073259.1464675-1-laurent@vivier.eu>
-In-Reply-To: <20200714073259.1464675-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Jul 2020 21:21:32 +0100
-Message-ID: <CAFEAcA_73OwotpmtEOeqwf2_B9CGvjeJoroBbxiZvb6Aker4tA@mail.gmail.com>
-Subject: Re: [PULL 0/7] Linux user for 5.1 patches
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22c;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22c.google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,39 +100,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jul 2020 at 08:34, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit 5c65b1f135ff09d24827fa3a17e56a4f8a032cd5:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200713' into staging (2020-07-13 15:14:48 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-5.1-pull-request
->
-> for you to fetch changes up to 42b16184d016d48d167229a1ddb89b3671c77440:
->
->   linux-user: fix print_syscall_err() when syscall returned value is negative (2020-07-14 09:29:14 +0200)
->
-> ----------------------------------------------------------------
-> linux-user branch 20200714
->
-> Fix strace errno management
-> Fix Coverity erros in ioctl straces
-> Fix some netlinks errors
-> Fix semtimedop
->
+The following changes since commit 1a53dfee92284d3016a579ef31d53367e84d9dd8:
 
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2020-07-13' into staging (2020-07-14 13:52:10 +0100)
 
-Applied, thanks.
+are available in the Git repository at:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
+  https://gitlab.com/philmd/qemu.git tags/mips-next-20200714
 
--- PMM
+for you to fetch changes up to 15d983dee95edff1dc4c0bed71ce02fff877e766:
+
+  MAINTAINERS: Adjust MIPS maintainership (add Huacai Chen & Jiaxun Yang) (2020-07-14 21:49:33 +0200)
+
+----------------------------------------------------------------
+MIPS patches for 5.1
+
+- A pair of fixes,
+- Add Huacai Chen as MIPS KVM maintainer,
+- Add Jiaxun Yang as designated MIPS TCG reviewer.
+
+CI jobs results:
+. https://travis-ci.org/github/philmd/qemu/builds/708079271
+. https://gitlab.com/philmd/qemu/-/pipelines/166528104
+. https://cirrus-ci.com/build/6483996878045184
+
+----------------------------------------------------------------
+
+Aleksandar Markovic (2):
+  target/mips: Remove identical if/else branches
+  MAINTAINERS: Adjust MIPS maintainership (add Huacai Chen & Jiaxun
+    Yang)
+
+Alex Richardson (1):
+  target/mips: Fix ADD.S FPU instruction
+
+ target/mips/cp0_helper.c | 9 +--------
+ target/mips/fpu_helper.c | 2 +-
+ MAINTAINERS              | 4 ++++
+ 3 files changed, 6 insertions(+), 9 deletions(-)
+
+-- 
+2.21.3
+
 
