@@ -3,98 +3,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC3FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:22:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEC0C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 578992242C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:22:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BB1A22280
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:32:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yuvf0Smk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 578992242C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="irP91iMc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB1A22280
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvKtI-0002fT-Jt
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 09:22:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54090)
+	id 1jvL2N-0007h3-Dy
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 09:31:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jvKsi-0002Cw-RR
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:22:00 -0400
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:39744)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jvKsg-00070G-9Y
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:22:00 -0400
-Received: by mail-pg1-x52e.google.com with SMTP id z5so7589807pgb.6
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 06:21:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HQ/jqj4l+Y6oRDJ+E+cXtneIopr0U6a/vMKRts+AgyQ=;
- b=Yuvf0SmkiTBUm8EWqBEX1goVpgXMF1dP17uDlneO3H4rqLmEvrZkH7Tmlt2JbZR21a
- 7vaJs3p98iPgF06RBoZ4rBC8t3S+jxe/nPPqiFabtTPxFPdKYP6awzlz/Yoo6zAdLRud
- cJ03SJ6uDR+3IwHsmVL9jZHR0MSu/w9Xkcu8id/++mSQDj5/ifXdLursSPCPfldG+NjO
- gOvZ9FNAI/YS+wlE6kI/WtRVS1W9pBOK0WVT/clZELTnbLNP/dsxFFMzqmK39WckyiqL
- 228IwbJBZrvTyq80WtUqHiF0jn5tiZcESrV0pyQKHLhoi930TofNLL6H2JPQ/g1gQqO9
- XNBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HQ/jqj4l+Y6oRDJ+E+cXtneIopr0U6a/vMKRts+AgyQ=;
- b=gzMFTv6dg9704pxa4D14SZ6bx0ttgZnDCAXDCf5KGR0SDRVQ07muGF3m5uexR5DA8g
- jiV4iSHYgxMPNRyYeddr02LC1pNyiAPZl25d4XQg/K7JZ3Oxk/Kwm0cnNCKTIePx2JZN
- XZ4stDT7Qagmw5oWLeengDk2B4sCluLXRp9hK3ne3nCk1L/yzE32OhJfWOYOHcBOqF3L
- lqk6+uUe7vL1kJBYW0yaDwQ8DghvmnVsiwTkXEfz2SUj1naLTzuC134un3fL3TUr0npI
- Go6OV4qU+HbiBbpe2V07JtDY8XSliHDWzHjsT6BM4LdVRbeWTIbnN3LDsFPV1annbhWW
- j+6A==
-X-Gm-Message-State: AOAM532BOVUWVQ2P+j6U8ze6SEBxoZrZug3o4gVtQxhZbKcLyBrtR4dF
- wy+lXTQ6qEezVqwe4GoZ6D90qQ==
-X-Google-Smtp-Source: ABdhPJzb0qXTVg6C3sgzI7U7BhyJIMGcTiEiyUk5fQiQMCEaXZH/ZRvk0zHKkrfc7L+USB173Z6qdQ==
-X-Received: by 2002:a63:e60b:: with SMTP id g11mr3523842pgh.188.1594732916207; 
- Tue, 14 Jul 2020 06:21:56 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id e191sm17319155pfh.42.2020.07.14.06.21.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 06:21:55 -0700 (PDT)
-Subject: Re: [RFC 05/65] target/riscv: remove vsll.vi, vsrl.vi, vsra.vi insns
- from using gvec
-To: Frank Chang <frank.chang@sifive.com>
-References: <20200710104920.13550-1-frank.chang@sifive.com>
- <20200710104920.13550-6-frank.chang@sifive.com>
- <452e8bc7-4622-77c2-ec81-9aa6f25705fc@linaro.org>
- <CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0ccc7311-02f4-821f-6272-73ab600a8cda@linaro.org>
-Date: Tue, 14 Jul 2020 06:21:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvL1L-0006OM-PY
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:30:55 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33378
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvL1I-0008GH-TK
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:30:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594733451;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=tialLkh8pgx8clCmqzYXrMqwYmrrkhzfrNyZzgw9jjs=;
+ b=irP91iMc+kDxf1TS846Dkk4aaRY/QOHheArWwtr/a5mWd6NkvuEeLoWtZJAGrX/vUwUeoJ
+ qkSkNim7STJz00sxqQ8lOvZcLYAODevjcUfGzlkxkS83RZLdDs+7B087IkmkjKyhJmrLzs
+ bhP6ABY+tVcy307JHn+yQv2NYC20uSg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-B1hVY583PXyzKiahcLFkfQ-1; Tue, 14 Jul 2020 09:30:40 -0400
+X-MC-Unique: B1hVY583PXyzKiahcLFkfQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57CC980BCBD;
+ Tue, 14 Jul 2020 13:30:38 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ADA545FC31;
+ Tue, 14 Jul 2020 13:30:23 +0000 (UTC)
+Date: Tue, 14 Jul 2020 14:30:21 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 1/1] MAINTAINERS: introduce cve or security quotient field
+Message-ID: <20200714133021.GF25187@redhat.com>
+References: <20200714083631.888605-1-ppandit@redhat.com>
+ <20200714083631.888605-2-ppandit@redhat.com>
+ <CAFEAcA9QWLmi1fGuPW93GXFKV2KCwNs6Xp3U9MU2r4wtendzhg@mail.gmail.com>
+ <20200714095233.GC25187@redhat.com>
+ <20200714060916-mutt-send-email-mst@kernel.org>
+ <CAFEAcA_ca4JN655GW=eGyjrjDmiv0EktaZZ7RMghO5rBwm9tGQ@mail.gmail.com>
+ <20200714064921-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com>
+In-Reply-To: <20200714064921-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52e;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,46 +100,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, P J P <ppandit@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/13/20 7:59 PM, Frank Chang wrote:
-> The latest spec specified:
+On Tue, Jul 14, 2020 at 07:02:59AM -0400, Michael S. Tsirkin wrote:
+> On Tue, Jul 14, 2020 at 11:22:28AM +0100, Peter Maydell wrote:
+> > On Tue, 14 Jul 2020 at 11:12, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > And for people who want to build QEMU with lots of functionality (like
+> > > Fedora does), I think a -security flag would be a useful addition.
+> > > We can then tell security researchers "only a high security issue
+> > > if it reproduces with -security=high, only a security issue
+> > > if it reproduces with -security=low".
+> > 
+> > I think a -security option would also be useful to users -- it
+> > makes it easier for them to check "is this configuration using
+> > something that I didn't realize was not intended to be secure".
+> > For me, something useful for our users is much more compelling
+> > than "this might make security researchers' lives a bit easier".
+> > 
+> > thanks
+> > -- PMM
 > 
-> Only the low *lg2(SEW) bits* are read to obtain the shift amount from a
-> *register value*.
-> The *immediate* is treated as an *unsigned shift amount*, with a *maximum shift
-> amount of 31*.
+> True. And I guess downstreams can also force the option to high or set the
+> default to high rather easily if they want to.
+> 
+> So the option would be:
+> 
+> -security level
+> 	Set minimal required security level of QEMU.
+> 
+> 	high: block use of QEMU functionality which is intended to be secure against
+> 		malicious guests.
+> 	low: allow use of all QEMU functionality, best effort security
+> 		against malicious guests.
+> 
+> Default would be -security low.
+> 
+> Does this look reasonable?
 
-Which, I hope you will agree is underspecified, and should be reported as a bug
-in the manual.
+The challenge I see is that wiring up a runtime flag into every relevant
+part of the QEMU codebase is an pretty large amount of work. Every device,
+every machine type, every backend type, every generic subsystem will all
+need checks for this flag. It is possible, but it isn't going to be quick
+or easy, especially with poor error reporting support in many areas.
 
-> Looks like the shift amount in the immediate value is not relevant with SEW
-> setting.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-How can it not be?  It is when the value comes from a register...
-
-> If so, is it better to just use do_opivi_gvec() and implement the logic by our
-> own rather than using gvec IR?
-
-No, it is not.  What is the logic you would apply on your own?  There should be
-a right answer.
-
-If the answer is that out-of-range shift produces zero, which some
-architectures use, then you can look at the immediate value, see that you must
-supply zero, and then fill the vector with zeros from translate.  You need not
-call a helper to perform N shifts when you know the result a-priori.
-
-If the answer is that shift values are truncated, which riscv uses *everywhere
-else*, then you should truncate the immediate value during translate.
-
-
-r~
 
