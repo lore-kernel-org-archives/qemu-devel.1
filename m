@@ -7,72 +7,70 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42067C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:15:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF0AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:20:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9B742065D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:15:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 923B320773
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:20:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JHqB+0cH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B742065D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxfZsBze"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 923B320773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvCLg-00031h-92
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 00:15:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34208)
+	id 1jvCR8-0005Oc-TD
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 00:20:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvCL7-0002bw-0I
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:14:45 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25635
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvCQP-0004SI-L4
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:20:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49721
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvCL4-000722-5y
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:14:44 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvCQO-0007dq-2B
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:20:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594700081;
+ s=mimecast20190719; t=1594700410;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=0T570xxamcTyCkniSz0e1NtIHgv/b2WWocqPrIKvv0w=;
- b=JHqB+0cHsvrnw7fiUutRrBVImLZkyA3qluJxaAv/bUjwwT7lPP79dg+n9GyInnWJ2i5tbT
- yq31uSgGVZH1hGfXjzOrb5Qr50RBrxcv3VcQXnMcUvvxhiBnm560kvMPRbt9NPZige0h0g
- Ej+kKscOKnJFgNDk+k9qXL9Ppx8Ljzk=
+ bh=p6i250nFGdu2A20Ms2PLEnT1nrV7PGv9PirpChT/iL8=;
+ b=TxfZsBzeVfQ4H1Q/DIIhZVc4D/j5ju4iJZJN4bQ1hR3BZo7WDhHYGS0wN27lKEAlCVQUQX
+ 8O9dFsvypzvqMWpyNe504JdqrvBfMq+zZ8LOqjW9Hno1IA5q3vRv82Lky7hbqAtwyh0luN
+ 34HQ7PlHH/Nrq26h6N/Isx6Ryz2a1Fc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-Ioa0Ky7YM7-F_ViCYvjboQ-1; Tue, 14 Jul 2020 00:14:38 -0400
-X-MC-Unique: Ioa0Ky7YM7-F_ViCYvjboQ-1
+ us-mta-409-saOGRP5dNW-KdElSI82hEA-1; Tue, 14 Jul 2020 00:20:08 -0400
+X-MC-Unique: saOGRP5dNW-KdElSI82hEA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 676E1800400;
- Tue, 14 Jul 2020 04:14:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 188631080;
+ Tue, 14 Jul 2020 04:20:07 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-112-247.rdu2.redhat.com
  [10.10.112.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8404F5C679;
- Tue, 14 Jul 2020 04:14:33 +0000 (UTC)
-Date: Tue, 14 Jul 2020 00:14:31 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F41215C6DD;
+ Tue, 14 Jul 2020 04:20:01 +0000 (UTC)
+Date: Tue, 14 Jul 2020 00:20:00 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 11/12] python/machine.py: re-add sigkill warning
- suppression
-Message-ID: <20200714041431.GI2983508@localhost.localdomain>
+Subject: Re: [PATCH v5 12/12] python/machine.py: change default wait timeout
+ to 3 seconds
+Message-ID: <20200714042000.GJ2983508@localhost.localdomain>
 References: <20200710050649.32434-1-jsnow@redhat.com>
- <20200710050649.32434-12-jsnow@redhat.com>
+ <20200710050649.32434-13-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200710050649.32434-12-jsnow@redhat.com>
+In-Reply-To: <20200710050649.32434-13-jsnow@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ZOudaV4lSIjFTlHv"
+ protocol="application/pgp-signature"; boundary="UlxN1C6awaFNesUv"
 Content-Disposition: inline
 Received-SPF: pass client-ip=207.211.31.81; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -108,43 +106,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ZOudaV4lSIjFTlHv
+--UlxN1C6awaFNesUv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 10, 2020 at 01:06:48AM -0400, John Snow wrote:
-> If the user kills QEMU on purpose, we don't need to warn them about that
-> having happened: they know already.
+On Fri, Jul 10, 2020 at 01:06:49AM -0400, John Snow wrote:
+> Machine.wait() does not appear to be used except in the acceptance tests,
+> and an infinite timeout by default in a test suite is not the most helpfu=
+l.
+>=20
+> Change it to 3 seconds, like the default shutdown timeout.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  python/qemu/machine.py | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  python/qemu/machine.py | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Well, for the acceptance tests, there's usually a test wide timeout,
+but this is indeed a good idea!
 
---ZOudaV4lSIjFTlHv
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
+
+--UlxN1C6awaFNesUv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8NMScACgkQZX6NM6Xy
-CfPqdRAAvB4yRX+FwBsK7e90kkmRnc/nk/RzF5cFhOvYofaGDccaYlWR7FmYq36i
-+E1CEQtForCbSbC33hXl1q+N3OoegsTS+9VO7206LZHGvBayJCiMKgFXmei3UsUM
-xyNmhm6TlvPKvBW6CsY9VcwxyR6CbnSRyvg4NtOYtJ1SFvvUs6hPSph5gqVV6Zvg
-gq1TW8GXrxD5u6A6YjEZ80r1Ka4Ipvg2hfHcbo/Puaq/dM74BB/MFNYKLHFxw5DR
-Zy0x6w8bRRZU9Bbimj2Sf7qHVbcg04cHelLPiO2NgBDVMFKxgOhPT+6zzEfkkYrL
-9M1FE1xbU0wVB/oYL3/RwPbiMEKxiCkOAwVdHZzH0Y9sgedt/nINc8fbh9NjcY5v
-oLWlRws3ljBX3/G4mxrStx2ayS+ArFxjBkJ5y8Cu6Dt694LQdEQuRk2PXUVVzIeo
-C6dQieuIpPhywS2UVv2qy8F/VRAj/c57lxrRt6OIXsYbDHQd9e19svEtyi0e09UM
-+WgpOMekFtlyQle/g0UONWeXCfNCkZ/lGA3t9QxXYM/oqP/V/HmNHarM0K8Hbj9R
-bux4XTO5LOD0hCJsuZ2Je1sT6T1UvpCLHo5g50RD1KIHxFoyRiGjW6XQpqJRG5YL
-4ItHTSbjwwNyuyXXDJdnLFN1+Q9i1q8wGKTbngzIrNdfSCmrSQw=
-=hrXS
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8NMm0ACgkQZX6NM6Xy
+CfP3Hg/8CU/AUQkvmH3xV7saG/csyI6Kxnw954y2z0HmcqM4reN1xCzLyR5XlBaK
+SSs6A3KXzrzUqU3ZXbbDJQqF6FrphuO1X1XhiHbn7XSVf3UAeq8b+ttCcS5JzOt3
+U165dbZrGFzmgs0h2skNalP0LpMTLvoRkb+r/lZ5XMUW1suvG2xzVcWX6ta0Lbcq
+8CzV5v9KpA1bWzg0yuEVSspX2KviC7/EiRsOOwZz5mlxutmh2gqZJGgUme4pUbYE
+JKHCjZg4IJNrEbTAhJb4bAqsE8JuQa8Glht2J9GlnBB2KV2ke7aYL6iX6U9Uq/9A
+EdlUElYRbpXJDJG5SRiyZ5WEmNXeRYdwfzw3Tq7fvC8hWB9zr2ha4H8TB+3Qx5+B
+gGQtNUYbrL8sUIlkknmKscepRjAdLhqntv0cuqCCMDfIf3CpQPCj+7bQJigO4/wz
+OQrCMWjDjhGj40h28vyBH4TPcy8EsQNcx9f85rRBl0fIdkLjpoEoH0atfOntVTrU
+NoBNpCDzAWrRPEW58QKq9YbmAiJCEmreTeytcVbMIiIO9Knaa4ePI2fHxV1R5b4x
+lbbU+if1jxIHHawN5C4BHkIBPKz1oTv0BeU2jwN5nrP0yneDFKFbn+W13XlFj9gs
+vK2VvKZnKYfCcnN1eDStVryWZZTbD0VXZv1dglU9p4zTEZe6Cxo=
+=ROhS
 -----END PGP SIGNATURE-----
 
---ZOudaV4lSIjFTlHv--
+--UlxN1C6awaFNesUv--
 
 
