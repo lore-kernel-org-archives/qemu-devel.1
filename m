@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E03C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:34:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8D9C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:35:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65DD822AB9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:34:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 102ED2064B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:35:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="MJQ8dcD0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65DD822AB9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="Wk2PQKJw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102ED2064B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvQhE-0003G0-LM
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 15:34:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46982)
+	id 1jvReb-0003Bd-BJ
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 16:35:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jvQgK-0002Ul-Ia
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:33:36 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:20491)
+ id 1jvRdf-0002iZ-PC
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:34:55 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:18784)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jvQgC-0007IR-P8
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:33:36 -0400
+ id 1jvRdZ-0000Ux-9N
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:34:55 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1594755209; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1594758888; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=so7LSiAJkTnsy1pR8KKooMWOQDpm/DDPbAxw3gj2vKg=;
- b=MJQ8dcD0OQa8S8c0DjL1V7HW+uW6kiyJ2Kob+DQQSqTOuQWt4ysGQnJAKt3IiqwQsla/Vmlk
- GjVMdV+h+traZNnH2CjvGnrgL74RwXe86MfdcZ8PE9LNg7/4CugQ79HX+6c2XU3vLlS60Utb
- C2QDFS9cGncFT1Tc3emc7K2Izd8=
+ Sender; bh=HrE8JEZK6tAbSp5INLPuK4JNWoZAfQUuHUtTcyxlQ4g=;
+ b=Wk2PQKJwwdQ9vcL0+G/S/KdZUh7gYKiKMqYbz/8x8VSn8C7tQ6pLMbP0LHQodh/59XcVwADD
+ dog+L8RDHOZ9q6CGDtCxLiIQ7ZksUqlnF3ROUAS3yWVqZNueN1Qs2/xBC9xAXeYVbXaLLtw/
+ U7jZaKP6fq6wsT9M0Pu7mJVIYI4=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (64.90.74.34.bc.googleusercontent.com
- [34.74.90.64]) by smtp-out-n20.prod.us-west-2.postgun.com with SMTP id
- 5f0e087e1012768490adadd7 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Tue, 14 Jul 2020 19:33:18 GMT
-Date: Tue, 14 Jul 2020 19:33:17 +0000
-Message-ID: <5f0e087d640fe_508f3f90e5bce9d016423a@sidekiq-catchall-01-sv-gprd.mail>
-Subject: QEMU | Pipeline #166560423 has failed for master | d2628b1e
+Received: from mg.gitlab.com (66.90.74.34.bc.googleusercontent.com
+ [34.74.90.66]) by smtp-out-n07.prod.us-west-2.postgun.com with SMTP id
+ 5f0e16e7ee866185752a597b (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Tue, 14 Jul 2020 20:34:47 GMT
+Date: Tue, 14 Jul 2020 20:34:45 +0000
+Message-ID: <5f0e16e5c205d_32143fdb46431668256960@sidekiq-catchall-02-sv-gprd.mail>
+Subject: QEMU | Pipeline #166584176 has failed for master | 8bfa25a4
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5f0e087d49c4e_508f3f90e5bce9d01641e7";
+ boundary="--==_mimepart_5f0e16e556075_32143fdb46431668256881";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 166560423
+X-GitLab-Pipeline-Id: 166584176
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -99,7 +99,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5f0e087d49c4e_508f3f90e5bce9d01641e7
+----==_mimepart_5f0e16e556075_32143fdb46431668256881
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,389 +111,33 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: d2628b1e ( https://gitlab.com/qemu-project/qemu/-/commit/d2628b1e=
-b761a5fbf08f367da405eb3314a1f068 )
-Commit Message: Merge remote-tracking branch 'remotes/kevin/tag...
+Commit: 8bfa25a4 ( https://gitlab.com/qemu-project/qemu/-/commit/8bfa25a4=
+6ff1082f75e7052875b5d435119dcf49 )
+Commit Message: Merge remote-tracking branch 'remotes/vivier2/t...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #166560423 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
-6560423 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #166584176 ( https://gitlab.com/qemu-project/qemu/-/pipelines/16=
+6584176 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 23 failed builds.
 
-Job #638541754 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541754/ra=
+Job #638652412 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652412/ra=
 w )
 
 Stage: containers-layer2
 Name: ppc64-debian-cross-container
-Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/2] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-ppc64-cross', '-f', '/tmp/docker_build6rx_0icu/tmp02aydtre.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build6rx_0icu']=
-' returned non-zero exit status 1.
-section_end:1594755192:step_script
-=1B[0Ksection_start:1594755192:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755193:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
 
-Job #638541745 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541745/ra=
-w )
-
-Stage: containers-layer2
-Name: mipsel-debian-cross-container
-Trace: #4 [1/5] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/5] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-mipsel-cross', '-f', '/tmp/docker_buildzsykle3v/tmpb1bxlt3r.docker'=
-, '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildzsykle3v'=
-]' returned non-zero exit status 1.
-section_end:1594755191:step_script
-=1B[0Ksection_start:1594755191:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755191:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541733 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541733/ra=
-w )
-
-Stage: containers-layer2
-Name: m68k-debian-cross-container
-Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/2] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-m68k-cross', '-f', '/tmp/docker_buildid1rni7o/tmp41ri7kp5.docker', =
-'--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildid1rni7o']'=
- returned non-zero exit status 1.
-section_end:1594755190:step_script
-=1B[0Ksection_start:1594755190:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755190:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541730 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541730/ra=
-w )
-
-Stage: containers-layer2
-Name: hppa-debian-cross-container
-Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/2] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-hppa-cross', '-f', '/tmp/docker_builds_lo5u_p/tmptj085hb0.docker', =
-'--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_builds_lo5u_p']'=
- returned non-zero exit status 1.
-section_end:1594755189:step_script
-=1B[0Ksection_start:1594755189:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755190:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541703 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541703/ra=
-w )
-
-Stage: containers-layer2
-Name: arm64-debian-cross-container
-Trace: #4 [1/5] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/5] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-arm64-cross', '-f', '/tmp/docker_buildr2lrecps/tmpq9rjp0pk.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildr2lrecps']=
-' returned non-zero exit status 1.
-section_end:1594755189:step_script
-=1B[0Ksection_start:1594755189:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755190:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541726 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541726/ra=
-w )
-
-Stage: containers-layer2
-Name: armhf-debian-cross-container
-Trace: #4 [1/5] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/5] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-armhf-cross', '-f', '/tmp/docker_buildx9r8ym37/tmpym3la16c.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildx9r8ym37']=
-' returned non-zero exit status 1.
-section_end:1594755188:step_script
-=1B[0Ksection_start:1594755188:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755189:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541741 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541741/ra=
-w )
-
-Stage: containers-layer2
-Name: mips-debian-cross-container
-Trace: #4 [1/5] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/5] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-mips-cross', '-f', '/tmp/docker_buildak1s31sm/tmp7fm_iwoa.docker', =
-'--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildak1s31sm']'=
- returned non-zero exit status 1.
-section_end:1594755188:step_script
-=1B[0Ksection_start:1594755188:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755189:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541766 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541766/ra=
-w )
-
-Stage: containers-layer2
-Name: riscv64-debian-cross-container
-Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/2] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-riscv64-cross', '-f', '/tmp/docker_build25crpzc2/tmpmkb3kkxf.docker=
-', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build25crpzc2=
-']' returned non-zero exit status 1.
-section_end:1594755186:step_script
-=1B[0Ksection_start:1594755186:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755187:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541699 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541699/ra=
+Job #638652394 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652394/ra=
 w )
 
 Stage: containers-layer2
 Name: amd64-debian-container
-Trace: #4 [1/11] FROM docker.io/qemu/debian10:latest
+
+Job #638652399 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652399/ra=
+w )
+
+Stage: containers-layer2
+Name: armhf-debian-cross-container
+Trace: #4 resolve docker.io/qemu/debian10:latest
 #4 resolve docker.io/qemu/debian10:latest 0.1s done
 #4 ERROR: pull access denied, repository does not exist or may require au=
 thorization: server message: insufficient_scope: authorization failed
@@ -501,7 +145,7 @@ thorization: server message: insufficient_scope: authorization failed
  > [internal] load metadata for docker.io/qemu/debian10:latest:
 ------
 ------
- > [1/11] FROM docker.io/qemu/debian10:latest:
+ > [1/5] FROM docker.io/qemu/debian10:latest:
 ------
 failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
 to load cache key: pull access denied, repository does not exist or may r=
@@ -521,20 +165,20 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-amd64', '-f', '/tmp/docker_buildzg_fr17b/tmpz__joyn1.docker', '--bu=
-ild-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildzg_fr17b']' retu=
-rned non-zero exit status 1.
-section_end:1594755186:step_script
-=1B[0Ksection_start:1594755186:after_script
+ebian-armhf-cross', '-f', '/tmp/docker_build0si09ye6/tmpk8wtpbmb.docker',=
+ '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build0si09ye6']=
+' returned non-zero exit status 1.
+section_end:1594758868:step_script
+=1B[0Ksection_start:1594758868:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755186:after_script
+section_end:1594758869:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
-Job #638541771 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541771/ra=
+Job #638652417 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652417/ra=
 w )
 
 Stage: containers-layer2
@@ -567,20 +211,20 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-s390x-cross', '-f', '/tmp/docker_build87ecrrmp/tmpaizt0ixi.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build87ecrrmp']=
+ebian-s390x-cross', '-f', '/tmp/docker_buildceueynzb/tmp0fsyck82.docker',=
+ '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildceueynzb']=
 ' returned non-zero exit status 1.
-section_end:1594755186:step_script
-=1B[0Ksection_start:1594755186:after_script
+section_end:1594758868:step_script
+=1B[0Ksection_start:1594758868:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755186:after_script
+section_end:1594758869:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
-Job #638541721 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541721/ra=
+Job #638652398 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652398/ra=
 w )
 
 Stage: containers-layer2
@@ -613,296 +257,20 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-armel-cross', '-f', '/tmp/docker_buildlga392qw/tmppdo34q6f.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildlga392qw']=
+ebian-armel-cross', '-f', '/tmp/docker_buildjqdwxis_/tmptqb00pva.docker',=
+ '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildjqdwxis_']=
 ' returned non-zero exit status 1.
-section_end:1594755185:step_script
-=1B[0Ksection_start:1594755185:after_script
+section_end:1594758868:step_script
+=1B[0Ksection_start:1594758868:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755186:after_script
+section_end:1594758869:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
-Job #638541773 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541773/ra=
-w )
-
-Stage: containers-layer2
-Name: sh4-debian-cross-container
-Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/2] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-sh4-cross', '-f', '/tmp/docker_buildu05d7rfh/tmp6cm1i62l.docker', '=
---build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildu05d7rfh']' =
-returned non-zero exit status 1.
-section_end:1594755185:step_script
-=1B[0Ksection_start:1594755185:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755185:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541693 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541693/ra=
-w )
-
-Stage: containers-layer2
-Name: amd64-debian-cross-container
-Trace: #4 [1/4] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/4] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-amd64-cross', '-f', '/tmp/docker_buildomgli7uy/tmpmegqfh03.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildomgli7uy']=
-' returned non-zero exit status 1.
-section_end:1594755185:step_script
-=1B[0Ksection_start:1594755185:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755185:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541776 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541776/ra=
-w )
-
-Stage: containers-layer2
-Name: sparc64-debian-cross-container
-Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/2] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-sparc64-cross', '-f', '/tmp/docker_build8crzj921/tmpvhlduzmo.docker=
-', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build8crzj921=
-']' returned non-zero exit status 1.
-section_end:1594755185:step_script
-=1B[0Ksection_start:1594755185:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755185:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541760 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541760/ra=
-w )
-
-Stage: containers-layer2
-Name: ppc64el-debian-cross-container
-Trace: #4 [1/4] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/4] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-ppc64el-cross', '-f', '/tmp/docker_buildcfhfc3v8/tmpugfld7_u.docker=
-', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildcfhfc3v8=
-']' returned non-zero exit status 1.
-section_end:1594755184:step_script
-=1B[0Ksection_start:1594755184:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755185:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541750 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541750/ra=
-w )
-
-Stage: containers-layer2
-Name: powerpc-debian-cross-container
-Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/2] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-powerpc-cross', '-f', '/tmp/docker_buildm3u3ubkz/tmp2ovjai88.docker=
-', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildm3u3ubkz=
-']' returned non-zero exit status 1.
-section_end:1594755184:step_script
-=1B[0Ksection_start:1594755184:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755185:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541738 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541738/ra=
-w )
-
-Stage: containers-layer2
-Name: mips64el-debian-cross-container
-Trace: #4 [1/4] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/4] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-mips64el-cross', '-f', '/tmp/docker_builde18wp6ly/tmp_fszpgvi.docke=
-r', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_builde18wp6l=
-y']' returned non-zero exit status 1.
-section_end:1594755183:step_script
-=1B[0Ksection_start:1594755183:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755184:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541689 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541689/ra=
+Job #638652389 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652389/ra=
 w )
 
 Stage: containers-layer2
@@ -935,20 +303,250 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-alpha-cross', '-f', '/tmp/docker_build4o3eereh/tmp3okwttaz.docker',=
- '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build4o3eereh']=
+ebian-alpha-cross', '-f', '/tmp/docker_build7p22p7ms/tmpqoqscw9a.docker',=
+ '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build7p22p7ms']=
 ' returned non-zero exit status 1.
-section_end:1594755183:step_script
-=1B[0Ksection_start:1594755183:after_script
+section_end:1594758868:step_script
+=1B[0Ksection_start:1594758868:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755184:after_script
+section_end:1594758869:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
-Job #638541735 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541735/ra=
+Job #638652392 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652392/ra=
+w )
+
+Stage: containers-layer2
+Name: amd64-debian-user-cross-container
+Trace: #4 resolve docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/3] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-all-test-cross', '-f', '/tmp/docker_buildgr1sq6qd/tmpea76vm19.docke=
+r', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildgr1sq6q=
+d']' returned non-zero exit status 1.
+section_end:1594758867:step_script
+=1B[0Ksection_start:1594758867:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758868:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652400 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652400/ra=
+w )
+
+Stage: containers-layer2
+Name: hppa-debian-cross-container
+Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/2] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-hppa-cross', '-f', '/tmp/docker_build_yq0gj9e/tmpv4caday0.docker', =
+'--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build_yq0gj9e']'=
+ returned non-zero exit status 1.
+section_end:1594758867:step_script
+=1B[0Ksection_start:1594758867:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758867:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652408 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652408/ra=
+w )
+
+Stage: containers-layer2
+Name: mipsel-debian-cross-container
+Trace: #4 [1/5] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/5] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-mipsel-cross', '-f', '/tmp/docker_buildqh53i_ra/tmps3_v2p6t.docker'=
+, '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildqh53i_ra'=
+]' returned non-zero exit status 1.
+section_end:1594758866:step_script
+=1B[0Ksection_start:1594758866:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758867:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652416 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652416/ra=
+w )
+
+Stage: containers-layer2
+Name: riscv64-debian-cross-container
+Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/2] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-riscv64-cross', '-f', '/tmp/docker_build0whs5e5j/tmpn7mbhf_i.docker=
+', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build0whs5e5j=
+']' returned non-zero exit status 1.
+section_end:1594758866:step_script
+=1B[0Ksection_start:1594758866:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758867:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652404 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652404/ra=
+w )
+
+Stage: containers-layer2
+Name: mips64el-debian-cross-container
+Trace: #4 [1/4] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/4] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-mips64el-cross', '-f', '/tmp/docker_buildcf77slgd/tmphw68w5qx.docke=
+r', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildcf77slg=
+d']' returned non-zero exit status 1.
+section_end:1594758866:step_script
+=1B[0Ksection_start:1594758866:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758867:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652402 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652402/ra=
 w )
 
 Stage: containers-layer2
@@ -981,25 +579,25 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-mips64-cross', '-f', '/tmp/docker_buildx30ehwjm/tmp_59m53n4.docker'=
-, '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildx30ehwjm'=
+ebian-mips64-cross', '-f', '/tmp/docker_build55gu86lm/tmpjvk2bywe.docker'=
+, '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build55gu86lm'=
 ]' returned non-zero exit status 1.
-section_end:1594755183:step_script
-=1B[0Ksection_start:1594755183:after_script
+section_end:1594758865:step_script
+=1B[0Ksection_start:1594758865:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755184:after_script
+section_end:1594758866:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
-Job #638541697 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541697/ra=
+Job #638652391 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652391/ra=
 w )
 
 Stage: containers-layer2
-Name: amd64-debian-user-cross-container
-Trace: #4 [1/3] FROM docker.io/qemu/debian10:latest
+Name: amd64-debian-cross-container
+Trace: #4 [1/4] FROM docker.io/qemu/debian10:latest
 #4 resolve docker.io/qemu/debian10:latest 0.1s done
 #4 ERROR: pull access denied, repository does not exist or may require au=
 thorization: server message: insufficient_scope: authorization failed
@@ -1007,7 +605,7 @@ thorization: server message: insufficient_scope: authorization failed
  > [internal] load metadata for docker.io/qemu/debian10:latest:
 ------
 ------
- > [1/3] FROM docker.io/qemu/debian10:latest:
+ > [1/4] FROM docker.io/qemu/debian10:latest:
 ------
 failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
 to load cache key: pull access denied, repository does not exist or may r=
@@ -1027,66 +625,20 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-all-test-cross', '-f', '/tmp/docker_buildfe8rl4kz/tmp1i__pa0u.docke=
-r', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildfe8rl4k=
-z']' returned non-zero exit status 1.
-section_end:1594755180:step_script
-=1B[0Ksection_start:1594755180:after_script
+ebian-amd64-cross', '-f', '/tmp/docker_builddkixk6wz/tmpqp45ez4w.docker',=
+ '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_builddkixk6wz']=
+' returned non-zero exit status 1.
+section_end:1594758865:step_script
+=1B[0Ksection_start:1594758865:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755181:after_script
+section_end:1594758865:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
-Job #638541686 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541686/ra=
-w )
-
-Stage: containers-layer2
-Name: amd64-debian9-mxe-container
-Trace: #4 [1/4] FROM docker.io/qemu/debian9:latest
-#4 resolve docker.io/qemu/debian9:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require au=
-thorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian9:latest:
-------
-------
- > [1/4] FROM docker.io/qemu/debian9:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
-to load cache key: pull access denied, repository does not exist or may r=
-equire authorization: server message: insufficient_scope: authorization f=
-ailed
-Traceback (most recent call last):
-  File "./tests/docker/docker.py", line 702, in <module>
-    sys.exit(main())
-  File "./tests/docker/docker.py", line 698, in main
-    return args.cmdobj.run(args, argv)
-  File "./tests/docker/docker.py", line 492, in run
-    dkr.build_image(tag, docker_dir, dockerfile,
-  File "./tests/docker/docker.py", line 347, in build_image
-    self._do_check(build_args,
-  File "./tests/docker/docker.py", line 244, in _do_check
-    return subprocess.check_call(self._command + cmd, **kwargs)
-  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
-    raise CalledProcessError(retcode, cmd)
-subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian9-mxe', '-f', '/tmp/docker_buildjgk7la8g/tmpbcq_izzg.docker', '--bui=
-ld-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildjgk7la8g']' retur=
-ned non-zero exit status 1.
-section_end:1594755174:step_script
-=1B[0Ksection_start:1594755174:after_script
-=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;m=1B[32;1mRunning after script...=1B[0;m
-=1B[32;1m$ docker logout=1B[0;m
-Removing login credentials for https://index.docker.io/v1/
-section_end:1594755175:after_script
-=1B[0K=1B[31;1mERROR: Job failed: exit code 1
-=1B[0;m
-
-Job #638541779 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541779/ra=
+Job #638652424 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652424/ra=
 w )
 
 Stage: containers-layer2
@@ -1119,20 +671,342 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-tricore-cross', '-f', '/tmp/docker_build3ubomy2w/tmp9y8vm2du.docker=
-', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build3ubomy2w=
+ebian-tricore-cross', '-f', '/tmp/docker_build0mwqxebb/tmpkoe9ayn7.docker=
+', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build0mwqxebb=
 ']' returned non-zero exit status 1.
-section_end:1594755171:step_script
-=1B[0Ksection_start:1594755171:after_script
+section_end:1594758864:step_script
+=1B[0Ksection_start:1594758864:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755172:after_script
+section_end:1594758864:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
-Job #638541712 ( https://gitlab.com/qemu-project/qemu/-/jobs/638541712/ra=
+Job #638652410 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652410/ra=
+w )
+
+Stage: containers-layer2
+Name: powerpc-debian-cross-container
+Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/2] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-powerpc-cross', '-f', '/tmp/docker_build9tmcnb_c/tmpv_bck4cd.docker=
+', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build9tmcnb_c=
+']' returned non-zero exit status 1.
+section_end:1594758863:step_script
+=1B[0Ksection_start:1594758863:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758864:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652422 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652422/ra=
+w )
+
+Stage: containers-layer2
+Name: sparc64-debian-cross-container
+Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/2] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-sparc64-cross', '-f', '/tmp/docker_buildln1e5mmx/tmp56nmqv53.docker=
+', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildln1e5mmx=
+']' returned non-zero exit status 1.
+section_end:1594758863:step_script
+=1B[0Ksection_start:1594758863:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758864:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652414 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652414/ra=
+w )
+
+Stage: containers-layer2
+Name: ppc64el-debian-cross-container
+Trace: #4 [1/4] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/4] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-ppc64el-cross', '-f', '/tmp/docker_build0bv40a0d/tmph0_l5ctf.docker=
+', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_build0bv40a0d=
+']' returned non-zero exit status 1.
+section_end:1594758863:step_script
+=1B[0Ksection_start:1594758863:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758864:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652407 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652407/ra=
+w )
+
+Stage: containers-layer2
+Name: mips-debian-cross-container
+Trace: #4 [1/5] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/5] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-mips-cross', '-f', '/tmp/docker_builde70r25vi/tmpg456qur9.docker', =
+'--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_builde70r25vi']'=
+ returned non-zero exit status 1.
+section_end:1594758863:step_script
+=1B[0Ksection_start:1594758863:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758864:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652401 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652401/ra=
+w )
+
+Stage: containers-layer2
+Name: m68k-debian-cross-container
+Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/2] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-m68k-cross', '-f', '/tmp/docker_buildzuerew21/tmp83now62y.docker', =
+'--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildzuerew21']'=
+ returned non-zero exit status 1.
+section_end:1594758862:step_script
+=1B[0Ksection_start:1594758862:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758863:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652395 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652395/ra=
+w )
+
+Stage: containers-layer2
+Name: arm64-debian-cross-container
+Trace: #4 [1/5] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/5] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-arm64-cross', '-f', '/tmp/docker_buildrqjqf0x8/tmp5f_3ix0k.docker',=
+ '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildrqjqf0x8']=
+' returned non-zero exit status 1.
+section_end:1594758862:step_script
+=1B[0Ksection_start:1594758862:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758862:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652420 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652420/ra=
+w )
+
+Stage: containers-layer2
+Name: sh4-debian-cross-container
+Trace: #4 [1/2] FROM docker.io/qemu/debian10:latest
+#4 resolve docker.io/qemu/debian10:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian10:latest:
+------
+------
+ > [1/2] FROM docker.io/qemu/debian10:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian-sh4-cross', '-f', '/tmp/docker_buildvwjkf6l9/tmp18v9rftn.docker', '=
+--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildvwjkf6l9']' =
+returned non-zero exit status 1.
+section_end:1594758860:step_script
+=1B[0Ksection_start:1594758860:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758861:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652397 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652397/ra=
 w )
 
 Stage: containers-layer2
@@ -1165,16 +1039,62 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
     raise CalledProcessError(retcode, cmd)
 subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
-ebian-arm64-test-cross', '-f', '/tmp/docker_buildya0ves6o/tmpg3rrkxga.doc=
-ker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildya0ve=
-s6o']' returned non-zero exit status 1.
-section_end:1594755162:step_script
-=1B[0Ksection_start:1594755162:after_script
+ebian-arm64-test-cross', '-f', '/tmp/docker_buildtf3z3o_6/tmpcg5o90_2.doc=
+ker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildtf3z3=
+o_6']' returned non-zero exit status 1.
+section_end:1594758857:step_script
+=1B[0Ksection_start:1594758857:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
 =1B[0;m=1B[32;1mRunning after script...=1B[0;m
 =1B[32;1m$ docker logout=1B[0;m
 Removing login credentials for https://index.docker.io/v1/
-section_end:1594755163:after_script
+section_end:1594758858:after_script
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
+
+Job #638652388 ( https://gitlab.com/qemu-project/qemu/-/jobs/638652388/ra=
+w )
+
+Stage: containers-layer2
+Name: amd64-debian9-mxe-container
+Trace: #4 [1/4] FROM docker.io/qemu/debian9:latest
+#4 resolve docker.io/qemu/debian9:latest 0.1s done
+#4 ERROR: pull access denied, repository does not exist or may require au=
+thorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/qemu/debian9:latest:
+------
+------
+ > [1/4] FROM docker.io/qemu/debian9:latest:
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: failed =
+to load cache key: pull access denied, repository does not exist or may r=
+equire authorization: server message: insufficient_scope: authorization f=
+ailed
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 702, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 698, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 492, in run
+    dkr.build_image(tag, docker_dir, dockerfile,
+  File "./tests/docker/docker.py", line 347, in build_image
+    self._do_check(build_args,
+  File "./tests/docker/docker.py", line 244, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python3.8/subprocess.py", line 364, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 'qemu/d=
+ebian9-mxe', '-f', '/tmp/docker_buildyg9_f146/tmp6zg9a6r3.docker', '--bui=
+ld-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/tmp/docker_buildyg9_f146']' retur=
+ned non-zero exit status 1.
+section_end:1594758856:step_script
+=1B[0Ksection_start:1594758856:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;m=1B[32;1mRunning after script...=1B[0;m
+=1B[32;1m$ docker logout=1B[0;m
+Removing login credentials for https://index.docker.io/v1/
+section_end:1594758857:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -1186,7 +1106,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5f0e087d49c4e_508f3f90e5bce9d01641e7
+----==_mimepart_5f0e16e556075_32143fdb46431668256881
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -1201,7 +1121,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #166560423 has failed for master | d2628b1e</title=
+<title>QEMU | Pipeline #166584176 has failed for master | 8bfa25a4</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -1369,17 +1289,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/d2628b1eb761a5fb=
-f08f367da405eb3314a1f068" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/8bfa25a46ff1082f=
+75e7052875b5d435119dcf49" style=3D"color: #3777b0; text-decoration: none;=
 ">
-d2628b1e
+8bfa25a4
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/kevin/tag...
+Merge remote-tracking branch 'remotes/vivier2/t...
 </div>
 </td>
 </tr>
@@ -1436,9 +1356,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/166560423" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/166584176" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#166560423
+#166584176
 </a>
 triggered by
 </td>
@@ -1515,7 +1435,7 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541754" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652412" style=3D=
 "color: #3777b0; text-decoration: none;">
 ppc64-debian-cross-container
 </a>
@@ -1549,9 +1469,9 @@ urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
 d '['docker', 'build', '-t', 'qemu/debian-ppc64-cross', '-f', '/tmp/docke=
-r_build6rx_0icu/tmp02aydtre.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_build6rx_0icu']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594755192" data=
+r_buildbor9p1ba/tmp6f77r5z4.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_buildbor9p1ba']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594758870" data=
 -section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
 cyan term-bold section section-header js-s-after-script">Running after_sc=
 ript</span><span class=3D"section section-header js-s-after-script"><br /=
@@ -1591,539 +1511,7 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541745" style=3D=
-"color: #3777b0; text-decoration: none;">
-mipsel-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/5] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-mipsel-cross', '-f', '/tmp/dock=
-er_buildzsykle3v/tmpb1bxlt3r.docker', '--build-arg', 'BUILDKIT_INLINE_CAC=
-HE=3D1', '/tmp/docker_buildzsykle3v']' returned non-zero exit status 1.<b=
-r /></span><div class=3D"section-start" data-timestamp=3D"1594755191" dat=
-a-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l=
--cyan term-bold section section-header js-s-after-script">Running after_s=
-cript</span><span class=3D"section section-header js-s-after-script"><br =
-/></span><span class=3D"term-fg-l-green term-bold section line js-s-after=
--script">Running after script...</span><span class=3D"section line js-s-a=
-fter-script"><br /></span><span class=3D"term-fg-l-green term-bold sectio=
-n line js-s-after-script">$ docker logout</span><span class=3D"section li=
-ne js-s-after-script"><br />Removing login credentials for https://index.=
-docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"afte=
-r-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed=
-: exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541733" style=3D=
-"color: #3777b0; text-decoration: none;">
-m68k-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-m68k-cross', '-f', '/tmp/docker=
-_buildid1rni7o/tmp41ri7kp5.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=
-=3D1', '/tmp/docker_buildid1rni7o']' returned non-zero exit status 1.<br =
-/></span><div class=3D"section-start" data-timestamp=3D"1594755190" data-=
-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-c=
-yan term-bold section section-header js-s-after-script">Running after_scr=
-ipt</span><span class=3D"section section-header js-s-after-script"><br />=
-</span><span class=3D"term-fg-l-green term-bold section line js-s-after-s=
-cript">Running after script...</span><span class=3D"section line js-s-aft=
-er-script"><br /></span><span class=3D"term-fg-l-green term-bold section =
-line js-s-after-script">$ docker logout</span><span class=3D"section line=
- js-s-after-script"><br />Removing login credentials for https://index.do=
-cker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-=
-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: =
-exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541730" style=3D=
-"color: #3777b0; text-decoration: none;">
-hppa-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-hppa-cross', '-f', '/tmp/docker=
-_builds_lo5u_p/tmptj085hb0.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=
-=3D1', '/tmp/docker_builds_lo5u_p']' returned non-zero exit status 1.<br =
-/></span><div class=3D"section-start" data-timestamp=3D"1594755189" data-=
-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-c=
-yan term-bold section section-header js-s-after-script">Running after_scr=
-ipt</span><span class=3D"section section-header js-s-after-script"><br />=
-</span><span class=3D"term-fg-l-green term-bold section line js-s-after-s=
-cript">Running after script...</span><span class=3D"section line js-s-aft=
-er-script"><br /></span><span class=3D"term-fg-l-green term-bold section =
-line js-s-after-script">$ docker logout</span><span class=3D"section line=
- js-s-after-script"><br />Removing login credentials for https://index.do=
-cker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-=
-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: =
-exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541703" style=3D=
-"color: #3777b0; text-decoration: none;">
-arm64-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/5] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-arm64-cross', '-f', '/tmp/docke=
-r_buildr2lrecps/tmpq9rjp0pk.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_buildr2lrecps']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594755189" data=
--section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
-cyan term-bold section section-header js-s-after-script">Running after_sc=
-ript</span><span class=3D"section section-header js-s-after-script"><br /=
-></span><span class=3D"term-fg-l-green term-bold section line js-s-after-=
-script">Running after script...</span><span class=3D"section line js-s-af=
-ter-script"><br /></span><span class=3D"term-fg-l-green term-bold section=
- line js-s-after-script">$ docker logout</span><span class=3D"section lin=
-e js-s-after-script"><br />Removing login credentials for https://index.d=
-ocker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after=
--script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed:=
- exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541726" style=3D=
-"color: #3777b0; text-decoration: none;">
-armhf-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/5] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-armhf-cross', '-f', '/tmp/docke=
-r_buildx9r8ym37/tmpym3la16c.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_buildx9r8ym37']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594755188" data=
--section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
-cyan term-bold section section-header js-s-after-script">Running after_sc=
-ript</span><span class=3D"section section-header js-s-after-script"><br /=
-></span><span class=3D"term-fg-l-green term-bold section line js-s-after-=
-script">Running after script...</span><span class=3D"section line js-s-af=
-ter-script"><br /></span><span class=3D"term-fg-l-green term-bold section=
- line js-s-after-script">$ docker logout</span><span class=3D"section lin=
-e js-s-after-script"><br />Removing login credentials for https://index.d=
-ocker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after=
--script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed:=
- exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541741" style=3D=
-"color: #3777b0; text-decoration: none;">
-mips-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/5] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-mips-cross', '-f', '/tmp/docker=
-_buildak1s31sm/tmp7fm_iwoa.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=
-=3D1', '/tmp/docker_buildak1s31sm']' returned non-zero exit status 1.<br =
-/></span><div class=3D"section-start" data-timestamp=3D"1594755188" data-=
-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-c=
-yan term-bold section section-header js-s-after-script">Running after_scr=
-ipt</span><span class=3D"section section-header js-s-after-script"><br />=
-</span><span class=3D"term-fg-l-green term-bold section line js-s-after-s=
-cript">Running after script...</span><span class=3D"section line js-s-aft=
-er-script"><br /></span><span class=3D"term-fg-l-green term-bold section =
-line js-s-after-script">$ docker logout</span><span class=3D"section line=
- js-s-after-script"><br />Removing login credentials for https://index.do=
-cker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-=
-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: =
-exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541766" style=3D=
-"color: #3777b0; text-decoration: none;">
-riscv64-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-riscv64-cross', '-f', '/tmp/doc=
-ker_build25crpzc2/tmpmkb3kkxf.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
-CHE=3D1', '/tmp/docker_build25crpzc2']' returned non-zero exit status 1.<=
-br /></span><div class=3D"section-start" data-timestamp=3D"1594755186" da=
-ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
-l-cyan term-bold section section-header js-s-after-script">Running after_=
-script</span><span class=3D"section section-header js-s-after-script"><br=
- /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
-r-script">Running after script...</span><span class=3D"section line js-s-=
-after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
-on line js-s-after-script">$ docker logout</span><span class=3D"section l=
-ine js-s-after-script"><br />Removing login credentials for https://index=
-.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
-er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
-d: exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541699" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652394" style=3D=
 "color: #3777b0; text-decoration: none;">
 amd64-debian-container
 </a>
@@ -2157,9 +1545,9 @@ eturn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/=
 usr/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise =
 CalledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comm=
 and '['docker', 'build', '-t', 'qemu/debian-amd64', '-f', '/tmp/docker_bu=
-ildzg_fr17b/tmpz__joyn1.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D=
-1', '/tmp/docker_buildzg_fr17b']' returned non-zero exit status 1.<br /><=
-/span><div class=3D"section-start" data-timestamp=3D"1594755186" data-sec=
+ildblyniioo/tmp8hn0q449.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D=
+1', '/tmp/docker_buildblyniioo']' returned non-zero exit status 1.<br /><=
+/span><div class=3D"section-start" data-timestamp=3D"1594758869" data-sec=
 tion=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-cyan=
  term-bold section section-header js-s-after-script">Running after_script=
 </span><span class=3D"section section-header js-s-after-script"><br /></s=
@@ -2199,7 +1587,83 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541771" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652399" style=3D=
+"color: #3777b0; text-decoration: none;">
+armhf-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 resolv=
+e docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian10:=
+latest 0.1s done<br />#4 ERROR: pull access denied, repository does not e=
+xist or may require authorization: server message: insufficient_scope: au=
+thorization failed<br />------<br /> &gt; [internal] load metadata for do=
+cker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5] FR=
+OM docker.io/qemu/debian10:latest:<br />------<br />failed to solve with =
+frontend dockerfile.v0: failed to build LLB: failed to load cache key: pu=
+ll access denied, repository does not exist or may require authorization:=
+ server message: insufficient_scope: authorization failed<br />Traceback =
+(most recent call last):<br />  File "./tests/docker/docker.py", line 702=
+, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/docker=
+/docker.py", line 698, in main<br />    return args.cmdobj.run(args, argv=
+)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dkr.b=
+uild_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/docke=
+r.py", line 347, in build_image<br />    self._do_check(build_args,<br />=
+  File "./tests/docker/docker.py", line 244, in _do_check<br />    return=
+ subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/usr/l=
+ib/python3.8/subprocess.py", line 364, in check_call<br />    raise Calle=
+dProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Command '=
+['docker', 'build', '-t', 'qemu/debian-armhf-cross', '-f', '/tmp/docker_b=
+uild0si09ye6/tmpk8wtpbmb.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D=
+1', '/tmp/docker_build0si09ye6']' returned non-zero exit status 1.<br /><=
+/span><div class=3D"section-start" data-timestamp=3D"1594758868" data-sec=
+tion=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-cyan=
+ term-bold section section-header js-s-after-script">Running after_script=
+</span><span class=3D"section section-header js-s-after-script"><br /></s=
+pan><span class=3D"term-fg-l-green term-bold section line js-s-after-scri=
+pt">Running after script...</span><span class=3D"section line js-s-after-=
+script"><br /></span><span class=3D"term-fg-l-green term-bold section lin=
+e js-s-after-script">$ docker logout</span><span class=3D"section line js=
+-s-after-script"><br />Removing login credentials for https://index.docke=
+r.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-scr=
+ipt"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exi=
+t code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652417" style=3D=
 "color: #3777b0; text-decoration: none;">
 s390x-debian-cross-container
 </a>
@@ -2233,9 +1697,9 @@ urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
 d '['docker', 'build', '-t', 'qemu/debian-s390x-cross', '-f', '/tmp/docke=
-r_build87ecrrmp/tmpaizt0ixi.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_build87ecrrmp']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594755186" data=
+r_buildceueynzb/tmp0fsyck82.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_buildceueynzb']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594758868" data=
 -section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
 cyan term-bold section section-header js-s-after-script">Running after_sc=
 ript</span><span class=3D"section section-header js-s-after-script"><br /=
@@ -2275,7 +1739,7 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541721" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652398" style=3D=
 "color: #3777b0; text-decoration: none;">
 armel-debian-cross-container
 </a>
@@ -2309,9 +1773,9 @@ urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
 d '['docker', 'build', '-t', 'qemu/debian-armel-cross', '-f', '/tmp/docke=
-r_buildlga392qw/tmppdo34q6f.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_buildlga392qw']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594755185" data=
+r_buildjqdwxis_/tmptqb00pva.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_buildjqdwxis_']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594758868" data=
 -section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
 cyan term-bold section section-header js-s-after-script">Running after_sc=
 ript</span><span class=3D"section section-header js-s-after-script"><br /=
@@ -2351,463 +1815,7 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541773" style=3D=
-"color: #3777b0; text-decoration: none;">
-sh4-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-sh4-cross', '-f', '/tmp/docker_=
-buildu05d7rfh/tmp6cm1i62l.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D=
-1', '/tmp/docker_buildu05d7rfh']' returned non-zero exit status 1.<br /><=
-/span><div class=3D"section-start" data-timestamp=3D"1594755185" data-sec=
-tion=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-cyan=
- term-bold section section-header js-s-after-script">Running after_script=
-</span><span class=3D"section section-header js-s-after-script"><br /></s=
-pan><span class=3D"term-fg-l-green term-bold section line js-s-after-scri=
-pt">Running after script...</span><span class=3D"section line js-s-after-=
-script"><br /></span><span class=3D"term-fg-l-green term-bold section lin=
-e js-s-after-script">$ docker logout</span><span class=3D"section line js=
--s-after-script"><br />Removing login credentials for https://index.docke=
-r.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-scr=
-ipt"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exi=
-t code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541693" style=3D=
-"color: #3777b0; text-decoration: none;">
-amd64-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/4]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-amd64-cross', '-f', '/tmp/docke=
-r_buildomgli7uy/tmpmegqfh03.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_buildomgli7uy']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594755185" data=
--section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
-cyan term-bold section section-header js-s-after-script">Running after_sc=
-ript</span><span class=3D"section section-header js-s-after-script"><br /=
-></span><span class=3D"term-fg-l-green term-bold section line js-s-after-=
-script">Running after script...</span><span class=3D"section line js-s-af=
-ter-script"><br /></span><span class=3D"term-fg-l-green term-bold section=
- line js-s-after-script">$ docker logout</span><span class=3D"section lin=
-e js-s-after-script"><br />Removing login credentials for https://index.d=
-ocker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after=
--script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed:=
- exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541776" style=3D=
-"color: #3777b0; text-decoration: none;">
-sparc64-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-sparc64-cross', '-f', '/tmp/doc=
-ker_build8crzj921/tmpvhlduzmo.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
-CHE=3D1', '/tmp/docker_build8crzj921']' returned non-zero exit status 1.<=
-br /></span><div class=3D"section-start" data-timestamp=3D"1594755185" da=
-ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
-l-cyan term-bold section section-header js-s-after-script">Running after_=
-script</span><span class=3D"section section-header js-s-after-script"><br=
- /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
-r-script">Running after script...</span><span class=3D"section line js-s-=
-after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
-on line js-s-after-script">$ docker logout</span><span class=3D"section l=
-ine js-s-after-script"><br />Removing login credentials for https://index=
-.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
-er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
-d: exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541760" style=3D=
-"color: #3777b0; text-decoration: none;">
-ppc64el-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/4]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-ppc64el-cross', '-f', '/tmp/doc=
-ker_buildcfhfc3v8/tmpugfld7_u.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
-CHE=3D1', '/tmp/docker_buildcfhfc3v8']' returned non-zero exit status 1.<=
-br /></span><div class=3D"section-start" data-timestamp=3D"1594755184" da=
-ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
-l-cyan term-bold section section-header js-s-after-script">Running after_=
-script</span><span class=3D"section section-header js-s-after-script"><br=
- /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
-r-script">Running after script...</span><span class=3D"section line js-s-=
-after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
-on line js-s-after-script">$ docker logout</span><span class=3D"section l=
-ine js-s-after-script"><br />Removing login credentials for https://index=
-.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
-er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
-d: exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541750" style=3D=
-"color: #3777b0; text-decoration: none;">
-powerpc-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-powerpc-cross', '-f', '/tmp/doc=
-ker_buildm3u3ubkz/tmp2ovjai88.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
-CHE=3D1', '/tmp/docker_buildm3u3ubkz']' returned non-zero exit status 1.<=
-br /></span><div class=3D"section-start" data-timestamp=3D"1594755184" da=
-ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
-l-cyan term-bold section section-header js-s-after-script">Running after_=
-script</span><span class=3D"section section-header js-s-after-script"><br=
- /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
-r-script">Running after script...</span><span class=3D"section line js-s-=
-after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
-on line js-s-after-script">$ docker logout</span><span class=3D"section l=
-ine js-s-after-script"><br />Removing login credentials for https://index=
-.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
-er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
-d: exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541738" style=3D=
-"color: #3777b0; text-decoration: none;">
-mips64el-debian-cross-container
-</a>
-
-</td>
-</tr>
-<tr class=3D"build-log">
-<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
-sans-serif; padding: 0 0 16px;">
-<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
-monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
-n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
-FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
-10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
-t exist or may require authorization: server message: insufficient_scope:=
- authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/4]=
- FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
-th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
- pull access denied, repository does not exist or may require authorizati=
-on: server message: insufficient_scope: authorization failed<br />Traceba=
-ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
-702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
-ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
-rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
-r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
-cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
- />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
-urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
-r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
-lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-mips64el-cross', '-f', '/tmp/do=
-cker_builde18wp6ly/tmp_fszpgvi.docker', '--build-arg', 'BUILDKIT_INLINE_C=
-ACHE=3D1', '/tmp/docker_builde18wp6ly']' returned non-zero exit status 1.=
-<br /></span><div class=3D"section-start" data-timestamp=3D"1594755183" d=
-ata-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg=
--l-cyan term-bold section section-header js-s-after-script">Running after=
-_script</span><span class=3D"section section-header js-s-after-script"><b=
-r /></span><span class=3D"term-fg-l-green term-bold section line js-s-aft=
-er-script">Running after script...</span><span class=3D"section line js-s=
--after-script"><br /></span><span class=3D"term-fg-l-green term-bold sect=
-ion line js-s-after-script">$ docker logout</span><span class=3D"section =
-line js-s-after-script"><br />Removing login credentials for https://inde=
-x.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"af=
-ter-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job fail=
-ed: exit code 1<br /></span></pre>
-</td>
-</tr>
-<tr class=3D"build-state">
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
-<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
-le=3D"border-collapse: collapse;">
-<tbody>
-<tr>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
--height: 10px;" valign=3D"middle">
-<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
-ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
-6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
->
-</td>
-<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
-lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
-containers-layer2
-</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
-l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
- 16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541689" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652389" style=3D=
 "color: #3777b0; text-decoration: none;">
 alpha-debian-cross-container
 </a>
@@ -2841,9 +1849,9 @@ urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
 d '['docker', 'build', '-t', 'qemu/debian-alpha-cross', '-f', '/tmp/docke=
-r_build4o3eereh/tmp3okwttaz.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
-E=3D1', '/tmp/docker_build4o3eereh']' returned non-zero exit status 1.<br=
- /></span><div class=3D"section-start" data-timestamp=3D"1594755183" data=
+r_build7p22p7ms/tmpqoqscw9a.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_build7p22p7ms']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594758868" data=
 -section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
 cyan term-bold section section-header js-s-after-script">Running after_sc=
 ript</span><span class=3D"section section-header js-s-after-script"><br /=
@@ -2883,9 +1891,85 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541735" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652392" style=3D=
 "color: #3777b0; text-decoration: none;">
-mips64-debian-cross-container
+amd64-debian-user-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 resolv=
+e docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian10:=
+latest 0.1s done<br />#4 ERROR: pull access denied, repository does not e=
+xist or may require authorization: server message: insufficient_scope: au=
+thorization failed<br />------<br /> &gt; [internal] load metadata for do=
+cker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/3] FR=
+OM docker.io/qemu/debian10:latest:<br />------<br />failed to solve with =
+frontend dockerfile.v0: failed to build LLB: failed to load cache key: pu=
+ll access denied, repository does not exist or may require authorization:=
+ server message: insufficient_scope: authorization failed<br />Traceback =
+(most recent call last):<br />  File "./tests/docker/docker.py", line 702=
+, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/docker=
+/docker.py", line 698, in main<br />    return args.cmdobj.run(args, argv=
+)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dkr.b=
+uild_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/docke=
+r.py", line 347, in build_image<br />    self._do_check(build_args,<br />=
+  File "./tests/docker/docker.py", line 244, in _do_check<br />    return=
+ subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/usr/l=
+ib/python3.8/subprocess.py", line 364, in check_call<br />    raise Calle=
+dProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Command '=
+['docker', 'build', '-t', 'qemu/debian-all-test-cross', '-f', '/tmp/docke=
+r_buildgr1sq6qd/tmpea76vm19.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_buildgr1sq6qd']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594758867" data=
+-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
+cyan term-bold section section-header js-s-after-script">Running after_sc=
+ript</span><span class=3D"section section-header js-s-after-script"><br /=
+></span><span class=3D"term-fg-l-green term-bold section line js-s-after-=
+script">Running after script...</span><span class=3D"section line js-s-af=
+ter-script"><br /></span><span class=3D"term-fg-l-green term-bold section=
+ line js-s-after-script">$ docker logout</span><span class=3D"section lin=
+e js-s-after-script"><br />Removing login credentials for https://index.d=
+ocker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after=
+-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed:=
+ exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652400" style=3D=
+"color: #3777b0; text-decoration: none;">
+hppa-debian-cross-container
 </a>
 
 </td>
@@ -2916,10 +2000,86 @@ cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
 urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-mips64-cross', '-f', '/tmp/dock=
-er_buildx30ehwjm/tmp_59m53n4.docker', '--build-arg', 'BUILDKIT_INLINE_CAC=
-HE=3D1', '/tmp/docker_buildx30ehwjm']' returned non-zero exit status 1.<b=
-r /></span><div class=3D"section-start" data-timestamp=3D"1594755183" dat=
+d '['docker', 'build', '-t', 'qemu/debian-hppa-cross', '-f', '/tmp/docker=
+_build_yq0gj9e/tmpv4caday0.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=
+=3D1', '/tmp/docker_build_yq0gj9e']' returned non-zero exit status 1.<br =
+/></span><div class=3D"section-start" data-timestamp=3D"1594758867" data-=
+section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-c=
+yan term-bold section section-header js-s-after-script">Running after_scr=
+ipt</span><span class=3D"section section-header js-s-after-script"><br />=
+</span><span class=3D"term-fg-l-green term-bold section line js-s-after-s=
+cript">Running after script...</span><span class=3D"section line js-s-aft=
+er-script"><br /></span><span class=3D"term-fg-l-green term-bold section =
+line js-s-after-script">$ docker logout</span><span class=3D"section line=
+ js-s-after-script"><br />Removing login credentials for https://index.do=
+cker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-=
+script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: =
+exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652408" style=3D=
+"color: #3777b0; text-decoration: none;">
+mipsel-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/5] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-mipsel-cross', '-f', '/tmp/dock=
+er_buildqh53i_ra/tmps3_v2p6t.docker', '--build-arg', 'BUILDKIT_INLINE_CAC=
+HE=3D1', '/tmp/docker_buildqh53i_ra']' returned non-zero exit status 1.<b=
+r /></span><div class=3D"section-start" data-timestamp=3D"1594758866" dat=
 a-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l=
 -cyan term-bold section section-header js-s-after-script">Running after_s=
 cript</span><span class=3D"section section-header js-s-after-script"><br =
@@ -2959,9 +2119,9 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541697" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652416" style=3D=
 "color: #3777b0; text-decoration: none;">
-amd64-debian-user-cross-container
+riscv64-debian-cross-container
 </a>
 
 </td>
@@ -2972,12 +2132,12 @@ sans-serif; padding: 0 0 16px;">
 <pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/3] =
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
 FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
 10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
 t exist or may require authorization: server message: insufficient_scope:=
  authorization failed<br />------<br /> &gt; [internal] load metadata for=
- docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/3]=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
  FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
 th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
  pull access denied, repository does not exist or may require authorizati=
@@ -2992,10 +2152,86 @@ cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
 urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
-d '['docker', 'build', '-t', 'qemu/debian-all-test-cross', '-f', '/tmp/do=
-cker_buildfe8rl4kz/tmp1i__pa0u.docker', '--build-arg', 'BUILDKIT_INLINE_C=
-ACHE=3D1', '/tmp/docker_buildfe8rl4kz']' returned non-zero exit status 1.=
-<br /></span><div class=3D"section-start" data-timestamp=3D"1594755180" d=
+d '['docker', 'build', '-t', 'qemu/debian-riscv64-cross', '-f', '/tmp/doc=
+ker_build0whs5e5j/tmpn7mbhf_i.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
+CHE=3D1', '/tmp/docker_build0whs5e5j']' returned non-zero exit status 1.<=
+br /></span><div class=3D"section-start" data-timestamp=3D"1594758866" da=
+ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
+l-cyan term-bold section section-header js-s-after-script">Running after_=
+script</span><span class=3D"section section-header js-s-after-script"><br=
+ /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
+r-script">Running after script...</span><span class=3D"section line js-s-=
+after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
+on line js-s-after-script">$ docker logout</span><span class=3D"section l=
+ine js-s-after-script"><br />Removing login credentials for https://index=
+.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
+er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
+d: exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652404" style=3D=
+"color: #3777b0; text-decoration: none;">
+mips64el-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/4]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-mips64el-cross', '-f', '/tmp/do=
+cker_buildcf77slgd/tmphw68w5qx.docker', '--build-arg', 'BUILDKIT_INLINE_C=
+ACHE=3D1', '/tmp/docker_buildcf77slgd']' returned non-zero exit status 1.=
+<br /></span><div class=3D"section-start" data-timestamp=3D"1594758866" d=
 ata-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg=
 -l-cyan term-bold section section-header js-s-after-script">Running after=
 _script</span><span class=3D"section section-header js-s-after-script"><b=
@@ -3035,9 +2271,9 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541686" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652402" style=3D=
 "color: #3777b0; text-decoration: none;">
-amd64-debian9-mxe-container
+mips64-debian-cross-container
 </a>
 
 </td>
@@ -3048,41 +2284,41 @@ sans-serif; padding: 0 0 16px;">
 <pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
-FROM docker.io/qemu/debian9:latest<br />#4 resolve docker.io/qemu/debian9=
-:latest 0.1s done<br />#4 ERROR: pull access denied, repository does not =
-exist or may require authorization: server message: insufficient_scope: a=
-uthorization failed<br />------<br /> &gt; [internal] load metadata for d=
-ocker.io/qemu/debian9:latest:<br />------<br />------<br /> &gt; [1/4] FR=
-OM docker.io/qemu/debian9:latest:<br />------<br />failed to solve with f=
-rontend dockerfile.v0: failed to build LLB: failed to load cache key: pul=
-l access denied, repository does not exist or may require authorization: =
-server message: insufficient_scope: authorization failed<br />Traceback (=
-most recent call last):<br />  File "./tests/docker/docker.py", line 702,=
- in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/docker/=
-docker.py", line 698, in main<br />    return args.cmdobj.run(args, argv)=
-<br />  File "./tests/docker/docker.py", line 492, in run<br />    dkr.bu=
-ild_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/docker=
-.py", line 347, in build_image<br />    self._do_check(build_args,<br /> =
- File "./tests/docker/docker.py", line 244, in _do_check<br />    return =
-subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/usr/li=
-b/python3.8/subprocess.py", line 364, in check_call<br />    raise Called=
-ProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Command '[=
-'docker', 'build', '-t', 'qemu/debian9-mxe', '-f', '/tmp/docker_buildjgk7=
-la8g/tmpbcq_izzg.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/t=
-mp/docker_buildjgk7la8g']' returned non-zero exit status 1.<br /></span><=
-div class=3D"section-start" data-timestamp=3D"1594755174" data-section=3D=
-"after-script" role=3D"button"></div><span class=3D"term-fg-l-cyan term-b=
-old section section-header js-s-after-script">Running after_script</span>=
-<span class=3D"section section-header js-s-after-script"><br /></span><sp=
-an class=3D"term-fg-l-green term-bold section line js-s-after-script">Run=
-ning after script...</span><span class=3D"section line js-s-after-script"=
-><br /></span><span class=3D"term-fg-l-green term-bold section line js-s-=
-after-script">$ docker logout</span><span class=3D"section line js-s-afte=
-r-script"><br />Removing login credentials for https://index.docker.io/v1=
-/<br /></span><div class=3D"section-end" data-section=3D"after-script"></=
-div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code =
-1<br /></span></pre>
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-mips64-cross', '-f', '/tmp/dock=
+er_build55gu86lm/tmpjvk2bywe.docker', '--build-arg', 'BUILDKIT_INLINE_CAC=
+HE=3D1', '/tmp/docker_build55gu86lm']' returned non-zero exit status 1.<b=
+r /></span><div class=3D"section-start" data-timestamp=3D"1594758865" dat=
+a-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l=
+-cyan term-bold section section-header js-s-after-script">Running after_s=
+cript</span><span class=3D"section section-header js-s-after-script"><br =
+/></span><span class=3D"term-fg-l-green term-bold section line js-s-after=
+-script">Running after script...</span><span class=3D"section line js-s-a=
+fter-script"><br /></span><span class=3D"term-fg-l-green term-bold sectio=
+n line js-s-after-script">$ docker logout</span><span class=3D"section li=
+ne js-s-after-script"><br />Removing login credentials for https://index.=
+docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"afte=
+r-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed=
+: exit code 1<br /></span></pre>
 </td>
 </tr>
 <tr class=3D"build-state">
@@ -3111,7 +2347,83 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541779" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652391" style=3D=
+"color: #3777b0; text-decoration: none;">
+amd64-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/4]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-amd64-cross', '-f', '/tmp/docke=
+r_builddkixk6wz/tmpqp45ez4w.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_builddkixk6wz']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594758865" data=
+-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
+cyan term-bold section section-header js-s-after-script">Running after_sc=
+ript</span><span class=3D"section section-header js-s-after-script"><br /=
+></span><span class=3D"term-fg-l-green term-bold section line js-s-after-=
+script">Running after script...</span><span class=3D"section line js-s-af=
+ter-script"><br /></span><span class=3D"term-fg-l-green term-bold section=
+ line js-s-after-script">$ docker logout</span><span class=3D"section lin=
+e js-s-after-script"><br />Removing login credentials for https://index.d=
+ocker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after=
+-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed:=
+ exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652424" style=3D=
 "color: #3777b0; text-decoration: none;">
 tricore-debian-cross-container
 </a>
@@ -3145,9 +2457,9 @@ subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/usr/li=
 b/python3.8/subprocess.py", line 364, in check_call<br />    raise Called=
 ProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Command '[=
 'docker', 'build', '-t', 'qemu/debian-tricore-cross', '-f', '/tmp/docker_=
-build3ubomy2w/tmp9y8vm2du.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D=
-1', '/tmp/docker_build3ubomy2w']' returned non-zero exit status 1.<br /><=
-/span><div class=3D"section-start" data-timestamp=3D"1594755171" data-sec=
+build0mwqxebb/tmpkoe9ayn7.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D=
+1', '/tmp/docker_build0mwqxebb']' returned non-zero exit status 1.<br /><=
+/span><div class=3D"section-start" data-timestamp=3D"1594758864" data-sec=
 tion=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-cyan=
  term-bold section section-header js-s-after-script">Running after_script=
 </span><span class=3D"section section-header js-s-after-script"><br /></s=
@@ -3187,7 +2499,539 @@ containers-layer2
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638541712" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652410" style=3D=
+"color: #3777b0; text-decoration: none;">
+powerpc-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-powerpc-cross', '-f', '/tmp/doc=
+ker_build9tmcnb_c/tmpv_bck4cd.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
+CHE=3D1', '/tmp/docker_build9tmcnb_c']' returned non-zero exit status 1.<=
+br /></span><div class=3D"section-start" data-timestamp=3D"1594758863" da=
+ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
+l-cyan term-bold section section-header js-s-after-script">Running after_=
+script</span><span class=3D"section section-header js-s-after-script"><br=
+ /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
+r-script">Running after script...</span><span class=3D"section line js-s-=
+after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
+on line js-s-after-script">$ docker logout</span><span class=3D"section l=
+ine js-s-after-script"><br />Removing login credentials for https://index=
+.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
+er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
+d: exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652422" style=3D=
+"color: #3777b0; text-decoration: none;">
+sparc64-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-sparc64-cross', '-f', '/tmp/doc=
+ker_buildln1e5mmx/tmp56nmqv53.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
+CHE=3D1', '/tmp/docker_buildln1e5mmx']' returned non-zero exit status 1.<=
+br /></span><div class=3D"section-start" data-timestamp=3D"1594758863" da=
+ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
+l-cyan term-bold section section-header js-s-after-script">Running after_=
+script</span><span class=3D"section section-header js-s-after-script"><br=
+ /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
+r-script">Running after script...</span><span class=3D"section line js-s-=
+after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
+on line js-s-after-script">$ docker logout</span><span class=3D"section l=
+ine js-s-after-script"><br />Removing login credentials for https://index=
+.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
+er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
+d: exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652414" style=3D=
+"color: #3777b0; text-decoration: none;">
+ppc64el-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/4]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-ppc64el-cross', '-f', '/tmp/doc=
+ker_build0bv40a0d/tmph0_l5ctf.docker', '--build-arg', 'BUILDKIT_INLINE_CA=
+CHE=3D1', '/tmp/docker_build0bv40a0d']' returned non-zero exit status 1.<=
+br /></span><div class=3D"section-start" data-timestamp=3D"1594758863" da=
+ta-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-=
+l-cyan term-bold section section-header js-s-after-script">Running after_=
+script</span><span class=3D"section section-header js-s-after-script"><br=
+ /></span><span class=3D"term-fg-l-green term-bold section line js-s-afte=
+r-script">Running after script...</span><span class=3D"section line js-s-=
+after-script"><br /></span><span class=3D"term-fg-l-green term-bold secti=
+on line js-s-after-script">$ docker logout</span><span class=3D"section l=
+ine js-s-after-script"><br />Removing login credentials for https://index=
+.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"aft=
+er-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job faile=
+d: exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652407" style=3D=
+"color: #3777b0; text-decoration: none;">
+mips-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/5] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-mips-cross', '-f', '/tmp/docker=
+_builde70r25vi/tmpg456qur9.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=
+=3D1', '/tmp/docker_builde70r25vi']' returned non-zero exit status 1.<br =
+/></span><div class=3D"section-start" data-timestamp=3D"1594758863" data-=
+section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-c=
+yan term-bold section section-header js-s-after-script">Running after_scr=
+ipt</span><span class=3D"section section-header js-s-after-script"><br />=
+</span><span class=3D"term-fg-l-green term-bold section line js-s-after-s=
+cript">Running after script...</span><span class=3D"section line js-s-aft=
+er-script"><br /></span><span class=3D"term-fg-l-green term-bold section =
+line js-s-after-script">$ docker logout</span><span class=3D"section line=
+ js-s-after-script"><br />Removing login credentials for https://index.do=
+cker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-=
+script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: =
+exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652401" style=3D=
+"color: #3777b0; text-decoration: none;">
+m68k-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-m68k-cross', '-f', '/tmp/docker=
+_buildzuerew21/tmp83now62y.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=
+=3D1', '/tmp/docker_buildzuerew21']' returned non-zero exit status 1.<br =
+/></span><div class=3D"section-start" data-timestamp=3D"1594758862" data-=
+section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-c=
+yan term-bold section section-header js-s-after-script">Running after_scr=
+ipt</span><span class=3D"section section-header js-s-after-script"><br />=
+</span><span class=3D"term-fg-l-green term-bold section line js-s-after-s=
+cript">Running after script...</span><span class=3D"section line js-s-aft=
+er-script"><br /></span><span class=3D"term-fg-l-green term-bold section =
+line js-s-after-script">$ docker logout</span><span class=3D"section line=
+ js-s-after-script"><br />Removing login credentials for https://index.do=
+cker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-=
+script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: =
+exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652395" style=3D=
+"color: #3777b0; text-decoration: none;">
+arm64-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/5] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/5]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-arm64-cross', '-f', '/tmp/docke=
+r_buildrqjqf0x8/tmp5f_3ix0k.docker', '--build-arg', 'BUILDKIT_INLINE_CACH=
+E=3D1', '/tmp/docker_buildrqjqf0x8']' returned non-zero exit status 1.<br=
+ /></span><div class=3D"section-start" data-timestamp=3D"1594758862" data=
+-section=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-=
+cyan term-bold section section-header js-s-after-script">Running after_sc=
+ript</span><span class=3D"section section-header js-s-after-script"><br /=
+></span><span class=3D"term-fg-l-green term-bold section line js-s-after-=
+script">Running after script...</span><span class=3D"section line js-s-af=
+ter-script"><br /></span><span class=3D"term-fg-l-green term-bold section=
+ line js-s-after-script">$ docker logout</span><span class=3D"section lin=
+e js-s-after-script"><br />Removing login credentials for https://index.d=
+ocker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after=
+-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed:=
+ exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652420" style=3D=
+"color: #3777b0; text-decoration: none;">
+sh4-debian-cross-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/2] =
+FROM docker.io/qemu/debian10:latest<br />#4 resolve docker.io/qemu/debian=
+10:latest 0.1s done<br />#4 ERROR: pull access denied, repository does no=
+t exist or may require authorization: server message: insufficient_scope:=
+ authorization failed<br />------<br /> &gt; [internal] load metadata for=
+ docker.io/qemu/debian10:latest:<br />------<br />------<br /> &gt; [1/2]=
+ FROM docker.io/qemu/debian10:latest:<br />------<br />failed to solve wi=
+th frontend dockerfile.v0: failed to build LLB: failed to load cache key:=
+ pull access denied, repository does not exist or may require authorizati=
+on: server message: insufficient_scope: authorization failed<br />Traceba=
+ck (most recent call last):<br />  File "./tests/docker/docker.py", line =
+702, in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/doc=
+ker/docker.py", line 698, in main<br />    return args.cmdobj.run(args, a=
+rgv)<br />  File "./tests/docker/docker.py", line 492, in run<br />    dk=
+r.build_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/do=
+cker.py", line 347, in build_image<br />    self._do_check(build_args,<br=
+ />  File "./tests/docker/docker.py", line 244, in _do_check<br />    ret=
+urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
+r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
+lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
+d '['docker', 'build', '-t', 'qemu/debian-sh4-cross', '-f', '/tmp/docker_=
+buildvwjkf6l9/tmp18v9rftn.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D=
+1', '/tmp/docker_buildvwjkf6l9']' returned non-zero exit status 1.<br /><=
+/span><div class=3D"section-start" data-timestamp=3D"1594758860" data-sec=
+tion=3D"after-script" role=3D"button"></div><span class=3D"term-fg-l-cyan=
+ term-bold section section-header js-s-after-script">Running after_script=
+</span><span class=3D"section section-header js-s-after-script"><br /></s=
+pan><span class=3D"term-fg-l-green term-bold section line js-s-after-scri=
+pt">Running after script...</span><span class=3D"section line js-s-after-=
+script"><br /></span><span class=3D"term-fg-l-green term-bold section lin=
+e js-s-after-script">$ docker logout</span><span class=3D"section line js=
+-s-after-script"><br />Removing login credentials for https://index.docke=
+r.io/v1/<br /></span><div class=3D"section-end" data-section=3D"after-scr=
+ipt"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exi=
+t code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652397" style=3D=
 "color: #3777b0; text-decoration: none;">
 arm64-test-debian-cross-container
 </a>
@@ -3221,9 +3065,9 @@ urn subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/us=
 r/lib/python3.8/subprocess.py", line 364, in check_call<br />    raise Ca=
 lledProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Comman=
 d '['docker', 'build', '-t', 'qemu/debian-arm64-test-cross', '-f', '/tmp/=
-docker_buildya0ves6o/tmpg3rrkxga.docker', '--build-arg', 'BUILDKIT_INLINE=
-_CACHE=3D1', '/tmp/docker_buildya0ves6o']' returned non-zero exit status =
-1.<br /></span><div class=3D"section-start" data-timestamp=3D"1594755162"=
+docker_buildtf3z3o_6/tmpcg5o90_2.docker', '--build-arg', 'BUILDKIT_INLINE=
+_CACHE=3D1', '/tmp/docker_buildtf3z3o_6']' returned non-zero exit status =
+1.<br /></span><div class=3D"section-start" data-timestamp=3D"1594758857"=
  data-section=3D"after-script" role=3D"button"></div><span class=3D"term-=
 fg-l-cyan term-bold section section-header js-s-after-script">Running aft=
 er_script</span><span class=3D"section section-header js-s-after-script">=
@@ -3235,6 +3079,82 @@ n line js-s-after-script"><br />Removing login credentials for https://in=
 dex.docker.io/v1/<br /></span><div class=3D"section-end" data-section=3D"=
 after-script"></div><span class=3D"term-fg-l-red term-bold">ERROR: Job fa=
 iled: exit code 1<br /></span></pre>
+</td>
+</tr>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+containers-layer2
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/638652388" style=3D=
+"color: #3777b0; text-decoration: none;">
+amd64-debian9-mxe-container
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>#4 [1/4] =
+FROM docker.io/qemu/debian9:latest<br />#4 resolve docker.io/qemu/debian9=
+:latest 0.1s done<br />#4 ERROR: pull access denied, repository does not =
+exist or may require authorization: server message: insufficient_scope: a=
+uthorization failed<br />------<br /> &gt; [internal] load metadata for d=
+ocker.io/qemu/debian9:latest:<br />------<br />------<br /> &gt; [1/4] FR=
+OM docker.io/qemu/debian9:latest:<br />------<br />failed to solve with f=
+rontend dockerfile.v0: failed to build LLB: failed to load cache key: pul=
+l access denied, repository does not exist or may require authorization: =
+server message: insufficient_scope: authorization failed<br />Traceback (=
+most recent call last):<br />  File "./tests/docker/docker.py", line 702,=
+ in &lt;module&gt;<br />    sys.exit(main())<br />  File "./tests/docker/=
+docker.py", line 698, in main<br />    return args.cmdobj.run(args, argv)=
+<br />  File "./tests/docker/docker.py", line 492, in run<br />    dkr.bu=
+ild_image(tag, docker_dir, dockerfile,<br />  File "./tests/docker/docker=
+.py", line 347, in build_image<br />    self._do_check(build_args,<br /> =
+ File "./tests/docker/docker.py", line 244, in _do_check<br />    return =
+subprocess.check_call(self._command + cmd, **kwargs)<br />  File "/usr/li=
+b/python3.8/subprocess.py", line 364, in check_call<br />    raise Called=
+ProcessError(retcode, cmd)<br />subprocess.CalledProcessError: Command '[=
+'docker', 'build', '-t', 'qemu/debian9-mxe', '-f', '/tmp/docker_buildyg9_=
+f146/tmp6zg9a6r3.docker', '--build-arg', 'BUILDKIT_INLINE_CACHE=3D1', '/t=
+mp/docker_buildyg9_f146']' returned non-zero exit status 1.<br /></span><=
+div class=3D"section-start" data-timestamp=3D"1594758856" data-section=3D=
+"after-script" role=3D"button"></div><span class=3D"term-fg-l-cyan term-b=
+old section section-header js-s-after-script">Running after_script</span>=
+<span class=3D"section section-header js-s-after-script"><br /></span><sp=
+an class=3D"term-fg-l-green term-bold section line js-s-after-script">Run=
+ning after script...</span><span class=3D"section line js-s-after-script"=
+><br /></span><span class=3D"term-fg-l-green term-bold section line js-s-=
+after-script">$ docker logout</span><span class=3D"section line js-s-afte=
+r-script"><br />Removing login credentials for https://index.docker.io/v1=
+/<br /></span><div class=3D"section-end" data-section=3D"after-script"></=
+div><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code =
+1<br /></span></pre>
 </td>
 </tr>
 </tbody>
@@ -3282,5 +3202,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5f0e087d49c4e_508f3f90e5bce9d01641e7--
+----==_mimepart_5f0e16e556075_32143fdb46431668256881--
 
