@@ -2,73 +2,88 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E4BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E45C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:34:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D6972145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:59:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D6972145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 227E721BE5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:34:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rv0lQqv3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 227E721BE5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvFr2-0006Oj-Qs
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:59:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57604)
+	id 1jvGOm-0005FF-DU
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 04:34:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jvFqV-0005xw-U8
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:59:23 -0400
-Resent-Date: Tue, 14 Jul 2020 03:59:23 -0400
-Resent-Message-Id: <E1jvFqV-0005xw-U8@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21315)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jvGO8-0004iI-Gp
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:34:08 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52917
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jvFqT-0005ao-LL
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:59:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594713555; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=iZ4wTJrBS9FCl01tkh+3pxbkLFknxGbDYBIQiRdaynumc1SHj5LeDhkX/sptQtXbaJQmGIVV5qFSp5Rz4tPAib14PkI3Lo68cYxBoDQ90Zgt9fJ8zl1XtMOvjsvkUtOOc3VgP689NeHqgsDuCBYF0pJL/tijP9bO19eUeY4mNq0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594713555;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=fPf3iYuJDPY289iKjiOdmcth2eD0l9E11VR+y/UxyvQ=; 
- b=duDOiT6jrjEr4J4MzZIYExWhyzCcGWJmOIK0wuTiNZoVTl2V8thNKl1nUOM5e6Jt+anlrzrkk9K6bU91KItFJm+4gdP363QSFAIT2v5thxLIS9mOqCNO9Yh9oHSmwyCc9yqS41W+QMCdynvA8nms5R0Ovwk6ZR0NRB8STRp2l/w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159471355287616.417004255769825;
- Tue, 14 Jul 2020 00:59:12 -0700 (PDT)
-Subject: Re: [PULL 0/7] Linux user for 5.1 patches
-Message-ID: <159471355180.2008.16445869146206772547@07a7f0d89f7d>
-In-Reply-To: <20200714073259.1464675-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jvGO3-0001fG-M6
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:34:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594715642;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=zlxy0rQ6/K4t0Q1OYaZSDiz/duInP9Xvimvz2MHQ4Xk=;
+ b=Rv0lQqv38I/TT8Mdn2kOriojc+IMtJP2RHtj0XvFPLojTQpwPJOdOtH4/EfhJKSx8xAhFR
+ YdHuGn3OhkFxxV21fzGeOz//cDmGm3T3Xn4MItqsJkE/WR1LVicn/pBeapw8BInNMkasqO
+ 01HJ2hRIcPkNqHzPg/eSGoUD+L7OnOI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-Bmr10CMbPGiS9OYxBXsaMA-1; Tue, 14 Jul 2020 04:34:00 -0400
+X-MC-Unique: Bmr10CMbPGiS9OYxBXsaMA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EF91106B242;
+ Tue, 14 Jul 2020 08:33:59 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-8.ams2.redhat.com [10.36.114.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 367CC1D9;
+ Tue, 14 Jul 2020 08:33:58 +0000 (UTC)
+Date: Tue, 14 Jul 2020 10:33:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH for-5.1] qemu-img resize: Require --shrink for shrinking
+ all image formats
+Message-ID: <20200714083356.GA5120@linux.fritz.box>
+References: <20200710121717.28339-1-kwolf@redhat.com>
+ <CAFEAcA-QXayeXzrAv5=5mJvRy-qC5FD3Z7AEw3ZW_UDAZ6V8-w@mail.gmail.com>
+ <20200710124132.GF6641@linux.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Tue, 14 Jul 2020 00:59:12 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:59:19
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200710124132.GF6641@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:06:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,74 +96,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcxNDA3MzI1OS4xNDY0
-Njc1LTEtbGF1cmVudEB2aXZpZXIuZXUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDcxNDA3MzI1OS4xNDY0
-Njc1LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVjdDogW1BVTEwgMC83XSBMaW51eCB1c2VyIGZv
-ciA1LjEgcGF0Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
-cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0JwpmZmViNjkxIGxpbnV4LXVzZXI6IGZpeCBwcmludF9zeXNjYWxs
-X2VycigpIHdoZW4gc3lzY2FsbCByZXR1cm5lZCB2YWx1ZSBpcyBuZWdhdGl2ZQo0MTViMTIzIGxp
-bnV4LXVzZXI6IGZpeCB0aGUgZXJybm8gdmFsdWUgaW4gcHJpbnRfc3lzY2FsbF9lcnIoKQo3NWEw
-NWFkIGxpbnV4LXVzZXI6IGFkZCBuZXRsaW5rIFJUTV9TRVRMSU5LIGNvbW1hbmQKMTI0ZTI5MCBs
-aW51eC11c2VyOiBhZGQgbmV3IG5ldGxpbmsgdHlwZXMKMmZiMTk2NSBsaW51eC11c2VyOiBGaXgg
-Q292ZXJpdHkgQ0lEIDE0MzAyNzEgLyBDSUQgMTQzMDI3MgoxNzhhNDM2IGxpbnV4LXVzZXI6IHJl
-ZmFjdG9yIGlwYyBzeXNjYWxsIGFuZCBzdXBwb3J0IG9mIHNlbXRpbWVkb3Agc3lzY2FsbAo3OTAx
-ZmE3IGxpbnV4LXVzZXI6IFVzZSBFUFJPVE9OT1NVUFBPUlQgZm9yIHVuaW1wbGVtZW50ZWQgbmV0
-bGluayBwcm90b2NvbHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNyBDaGVja2luZyBjb21taXQg
-NzkwMWZhNzhkZjg0IChsaW51eC11c2VyOiBVc2UgRVBST1RPTk9TVVBQT1JUIGZvciB1bmltcGxl
-bWVudGVkIG5ldGxpbmsgcHJvdG9jb2xzKQoyLzcgQ2hlY2tpbmcgY29tbWl0IDE3OGE0MzZiZmUy
-ZCAobGludXgtdXNlcjogcmVmYWN0b3IgaXBjIHN5c2NhbGwgYW5kIHN1cHBvcnQgb2Ygc2VtdGlt
-ZWRvcCBzeXNjYWxsKQpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91
-bGQgYmUgYXZvaWRlZAojMjk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjgyMDoKKyNpZmRl
-ZiBfX3MzOTB4X18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3Vs
-ZCBiZSBhdm9pZGVkCiM2MjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6Mzg5NDoKKyNpZmRl
-ZiBfX3MzOTB4X18KCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUg
-ZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzYzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoz
-ODk1OgorI2RlZmluZSBTRU1USU1FRE9QX0lQQ19BUkdTKF9fbnNvcHMsIF9fc29wcywgX190aW1l
-b3V0KSBcCisgIChfX25zb3BzKSwgKF9fdGltZW91dCksIChfX3NvcHMpCgpFUlJPUjogTWFjcm9z
-IHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM2
-NjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6Mzg5ODoKKyNkZWZpbmUgU0VNVElNRURPUF9J
-UENfQVJHUyhfX25zb3BzLCBfX3NvcHMsIF9fdGltZW91dCkgXAorICAoX19uc29wcyksIDAsIChf
-X3NvcHMpLCAoX190aW1lb3V0KQoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmlu
-ZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzExMTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NDA5
-MzoKKyNpZmRlZiBfX3MzOTB4X18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZp
-bmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxMjU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjQx
-MDg6CisjaWZkZWYgX19OUl9pcGMKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZp
-bmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxMjY6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjQx
-MDk6CisjaWYgZGVmaW5lZChfX3NwYXJjX18pCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2
-YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxMjg6IEZJTEU6IGxpbnV4
-LXVzZXIvc3lzY2FsbC5jOjQxMTE6CisjZGVmaW5lIE1TR1JDVl9BUkdTKF9fbXNncCwgX19tc2d0
-eXApIF9fbXNncCwgX19tc2d0eXAKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBz
-aG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzEzNDogRklMRTogbGludXgtdXNlci9z
-eXNjYWxsLmM6NDExNzoKKyNkZWZpbmUgTVNHUkNWX0FSR1MoX19tc2dwLCBfX21zZ3R5cCkgXAor
-ICAgICgobG9uZyBpbnRbXSl7KGxvbmcgaW50KV9fbXNncCwgX19tc2d0eXB9KSwgMAoKdG90YWw6
-IDQgZXJyb3JzLCA1IHdhcm5pbmdzLCAxNTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi83IGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzcgQ2hlY2tpbmcgY29tbWl0IDJmYjE5NjU2Y2E5ZSAo
-bGludXgtdXNlcjogRml4IENvdmVyaXR5IENJRCAxNDMwMjcxIC8gQ0lEIDE0MzAyNzIpCjQvNyBD
-aGVja2luZyBjb21taXQgMTI0ZTI5MDkzMWEyIChsaW51eC11c2VyOiBhZGQgbmV3IG5ldGxpbmsg
-dHlwZXMpCjUvNyBDaGVja2luZyBjb21taXQgNzVhMDVhZGYwYzQ2IChsaW51eC11c2VyOiBhZGQg
-bmV0bGluayBSVE1fU0VUTElOSyBjb21tYW5kKQo2LzcgQ2hlY2tpbmcgY29tbWl0IDQxNWIxMjM5
-NTc5NiAobGludXgtdXNlcjogZml4IHRoZSBlcnJubyB2YWx1ZSBpbiBwcmludF9zeXNjYWxsX2Vy
-cigpKQo3LzcgQ2hlY2tpbmcgY29tbWl0IGZmZWI2OTE0NmVmNiAobGludXgtdXNlcjogZml4IHBy
-aW50X3N5c2NhbGxfZXJyKCkgd2hlbiBzeXNjYWxsIHJldHVybmVkIHZhbHVlIGlzIG5lZ2F0aXZl
-KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
-MDcxNDA3MzI1OS4xNDY0Njc1LTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNo
-Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Am 10.07.2020 um 14:41 hat Kevin Wolf geschrieben:
+> Am 10.07.2020 um 14:33 hat Peter Maydell geschrieben:
+> > On Fri, 10 Jul 2020 at 13:17, Kevin Wolf <kwolf@redhat.com> wrote:
+> > >
+> > > QEMU 2.11 introduced the --shrink option for qemu-img resize to avoid
+> > > accidentally shrinking images (commit 4ffca8904a3). However, for
+> > > compatibility reasons, it was not enforced for raw images yet, but only
+> > > a deprecation warning was printed. This warning has existed for long
+> > > enough that we can now finally require --shrink for raw images, too, and
+> > > error out if it's not given.
+> > >
+> > > Documentation already describes the state as it is after this patch.
+> > >
+> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > > ---
+> > >  qemu-img.c | 17 +++--------------
+> > >  1 file changed, 3 insertions(+), 14 deletions(-)
+> > >
+> > > diff --git a/qemu-img.c b/qemu-img.c
+> > > index e3b2ec3e78..f6a2703039 100644
+> > > --- a/qemu-img.c
+> > > +++ b/qemu-img.c
+> > > @@ -4011,20 +4011,9 @@ static int img_resize(int argc, char **argv)
+> > >      }
+> > >
+> > >      if (total_size < current_size && !shrink) {
+> > > -        warn_report("Shrinking an image will delete all data beyond the "
+> > > -                    "shrunken image's end. Before performing such an "
+> > > -                    "operation, make sure there is no important data there.");
+> > > -
+> > > -        if (g_strcmp0(bdrv_get_format_name(blk_bs(blk)), "raw") != 0) {
+> > > -            error_report(
+> > > -              "Use the --shrink option to perform a shrink operation.");
+> > > -            ret = -1;
+> > > -            goto out;
+> > > -        } else {
+> > > -            warn_report("Using the --shrink option will suppress this message. "
+> > > -                        "Note that future versions of qemu-img may refuse to "
+> > > -                        "shrink images without this option.");
+> > > -        }
+> > > +        error_report("Use the --shrink option to perform a shrink operation.");
+> > 
+> > I think it would be nice to retain this bit of text:
+> > 
+> > > -        warn_report("Shrinking an image will delete all data beyond the "
+> > > -                    "shrunken image's end. Before performing such an "
+> > > -                    "operation, make sure there is no important data there.");
+> > 
+> > ie, make the raw-shrink case be the same as the non-raw-shrink
+> > case currently does.
+> 
+> I had this at first, but then the whole thing looked like a warning and
+> I wasn't sure that it would still be understood as an error. (Which is
+> of course a preexisting problem for non-raw.)
+> 
+> Maybe it becomes clearer if I just swap the order and print the error
+> first and only then the warning?
+
+I made this change and applied the patch to the block branch.
+
+Kevin
+
 
