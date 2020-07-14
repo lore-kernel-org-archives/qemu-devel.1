@@ -2,125 +2,88 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF096C433EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:54:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E156DC433E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:56:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7932621973
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:54:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF85C2245A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:56:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WNA7eDAu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7932621973
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vv2ejH4I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF85C2245A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvMJq-0007RN-Mn
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:54:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59894)
+	id 1jvMLl-0008W7-Vd
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:56:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jvMIY-0006FO-H2; Tue, 14 Jul 2020 10:52:46 -0400
-Received: from mail-db8eur05on2090.outbound.protection.outlook.com
- ([40.107.20.90]:48788 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jvMIV-0004h4-Id; Tue, 14 Jul 2020 10:52:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DH+6iT1lkZ73lscrE6HiSLdPpJUqyUhGqxSFfpt3VVt75LS6fVJ8Mbk92tRSmI0JdLDiMkJWUNBUU/1nhb/B+rknBCBUXfoFBLPPaSpQOxqiWJA7W4yBHLpXqNlTPhdQPNCMhj1KSW1Hg9C6E3loP7g1s4BLWkgyMX75sAzKHifOOg563Vt5XJsC1Gprm9FUyOa330eUh+qWPVkeEXCnH1FGYUjHQwacSyGJPjFmvRXIaeVQV2Vk8doWUM+Ym/6qTvE6f26MfvD6prgpot9YYREiI5f3rx4FYuGFWWzX99YZGQGRr1aajOFu6a+/UM4astKm/jUjlZFMtlBuM8kt5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vSrJwW9MPSuzjUVSjBhxcglKzR/emejhXaRa/OKs20s=;
- b=k8YnHf8fGcySk/A4WZVGXoqYrFE4zcR5ZpHW0WRKZjEd63vSRQYuetsHm77g9QHFxelCvpd9wawxZTYEKrORa3yE9Ul8TOgOU2VuY/RLN1aqfKCCKpcqRgbP+dBP48NyCrBr6Rd8VWrSI7ZQbhbmnaxKv3Lqu0j3Njjcj3W5SlOAOksyxVutf+PDKL387NhhnGNlnMcxqFIZpL6wvy7WUEd9qWYlyddAcZRLnT/xYnZSSrBADVPT3xyb6Avd3UWVmJ4DtH7DWmRn5ORKLm/y2P0pga5DAg2dxnQ8lvdkkEXsidz2zYOvPNkY2wk4DTnyBa0vQJi08c5xYRaj7sj5zg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vSrJwW9MPSuzjUVSjBhxcglKzR/emejhXaRa/OKs20s=;
- b=WNA7eDAuVhGJioGdv0/l0fcpPtIRDBuniSOdWfo90as+Yrvt+bFoAcv1K9u8DFX9rgtxhLK3PPCjzL+IghPg78aXnZlxXcsyp//0W3buDI2o20bw2KEaI5RAwnXtuZGSB5/ZbG+qFQWtmvHuSJZjnAFS5aVPmBGb02yYbuI9Kow=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB3717.eurprd08.prod.outlook.com (2603:10a6:20b:8e::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Tue, 14 Jul
- 2020 14:52:39 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.025; Tue, 14 Jul 2020
- 14:52:39 +0000
-Subject: Re: [PATCH v7 19/47] vmdk: Drop vmdk_co_flush()
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-20-mreitz@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <da609c95-f48c-90c7-8a4c-d53c69441c4c@virtuozzo.com>
-Date: Tue, 14 Jul 2020 17:52:35 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-20-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM0PR04CA0105.eurprd04.prod.outlook.com
- (2603:10a6:208:be::46) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jvMLB-00085N-5j
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:55:29 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37241)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jvML9-00056K-76
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:55:28 -0400
+Received: by mail-ot1-x344.google.com with SMTP id w17so13253023otl.4
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:55:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=XKZChAnIt0R8bhArHGhZ2dZkaprsODCYp7nm3Zoyp6k=;
+ b=Vv2ejH4IoAIK4I2nSHe0oEc1qvQDJBvnaYR0H81CURqDFbNE7Tofz6EwA08PckTp/F
+ WxkbYQwfVyQax6i+P0SS7UksNTtZ+YoLffPpL9LftcG44u5a3N971ZM65VUT7oALT804
+ szDMN/K2gz6b6Lu/nzTJBGTfj5R/GJ2W6CQefuUhGhVc3hJJY67F/UGKbT5+3A7kKk61
+ Knwv8f549lpqPkuMwBlFLpTOGD1fvGMz4uBhuJi8jiB5FfGmlda6KVW2SJACui/EesH7
+ RH5R2UPRcgj2olENJd1jbX1lEMYZNIiuVw0fmzzatWkm+p0+fG+WKad2veb4CHbBtfq4
+ X5Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=XKZChAnIt0R8bhArHGhZ2dZkaprsODCYp7nm3Zoyp6k=;
+ b=aPNAFOnYVO7t0hhB996VbzPvVNWSklPwj/Il7b66LSbOSOUsTEJaguWkjRoslVo/fN
+ u+RvAb3uvaDW7ZbgO6rPjhPOBBPrMdDstAHUffliUKXhJb1cueiUuYmeaDkpiti3Rm4p
+ ZHyS0kdIb9Oruuja/T2QdD+4HnEOGgBGD+rq7QPemBgm1Smw9E/WxsAMFM5DUUBInqNh
+ mdcC6v8xYh28v7efMq8fg/PrcFmXbdE/b8VbJ3Nc30IgDhkK3NQc3S7Ipc6Q+CB6ZXQA
+ 6XhP6EP1cll3UsBiooA9m+n35MM7AP5qXOB+ukRs1O2DFsKDicogssKsz4tfS4rOhoJE
+ jYDQ==
+X-Gm-Message-State: AOAM532EN2y9Lr7uuOBsYT8xyZe7eTrOKil1io7rCAnS6CIZ5Kk3/IuK
+ K+Blkh4iF66Zddts0RrX4LGqtsoy2QDQIkyXdL6FTA==
+X-Google-Smtp-Source: ABdhPJwCtnNwmv+usa7Ai8V8HNtOI+PrixMc9WArleIvgiqNRKACn2Q0LtbCQOLnqE2u+evtqFkUCm1Z20bbJ50l/hY=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr4394492ota.91.1594738525454; 
+ Tue, 14 Jul 2020 07:55:25 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.191) by
- AM0PR04CA0105.eurprd04.prod.outlook.com (2603:10a6:208:be::46) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.21 via Frontend Transport; Tue, 14 Jul 2020 14:52:37 +0000
-X-Originating-IP: [109.252.114.191]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 14006773-1374-4e38-3665-08d828058e17
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3717:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB37177A8563F080009DD52945F4610@AM6PR08MB3717.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:873;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Rb8EFXlw/wpxBWNhi0/GvSoKYWGKMCn3zzL8xkedIfvchWziQNNYYlQBaPs3+lt7ft7f5vcVBn9YEO7ZsL2hcMEADmuVHwecfAv1nlJLsT+SuiZ4tLY+8iTmjFPDfZSdSp3TM1fis8+cpgrv+ixhybgN2yAG2lTqp+OsJ4y2OI2xUU+ZW4Bp+M7EVpdMNddelGSFV7dFis9H4MzosjOGnQXBkeM+28X/0M2IsW7ySucH37sogVpv1d/J1cg66TaErgOQJ6bQc8p4ka2DgvWK8D2VnD7OiwlkuhyW83ENw/z78jGpi37C15r1bCLomOFd0Jq7RhrXXC03D84L1iqWshjdKVvCTO0QcA7yBx2cEj4qFNXq7aOgKPdXoS0Ve60v
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(346002)(376002)(396003)(39840400004)(136003)(66556008)(66476007)(66946007)(2616005)(4326008)(53546011)(52116002)(6506007)(26005)(186003)(16526019)(6512007)(956004)(5660300002)(44832011)(83380400001)(6486002)(316002)(478600001)(86362001)(31696002)(36756003)(8936002)(31686004)(54906003)(2906002)(8676002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: tdy1RSdgy6WEVT1QFrM9uCQZizGwl7L3E3k67TiUmy/U6YE/nQEtkkenzxtr1Fpq0PZ/o8onGoAy0aHt72WoVgRV0QIwIOyTZnEBnKi/bZ8Ack3iQzcDHiAE5tjRE594K+J7+D5fsPsD45yiNvyo56ajlBbr2iGET1BcBDf94XgoDjfRu+kftuzAZ3iaFeHoMs/xhpdZ6vmOCFQmW5UJnLmNJbv5clBrAGSYU065ZEOGj9eow62tJu/NzzuzuNKNiiLKDpjR6A9KEAG4EY2YzwEEjtlM7pPDjl3zX2g96cQZqXuNwiPU9mGbnpTaDz+/xfuu9/hcRwBYfdngM5OHyMQJzsAXbUWD/jJ2KOWNEZDjHex+CG+4GuhuuCEqveOAoT3GC3rGqcObK888RQ+Eplf993wlCWcoWFqzYuEJ7GUxoD4G6ZIkf+r7PzdwJDBEsGD8vLn1EC+18MEg98hvSxagjNbTqq61i+AyzsiCBcr9VoaEoYKkO4TMwqeq4Bx4
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14006773-1374-4e38-3665-08d828058e17
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2020 14:52:39.8787 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7CfMH0b7F1SF+XEQFt2xMl1LgWdQuIxQKZOrLkBPlfyj7n8SDBLIs18VmshwIpJSz4InbMNk3Y5ag5TLe3hDXJPRv9ncw/w4uDEbqOlEaNA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3717
-Received-SPF: pass client-ip=40.107.20.90;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 10:52:41
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+References: <20200713141104.5139-1-peter.maydell@linaro.org>
+ <CAFEAcA-ULj8BGkm6k2f9ye-ovg9FCKrHg6BRMuKf+F7O3sJtFQ@mail.gmail.com>
+ <DM5PR11MB183361CB8C55AA9E1057402D8D610@DM5PR11MB1833.namprd11.prod.outlook.com>
+In-Reply-To: <DM5PR11MB183361CB8C55AA9E1057402D8D610@DM5PR11MB1833.namprd11.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Jul 2020 15:55:14 +0100
+Message-ID: <CAFEAcA_4ipxWBYcF59bNSecL6nHhGF5ezCLAn_9sh-gxFLm3dA@mail.gmail.com>
+Subject: Re: [PULL 00/25] target-arm queue
+To: "Wu, Wentong" <wentong.wu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,62 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.06.2020 18:21, Max Reitz wrote:
-> Before HEAD^, we needed this because bdrv_co_flush() by itself would
-> only flush bs->file.  With HEAD^, bdrv_co_flush() will flush all
-> children on which a WRITE or WRITE_UNCHANGED permission has been taken.
-> Thus, vmdk no longer needs to do it itself.
+On Tue, 14 Jul 2020 at 15:52, Wu, Wentong <wentong.wu@intel.com> wrote:
 >
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   block/vmdk.c | 16 ----------------
->   1 file changed, 16 deletions(-)
+> > On Mon, 13 Jul 2020 at 15:11, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > ----------------------------------------------------------------
+> > > target-arm queue:
+> > >  * hw/arm/bcm2836: Remove unused 'cpu_type' field
+> > >  * target/arm: Fix mtedesc for do_mem_zpz
+> > >  * Add the ability to change the FEC PHY MDIO device number on i.MX25/i.MX6/i.MX7
+> > >  * target/arm: Don't do raw writes for PMINTENCLR
+> > >  * virtio-iommu: Fix coverity issue in virtio_iommu_handle_command()
+> > >  * build: Fix various issues with building on Haiku
+> > >  * target/nios2: fix wrctl behaviour when using icount
+> > >  * hw/arm/tosa: Encapsulate misc GPIO handling in a device
+> > >  * hw/arm/palm.c: Encapsulate misc GPIO handling in a device
+> > >  * hw/arm/aspeed: Do not create and attach empty SD cards by default
+> >
+> >
+> > Applied, thanks.
+> >
+> > Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+> > for any user-visible changes.
 >
-> diff --git a/block/vmdk.c b/block/vmdk.c
-> index 62da465126..a23890e6ec 100644
-> --- a/block/vmdk.c
-> +++ b/block/vmdk.c
-> @@ -2802,21 +2802,6 @@ static void vmdk_close(BlockDriverState *bs)
->       error_free(s->migration_blocker);
->   }
->   
-> -static coroutine_fn int vmdk_co_flush(BlockDriverState *bs)
-> -{
-> -    BDRVVmdkState *s = bs->opaque;
-> -    int i, err;
-> -    int ret = 0;
-> -
-> -    for (i = 0; i < s->num_extents; i++) {
-> -        err = bdrv_co_flush(s->extents[i].file->bs);
-> -        if (err < 0) {
-> -            ret = err;
-> -        }
-> -    }
-> -    return ret;
-> -}
-> -
->   static int64_t vmdk_get_allocated_file_size(BlockDriverState *bs)
->   {
->       int i;
-> @@ -3075,7 +3060,6 @@ static BlockDriver bdrv_vmdk = {
->       .bdrv_close                   = vmdk_close,
->       .bdrv_co_create_opts          = vmdk_co_create_opts,
->       .bdrv_co_create               = vmdk_co_create,
-> -    .bdrv_co_flush_to_disk        = vmdk_co_flush,
+> Who will be responsible updating the changelog? Patch author or
+> the person who has the special access for that wiki page?
 
+Usually it's the person who sends the pullrequest (me in this case),
+unless they specifically ask a patch author to write some changelog
+text. In this case I didn't think anything in this set of patches
+needed a changelog entry except for the empty-SD-card change.
+If you think there's some text worth adding I can add it for you.
 
-After HEAD^ applied, wouldn't we get an endless recursion in 
-bdrv_co_flush() if the HEAD (this patch) had not been merged into HEAD^?
+The changelog wiki page, incidentally, can be edited by anybody
+with a wiki account. We don't have an automatic account-creation
+process because it was heavily hit by spammers, but anybody with
+an existing wiki account can create one for developers who want one.
 
-Andrey
-
->       .bdrv_co_block_status         = vmdk_co_block_status,
->       .bdrv_get_allocated_file_size = vmdk_get_allocated_file_size,
->       .bdrv_has_zero_init           = vmdk_has_zero_init,
+thanks
+-- PMM
 
