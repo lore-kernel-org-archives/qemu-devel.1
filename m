@@ -2,92 +2,73 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3ADC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E4BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C3032145D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:58:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eDbtbg29"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C3032145D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D6972145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:59:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D6972145D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvFpP-0005Nx-HD
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:58:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57306)
+	id 1jvFr2-0006Oj-Qs
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvFom-0004yd-Vr
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:57:38 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49136
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jvFqV-0005xw-U8
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:59:23 -0400
+Resent-Date: Tue, 14 Jul 2020 03:59:23 -0400
+Resent-Message-Id: <E1jvFqV-0005xw-U8@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21315)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvFok-0005U4-3C
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:57:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594713452;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AJuzeen2J9oH/kM1HYcS+neMEfRiIn7Nm//XepiXBok=;
- b=eDbtbg29zkHzLfDmQBnZUMWUBbS5FwhquzlwdPjCjeEQV9X3TjBmzEIUtW486q+9raXhyA
- e4I+JU8D94GVN2lFGj4D943vcLYpqrE4B989qIsAu1LTNAfJlaY139D0M7W3p4UZQMKuYO
- iCfWrVA5Dyp+hHl1nfFx/rSDTfSGDoU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-wHJTVjilOAG5K0JLFC16dQ-1; Tue, 14 Jul 2020 03:57:31 -0400
-X-MC-Unique: wHJTVjilOAG5K0JLFC16dQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89D4D800400
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:57:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 54F835C1B2;
- Tue, 14 Jul 2020 07:57:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D8394105A45D; Tue, 14 Jul 2020 09:57:28 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH] tests: improve performance of device-introspect-test
-References: <20200709112857.3760116-1-berrange@redhat.com>
- <87mu47gms3.fsf@dusky.pond.sub.org>
- <20200713084759.GA4044570@redhat.com>
-Date: Tue, 14 Jul 2020 09:57:28 +0200
-In-Reply-To: <20200713084759.GA4044570@redhat.com> ("Daniel P. =?utf-8?Q?B?=
- =?utf-8?Q?errang=C3=A9=22's?=
- message of "Mon, 13 Jul 2020 09:47:59 +0100")
-Message-ID: <87h7ua8r6f.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jvFqT-0005ao-LL
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:59:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1594713555; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=iZ4wTJrBS9FCl01tkh+3pxbkLFknxGbDYBIQiRdaynumc1SHj5LeDhkX/sptQtXbaJQmGIVV5qFSp5Rz4tPAib14PkI3Lo68cYxBoDQ90Zgt9fJ8zl1XtMOvjsvkUtOOc3VgP689NeHqgsDuCBYF0pJL/tijP9bO19eUeY4mNq0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1594713555;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=fPf3iYuJDPY289iKjiOdmcth2eD0l9E11VR+y/UxyvQ=; 
+ b=duDOiT6jrjEr4J4MzZIYExWhyzCcGWJmOIK0wuTiNZoVTl2V8thNKl1nUOM5e6Jt+anlrzrkk9K6bU91KItFJm+4gdP363QSFAIT2v5thxLIS9mOqCNO9Yh9oHSmwyCc9yqS41W+QMCdynvA8nms5R0Ovwk6ZR0NRB8STRp2l/w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 159471355287616.417004255769825;
+ Tue, 14 Jul 2020 00:59:12 -0700 (PDT)
+Subject: Re: [PULL 0/7] Linux user for 5.1 patches
+Message-ID: <159471355180.2008.16445869146206772547@07a7f0d89f7d>
+In-Reply-To: <20200714073259.1464675-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Tue, 14 Jul 2020 00:59:12 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:59:19
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,81 +81,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-
-> On Fri, Jul 10, 2020 at 10:03:56PM +0200, Markus Armbruster wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->>=20
->> > Total execution time with "-m slow" and x86_64 QEMU, drops from 3
->> > minutes 15 seconds, down to 54 seconds.
->> >
->> > Individual tests drop from 17-20 seconds, down to 3-4 seconds.
->>=20
->> Nice!
->>=20
->> A few observations on this test (impatient readers may skip to
->> "Conclusions"):
->
-> snip
->
->> * The number of known device types varies between targets from 33
->>   (tricore) to several hundreds (x86_64+i386: 421, ppc 593, arm 667,
->>   aarch64 680, ppc64 689).  Median is 215, sum is 7485.
->
-> snip
->
->> * The test matrix is *expensive*.  Testing even a simple QMP query is
->>   when you do it a quarter million times.  ARM is the greediest pig by
->>   far (170k introspections, almost two thirds of the total!), followed
->>   by ppc (36k), x86 (12k) and mips (11k).  Ideas on trimming excess are
->>   welcome.  I'm not even sure anymore this should be a qtest.
->
-> We have 70 arm machines, 667 devices. IIUC we are roughly testing every
-> device against everything machine. 46,690 tests.
->
-> Most of the time devices are going to behave identically regardless of
-> which machine type is used. The trouble is some machines are different
-> enough that they can genuinely trigger different behaviour. It isn't
-> possible to slim the (machine, device) expansion down programatically
-> while still exercising the interesting combinations unless we get alot
-> more advanced.
->
-> eg if a have a PCI device, we only need test it in one PCI based machine,
-> and only need test it on one non-PCI based machine.
-
-The trouble is .instance_init() can do anything, and can therefore
-interact badly with anything.
-
-Example: m2sxxx_soc_initfn() of device type "msf2-soc" messes with
-nd_table[0].  That's wrong.  The test doesn't catch it with machine type
-"none", where nd_table[0] is blank.  It does catch it with machine type
-"ast2600-evb", because aspeed_machine_init() puts something incompatible
-into nd_table[0], which makes m2sxxx_soc_initfn() crash.
-
-"msf2-soc" is not a PCI device, but if it was, then the two machines
-(with and without PCI) picked for testing PCI devices may well both
-leave nd_table[0] blank, and therefore not catch the bug.
-
-Some instances of "device code does stuff it should not" could be
-prevented by making interfaces inaccessible there.  We'd have to
-identify device code first.  The hw/BASE-ARCH/ contain both boards and
-devices.  Possibly even in the same .c.
-
-> I would be interesting to actually get some CPU profiling data for
-> this test to see if it points out anything interesting about where the
-> time is being spent. Even if we don't reduce the complexity, reducing
-> a time factor will potentially greatly help.=20
-
-Hunch: when we want to test device instantiation and finalization for a
-million (give or take) combinations of board x device, testing them one
-by one with QMP might be a bad idea.
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcxNDA3MzI1OS4xNDY0
+Njc1LTEtbGF1cmVudEB2aXZpZXIuZXUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDcxNDA3MzI1OS4xNDY0
+Njc1LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVjdDogW1BVTEwgMC83XSBMaW51eCB1c2VyIGZv
+ciA1LjEgcGF0Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
+cmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
+cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwpmZmViNjkxIGxpbnV4LXVzZXI6IGZpeCBwcmludF9zeXNjYWxs
+X2VycigpIHdoZW4gc3lzY2FsbCByZXR1cm5lZCB2YWx1ZSBpcyBuZWdhdGl2ZQo0MTViMTIzIGxp
+bnV4LXVzZXI6IGZpeCB0aGUgZXJybm8gdmFsdWUgaW4gcHJpbnRfc3lzY2FsbF9lcnIoKQo3NWEw
+NWFkIGxpbnV4LXVzZXI6IGFkZCBuZXRsaW5rIFJUTV9TRVRMSU5LIGNvbW1hbmQKMTI0ZTI5MCBs
+aW51eC11c2VyOiBhZGQgbmV3IG5ldGxpbmsgdHlwZXMKMmZiMTk2NSBsaW51eC11c2VyOiBGaXgg
+Q292ZXJpdHkgQ0lEIDE0MzAyNzEgLyBDSUQgMTQzMDI3MgoxNzhhNDM2IGxpbnV4LXVzZXI6IHJl
+ZmFjdG9yIGlwYyBzeXNjYWxsIGFuZCBzdXBwb3J0IG9mIHNlbXRpbWVkb3Agc3lzY2FsbAo3OTAx
+ZmE3IGxpbnV4LXVzZXI6IFVzZSBFUFJPVE9OT1NVUFBPUlQgZm9yIHVuaW1wbGVtZW50ZWQgbmV0
+bGluayBwcm90b2NvbHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNyBDaGVja2luZyBjb21taXQg
+NzkwMWZhNzhkZjg0IChsaW51eC11c2VyOiBVc2UgRVBST1RPTk9TVVBQT1JUIGZvciB1bmltcGxl
+bWVudGVkIG5ldGxpbmsgcHJvdG9jb2xzKQoyLzcgQ2hlY2tpbmcgY29tbWl0IDE3OGE0MzZiZmUy
+ZCAobGludXgtdXNlcjogcmVmYWN0b3IgaXBjIHN5c2NhbGwgYW5kIHN1cHBvcnQgb2Ygc2VtdGlt
+ZWRvcCBzeXNjYWxsKQpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91
+bGQgYmUgYXZvaWRlZAojMjk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjgyMDoKKyNpZmRl
+ZiBfX3MzOTB4X18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3Vs
+ZCBiZSBhdm9pZGVkCiM2MjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6Mzg5NDoKKyNpZmRl
+ZiBfX3MzOTB4X18KCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUg
+ZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzYzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoz
+ODk1OgorI2RlZmluZSBTRU1USU1FRE9QX0lQQ19BUkdTKF9fbnNvcHMsIF9fc29wcywgX190aW1l
+b3V0KSBcCisgIChfX25zb3BzKSwgKF9fdGltZW91dCksIChfX3NvcHMpCgpFUlJPUjogTWFjcm9z
+IHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM2
+NjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6Mzg5ODoKKyNkZWZpbmUgU0VNVElNRURPUF9J
+UENfQVJHUyhfX25zb3BzLCBfX3NvcHMsIF9fdGltZW91dCkgXAorICAoX19uc29wcyksIDAsIChf
+X3NvcHMpLCAoX190aW1lb3V0KQoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmlu
+ZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzExMTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NDA5
+MzoKKyNpZmRlZiBfX3MzOTB4X18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZp
+bmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxMjU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjQx
+MDg6CisjaWZkZWYgX19OUl9pcGMKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZp
+bmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxMjY6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjQx
+MDk6CisjaWYgZGVmaW5lZChfX3NwYXJjX18pCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2
+YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxMjg6IEZJTEU6IGxpbnV4
+LXVzZXIvc3lzY2FsbC5jOjQxMTE6CisjZGVmaW5lIE1TR1JDVl9BUkdTKF9fbXNncCwgX19tc2d0
+eXApIF9fbXNncCwgX19tc2d0eXAKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBz
+aG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzEzNDogRklMRTogbGludXgtdXNlci9z
+eXNjYWxsLmM6NDExNzoKKyNkZWZpbmUgTVNHUkNWX0FSR1MoX19tc2dwLCBfX21zZ3R5cCkgXAor
+ICAgICgobG9uZyBpbnRbXSl7KGxvbmcgaW50KV9fbXNncCwgX19tc2d0eXB9KSwgMAoKdG90YWw6
+IDQgZXJyb3JzLCA1IHdhcm5pbmdzLCAxNTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi83IGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzcgQ2hlY2tpbmcgY29tbWl0IDJmYjE5NjU2Y2E5ZSAo
+bGludXgtdXNlcjogRml4IENvdmVyaXR5IENJRCAxNDMwMjcxIC8gQ0lEIDE0MzAyNzIpCjQvNyBD
+aGVja2luZyBjb21taXQgMTI0ZTI5MDkzMWEyIChsaW51eC11c2VyOiBhZGQgbmV3IG5ldGxpbmsg
+dHlwZXMpCjUvNyBDaGVja2luZyBjb21taXQgNzVhMDVhZGYwYzQ2IChsaW51eC11c2VyOiBhZGQg
+bmV0bGluayBSVE1fU0VUTElOSyBjb21tYW5kKQo2LzcgQ2hlY2tpbmcgY29tbWl0IDQxNWIxMjM5
+NTc5NiAobGludXgtdXNlcjogZml4IHRoZSBlcnJubyB2YWx1ZSBpbiBwcmludF9zeXNjYWxsX2Vy
+cigpKQo3LzcgQ2hlY2tpbmcgY29tbWl0IGZmZWI2OTE0NmVmNiAobGludXgtdXNlcjogZml4IHBy
+aW50X3N5c2NhbGxfZXJyKCkgd2hlbiBzeXNjYWxsIHJldHVybmVkIHZhbHVlIGlzIG5lZ2F0aXZl
+KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
+MDcxNDA3MzI1OS4xNDY0Njc1LTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNo
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
