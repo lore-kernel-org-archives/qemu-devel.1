@@ -2,85 +2,83 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50539C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3EAC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:22:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AAC52082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:17:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 071C2221FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:22:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIY03kAN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AAC52082F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2vQEcFM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 071C2221FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvNcP-0005A0-Bs
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:17:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57926)
+	id 1jvNgt-0007HC-A6
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:21:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNbY-0004N5-Nx
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:16:28 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57342
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNg7-0006X5-Sw
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:21:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48596
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNbW-0001Yt-3r
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:16:28 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNg5-00028q-RO
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:21:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594743384;
+ s=mimecast20190719; t=1594743669;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=FqdDn8VMLbT2SpVJHj8q8O9JV0eQgZW7xoNpHstZUto=;
- b=CIY03kANlk2XhkIobcAUgSBWFY5yCY6zYOHmLHDNLDPFouHxTc9OFIIsrpL67g/9G4kikY
- wKQi+5WW8SeA/X349Msa5BJXOONOrABb46Va4PiGMMrlyYsm41aKEBU2+AwVu3geVFoE5T
- mzR89lCiRCmUELkQkejWvbdv/NWf76o=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-ZUYE7uK2MTqx1srzsaXjdg-1; Tue, 14 Jul 2020 12:16:22 -0400
-X-MC-Unique: ZUYE7uK2MTqx1srzsaXjdg-1
-Received: by mail-wr1-f70.google.com with SMTP id c6so22351329wru.7
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 09:16:22 -0700 (PDT)
+ bh=+8cuElV7urTDeBXt9SGgsI57OjIGEfYH+WapIy/aIz0=;
+ b=e2vQEcFMJM6X9DOFfd4rJEmNo20To8oSybTjA2m8eNaCDHU/BwqvSe/G3tnXyUpGfKEaof
+ WUTkZKOVpXXthG9JL0uKMh+2JOoaVsY1CGENlbT2qLpRMPycXKwJsIM2HSyK3XQlIdUX/6
+ GCJrvMvcn7BJD5+8olCkU7JKjECewG0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-eLH6ANFCMa2fjMLZjmj0og-1; Tue, 14 Jul 2020 12:21:07 -0400
+X-MC-Unique: eLH6ANFCMa2fjMLZjmj0og-1
+Received: by mail-wm1-f71.google.com with SMTP id v6so4707771wmg.1
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 09:21:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=FqdDn8VMLbT2SpVJHj8q8O9JV0eQgZW7xoNpHstZUto=;
- b=KkfevdjtwUgoUWyI/frvlPE/sMF2VKR+gRp+Ed3JjBO4ZVMq/WGaxDliUZuHwVf/9L
- vCuuN9Sc5clPkF3X2kb4N3fnr1SgJJ9tInYT6D2e4eRfnOXc9kLPe7offVa4qU5vasCI
- Ny3t/pn9nnq90z7TmpDBcVYqkQ06h/SLv2h2R+wyCH+NTweyCjhHBzTF4fLY8HoNDVVG
- BOuNlj0BGYo7KlLACK5RWCxWhJDdA93OQ6c4BW+OMuoFAgTCnVyaZMTLiZ4YRBZWMQo6
- zXRbaEI8fPoJ27iLCNEbSGIpcEK6RlGRQL/j9Ou8GwlY3ZQCp2LIHlWDxMz3Oer3Lg9N
- H48A==
-X-Gm-Message-State: AOAM5332tNR9qazxOZGsf26AGGXPbXttYd8G4OoWQ5Vl6swKK9JTgRRE
- zhXIUJRpzUt5XEPnDcoKaDPMZPwuACvXeEX6XGvCymALOg6pLEbULeqc8uI7e+NNj320KxtYkgy
- FawsbJ67y41RAK6c=
-X-Received: by 2002:a05:6000:100c:: with SMTP id
- a12mr7215710wrx.81.1594743381378; 
- Tue, 14 Jul 2020 09:16:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwAv5rDS4avFJhQfn2zHNy4y+pZIL09qOysQykAqVszF5B+0hh2z26bLjWNt4aZZ++EUjyL5w==
-X-Received: by 2002:a05:6000:100c:: with SMTP id
- a12mr7215671wrx.81.1594743381100; 
- Tue, 14 Jul 2020 09:16:21 -0700 (PDT)
+ bh=+8cuElV7urTDeBXt9SGgsI57OjIGEfYH+WapIy/aIz0=;
+ b=jyIA+fa8UbBcGWV/oI1zaXaBct1tHGmlRBkMQ4vZiw6MPbzGi80XsYPUa4BjTd+gK0
+ wkKL3nf2xG36Wx59HfnF7O6fVFSWz6suuYIexo4kzkspUZ8H/4ncKrkoUA/dYRJGHoGU
+ G+GxwF6D1dOUHMEBYxQDI4LX8/CQQqoI8jPwMzUlFa7kPSllurmof4P9sYH4IFPbaldH
+ d9Ah8jjk110BGNDgWvfdwUkAMdT5ylL177sC4Lc0VtGceW26L5yTYSRP2JsPFCZsEIeD
+ 8hOyPaTMfpYgnxo1tRj7zEXrdBbpEkZvlDSecYeUxLQEiBN4+MpWcCK2jg5nXLSOE5/t
+ lY8w==
+X-Gm-Message-State: AOAM532U6J9Z7hlW0Gxb+gpWXw6ed/FYFvknTbEfrnWr8C26tiyRW42K
+ ae0mCd1tOeHQkGrDQv5DDRPRQHzPnMPjyU/vJ3caNrV806w9XAgzRz5eEZ5t+LJ3LDwF9q2IGYJ
+ mqY+j+sL1t58ZAso=
+X-Received: by 2002:a5d:6107:: with SMTP id v7mr6670678wrt.174.1594743666249; 
+ Tue, 14 Jul 2020 09:21:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxjYktlRL47mWLioXCMu1hg5dosc/T+cGYFb2n6QjDJAGjHBMffL/6fSqtjuuNXqVSyIsVFaw==
+X-Received: by 2002:a5d:6107:: with SMTP id v7mr6670648wrt.174.1594743666026; 
+ Tue, 14 Jul 2020 09:21:06 -0700 (PDT)
 Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id q5sm29966288wrp.60.2020.07.14.09.16.20
+ by smtp.gmail.com with ESMTPSA id 190sm5221323wmb.15.2020.07.14.09.21.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 09:16:20 -0700 (PDT)
-Subject: Re: [PATCH for-5.1 2/5] qom: Plug memory leak in "info qom-tree"
+ Tue, 14 Jul 2020 09:21:05 -0700 (PDT)
+Subject: Re: [PATCH for-5.1 3/5] qom: Change
+ object_get_canonical_path_component() not to malloc
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200714160202.3121879-1-armbru@redhat.com>
- <20200714160202.3121879-3-armbru@redhat.com>
+ <20200714160202.3121879-4-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -105,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <067bb7f2-2ac4-9ed2-493c-5705fe59affa@redhat.com>
-Date: Tue, 14 Jul 2020 18:16:19 +0200
+Message-ID: <10950d76-a58a-0e5f-ba79-71159c9ad4a3@redhat.com>
+Date: Tue, 14 Jul 2020 18:21:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200714160202.3121879-3-armbru@redhat.com>
+In-Reply-To: <20200714160202.3121879-4-armbru@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -145,48 +143,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/14/20 6:01 PM, Markus Armbruster wrote:
-> Commit e8c9e65816 "qom: Make "info qom-tree" show children sorted"
-> created a memory leak, because I didn't realize
-> object_get_canonical_path_component()'s value needs to be freed.
+On 7/14/20 6:02 PM, Markus Armbruster wrote:
+> object_get_canonical_path_component() returns a malloced copy of a
+> property name on success, null on failure.
 > 
-> Reproducer:
+> 19 of its 25 callers immediately free the returned copy.
 > 
->     $ qemu-system-x86_64 -nodefaults -display none -S -monitor stdio
->     QEMU 5.0.50 monitor - type 'help' for more information
->     (qemu) info qom-tree
+> Change object_get_canonical_path_component() to return the property
+> name directly.  Since modifying the name would be wrong, adjust the
+> return type to const char *.
+
+Yeah!
+
 > 
-> This leaks some 4500 path components, 12-13 characters on average,
-> i.e. roughly 100kBytes depending on the allocator.  A couple of
-> hundred "info qom-tree" here, a couple of hundred there, and soon
-> enough we're talking about real memory.
+> Drop the free from the 19 callers become simpler, add the g_strdup()
+> to the other six.
 > 
-> Plug the leak.
-> 
-> Fixes: e8c9e65816f5dbfe18ad3b2be938d0d8192d459a
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  qom/qom-hmp-cmds.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
-> index 9ed8bb1c9f..aaacadacca 100644
-> --- a/qom/qom-hmp-cmds.c
-> +++ b/qom/qom-hmp-cmds.c
-> @@ -96,8 +96,10 @@ static void print_qom_composition(Monitor *mon, Object *obj, int indent);
+>  include/qom/object.h       |  2 +-
+>  backends/hostmem.c         |  2 +-
+>  block/throttle-groups.c    |  2 +-
+>  gdbstub.c                  |  2 +-
+>  hw/arm/xlnx-zynqmp.c       |  6 ++----
+>  hw/block/nvme.c            |  5 ++---
+>  hw/core/machine-qmp-cmds.c |  2 +-
+>  hw/core/machine.c          |  5 ++---
+>  hw/mem/nvdimm.c            |  5 ++---
+>  hw/mem/pc-dimm.c           |  5 ++---
+>  hw/misc/ivshmem.c          |  5 ++---
+>  hw/ppc/spapr_drc.c         |  3 +--
+>  hw/virtio/virtio-crypto.c  |  5 ++---
+>  hw/virtio/virtio-mem.c     |  6 ++----
+>  hw/virtio/virtio-pmem.c    |  5 ++---
+>  iothread.c                 |  9 ++++-----
+>  net/net.c                  |  6 ++----
+>  qom/object.c               |  7 +++----
+>  qom/qom-hmp-cmds.c         | 11 ++++-------
+>  scsi/pr-manager-helper.c   |  3 +--
+>  scsi/pr-manager.c          |  2 +-
+>  softmmu/memory.c           |  2 +-
+>  hw/ppc/trace-events        |  2 +-
+>  23 files changed, 41 insertions(+), 61 deletions(-)
+...
+
+> @@ -303,7 +302,7 @@ type_init(iothread_register_types)
 >  
->  static int qom_composition_compare(const void *a, const void *b, void *ignore)
+>  char *iothread_get_id(IOThread *iothread)
 >  {
-> -    return g_strcmp0(a ? object_get_canonical_path_component(a) : NULL,
-> -                     b ? object_get_canonical_path_component(b) : NULL);
-> +    g_autofree char *ac = object_get_canonical_path_component(a);
-> +    g_autofree char *bc = object_get_canonical_path_component(b);
-> +
-> +    return g_strcmp0(ac, bc);
+> -    return object_get_canonical_path_component(OBJECT(iothread));
+> +    return g_strdup(object_get_canonical_path_component(OBJECT(iothread)));
 >  }
->  
->  static int insert_qom_composition_child(Object *obj, void *opaque)
-> 
+
+(Note for later, this one can return const).
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
