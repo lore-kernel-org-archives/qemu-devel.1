@@ -2,84 +2,89 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9AAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65764C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0948122510
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:07:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3013722510
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:08:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqye65JM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0948122510
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFsLO3OC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3013722510
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvLb6-0001OM-BS
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:07:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35084)
+	id 1jvLbI-0001WL-Er
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:08:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jvLS5-0004SD-Vq; Tue, 14 Jul 2020 09:58:34 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38924)
+ id 1jvLaH-0000bi-6k
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:07:01 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34241)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jvLS0-0003S6-Hi; Tue, 14 Jul 2020 09:58:33 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q5so21792786wru.6;
- Tue, 14 Jul 2020 06:58:27 -0700 (PDT)
+ id 1jvLaF-0004qc-Bc
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:07:00 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f7so21864025wrw.1
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:06:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xJNAHPmz369DioNcGM4Scwy8Ugn1lj7QhwxPj6ml31c=;
- b=iqye65JM8+hj/MGqzuxOZbmYUlTZ6AdWXw2OCcTI7fNfM+ci6btDSzXyh+o4PT6NW0
- dtxXh8OLEL2KJ2Uglc1ahWJUVYaULQxF45co9prwgapp4WN4/JpjeyDMOxvcp4jEexv2
- sgLS2tht6pFNAh/bJr3vquRn7dx+Hkzn99l82PykgbWxohN0MHyBIFk/PiNbRuvAYHwd
- dOqWiTIwmU6Bs3IV1B2YV8fdzxK5z5j1bm1nupkwLzVgoxE2ZU+7ZuWvjKmfZElA05+E
- YRVbv2IMT4DjmXBGFl4iO8yvgTZBhjct5LDTMp3+O2gqM1dIiSN4RjTslpRaWYqy3ZJy
- tdQQ==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=j3O91gpeK5GJJmhIVSZPjES05mMsQNR8reQiPi/rhWw=;
+ b=dFsLO3OC7QE38EV4O0tIFFhMdedu5xpazLnw3uPw2rLIFbzcPqHxX0Hae9kn/ATv5K
+ AMvuNHNMVE/zBCjy4dTwq7dbsh8+f0O5hpwDidl4H41sEr297hVQuoBcJR79UpVhhm9u
+ jWn5/ByVl46Gy3nK43DVkfAbZWJmn0MungT2R43g45zn7ntPVI9tllD1p9yJa3AdtJH4
+ adQBV/6pZhB4nrK/bvi8oDgw/prAQyluw9omLL+adWrd1nBl9t8z0Z4TTBIsg00HkaKF
+ JGOBiNYv7cD2wIsfAvZHcwm8JbM97ZNzNUlTzJCcoDmne09whjphcBMWeXJYKAP5hbnq
+ iWfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=xJNAHPmz369DioNcGM4Scwy8Ugn1lj7QhwxPj6ml31c=;
- b=qcUWpeM2jyZstOfZCAsYc+Y9Vr5hr9dejp7u5RENxa9NR8F0Gk+lZbaIfMDyaRfQYI
- wBC7mWwoBMm3pAAZ/rnxLnKWZIT8rEnA3TNNyi7tVeIWXGl1uyQ85iuuSSm0p/tPGW4j
- /Zbm2IU9lw+3ZuzpuC5OZOVVQ2aZjL1/8N4iPIY3hFZTkqxKp4133v5DR73Cr6JYGLrs
- 6Ky6EX3wzFddciBgxlZbQvraH5zKH7VsvKynLmghlLru0CNdkzhKybMfVSnsMO+1jtlG
- HNACWThVE/YZatoEJhx9ITImAzVWpCL4SqOVqbwDa/XqjI9Ml8HS124I3UsKxQrj7UmM
- hKmg==
-X-Gm-Message-State: AOAM530/gCGzlfBw+zxG+drPz0VBjmSOxKPITJapt104Lnc3afXFAWtp
- 0PgSPnaMR+2eIaA1o3yhb1VP/BxR9GA=
-X-Google-Smtp-Source: ABdhPJyiSvaSVhQJ+rJxWSsOVCQeB7z/TtQcouCdy8qB9Ok/ybsZwGmOt0M246FzkaFMGUQJTI2hgw==
-X-Received: by 2002:adf:f34f:: with SMTP id e15mr5769852wrp.415.1594735106722; 
- Tue, 14 Jul 2020 06:58:26 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id k14sm29145343wrn.76.2020.07.14.06.58.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jul 2020 06:58:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j3O91gpeK5GJJmhIVSZPjES05mMsQNR8reQiPi/rhWw=;
+ b=i9BZlvodFgFpwhKaNkVX0xqu3va/7OmbShMl+okbC7QyXH06hkiH6JJDZnuuiAi/aS
+ Jq/lh3OzeNMwggPUdk/mtTxhj4JT+30YgDA21IXp81lPU6sCD5/YXW+49F1ZRQLOdo1T
+ iSrQgpQrR2MTe0/KltALn2uBRQVUkPp1CBFiUD/TZM3jJgVjLW4eftM9ZznQ1Kuz/wxD
+ mUdMrehJjZXeSROk2SyHMlcNDnzf9la8tctFX4ZiW5McqOeAEsm/YUUtJpeE0OCEJwXz
+ MQ6bJ2R5ydSzrEwm+MYKQ9xKgw984ByaG3/c7yTmRtMLuI9qkaNbM8XVRpxnOjM8dH2J
+ 1bsg==
+X-Gm-Message-State: AOAM531OpdmqX8oLWBDLU64NCxK+Uw4K72JD446APSnGeHUQMvIoE5nt
+ WQDmkPMT98t/QZ2WwPiGj/E=
+X-Google-Smtp-Source: ABdhPJzZ+L2moUZlUCPAkohfh3XU48NqGQ6i5IzJJXD+ZRHvJKaZ6Kv3FvqOTNbX/qNV/X3r13LxnA==
+X-Received: by 2002:adf:8091:: with SMTP id 17mr5619281wrl.13.1594735617561;
+ Tue, 14 Jul 2020 07:06:57 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id f197sm4975857wme.33.2020.07.14.07.06.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Jul 2020 07:06:56 -0700 (PDT)
+Subject: Re: [PATCH 4/5] MAINTAINERS: Adjust MIPS maintainership (remove Paul
+ Burton)
 To: qemu-devel@nongnu.org
-Subject: [PULL 8/9] hw/sd/sdcard: Update coding style to make checkpatch.pl
- happy
-Date: Tue, 14 Jul 2020 15:58:13 +0200
-Message-Id: <20200714135814.19910-9-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200714135814.19910-1-f4bug@amsat.org>
-References: <20200714135814.19910-1-f4bug@amsat.org>
+References: <20200702133701.25237-1-f4bug@amsat.org>
+ <20200702133701.25237-5-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <acfcd2c4-bfec-de29-1871-20339b3992c1@amsat.org>
+Date: Tue, 14 Jul 2020 16:06:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200702133701.25237-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,91 +107,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Prasad J Pandit <ppandit@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Yunqiang Su <syq@debian.org>, Paul Burton <paulburton@kernel.org>,
+ James Hogan <jhogan@kernel.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To make the next commit easier to review, clean this code first.
+On 7/2/20 3:37 PM, Philippe Mathieu-Daudé wrote:
+> From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> 
+> Paul Burton removed for not being present.
+> 
+> Aleksandar Markovic comment:
+> 
+>   A polite email was sent [2 days ago] to him with question
+>   whether he intend to actively participate, but there was no
+>   response.
+> 
+> Paul Burton response [*]:
+> 
+>   It was 2 days ago, not 2 months :)
+>   I'm fine with being removed though - I no longer have access
+>   to modern MIPS CPUs or Boston hardware, and wouldn't currently
+>   have time to spend on them if I did.
+> 
+> Aleksandar Rikalo becomes the new maintainer of the Boston board.
+> 
+> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg718739.html
+> 
+> Cc: Paul Burton <paulburton@kernel.org>
+> Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+> Acked-by: Paul Burton <paulburton@kernel.org>
+> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Message-Id: <20200701182559.28841-3-aleksandar.qemu.devel@gmail.com>
+> [PMD: Split patch in 3, added Paul response]
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> This patch still requires Ack-by from Aleksandar Rikalo
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
-Message-Id: <20200630133912.9428-3-f4bug@amsat.org>
----
- hw/sd/sd.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+I can not merge this without Aleksandar Rikalo approval,
+so I'm taking it out for 5.1.
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 76d68359a4..f4f76f8fd2 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -1175,8 +1175,9 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-             sd->data_start = addr;
-             sd->data_offset = 0;
- 
--            if (sd->data_start + sd->blk_len > sd->size)
-+            if (sd->data_start + sd->blk_len > sd->size) {
-                 sd->card_status |= ADDRESS_ERROR;
-+            }
-             return sd_r1;
- 
-         default:
-@@ -1191,8 +1192,9 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-             sd->data_start = addr;
-             sd->data_offset = 0;
- 
--            if (sd->data_start + sd->blk_len > sd->size)
-+            if (sd->data_start + sd->blk_len > sd->size) {
-                 sd->card_status |= ADDRESS_ERROR;
-+            }
-             return sd_r1;
- 
-         default:
-@@ -1237,12 +1239,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-             sd->data_offset = 0;
-             sd->blk_written = 0;
- 
--            if (sd->data_start + sd->blk_len > sd->size)
-+            if (sd->data_start + sd->blk_len > sd->size) {
-                 sd->card_status |= ADDRESS_ERROR;
--            if (sd_wp_addr(sd, sd->data_start))
-+            }
-+            if (sd_wp_addr(sd, sd->data_start)) {
-                 sd->card_status |= WP_VIOLATION;
--            if (sd->csd[14] & 0x30)
-+            }
-+            if (sd->csd[14] & 0x30) {
-                 sd->card_status |= WP_VIOLATION;
-+            }
-             return sd_r1;
- 
-         default:
-@@ -1261,12 +1266,15 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-             sd->data_offset = 0;
-             sd->blk_written = 0;
- 
--            if (sd->data_start + sd->blk_len > sd->size)
-+            if (sd->data_start + sd->blk_len > sd->size) {
-                 sd->card_status |= ADDRESS_ERROR;
--            if (sd_wp_addr(sd, sd->data_start))
-+            }
-+            if (sd_wp_addr(sd, sd->data_start)) {
-                 sd->card_status |= WP_VIOLATION;
--            if (sd->csd[14] & 0x30)
-+            }
-+            if (sd->csd[14] & 0x30) {
-                 sd->card_status |= WP_VIOLATION;
-+            }
-             return sd_r1;
- 
-         default:
--- 
-2.21.3
-
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 53404a746e..64f54c553c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1099,8 +1099,7 @@ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>  S: Maintained
+>  
+>  Boston
+> -M: Paul Burton <pburton@wavecomp.com>
+> -R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+> +M: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+>  S: Maintained
+>  F: hw/core/loader-fit.c
+>  F: hw/mips/boston.c
+> 
 
