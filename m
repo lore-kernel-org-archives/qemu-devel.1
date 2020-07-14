@@ -2,86 +2,91 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF18C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D29C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:40:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1AAA20773
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:30:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7352E20B80
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:40:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N2nHdeiF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1AAA20773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="IEyw8hJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7352E20B80
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvCaj-00088F-1W
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 00:30:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37854)
+	id 1jvCjy-0001S5-PY
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 00:40:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvCa5-0007cm-LF
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:30:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38990
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvCa3-0000Xw-0F
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:30:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594701009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=LOxxxGcLpv50wQyT3VzCnFOlQQyLavJjICuoMhSqgec=;
- b=N2nHdeiFMLND3a9qGHM9ECQYOWx8Eg7EUCyguUC7tF4JG/8irSDUiEPY2wqlJRyFhhRXIz
- 1vbgldZKPPpFubJRibCoC0twO2SR6itZkTAw4IOINJGe9qs67YEwi+ecm7UWcu3usjkmnS
- tkKczEuVieXBuB/hUTi6CJp7vTLRzro=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-HY8K750BPoGkzJCInrZnrw-1; Tue, 14 Jul 2020 00:30:07 -0400
-X-MC-Unique: HY8K750BPoGkzJCInrZnrw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E7E71009441
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 04:30:06 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-112-247.rdu2.redhat.com
- [10.10.112.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF2E476206;
- Tue, 14 Jul 2020 04:30:05 +0000 (UTC)
-Date: Tue, 14 Jul 2020 00:30:03 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 1/1] python: add check-python target
-Message-ID: <20200714043003.GA3012808@localhost.localdomain>
-References: <20200714013026.9019-1-jsnow@redhat.com>
- <20200714013026.9019-2-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jvCjE-000103-DO
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:39:40 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:41087)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jvCjB-0002UX-1V
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 00:39:40 -0400
+Received: by mail-ot1-x333.google.com with SMTP id a21so11948366otq.8
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 21:39:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=u3qAweFNJ6WHi8MtwgaGsVD1PoKriZDZAZPxQuIwsCM=;
+ b=IEyw8hJi2rNmCpsQgaAlek9T6G+9Qf1f5aotyy5oWDn97k4EtOYoTKn4bSHBWUeljZ
+ Cgll4wFuGGtEfED7qqHjDG1OPEBgxa09ETi9D9RbfKiLUys9iiFH5VTxF5CTgOUVC5sY
+ ANEx1XEmZZz1YKt/rHyDPYFTazNbVECTFEwevK9lnUaWsX3WWAQc7Hla1T3qMowvgVIU
+ 7XvSRrS/BLV8KMMV4dJE6Ohq/hNa/7TtQJYVVrMCEQRBYyLF9UCK8fikYJYvKAKq/dbM
+ e/2RdnXLFdgB/c+HRJneNQvFnE+Z3v+6bvp+V1M89LHBI4MTlSu8zAMp7TG1dqzpFxYF
+ H6eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=u3qAweFNJ6WHi8MtwgaGsVD1PoKriZDZAZPxQuIwsCM=;
+ b=pPsLhw2njiNoisInZOmTQfyLBtLj5LgY9JAMNR/9b68clT52YNzgyMUStHVG9CtM+/
+ Dns3tLQ7pBZU9fpvdwV6LLQgSSq0T/0Yis+qjNaQJVvUXytYo1Z53ITCbDy3YoySXsmR
+ LQSykct8AFKwTAL16A8mbGVLiGdx1fJFOYs+x+yBeu2xw3YfBGD74ahIXtzArV91ZiB5
+ BteKgFMlshcr7ResAcyPaKL2tSetdPTHWQpf1wJ4124Y5mxQ+SHa+ptVrTv1OaZpVm/u
+ m828KyTgptmLrvFg/lQ6H/8Wo5ubwni5CBxcPjTvGPeVOKIQy+pr4+yv59rUpxB32FpI
+ ydZg==
+X-Gm-Message-State: AOAM533DuNKVw2U0eYdKuxr/igCHSeUVMyU1iZtHwJRsGKfhCJK6tl3f
+ 8T1P9Ud38gKuWDkWH1JVF3dA5joM1fK3Yimv68RM+A==
+X-Google-Smtp-Source: ABdhPJwmzjuzNJq8FmVBKZURCSXfY/8BSMwahm4lYiDvrbdk4HwAaLLVESJw80M7cXWgMXx9PpkSQ+6+cuQR6pU/gzQ=
+X-Received: by 2002:a05:6830:1d0:: with SMTP id
+ r16mr2748184ota.188.1594701575529; 
+ Mon, 13 Jul 2020 21:39:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200714013026.9019-2-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6c2NcOVqGQ03X4Wi"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:30:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+ <20200710104920.13550-6-frank.chang@sifive.com>
+ <452e8bc7-4622-77c2-ec81-9aa6f25705fc@linaro.org>
+ <CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com>
+ <407ef5d5-d9d9-9619-b6e3-456f8a5b4bfb@c-sky.com>
+In-Reply-To: <407ef5d5-d9d9-9619-b6e3-456f8a5b4bfb@c-sky.com>
+From: Frank Chang <frank.chang@sifive.com>
+Date: Tue, 14 Jul 2020 12:39:24 +0800
+Message-ID: <CAE_xrPiNfu2f0fMfVes6PF-HPRuP7-dFuVEidMYFGLfwGhdcEA@mail.gmail.com>
+Subject: Re: [RFC 05/65] target/riscv: remove vsll.vi, vsrl.vi, vsra.vi insns
+ from using gvec
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: multipart/alternative; boundary="000000000000eebb8c05aa5f64bf"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
+ envelope-from=frank.chang@sifive.com; helo=mail-ot1-x333.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,118 +99,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---6c2NcOVqGQ03X4Wi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--000000000000eebb8c05aa5f64bf
+Content-Type: text/plain; charset="UTF-8"
+
+On Tue, Jul 14, 2020 at 11:35 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+
+>
+>
+> On 2020/7/14 10:59, Frank Chang wrote:
+>
+> On Sat, Jul 11, 2020 at 12:27 AM Richard Henderson <
+> richard.henderson@linaro.org> wrote:
+>
+>> On 7/10/20 3:48 AM, frank.chang@sifive.com wrote:
+>> > From: Frank Chang <frank.chang@sifive.com>
+>> >
+>> > vsll.vi, vsrl.vi, vsra.vi cannot use shli gvec as it requires the
+>> > shift immediate value to be within the range: [0.. SEW bits].
+>> > Otherwise, it will hit the assertion:
+>> > tcg_debug_assert(shift >= 0 && shift < (8 << vece));
+>> >
+>> > However, RVV spec does not have such constraint, therefore we have to
+>> > use helper functions instead.
+>>
+>> Why do you say that?  It does have such a constraint:
+>>
+>> # Only the low lg2(SEW) bits are read to obtain the shift amount from a
+>> register value.
+>>
+>> While that only talks about the register value, I sincerely doubt that
+>> the same
+>> truncation does not actually apply to immediates.
+>>
+>> And if the entire immediate value does apply, the manual should certainly
+>> specify what should happen in that case.  And at present it doesn't.
+>>
+>> It seems to me the bug is the bare use of GEN_OPIVI_GVEC_TRANS and thence
+>> do_opivi_gvec.  The ZX parameter should be extended to more than just
+>> "zero vs
+>> sign-extend", it should have an option for truncating the immediate to
+>> s->sew.
+>>
+>>
+>> r~
+>>
+>
+> The latest spec specified:
+>
+> Only the low *lg2(SEW) bits* are read to obtain the shift amount from a *register
+> value*.
+> The *immediate* is treated as an *unsigned shift amount*, with a *maximum
+> shift amount of 31*.
+>
+> Looks like the shift amount in the immediate value is not relevant with
+> SEW setting.
+> If so, is it better to just use do_opivi_gvec() and implement the logic by
+> our own rather than using gvec IR?
+>
+>
+> In my opinion, it doesn't matter to truncate the immediate to s->sew
+> before calling the gvec IR,
+> whether the constraint of immediate exits or not.
+>
+> Zhiwei
+>
+>
+> Frank Chang
+>
+>
+>
+The current issue I've encountered is the test like:
+
+*vsetvli t0,t0,e8,m1,tu,mu,d1*
+*vsll.vi <http://vsll.vi> v30, v30, 27*
+where the SEW is 8 (i.e. vece = 0), but the immediate value is: 27.
+The instruction doesn't violate the requirement specified in spec as its
+value is less then 31.
+However, it can't pass *tcg_debug_assert(shift >= 0 && shift < (8 <<
+vece));* assertion if tcg debug option is enabled.
+
+Frank Chang
+
+--000000000000eebb8c05aa5f64bf
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 13, 2020 at 09:30:26PM -0400, John Snow wrote:
-> Move pylintrc and flake8 up to the root of the python folder where
-> they're the most useful. Add a requirements.cqa.txt file to house
-> the requirements necessary to build a venv sufficient for running
-> code quality analysis on the python folder. Add a makefile that
-> will build the venv and run the tests.
->
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  Makefile                    |  1 +
->  python/{qemu =3D> }/.flake8   |  0
->  python/Makefile.include     | 33 +++++++++++++++++++++++++++++++++
->  python/{qemu =3D> }/pylintrc  |  1 +
->  python/requirements.cqa.txt |  3 +++
->  5 files changed, 38 insertions(+)
->  rename python/{qemu =3D> }/.flake8 (100%)
->  create mode 100644 python/Makefile.include
->  rename python/{qemu =3D> }/pylintrc (99%)
->  create mode 100644 python/requirements.cqa.txt
->=20
-> diff --git a/Makefile b/Makefile
-> index b1b8a5a6d0..41808be392 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -478,6 +478,7 @@ dummy :=3D $(call unnest-vars,, \
->                  trace-obj-y)
-> =20
->  include $(SRC_PATH)/tests/Makefile.include
-> +include $(SRC_PATH)/python/Makefile.include
-> =20
->  all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurs=
-e-all modules $(vhost-user-json-y)
-> =20
-> diff --git a/python/qemu/.flake8 b/python/.flake8
-> similarity index 100%
-> rename from python/qemu/.flake8
-> rename to python/.flake8
-> diff --git a/python/Makefile.include b/python/Makefile.include
-> new file mode 100644
-> index 0000000000..917808e2f1
-> --- /dev/null
-> +++ b/python/Makefile.include
-> @@ -0,0 +1,33 @@
-> +# -*- Mode: makefile -*-
-> +
-> +PYLIB_VENV_DIR=3D$(BUILD_DIR)/venv/cqa
-> +PYLIB_VENV_REQ=3D$(SRC_PATH)/python/requirements.cqa.txt
-> +
-> +$(PYLIB_VENV_DIR): $(PYLIB_VENV_REQ)
-> +=09$(call quiet-command, \
-> +=09    $(PYTHON) -m venv $@, \
-> +=09    VENV, $@)
-> +=09$(call quiet-command, \
-> +=09    $(PYLIB_VENV_DIR)/bin/python3 -m pip -q install -r $(PYLIB_VENV_R=
-EQ), \
-> +=09    PIP, $(PYLIB_VENV_REQ))
-> +=09$(call quiet-command, touch $@)
-> +
+<div dir=3D"ltr"><div dir=3D"ltr">On Tue, Jul 14, 2020 at 11:35 AM LIU Zhiw=
+ei &lt;<a href=3D"mailto:zhiwei_liu@c-sky.com">zhiwei_liu@c-sky.com</a>&gt;=
+ wrote:<br></div><div class=3D"gmail_quote"><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
+;padding-left:1ex">
+ =20
+   =20
+ =20
+  <div>
+    <br>
+    <br>
+    <div>On 2020/7/14 10:59, Frank Chang wrote:<br>
+    </div>
+    <blockquote type=3D"cite">
+     =20
+      <div dir=3D"ltr">
+        <div dir=3D"ltr">On Sat, Jul 11, 2020 at 12:27 AM Richard
+          Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org" tar=
+get=3D"_blank">richard.henderson@linaro.org</a>&gt;
+          wrote:<br>
+        </div>
+        <div class=3D"gmail_quote">
+          <blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8=
+ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 7/10/20 3:48=
+ AM, <a href=3D"mailto:frank.chang@sifive.com" target=3D"_blank">frank.chan=
+g@sifive.com</a> wrote:<br>
+            &gt; From: Frank Chang &lt;<a href=3D"mailto:frank.chang@sifive=
+.com" target=3D"_blank">frank.chang@sifive.com</a>&gt;<br>
+            &gt; <br>
+            &gt; <a href=3D"http://vsll.vi" rel=3D"noreferrer" target=3D"_b=
+lank">vsll.vi</a>, <a href=3D"http://vsrl.vi" rel=3D"noreferrer" target=3D"=
+_blank">vsrl.vi</a>, <a href=3D"http://vsra.vi" rel=3D"noreferrer" target=
+=3D"_blank">vsra.vi</a> cannot use shli gvec as
+            it requires the<br>
+            &gt; shift immediate value to be within the range: [0.. SEW
+            bits].<br>
+            &gt; Otherwise, it will hit the assertion:<br>
+            &gt; tcg_debug_assert(shift &gt;=3D 0 &amp;&amp; shift &lt; (8
+            &lt;&lt; vece));<br>
+            &gt; <br>
+            &gt; However, RVV spec does not have such constraint,
+            therefore we have to<br>
+            &gt; use helper functions instead.<br>
+            <br>
+            Why do you say that?=C2=A0 It does have such a constraint:<br>
+            <br>
+            # Only the low lg2(SEW) bits are read to obtain the shift
+            amount from a<br>
+            register value.<br>
+            <br>
+            While that only talks about the register value, I sincerely
+            doubt that the same<br>
+            truncation does not actually apply to immediates.<br>
+            <br>
+            And if the entire immediate value does apply, the manual
+            should certainly<br>
+            specify what should happen in that case.=C2=A0 And at present i=
+t
+            doesn&#39;t.<br>
+            <br>
+            It seems to me the bug is the bare use of
+            GEN_OPIVI_GVEC_TRANS and thence<br>
+            do_opivi_gvec.=C2=A0 The ZX parameter should be extended to mor=
+e
+            than just &quot;zero vs<br>
+            sign-extend&quot;, it should have an option for truncating the
+            immediate to s-&gt;sew.<br>
+            <br>
+            <br>
+            r~<br>
+          </blockquote>
+          <div><br>
+          </div>
+          <div>The latest spec specified:</div>
+          <div><br>
+          </div>
+          Only the low <b>lg2(SEW) bits</b> are read to obtain the
+          shift amount from a <b>register value</b>.<br>
+          <div>The <b>immediate</b> is treated as an <b>unsigned shift
+              amount</b>, with a <b>maximum shift amount of 31</b>.</div>
+          <div><br>
+          </div>
+          <div>Looks like the shift amount in the immediate value is not
+            relevant with SEW setting.</div>
+          <div>If so, is it better to just use do_opivi_gvec() and
+            implement the logic by our own rather than using gvec IR?</div>
+        </div>
+      </div>
+    </blockquote>
+    <br>
+    In my opinion, it doesn&#39;t matter to truncate the immediate to
+    s-&gt;sew before calling the gvec IR, <br>
+    whether the constraint of immediate exits or not. <br>
+    <br>
+    Zhiwei<br>
+    <blockquote type=3D"cite">
+      <div dir=3D"ltr">
+        <div class=3D"gmail_quote">
+          <div><br>
+          </div>
+          <div>Frank Chang</div>
+        </div>
+      </div>
+    </blockquote>
+    <br></div></blockquote><div><br></div><div>The current issue I&#39;ve e=
+ncountered is the test like:</div><div><i>vsetvli	t0,t0,e8,m1,tu,mu,d1<br><=
+/i></div><div><i><a href=3D"http://vsll.vi">vsll.vi</a> v30, v30, 27</i></d=
+iv><div>where the SEW is 8 (i.e. vece =3D 0), but the immediate value is: 2=
+7.</div><div>The instruction doesn&#39;t violate the requirement specified =
+in spec as its value is less then 31.</div><div>However, it can&#39;t pass =
+<i style=3D"">tcg_debug_assert(shift &gt;=3D 0 &amp;&amp; shift &lt; (8
+            &lt;&lt; vece));</i> assertion if tcg debug option is enabled.<=
+/div><div><br></div><div>Frank Chang</div></div></div>
 
-Maybe we should try to create a generic rule that takes a directory
-name and a requirements file and creates the venv accordingly, instead
-of duplicating the other similar rules under tests/Makefile.include?
-
-> +pylib-venv: $(PYLIB_VENV_DIR)
-> +
-> +check-python: pylib-venv
-> +=09$(call quiet-command, cd $(SRC_PATH)/python && \
-> +=09    $(PYLIB_VENV_DIR)/bin/python3 -m flake8 qemu, \
-> +=09    FLAKE8, \
-> +=09    $(SRC_PATH)/python/qemu \
-
-I can see how this venv would be very useful to run the same checks on
-other Python code (for instance, the acceptance tests themselves), so
-we'd also need another "check-python"-like rule, or include those on
-the same call.
-
-Ideas? :)
-
-Thanks!
-- Cleber.
-
---6c2NcOVqGQ03X4Wi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8NNMkACgkQZX6NM6Xy
-CfPCzxAAkDPvWZ034bXhULrS6bPHLfVF/0Qo3+GiOn4+kqkwNIFNltWhBwNJJHJf
-DpHShGky/AK9PJTfk6Kuk4s0it2OTYdibVpV+jHp2LUMRHs8vtZ24CT6P5nZn4AE
-fR4ZVCl8HPkjT0oO2HtkXCtjjK6TdhSPXQ659PGKDQ8G+pMLFLwgQwYVytUdmTUy
-Xdm0vYifDUeb0DMDio2a3aiVgtkF7h4lzsCmxB97ITsHZJuIN6Wjz4OI4k0ibXhK
-mmxxpPk8bbf99YdCobRS/ScCh+cc1ym1y6L4+iHQCXX0CuJaojCcKkJ338vjxDu8
-pSpAI+IpfATuM+V91yi/WFkkfHTE1rsAjR9dyOUnWGeIQzhFva9/eVeJ6xw8cMsY
-z4SuY1EVohv8sg68QWz7N9ikDrpIo/NavGNOgYoxt/z5kCmkRCnpUTRXBNCmtKKr
-HEjt83Vzh5O1IVosew6O9sfW221g3sDXNtuu8QAi/R0iFcHBuMU93cTogpKMvHcc
-nJsdbE/s9xeOHxr/Bjnx8N8hifOldB706aJh8TwCIIZMMfRw6n+VN/35m7FWFEVG
-Rd9rbAFkotSBTBsH8dRwg8qkknvkivil9h8ViuxP3Mwm3Beyu9wM6w3Al/gAE7nj
-oOacUjGdhAGp+EyO1lnj7VWROLhB9h1Gf6TkwGROJqq2qDjfmYs=
-=RnCE
------END PGP SIGNATURE-----
-
---6c2NcOVqGQ03X4Wi--
-
+--000000000000eebb8c05aa5f64bf--
 
