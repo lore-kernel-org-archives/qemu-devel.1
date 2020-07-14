@@ -2,123 +2,94 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1ABC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A600CC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 11:04:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083DF22200
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F8E6207CD
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 11:04:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQu5mUSd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083DF22200
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CVREvkRA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8E6207CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvIcD-0004Kj-B4
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 06:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45884)
+	id 1jvIjJ-0007wW-Q1
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 07:04:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvIbM-0003Qe-Ch
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:55:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46121
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvIiQ-0007Vt-39
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 07:03:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56421
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvIbJ-0004J8-M8
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:55:55 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvIiN-0005Gq-HK
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 07:03:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594724152;
+ s=mimecast20190719; t=1594724587;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+Ydl41/I9H4a7/oq3cF9M5jYD9IlxMRzPZmoGHS3EHE=;
- b=LQu5mUSdYppa9VsD+W4M8LgI8HWry0TP9hUNXpPX7vMaTdY541jTVjzjSmDUvJhcLLrMlI
- tDs9nMIs14yEWroF2RduDbHelqLs6kIdW06X+tK0Q6j+MP00ndjWJX25X48CgJ6zc0IDig
- h4lntdb5xOy37O5cFCCl6JN1DkKJ7r0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-je_r5-sgPV6COXv_Utn7hQ-1; Tue, 14 Jul 2020 06:55:48 -0400
-X-MC-Unique: je_r5-sgPV6COXv_Utn7hQ-1
-Received: by mail-wr1-f70.google.com with SMTP id y13so21132545wrp.13
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 03:55:48 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references;
+ bh=Sk6wGfMUobfu/xWX4jTK8eHp+LSxrOxz59O7riEM4Mk=;
+ b=CVREvkRAdsmUMcrPpWlz/mJZ7k2FFQXIuvhxt2oGWLdwRhqhDW+vUmTKpGHJUkxbJpx4So
+ 4jhAknbZTxyLtJcI9JTFBQi5tUhnXsI1HEL0lsUbxPqigpHffMIqOGDV8dX0WDfVE9eNsx
+ A8/I0WdLcQc1UIv6PtRIV1coRvnM5SM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-dLEeZgNjO1y1Fwn2F4QB-A-1; Tue, 14 Jul 2020 07:03:05 -0400
+X-MC-Unique: dLEeZgNjO1y1Fwn2F4QB-A-1
+Received: by mail-wm1-f71.google.com with SMTP id g138so3378302wme.7
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 04:03:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=+Ydl41/I9H4a7/oq3cF9M5jYD9IlxMRzPZmoGHS3EHE=;
- b=KOli56OomvWSFztLAFYoHkRVkDsOjXc4XzEINumgYIQaIPQIni7FVLVOiJ1gpzy+gv
- fmxq39bylGg5khugvywVgOlpmRNkI4jTtGYGy1vN/B1yG9jSboYO4S/2daL1HrNJLNEO
- aR1Wfh/GuJ0NA/1U+KztUljIPqmqlxy+3PhCFv9N7snpVkjID/uoi6cJV0X5Txf7gNmw
- r9pulLfsJW2+f95pesmPN7oMN3pYk4yqeoRfmqFG4MN87f4xyf0s9dgjMwixhgF61IwT
- ykGU3QBuM0hpXkizXox8RCS96xir8Aeg18/c2lt4oHl6qwdCIG+LfXRQeJl5MqxbQ8YK
- Z14A==
-X-Gm-Message-State: AOAM533Smf+Ef/dJi13eteEfLUrrMpL1ytYijaHKR3ebtmgkzF6U8gug
- AFPqGFA+wccQGiJC7F3jqvwX1e49hquXPzI66bFhbIyPu6Ve0d4MfeDprvc/XMTGbUkrmvUX+/n
- kEiZaZiCLpvKK4bs=
-X-Received: by 2002:adf:92c4:: with SMTP id 62mr4375146wrn.290.1594724147153; 
- Tue, 14 Jul 2020 03:55:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxNebMtTbJbIocKmCBY+TCCsLlrz9nf/1FXIw7W+ZHmqxur0scn9e5QzacNMHd3FSRLh65KQg==
-X-Received: by 2002:adf:92c4:: with SMTP id 62mr4375107wrn.290.1594724146802; 
- Tue, 14 Jul 2020 03:55:46 -0700 (PDT)
-Received: from [192.168.1.43] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id s10sm3928015wme.31.2020.07.14.03.55.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 03:55:46 -0700 (PDT)
-Subject: Re: [PATCH] Allow acpi-tmr size=2
-To: "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-References: <5f12377f-b640-c4c5-1bcd-858c622c6c31@the-jedi.co.uk>
- <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
- <20200713070946-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <cf26ffdf-3165-8f54-267f-70f150c73c37@redhat.com>
-Date: Tue, 14 Jul 2020 12:55:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Sk6wGfMUobfu/xWX4jTK8eHp+LSxrOxz59O7riEM4Mk=;
+ b=LV6/GI5iYhqYkuDD/GWRdFKUCts8JUA6kj1fiVW5DegmAZUjO5qnNz9CNuAbEAGXpZ
+ EXJFcbidzr5lJIB5qcB+JrDg2pX59e79tQzkZkcPeAvzqAJUw4lKApIkwBm4U9mfC5b1
+ gyqat04b1zzdIwzoLFEiA0er+uqhQ10T2L7QRAE27AXUtOytsn/bzppHx/cyGhNOq1nc
+ Wfdz9M5iRvAFtfj6Ab0GfKhn9qPr4+egl8mO6+Xb7xPQ9Bs4JKxCN5mvMJ1ErEompSMc
+ dOE5g2pjbLiFM7EgyDHuV5Hn6I4WlX6zKVba7oet9oSRQOqMZD7wwYNOMqnHY3X3plce
+ LfmQ==
+X-Gm-Message-State: AOAM53347ldXCKUWNxt6JYuveDyK2jfm7zRGjTpglLHB6aBGHAGHAAR/
+ CKWieY78HB8z8Zcpd/cMbahbwGAJd9VJAjU3On1HneWM1fLBg4IpGM6EpF0+BLbRtfdpCLAyvCe
+ ld8PEWnpTbdTgDGk=
+X-Received: by 2002:adf:82a1:: with SMTP id 30mr4857620wrc.210.1594724584318; 
+ Tue, 14 Jul 2020 04:03:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzrnjmaI7/5s73YJjnpwhxl6LnSwi9UDAj7K6xDh/U5qYUITKSVQFCqiMw55Zri+EbnS0PNGg==
+X-Received: by 2002:adf:82a1:: with SMTP id 30mr4857574wrc.210.1594724584074; 
+ Tue, 14 Jul 2020 04:03:04 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
+ by smtp.gmail.com with ESMTPSA id e17sm27277234wrr.88.2020.07.14.04.03.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jul 2020 04:03:03 -0700 (PDT)
+Date: Tue, 14 Jul 2020 07:02:59 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 1/1] MAINTAINERS: introduce cve or security quotient field
+Message-ID: <20200714064921-mutt-send-email-mst@kernel.org>
+References: <20200714083631.888605-1-ppandit@redhat.com>
+ <20200714083631.888605-2-ppandit@redhat.com>
+ <CAFEAcA9QWLmi1fGuPW93GXFKV2KCwNs6Xp3U9MU2r4wtendzhg@mail.gmail.com>
+ <20200714095233.GC25187@redhat.com>
+ <20200714060916-mutt-send-email-mst@kernel.org>
+ <CAFEAcA_ca4JN655GW=eGyjrjDmiv0EktaZZ7RMghO5rBwm9tGQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200713070946-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+In-Reply-To: <CAFEAcA_ca4JN655GW=eGyjrjDmiv0EktaZZ7RMghO5rBwm9tGQ@mail.gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -139,143 +110,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Simon John <github@the-jedi.co.uk>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- imammedo@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, P J P <ppandit@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Peter/Paolo
-
-On 7/13/20 1:14 PM, Michael S. Tsirkin wrote:
-> On Mon, Jul 13, 2020 at 10:20:12AM +0300, Michael Tokarev wrote:
->> 12.07.2020 15:00, Simon John wrote:
->>> macos guests no longer boot after commit 5d971f9e672507210e77d020d89e0e89165c8fc9
->>>
->>> acpi-tmr needs 2 byte memory accesses, so breaks as that commit only allows 4 bytes.
->>>
->>> Fixes: 5d971f9e672507210e7 (memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
->>> Buglink: https://bugs.launchpad.net/qemu/+bug/1886318
->>
->> Actually this fixes 77d58b1e47c8d1c661f98f12b47ab519d3561488
->> Author: Gerd Hoffmann <kraxel@redhat.com>
->> Date:   Thu Nov 22 12:12:30 2012 +0100
->> Subject: apci: switch timer to memory api
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->>
->> because this is the commit which put min_access_size = 4 in there
->> (5d971f9e672507210e7 is just a messenger, actual error were here
->> earlier but it went unnoticed).
->>
->> While min_access_size=4 was most likely an error, I wonder why
->> we use 1 now, while the subject says it needs 2? What real min
->> size is here for ACPI PM timer?
->>
->> /mjt
+On Tue, Jul 14, 2020 at 11:22:28AM +0100, Peter Maydell wrote:
+> On Tue, 14 Jul 2020 at 11:12, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > And for people who want to build QEMU with lots of functionality (like
+> > Fedora does), I think a -security flag would be a useful addition.
+> > We can then tell security researchers "only a high security issue
+> > if it reproduces with -security=high, only a security issue
+> > if it reproduces with -security=low".
 > 
+> I think a -security option would also be useful to users -- it
+> makes it easier for them to check "is this configuration using
+> something that I didn't realize was not intended to be secure".
+> For me, something useful for our users is much more compelling
+> than "this might make security researchers' lives a bit easier".
 > 
-> Well the ACPI spec 1.0b says
-> 
-> 4.7.3.3 Power Management Timer (PM_TMR)
-> 
-> ...
-> 
-> This register is accessed as 32 bits.
-> 
-> and this text is still there in 6.2.
-> 
-> 
-> So it's probably worth it to cite this in the commit log
-> and explain it's a spec violation.
-> I think it's better to be restrictive and only allow the
-> minimal variation from spec - in this case I guess this means 2 byte
-> reads.
+> thanks
+> -- PMM
 
-Now reading this thread, I guess understand this register is
-accessed via the I/O address space, where 8/16/32-bit accesses
-are always valid if the CPU supports an I/O bus.
+True. And I guess downstreams can also force the option to high or set the
+default to high rather easily if they want to.
 
-We have 3 different devices providing this register:
-- ICH9
-- PIIX4 (abused in PIIX3)
-- VT82C686
+So the option would be:
 
-All are PCI devices, exposing this register via an ISA function.
+-security level
+	Set minimal required security level of QEMU.
 
-The ISA MemoryRegion should allow 8/16/32-bit accesses.
+	high: block use of QEMU functionality which is intended to be secure against
+		malicious guests.
+	low: allow use of all QEMU functionality, best effort security
+		against malicious guests.
 
-For these devices we use:
+Default would be -security low.
 
-MemoryRegion *pci_address_space_io(PCIDevice *dev)
-{
-    return pci_get_bus(dev)->address_space_io;
-}
+Does this look reasonable?
 
-Which comes from:
+Just a correction to what I wrote: I no longer think it's reasonable to
+classify the severity of a security issue automatically. E.g. a qemu
+crash in virtio code is a high severity security issue if it triggers
+with platform_iommu=on since it is then driver from guest userspace, and
+low severity one without since then it's driven from a guest driver.
 
-static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
-                              MemoryRegion *address_space_mem,
-                              MemoryRegion *address_space_io,
-                              uint8_t devfn_min)
-{
-    ...
-    bus->address_space_mem = address_space_mem;
-    bus->address_space_io = address_space_io;
-    ...
+So I think we can add something like this to security.rst and to
+the wiki:
 
+	only a security issue if it
+	reproduces with -security high, a regular bug if it only reproduces with
+	-security low
 
-In i440fx_init():
+Prasad?
 
-    b = pci_root_bus_new(dev, NULL, pci_address_space,
-                         address_space_io, 0, TYPE_PCI_BUS);
-
-q35_host_initfn() uses get_system_io() from pc_q35_init().
-
-If the guest did a 16-bit read, it should work ...:
-
-uint16_t cpu_inw(uint32_t addr)
-{
-    uint8_t buf[2];
-    uint16_t val;
-
-    address_space_read(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
-buf, 2);
-    val = lduw_p(buf);
-    trace_cpu_in(addr, 'w', val);
-    return val;
-}
-
-... but it is indeed prevented by min_access_size=4.
-
-Maybe we should have the ISA MemoryRegion accepts min_access_size=1
-and adjust the access sizes.
-
-> 
-> In any case pls do include an explanation for why you picked
-> one over the other.
-> 
->>
->>> Signed-off-by: Simon John <git@the-jedi.co.uk>
->>> ---
->>> Ãƒâ€šÃ‚Â hw/acpi/core.c | 2 +-
->>> Ãƒâ€šÃ‚Â 1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
->>> index f6d9ec4f13..05ff29b9d7 100644
->>> --- a/hw/acpi/core.c
->>> +++ b/hw/acpi/core.c
->>> @@ -527,7 +527,7 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
->>> Ãƒâ€šÃ‚Â static const MemoryRegionOps acpi_pm_tmr_ops = {
->>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .read = acpi_pm_tmr_read,
->>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .write = acpi_pm_tmr_write,
->>> -Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .valid.min_access_size = 4,
->>> +Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .valid.min_access_size = 1,
->>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .valid.max_access_size = 4,
->>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .endianness = DEVICE_LITTLE_ENDIAN,
->>> Ãƒâ€šÃ‚Â };
-> 
-> 
+-- 
+MST
 
 
