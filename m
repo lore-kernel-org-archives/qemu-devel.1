@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF4FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21457C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC1442193E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D16912193E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 04:52:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZA4fa5N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC1442193E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmU+4mRr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16912193E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvCvs-0005nd-Rh
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 00:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42408)
+	id 1jvCw2-0006CS-2w
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 00:52:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jvCui-00047X-P5; Tue, 14 Jul 2020 00:51:32 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:46730)
+ id 1jvCuk-0004CG-D5; Tue, 14 Jul 2020 00:51:34 -0400
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:41222)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jvCuh-0004u7-7Z; Tue, 14 Jul 2020 00:51:32 -0400
-Received: by mail-qt1-x844.google.com with SMTP id i3so11860924qtq.13;
- Mon, 13 Jul 2020 21:51:30 -0700 (PDT)
+ id 1jvCui-0004uL-Mv; Tue, 14 Jul 2020 00:51:34 -0400
+Received: by mail-qv1-xf42.google.com with SMTP id t7so6908330qvl.8;
+ Mon, 13 Jul 2020 21:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=iKj8QRlEHnqQiQIMVUyx74CJD+1/xr2oFDQvFu0P86g=;
- b=gZA4fa5NxvZLxT7grMJolKq91xCjVvT8jUa4VoeoQ37Zt1nHyexY+3w2ymmqBzTg/b
- s6SL0QSJceP7IVHCooku83imwJsfJPcQLuXI52mdG5BSii+ZTlLSpzWyDdDxX7mhRvEv
- ioHuJvwXWrqF/NHkeNvgD+F8tqYjmNdS8fabJPARLnLooPa2bieH/z62aC02D9fmMsTf
- q6s9KUeZr1lqM+HIdlyU7/oxjQUpHIAWwOco2yCcJ3CIrTPfnizoImhlBo1vSB+BZJ9J
- SQwS1D9Hf86jFnIRMYOtmbH4SgVy2b/U+6kz94KIdTp+wFVb4pf2Tv7S66pe/NdKzzOo
- zebA==
+ bh=6zfDC1IpCS6Uind9hNMhnPD8YUtgy8op4476VImHmB0=;
+ b=JmU+4mRrKv2vFERIp1+TDI/G3Bc/dUkgyDk0toYhWLr/sPQkt4/OFuEqW7eVFLxc4t
+ mLMIeXa9sCQ70egy1Q9HtGDM9p1UiDDujUzwnGeVKoc/YrBNgqJsTVah0vqPAUb/HxVp
+ db7KQnFF0Gc8kGvzncqdg2IFcmI23GGa/nfAk3AJUfC34M86rWfd5Bf7TGRzSRWFUOIE
+ NT7zanEqE0SWF03y74MyLQPT7qfRzuIMDiAAcbxHRcFDHN3Wxp0IcgZ19ZMe5gQWteJT
+ B7isXYgGyYEQPg2QNV9Mec6FmfHtjRTHT4RGrFSRJFtPDPrGKbDaVqgoivbtvygktulY
+ lYlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=iKj8QRlEHnqQiQIMVUyx74CJD+1/xr2oFDQvFu0P86g=;
- b=bMAvhcWhDz1r+SKIG+CJnnOt9bJsu7UDFUCKffQaIaII2Vrfwmv8zadIHgjTNMARD3
- meWOsqpKP43X/V1/S8ah/dmrmmw2IVB/6JJ0DA8/XXFtAv9TqDQ3KMlBZeb/YcFlwSuo
- p90oxBlzJQjhHLoaCg6Zt2RLsoMqsUhuuxUNeAEWtMkX0jkfeJL9rRfWi3co3e7DrR0y
- /ELE2ofgsxWuoubURNKPNpObyO7xG6lwwH7cy3gwTXEO6sy3O9mSSO1ttYasEzhzZut2
- A5pYjH4CL3MEFZkXJVJKh+saGe9+PDzxT/oPZt+Idgezwq+cGvZF7visBveM36GaGVKh
- gukw==
-X-Gm-Message-State: AOAM531cAnP7ORF/gJjDfK1PUvjuQYX9yb08cxCBq5OSjNZB9MrzsYQF
- GipVKLpGUJcLuml9wZIPGnGseabr
-X-Google-Smtp-Source: ABdhPJw9pbjlDMYjYUGRWBPGq/oxTABJG9F496KlXrJgyWwvFustjn8tuJbIoeNnnEpBE1fbWzFlFw==
-X-Received: by 2002:ac8:4643:: with SMTP id f3mr2947246qto.128.1594702289484; 
- Mon, 13 Jul 2020 21:51:29 -0700 (PDT)
+ bh=6zfDC1IpCS6Uind9hNMhnPD8YUtgy8op4476VImHmB0=;
+ b=rr1LLYCK/Obf+Zg8LBAnkqzMrrZPByYU/PfESV4x3HvgWHEfB3ZrfCKSpLZrlRg45Q
+ xkONbRQHdvEi++GTSPRun4CHZYdHieBaAhE/B461DG4mxZDOyaoF/jld1VIYIrFELF0f
+ ClZENHnZJlBBhTzizheDTcHKD66xluW2gkJTRJGjvGVffKFthbcXREOuRI50c/xKB4bl
+ aQjBICoM6TFomV2nTVPRXuFj+wftiiJHMW3jjIGZ0fa6xdpwdQw3/aaJYL1xC0bpfIOW
+ scfhyZNyuY8WYE2Pe2OK4fRK6ihKqdTZhnmYx/xP/vb1wk2xPdVke5QjLC21nO1Ahfcu
+ 9bkw==
+X-Gm-Message-State: AOAM5310Uw+/zrSK54c5QiQoFUeG2DasAT7nz/e84f3EsJeh3hwiwsWX
+ 4/jj6sOiWFweKaFYsjZNKM/DtNrr
+X-Google-Smtp-Source: ABdhPJxzp+zxTrtYWZIZbL/7UlAfrKJXrRmyWN2Z64knfWKEfzgz1+8npMB9yCC81FvuIt7+OoOxqQ==
+X-Received: by 2002:a0c:b712:: with SMTP id t18mr2776144qvd.205.1594702291258; 
+ Mon, 13 Jul 2020 21:51:31 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id m14sm22046370qke.99.2020.07.13.21.51.28
+ by smtp.gmail.com with ESMTPSA id g30sm24139571qte.72.2020.07.13.21.51.30
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 13 Jul 2020 21:51:28 -0700 (PDT)
+ Mon, 13 Jul 2020 21:51:30 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/4] util: Introduce qemu_get_host_name()
-Date: Mon, 13 Jul 2020 23:51:13 -0500
-Message-Id: <20200714045114.29319-4-mdroth@linux.vnet.ibm.com>
+Subject: [PULL 4/4] qga: Use qemu_get_host_name() instead of g_get_host_name()
+Date: Mon, 13 Jul 2020 23:51:14 -0500
+Message-Id: <20200714045114.29319-5-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200714045114.29319-1-mdroth@linux.vnet.ibm.com>
 References: <20200714045114.29319-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
- envelope-from=flukshun@gmail.com; helo=mail-qt1-x844.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f42;
+ envelope-from=flukshun@gmail.com; helo=mail-qv1-xf42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -107,103 +107,52 @@ Sender: "Qemu-devel"
 
 From: Michal Privoznik <mprivozn@redhat.com>
 
-This function offers operating system agnostic way to fetch host
-name. It is implemented for both POSIX-like and Windows systems.
+Problem with g_get_host_name() is that on the first call it saves
+the hostname into a global variable and from then on, every
+subsequent call returns the saved hostname. Even if the hostname
+changes. This doesn't play nicely with guest agent, because if
+the hostname is acquired before the guest is set up (e.g. on the
+first boot, or before DHCP) we will report old, invalid hostname.
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1845127
 
 Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Cc: qemu-stable@nongnu.org
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- include/qemu/osdep.h | 10 ++++++++++
- util/oslib-posix.c   | 35 +++++++++++++++++++++++++++++++++++
- util/oslib-win32.c   | 13 +++++++++++++
- 3 files changed, 58 insertions(+)
+ qga/commands.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 979a403984..4841b5c6b5 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -655,4 +655,14 @@ static inline void qemu_reset_optind(void)
- #endif
+diff --git a/qga/commands.c b/qga/commands.c
+index efc8b90281..d3fec807c1 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -515,11 +515,20 @@ int ga_parse_whence(GuestFileWhence *whence, Error **errp)
+ GuestHostName *qmp_guest_get_host_name(Error **errp)
+ {
+     GuestHostName *result = NULL;
+-    gchar const *hostname = g_get_host_name();
+-    if (hostname != NULL) {
+-        result = g_new0(GuestHostName, 1);
+-        result->host_name = g_strdup(hostname);
++    g_autofree char *hostname = qemu_get_host_name(errp);
++
++    /*
++     * We want to avoid using g_get_host_name() because that
++     * caches the result and we wouldn't reflect changes in the
++     * host name.
++     */
++
++    if (!hostname) {
++        hostname = g_strdup("localhost");
+     }
++
++    result = g_new0(GuestHostName, 1);
++    result->host_name = g_steal_pointer(&hostname);
+     return result;
  }
  
-+/**
-+ * qemu_get_host_name:
-+ * @errp: Error object
-+ *
-+ * Operating system agnostic way of querying host name.
-+ *
-+ * Returns allocated hostname (caller should free), NULL on failure.
-+ */
-+char *qemu_get_host_name(Error **errp);
-+
- #endif
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 72907d4d7f..e60aea85b6 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -794,3 +794,38 @@ void sigaction_invoke(struct sigaction *action,
-     }
-     action->sa_sigaction(info->ssi_signo, &si, NULL);
- }
-+
-+#ifndef HOST_NAME_MAX
-+# ifdef _POSIX_HOST_NAME_MAX
-+#  define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
-+# else
-+#  define HOST_NAME_MAX 255
-+# endif
-+#endif
-+
-+char *qemu_get_host_name(Error **errp)
-+{
-+    long len = -1;
-+    g_autofree char *hostname = NULL;
-+
-+#ifdef _SC_HOST_NAME_MAX
-+    len = sysconf(_SC_HOST_NAME_MAX);
-+#endif /* _SC_HOST_NAME_MAX */
-+
-+    if (len < 0) {
-+        len = HOST_NAME_MAX;
-+    }
-+
-+    /* Unfortunately, gethostname() below does not guarantee a
-+     * NULL terminated string. Therefore, allocate one byte more
-+     * to be sure. */
-+    hostname = g_new0(char, len + 1);
-+
-+    if (gethostname(hostname, len) < 0) {
-+        error_setg_errno(errp, errno,
-+                         "cannot get hostname");
-+        return NULL;
-+    }
-+
-+    return g_steal_pointer(&hostname);
-+}
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index e9b14ab178..3b49d27297 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -808,3 +808,16 @@ bool qemu_write_pidfile(const char *filename, Error **errp)
-     }
-     return true;
- }
-+
-+char *qemu_get_host_name(Error **errp)
-+{
-+    wchar_t tmp[MAX_COMPUTERNAME_LENGTH + 1];
-+    DWORD size = G_N_ELEMENTS(tmp);
-+
-+    if (GetComputerNameW(tmp, &size) == 0) {
-+        error_setg_win32(errp, GetLastError(), "failed close handle");
-+        return NULL;
-+    }
-+
-+    return g_utf16_to_utf8(tmp, size, NULL, NULL, NULL);
-+}
 -- 
 2.17.1
 
