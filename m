@@ -2,75 +2,105 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB676C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA0AC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:56:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF28C2084C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:37:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF28C2084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 19AC42145D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:56:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8SeSsLe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19AC42145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvFV0-0008MV-0x
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:37:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52892)
+	id 1jvFne-0003oS-AF
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:56:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jvFRC-0001fG-JF
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:33:14 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:43633)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jvFRA-00025A-MA
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:33:14 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MAxLT-1k1b5O3U3F-00BONa; Tue, 14 Jul 2020 09:33:08 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 6/7] linux-user: fix the errno value in print_syscall_err()
-Date: Tue, 14 Jul 2020 09:32:58 +0200
-Message-Id: <20200714073259.1464675-7-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200714073259.1464675-1-laurent@vivier.eu>
-References: <20200714073259.1464675-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvFmm-000380-0w
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:55:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39655
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvFmj-0005BD-G3
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:55:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594713328;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mzH2VvrhXRsNG8azCI3t0Sju5lO1d/8A9XERbQDKyw0=;
+ b=J8SeSsLeLAJyo4YaMgMvTgJ4+61QyHnxQGIncoHIRCvhdOp6iYYdAGkeyCmC89Wb2640k5
+ rwNaX2ih7uuadEmu8OJo/7Wc7b+2Pd+SVtkqiHSfCjYlO4BzaX49eaf8aibLTcV/hZzuYN
+ HGaDordDsl1HXK8IdNes2RBl2CKTpXc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-bsh3qauYO7W9t9fXGCAvlw-1; Tue, 14 Jul 2020 03:55:26 -0400
+X-MC-Unique: bsh3qauYO7W9t9fXGCAvlw-1
+Received: by mail-wm1-f72.google.com with SMTP id z11so2779512wmg.5
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 00:55:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=mzH2VvrhXRsNG8azCI3t0Sju5lO1d/8A9XERbQDKyw0=;
+ b=aaYWnUG+PA+a8eQ/tY4TG75E7I0tnDlPQ90zRahtOHZG1RCfE7eI/t6SJ2hwC4j6qX
+ hnNTrBMT/ROWyWAlxIuDvkWv+J+ct609xlPgepQNDx/fzBEAO0zDkDYxkeCe5quLbpo/
+ WsTznABe/4GA7rVvapP/qAy7SyobtYjpsL362IvQ6AnFIs4MsLUuIvSrVoZAK7CbjvcQ
+ 6keHSCxQt9nyS7EHuLTSETWHawzG4YfmcMOR5LKMeLviKUI84UQcdrbOxNj6gBqAvbjT
+ tjjpknL0uY5+SZ5XmBoNrFnZj4P5BoUdUaigzch23JuD2rxeHLmgw8DTauRpACSNnt89
+ Mp5Q==
+X-Gm-Message-State: AOAM532XW0q9ZGd+MLHaq9Kl965E2UjKt98f50LIFh/EJzGemXr3H085
+ pqtBi+pAVdM311HpgNI4R9Z8ZI1YiSrwaVKHslL63JCFZz2sXw2Fz2o6L+2ZSPld5hWfPKskmca
+ VglUt54jmWZgB5fU=
+X-Received: by 2002:a1c:5ac3:: with SMTP id o186mr2993602wmb.39.1594713325000; 
+ Tue, 14 Jul 2020 00:55:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyvpgAD2uRB9NxCoiAxYIcHANwIo5dkA/mGxcevqj87IrRjjB7fSdFe7YLolxQTJIPYdC+2Xg==
+X-Received: by 2002:a1c:5ac3:: with SMTP id o186mr2993581wmb.39.1594713324737; 
+ Tue, 14 Jul 2020 00:55:24 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
+ by smtp.gmail.com with ESMTPSA id a22sm2948485wmb.4.2020.07.14.00.55.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jul 2020 00:55:23 -0700 (PDT)
+Date: Tue, 14 Jul 2020 03:55:19 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Subject: Re: [PATCH] Allow acpi-tmr size=2
+Message-ID: <20200714035300-mutt-send-email-mst@kernel.org>
+References: <5f12377f-b640-c4c5-1bcd-858c622c6c31@the-jedi.co.uk>
+ <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
+ <20200713070946-mutt-send-email-mst@kernel.org>
+ <7662bc2c-d958-731a-0882-62c5ab47c7a4@the-jedi.co.uk>
+ <20200713081627-mutt-send-email-mst@kernel.org>
+ <34d24b3a-75ec-ad94-c61b-2ebe4a0f277a@msgid.tls.msk.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <34d24b3a-75ec-ad94-c61b-2ebe4a0f277a@msgid.tls.msk.ru>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:oCUu1ehJPhU3cSnwuBUwhoU/Os00IvSHSwc4weBqHvZLuio0IDa
- l+4ioJa6FCbqrWssA/ojEMMcDog1Rd5FtwucybHQc38ASUdAHNqg+nNwj0wRsdIb7CZPbkW
- guzn7LqIfmz7+SK3IsbuyGvuM7QSZcLIetSE1V3qyKPT0YDCo10XJPh80YVRhieg3f/so2M
- HVcrysSNgsV6Dtg6xMveA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7dpG+BiOCmQ=:0gJOjl1qhHCMD+SiUvKFiF
- BW9BHtNfO8rIlWJ1pHGIjJskFbFTmAe/xCLDEcFSgbOZCQIiHkFMy+T4KpO2tFcGfDECx3zIT
- OY+9XXwkV4kZQjT+MMTQI1lKKiB1TUdxo1jZeVtgj02P3sIfrMmolY9kKM0BL9wpAIrzIxGEp
- Ui+Bxbpd2OmjRBznViNsmj+RrRYnHEzLAfQtJPCTSlkobdFA5bphSTDyrU6v/oq0261LQsUsu
- jgDNWgvaWA60/91mPH+Q7g6RsZQ5CrQnIgxj4wCMjDq7E4VfonOUMUjz6tKQbR9N8xBwJWoLn
- MYHaGLiNkHJuSLjwXXtBbp2NDQETBIo7yN8+hWF6JaOHEXchPli91PbooK7ppc7Vy49nQlWeC
- uwVIqDIPB7/iavoXKJ88srjI8fCm1F3KJ8PocLKd/J/7hMK/TBkLPluyGoZ3/hqbi1ebV+0lT
- XRBH1q5cslJFQqvksgkSOHX2RgH69VPMOcYiLABy68wp5o5thZAgBEubxE5ZJi4/SkHn+rUFf
- RyXWGQS4IvV6LjnuAWUMZqUyXaMZVV7v2ndkHv0JN9F2qVJFPtSMfvoKbwJoZTBY75rFKfcf5
- bUZdEW1FctJIVwD7BfYUUbPgIrABAeR5vEL6xDYCOlcdS3xe2dDtExliLoo6mZD6tKDXoImIY
- jbs5+r+lLriVaYvsTStKMni/pMCO2o0FvMC2nv0h8QQ+Go6g7zJYHdeIczyPrnD8eN0hH9mES
- gGNRxUPBSbsm3kSOAjP3/mXyFLAI/y8oSEWdW+AT+BSGR3/4i5nXYaBMlSym/4dOdnM8jwVRa
- FDtfhTUSDIfTKuhUSyOnYkdTtZ3oPGYwBS6I9Lc462CQaW8ctudZEpxa/hC7JnzJUwcbwnA
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:28:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,45 +113,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Filip.Bozuta@syrmia.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Simon John <git@the-jedi.co.uk>, imammedo@redhat.com, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-errno of the target is returned as a negative value by the syscall,
-not in the host errno variable.
+On Mon, Jul 13, 2020 at 05:16:56PM +0300, Michael Tokarev wrote:
+> 13.07.2020 15:17, Michael S. Tsirkin пишет:
+> > On Mon, Jul 13, 2020 at 12:46:00PM +0100, Simon John wrote:
+> >> I don't profess to understand most of this, I am just a user who found
+> >> something didn't work and tracked down the cause with help from the people
+> >> on the bugtracker.
+> >>
+> >> the min=1 and max=4 was chosen as it seems to be set that way in most other
+> >> places in the source, and 2 fits in that range.
+> >>
+> >> so as macos seems to require 2 bytes but spec says 4 (32 bits) would it be
+> >> better to set min=2 max=4, given that the original revert seems to be a
+> >> security fix?
+> 
+> It's not about the security fix, it's about the piece in qemu code which
+> behaved wrongly for several years, which finally started to actually work.
+> 
+> >> this works equally well:
+> >>
+> >> static const MemoryRegionOps acpi_pm_tmr_ops = {
+> >>     .read = acpi_pm_tmr_read,
+> >>     .write = acpi_pm_tmr_write,
+> >>     .valid.min_access_size = 2,
+> >>     .valid.max_access_size = 4,
+> >>     .endianness = DEVICE_LITTLE_ENDIAN,
+> >> };
+> >>
+> >> regards.
+> >>
+> > 
+> > Sounds good. And how about also adding:
+> 
+> What this call will receive on a real HW? returning the same 4 bytes
+> even when asked for 2 smells wrong, no?
+> 
+> >       .impl.min_access_size = 4,
+> 
+> What does it mean? :)
+> 
+> /mjt
 
-The emulation of the target syscall can return an error while the
-host doesn't set an errno value. Target errnos and host errnos can
-also differ in some cases.
+This will allow you to return a 4 byte value and will shift it
+accordingly.
 
-Fixes: c84be71f6854 ("linux-user: Extend strace support to enable argument printing after syscall execution")
-Cc: Filip.Bozuta@syrmia.com
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Message-Id: <20200708152435.706070-2-laurent@vivier.eu>
----
- linux-user/strace.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+See: docs/devel/memory.rst :
+- .impl.min_access_size, .impl.max_access_size define the access sizes
+  (in bytes) supported by the *implementation*; other access sizes will be
+  emulated using the ones available.  For example a 4-byte write will be
+  emulated using four 1-byte writes, if .impl.max_access_size = 1.
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 39554d903911..7769f53bd5ed 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -731,7 +731,7 @@ print_syscall_err(abi_long ret)
- 
-     qemu_log(" = ");
-     if (ret < 0) {
--        qemu_log("-1 errno=%d", errno);
-+        qemu_log("-1 errno=%d", (int)-ret);
-         errstr = target_strerror(-ret);
-         if (errstr) {
-             qemu_log(" (%s)", errstr);
+
 -- 
-2.26.2
+MST
 
 
