@@ -2,92 +2,120 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D912C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D91CAC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:29:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA5682076D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:07:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KkKmcv1E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA5682076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD064206F0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 07:29:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD064206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvF1r-0002r0-75
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45736)
+	id 1jvFNb-0000Sk-0Q
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 03:29:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvF14-000294-Hf
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:06:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23754
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvF11-00073U-0q
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:06:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594710369;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ixxg+GRT7G5TW1fzZfXilfGK38e/HN2BuMRx7Flnqnk=;
- b=KkKmcv1E24hnDrjKQr96tqd+495KkUUS6W2exfRv5WCFFy6SPRVslw0A7zUkCtwjAn23vW
- ajjP6xLwsD3apbV30g4468+Wt9Ueg5Npy0OiTuf0zzlIv0Xnx84w2D3kZEXPDYbQ2j73Et
- 0CjKzX+adRlAxEATI6UJP8s4f38jV/8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-s8_5kHitP0GvrMemI38POw-1; Tue, 14 Jul 2020 03:06:05 -0400
-X-MC-Unique: s8_5kHitP0GvrMemI38POw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CF4E100CCC1;
- Tue, 14 Jul 2020 07:06:03 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A187876206;
- Tue, 14 Jul 2020 07:05:57 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 20069105A45D; Tue, 14 Jul 2020 09:05:56 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 5/5] hw/i2c: Document the I2C qdev helpers
-References: <20200629173821.22037-1-f4bug@amsat.org>
- <20200629173821.22037-6-f4bug@amsat.org>
- <87zh8kg8qu.fsf@dusky.pond.sub.org>
- <CAFEAcA9cajf=MKv4ZD6ivyDTrK4hWLfBP_9T2mJ6LrWjwGMFGA@mail.gmail.com>
-Date: Tue, 14 Jul 2020 09:05:56 +0200
-In-Reply-To: <CAFEAcA9cajf=MKv4ZD6ivyDTrK4hWLfBP_9T2mJ6LrWjwGMFGA@mail.gmail.com>
- (Peter Maydell's message of "Tue, 30 Jun 2020 14:16:45 +0100")
-Message-ID: <87pn8y8tkb.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jvFMw-0008Sx-7K
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:28:50 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:54401)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jvFMu-0001L5-72
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 03:28:49 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M2OAi-1jsTwh0Sly-003rDo; Tue, 14 Jul 2020 09:28:37 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
+References: <20200710195328.587462-1-jkz@google.com>
+ <c5af9eb0-c01a-b624-e753-f7533e4e2772@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH] linux-user: Add several IFTUN ioctls
+Message-ID: <34c4dbf2-b7b5-dad9-962a-f15c8e3b2f64@vivier.eu>
+Date: Tue, 14 Jul 2020 09:28:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <c5af9eb0-c01a-b624-e753-f7533e4e2772@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:06:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:ySB60QB14wL4ZNUbq8Qpvn9vD2mF/NxEfRUmYvlcY3/ohVtm35w
+ YXBSSyX/gs9SwmXcHYD4rHpZEaF5UIZsX5FRuydwImJhghCrn4HCxiUkgYcfMJWjT8prd6H
+ 2glFihpnvKsYph7+8XbAPSO1TOMOLw0273gY/agqCaTotn4KddJk4KCuOQUjiqBYUEkp+/0
+ KyZ02ctRQfIqSjQHKwMIQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ePcYCCUM6Tk=:0u1OkouPjpYQjYJPaVdfuC
+ fyjXN0b5hOi21yKnPhtumYZecIFcMqKTNL0YhHfSN5BN6G5SeaRZQ2nOCNLTAue0yCwziC8JB
+ K5kXsutLYvCsxukhsLQ21v3AnwqcIUHEhF52M626DxsuQaBvF5bCH12v9J6L9PkpyiXnn3pfv
+ FQuF8wUzhuXmpFmXnvAS8cIos1/dwQRMK/UbOm9cBhxBQL8JOOY8YySEFn8nzD2qM/ponplCq
+ VZ+MESNQ7+xsHhE5vvgJfcH6mmftHUhZFlqczEmNSML70z78n2WjJ9t00KyAW2RBLPzJQvUwt
+ mT3JaZW7ASxbuKUfwsLkG6hp3G6pcLm8EKMVSIRxz41J1iFsJhFuXvi0Xk+TU6NXPNFUJIkcb
+ k45sCkh++wKv59EFHRtuh/h2cwmGDHquBQ82ohv+LLGDTuJVNG7CMm8f4h3im5ATik1GOBaHn
+ Z8W0vqJzbEJowO5uOwKtEjd8Sx0CI/b6nbZd6SSIsEIz6SeIEP/vnzCTsMkigdVOVVzM3zFmz
+ HbckGJNMmpAh2deSefBgsUW5uLUk8499RPVQHEy37K3bBwE3iMdFbRx9x1eSaibm3qcrgLpND
+ R4Oav4+N0yli+TemgJFuL6V9t5fEk0WM72SvRqKZbLBRARELXgULHmPYJcDhBjGMmVEe7frax
+ MZu07WTcEwsqB6I8TCwZ6g6VrbFptonAI248H73qYz2BuqFJ55rkHxbOWUeyZQGUdrOflsFZW
+ GLNv68RKBrYlW8oV4a3uFNJNiLPb/U0H7u83h/kPaGr3RqeEXTK5V6HaAziQEdnlrK7hV2vP3
+ nmLJinsVj9v9gG37OUoYkDIp8tmw4RmS9cTLNDBS+qQ7mvN532AFjsuejxJT3lXNhIwVE0T
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:28:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,74 +128,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, Andrew Jeffery <andrew@aj.id.au>,
- Joel Stanley <joel@jms.id.au>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- Jan Kiszka <jan.kiszka@web.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: riku.voipio@iki.fi
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Tue, 30 Jun 2020 at 11:15, Markus Armbruster <armbru@redhat.com> wrote=
-:
+Le 13/07/2020 à 21:28, Laurent Vivier a écrit :
+> Le 10/07/2020 à 21:53, Josh Kunz a écrit :
+>> This change includes most widely-available if_tun ioctls that are
+>> integer typed.
 >>
->> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>> Tested by compiling all linux-user emulators. This patch has also been
+>> used successfully to run several binaries that utilize these ioctls for
+>> several months.
 >>
->> > In commit d88c42ff2c we added new prototype but neglected to
->> > add their documentation. Fix that.
->> >
->> > Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->> > + * This function is useful if you have created @dev via qdev_new(),
->> > + * i2c_slave_new() or i2c_slave_try_new() (which take a reference to
->> > + * the device it returns to you), so that you can set properties on i=
-t
->> > + * before realizing it. If you don't need to set properties then
->> > + * i2c_slave_create_simple() is probably better (as it does the creat=
-e,
->> > + * init and realize in one step).
->> > + *
->> > + * If you are embedding the I2C slave into another QOM device and
->> > + * initialized it via some variant on object_initialize_child() then
->> > + * do not use this function, because that family of functions arrange
->> > + * for the only reference to the child device to be held by the paren=
-t
->> > + * via the child<> property, and so the reference-count-drop done her=
-e
->> > + * would be incorrect.  (Instead you would want i2c_slave_realize(),
->> > + * which doesn't currently exist but would be trivial to create if we
->> > + * had any code that wanted it.)
->> > + */
+>> Linux Header:
+>> https://github.com/torvalds/linux/blob/dcde237b9b0eb1d19306e6f48c0a4e058907619f/include/uapi/linux/if_tun.h#L31
 >>
->> The advice on use is more elaborate qdev_realize_and_unref()'s.  That
->> one simply shows intended use.  I doubt we need more.  But as the person
->> who wrote qdev_realize_and_unref(), I'm singularly unqualified judging
->> the need ;)
->
-> If qdev_realize_and_unref() has documentation which gives
-> the use-cases similar to the text above, then we could make
-> this text say "This function follows the patterns and
-> intended usecases for qdev_realize_and_unref(); see the
-> documentation for that function for whether you would be
-> better off using i2c_realize() or (the not-yet-existing)
-> i2c_slave_realize()" or similar. I originally wrote the
-> version of the above text for ssi_realize_and_unref()
-> as essentially the documentation I would have liked
-> qdev_realize_and_unref() to have, ie including the nuances
-> which I had to figure out for myself.
+>> Signed-off-by: Josh Kunz <jkz@google.com>
+>> ---
+>>  linux-user/ioctls.h       | 20 ++++++++++++++++++++
+>>  linux-user/syscall.c      |  1 +
+>>  linux-user/syscall_defs.h | 21 +++++++++++++++++++++
+>>  3 files changed, 42 insertions(+)
+>>
+>> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+>> index 0713ae1311..9b4a67fe84 100644
+>> --- a/linux-user/ioctls.h
+>> +++ b/linux-user/ioctls.h
+>> @@ -593,3 +593,23 @@
+>>    IOCTL(KCOV_DISABLE, 0, TYPE_NULL)
+>>    IOCTL(KCOV_INIT_TRACE, IOC_R, TYPE_ULONG)
+>>  #endif
+>> +
+>> +  IOCTL(TUNGETFEATURES  , IOC_R , TYPE_INT)
+>> +  IOCTL(TUNGETIFF       , IOC_R , TYPE_INT)
+>> +  IOCTL(TUNGETSNDBUF    , IOC_R , TYPE_INT)
+>> +  IOCTL(TUNGETVNETHDRSZ , IOC_R , TYPE_INT)
+>> +  IOCTL(TUNGETVNETLE    , IOC_R , TYPE_INT)
+>> +  IOCTL(TUNSETDEBUG     , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETGROUP     , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETIFF       , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETIFINDEX   , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETLINK      , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETNOCSUM    , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETOFFLOAD   , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETOWNER     , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETPERSIST   , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETQUEUE     , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETSNDBUF    , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETTXFILTER  , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETVNETHDRSZ , IOC_W , TYPE_INT)
+>> +  IOCTL(TUNSETVNETLE    , IOC_W , TYPE_INT)
+...
+>>
+> 
+> Applied to my linux-user-for-5.1 branch.
 
-To document wrappers as simple as ssi_realize_and_unref(), pointing to
-the wrapped function should suffice.  When more elaborate documentation
-is wanted, it's probably wanted for the wrapped function.
+This patch fails ioctls03 LTP tests on some archs (s390x for instance),
+TUNGETFEATURES returns unknown features.
 
-Since you felt a need for a more elaborate ssi_realize_and_unref() doc
-comment, you should probably propose a patch for
-qdev_realize_and_unref()'s doc comment :)
+Your patch is not correct, definitions should use MK_PTR(...) rather
+than TYPE_INT (and some of them are not based on int but on more complex
+structures). Your patch only works with guest with same endianness and
+word size.
 
+I remove it from the queue.
+
+Thanks,
+Laurent
 
