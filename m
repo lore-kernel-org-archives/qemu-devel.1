@@ -7,54 +7,53 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6090BC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCDFC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 160F521D79
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FC8E22409
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:36:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=seznam.cz header.i=@seznam.cz header.b="XbZ00S9G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 160F521D79
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=seznam.cz header.i=@seznam.cz header.b="RbXPluNM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FC8E22409
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmp.felk.cvut.cz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvK8B-0003xi-9T
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 08:33:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40546)
+	id 1jvKAM-0005oS-EB
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 08:36:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <autobot.majer@seznam.cz>)
- id 1jvK5J-00024d-SL
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:30:57 -0400
-Received: from mxa2.seznam.cz ([2a02:598:2::90]:55943)
+ id 1jvK8J-0004LP-K1
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:34:03 -0400
+Received: from mxa2.seznam.cz ([2a02:598:2::90]:45443)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <autobot.majer@seznam.cz>)
- id 1jvK5G-0000Ct-OQ
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:30:57 -0400
+ id 1jvK8F-0000mr-Pt
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:34:03 -0400
 Received: from email.seznam.cz
- by email-smtpc3b.ng.seznam.cz (email-smtpc3b.ng.seznam.cz [10.23.13.75])
- id 0c4405e1cefb1aa00936e1d5; Tue, 14 Jul 2020 14:30:52 +0200 (CEST)
+ by email-smtpc9b.ng.seznam.cz (email-smtpc9b.ng.seznam.cz [10.23.14.15])
+ id 16d601e5d4691ea413a4e5d1; Tue, 14 Jul 2020 14:33:57 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seznam.cz; s=beta;
- t=1594729852; bh=06ExxRwFfVYECg6tEOJT7fnHUiiS6UGecvZs8hF0y7E=;
+ t=1594730037; bh=RZFUeAOa2leh68Lw975Km8xHo1QtI6bCglTLg5FMoFo=;
  h=Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
  References:MIME-Version:Content-Transfer-Encoding;
- b=XbZ00S9Gg3okUymmmBo4cs5T3PgZ0sUYPSpzOZ166uj4UbA8LVQYWI1rSSjGqRJHs
- 0qLm04YRDp3wu4SiReAmgDBlJXuzCo3YUHPJs28XdHGmk4Fg2NVxEpqOKzks2XHIZe
- 9JExGTVaGQvA9VGA1u74gSkL+/utDuGpGJceK2Aw=
+ b=RbXPluNMx44VymEQImCqM6gTjMkWl3/cYn6XjiwrGGf4/PRxO+vkqnd2ox3nMB3Vt
+ H7LHV4rkXcRHPINYJdz8JeLuZCBanGCE8cHptDB/ZLBGf4eT2zX9r+tEA+6tCvHPeK
+ eoIzkBaPaBG4GUEv5jIC5HtBhVQ4cKfo0Axh/BUQ=
 Received: from hathi.duckdns.org (2001:718:2:1654:e269:95ff:fec3:1c81
  [2001:718:2:1654:e269:95ff:fec3:1c81])
- by email-relay2.ng.seznam.cz (Seznam SMTPD 1.3.119) with ESMTP;
- Tue, 14 Jul 2020 14:30:47 +0200 (CEST)  
+ by email-relay18.ng.seznam.cz (Seznam SMTPD 1.3.119) with ESMTP;
+ Tue, 14 Jul 2020 14:33:52 +0200 (CEST)  
 From: pisa@cmp.felk.cvut.cz
 To: qemu-devel@nongnu.org,
 	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v1 4/6] hw/net/can/ctucafd: Add CTU CAN FD core register
- definitions.
-Date: Tue, 14 Jul 2020 14:20:17 +0200
-Message-Id: <df0b5f85bba0bd566332bf7954ef258b89b3ff21.1594725647.git.pisa@cmp.felk.cvut.cz>
+Subject: [PATCH v1 5/6] hw/net/can: CTU CAN FD IP open hardware core emulation.
+Date: Tue, 14 Jul 2020 14:20:18 +0200
+Message-Id: <4e61e618c56fdb2034f3875f8b19635d33d2efbf.1594725647.git.pisa@cmp.felk.cvut.cz>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1594725647.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1594725647.git.pisa@cmp.felk.cvut.cz>
@@ -97,1207 +96,1166 @@ Sender: "Qemu-devel"
 
 From: Jan Charvat <charvj10@fel.cvut.cz>
 
-Definitions of registers and CAN FD frame message box of CTU CAN FD
-IP core are generated the specification in CACTUS/IP-XACT format.
+The implementation of the model of complete open-source/design/hardware
+CAN FD controller. The IP core project has been started and is maintained
+by Ondrej Ille at Czech Technical University in Prague.
 
-CTU CAN FD IP core repository
+CTU CAN FD project pages:
+	https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core
 
-  https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core
+CAN bus CTU FEE Projects Listing page:
+	http://canbus.pages.fel.cvut.cz/
 
-The location of the CTU CAN IP core specification within
-IP core design
+The core is mapped to PCIe card same as on one of its real hardware
+adaptations. The device implementing two CTU CAN FD ip cores
+is instantiated after CAN bus definition
 
-  spec/CTU/ip/CAN_FD_IP_Core/2.1/CAN_FD_IP_Core.2.1.xml
+	-object can-bus,id=canbus0-bus
 
-The header files are generated by pyXact_generator designed
-by Ondrej Ille which is based on ipyxact_parser.
+by QEMU parameters
 
-The specification is source of header files for driver and emulation,
-documentation and VHDL registers map implementation.
+	-device ctucan_pci,canbus0=canbus0-bus,canbus1=canbus0-bus
 
 Signed-off-by: Jan Charvat <charvj10@fel.cvut.cz>
 Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 ---
- hw/net/can/ctu_can_fd_frame.h | 190 +++++++
- hw/net/can/ctu_can_fd_regs.h  | 972 ++++++++++++++++++++++++++++++++++
- 2 files changed, 1162 insertions(+)
- create mode 100644 hw/net/can/ctu_can_fd_frame.h
- create mode 100644 hw/net/can/ctu_can_fd_regs.h
+ hw/net/can/Makefile.objs |   3 +
+ hw/net/can/ctucan_core.c | 691 +++++++++++++++++++++++++++++++++++++++
+ hw/net/can/ctucan_core.h | 127 +++++++
+ hw/net/can/ctucan_pci.c  | 281 ++++++++++++++++
+ 4 files changed, 1102 insertions(+)
+ create mode 100644 hw/net/can/ctucan_core.c
+ create mode 100644 hw/net/can/ctucan_core.h
+ create mode 100644 hw/net/can/ctucan_pci.c
 
-diff --git a/hw/net/can/ctu_can_fd_frame.h b/hw/net/can/ctu_can_fd_frame.h
+diff --git a/hw/net/can/Makefile.objs b/hw/net/can/Makefile.objs
+index 9f0c4ee332..8945576a22 100644
+--- a/hw/net/can/Makefile.objs
++++ b/hw/net/can/Makefile.objs
+@@ -2,3 +2,6 @@ common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
+ common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
+ common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
+ common-obj-$(CONFIG_CAN_PCI) += can_mioe3680_pci.o
++
++common-obj-$(CONFIG_CAN_PCI) += ctucan_core.o
++common-obj-$(CONFIG_CAN_PCI) += ctucan_pci.o
+diff --git a/hw/net/can/ctucan_core.c b/hw/net/can/ctucan_core.c
 new file mode 100644
-index 0000000000..d1d6f8ef24
+index 0000000000..f260646777
 --- /dev/null
-+++ b/hw/net/can/ctu_can_fd_frame.h
-@@ -0,0 +1,190 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*******************************************************************************
++++ b/hw/net/can/ctucan_core.c
+@@ -0,0 +1,691 @@
++/*
++ * CTU CAN FD PCI device emulation
++ * http://canbus.pages.fel.cvut.cz/
 + *
-+ * CTU CAN FD IP Core
-+ * Copyright (C) 2015-2018
++ * Copyright (c) 2019 Jan Charvat (jancharvat.charvat@gmail.com)
 + *
-+ * Authors:
-+ *     Ondrej Ille <ondrej.ille@gmail.com>
-+ *     Martin Jerabek <martin.jerabek01@gmail.com>
-+ *     Jaroslav Beran <jara.beran@gmail.com>
++ * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
++ * Jin Yang and Pavel Pisa
 + *
-+ * Project advisors:
-+ *     Jiri Novak <jnovak@fel.cvut.cz>
-+ *     Pavel Pisa <pisa@cmp.felk.cvut.cz>
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * Department of Measurement         (http://meas.fel.cvut.cz/)
-+ * Faculty of Electrical Engineering (http://www.fel.cvut.cz)
-+ * Czech Technical University        (http://www.cvut.cz/)
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ ******************************************************************************/
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+/* This file is autogenerated, DO NOT EDIT! */
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "chardev/char.h"
++#include "hw/irq.h"
++#include "migration/vmstate.h"
++#include "net/can_emu.h"
 +
-+#ifndef __CTU_CAN_FD_CAN_FD_FRAME_FORMAT__
-+#define __CTU_CAN_FD_CAN_FD_FRAME_FORMAT__
++#include "ctucan_core.h"
 +
-+/* CAN_Frame_format memory map */
-+enum ctu_can_fd_can_frame_format {
-+	CTU_CAN_FD_FRAME_FORM_W        = 0x0,
-+	CTU_CAN_FD_IDENTIFIER_W        = 0x4,
-+	CTU_CAN_FD_TIMESTAMP_L_W       = 0x8,
-+	CTU_CAN_FD_TIMESTAMP_U_W       = 0xc,
-+	CTU_CAN_FD_DATA_1_4_W         = 0x10,
-+	CTU_CAN_FD_DATA_5_8_W         = 0x14,
-+	CTU_CAN_FD_DATA_61_64_W       = 0x4c,
++#ifndef DEBUG_CAN
++#define DEBUG_CAN 0
++#endif /*DEBUG_CAN*/
++
++#define DPRINTF(fmt, ...) \
++    do { \
++        if (DEBUG_CAN) { \
++            qemu_log("[ctucan]: " fmt , ## __VA_ARGS__); \
++        } \
++    } while (0)
++
++static void ctucan_buff2frame(const uint8_t *buff, qemu_can_frame *frame)
++{
++    frame->can_id = 0;
++    frame->can_dlc = 0;
++    frame->flags = 0;
++
++    if (buff == NULL) {
++        return;
++    }
++    {
++        union ctu_can_fd_frame_form_w frame_form_w;
++        union ctu_can_fd_identifier_w identifier_w;
++        unsigned int ide;
++
++        frame_form_w = *(union ctu_can_fd_frame_form_w *) buff;
++        frame->can_dlc = can_dlc2len(frame_form_w.s.dlc);
++
++        identifier_w = *(union ctu_can_fd_identifier_w *) (buff + 4);
++
++        ide = frame_form_w.s.ide;
++        if (ide) {
++            frame->can_id = (identifier_w.s.identifier_base << 18) |
++                            identifier_w.s.identifier_ext;
++            frame->can_id |= QEMU_CAN_EFF_FLAG;
++        } else {
++            frame->can_id = identifier_w.s.identifier_base;
++        }
++
++        if (frame_form_w.s.esi_rsv) {
++            frame->flags |= QEMU_CAN_FRMF_ESI;
++        }
++
++        if (frame_form_w.s.rtr) {
++            frame->can_id |= QEMU_CAN_RTR_FLAG;
++        }
++
++        if (frame_form_w.s.fdf) {   /*CAN FD*/
++            frame->flags |= QEMU_CAN_FRMF_TYPE_FD;
++            if (frame_form_w.s.brs) {
++                frame->flags |= QEMU_CAN_FRMF_BRS;
++            }
++        }
++    }
++
++    memcpy(frame->data, buff + 0x10, 0x40);
++}
++
++
++static int ctucan_frame2buff(const qemu_can_frame *frame, uint8_t *buff)
++{
++    unsigned int bytes_cnt = -1;
++    memset(buff, 0, CTUCAN_MSG_MAX_LEN * sizeof(*buff));
++
++    if (frame == NULL) {
++        return bytes_cnt;
++    }
++    {
++        union ctu_can_fd_frame_form_w *frame_form_w;
++        union ctu_can_fd_identifier_w *identifier_w;
++        frame_form_w = (union ctu_can_fd_frame_form_w *) buff;
++        identifier_w = (union ctu_can_fd_identifier_w *) (buff + 4);
++
++        frame_form_w->u32 = 0;
++        identifier_w->u32 = 0;
++
++        bytes_cnt = frame->can_dlc;
++        bytes_cnt = (bytes_cnt + 3) & ~3;
++        bytes_cnt += 16;
++        frame_form_w->s.rwcnt = (bytes_cnt >> 2) - 1;
++
++        frame_form_w->s.dlc = can_len2dlc(frame->can_dlc);
++
++        if (frame->can_id & QEMU_CAN_EFF_FLAG) {
++            frame_form_w->s.ide = 1;
++            identifier_w->s.identifier_base =
++                                    (frame->can_id & 0x1FFC0000) >> 18;
++            identifier_w->s.identifier_ext = frame->can_id & 0x3FFFF;
++        } else {
++            identifier_w->s.identifier_base = frame->can_id & 0x7FF;
++        }
++
++        if (frame->flags & QEMU_CAN_FRMF_ESI) {
++            frame_form_w->s.esi_rsv = 1;
++        }
++
++        if (frame->can_id & QEMU_CAN_RTR_FLAG) {
++            frame_form_w->s.rtr = 1;
++        }
++
++        if (frame->flags & QEMU_CAN_FRMF_TYPE_FD) {  /*CAN FD*/
++           frame_form_w->s.fdf = 1;
++            if (frame->flags & QEMU_CAN_FRMF_BRS) {
++                frame_form_w->s.brs = 1;
++            }
++        }
++    }
++
++    memcpy(buff + 0x10, frame->data, 0x40);
++
++    return bytes_cnt;
++}
++
++static void ctucan_update_irq(CtuCanCoreState *s)
++{
++    union ctu_can_fd_int_stat int_rq;
++
++    int_rq.u32 = 0;
++
++    if (s->rx_status_rx_settings.s.rxfrc) {
++        int_rq.s.rbnei = 1;
++    }
++
++    int_rq.u32 &= ~s->int_mask.u32;
++    s->int_stat.u32 |= int_rq.u32;
++    if (s->int_stat.u32 & s->int_ena.u32) {
++        qemu_irq_raise(s->irq);
++    } else {
++        qemu_irq_lower(s->irq);
++    }
++}
++
++static void ctucan_update_txnf(CtuCanCoreState *s)
++{
++    int i;
++    int txnf;
++    unsigned int buff_st;
++
++    txnf = 0;
++
++    for (i = 0; i < CTUCAN_CORE_TXBUF_NUM; i++) {
++        buff_st = (s->tx_status.u32 >> (i * 4)) & 0xf;
++        if (buff_st == TXT_ETY) {
++            txnf = 1;
++        }
++    }
++    s->status.s.txnf = txnf;
++}
++
++void ctucan_hardware_reset(CtuCanCoreState *s)
++{
++    DPRINTF("Hardware reset in progress!!!\n");
++    int i;
++    unsigned int buff_st;
++    uint32_t buff_st_mask;
++
++    s->tx_status.u32 = 0;
++    for (i = 0; i < CTUCAN_CORE_TXBUF_NUM; i++) {
++        buff_st_mask = 0xf << (i * 4);
++        buff_st = TXT_ETY;
++        s->tx_status.u32 = (s->tx_status.u32 & ~buff_st_mask) |
++            (buff_st << (i * 4));
++    }
++    s->status.s.idle = 1;
++
++    ctucan_update_txnf(s);
++
++    s->rx_status_rx_settings.u32 = 0;
++    s->rx_tail_pos = 0;
++    s->rx_cnt = 0;
++    s->rx_frame_rem = 0;
++
++    /* Flush RX buffer */
++    s->rx_tail_pos = 0;
++    s->rx_cnt = 0;
++    s->rx_frame_rem = 0;
++
++    /* Set on progdokum reset value */
++    s->mode_settings.u32 = 0;
++    s->mode_settings.s.fde = 1;
++
++    s->int_stat.u32 = 0;
++    s->int_ena.u32 = 0;
++    s->int_mask.u32 = 0;
++
++    s->rx_status_rx_settings.u32 = 0;
++    s->rx_status_rx_settings.s.rxe = 0;
++
++    s->rx_fr_ctr.u32 = 0;
++    s->tx_fr_ctr.u32 = 0;
++
++    s->yolo_reg.s.yolo_val = 3735928559;
++
++    qemu_irq_lower(s->irq);
++}
++
++static void ctucan_send_ready_buffers(CtuCanCoreState *s)
++{
++    qemu_can_frame frame;
++    uint8_t *pf;
++    int buff2tx_idx;
++    uint32_t tx_prio_max;
++    unsigned int buff_st;
++    uint32_t buff_st_mask;
++
++    if (!s->mode_settings.s.ena) {
++        return;
++    }
++
++    do {
++        union ctu_can_fd_int_stat int_stat;
++        int i;
++        buff2tx_idx = -1;
++        tx_prio_max = 0;
++
++        for (i = 0; i < CTUCAN_CORE_TXBUF_NUM; i++) {
++            uint32_t prio;
++
++            buff_st_mask = 0xf << (i * 4);
++            buff_st = (s->tx_status.u32 >> (i * 4)) & 0xf;
++
++            if (buff_st != TXT_RDY) {
++                continue;
++            }
++            prio = (s->tx_priority.u32 >> (i * 4)) & 0x7;
++            if (tx_prio_max < prio) {
++                tx_prio_max = prio;
++                buff2tx_idx = i;
++            }
++        }
++        if (buff2tx_idx == -1) {
++            break;
++        }
++        buff_st_mask = 0xf << (buff2tx_idx * 4);
++        buff_st = (s->tx_status.u32 >> (buff2tx_idx * 4)) & 0xf;
++        int_stat.u32 = 0;
++        buff_st = TXT_RDY;
++        pf = s->tx_buffer[buff2tx_idx].data;
++        ctucan_buff2frame(pf, &frame);
++        s->status.s.idle = 0;
++        s->status.s.txs = 1;
++        can_bus_client_send(&s->bus_client, &frame, 1);
++        s->status.s.idle = 1;
++        s->status.s.txs = 0;
++        s->tx_fr_ctr.s.tx_fr_ctr_val++;
++        buff_st = TXT_TOK;
++        int_stat.s.txi = 1;
++        int_stat.s.txbhci = 1;
++        s->int_stat.u32 |= int_stat.u32 & ~s->int_mask.u32;
++        s->tx_status.u32 = (s->tx_status.u32 & ~buff_st_mask) |
++                        (buff_st << (buff2tx_idx * 4));
++    } while (1);
++}
++
++#define CTUCAN_CORE_TXBUFF_SPAN \
++            (CTU_CAN_FD_TXTB2_DATA_1 - CTU_CAN_FD_TXTB1_DATA_1)
++
++void ctucan_mem_write(CtuCanCoreState *s, hwaddr addr, uint64_t val,
++                       unsigned size)
++{
++    int              i;
++
++    DPRINTF("write 0x%02llx addr 0x%02x\n",
++            (unsigned long long)val, (unsigned int)addr);
++
++    if (addr > CTUCAN_CORE_MEM_SIZE) {
++        return;
++    }
++
++    if (addr >= CTU_CAN_FD_TXTB1_DATA_1) {
++        int buff_num;
++        addr -= CTU_CAN_FD_TXTB1_DATA_1;
++        buff_num = addr / CTUCAN_CORE_TXBUFF_SPAN;
++        addr %= CTUCAN_CORE_TXBUFF_SPAN;
++        if (buff_num < CTUCAN_CORE_TXBUF_NUM) {
++            *(uint32_t *)(s->tx_buffer[buff_num].data + addr) = val;
++        }
++    } else {
++        switch (addr & ~3) {
++        case CTU_CAN_FD_MODE:
++            s->mode_settings.u32 = (uint32_t)val;
++            if (s->mode_settings.s.rst) {
++                ctucan_hardware_reset(s);
++                s->mode_settings.s.rst = 0;
++            }
++            break;
++        case CTU_CAN_FD_COMMAND:
++        {
++            union ctu_can_fd_command command;
++            command.u32 = (uint32_t)val;
++            if (command.s.cdo) {
++                s->status.s.dor = 0;
++            }
++            if (command.s.rrb) {
++                s->rx_tail_pos = 0;
++                s->rx_cnt = 0;
++                s->rx_frame_rem = 0;
++                s->rx_status_rx_settings.s.rxfrc = 0;
++            }
++            if (command.s.txfcrst) {
++                s->tx_fr_ctr.s.tx_fr_ctr_val = 0;
++            }
++            if (command.s.rxfcrst) {
++                s->rx_fr_ctr.s.rx_fr_ctr_val = 0;
++            }
++            break;
++        }
++        case CTU_CAN_FD_INT_STAT:
++            s->int_stat.u32 &= ~(uint32_t)val;
++            break;
++        case CTU_CAN_FD_INT_ENA_SET:
++            s->int_ena.u32 |= (uint32_t)val;
++            break;
++        case CTU_CAN_FD_INT_ENA_CLR:
++            s->int_ena.u32 &= ~(uint32_t)val;
++            break;
++        case CTU_CAN_FD_INT_MASK_SET:
++            s->int_mask.u32 |= (uint32_t)val;
++            break;
++        case CTU_CAN_FD_INT_MASK_CLR:
++            s->int_mask.u32 &= ~(uint32_t)val;
++            break;
++        case CTU_CAN_FD_TX_COMMAND:
++            if (s->mode_settings.s.ena) {
++                union ctu_can_fd_tx_command tx_command;
++                union ctu_can_fd_tx_command mask;
++                unsigned int buff_st;
++                uint32_t buff_st_mask;
++
++                tx_command.u32 = (uint32_t)val;
++                mask.u32 = 0;
++                mask.s.txb1 = 1;
++
++                for (i = 0; i < CTUCAN_CORE_TXBUF_NUM; i++) {
++                    if (!(tx_command.u32 & (mask.u32 << i))) {
++                        continue;
++                    }
++                    buff_st_mask = 0xf << (i * 4);
++                    buff_st = (s->tx_status.u32 >> (i * 4)) & 0xf;
++                    if (tx_command.s.txca) {
++                        if (buff_st == TXT_RDY) {
++                            buff_st = TXT_ABT;
++                        }
++                    }
++                    if (tx_command.s.txcr) {
++                        if ((buff_st == TXT_TOK) || (buff_st == TXT_ERR) ||
++                            (buff_st == TXT_ABT) || (buff_st == TXT_ETY))
++                            buff_st = TXT_RDY;
++                    }
++                    if (tx_command.s.txce) {
++                        if ((buff_st == TXT_TOK) || (buff_st == TXT_ERR) ||
++                            (buff_st == TXT_ABT))
++                            buff_st = TXT_ETY;
++                    }
++                    s->tx_status.u32 = (s->tx_status.u32 & ~buff_st_mask) |
++                                        (buff_st << (i * 4));
++                }
++
++                ctucan_send_ready_buffers(s);
++                ctucan_update_txnf(s);
++            }
++            break;
++        case CTU_CAN_FD_TX_PRIORITY:
++            s->tx_priority.u32 = (uint32_t)val;
++            break;
++        }
++
++        ctucan_update_irq(s);
++    }
++
++    return;
++}
++
++uint64_t ctucan_mem_read(CtuCanCoreState *s, hwaddr addr, unsigned size)
++{
++    uint32_t val = 0;
++
++    DPRINTF("read addr 0x%02x ...\n", (unsigned int)addr);
++
++    if (addr > CTUCAN_CORE_MEM_SIZE) {
++        return 0;
++    }
++
++    switch (addr & ~3) {
++    case CTU_CAN_FD_DEVICE_ID:
++        {
++            union ctu_can_fd_device_id_version idver;
++            idver.u32 = 0;
++            idver.s.device_id = CTU_CAN_FD_ID;
++            idver.s.ver_major = 2;
++            idver.s.ver_minor = 2;
++            val = idver.u32;
++        }
++        break;
++    case CTU_CAN_FD_MODE:
++        val = s->mode_settings.u32;
++        break;
++    case CTU_CAN_FD_STATUS:
++        val = s->status.u32;
++        break;
++    case CTU_CAN_FD_INT_STAT:
++        val = s->int_stat.u32;
++        break;
++    case CTU_CAN_FD_INT_ENA_SET:
++    case CTU_CAN_FD_INT_ENA_CLR:
++        val = s->int_ena.u32;
++        break;
++    case CTU_CAN_FD_INT_MASK_SET:
++    case CTU_CAN_FD_INT_MASK_CLR:
++        val = s->int_mask.u32;
++        break;
++    case CTU_CAN_FD_RX_MEM_INFO:
++        s->rx_mem_info.u32 = 0;
++        s->rx_mem_info.s.rx_buff_size = CTUCAN_RCV_BUF_LEN >> 2;
++        s->rx_mem_info.s.rx_mem_free = (CTUCAN_RCV_BUF_LEN -
++                                        s->rx_cnt) >> 2;
++        val = s->rx_mem_info.u32;
++        break;
++    case CTU_CAN_FD_RX_POINTERS:
++    {
++        uint32_t rx_head_pos = s->rx_tail_pos + s->rx_cnt;
++        rx_head_pos %= CTUCAN_RCV_BUF_LEN;
++        s->rx_pointers.s.rx_wpp = rx_head_pos;
++        s->rx_pointers.s.rx_rpp = s->rx_tail_pos;
++        val = s->rx_pointers.u32;
++        break;
++    }
++    case CTU_CAN_FD_RX_STATUS:
++    case CTU_CAN_FD_RX_SETTINGS:
++        if (!s->rx_status_rx_settings.s.rxfrc) {
++            s->rx_status_rx_settings.s.rxe = 1;
++        } else {
++            s->rx_status_rx_settings.s.rxe = 0;
++        }
++        if (((s->rx_cnt + 3) & ~3) == CTUCAN_RCV_BUF_LEN) {
++            s->rx_status_rx_settings.s.rxf = 1;
++        } else {
++            s->rx_status_rx_settings.s.rxf = 0;
++        }
++        val = s->rx_status_rx_settings.u32;
++        break;
++    case CTU_CAN_FD_RX_DATA:
++        if (s->rx_cnt) {
++            memcpy(&val, s->rx_buff + s->rx_tail_pos, 4);
++            if (!s->rx_frame_rem) {
++                union ctu_can_fd_frame_form_w frame_form_w;
++                frame_form_w.u32 = val;
++                s->rx_frame_rem = frame_form_w.s.rwcnt * 4 + 4;
++            }
++            s->rx_cnt -= 4;
++            s->rx_frame_rem -= 4;
++            if (!s->rx_frame_rem) {
++                s->rx_status_rx_settings.s.rxfrc--;
++                if (!s->rx_status_rx_settings.s.rxfrc) {
++                    s->status.s.rxne = 0;
++                    s->status.s.idle = 1;
++                    s->status.s.rxs = 0;
++                }
++            }
++            s->rx_tail_pos = (s->rx_tail_pos + 4) % CTUCAN_RCV_BUF_LEN;
++        } else {
++            val = 0;
++        }
++        break;
++    case CTU_CAN_FD_TX_STATUS:
++        val = s->tx_status.u32;
++        break;
++    case CTU_CAN_FD_TX_PRIORITY:
++        val = s->tx_priority.u32;
++        break;
++    case CTU_CAN_FD_RX_FR_CTR:
++        val = s->rx_fr_ctr.s.rx_fr_ctr_val;
++        break;
++    case CTU_CAN_FD_TX_FR_CTR:
++        val = s->tx_fr_ctr.s.tx_fr_ctr_val;
++        break;
++    case CTU_CAN_FD_YOLO_REG:
++        val = s->yolo_reg.s.yolo_val;
++        break;
++    }
++
++    val >>= ((addr & 3) << 3);
++    if (size < 8) {
++        val &= ((uint64_t)1 << (size << 3)) - 1;
++    }
++
++    return val;
++}
++
++bool ctucan_can_receive(CanBusClientState *client)
++{
++    CtuCanCoreState *s = container_of(client, CtuCanCoreState, bus_client);
++
++    if (!s->mode_settings.s.ena) {
++        return false;
++    }
++
++    return true; /* always return true, when operation mode */
++}
++
++ssize_t ctucan_receive(CanBusClientState *client, const qemu_can_frame *frames,
++                        size_t frames_cnt)
++{
++    CtuCanCoreState *s = container_of(client, CtuCanCoreState, bus_client);
++    static uint8_t rcv[CTUCAN_MSG_MAX_LEN];
++    int i;
++    int ret = -1;
++    const qemu_can_frame *frame = frames;
++    union ctu_can_fd_int_stat int_stat;
++    int_stat.u32 = 0;
++
++    if (frames_cnt <= 0) {
++        return 0;
++    }
++
++    ret = ctucan_frame2buff(frame, rcv);
++
++    if (s->rx_cnt + ret > CTUCAN_RCV_BUF_LEN) { /* Data overrun. */
++        s->status.s.dor = 1;
++        int_stat.s.doi = 1;
++        s->int_stat.u32 |= int_stat.u32 & ~s->int_mask.u32;
++        ctucan_update_irq(s);
++        DPRINTF("Receive FIFO overrun\n");
++        return ret;
++    }
++    s->status.s.idle = 0;
++    s->status.s.rxs = 1;
++    int_stat.s.rxi = 1;
++    if (((s->rx_cnt + 3) & ~3) == CTUCAN_RCV_BUF_LEN) {
++        int_stat.s.rxfi = 1;
++    }
++    s->int_stat.u32 |= int_stat.u32 & ~s->int_mask.u32;
++    s->rx_fr_ctr.s.rx_fr_ctr_val++;
++    s->rx_status_rx_settings.s.rxfrc++;
++    for (i = 0; i < ret; i++) {
++        s->rx_buff[(s->rx_tail_pos + s->rx_cnt) % CTUCAN_RCV_BUF_LEN] = rcv[i];
++        s->rx_cnt++;
++    }
++    s->status.s.rxne = 1;
++
++    ctucan_update_irq(s);
++
++    return 1;
++}
++
++static CanBusClientInfo ctucan_bus_client_info = {
++    .can_receive = ctucan_can_receive,
++    .receive = ctucan_receive,
 +};
 +
 +
-+/* Register descriptions: */
-+union ctu_can_fd_frame_form_w {
-+	uint32_t u32;
-+	struct ctu_can_fd_frame_form_w_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FRAME_FORM_W */
-+		uint32_t dlc                     : 4;
-+		uint32_t reserved_4              : 1;
-+		uint32_t rtr                     : 1;
-+		uint32_t ide                     : 1;
-+		uint32_t fdf                     : 1;
-+		uint32_t reserved_8              : 1;
-+		uint32_t brs                     : 1;
-+		uint32_t esi_rsv                 : 1;
-+		uint32_t rwcnt                   : 5;
-+		uint32_t reserved_31_16         : 16;
-+#else
-+		uint32_t reserved_31_16         : 16;
-+		uint32_t rwcnt                   : 5;
-+		uint32_t esi_rsv                 : 1;
-+		uint32_t brs                     : 1;
-+		uint32_t reserved_8              : 1;
-+		uint32_t fdf                     : 1;
-+		uint32_t ide                     : 1;
-+		uint32_t rtr                     : 1;
-+		uint32_t reserved_4              : 1;
-+		uint32_t dlc                     : 4;
-+#endif
-+	} s;
++int ctucan_connect_to_bus(CtuCanCoreState *s, CanBusState *bus)
++{
++    s->bus_client.info = &ctucan_bus_client_info;
++
++    if (!bus) {
++        return -EINVAL;
++    }
++
++    if (can_bus_insert_client(bus, &s->bus_client) < 0) {
++        return -1;
++    }
++
++    return 0;
++}
++
++void ctucan_disconnect(CtuCanCoreState *s)
++{
++    can_bus_remove_client(&s->bus_client);
++}
++
++int ctucan_init(CtuCanCoreState *s, qemu_irq irq)
++{
++    s->irq = irq;
++
++    qemu_irq_lower(s->irq);
++
++    ctucan_hardware_reset(s);
++
++    return 0;
++}
++
++const VMStateDescription vmstate_qemu_ctucan_tx_buffer = {
++    .name = "qemu_ctucan_tx_buffer",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(data, CtuCanCoreMsgBuffer, CTUCAN_CORE_MSG_MAX_LEN),
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+enum ctu_can_fd_frame_form_w_rtr {
-+	NO_RTR_FRAME       = 0x0,
-+	RTR_FRAME          = 0x1,
-+};
++static int ctucan_post_load(void *opaque, int version_id)
++{
++    CtuCanCoreState *s = opaque;
++    ctucan_update_irq(s);
++    return 0;
++}
 +
-+enum ctu_can_fd_frame_form_w_ide {
-+	BASE           = 0x0,
-+	EXTENDED       = 0x1,
-+};
++/* VMState is needed for live migration of QEMU images */
++const VMStateDescription vmstate_ctucan = {
++    .name = "ctucan",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .post_load = ctucan_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(mode_settings.u32, CtuCanCoreState),
++        VMSTATE_UINT32(status.u32, CtuCanCoreState),
++        VMSTATE_UINT32(int_stat.u32, CtuCanCoreState),
++        VMSTATE_UINT32(int_ena.u32, CtuCanCoreState),
++        VMSTATE_UINT32(int_mask.u32, CtuCanCoreState),
++        VMSTATE_UINT32(brt.u32, CtuCanCoreState),
++        VMSTATE_UINT32(brt_fd.u32, CtuCanCoreState),
++        VMSTATE_UINT32(ewl_erp_fault_state.u32, CtuCanCoreState),
++        VMSTATE_UINT32(rec_tec.u32, CtuCanCoreState),
++        VMSTATE_UINT32(err_norm_err_fd.u32, CtuCanCoreState),
++        VMSTATE_UINT32(ctr_pres.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_a_mask.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_a_val.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_b_mask.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_b_val.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_c_mask.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_c_val.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_ran_low.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_ran_high.u32, CtuCanCoreState),
++        VMSTATE_UINT32(filter_control_filter_status.u32, CtuCanCoreState),
++        VMSTATE_UINT32(rx_mem_info.u32, CtuCanCoreState),
++        VMSTATE_UINT32(rx_pointers.u32, CtuCanCoreState),
++        VMSTATE_UINT32(rx_status_rx_settings.u32, CtuCanCoreState),
++        VMSTATE_UINT32(tx_status.u32, CtuCanCoreState),
++        VMSTATE_UINT32(tx_priority.u32, CtuCanCoreState),
++        VMSTATE_UINT32(err_capt_alc.u32, CtuCanCoreState),
++        VMSTATE_UINT32(trv_delay_ssp_cfg.u32, CtuCanCoreState),
++        VMSTATE_UINT32(rx_fr_ctr.u32, CtuCanCoreState),
++        VMSTATE_UINT32(tx_fr_ctr.u32, CtuCanCoreState),
++        VMSTATE_UINT32(debug_register.u32, CtuCanCoreState),
++        VMSTATE_UINT32(yolo_reg.u32, CtuCanCoreState),
++        VMSTATE_UINT32(timestamp_low.u32, CtuCanCoreState),
++        VMSTATE_UINT32(timestamp_high.u32, CtuCanCoreState),
 +
-+enum ctu_can_fd_frame_form_w_fdf {
-+	NORMAL_CAN       = 0x0,
-+	FD_CAN           = 0x1,
-+};
++        VMSTATE_STRUCT_ARRAY(tx_buffer, CtuCanCoreState,
++                CTUCAN_CORE_TXBUF_NUM, 0, vmstate_qemu_ctucan_tx_buffer,
++                CtuCanCoreMsgBuffer),
 +
-+enum ctu_can_fd_frame_form_w_brs {
-+	BR_NO_SHIFT       = 0x0,
-+	BR_SHIFT          = 0x1,
-+};
++        VMSTATE_BUFFER(rx_buff, CtuCanCoreState),
++        VMSTATE_UINT32(rx_tail_pos, CtuCanCoreState),
++        VMSTATE_UINT32(rx_cnt, CtuCanCoreState),
++        VMSTATE_UINT32(rx_frame_rem, CtuCanCoreState),
 +
-+enum ctu_can_fd_frame_form_w_esi_rsv {
-+	ESI_ERR_ACTIVE       = 0x0,
-+	ESI_ERR_PASIVE       = 0x1,
++        VMSTATE_END_OF_LIST()
++    }
 +};
-+
-+union ctu_can_fd_identifier_w {
-+	uint32_t u32;
-+	struct ctu_can_fd_identifier_w_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* IDENTIFIER_W */
-+		uint32_t identifier_ext         : 18;
-+		uint32_t identifier_base        : 11;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t identifier_base        : 11;
-+		uint32_t identifier_ext         : 18;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_timestamp_l_w {
-+	uint32_t u32;
-+	struct ctu_can_fd_timestamp_l_w_s {
-+  /* TIMESTAMP_L_W */
-+		uint32_t time_stamp_31_0        : 32;
-+	} s;
-+};
-+
-+union ctu_can_fd_timestamp_u_w {
-+	uint32_t u32;
-+	struct ctu_can_fd_timestamp_u_w_s {
-+  /* TIMESTAMP_U_W */
-+		uint32_t timestamp_l_w          : 32;
-+	} s;
-+};
-+
-+union ctu_can_fd_data_1_4_w {
-+	uint32_t u32;
-+	struct ctu_can_fd_data_1_4_w_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* DATA_1_4_W */
-+		uint32_t data_1                  : 8;
-+		uint32_t data_2                  : 8;
-+		uint32_t data_3                  : 8;
-+		uint32_t data_4                  : 8;
-+#else
-+		uint32_t data_4                  : 8;
-+		uint32_t data_3                  : 8;
-+		uint32_t data_2                  : 8;
-+		uint32_t data_1                  : 8;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_data_5_8_w {
-+	uint32_t u32;
-+	struct ctu_can_fd_data_5_8_w_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* DATA_5_8_W */
-+		uint32_t data_5                  : 8;
-+		uint32_t data_6                  : 8;
-+		uint32_t data_7                  : 8;
-+		uint32_t data_8                  : 8;
-+#else
-+		uint32_t data_8                  : 8;
-+		uint32_t data_7                  : 8;
-+		uint32_t data_6                  : 8;
-+		uint32_t data_5                  : 8;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_data_61_64_w {
-+	uint32_t u32;
-+	struct ctu_can_fd_data_61_64_w_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* DATA_61_64_W */
-+		uint32_t data_61                 : 8;
-+		uint32_t data_62                 : 8;
-+		uint32_t data_63                 : 8;
-+		uint32_t data_64                 : 8;
-+#else
-+		uint32_t data_64                 : 8;
-+		uint32_t data_63                 : 8;
-+		uint32_t data_62                 : 8;
-+		uint32_t data_61                 : 8;
-+#endif
-+	} s;
-+};
-+
-+#endif
-diff --git a/hw/net/can/ctu_can_fd_regs.h b/hw/net/can/ctu_can_fd_regs.h
+diff --git a/hw/net/can/ctucan_core.h b/hw/net/can/ctucan_core.h
 new file mode 100644
-index 0000000000..a3b3b5c374
+index 0000000000..f21cb1c5ec
 --- /dev/null
-+++ b/hw/net/can/ctu_can_fd_regs.h
-@@ -0,0 +1,972 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*******************************************************************************
++++ b/hw/net/can/ctucan_core.h
+@@ -0,0 +1,127 @@
++/*
++ * CTU CAN FD device emulation
++ * http://canbus.pages.fel.cvut.cz/
 + *
-+ * CTU CAN FD IP Core
-+ * Copyright (C) 2015-2018
++ * Copyright (c) 2019 Jan Charvat (jancharvat.charvat@gmail.com)
 + *
-+ * Authors:
-+ *     Ondrej Ille <ondrej.ille@gmail.com>
-+ *     Martin Jerabek <martin.jerabek01@gmail.com>
-+ *     Jaroslav Beran <jara.beran@gmail.com>
++ * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
++ * Jin Yang and Pavel Pisa
 + *
-+ * Project advisors:
-+ *     Jiri Novak <jnovak@fel.cvut.cz>
-+ *     Pavel Pisa <pisa@cmp.felk.cvut.cz>
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * Department of Measurement         (http://meas.fel.cvut.cz/)
-+ * Faculty of Electrical Engineering (http://www.fel.cvut.cz)
-+ * Czech Technical University        (http://www.cvut.cz/)
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#ifndef HW_CAN_CTUCAN_CORE_H
++#define HW_CAN_CTUCAN_CORE_H
++
++#include "exec/hwaddr.h"
++#include "net/can_emu.h"
++
++
++#ifndef __LITTLE_ENDIAN_BITFIELD
++#define __LITTLE_ENDIAN_BITFIELD 1
++#endif
++
++#include "ctu_can_fd_frame.h"
++#include "ctu_can_fd_regs.h"
++
++#define CTUCAN_CORE_MEM_SIZE       0x500
++
++/* The max size for a message in FIFO */
++#define CTUCAN_MSG_MAX_LEN        (CTU_CAN_FD_DATA_1_4_W + 64)
++/* The receive buffer size. */
++#define CTUCAN_RCV_BUF_LEN        (1024 * 8)
++
++
++/* The max size for a message buffer */
++#define CTUCAN_CORE_MSG_MAX_LEN       0x50
++/* The receive buffer size. */
++#define CTUCAN_CORE_RCV_BUF_LEN       0x1000
++
++#define CTUCAN_CORE_TXBUF_NUM            4
++
++typedef struct CtuCanCoreMsgBuffer {
++    uint8_t data[CTUCAN_CORE_MSG_MAX_LEN];
++} CtuCanCoreMsgBuffer;
++
++typedef struct CtuCanCoreState {
++    union ctu_can_fd_mode_settings                  mode_settings;
++    union ctu_can_fd_status                         status;
++    union ctu_can_fd_int_stat                       int_stat;
++    union ctu_can_fd_int_ena_set                    int_ena;
++    union ctu_can_fd_int_mask_set                   int_mask;
++    union ctu_can_fd_btr                            brt;
++    union ctu_can_fd_btr_fd                         brt_fd;
++    union ctu_can_fd_ewl_erp_fault_state            ewl_erp_fault_state;
++    union ctu_can_fd_rec_tec                        rec_tec;
++    union ctu_can_fd_err_norm_err_fd                err_norm_err_fd;
++    union ctu_can_fd_ctr_pres                       ctr_pres;
++    union ctu_can_fd_filter_a_mask                  filter_a_mask;
++    union ctu_can_fd_filter_a_val                   filter_a_val;
++    union ctu_can_fd_filter_b_mask                  filter_b_mask;
++    union ctu_can_fd_filter_b_val                   filter_b_val;
++    union ctu_can_fd_filter_c_mask                  filter_c_mask;
++    union ctu_can_fd_filter_c_val                   filter_c_val;
++    union ctu_can_fd_filter_ran_low                 filter_ran_low;
++    union ctu_can_fd_filter_ran_high                filter_ran_high;
++    union ctu_can_fd_filter_control_filter_status   filter_control_filter_status;
++    union ctu_can_fd_rx_mem_info                    rx_mem_info;
++    union ctu_can_fd_rx_pointers                    rx_pointers;
++    union ctu_can_fd_rx_status_rx_settings          rx_status_rx_settings;
++    union ctu_can_fd_tx_status                      tx_status;
++    union ctu_can_fd_tx_priority                    tx_priority;
++    union ctu_can_fd_err_capt_alc                   err_capt_alc;
++    union ctu_can_fd_trv_delay_ssp_cfg              trv_delay_ssp_cfg;
++    union ctu_can_fd_rx_fr_ctr                      rx_fr_ctr;
++    union ctu_can_fd_tx_fr_ctr                      tx_fr_ctr;
++    union ctu_can_fd_debug_register                 debug_register;
++    union ctu_can_fd_yolo_reg                       yolo_reg;
++    union ctu_can_fd_timestamp_low                  timestamp_low;
++    union ctu_can_fd_timestamp_high                 timestamp_high;
++
++    CtuCanCoreMsgBuffer tx_buffer[CTUCAN_CORE_TXBUF_NUM];
++
++    uint8_t         rx_buff[CTUCAN_RCV_BUF_LEN];  /* 32~95 .. 64bytes Rx FIFO */
++    uint32_t        rx_tail_pos;        /* Count by bytes. */
++    uint32_t        rx_cnt;        /* Count by bytes. */
++    uint32_t        rx_frame_rem;
++
++    qemu_irq        irq;
++    CanBusClientState bus_client;
++} CtuCanCoreState;
++
++void ctucan_hardware_reset(CtuCanCoreState *s);
++
++void ctucan_mem_write(CtuCanCoreState *s, hwaddr addr, uint64_t val,
++                       unsigned size);
++
++uint64_t ctucan_mem_read(CtuCanCoreState *s, hwaddr addr, unsigned size);
++
++int ctucan_connect_to_bus(CtuCanCoreState *s, CanBusState *bus);
++
++void ctucan_disconnect(CtuCanCoreState *s);
++
++int ctucan_init(CtuCanCoreState *s, qemu_irq irq);
++
++bool ctucan_can_receive(CanBusClientState *client);
++
++ssize_t ctucan_receive(CanBusClientState *client,
++                        const qemu_can_frame *frames, size_t frames_cnt);
++
++extern const VMStateDescription vmstate_ctucan;
++
++#endif
+diff --git a/hw/net/can/ctucan_pci.c b/hw/net/can/ctucan_pci.c
+new file mode 100644
+index 0000000000..accc7f0fd9
+--- /dev/null
++++ b/hw/net/can/ctucan_pci.c
+@@ -0,0 +1,281 @@
++/*
++ * CTU CAN FD PCI device emulation
++ * http://canbus.pages.fel.cvut.cz/
 + *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ ******************************************************************************/
++ * Copyright (c) 2019 Jan Charvat (jancharvat.charvat@gmail.com)
++ *
++ * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
++ * Jin Yang and Pavel Pisa
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+/* This file is autogenerated, DO NOT EDIT! */
++#include "qemu/osdep.h"
++#include "qemu/event_notifier.h"
++#include "qemu/module.h"
++#include "qemu/thread.h"
++#include "qemu/sockets.h"
++#include "qapi/error.h"
++#include "chardev/char.h"
++#include "hw/irq.h"
++#include "hw/pci/pci.h"
++#include "hw/qdev-properties.h"
++#include "migration/vmstate.h"
++#include "net/can_emu.h"
 +
-+#ifndef __CTU_CAN_FD_CAN_FD_REGISTER_MAP__
-+#define __CTU_CAN_FD_CAN_FD_REGISTER_MAP__
++#include "ctucan_core.h"
 +
-+/* CAN_Registers memory map */
-+enum ctu_can_fd_can_registers {
-+	CTU_CAN_FD_DEVICE_ID             = 0x0,
-+	CTU_CAN_FD_VERSION               = 0x2,
-+	CTU_CAN_FD_MODE                  = 0x4,
-+	CTU_CAN_FD_SETTINGS              = 0x6,
-+	CTU_CAN_FD_STATUS                = 0x8,
-+	CTU_CAN_FD_COMMAND               = 0xc,
-+	CTU_CAN_FD_INT_STAT             = 0x10,
-+	CTU_CAN_FD_INT_ENA_SET          = 0x14,
-+	CTU_CAN_FD_INT_ENA_CLR          = 0x18,
-+	CTU_CAN_FD_INT_MASK_SET         = 0x1c,
-+	CTU_CAN_FD_INT_MASK_CLR         = 0x20,
-+	CTU_CAN_FD_BTR                  = 0x24,
-+	CTU_CAN_FD_BTR_FD               = 0x28,
-+	CTU_CAN_FD_EWL                  = 0x2c,
-+	CTU_CAN_FD_ERP                  = 0x2d,
-+	CTU_CAN_FD_FAULT_STATE          = 0x2e,
-+	CTU_CAN_FD_REC                  = 0x30,
-+	CTU_CAN_FD_TEC                  = 0x32,
-+	CTU_CAN_FD_ERR_NORM             = 0x34,
-+	CTU_CAN_FD_ERR_FD               = 0x36,
-+	CTU_CAN_FD_CTR_PRES             = 0x38,
-+	CTU_CAN_FD_FILTER_A_MASK        = 0x3c,
-+	CTU_CAN_FD_FILTER_A_VAL         = 0x40,
-+	CTU_CAN_FD_FILTER_B_MASK        = 0x44,
-+	CTU_CAN_FD_FILTER_B_VAL         = 0x48,
-+	CTU_CAN_FD_FILTER_C_MASK        = 0x4c,
-+	CTU_CAN_FD_FILTER_C_VAL         = 0x50,
-+	CTU_CAN_FD_FILTER_RAN_LOW       = 0x54,
-+	CTU_CAN_FD_FILTER_RAN_HIGH      = 0x58,
-+	CTU_CAN_FD_FILTER_CONTROL       = 0x5c,
-+	CTU_CAN_FD_FILTER_STATUS        = 0x5e,
-+	CTU_CAN_FD_RX_MEM_INFO          = 0x60,
-+	CTU_CAN_FD_RX_POINTERS          = 0x64,
-+	CTU_CAN_FD_RX_STATUS            = 0x68,
-+	CTU_CAN_FD_RX_SETTINGS          = 0x6a,
-+	CTU_CAN_FD_RX_DATA              = 0x6c,
-+	CTU_CAN_FD_TX_STATUS            = 0x70,
-+	CTU_CAN_FD_TX_COMMAND           = 0x74,
-+	CTU_CAN_FD_TX_PRIORITY          = 0x78,
-+	CTU_CAN_FD_ERR_CAPT             = 0x7c,
-+	CTU_CAN_FD_ALC                  = 0x7e,
-+	CTU_CAN_FD_TRV_DELAY            = 0x80,
-+	CTU_CAN_FD_SSP_CFG              = 0x82,
-+	CTU_CAN_FD_RX_FR_CTR            = 0x84,
-+	CTU_CAN_FD_TX_FR_CTR            = 0x88,
-+	CTU_CAN_FD_DEBUG_REGISTER       = 0x8c,
-+	CTU_CAN_FD_YOLO_REG             = 0x90,
-+	CTU_CAN_FD_TIMESTAMP_LOW        = 0x94,
-+	CTU_CAN_FD_TIMESTAMP_HIGH       = 0x98,
-+	CTU_CAN_FD_TXTB1_DATA_1        = 0x100,
-+	CTU_CAN_FD_TXTB1_DATA_2        = 0x104,
-+	CTU_CAN_FD_TXTB1_DATA_20       = 0x14c,
-+	CTU_CAN_FD_TXTB2_DATA_1        = 0x200,
-+	CTU_CAN_FD_TXTB2_DATA_2        = 0x204,
-+	CTU_CAN_FD_TXTB2_DATA_20       = 0x24c,
-+	CTU_CAN_FD_TXTB3_DATA_1        = 0x300,
-+	CTU_CAN_FD_TXTB3_DATA_2        = 0x304,
-+	CTU_CAN_FD_TXTB3_DATA_20       = 0x34c,
-+	CTU_CAN_FD_TXTB4_DATA_1        = 0x400,
-+	CTU_CAN_FD_TXTB4_DATA_2        = 0x404,
-+	CTU_CAN_FD_TXTB4_DATA_20       = 0x44c,
-+};
++#define TYPE_CAN_PCI_DEV "ctucan_pci"
 +
++#define CTUCAN_PCI_DEV(obj) \
++    OBJECT_CHECK(CtuCanPCIState, (obj), TYPE_CAN_PCI_DEV)
 +
-+/* Register descriptions: */
-+union ctu_can_fd_device_id_version {
-+	uint32_t u32;
-+	struct ctu_can_fd_device_id_version_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* DEVICE_ID */
-+		uint32_t device_id              : 16;
-+  /* VERSION */
-+		uint32_t ver_minor               : 8;
-+		uint32_t ver_major               : 8;
-+#else
-+		uint32_t ver_major               : 8;
-+		uint32_t ver_minor               : 8;
-+		uint32_t device_id              : 16;
++#define CTUCAN_PCI_CORE_COUNT     2
++#define CTUCAN_PCI_CORE_RANGE     0x10000
++
++#define CTUCAN_PCI_BAR_COUNT      2
++
++#define CTUCAN_PCI_BYTES_PER_CORE 0x4000
++
++#ifndef PCI_VENDOR_ID_TEDIA
++#define PCI_VENDOR_ID_TEDIA 0x1760
 +#endif
-+	} s;
++
++#define PCI_DEVICE_ID_TEDIA_CTUCAN_VER21 0xff00
++
++#define CTUCAN_BAR0_RANGE 0x8000
++#define CTUCAN_BAR0_CTUCAN_ID 0x0000
++#define CTUCAN_BAR0_CRA_BASE  0x4000
++#define CYCLONE_IV_CRA_A2P_IE (0x0050)
++
++#define CTUCAN_WITHOUT_CTUCAN_ID  0
++#define CTUCAN_WITH_CTUCAN_ID     1
++
++typedef struct CtuCanPCIState {
++    /*< private >*/
++    PCIDevice       dev;
++    /*< public >*/
++    MemoryRegion    ctucan_io[CTUCAN_PCI_BAR_COUNT];
++
++    CtuCanCoreState ctucan_state[CTUCAN_PCI_CORE_COUNT];
++    qemu_irq        irq;
++
++    char            *model; /* The model that support, only SJA1000 now. */
++    CanBusState     *canbus[CTUCAN_PCI_CORE_COUNT];
++} CtuCanPCIState;
++
++static void ctucan_pci_reset(DeviceState *dev)
++{
++    CtuCanPCIState *d = CTUCAN_PCI_DEV(dev);
++    int i;
++
++    for (i = 0 ; i < CTUCAN_PCI_CORE_COUNT; i++) {
++        ctucan_hardware_reset(&d->ctucan_state[i]);
++    }
++}
++
++static uint64_t ctucan_pci_id_cra_io_read(void *opaque, hwaddr addr,
++                                          unsigned size)
++{
++    if (addr >= 4) {
++        return 0;
++    }
++
++    uint64_t tmp = 0xC0000000 + CTUCAN_PCI_CORE_COUNT;
++    tmp >>= ((addr & 3) << 3);
++    if (size < 8) {
++        tmp &= ((uint64_t)1 << (size << 3)) - 1;
++    }
++    printf("addr=%lx,size=%x,tmp=%lx\n", addr, size, tmp);
++    return tmp;
++}
++
++static void ctucan_pci_id_cra_io_write(void *opaque, hwaddr addr, uint64_t data,
++                             unsigned size)
++{
++
++}
++
++static uint64_t ctucan_pci_cores_io_read(void *opaque, hwaddr addr,
++                                          unsigned size)
++{
++    CtuCanPCIState *d = opaque;
++    CtuCanCoreState *s;
++    hwaddr core_num = addr / CTUCAN_PCI_BYTES_PER_CORE;
++
++    if (core_num >= CTUCAN_PCI_CORE_COUNT) {
++        return 0;
++    }
++
++    s = &d->ctucan_state[core_num];
++
++    return ctucan_mem_read(s, addr % CTUCAN_PCI_BYTES_PER_CORE, size);
++}
++
++static void ctucan_pci_cores_io_write(void *opaque, hwaddr addr, uint64_t data,
++                             unsigned size)
++{
++    CtuCanPCIState *d = opaque;
++    CtuCanCoreState *s;
++    hwaddr core_num = addr / CTUCAN_PCI_BYTES_PER_CORE;
++
++    if (core_num >= CTUCAN_PCI_CORE_COUNT) {
++        return;
++    }
++
++    s = &d->ctucan_state[core_num];
++
++    return ctucan_mem_write(s, addr % CTUCAN_PCI_BYTES_PER_CORE, data, size);
++}
++
++static const MemoryRegionOps ctucan_pci_id_cra_io_ops = {
++    .read = ctucan_pci_id_cra_io_read,
++    .write = ctucan_pci_id_cra_io_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
 +};
 +
-+enum ctu_can_fd_device_id_device_id {
-+	CTU_CAN_FD_ID    = 0xcafd,
++static const MemoryRegionOps ctucan_pci_cores_io_ops = {
++    .read = ctucan_pci_cores_io_read,
++    .write = ctucan_pci_cores_io_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
 +};
 +
-+union ctu_can_fd_mode_settings {
-+	uint32_t u32;
-+	struct ctu_can_fd_mode_settings_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* MODE */
-+		uint32_t rst                     : 1;
-+		uint32_t lom                     : 1;
-+		uint32_t stm                     : 1;
-+		uint32_t afm                     : 1;
-+		uint32_t fde                     : 1;
-+		uint32_t reserved_6_5            : 2;
-+		uint32_t acf                     : 1;
-+		uint32_t tstm                    : 1;
-+		uint32_t reserved_15_9           : 7;
-+  /* SETTINGS */
-+		uint32_t rtrle                   : 1;
-+		uint32_t rtrth                   : 4;
-+		uint32_t ilbp                    : 1;
-+		uint32_t ena                     : 1;
-+		uint32_t nisofd                  : 1;
-+		uint32_t pex                     : 1;
-+		uint32_t reserved_31_25          : 7;
-+#else
-+		uint32_t reserved_31_25          : 7;
-+		uint32_t pex                     : 1;
-+		uint32_t nisofd                  : 1;
-+		uint32_t ena                     : 1;
-+		uint32_t ilbp                    : 1;
-+		uint32_t rtrth                   : 4;
-+		uint32_t rtrle                   : 1;
-+		uint32_t reserved_15_9           : 7;
-+		uint32_t tstm                    : 1;
-+		uint32_t acf                     : 1;
-+		uint32_t reserved_6_5            : 2;
-+		uint32_t fde                     : 1;
-+		uint32_t afm                     : 1;
-+		uint32_t stm                     : 1;
-+		uint32_t lom                     : 1;
-+		uint32_t rst                     : 1;
++static void ctucan_pci_realize(PCIDevice *pci_dev, Error **errp)
++{
++    CtuCanPCIState *d = CTUCAN_PCI_DEV(pci_dev);
++    uint8_t *pci_conf;
++    int i;
++
++    pci_conf = pci_dev->config;
++    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
++
++    d->irq = pci_allocate_irq(&d->dev);
++
++    for (i = 0 ; i < CTUCAN_PCI_CORE_COUNT; i++) {
++        ctucan_init(&d->ctucan_state[i], d->irq);
++    }
++
++    for (i = 0 ; i < CTUCAN_PCI_CORE_COUNT; i++) {
++        if (ctucan_connect_to_bus(&d->ctucan_state[i], d->canbus[i]) < 0) {
++            error_setg(errp, "ctucan_connect_to_bus failed");
++            return;
++        }
++    }
++
++    memory_region_init_io(&d->ctucan_io[0], OBJECT(d),
++                          &ctucan_pci_id_cra_io_ops, d,
++                          "ctucan_pci-core0", CTUCAN_BAR0_RANGE);
++    memory_region_init_io(&d->ctucan_io[1], OBJECT(d),
++                          &ctucan_pci_cores_io_ops, d,
++                          "ctucan_pci-core1", CTUCAN_PCI_CORE_RANGE);
++
++    for (i = 0 ; i < CTUCAN_PCI_BAR_COUNT; i++) {
++        pci_register_bar(&d->dev, i, PCI_BASE_ADDRESS_MEM_MASK & 0,
++                         &d->ctucan_io[i]);
++    }
++}
++
++static void ctucan_pci_exit(PCIDevice *pci_dev)
++{
++    CtuCanPCIState *d = CTUCAN_PCI_DEV(pci_dev);
++    int i;
++
++    for (i = 0 ; i < CTUCAN_PCI_CORE_COUNT; i++) {
++        ctucan_disconnect(&d->ctucan_state[i]);
++    }
++
++    qemu_free_irq(d->irq);
++}
++
++static const VMStateDescription vmstate_ctucan_pci = {
++    .name = "ctucan_pci",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(dev, CtuCanPCIState),
++        VMSTATE_STRUCT(ctucan_state[0], CtuCanPCIState, 0, vmstate_ctucan,
++                       CtuCanCoreState),
++#if CTUCAN_PCI_CORE_COUNT >= 2
++        VMSTATE_STRUCT(ctucan_state[1], CtuCanPCIState, 0, vmstate_ctucan,
++                       CtuCanCoreState),
 +#endif
-+	} s;
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+enum ctu_can_fd_mode_lom {
-+	LOM_DISABLED       = 0x0,
-+	LOM_ENABLED        = 0x1,
-+};
++static void ctucan_pci_instance_init(Object *obj)
++{
++    CtuCanPCIState *d = CTUCAN_PCI_DEV(obj);
 +
-+enum ctu_can_fd_mode_stm {
-+	STM_DISABLED       = 0x0,
-+	STM_ENABLED        = 0x1,
-+};
-+
-+enum ctu_can_fd_mode_afm {
-+	AFM_DISABLED       = 0x0,
-+	AFM_ENABLED        = 0x1,
-+};
-+
-+enum ctu_can_fd_mode_fde {
-+	FDE_DISABLE       = 0x0,
-+	FDE_ENABLE        = 0x1,
-+};
-+
-+enum ctu_can_fd_mode_acf {
-+	ACF_DISABLED       = 0x0,
-+	ACF_ENABLED        = 0x1,
-+};
-+
-+enum ctu_can_fd_settings_rtrle {
-+	RTRLE_DISABLED       = 0x0,
-+	RTRLE_ENABLED        = 0x1,
-+};
-+
-+enum ctu_can_fd_settings_ilbp {
-+	INT_LOOP_DISABLED       = 0x0,
-+	INT_LOOP_ENABLED        = 0x1,
-+};
-+
-+enum ctu_can_fd_settings_ena {
-+	CTU_CAN_DISABLED       = 0x0,
-+	CTU_CAN_ENABLED        = 0x1,
-+};
-+
-+enum ctu_can_fd_settings_nisofd {
-+	ISO_FD           = 0x0,
-+	NON_ISO_FD       = 0x1,
-+};
-+
-+enum ctu_can_fd_settings_pex {
-+	PROTOCOL_EXCEPTION_DISABLED       = 0x0,
-+	PROTOCOL_EXCEPTION_ENABLED        = 0x1,
-+};
-+
-+union ctu_can_fd_status {
-+	uint32_t u32;
-+	struct ctu_can_fd_status_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* STATUS */
-+		uint32_t rxne                    : 1;
-+		uint32_t dor                     : 1;
-+		uint32_t txnf                    : 1;
-+		uint32_t eft                     : 1;
-+		uint32_t rxs                     : 1;
-+		uint32_t txs                     : 1;
-+		uint32_t ewl                     : 1;
-+		uint32_t idle                    : 1;
-+		uint32_t reserved_31_8          : 24;
-+#else
-+		uint32_t reserved_31_8          : 24;
-+		uint32_t idle                    : 1;
-+		uint32_t ewl                     : 1;
-+		uint32_t txs                     : 1;
-+		uint32_t rxs                     : 1;
-+		uint32_t eft                     : 1;
-+		uint32_t txnf                    : 1;
-+		uint32_t dor                     : 1;
-+		uint32_t rxne                    : 1;
++    object_property_add_link(obj, "canbus0", TYPE_CAN_BUS,
++                             (Object **)&d->canbus[0],
++                             qdev_prop_allow_set_link_before_realize, 0);
++#if CTUCAN_PCI_CORE_COUNT >= 2
++    object_property_add_link(obj, "canbus1", TYPE_CAN_BUS,
++                             (Object **)&d->canbus[1],
++                             qdev_prop_allow_set_link_before_realize, 0);
 +#endif
-+	} s;
++}
++
++static void ctucan_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->realize = ctucan_pci_realize;
++    k->exit = ctucan_pci_exit;
++    k->vendor_id = PCI_VENDOR_ID_TEDIA;
++    k->device_id = PCI_DEVICE_ID_TEDIA_CTUCAN_VER21;
++    k->revision = 0x00;
++    k->class_id = 0x000c09;
++    k->subsystem_vendor_id = PCI_VENDOR_ID_TEDIA;
++    k->subsystem_id = PCI_DEVICE_ID_TEDIA_CTUCAN_VER21;
++    dc->desc = "CTU CAN PCI";
++    dc->vmsd = &vmstate_ctucan_pci;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->reset = ctucan_pci_reset;
++}
++
++static const TypeInfo ctucan_pci_info = {
++    .name          = TYPE_CAN_PCI_DEV,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(CtuCanPCIState),
++    .class_init    = ctucan_pci_class_init,
++    .instance_init = ctucan_pci_instance_init,
++    .interfaces = (InterfaceInfo[]) {
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { },
++    },
 +};
 +
-+union ctu_can_fd_command {
-+	uint32_t u32;
-+	struct ctu_can_fd_command_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+		uint32_t reserved_1_0            : 2;
-+  /* COMMAND */
-+		uint32_t rrb                     : 1;
-+		uint32_t cdo                     : 1;
-+		uint32_t ercrst                  : 1;
-+		uint32_t rxfcrst                 : 1;
-+		uint32_t txfcrst                 : 1;
-+		uint32_t reserved_31_7          : 25;
-+#else
-+		uint32_t reserved_31_7          : 25;
-+		uint32_t txfcrst                 : 1;
-+		uint32_t rxfcrst                 : 1;
-+		uint32_t ercrst                  : 1;
-+		uint32_t cdo                     : 1;
-+		uint32_t rrb                     : 1;
-+		uint32_t reserved_1_0            : 2;
-+#endif
-+	} s;
-+};
++static void ctucan_pci_register_types(void)
++{
++    type_register_static(&ctucan_pci_info);
++}
 +
-+union ctu_can_fd_int_stat {
-+	uint32_t u32;
-+	struct ctu_can_fd_int_stat_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* INT_STAT */
-+		uint32_t rxi                     : 1;
-+		uint32_t txi                     : 1;
-+		uint32_t ewli                    : 1;
-+		uint32_t doi                     : 1;
-+		uint32_t fcsi                    : 1;
-+		uint32_t ali                     : 1;
-+		uint32_t bei                     : 1;
-+		uint32_t ofi                     : 1;
-+		uint32_t rxfi                    : 1;
-+		uint32_t bsi                     : 1;
-+		uint32_t rbnei                   : 1;
-+		uint32_t txbhci                  : 1;
-+		uint32_t reserved_31_12         : 20;
-+#else
-+		uint32_t reserved_31_12         : 20;
-+		uint32_t txbhci                  : 1;
-+		uint32_t rbnei                   : 1;
-+		uint32_t bsi                     : 1;
-+		uint32_t rxfi                    : 1;
-+		uint32_t ofi                     : 1;
-+		uint32_t bei                     : 1;
-+		uint32_t ali                     : 1;
-+		uint32_t fcsi                    : 1;
-+		uint32_t doi                     : 1;
-+		uint32_t ewli                    : 1;
-+		uint32_t txi                     : 1;
-+		uint32_t rxi                     : 1;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_int_ena_set {
-+	uint32_t u32;
-+	struct ctu_can_fd_int_ena_set_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* INT_ENA_SET */
-+		uint32_t int_ena_set            : 12;
-+		uint32_t reserved_31_12         : 20;
-+#else
-+		uint32_t reserved_31_12         : 20;
-+		uint32_t int_ena_set            : 12;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_int_ena_clr {
-+	uint32_t u32;
-+	struct ctu_can_fd_int_ena_clr_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* INT_ENA_CLR */
-+		uint32_t int_ena_clr            : 12;
-+		uint32_t reserved_31_12         : 20;
-+#else
-+		uint32_t reserved_31_12         : 20;
-+		uint32_t int_ena_clr            : 12;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_int_mask_set {
-+	uint32_t u32;
-+	struct ctu_can_fd_int_mask_set_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* INT_MASK_SET */
-+		uint32_t int_mask_set           : 12;
-+		uint32_t reserved_31_12         : 20;
-+#else
-+		uint32_t reserved_31_12         : 20;
-+		uint32_t int_mask_set           : 12;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_int_mask_clr {
-+	uint32_t u32;
-+	struct ctu_can_fd_int_mask_clr_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* INT_MASK_CLR */
-+		uint32_t int_mask_clr           : 12;
-+		uint32_t reserved_31_12         : 20;
-+#else
-+		uint32_t reserved_31_12         : 20;
-+		uint32_t int_mask_clr           : 12;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_btr {
-+	uint32_t u32;
-+	struct ctu_can_fd_btr_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* BTR */
-+		uint32_t prop                    : 7;
-+		uint32_t ph1                     : 6;
-+		uint32_t ph2                     : 6;
-+		uint32_t brp                     : 8;
-+		uint32_t sjw                     : 5;
-+#else
-+		uint32_t sjw                     : 5;
-+		uint32_t brp                     : 8;
-+		uint32_t ph2                     : 6;
-+		uint32_t ph1                     : 6;
-+		uint32_t prop                    : 7;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_btr_fd {
-+	uint32_t u32;
-+	struct ctu_can_fd_btr_fd_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* BTR_FD */
-+		uint32_t prop_fd                 : 6;
-+		uint32_t reserved_6              : 1;
-+		uint32_t ph1_fd                  : 5;
-+		uint32_t reserved_12             : 1;
-+		uint32_t ph2_fd                  : 5;
-+		uint32_t reserved_18             : 1;
-+		uint32_t brp_fd                  : 8;
-+		uint32_t sjw_fd                  : 5;
-+#else
-+		uint32_t sjw_fd                  : 5;
-+		uint32_t brp_fd                  : 8;
-+		uint32_t reserved_18             : 1;
-+		uint32_t ph2_fd                  : 5;
-+		uint32_t reserved_12             : 1;
-+		uint32_t ph1_fd                  : 5;
-+		uint32_t reserved_6              : 1;
-+		uint32_t prop_fd                 : 6;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_ewl_erp_fault_state {
-+	uint32_t u32;
-+	struct ctu_can_fd_ewl_erp_fault_state_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* EWL */
-+		uint32_t ew_limit                : 8;
-+  /* ERP */
-+		uint32_t erp_limit               : 8;
-+  /* FAULT_STATE */
-+		uint32_t era                     : 1;
-+		uint32_t erp                     : 1;
-+		uint32_t bof                     : 1;
-+		uint32_t reserved_31_19         : 13;
-+#else
-+		uint32_t reserved_31_19         : 13;
-+		uint32_t bof                     : 1;
-+		uint32_t erp                     : 1;
-+		uint32_t era                     : 1;
-+		uint32_t erp_limit               : 8;
-+		uint32_t ew_limit                : 8;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_rec_tec {
-+	uint32_t u32;
-+	struct ctu_can_fd_rec_tec_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* REC */
-+		uint32_t rec_val                 : 9;
-+		uint32_t reserved_15_9           : 7;
-+  /* TEC */
-+		uint32_t tec_val                 : 9;
-+		uint32_t reserved_31_25          : 7;
-+#else
-+		uint32_t reserved_31_25          : 7;
-+		uint32_t tec_val                 : 9;
-+		uint32_t reserved_15_9           : 7;
-+		uint32_t rec_val                 : 9;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_err_norm_err_fd {
-+	uint32_t u32;
-+	struct ctu_can_fd_err_norm_err_fd_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* ERR_NORM */
-+		uint32_t err_norm_val           : 16;
-+  /* ERR_FD */
-+		uint32_t err_fd_val             : 16;
-+#else
-+		uint32_t err_fd_val             : 16;
-+		uint32_t err_norm_val           : 16;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_ctr_pres {
-+	uint32_t u32;
-+	struct ctu_can_fd_ctr_pres_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* CTR_PRES */
-+		uint32_t ctpv                    : 9;
-+		uint32_t ptx                     : 1;
-+		uint32_t prx                     : 1;
-+		uint32_t enorm                   : 1;
-+		uint32_t efd                     : 1;
-+		uint32_t reserved_31_13         : 19;
-+#else
-+		uint32_t reserved_31_13         : 19;
-+		uint32_t efd                     : 1;
-+		uint32_t enorm                   : 1;
-+		uint32_t prx                     : 1;
-+		uint32_t ptx                     : 1;
-+		uint32_t ctpv                    : 9;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_a_mask {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_a_mask_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_A_MASK */
-+		uint32_t bit_mask_a_val         : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_mask_a_val         : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_a_val {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_a_val_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_A_VAL */
-+		uint32_t bit_val_a_val          : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_val_a_val          : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_b_mask {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_b_mask_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_B_MASK */
-+		uint32_t bit_mask_b_val         : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_mask_b_val         : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_b_val {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_b_val_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_B_VAL */
-+		uint32_t bit_val_b_val          : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_val_b_val          : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_c_mask {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_c_mask_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_C_MASK */
-+		uint32_t bit_mask_c_val         : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_mask_c_val         : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_c_val {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_c_val_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_C_VAL */
-+		uint32_t bit_val_c_val          : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_val_c_val          : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_ran_low {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_ran_low_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_RAN_LOW */
-+		uint32_t bit_ran_low_val        : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_ran_low_val        : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_ran_high {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_ran_high_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_RAN_HIGH */
-+		uint32_t bit_ran_high_val       : 29;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t bit_ran_high_val       : 29;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_filter_control_filter_status {
-+	uint32_t u32;
-+	struct ctu_can_fd_filter_control_filter_status_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* FILTER_CONTROL */
-+		uint32_t fanb                    : 1;
-+		uint32_t fane                    : 1;
-+		uint32_t fafb                    : 1;
-+		uint32_t fafe                    : 1;
-+		uint32_t fbnb                    : 1;
-+		uint32_t fbne                    : 1;
-+		uint32_t fbfb                    : 1;
-+		uint32_t fbfe                    : 1;
-+		uint32_t fcnb                    : 1;
-+		uint32_t fcne                    : 1;
-+		uint32_t fcfb                    : 1;
-+		uint32_t fcfe                    : 1;
-+		uint32_t frnb                    : 1;
-+		uint32_t frne                    : 1;
-+		uint32_t frfb                    : 1;
-+		uint32_t frfe                    : 1;
-+  /* FILTER_STATUS */
-+		uint32_t sfa                     : 1;
-+		uint32_t sfb                     : 1;
-+		uint32_t sfc                     : 1;
-+		uint32_t sfr                     : 1;
-+		uint32_t reserved_31_20         : 12;
-+#else
-+		uint32_t reserved_31_20         : 12;
-+		uint32_t sfr                     : 1;
-+		uint32_t sfc                     : 1;
-+		uint32_t sfb                     : 1;
-+		uint32_t sfa                     : 1;
-+		uint32_t frfe                    : 1;
-+		uint32_t frfb                    : 1;
-+		uint32_t frne                    : 1;
-+		uint32_t frnb                    : 1;
-+		uint32_t fcfe                    : 1;
-+		uint32_t fcfb                    : 1;
-+		uint32_t fcne                    : 1;
-+		uint32_t fcnb                    : 1;
-+		uint32_t fbfe                    : 1;
-+		uint32_t fbfb                    : 1;
-+		uint32_t fbne                    : 1;
-+		uint32_t fbnb                    : 1;
-+		uint32_t fafe                    : 1;
-+		uint32_t fafb                    : 1;
-+		uint32_t fane                    : 1;
-+		uint32_t fanb                    : 1;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_rx_mem_info {
-+	uint32_t u32;
-+	struct ctu_can_fd_rx_mem_info_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* RX_MEM_INFO */
-+		uint32_t rx_buff_size           : 13;
-+		uint32_t reserved_15_13          : 3;
-+		uint32_t rx_mem_free            : 13;
-+		uint32_t reserved_31_29          : 3;
-+#else
-+		uint32_t reserved_31_29          : 3;
-+		uint32_t rx_mem_free            : 13;
-+		uint32_t reserved_15_13          : 3;
-+		uint32_t rx_buff_size           : 13;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_rx_pointers {
-+	uint32_t u32;
-+	struct ctu_can_fd_rx_pointers_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* RX_POINTERS */
-+		uint32_t rx_wpp                 : 12;
-+		uint32_t reserved_15_12          : 4;
-+		uint32_t rx_rpp                 : 12;
-+		uint32_t reserved_31_28          : 4;
-+#else
-+		uint32_t reserved_31_28          : 4;
-+		uint32_t rx_rpp                 : 12;
-+		uint32_t reserved_15_12          : 4;
-+		uint32_t rx_wpp                 : 12;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_rx_status_rx_settings {
-+	uint32_t u32;
-+	struct ctu_can_fd_rx_status_rx_settings_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* RX_STATUS */
-+		uint32_t rxe                     : 1;
-+		uint32_t rxf                     : 1;
-+		uint32_t reserved_3_2            : 2;
-+		uint32_t rxfrc                  : 11;
-+		uint32_t reserved_15             : 1;
-+  /* RX_SETTINGS */
-+		uint32_t rtsop                   : 1;
-+		uint32_t reserved_31_17         : 15;
-+#else
-+		uint32_t reserved_31_17         : 15;
-+		uint32_t rtsop                   : 1;
-+		uint32_t reserved_15             : 1;
-+		uint32_t rxfrc                  : 11;
-+		uint32_t reserved_3_2            : 2;
-+		uint32_t rxf                     : 1;
-+		uint32_t rxe                     : 1;
-+#endif
-+	} s;
-+};
-+
-+enum ctu_can_fd_rx_settings_rtsop {
-+	RTS_END       = 0x0,
-+	RTS_BEG       = 0x1,
-+};
-+
-+union ctu_can_fd_rx_data {
-+	uint32_t u32;
-+	struct ctu_can_fd_rx_data_s {
-+  /* RX_DATA */
-+		uint32_t rx_data                : 32;
-+	} s;
-+};
-+
-+union ctu_can_fd_tx_status {
-+	uint32_t u32;
-+	struct ctu_can_fd_tx_status_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* TX_STATUS */
-+		uint32_t tx1s                    : 4;
-+		uint32_t tx2s                    : 4;
-+		uint32_t tx3s                    : 4;
-+		uint32_t tx4s                    : 4;
-+		uint32_t reserved_31_16         : 16;
-+#else
-+		uint32_t reserved_31_16         : 16;
-+		uint32_t tx4s                    : 4;
-+		uint32_t tx3s                    : 4;
-+		uint32_t tx2s                    : 4;
-+		uint32_t tx1s                    : 4;
-+#endif
-+	} s;
-+};
-+
-+enum ctu_can_fd_tx_status_tx1s {
-+	TXT_RDY        = 0x1,
-+	TXT_TRAN       = 0x2,
-+	TXT_ABTP       = 0x3,
-+	TXT_TOK        = 0x4,
-+	TXT_ERR        = 0x6,
-+	TXT_ABT        = 0x7,
-+	TXT_ETY        = 0x8,
-+};
-+
-+union ctu_can_fd_tx_command {
-+	uint32_t u32;
-+	struct ctu_can_fd_tx_command_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* TX_COMMAND */
-+		uint32_t txce                    : 1;
-+		uint32_t txcr                    : 1;
-+		uint32_t txca                    : 1;
-+		uint32_t reserved_7_3            : 5;
-+		uint32_t txb1                    : 1;
-+		uint32_t txb2                    : 1;
-+		uint32_t txb3                    : 1;
-+		uint32_t txb4                    : 1;
-+		uint32_t reserved_31_12         : 20;
-+#else
-+		uint32_t reserved_31_12         : 20;
-+		uint32_t txb4                    : 1;
-+		uint32_t txb3                    : 1;
-+		uint32_t txb2                    : 1;
-+		uint32_t txb1                    : 1;
-+		uint32_t reserved_7_3            : 5;
-+		uint32_t txca                    : 1;
-+		uint32_t txcr                    : 1;
-+		uint32_t txce                    : 1;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_tx_priority {
-+	uint32_t u32;
-+	struct ctu_can_fd_tx_priority_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* TX_PRIORITY */
-+		uint32_t txt1p                   : 3;
-+		uint32_t reserved_3              : 1;
-+		uint32_t txt2p                   : 3;
-+		uint32_t reserved_7              : 1;
-+		uint32_t txt3p                   : 3;
-+		uint32_t reserved_11             : 1;
-+		uint32_t txt4p                   : 3;
-+		uint32_t reserved_31_15         : 17;
-+#else
-+		uint32_t reserved_31_15         : 17;
-+		uint32_t txt4p                   : 3;
-+		uint32_t reserved_11             : 1;
-+		uint32_t txt3p                   : 3;
-+		uint32_t reserved_7              : 1;
-+		uint32_t txt2p                   : 3;
-+		uint32_t reserved_3              : 1;
-+		uint32_t txt1p                   : 3;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_err_capt_alc {
-+	uint32_t u32;
-+	struct ctu_can_fd_err_capt_alc_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* ERR_CAPT */
-+		uint32_t err_pos                 : 5;
-+		uint32_t err_type                : 3;
-+		uint32_t reserved_15_8           : 8;
-+  /* ALC */
-+		uint32_t alc_bit                 : 5;
-+		uint32_t alc_id_field            : 3;
-+		uint32_t reserved_31_24          : 8;
-+#else
-+		uint32_t reserved_31_24          : 8;
-+		uint32_t alc_id_field            : 3;
-+		uint32_t alc_bit                 : 5;
-+		uint32_t reserved_15_8           : 8;
-+		uint32_t err_type                : 3;
-+		uint32_t err_pos                 : 5;
-+#endif
-+	} s;
-+};
-+
-+enum ctu_can_fd_err_capt_err_pos {
-+	ERC_POS_SOF         = 0x0,
-+	ERC_POS_ARB         = 0x1,
-+	ERC_POS_CTRL        = 0x2,
-+	ERC_POS_DATA        = 0x3,
-+	ERC_POS_CRC         = 0x4,
-+	ERC_POS_ACK         = 0x5,
-+	ERC_POS_EOF         = 0x6,
-+	ERC_POS_ERR         = 0x7,
-+	ERC_POS_OVRL        = 0x8,
-+	ERC_POS_OTHER      = 0x1f,
-+};
-+
-+enum ctu_can_fd_err_capt_err_type {
-+	ERC_BIT_ERR        = 0x0,
-+	ERC_CRC_ERR        = 0x1,
-+	ERC_FRM_ERR        = 0x2,
-+	ERC_ACK_ERR        = 0x3,
-+	ERC_STUF_ERR       = 0x4,
-+};
-+
-+enum ctu_can_fd_alc_alc_id_field {
-+	ALC_RSVD            = 0x0,
-+	ALC_BASE_ID         = 0x1,
-+	ALC_SRR_RTR         = 0x2,
-+	ALC_IDE             = 0x3,
-+	ALC_EXTENSION       = 0x4,
-+	ALC_RTR             = 0x5,
-+};
-+
-+union ctu_can_fd_trv_delay_ssp_cfg {
-+	uint32_t u32;
-+	struct ctu_can_fd_trv_delay_ssp_cfg_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* TRV_DELAY */
-+		uint32_t trv_delay_value         : 7;
-+		uint32_t reserved_15_7           : 9;
-+  /* SSP_CFG */
-+		uint32_t ssp_offset              : 8;
-+		uint32_t ssp_src                 : 2;
-+		uint32_t reserved_31_26          : 6;
-+#else
-+		uint32_t reserved_31_26          : 6;
-+		uint32_t ssp_src                 : 2;
-+		uint32_t ssp_offset              : 8;
-+		uint32_t reserved_15_7           : 9;
-+		uint32_t trv_delay_value         : 7;
-+#endif
-+	} s;
-+};
-+
-+enum ctu_can_fd_ssp_cfg_ssp_src {
-+	SSP_SRC_MEAS_N_OFFSET       = 0x0,
-+	SSP_SRC_NO_SSP              = 0x1,
-+	SSP_SRC_OFFSET              = 0x2,
-+};
-+
-+union ctu_can_fd_rx_fr_ctr {
-+	uint32_t u32;
-+	struct ctu_can_fd_rx_fr_ctr_s {
-+  /* RX_FR_CTR */
-+		uint32_t rx_fr_ctr_val          : 32;
-+	} s;
-+};
-+
-+union ctu_can_fd_tx_fr_ctr {
-+	uint32_t u32;
-+	struct ctu_can_fd_tx_fr_ctr_s {
-+  /* TX_FR_CTR */
-+		uint32_t tx_fr_ctr_val          : 32;
-+	} s;
-+};
-+
-+union ctu_can_fd_debug_register {
-+	uint32_t u32;
-+	struct ctu_can_fd_debug_register_s {
-+#ifdef __LITTLE_ENDIAN_BITFIELD
-+  /* DEBUG_REGISTER */
-+		uint32_t stuff_count             : 3;
-+		uint32_t destuff_count           : 3;
-+		uint32_t pc_arb                  : 1;
-+		uint32_t pc_con                  : 1;
-+		uint32_t pc_dat                  : 1;
-+		uint32_t pc_stc                  : 1;
-+		uint32_t pc_crc                  : 1;
-+		uint32_t pc_crcd                 : 1;
-+		uint32_t pc_ack                  : 1;
-+		uint32_t pc_ackd                 : 1;
-+		uint32_t pc_eof                  : 1;
-+		uint32_t pc_int                  : 1;
-+		uint32_t pc_susp                 : 1;
-+		uint32_t pc_ovr                  : 1;
-+		uint32_t pc_sof                  : 1;
-+		uint32_t reserved_31_19         : 13;
-+#else
-+		uint32_t reserved_31_19         : 13;
-+		uint32_t pc_sof                  : 1;
-+		uint32_t pc_ovr                  : 1;
-+		uint32_t pc_susp                 : 1;
-+		uint32_t pc_int                  : 1;
-+		uint32_t pc_eof                  : 1;
-+		uint32_t pc_ackd                 : 1;
-+		uint32_t pc_ack                  : 1;
-+		uint32_t pc_crcd                 : 1;
-+		uint32_t pc_crc                  : 1;
-+		uint32_t pc_stc                  : 1;
-+		uint32_t pc_dat                  : 1;
-+		uint32_t pc_con                  : 1;
-+		uint32_t pc_arb                  : 1;
-+		uint32_t destuff_count           : 3;
-+		uint32_t stuff_count             : 3;
-+#endif
-+	} s;
-+};
-+
-+union ctu_can_fd_yolo_reg {
-+	uint32_t u32;
-+	struct ctu_can_fd_yolo_reg_s {
-+  /* YOLO_REG */
-+		uint32_t yolo_val               : 32;
-+	} s;
-+};
-+
-+union ctu_can_fd_timestamp_low {
-+	uint32_t u32;
-+	struct ctu_can_fd_timestamp_low_s {
-+  /* TIMESTAMP_LOW */
-+		uint32_t timestamp_low          : 32;
-+	} s;
-+};
-+
-+union ctu_can_fd_timestamp_high {
-+	uint32_t u32;
-+	struct ctu_can_fd_timestamp_high_s {
-+  /* TIMESTAMP_HIGH */
-+		uint32_t timestamp_high         : 32;
-+	} s;
-+};
-+
-+#endif
++type_init(ctucan_pci_register_types)
 -- 
 2.20.1
 
