@@ -2,108 +2,92 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED04C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC933C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:11:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FBBC22456
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:05:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C1F122510
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:11:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U84QadVv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FBBC22456
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VaHp6sta"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C1F122510
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvLYK-0005DQ-Pj
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:05:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41680)
+	id 1jvLeI-0003I2-T4
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:11:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
- id 1jvK9K-000545-9L
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:35:06 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47297
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jvLdY-0002eI-8s
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:10:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34216
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
- id 1jvK9H-0000sJ-HI
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:35:05 -0400
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jvLdT-00058Q-AN
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:10:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594730101;
+ s=mimecast20190719; t=1594735817;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=t56q2i2kWe5qidncJEOdhkmzgAnPO6MguGehPznRv04=;
- b=U84QadVvcr6+F98FATdohR69qHvyViCMulV7mnpUV1LHGTb2PQJe7JZXbARzn8apOrIF/X
- pGeVeWN1YCarbnqdDQJEDnMx9KKqnOHxR8MfsjY8QWsvMGSECPXKl/416TBcIjx3RCFMhk
- yCKtFQN1TNP34oL/AXh3SwQbIyK3EtA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-BAKWuUYIPGapOq-P5CxjUQ-1; Tue, 14 Jul 2020 08:33:27 -0400
-X-MC-Unique: BAKWuUYIPGapOq-P5CxjUQ-1
-Received: by mail-wm1-f71.google.com with SMTP id v6so3761258wmg.1
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 05:33:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=t56q2i2kWe5qidncJEOdhkmzgAnPO6MguGehPznRv04=;
- b=oniJTpHBn/18w9XQobMDWNkl/EQtjWXJLWTl4r41bbJ5mkVJfn8Sc9+2eUAu2STDrv
- TUPeU6TM325GxJiFWFqVkKJ3pwd3MaO74JVtHeTWO35+GGrewmw1f2rzPFaa6zRTGw7W
- RtPZkqOKNzWri0pnGEWv5lORWAwIZSAZN6gN8MK5QHcg5xd55erBnYTk0JDp+lxjbRJj
- siec5axdRSYvAQA0owXU7mz4JWEEskBgKPluFU/vYWwbgrAqbPIwXkkGGvZmod0ApeVe
- o6g8Tzr/cM+rPEl8DVGW196ZlzMhlJztwlUX5LG/c9bOCSTybDkKVroXrFKd51Qzx8Ow
- MFrw==
-X-Gm-Message-State: AOAM533hXmm7wRZ0Xy5kCya4UpcYsiSKV51+NeHnLQ2wQwEmUUEJz3+d
- m12q74SuFoiLd4BZC7zDtYnAQo+wIDjAMPl/+xTgXelSrmjJ9xY0e8b7YffOOdE4YbLBa9cXBV6
- uwgGSPf92YlcmXms=
-X-Received: by 2002:a5d:408c:: with SMTP id o12mr5140498wrp.412.1594730006430; 
- Tue, 14 Jul 2020 05:33:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx0B7FveCBnVdlppVprd5K2mdOpDaeFXP/dIr2p2T6REcFccaP5z4ESNi8JDrXEHZI4SPZatQ==
-X-Received: by 2002:a5d:408c:: with SMTP id o12mr5140430wrp.412.1594730005970; 
- Tue, 14 Jul 2020 05:33:25 -0700 (PDT)
-Received: from pop-os ([51.37.88.107])
- by smtp.gmail.com with ESMTPSA id n125sm4229689wme.30.2020.07.14.05.33.24
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 14 Jul 2020 05:33:25 -0700 (PDT)
-Message-ID: <febb463fc7494aa20b6f57fef469cce7279d2c9a.camel@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-From: Sean Mooney <smooney@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>, Yan Zhao
- <yan.y.zhao@intel.com>
-Date: Tue, 14 Jul 2020 13:33:24 +0100
-In-Reply-To: <20200714102129.GD25187@redhat.com>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
- <20200714102129.GD25187@redhat.com>
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2
-Mime-Version: 1.0
+ bh=RQw0TNnZAKzE6cZlYgAIVBs1pE8CtxL9hMk4xtKC0Qw=;
+ b=VaHp6staR/y3QOpZuwbX57+JEekUsrGWB++iiPOF7VKPQGdYFN5Upl9lAXUfTxzHU9Z2Yf
+ ulA3isexzJFS/zchm2mgWP31CxMH6+T1ToPn73Hwko+EBP5hn5GnLGJXIY1wfDtuxS3Wu2
+ RKk73iepBajZc2kzqAlp6PNbBA7NpX4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-288-4aElnU-kPh2i12NjSyNYMA-1; Tue, 14 Jul 2020 10:09:59 -0400
+X-MC-Unique: 4aElnU-kPh2i12NjSyNYMA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE77E18C63C2;
+ Tue, 14 Jul 2020 14:09:58 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-110.ams2.redhat.com
+ [10.36.114.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C35219C4F;
+ Tue, 14 Jul 2020 14:09:57 +0000 (UTC)
+Subject: Re: [PULL 14/31] target/i386: reimplement f2xm1 using floatx80
+ operations
+To: Paolo Bonzini <pbonzini@redhat.com>, Joseph Myers <joseph@codesourcery.com>
+References: <20200624104917.375143-1-pbonzini@redhat.com>
+ <20200624105048.375353-14-pbonzini@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a3302e58-c470-9305-b106-a2b6b2c52d39@redhat.com>
+Date: Tue, 14 Jul 2020 16:09:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
+MIME-Version: 1.0
+In-Reply-To: <20200624105048.375353-14-pbonzini@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=smooney@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:06:09
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Tue, 14 Jul 2020 09:59:31 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,247 +99,683 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: shaohe.feng@intel.com, corbet@lwn.net, kevin.tian@intel.com,
- cohuck@redhat.com, kvm@vger.kernel.org, devel@ovirt.org,
- libvir-list@redhat.com, eskultet@redhat.com, jian-feng.ding@intel.com,
- qemu-devel@nongnu.org, kwankhede@nvidia.com, dgilbert@redhat.com,
- bao.yumeng@zte.com.cn, alex.williamson@redhat.com, zhenyuw@linux.intel.com,
- openstack-discuss@lists.openstack.org, xin-ran.wang@intel.com,
- dinechin@redhat.com, hejie.xu@intel.com, intel-gvt-dev@lists.freedesktop.org,
- eauger@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-07-14 at 11:21 +0100, Daniel P. Berrangé wrote:
-> On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote:
-> > hi folks,
-> > we are defining a device migration compatibility interface that helps upper
-> > layer stack like openstack/ovirt/libvirt to check if two devices are
-> > live migration compatible.
-> > The "devices" here could be MDEVs, physical devices, or hybrid of the two.
-> > e.g. we could use it to check whether
-> > - a src MDEV can migrate to a target MDEV,
-mdev live migration is completely possible to do but i agree with Dan barrange's comments
-from the point of view of openstack integration i dont see calling out to a vender sepecific
-tool to be an accpetable
-solutions for device compatiablity checking. the sys filesystem
-that describs the mdevs that can be created shoudl also
-contain the relevent infomation such
-taht nova could integrate it via libvirt xml representation or directly retrive the
-info from
-sysfs.
-> > - a src VF in SRIOV can migrate to a target VF in SRIOV,
-so vf to vf migration is not possible in the general case as there is no standarised
-way to transfer teh device state as part of the siorv specs produced by the pci-sig
-as such there is not vender neutral way to support sriov live migration. 
-> > - a src MDEV can migration to a target VF in SRIOV.
-that also makes this unviable
-> >   (e.g. SIOV/SRIOV backward compatibility case)
-> > 
-> > The upper layer stack could use this interface as the last step to check
-> > if one device is able to migrate to another device before triggering a real
-> > live migration procedure.
-well actully that is already too late really. ideally we would want to do this compaiablity
-check much sooneer to avoid the migration failing. in an openstack envionment  at least
-by the time we invoke libvirt (assuming your using the libvirt driver) to do the migration we have alreaedy
-finished schduling the instance to the new host. if if we do the compatiablity check at this point
-and it fails then the live migration is aborted and will not be retired. These types of late check lead to a
-poor user experince as unless you check the migration detial it basically looks like the migration was ignored
-as it start to migrate and then continuge running on the orgininal host.
+On 06/24/20 12:50, Paolo Bonzini wrote:
+> From: Joseph Myers <joseph@codesourcery.com>
+>
+> The x87 f2xm1 emulation is currently based around conversion to
+> double.  This is inherently unsuitable for a good emulation of any
+> floatx80 operation, even before considering that it is a particularly
+> naive implementation using double (computing with pow and then
+> subtracting 1 rather than attempting a better emulation using expm1).
+>
+> Reimplement using the soft-float operations, including additions and
+> multiplications with higher precision where appropriate to limit
+> accumulation of errors.  I considered reusing some of the m68k code
+> for transcendental operations, but the instructions don't generally
+> correspond exactly to x87 operations (for example, m68k has 2^x and
+> e^x - 1, but not 2^x - 1); to avoid possible accumulation of errors
+> from applying multiple such operations each rounding to floatx80
+> precision, I wrote a direct implementation of 2^x - 1 instead.  It
+> would be possible in principle to make the implementation more
+> efficient by doing the intermediate operations directly with
+> significands, signs and exponents and not packing / unpacking floatx80
+> format for each operation, but that would make it significantly more
+> complicated and it's not clear that's worthwhile; the m68k emulation
+> doesn't try to do that.
+>
+> A test is included with many randomly generated inputs.  The
+> assumption of the test is that the result in round-to-nearest mode
+> should always be one of the two closest floating-point numbers to the
+> mathematical value of 2^x - 1; the implementation aims to do somewhat
+> better than that (about 70 correct bits before rounding).  I haven't
+> investigated how accurate hardware is.
+>
+> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+>
+> Message-Id: <alpine.DEB.2.21.2006112341010.18393@digraph.polyomino.org.uk>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/i386/fpu_helper.c         |  385 +++++++++-
+>  tests/tcg/i386/test-i386-f2xm1.c | 1140 ++++++++++++++++++++++++++++++
+>  2 files changed, 1522 insertions(+), 3 deletions(-)
+>  create mode 100644 tests/tcg/i386/test-i386-f2xm1.c
+>
+> diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
+> index 8ef5b463ea..e32a2aa74b 100644
+> --- a/target/i386/fpu_helper.c
+> +++ b/target/i386/fpu_helper.c
+> @@ -25,6 +25,7 @@
+>  #include "exec/exec-all.h"
+>  #include "exec/cpu_ldst.h"
+>  #include "fpu/softfloat.h"
+> +#include "fpu/softfloat-macros.h"
+>
+>  #ifdef CONFIG_SOFTMMU
+>  #include "hw/irq.h"
+> @@ -836,12 +837,390 @@ void helper_fbst_ST0(CPUX86State *env, target_ulong ptr)
+>      merge_exception_flags(env, old_flags);
+>  }
+>
+> +/* 128-bit significand of log(2).  */
+> +#define ln2_sig_high 0xb17217f7d1cf79abULL
+> +#define ln2_sig_low 0xc9e3b39803f2f6afULL
+> +
+> +/*
+> + * Polynomial coefficients for an approximation to (2^x - 1) / x, on
+> + * the interval [-1/64, 1/64].
+> + */
+> +#define f2xm1_coeff_0 make_floatx80(0x3ffe, 0xb17217f7d1cf79acULL)
+> +#define f2xm1_coeff_0_low make_floatx80(0xbfbc, 0xd87edabf495b3762ULL)
+> +#define f2xm1_coeff_1 make_floatx80(0x3ffc, 0xf5fdeffc162c7543ULL)
+> +#define f2xm1_coeff_2 make_floatx80(0x3ffa, 0xe35846b82505fcc7ULL)
+> +#define f2xm1_coeff_3 make_floatx80(0x3ff8, 0x9d955b7dd273b899ULL)
+> +#define f2xm1_coeff_4 make_floatx80(0x3ff5, 0xaec3ff3c4ef4ac0cULL)
+> +#define f2xm1_coeff_5 make_floatx80(0x3ff2, 0xa184897c3a7f0de9ULL)
+> +#define f2xm1_coeff_6 make_floatx80(0x3fee, 0xffe634d0ec30d504ULL)
+> +#define f2xm1_coeff_7 make_floatx80(0x3feb, 0xb160111d2db515e4ULL)
+> +
+> +struct f2xm1_data {
+> +    /*
+> +     * A value very close to a multiple of 1/32, such that 2^t and 2^t - 1
+> +     * are very close to exact floatx80 values.
+> +     */
+> +    floatx80 t;
+> +    /* The value of 2^t.  */
+> +    floatx80 exp2;
+> +    /* The value of 2^t - 1.  */
+> +    floatx80 exp2m1;
+> +};
+> +
+> +static const struct f2xm1_data f2xm1_table[65] = {
+> +    { make_floatx80(0xbfff, 0x8000000000000000ULL),
 
-when using generic pci passhotuhg with openstack, the pci alias is intended to reference a single vendor id/product
-id so you will have 1+ alias for each type of device. that allows openstack to schedule based on the availability of a
-compatibale device because we track inventories of pci devices and can query that when selecting a host.
+This line (in commit eca30647fc07, "target/i386: reimplement f2xm1 using
+floatx80 operations", 2020-06-26) causes a build failure for me, with
+gcc-4.8 (on RHEL-7.6):
 
-if we were to support mdev live migration in the future we would want to take the same declarative approch.
-1 interospec the capability of the deivce we manage
-2 create inventories of the allocatable devices and there capabilities
-3 schdule the instance to a host based on the device-type/capabilities and claim it atomicly to prevent raceces
-4 have the lower level hyperviors do addtional validation if need prelive migration.
+> target/i386/fpu_helper.c:871:5: error: initializer element is not constant
+>      { make_floatx80(0xbfff, 0x8000000000000000ULL),
+>      ^
 
-this proposal seams to be targeting extending step 4 where as ideally we should focuse on providing the info that would
-be relevant in set 1 preferably in a vendor neutral way vai a kernel interface like /sys.
- 
-> > we are not sure if this interface is of value or help to you. please don't
-> > hesitate to drop your valuable comments.
-> > 
-> > 
-> > (1) interface definition
-> > The interface is defined in below way:
-> > 
-> >              __    userspace
-> >               /\              \
-> >              /                 \write
-> >             / read              \
-> >    ________/__________       ___\|/_____________
-> >   | migration_version |     | migration_version |-->check migration
-> >   ---------------------     ---------------------   compatibility
-> >      device A                    device B
-> > 
-> > 
-> > a device attribute named migration_version is defined under each device's
-> > sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/migration_version).
-this might be useful as we could tag the inventory with the migration version and only might to
-devices with  the same version
-> > userspace tools read the migration_version as a string from the source device,
-> > and write it to the migration_version sysfs attribute in the target device.
-this would not be useful as the schduler cannot directlly connect to the compute host
-and even if it could it would be extreamly slow to do this for 1000s of hosts and potentally
-multiple devices per host.
-> > 
-> > The userspace should treat ANY of below conditions as two devices not compatible:
-> > - any one of the two devices does not have a migration_version attribute
-> > - error when reading from migration_version attribute of one device
-> > - error when writing migration_version string of one device to
-> >   migration_version attribute of the other device
-> > 
-> > The string read from migration_version attribute is defined by device vendor
-> > driver and is completely opaque to the userspace.
-opaque vendor specific stings that higher level orchestros have to pass form host
-to host and cant reason about are evil, when allowed they prolifroate and
-makes any idea of a vendor nutral abstraction and interoperablity between systems
-impossible to reason about. that said there is a way to make it opaue but still useful
-to userspace. see below
-> > for a Intel vGPU, string format can be defined like
-> > "parent device PCI ID" + "version of gvt driver" + "mdev type" + "aggregator count".
-> > 
-> > for an NVMe VF connecting to a remote storage. it could be
-> > "PCI ID" + "driver version" + "configured remote storage URL"
-> > 
-> > for a QAT VF, it may be
-> > "PCI ID" + "driver version" + "supported encryption set".
-> > 
-> > (to avoid namespace confliction from each vendor, we may prefix a driver name to
-> > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_8-1)
-honestly i would much prefer if the version string was just a semver string.
-e.g. {major}.{minor}.{bugfix} 
+The macro is defined as follows:
 
-if you do a driver/frimware update and break compatiablity with an older version bump the
-major version.
+  #define make_floatx80(exp, mant) ((floatx80) { mant, exp })
 
-if you add optional a feature that does not break backwards compatiablity if you migrate
-an older instance to the new host then just bump the minor/feature number.
+with floatx80 being:
 
-if you have a fix for a bug that does not change the feature set or compatiblity backwards or
-forwards then bump the bugfix number
+  typedef struct {
+      uint64_t low;
+      uint16_t high;
+  } floatx80;
 
-then the check is as simple as 
-1.) is the mdev type the same
-2.) is the major verion the same
-3.) am i going form the same version to same version or same version to newer version
+The macro produces a compound literal. While the compound literal occurs
+outside of the body of a function, and thus has static storage duration
+(per ISO C99 6.5.2.5p6), it is not a constant expression.
 
-if all 3 are true we can migrate.
-e.g. 
-2.0.1 -> 2.1.1 (ok same major version and migrating from older feature release to newer feature release)
-2.1.1 -> 2.0.1 (not ok same major version and migrating from new feature release to old feature release may be
-incompatable)
-2.0.0 -> 3.0.0 (not ok chaning major version)
-2.0.1 -> 2.0.0 (ok same major and minor version, all bugfixs in the same minor release should be compatibly)
+The array object "f2xm1_table" has static storage duration, and "All the
+expressions in an initializer for an object that has static storage
+duration shall be constant expressions or string literals" (ISO C99
+6.7.8p4).
 
-we dont need vendor to rencode the driver name or vendor id and product id in the string. that info is alreay
-available both to the device driver and to userspace via /sys already we just need to know if version of
-the same mdev are compatiable so a simple semver version string which is well know in the software world
-at least is a clean abstration we can reuse.
+Per ISO C99 6.6:
 
-> > (2) backgrounds
-> > 
-> > The reason we hope the migration_version string is opaque to the userspace
-> > is that it is hard to generalize standard comparing fields and comparing
-> > methods for different devices from different vendors.
-> > Though userspace now could still do a simple string compare to check if
-> > two devices are compatible, and result should also be right, it's still
-> > too limited as it excludes the possible candidate whose migration_version
-> > string fails to be equal.
-> > e.g. an MDEV with mdev_type_1, aggregator count 3 is probably compatible
-> > with another MDEV with mdev_type_3, aggregator count 1, even their
-> > migration_version strings are not equal.
-> > (assumed mdev_type_3 is of 3 times equal resources of mdev_type_1).
-> > 
-> > besides that, driver version + configured resources are all elements demanding
-> > to take into account.
-> > 
-> > So, we hope leaving the freedom to vendor driver and let it make the final decision
-> > in a simple reading from source side and writing for test in the target side way.
-> > 
-> > 
-> > we then think the device compatibility issues for live migration with assigned
-> > devices can be divided into two steps:
-> > a. management tools filter out possible migration target devices.
-> >    Tags could be created according to info from product specification.
-> >    we think openstack/ovirt may have vendor proprietary components to create
-> >    those customized tags for each product from each vendor.
-> >    for Intel vGPU, with a vGPU(a MDEV device) in source side, the tags to
-> >    search target vGPU are like:
-> >    a tag for compatible parent PCI IDs,
-> >    a tag for a range of gvt driver versions,
-> >    a tag for a range of mdev type + aggregator count
-> > 
-> >    for NVMe VF, the tags to search target VF may be like:
-> >    a tag for compatible PCI IDs,
-> >    a tag for a range of driver versions,
-> >    a tag for URL of configured remote storage.
-> 
-> Requiring management application developers to figure out this possible
-> compatibility based on prod specs is really unrealistic. Product specs
-> are typically as clear as mud, and with the suggestion we consider
-> different rules for different types of devices, add up to a huge amount
-> of complexity. This isn't something app developers should have to spend
-> their time figuring out.
-> 
-> The suggestion that we make use of vendor proprietary helper components
-> is totally unacceptable. We need to be able to build a solution that
-> works with exclusively an open source software stack.
-> 
-> IMHO there needs to be a mechanism for the kernel to report via sysfs
-> what versions are supported on a given device. This puts the job of
-> reporting compatible versions directly under the responsibility of the
-> vendor who writes the kernel driver for it. They are the ones with the
-> best knowledge of the hardware they've built and the rules around its
-> compatibility.
-yep totally agree with that statement.
-> 
-> > b. with the output from step a, openstack/ovirt/libvirt could use our proposed
-> >    device migration compatibility interface to make sure the two devices are
-> >    indeed live migration compatible before launching the real live migration
-> >    process to start stream copying, src device stopping and target device
-> >    resuming.
-> >    It is supposed that this step would not bring any performance penalty as
-> >    -in kernel it's just a simple string decoding and comparing
-> >    -in openstack/ovirt, it could be done by extending current function
-> >     check_can_live_migrate_destination, along side claiming target resources.[1]
-that is a compute driver fucntion
-https://github.com/openstack/nova/blob/8988316b8c132c9662dea6cf0345975e87ce7344/nova/virt/driver.py#L1261-L1278
-that is called in the conductor here
+> 7 More latitude is permitted for constant expressions in initializers.
+>   Such a constant expression shall be, or evaluate to, one of the
+>   following:
+>   - an arithmetic constant expression,
+>   - a null pointer constant,
+>   - an address constant, or
+>   - an address constant for an object type plus or minus an integer
+>     constant expression.
+>
+> 8 An arithmetic constant expression shall have arithmetic type and
+>   shall only have operands that are integer constants, floating
+>   constants, enumeration constants, character constants, and sizeof
+>   expressions. Cast operators in an arithmetic constant expression
+>   shall only convert arithmetic types to arithmetic types, except as
+>   part of an operand to a sizeof operator whose result is an integer
+>   constant.
+>
+> 9 An address constant is a null pointer, a pointer to an lvalue
+>   designating an object of static storage duration, or a pointer to a
+>   function designator; it shall be created explicitly using the unary
+>   & operator or an integer constant cast to pointer type, or
+>   implicitly by the use of an expression of array or function type.
+>   The array-subscript [] and member-access . and -> operators, the
+>   address & and indirection * unary operators, and pointer casts may
+>   be used in the creation of an address constant, but the value of an
+>   object shall not be accessed by use of these operators.
+>
+> 10 An implementation may accept other forms of constant expressions.
 
-https://github.com/openstack/nova/blob/8988316b8c132c9662dea6cf0345975e87ce7344/nova/conductor/tasks/live_migrate.py#L360-L364
-if the check fails(ignoreing the fact its expensive to do an rpc to the compute host) we raise an excption that
-move on to the next host in the alternate host list.
+So at best the code is implementation-dependent.
 
-https://github.com/openstack/nova/blob/8988316b8c132c9662dea6cf0345975e87ce7344/nova/conductor/tasks/live_migrate.py#L556-L567
-by default the alternate host list is 3
-https://docs.openstack.org/nova/latest/configuration/config.html#scheduler.max_attempts
-so there would be a pretty high likely hood that if we only checked compatiablity at this point it would fail to
-migrate. realistically speaking this is too late. we can do a final safty check at this point but this should
-not be the first time we check compatibility. at a mimnium we would have wanted to select a host with the same mdev
-type first, we can do that from the info we have today but i hope i have made the point that declaritive interfacs
-which we can introspect without haveing opaqce vender sepecitic blob are vastly more consomable then imperitive
-interfaces we have to probe. form a security and packaging point of view this is better too as if i only need
-readonly access to sysfs instead of write access and if i dont need to package a bunch of addtion vendor tools
-in a continerised deployment that significantly decreases the potential attack surface.
-> 
-> 
-> 
-> 
-> > 
-> > 
-> > [1] https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/libvirt-neutron-sriov-livemigration.html
-> > 
-> > Thanks
-> > Yan
-> > 
-> 
-> Regards,
-> Daniel
+
+It shouldn't be hard to fix, by re-dedicating the macro to initializer
+context:
+
+  #define make_floatx80(exp, mant) { mant, exp }
+
+and, if desirable, by introducing a new macro for where a compound
+literal is really needed:
+
+  #define make_floatx80_lit(exp, mant) ((floatx80) make_floatx80(exp, mant))
+
+
+This issue has popped up before:
+
+  http://mid.mail-archive.com/1cf6ce88-0dd4-6d40-60bf-8b78f02a2fa0@redhat.com
+  (alt link: <https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06566.html>)
+
+Apologies if a patch is already on the list (I couldn't find it, by
+searching for subjects with "float".)
+
+
+... Ugh, wait, we already have:
+
+  #define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
+
+namely from from commit 3bf7e40ab914 ("softfloat: fix for C99",
+2012-03-17):
+
+> commit 3bf7e40ab9140e577a6e7e17d3f5711b28aed833
+> Author: Avi Kivity <avi@redhat.com>
+> Date:   Tue Dec 27 17:11:20 2011 +0200
+>
+>     softfloat: fix for C99
+>
+>     C99 appears to consider compound literals as non-constants, and complains
+>     when they are used in static initializers.  Switch to ordinary initializer
+>     syntax.
+>
+>     Signed-off-by: Avi Kivity <avi@redhat.com>
+>     Acked-by: Andreas Färber <afaerber@suse.de>
+>     Reported-by: Andreas Färber <andreas.faerber@web.de>
+>     Signed-off-by: Blue Swirl <blauwirbel@gmail.com>
+
+So the issue is indeed in commit eca30647fc07; the initializer elements
+for the static array should have been provided with
+make_floatx80_init(), not make_floatx80().
+
+The same applies to commit ff57bb7b6326 ("target/i386: reimplement
+fpatan using floatx80 operations", 2020-06-26), which introduces
+"fpatan_table" with the same problem.
+
+
+The following lets me build QEMU:
+
+> commit ec4da236aad8d243ea76c8baee6c1737a48f4453
+> Author: Laszlo Ersek <lersek@redhat.com>
+> Date:   Tue Jul 14 15:43:04 2020 +0200
+>
+>     fix eca30647fc07 and ff57bb7b63267
+>
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index f1a19df066b7..659218b5c787 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -822,6 +822,7 @@ static inline bool floatx80_invalid_encoding(floatx80 a)
+>  }
+>
+>  #define floatx80_zero make_floatx80(0x0000, 0x0000000000000000LL)
+> +#define floatx80_zero_init make_floatx80_init(0x0000, 0x0000000000000000LL)
+>  #define floatx80_one make_floatx80(0x3fff, 0x8000000000000000LL)
+>  #define floatx80_ln2 make_floatx80(0x3ffe, 0xb17217f7d1cf79acLL)
+>  #define floatx80_pi make_floatx80(0x4000, 0xc90fdaa22168c235LL)
+> diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
+> index f5e6c4b88d4e..4ea73874d836 100644
+> --- a/target/i386/fpu_helper.c
+> +++ b/target/i386/fpu_helper.c
+> @@ -868,201 +868,201 @@ struct f2xm1_data {
+>  };
+>
+>  static const struct f2xm1_data f2xm1_table[65] = {
+> -    { make_floatx80(0xbfff, 0x8000000000000000ULL),
+> -      make_floatx80(0x3ffe, 0x8000000000000000ULL),
+> -      make_floatx80(0xbffe, 0x8000000000000000ULL) },
+> -    { make_floatx80(0xbffe, 0xf800000000002e7eULL),
+> -      make_floatx80(0x3ffe, 0x82cd8698ac2b9160ULL),
+> -      make_floatx80(0xbffd, 0xfa64f2cea7a8dd40ULL) },
+> -    { make_floatx80(0xbffe, 0xefffffffffffe960ULL),
+> -      make_floatx80(0x3ffe, 0x85aac367cc488345ULL),
+> -      make_floatx80(0xbffd, 0xf4aa7930676ef976ULL) },
+> -    { make_floatx80(0xbffe, 0xe800000000006f10ULL),
+> -      make_floatx80(0x3ffe, 0x88980e8092da5c14ULL),
+> -      make_floatx80(0xbffd, 0xeecfe2feda4b47d8ULL) },
+> -    { make_floatx80(0xbffe, 0xe000000000008a45ULL),
+> -      make_floatx80(0x3ffe, 0x8b95c1e3ea8ba2a5ULL),
+> -      make_floatx80(0xbffd, 0xe8d47c382ae8bab6ULL) },
+> -    { make_floatx80(0xbffe, 0xd7ffffffffff8a9eULL),
+> -      make_floatx80(0x3ffe, 0x8ea4398b45cd8116ULL),
+> -      make_floatx80(0xbffd, 0xe2b78ce97464fdd4ULL) },
+> -    { make_floatx80(0xbffe, 0xd0000000000019a0ULL),
+> -      make_floatx80(0x3ffe, 0x91c3d373ab11b919ULL),
+> -      make_floatx80(0xbffd, 0xdc785918a9dc8dceULL) },
+> -    { make_floatx80(0xbffe, 0xc7ffffffffff14dfULL),
+> -      make_floatx80(0x3ffe, 0x94f4efa8fef76836ULL),
+> -      make_floatx80(0xbffd, 0xd61620ae02112f94ULL) },
+> -    { make_floatx80(0xbffe, 0xc000000000006530ULL),
+> -      make_floatx80(0x3ffe, 0x9837f0518db87fbbULL),
+> -      make_floatx80(0xbffd, 0xcf901f5ce48f008aULL) },
+> -    { make_floatx80(0xbffe, 0xb7ffffffffff1723ULL),
+> -      make_floatx80(0x3ffe, 0x9b8d39b9d54eb74cULL),
+> -      make_floatx80(0xbffd, 0xc8e58c8c55629168ULL) },
+> -    { make_floatx80(0xbffe, 0xb00000000000b5e1ULL),
+> -      make_floatx80(0x3ffe, 0x9ef5326091a0c366ULL),
+> -      make_floatx80(0xbffd, 0xc2159b3edcbe7934ULL) },
+> -    { make_floatx80(0xbffe, 0xa800000000006f8aULL),
+> -      make_floatx80(0x3ffe, 0xa27043030c49370aULL),
+> -      make_floatx80(0xbffd, 0xbb1f79f9e76d91ecULL) },
+> -    { make_floatx80(0xbffe, 0x9fffffffffff816aULL),
+> -      make_floatx80(0x3ffe, 0xa5fed6a9b15171cfULL),
+> -      make_floatx80(0xbffd, 0xb40252ac9d5d1c62ULL) },
+> -    { make_floatx80(0xbffe, 0x97ffffffffffb621ULL),
+> -      make_floatx80(0x3ffe, 0xa9a15ab4ea7c30e6ULL),
+> -      make_floatx80(0xbffd, 0xacbd4a962b079e34ULL) },
+> -    { make_floatx80(0xbffe, 0x8fffffffffff162bULL),
+> -      make_floatx80(0x3ffe, 0xad583eea42a1b886ULL),
+> -      make_floatx80(0xbffd, 0xa54f822b7abc8ef4ULL) },
+> -    { make_floatx80(0xbffe, 0x87ffffffffff4d34ULL),
+> -      make_floatx80(0x3ffe, 0xb123f581d2ac7b51ULL),
+> -      make_floatx80(0xbffd, 0x9db814fc5aa7095eULL) },
+> -    { make_floatx80(0xbffe, 0x800000000000227dULL),
+> -      make_floatx80(0x3ffe, 0xb504f333f9de539dULL),
+> -      make_floatx80(0xbffd, 0x95f619980c4358c6ULL) },
+> -    { make_floatx80(0xbffd, 0xefffffffffff3978ULL),
+> -      make_floatx80(0x3ffe, 0xb8fbaf4762fbd0a1ULL),
+> -      make_floatx80(0xbffd, 0x8e08a1713a085ebeULL) },
+> -    { make_floatx80(0xbffd, 0xe00000000000df81ULL),
+> -      make_floatx80(0x3ffe, 0xbd08a39f580bfd8cULL),
+> -      make_floatx80(0xbffd, 0x85eeb8c14fe804e8ULL) },
+> -    { make_floatx80(0xbffd, 0xd00000000000bccfULL),
+> -      make_floatx80(0x3ffe, 0xc12c4cca667062f6ULL),
+> -      make_floatx80(0xbffc, 0xfb4eccd6663e7428ULL) },
+> -    { make_floatx80(0xbffd, 0xc00000000000eff0ULL),
+> -      make_floatx80(0x3ffe, 0xc5672a1155069abeULL),
+> -      make_floatx80(0xbffc, 0xea6357baabe59508ULL) },
+> -    { make_floatx80(0xbffd, 0xb000000000000fe6ULL),
+> -      make_floatx80(0x3ffe, 0xc9b9bd866e2f234bULL),
+> -      make_floatx80(0xbffc, 0xd91909e6474372d4ULL) },
+> -    { make_floatx80(0xbffd, 0x9fffffffffff2172ULL),
+> -      make_floatx80(0x3ffe, 0xce248c151f84bf00ULL),
+> -      make_floatx80(0xbffc, 0xc76dcfab81ed0400ULL) },
+> -    { make_floatx80(0xbffd, 0x8fffffffffffafffULL),
+> -      make_floatx80(0x3ffe, 0xd2a81d91f12afb2bULL),
+> -      make_floatx80(0xbffc, 0xb55f89b83b541354ULL) },
+> -    { make_floatx80(0xbffc, 0xffffffffffff81a3ULL),
+> -      make_floatx80(0x3ffe, 0xd744fccad69d7d5eULL),
+> -      make_floatx80(0xbffc, 0xa2ec0cd4a58a0a88ULL) },
+> -    { make_floatx80(0xbffc, 0xdfffffffffff1568ULL),
+> -      make_floatx80(0x3ffe, 0xdbfbb797daf25a44ULL),
+> -      make_floatx80(0xbffc, 0x901121a0943696f0ULL) },
+> -    { make_floatx80(0xbffc, 0xbfffffffffff68daULL),
+> -      make_floatx80(0x3ffe, 0xe0ccdeec2a94f811ULL),
+> -      make_floatx80(0xbffb, 0xf999089eab583f78ULL) },
+> -    { make_floatx80(0xbffc, 0x9fffffffffff4690ULL),
+> -      make_floatx80(0x3ffe, 0xe5b906e77c83657eULL),
+> -      make_floatx80(0xbffb, 0xd237c8c41be4d410ULL) },
+> -    { make_floatx80(0xbffb, 0xffffffffffff8aeeULL),
+> -      make_floatx80(0x3ffe, 0xeac0c6e7dd24427cULL),
+> -      make_floatx80(0xbffb, 0xa9f9c8c116ddec20ULL) },
+> -    { make_floatx80(0xbffb, 0xbfffffffffff2d18ULL),
+> -      make_floatx80(0x3ffe, 0xefe4b99bdcdb06ebULL),
+> -      make_floatx80(0xbffb, 0x80da33211927c8a8ULL) },
+> -    { make_floatx80(0xbffa, 0xffffffffffff8ccbULL),
+> -      make_floatx80(0x3ffe, 0xf5257d152486d0f4ULL),
+> -      make_floatx80(0xbffa, 0xada82eadb792f0c0ULL) },
+> -    { make_floatx80(0xbff9, 0xffffffffffff11feULL),
+> -      make_floatx80(0x3ffe, 0xfa83b2db722a0846ULL),
+> -      make_floatx80(0xbff9, 0xaf89a491babef740ULL) },
+> -    { floatx80_zero,
+> -      make_floatx80(0x3fff, 0x8000000000000000ULL),
+> -      floatx80_zero },
+> -    { make_floatx80(0x3ff9, 0xffffffffffff2680ULL),
+> -      make_floatx80(0x3fff, 0x82cd8698ac2b9f6fULL),
+> -      make_floatx80(0x3ff9, 0xb361a62b0ae7dbc0ULL) },
+> -    { make_floatx80(0x3ffb, 0x800000000000b500ULL),
+> -      make_floatx80(0x3fff, 0x85aac367cc488345ULL),
+> -      make_floatx80(0x3ffa, 0xb5586cf9891068a0ULL) },
+> -    { make_floatx80(0x3ffb, 0xbfffffffffff4b67ULL),
+> -      make_floatx80(0x3fff, 0x88980e8092da7cceULL),
+> -      make_floatx80(0x3ffb, 0x8980e8092da7cce0ULL) },
+> -    { make_floatx80(0x3ffb, 0xffffffffffffff57ULL),
+> -      make_floatx80(0x3fff, 0x8b95c1e3ea8bd6dfULL),
+> -      make_floatx80(0x3ffb, 0xb95c1e3ea8bd6df0ULL) },
+> -    { make_floatx80(0x3ffc, 0x9fffffffffff811fULL),
+> -      make_floatx80(0x3fff, 0x8ea4398b45cd4780ULL),
+> -      make_floatx80(0x3ffb, 0xea4398b45cd47800ULL) },
+> -    { make_floatx80(0x3ffc, 0xbfffffffffff9980ULL),
+> -      make_floatx80(0x3fff, 0x91c3d373ab11b919ULL),
+> -      make_floatx80(0x3ffc, 0x8e1e9b9d588dc8c8ULL) },
+> -    { make_floatx80(0x3ffc, 0xdffffffffffff631ULL),
+> -      make_floatx80(0x3fff, 0x94f4efa8fef70864ULL),
+> -      make_floatx80(0x3ffc, 0xa7a77d47f7b84320ULL) },
+> -    { make_floatx80(0x3ffc, 0xffffffffffff2499ULL),
+> -      make_floatx80(0x3fff, 0x9837f0518db892d4ULL),
+> -      make_floatx80(0x3ffc, 0xc1bf828c6dc496a0ULL) },
+> -    { make_floatx80(0x3ffd, 0x8fffffffffff80fbULL),
+> -      make_floatx80(0x3fff, 0x9b8d39b9d54e3a79ULL),
+> -      make_floatx80(0x3ffc, 0xdc69cdceaa71d3c8ULL) },
+> -    { make_floatx80(0x3ffd, 0x9fffffffffffbc23ULL),
+> -      make_floatx80(0x3fff, 0x9ef5326091a10313ULL),
+> -      make_floatx80(0x3ffc, 0xf7a993048d081898ULL) },
+> -    { make_floatx80(0x3ffd, 0xafffffffffff20ecULL),
+> -      make_floatx80(0x3fff, 0xa27043030c49370aULL),
+> -      make_floatx80(0x3ffd, 0x89c10c0c3124dc28ULL) },
+> -    { make_floatx80(0x3ffd, 0xc00000000000fd2cULL),
+> -      make_floatx80(0x3fff, 0xa5fed6a9b15171cfULL),
+> -      make_floatx80(0x3ffd, 0x97fb5aa6c545c73cULL) },
+> -    { make_floatx80(0x3ffd, 0xd0000000000093beULL),
+> -      make_floatx80(0x3fff, 0xa9a15ab4ea7c30e6ULL),
+> -      make_floatx80(0x3ffd, 0xa6856ad3a9f0c398ULL) },
+> -    { make_floatx80(0x3ffd, 0xe00000000000c2aeULL),
+> -      make_floatx80(0x3fff, 0xad583eea42a17876ULL),
+> -      make_floatx80(0x3ffd, 0xb560fba90a85e1d8ULL) },
+> -    { make_floatx80(0x3ffd, 0xefffffffffff1e3fULL),
+> -      make_floatx80(0x3fff, 0xb123f581d2abef6cULL),
+> -      make_floatx80(0x3ffd, 0xc48fd6074aafbdb0ULL) },
+> -    { make_floatx80(0x3ffd, 0xffffffffffff1c23ULL),
+> -      make_floatx80(0x3fff, 0xb504f333f9de2cadULL),
+> -      make_floatx80(0x3ffd, 0xd413cccfe778b2b4ULL) },
+> -    { make_floatx80(0x3ffe, 0x8800000000006344ULL),
+> -      make_floatx80(0x3fff, 0xb8fbaf4762fbd0a1ULL),
+> -      make_floatx80(0x3ffd, 0xe3eebd1d8bef4284ULL) },
+> -    { make_floatx80(0x3ffe, 0x9000000000005d67ULL),
+> -      make_floatx80(0x3fff, 0xbd08a39f580c668dULL),
+> -      make_floatx80(0x3ffd, 0xf4228e7d60319a34ULL) },
+> -    { make_floatx80(0x3ffe, 0x9800000000009127ULL),
+> -      make_floatx80(0x3fff, 0xc12c4cca6670e042ULL),
+> -      make_floatx80(0x3ffe, 0x82589994cce1c084ULL) },
+> -    { make_floatx80(0x3ffe, 0x9fffffffffff06f9ULL),
+> -      make_floatx80(0x3fff, 0xc5672a11550655c3ULL),
+> -      make_floatx80(0x3ffe, 0x8ace5422aa0cab86ULL) },
+> -    { make_floatx80(0x3ffe, 0xa7fffffffffff80dULL),
+> -      make_floatx80(0x3fff, 0xc9b9bd866e2f234bULL),
+> -      make_floatx80(0x3ffe, 0x93737b0cdc5e4696ULL) },
+> -    { make_floatx80(0x3ffe, 0xafffffffffff1470ULL),
+> -      make_floatx80(0x3fff, 0xce248c151f83fd69ULL),
+> -      make_floatx80(0x3ffe, 0x9c49182a3f07fad2ULL) },
+> -    { make_floatx80(0x3ffe, 0xb800000000000e0aULL),
+> -      make_floatx80(0x3fff, 0xd2a81d91f12aec5cULL),
+> -      make_floatx80(0x3ffe, 0xa5503b23e255d8b8ULL) },
+> -    { make_floatx80(0x3ffe, 0xc00000000000b7faULL),
+> -      make_floatx80(0x3fff, 0xd744fccad69dd630ULL),
+> -      make_floatx80(0x3ffe, 0xae89f995ad3bac60ULL) },
+> -    { make_floatx80(0x3ffe, 0xc800000000003aa6ULL),
+> -      make_floatx80(0x3fff, 0xdbfbb797daf25a44ULL),
+> -      make_floatx80(0x3ffe, 0xb7f76f2fb5e4b488ULL) },
+> -    { make_floatx80(0x3ffe, 0xd00000000000a6aeULL),
+> -      make_floatx80(0x3fff, 0xe0ccdeec2a954685ULL),
+> -      make_floatx80(0x3ffe, 0xc199bdd8552a8d0aULL) },
+> -    { make_floatx80(0x3ffe, 0xd800000000004165ULL),
+> -      make_floatx80(0x3fff, 0xe5b906e77c837155ULL),
+> -      make_floatx80(0x3ffe, 0xcb720dcef906e2aaULL) },
+> -    { make_floatx80(0x3ffe, 0xe00000000000582cULL),
+> -      make_floatx80(0x3fff, 0xeac0c6e7dd24713aULL),
+> -      make_floatx80(0x3ffe, 0xd5818dcfba48e274ULL) },
+> -    { make_floatx80(0x3ffe, 0xe800000000001a5dULL),
+> -      make_floatx80(0x3fff, 0xefe4b99bdcdb06ebULL),
+> -      make_floatx80(0x3ffe, 0xdfc97337b9b60dd6ULL) },
+> -    { make_floatx80(0x3ffe, 0xefffffffffffc1efULL),
+> -      make_floatx80(0x3fff, 0xf5257d152486a2faULL),
+> -      make_floatx80(0x3ffe, 0xea4afa2a490d45f4ULL) },
+> -    { make_floatx80(0x3ffe, 0xf800000000001069ULL),
+> -      make_floatx80(0x3fff, 0xfa83b2db722a0e5cULL),
+> -      make_floatx80(0x3ffe, 0xf50765b6e4541cb8ULL) },
+> -    { make_floatx80(0x3fff, 0x8000000000000000ULL),
+> -      make_floatx80(0x4000, 0x8000000000000000ULL),
+> -      make_floatx80(0x3fff, 0x8000000000000000ULL) },
+> +    { make_floatx80_init(0xbfff, 0x8000000000000000ULL),
+> +      make_floatx80_init(0x3ffe, 0x8000000000000000ULL),
+> +      make_floatx80_init(0xbffe, 0x8000000000000000ULL) },
+> +    { make_floatx80_init(0xbffe, 0xf800000000002e7eULL),
+> +      make_floatx80_init(0x3ffe, 0x82cd8698ac2b9160ULL),
+> +      make_floatx80_init(0xbffd, 0xfa64f2cea7a8dd40ULL) },
+> +    { make_floatx80_init(0xbffe, 0xefffffffffffe960ULL),
+> +      make_floatx80_init(0x3ffe, 0x85aac367cc488345ULL),
+> +      make_floatx80_init(0xbffd, 0xf4aa7930676ef976ULL) },
+> +    { make_floatx80_init(0xbffe, 0xe800000000006f10ULL),
+> +      make_floatx80_init(0x3ffe, 0x88980e8092da5c14ULL),
+> +      make_floatx80_init(0xbffd, 0xeecfe2feda4b47d8ULL) },
+> +    { make_floatx80_init(0xbffe, 0xe000000000008a45ULL),
+> +      make_floatx80_init(0x3ffe, 0x8b95c1e3ea8ba2a5ULL),
+> +      make_floatx80_init(0xbffd, 0xe8d47c382ae8bab6ULL) },
+> +    { make_floatx80_init(0xbffe, 0xd7ffffffffff8a9eULL),
+> +      make_floatx80_init(0x3ffe, 0x8ea4398b45cd8116ULL),
+> +      make_floatx80_init(0xbffd, 0xe2b78ce97464fdd4ULL) },
+> +    { make_floatx80_init(0xbffe, 0xd0000000000019a0ULL),
+> +      make_floatx80_init(0x3ffe, 0x91c3d373ab11b919ULL),
+> +      make_floatx80_init(0xbffd, 0xdc785918a9dc8dceULL) },
+> +    { make_floatx80_init(0xbffe, 0xc7ffffffffff14dfULL),
+> +      make_floatx80_init(0x3ffe, 0x94f4efa8fef76836ULL),
+> +      make_floatx80_init(0xbffd, 0xd61620ae02112f94ULL) },
+> +    { make_floatx80_init(0xbffe, 0xc000000000006530ULL),
+> +      make_floatx80_init(0x3ffe, 0x9837f0518db87fbbULL),
+> +      make_floatx80_init(0xbffd, 0xcf901f5ce48f008aULL) },
+> +    { make_floatx80_init(0xbffe, 0xb7ffffffffff1723ULL),
+> +      make_floatx80_init(0x3ffe, 0x9b8d39b9d54eb74cULL),
+> +      make_floatx80_init(0xbffd, 0xc8e58c8c55629168ULL) },
+> +    { make_floatx80_init(0xbffe, 0xb00000000000b5e1ULL),
+> +      make_floatx80_init(0x3ffe, 0x9ef5326091a0c366ULL),
+> +      make_floatx80_init(0xbffd, 0xc2159b3edcbe7934ULL) },
+> +    { make_floatx80_init(0xbffe, 0xa800000000006f8aULL),
+> +      make_floatx80_init(0x3ffe, 0xa27043030c49370aULL),
+> +      make_floatx80_init(0xbffd, 0xbb1f79f9e76d91ecULL) },
+> +    { make_floatx80_init(0xbffe, 0x9fffffffffff816aULL),
+> +      make_floatx80_init(0x3ffe, 0xa5fed6a9b15171cfULL),
+> +      make_floatx80_init(0xbffd, 0xb40252ac9d5d1c62ULL) },
+> +    { make_floatx80_init(0xbffe, 0x97ffffffffffb621ULL),
+> +      make_floatx80_init(0x3ffe, 0xa9a15ab4ea7c30e6ULL),
+> +      make_floatx80_init(0xbffd, 0xacbd4a962b079e34ULL) },
+> +    { make_floatx80_init(0xbffe, 0x8fffffffffff162bULL),
+> +      make_floatx80_init(0x3ffe, 0xad583eea42a1b886ULL),
+> +      make_floatx80_init(0xbffd, 0xa54f822b7abc8ef4ULL) },
+> +    { make_floatx80_init(0xbffe, 0x87ffffffffff4d34ULL),
+> +      make_floatx80_init(0x3ffe, 0xb123f581d2ac7b51ULL),
+> +      make_floatx80_init(0xbffd, 0x9db814fc5aa7095eULL) },
+> +    { make_floatx80_init(0xbffe, 0x800000000000227dULL),
+> +      make_floatx80_init(0x3ffe, 0xb504f333f9de539dULL),
+> +      make_floatx80_init(0xbffd, 0x95f619980c4358c6ULL) },
+> +    { make_floatx80_init(0xbffd, 0xefffffffffff3978ULL),
+> +      make_floatx80_init(0x3ffe, 0xb8fbaf4762fbd0a1ULL),
+> +      make_floatx80_init(0xbffd, 0x8e08a1713a085ebeULL) },
+> +    { make_floatx80_init(0xbffd, 0xe00000000000df81ULL),
+> +      make_floatx80_init(0x3ffe, 0xbd08a39f580bfd8cULL),
+> +      make_floatx80_init(0xbffd, 0x85eeb8c14fe804e8ULL) },
+> +    { make_floatx80_init(0xbffd, 0xd00000000000bccfULL),
+> +      make_floatx80_init(0x3ffe, 0xc12c4cca667062f6ULL),
+> +      make_floatx80_init(0xbffc, 0xfb4eccd6663e7428ULL) },
+> +    { make_floatx80_init(0xbffd, 0xc00000000000eff0ULL),
+> +      make_floatx80_init(0x3ffe, 0xc5672a1155069abeULL),
+> +      make_floatx80_init(0xbffc, 0xea6357baabe59508ULL) },
+> +    { make_floatx80_init(0xbffd, 0xb000000000000fe6ULL),
+> +      make_floatx80_init(0x3ffe, 0xc9b9bd866e2f234bULL),
+> +      make_floatx80_init(0xbffc, 0xd91909e6474372d4ULL) },
+> +    { make_floatx80_init(0xbffd, 0x9fffffffffff2172ULL),
+> +      make_floatx80_init(0x3ffe, 0xce248c151f84bf00ULL),
+> +      make_floatx80_init(0xbffc, 0xc76dcfab81ed0400ULL) },
+> +    { make_floatx80_init(0xbffd, 0x8fffffffffffafffULL),
+> +      make_floatx80_init(0x3ffe, 0xd2a81d91f12afb2bULL),
+> +      make_floatx80_init(0xbffc, 0xb55f89b83b541354ULL) },
+> +    { make_floatx80_init(0xbffc, 0xffffffffffff81a3ULL),
+> +      make_floatx80_init(0x3ffe, 0xd744fccad69d7d5eULL),
+> +      make_floatx80_init(0xbffc, 0xa2ec0cd4a58a0a88ULL) },
+> +    { make_floatx80_init(0xbffc, 0xdfffffffffff1568ULL),
+> +      make_floatx80_init(0x3ffe, 0xdbfbb797daf25a44ULL),
+> +      make_floatx80_init(0xbffc, 0x901121a0943696f0ULL) },
+> +    { make_floatx80_init(0xbffc, 0xbfffffffffff68daULL),
+> +      make_floatx80_init(0x3ffe, 0xe0ccdeec2a94f811ULL),
+> +      make_floatx80_init(0xbffb, 0xf999089eab583f78ULL) },
+> +    { make_floatx80_init(0xbffc, 0x9fffffffffff4690ULL),
+> +      make_floatx80_init(0x3ffe, 0xe5b906e77c83657eULL),
+> +      make_floatx80_init(0xbffb, 0xd237c8c41be4d410ULL) },
+> +    { make_floatx80_init(0xbffb, 0xffffffffffff8aeeULL),
+> +      make_floatx80_init(0x3ffe, 0xeac0c6e7dd24427cULL),
+> +      make_floatx80_init(0xbffb, 0xa9f9c8c116ddec20ULL) },
+> +    { make_floatx80_init(0xbffb, 0xbfffffffffff2d18ULL),
+> +      make_floatx80_init(0x3ffe, 0xefe4b99bdcdb06ebULL),
+> +      make_floatx80_init(0xbffb, 0x80da33211927c8a8ULL) },
+> +    { make_floatx80_init(0xbffa, 0xffffffffffff8ccbULL),
+> +      make_floatx80_init(0x3ffe, 0xf5257d152486d0f4ULL),
+> +      make_floatx80_init(0xbffa, 0xada82eadb792f0c0ULL) },
+> +    { make_floatx80_init(0xbff9, 0xffffffffffff11feULL),
+> +      make_floatx80_init(0x3ffe, 0xfa83b2db722a0846ULL),
+> +      make_floatx80_init(0xbff9, 0xaf89a491babef740ULL) },
+> +    { floatx80_zero_init,
+> +      make_floatx80_init(0x3fff, 0x8000000000000000ULL),
+> +      floatx80_zero_init },
+> +    { make_floatx80_init(0x3ff9, 0xffffffffffff2680ULL),
+> +      make_floatx80_init(0x3fff, 0x82cd8698ac2b9f6fULL),
+> +      make_floatx80_init(0x3ff9, 0xb361a62b0ae7dbc0ULL) },
+> +    { make_floatx80_init(0x3ffb, 0x800000000000b500ULL),
+> +      make_floatx80_init(0x3fff, 0x85aac367cc488345ULL),
+> +      make_floatx80_init(0x3ffa, 0xb5586cf9891068a0ULL) },
+> +    { make_floatx80_init(0x3ffb, 0xbfffffffffff4b67ULL),
+> +      make_floatx80_init(0x3fff, 0x88980e8092da7cceULL),
+> +      make_floatx80_init(0x3ffb, 0x8980e8092da7cce0ULL) },
+> +    { make_floatx80_init(0x3ffb, 0xffffffffffffff57ULL),
+> +      make_floatx80_init(0x3fff, 0x8b95c1e3ea8bd6dfULL),
+> +      make_floatx80_init(0x3ffb, 0xb95c1e3ea8bd6df0ULL) },
+> +    { make_floatx80_init(0x3ffc, 0x9fffffffffff811fULL),
+> +      make_floatx80_init(0x3fff, 0x8ea4398b45cd4780ULL),
+> +      make_floatx80_init(0x3ffb, 0xea4398b45cd47800ULL) },
+> +    { make_floatx80_init(0x3ffc, 0xbfffffffffff9980ULL),
+> +      make_floatx80_init(0x3fff, 0x91c3d373ab11b919ULL),
+> +      make_floatx80_init(0x3ffc, 0x8e1e9b9d588dc8c8ULL) },
+> +    { make_floatx80_init(0x3ffc, 0xdffffffffffff631ULL),
+> +      make_floatx80_init(0x3fff, 0x94f4efa8fef70864ULL),
+> +      make_floatx80_init(0x3ffc, 0xa7a77d47f7b84320ULL) },
+> +    { make_floatx80_init(0x3ffc, 0xffffffffffff2499ULL),
+> +      make_floatx80_init(0x3fff, 0x9837f0518db892d4ULL),
+> +      make_floatx80_init(0x3ffc, 0xc1bf828c6dc496a0ULL) },
+> +    { make_floatx80_init(0x3ffd, 0x8fffffffffff80fbULL),
+> +      make_floatx80_init(0x3fff, 0x9b8d39b9d54e3a79ULL),
+> +      make_floatx80_init(0x3ffc, 0xdc69cdceaa71d3c8ULL) },
+> +    { make_floatx80_init(0x3ffd, 0x9fffffffffffbc23ULL),
+> +      make_floatx80_init(0x3fff, 0x9ef5326091a10313ULL),
+> +      make_floatx80_init(0x3ffc, 0xf7a993048d081898ULL) },
+> +    { make_floatx80_init(0x3ffd, 0xafffffffffff20ecULL),
+> +      make_floatx80_init(0x3fff, 0xa27043030c49370aULL),
+> +      make_floatx80_init(0x3ffd, 0x89c10c0c3124dc28ULL) },
+> +    { make_floatx80_init(0x3ffd, 0xc00000000000fd2cULL),
+> +      make_floatx80_init(0x3fff, 0xa5fed6a9b15171cfULL),
+> +      make_floatx80_init(0x3ffd, 0x97fb5aa6c545c73cULL) },
+> +    { make_floatx80_init(0x3ffd, 0xd0000000000093beULL),
+> +      make_floatx80_init(0x3fff, 0xa9a15ab4ea7c30e6ULL),
+> +      make_floatx80_init(0x3ffd, 0xa6856ad3a9f0c398ULL) },
+> +    { make_floatx80_init(0x3ffd, 0xe00000000000c2aeULL),
+> +      make_floatx80_init(0x3fff, 0xad583eea42a17876ULL),
+> +      make_floatx80_init(0x3ffd, 0xb560fba90a85e1d8ULL) },
+> +    { make_floatx80_init(0x3ffd, 0xefffffffffff1e3fULL),
+> +      make_floatx80_init(0x3fff, 0xb123f581d2abef6cULL),
+> +      make_floatx80_init(0x3ffd, 0xc48fd6074aafbdb0ULL) },
+> +    { make_floatx80_init(0x3ffd, 0xffffffffffff1c23ULL),
+> +      make_floatx80_init(0x3fff, 0xb504f333f9de2cadULL),
+> +      make_floatx80_init(0x3ffd, 0xd413cccfe778b2b4ULL) },
+> +    { make_floatx80_init(0x3ffe, 0x8800000000006344ULL),
+> +      make_floatx80_init(0x3fff, 0xb8fbaf4762fbd0a1ULL),
+> +      make_floatx80_init(0x3ffd, 0xe3eebd1d8bef4284ULL) },
+> +    { make_floatx80_init(0x3ffe, 0x9000000000005d67ULL),
+> +      make_floatx80_init(0x3fff, 0xbd08a39f580c668dULL),
+> +      make_floatx80_init(0x3ffd, 0xf4228e7d60319a34ULL) },
+> +    { make_floatx80_init(0x3ffe, 0x9800000000009127ULL),
+> +      make_floatx80_init(0x3fff, 0xc12c4cca6670e042ULL),
+> +      make_floatx80_init(0x3ffe, 0x82589994cce1c084ULL) },
+> +    { make_floatx80_init(0x3ffe, 0x9fffffffffff06f9ULL),
+> +      make_floatx80_init(0x3fff, 0xc5672a11550655c3ULL),
+> +      make_floatx80_init(0x3ffe, 0x8ace5422aa0cab86ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xa7fffffffffff80dULL),
+> +      make_floatx80_init(0x3fff, 0xc9b9bd866e2f234bULL),
+> +      make_floatx80_init(0x3ffe, 0x93737b0cdc5e4696ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xafffffffffff1470ULL),
+> +      make_floatx80_init(0x3fff, 0xce248c151f83fd69ULL),
+> +      make_floatx80_init(0x3ffe, 0x9c49182a3f07fad2ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xb800000000000e0aULL),
+> +      make_floatx80_init(0x3fff, 0xd2a81d91f12aec5cULL),
+> +      make_floatx80_init(0x3ffe, 0xa5503b23e255d8b8ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xc00000000000b7faULL),
+> +      make_floatx80_init(0x3fff, 0xd744fccad69dd630ULL),
+> +      make_floatx80_init(0x3ffe, 0xae89f995ad3bac60ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xc800000000003aa6ULL),
+> +      make_floatx80_init(0x3fff, 0xdbfbb797daf25a44ULL),
+> +      make_floatx80_init(0x3ffe, 0xb7f76f2fb5e4b488ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xd00000000000a6aeULL),
+> +      make_floatx80_init(0x3fff, 0xe0ccdeec2a954685ULL),
+> +      make_floatx80_init(0x3ffe, 0xc199bdd8552a8d0aULL) },
+> +    { make_floatx80_init(0x3ffe, 0xd800000000004165ULL),
+> +      make_floatx80_init(0x3fff, 0xe5b906e77c837155ULL),
+> +      make_floatx80_init(0x3ffe, 0xcb720dcef906e2aaULL) },
+> +    { make_floatx80_init(0x3ffe, 0xe00000000000582cULL),
+> +      make_floatx80_init(0x3fff, 0xeac0c6e7dd24713aULL),
+> +      make_floatx80_init(0x3ffe, 0xd5818dcfba48e274ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xe800000000001a5dULL),
+> +      make_floatx80_init(0x3fff, 0xefe4b99bdcdb06ebULL),
+> +      make_floatx80_init(0x3ffe, 0xdfc97337b9b60dd6ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xefffffffffffc1efULL),
+> +      make_floatx80_init(0x3fff, 0xf5257d152486a2faULL),
+> +      make_floatx80_init(0x3ffe, 0xea4afa2a490d45f4ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xf800000000001069ULL),
+> +      make_floatx80_init(0x3fff, 0xfa83b2db722a0e5cULL),
+> +      make_floatx80_init(0x3ffe, 0xf50765b6e4541cb8ULL) },
+> +    { make_floatx80_init(0x3fff, 0x8000000000000000ULL),
+> +      make_floatx80_init(0x4000, 0x8000000000000000ULL),
+> +      make_floatx80_init(0x3fff, 0x8000000000000000ULL) },
+>  };
+>
+>  void helper_f2xm1(CPUX86State *env)
+> @@ -1275,24 +1275,24 @@ struct fpatan_data {
+>  };
+>
+>  static const struct fpatan_data fpatan_table[9] = {
+> -    { floatx80_zero,
+> -      floatx80_zero },
+> -    { make_floatx80(0x3ffb, 0xfeadd4d5617b6e33ULL),
+> -      make_floatx80(0xbfb9, 0xdda19d8305ddc420ULL) },
+> -    { make_floatx80(0x3ffc, 0xfadbafc96406eb15ULL),
+> -      make_floatx80(0x3fbb, 0xdb8f3debef442fccULL) },
+> -    { make_floatx80(0x3ffd, 0xb7b0ca0f26f78474ULL),
+> -      make_floatx80(0xbfbc, 0xeab9bdba460376faULL) },
+> -    { make_floatx80(0x3ffd, 0xed63382b0dda7b45ULL),
+> -      make_floatx80(0x3fbc, 0xdfc88bd978751a06ULL) },
+> -    { make_floatx80(0x3ffe, 0x8f005d5ef7f59f9bULL),
+> -      make_floatx80(0x3fbd, 0xb906bc2ccb886e90ULL) },
+> -    { make_floatx80(0x3ffe, 0xa4bc7d1934f70924ULL),
+> -      make_floatx80(0x3fbb, 0xcd43f9522bed64f8ULL) },
+> -    { make_floatx80(0x3ffe, 0xb8053e2bc2319e74ULL),
+> -      make_floatx80(0xbfbc, 0xd3496ab7bd6eef0cULL) },
+> -    { make_floatx80(0x3ffe, 0xc90fdaa22168c235ULL),
+> -      make_floatx80(0xbfbc, 0xece675d1fc8f8cbcULL) },
+> +    { floatx80_zero_init,
+> +      floatx80_zero_init },
+> +    { make_floatx80_init(0x3ffb, 0xfeadd4d5617b6e33ULL),
+> +      make_floatx80_init(0xbfb9, 0xdda19d8305ddc420ULL) },
+> +    { make_floatx80_init(0x3ffc, 0xfadbafc96406eb15ULL),
+> +      make_floatx80_init(0x3fbb, 0xdb8f3debef442fccULL) },
+> +    { make_floatx80_init(0x3ffd, 0xb7b0ca0f26f78474ULL),
+> +      make_floatx80_init(0xbfbc, 0xeab9bdba460376faULL) },
+> +    { make_floatx80_init(0x3ffd, 0xed63382b0dda7b45ULL),
+> +      make_floatx80_init(0x3fbc, 0xdfc88bd978751a06ULL) },
+> +    { make_floatx80_init(0x3ffe, 0x8f005d5ef7f59f9bULL),
+> +      make_floatx80_init(0x3fbd, 0xb906bc2ccb886e90ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xa4bc7d1934f70924ULL),
+> +      make_floatx80_init(0x3fbb, 0xcd43f9522bed64f8ULL) },
+> +    { make_floatx80_init(0x3ffe, 0xb8053e2bc2319e74ULL),
+> +      make_floatx80_init(0xbfbc, 0xd3496ab7bd6eef0cULL) },
+> +    { make_floatx80_init(0x3ffe, 0xc90fdaa22168c235ULL),
+> +      make_floatx80_init(0xbfbc, 0xece675d1fc8f8cbcULL) },
+>  };
+>
+>  void helper_fpatan(CPUX86State *env)
+
+I see that there are test cases under "tests/tcg/i386", but I don't know
+how to run them.
+
+Thanks,
+Laszlo
 
 
