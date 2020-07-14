@@ -2,128 +2,86 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D30C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC889C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:40:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E2C121D7D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A617D22202
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:40:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dSaa1NX4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E2C121D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="DmTP1jyg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A617D22202
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvI9r-0003xf-GD
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 06:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39476)
+	id 1jvIM9-0007LY-Qq
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 06:40:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvI9C-0003Vj-AG
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:26:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40456
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvI9A-0000Vz-Lm
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:26:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594722407;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xh+zvtbEq76blazqEzvubzPZ0BcWE5+JJ1l+TKOqXO0=;
- b=dSaa1NX4x2MUkJxr4s7r8M2SPOUsMmBbZRyVuGxYgkOBDkoJhfAnwViPdlqEvLWInrvcQD
- 5eJ/B/lxbqjVYQ3y/QUDBZ1m+qDe5ll0ZJmBW2694D6uablZi9G548CG8zkSRIcyYa6MR2
- t/rC8XPdNLjPPJEVWC5J7BEnJ8y+DMk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-lojQu0XdM26W0Ba4eXi9OA-1; Tue, 14 Jul 2020 06:26:44 -0400
-X-MC-Unique: lojQu0XdM26W0Ba4eXi9OA-1
-Received: by mail-wm1-f69.google.com with SMTP id z11so3250931wmg.5
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 03:26:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=xh+zvtbEq76blazqEzvubzPZ0BcWE5+JJ1l+TKOqXO0=;
- b=jeV7R/F0aTNlzshcC3ol33y7EVvnWdh/u1mpgMwpQ9T8aVQHEQ4nX6vA85zV7V2wkY
- xuhVIli1ezQOS8rcFzdHCUxZ71mW0rx0MYxD8Hei0r9/nMAlXJeHtaWb/CiknfM6UR4w
- 3GQorR05bBTgzuIzdrWNfTzv5YP13oVw/8AbvbbXYhJL7NQpEcX2dGthBdtT543qn44R
- POumes5YUkWt009jBQjtenfI9dP+gGHH/jhZvIwY9JQwRqorCESt9hqdjat+FFPErUQu
- FMHcgkB8LquEOxOGNzgJsM8jtZ4A8o9jx/vqX+/Agv8HDilCcUg6j2LtKpNM+P7GGPid
- qzOQ==
-X-Gm-Message-State: AOAM5309TRG8vvzWgq5cNPt10T2FLVpYOnt/Tc5ElBpMCTpW1ne6az1H
- yUldU4p2WY1uWhzbhAw4czDMHM+/Pb35htl4lYEKHZsh5WyNsQ02AYqZtJhk4N2hFNp4b76ojrf
- yK7KmkQExwuQUiWk=
-X-Received: by 2002:adf:ef8a:: with SMTP id d10mr4254446wro.126.1594722402979; 
- Tue, 14 Jul 2020 03:26:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyxk78X9P+sy0U/AtVZXkOTsFDjMyCUuYTO0xjzb9/x35om3ymHOX4emL1VZwexIIrPNL0j9Q==
-X-Received: by 2002:adf:ef8a:: with SMTP id d10mr4254428wro.126.1594722402792; 
- Tue, 14 Jul 2020 03:26:42 -0700 (PDT)
-Received: from [192.168.1.43] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id f15sm26762735wrx.91.2020.07.14.03.26.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 03:26:42 -0700 (PDT)
-Subject: Re: [PATCH for-5.1] acpi-pm-tmr: allow 2-byte reads
-To: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org
-References: <20200714095518.16241-1-mjt@msgid.tls.msk.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <464386eb-ad88-2fe8-d943-6febe511eb6a@redhat.com>
-Date: Tue, 14 Jul 2020 12:26:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jvILb-0006tx-GP
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:39:39 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:44758 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jvILZ-0002E3-S8
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:39:39 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 1A6794C87A;
+ Tue, 14 Jul 2020 10:39:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1594723173;
+ x=1596537574; bh=dDDniMcL7h6ErMjL07Tyn6Kei8vXefMbFE2fvfwbDdU=; b=
+ DmTP1jygqmtZF/2a76mGsvq0xpU2aJX3gWhEIDuNMzYDf0GSFt4ThdZpiJ07zkx6
+ kerZ8usHtG2273ECKaLglcbICpsIewF7L3J5nA14VgWr7Bv3eiP7jODNViwQ4Inc
+ D03zTGzHYmFTFXZ7GCgAl80V20kti487jEz330JdVIw=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ryxqAIUoU0ib; Tue, 14 Jul 2020 13:39:33 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 0131A47D0B;
+ Tue, 14 Jul 2020 13:39:32 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 14
+ Jul 2020 13:39:32 +0300
+Date: Tue, 14 Jul 2020 13:39:32 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: <qemu-devel@nongnu.org>
+Subject: Re: [PATCH for-5.1] i386: hvf: Explicitly set CR4 guest/host mask
+Message-ID: <20200714103932.GB90799@SPB-NB-133.local>
+References: <20200714090726.41082-1-r.bolshakov@yadro.com>
 MIME-Version: 1.0
-In-Reply-To: <20200714095518.16241-1-mjt@msgid.tls.msk.ru>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200714090726.41082-1-r.bolshakov@yadro.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 05:09:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,46 +94,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Simon John <git@the-jedi.co.uk>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: programmingkidx@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/14/20 11:55 AM, Michael Tokarev wrote:
-> As found in LP#964247, MacOS Catalina performs 2-byte reads
-> on the acpi timer address space while the spec says it should
-> be 4-byte. Allow 2-byte reads.
-
-https://bugs.launchpad.net/qemu/+bug/964247 is about Unity-2D shell...
-
-What is the target hardware used here?
-
+On Tue, Jul 14, 2020 at 12:07:27PM +0300, Roman Bolshakov wrote:
+> Removal of register reset omitted initialization of CR4 guest/host mask.
+> x86_64 guests aren't booting without it.
 > 
-> Reported-By: Simon John <git@the-jedi.co.uk>
-> Signed-Off-By: Michael Tokarev <mjt@tls.msk.ru>
-> ---
->  hw/acpi/core.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> I'm applying this to debian qemu package, need the fix
-> faster in order to release security updates for other
-> branches.
-> 
-> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-> index 45cbed49ab..9be38aa2ac 100644
-> --- a/hw/acpi/core.c
-> +++ b/hw/acpi/core.c
-> @@ -530,7 +530,9 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
->  static const MemoryRegionOps acpi_pm_tmr_ops = {
->      .read = acpi_pm_tmr_read,
->      .write = acpi_pm_tmr_write,
-> -    .valid.min_access_size = 4,
-> +    .impl.min_access_size = 4,
-> +     /* at least MacOS Catalina reads 2 bytes and fails if it doesn't work */
-> +    .valid.min_access_size = 2,
->      .valid.max_access_size = 4,
->      .endianness = DEVICE_LITTLE_ENDIAN,
->  };
+> Fixes: 5009ef22c6bb2 ("i386: hvf: Don't duplicate register reset")
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 > 
 
+If one has a chance to test or review it, it'd be very helpful. That'd
+allow to include it in RC0.
+
+Thanks,
+Roman
 
