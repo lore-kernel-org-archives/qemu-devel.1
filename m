@@ -2,76 +2,87 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B426C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3779EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:45:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25F742065D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:40:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02977224B2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:45:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TCY3a+v8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25F742065D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tx5dgfce"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02977224B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvLAI-0004Xz-Dn
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 09:40:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58936)
+	id 1jvLFZ-0000qC-A9
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 09:45:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jvL9I-0003Ec-HF
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:39:08 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40589)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jvLDH-0007D8-2z
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:43:15 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41797)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jvL9G-0000xd-QQ
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:39:08 -0400
-Received: by mail-ot1-x341.google.com with SMTP id c25so13043302otf.7
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 06:39:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jvLDF-0001Ol-8t
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:43:14 -0400
+Received: by mail-pl1-x644.google.com with SMTP id d1so1792792plr.8
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 06:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pEyi+cJZDofxTNdzqoAuA+pJLcC12uxaOX5ZXU5YcSE=;
- b=TCY3a+v85TYINN7n4iPO7acXCpIE8wD260vMlfps86+keec9nujUp7NSs0n1YuJMfq
- YjZhNuX3MegJCXLz8Zsp5fgbSXKQJiu2gi7tJZ+UywglGyY1Y5UYPvuJvl2JzFxw3B/U
- 2yafWRo0wzetUOePDct0Pjaa+2NHCGcuAzSTL7PaFlZW0Amk+V3cYNkZYMjiF81l6Bxr
- iPnOxPVkrI3sNGtO1BraqSGcrUqc55LdTug/VJU7zPpMFsbO8xoAn1A9/cQXKnKydIN7
- 4/yNuNrmQdiiNNvm0Mw1T1oPtf9aLd7IoCcnEAztLrlCIhBdTR+KDBW1NMdzB7S3quNd
- oH0w==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=LaymbafiOWcJLlHvWfftD4ZEH6QqzyKcrvc/ye3Z+KQ=;
+ b=Tx5dgfcect/pT34P1zIypaUOEMx+XAjBcEfdKW2iqTasy7Wgz/0keJIWsf5mH5dIGl
+ 9MPVoL/h3Vu4bnEJ6BYNIMC5wy3ggeqzPfbFtjEM+VAAx+foeS7VCZ0aSeUorfPt7Ad1
+ YpOX+01/FZpTL7pHWz3WWc7jGJbuuL1C1+BOj0zQQKnAqo800C2sd0dW+bYg4nIQpoew
+ zmJw6SWIEFJd7M0xbjZJsGUjfJTAMT8MXBrgo2qk7kMPL76q0r7t8Gg9I6ioSSUW5PeM
+ aS6YuIvHxPYrLg8BW0KWk7hgILaExY7TYoAps4IcBO3r2dvt/Y2QeZkXmxMGmJCcaGae
+ Fmfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pEyi+cJZDofxTNdzqoAuA+pJLcC12uxaOX5ZXU5YcSE=;
- b=QeunvmFkUf2UfXfxz2e9pp0CwrUxn4BQbNoyOrIwifZz4T5o/VJmnqwBTTI1GNxIMa
- 3NPoKocUMjxwciZCmPZPvWpJDZ5fv8OIBRv8S1OQztWCZRiMfYgJG8jIuAvBcDgSyxcK
- s3Sh9B3ikqdIftGHQO3T/tuZQ2EFVPdMdOqFWV2T9bansLllrh/tJduwcsMqZS81O6BL
- Tv1J+7LZNJRVtxAiAzuJWarPcyrBv1GknTcwoxg6DCeFA0W03nVx7NkRh5HAMnaO9JcT
- rt9NS3yVI6hlnsJNPWpgi273WCbcZjiTtQpS2KXZCJRlQ5Phzy8OX5B5J9f1CcX8m5r8
- FnGg==
-X-Gm-Message-State: AOAM531tGysJ+E8rNG9NtmpQ5o1occjDFpSXTs+h8wRKkjFLp+2mOLbK
- HGVsqurAgZABuTNeD0KlDPQnr2aH38IX3HT7dX6DIQ==
-X-Google-Smtp-Source: ABdhPJxjdtic6Uy0N08DZAwoRQf9Iimjadjbav/zCiODPTsJSGRHww1XiE9Vlai0MXVh9gUDN5M/lTgUx7oOjwqH06w=
-X-Received: by 2002:a9d:7303:: with SMTP id e3mr3903504otk.221.1594733945272; 
- Tue, 14 Jul 2020 06:39:05 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LaymbafiOWcJLlHvWfftD4ZEH6QqzyKcrvc/ye3Z+KQ=;
+ b=YxK7Dm1GGqc/48z6WGUDLCPuh2yEHEHVDLT+vlpi976wDqQ5hki8YngGgFAR/DxR0L
+ +1672rROABucw56M6+3xDhyrmF2ubQqfuzWK9V3+ZjwHtAA3N8pmYyk4HmXQ9ErkiqDv
+ 3fTOjOXKNaHCI0ds8Zq9pBgjxWXK5gM6PfHElcGYXpHrkyl4/nu76vTwt14qpRREnJ1D
+ R4Bc+R7S5N7qs7VCuy5A3SLm9XcpZLdYUw73z4NHCK2iiSkSk+AMA5O/S7JZkefFckzN
+ WT8LjtQgfTjTPHWtERsy3X9YyJAxqL4o97EAl3CXoCp9L0l0+AnsbjrXUS4gJKdxLaPG
+ PaUA==
+X-Gm-Message-State: AOAM530+IQMQLYiKlxcMeJ3CADXW+1DBpvmfiofumQTjnSq9Zmu41oRI
+ jCjGcYJtXqmFEtovumVe9rCazA==
+X-Google-Smtp-Source: ABdhPJzCmYAyZfC3PmAvaZKgQo0Ul8eOncNAv7YoufI9VIkUNbk3fBepFWVJfqp5CfQQ7TV3F2E3ow==
+X-Received: by 2002:a17:902:bc44:: with SMTP id
+ t4mr3989063plz.290.1594734191995; 
+ Tue, 14 Jul 2020 06:43:11 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id nk22sm2760067pjb.51.2020.07.14.06.43.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Jul 2020 06:43:11 -0700 (PDT)
+Subject: Re: [PATCH] virtfs-proxy-helper: Remove the superfluous break
+To: Yi Wang <wang.yi59@zte.com.cn>, qemu-devel@nongnu.org
+References: <1594600429-23052-1-git-send-email-wang.yi59@zte.com.cn>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <aa1bcca2-5413-c847-01a2-27d5b8965149@linaro.org>
+Date: Tue, 14 Jul 2020 06:43:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200713142106.261809-1-eblake@redhat.com>
-In-Reply-To: <20200713142106.261809-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Jul 2020 14:38:54 +0100
-Message-ID: <CAFEAcA9=TdQ5AuXZfLvBj7Xi5cKLq7+N=91Jfrh64fu=Dd9TAw@mail.gmail.com>
-Subject: Re: [PULL 0/5] NBD patches for 2020-07-13
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+In-Reply-To: <1594600429-23052-1-git-send-email-wang.yi59@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -79,8 +90,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,42 +104,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: xue.zhihong@zte.com.cn, qemu-trivial <qemu-trivial@nongnu.org>,
+ wang.liang82@zte.com.cn, Liao Pingfang <liao.pingfang@zte.com.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jul 2020 at 15:34, Eric Blake <eblake@redhat.com> wrote:
->
-> The following changes since commit 00ce6c36b35e0eb8cc5d68a28f288a6335848813:
->
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-07-13' into staging (2020-07-13 13:01:30 +0100)
->
-> are available in the Git repository at:
->
->   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2020-07-13
->
-> for you to fetch changes up to df0e032b6196934b2b12180a6a05aa8b7e6553fc:
->
->   iotests.py: filter_testfiles(): filter SOCK_DIR too (2020-07-13 09:01:01 -0500)
->
-> Patch 2 is a trivial patch that isn't really NBD-related, but which
-> has been overlooked for too long now, so I just included it.
->
-> ----------------------------------------------------------------
-> NBD patches for 2020-07-13
->
-> - fix off-by-one truncation in corner-case name display
-> - use fcntl correctly
-> - iotest cleanups that enable testing an upcoming fix for NBD close
->
-> ----------------------------------------------------------------
+On 7/12/20 5:33 PM, Yi Wang wrote:
+> From: Liao Pingfang <liao.pingfang@zte.com.cn>
+> 
+> Remove the superfluous break, as there is a "return" before it.
+> 
+> Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
+> ---
+>  fsdev/virtfs-proxy-helper.c | 1 -
+>  1 file changed, 1 deletion(-)
+
+Cc: qemu-trivial
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
-
--- PMM
+r~
 
