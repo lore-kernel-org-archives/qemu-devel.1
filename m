@@ -2,98 +2,85 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C363CC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9A2C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C41722AAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:37:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 498DA22B3A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:38:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vYy66G49"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C41722AAE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3lh5kWF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 498DA22B3A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvQjz-0005Ud-SA
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 15:37:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48100)
+	id 1jvQl8-0006cK-JX
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 15:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jvQjP-0004wD-BX
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:36:47 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38831)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jvQjM-0007rE-Vs
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:36:47 -0400
-Received: by mail-pf1-x443.google.com with SMTP id j20so8011187pfe.5
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 12:36:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=AkzKjzcpZZ6V+5dJ0AMAwarmuZaZ2SA0/OwS5u5zcM4=;
- b=vYy66G492hs2XKYL3b5dB74Arnw4CsxTIXh7FeiaRagkuDjpTx3ne0EeL7QmmB2IcC
- J1goyCePmLtY6nKpp4ULo+kqABje0BLqEMlGhl8CHr5E4xuQjq8NbBkRl+dL0+csQs0i
- yGpE/RZzIGsHFIE7rARLb8h3cUCiZ2RopxN1GB6fJHvisvzc+loCjTxqZr7opBMt7Hf9
- 10W2JWyUo6/1IC6hbotN9GYQHVP2dLW8/WQKeRDrK1O8Tsrc/drErqTWcmATUOA1GxZN
- JO9cFRg4XY3XWj+RidgbE43gXb9TAO+Z3HM4viIlnXBlChRNhggD+03yp8AI56H0CJhp
- Zi9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=AkzKjzcpZZ6V+5dJ0AMAwarmuZaZ2SA0/OwS5u5zcM4=;
- b=Y4Q9V5HMm9yRGaPrKO10t9abPKspHI6+yFBAUulmoIABTMsuk+YjeHynMA3rIeaf9h
- 9jisZopIjPbtl4YEv4baSCioXDqr/MqyWmXVQQ6wAEdvVoiV016waRKlfUd6Odx5dQ2M
- sFG0Ev7Gg1ZHGA+0i8cKqc8hMpkA0U4r4YLmTVlpVitMieH44WFrz9d4hBuReSwUbKFa
- T2baIPlZTqzWgR01QQfzp/PL90gWXzyBEf/1ycsc7vho5QLnFKucG9EYJBjz4W2bErjg
- 49PbpuQk2oUEgsR5czfZkCd7gsrsbRLEnvRVJ80k7ZyNWyVIuB4LrAvJjhIpmOLYbx2y
- qDRg==
-X-Gm-Message-State: AOAM532XXaTNsEa1W8Di+rLXcMbq+506n+vx9DENMGF75MKJIpHyY1us
- fvRk9bp4i2eHJZ1LzChEft7NQg==
-X-Google-Smtp-Source: ABdhPJyk+YQYzkm1sKfFrb+5sfZnL7XVVX/5Q8HvLPikfWqZpa2+trtI7HKDbgp13C/zKy+X/Yuh5Q==
-X-Received: by 2002:a63:c947:: with SMTP id y7mr4487627pgg.357.1594755403330; 
- Tue, 14 Jul 2020 12:36:43 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id a30sm8517pfr.87.2020.07.14.12.36.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 12:36:42 -0700 (PDT)
-Subject: Re: [PATCH v3 4/9] host trust limitation: Rework the
- "memory-encryption" property
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
- dgilbert@redhat.com, frankja@linux.ibm.com
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <20200619020602.118306-5-david@gibson.dropbear.id.au>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <33b0169a-1c9a-276f-361f-b27c39f366b6@linaro.org>
-Date: Tue, 14 Jul 2020 12:36:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jvQkX-00066E-FR
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:37:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24693
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jvQkV-00086I-LA
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:37:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594755475;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=uPGEzwO8NbdRfdrh/QIRtQeTFxcdAzrU8MI8Uuv2sXA=;
+ b=Z3lh5kWF+qAJEG4P+M2thhsbEd7Wp1L9xCySoYb5pqvjnNneBQRoeVKKuILv9kZJzLEJO0
+ lBZNCLdGUMo4Z7mGxwcWN0jMzMzSKfvGiYkZhaosv3Ib3Y+jvshEmIJYpOfPwGt6EfJGNn
+ koeXt8F3lWW1eg48O+QwKe61OxbD888=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-rdBLuVAAM3mQ8uOkin678A-1; Tue, 14 Jul 2020 15:36:56 -0400
+X-MC-Unique: rdBLuVAAM3mQ8uOkin678A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8433D1DE0;
+ Tue, 14 Jul 2020 19:36:54 +0000 (UTC)
+Received: from localhost (ovpn-119-232.rdu2.redhat.com [10.10.119.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 094A36FEDF;
+ Tue, 14 Jul 2020 19:36:53 +0000 (UTC)
+Date: Tue, 14 Jul 2020 15:36:52 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v6] scripts/simplebench: compare write request performance
+Message-ID: <20200714193652.GD1274972@habkost.net>
+References: <1594741846-475697-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <895cc194-04fd-344a-1fb6-7f17be0f0a30@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20200619020602.118306-5-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <895cc194-04fd-344a-1fb6-7f17be0f0a30@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,36 +94,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- david@redhat.com, cohuck@redhat.com, mdroth@linux.vnet.ibm.com,
- pasic@linux.ibm.com, qemu-s390x@nongnu.org, mst@redhat.com,
- qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/18/20 7:05 PM, David Gibson wrote:
-> Currently the "memory-encryption" property is only looked at once we get to
-> kvm_init().  Although protection of guest memory from the hypervisor isn't
-> something that could really ever work with TCG, it's not conceptually tied
-> to the KVM accelerator.
+On Tue, Jul 14, 2020 at 07:05:05PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Hi Eduardo!
 > 
-> In addition, the way the string property is resolved to an object is
-> almost identical to how a QOM link property is handled.
-> 
-> So, create a new "host-trust-limitation" link property which sets this QOM
-> interface link directly in the machine.  For compatibility we keep the
-> "memory-encryption" property, but now implemented in terms of the new
-> property.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  accel/kvm/kvm-all.c | 23 +++++++----------------
->  hw/core/machine.c   | 41 ++++++++++++++++++++++++++++++++++++-----
->  include/hw/boards.h |  2 +-
->  3 files changed, 44 insertions(+), 22 deletions(-)
+> Could you please stage this in your branch, to be pulled for 5.2 later?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Queued, thanks!
 
-r~
+> 
+> 14.07.2020 18:50, Andrey Shinkevich wrote:
+> > The script 'bench_write_req.py' allows comparing performances of write
+> > request for two qemu-img binary files.
+> > An example with (qemu-img binary 1) and without (qemu-img binary 2) the
+> > applied patch "qcow2: skip writing zero buffers to empty COW areas"
+> > (git commit ID: c8bb23cbdbe32f5) has the following results:
+> > 
+> > SSD:
+> > ----------------  -------------------  -------------------
+> >                    <qemu-img binary 1>  <qemu-img binary 2>
+> > <cluster front>   0.10 +- 0.00         8.16 +- 0.65
+> > <cluster middle>  0.10 +- 0.00         7.37 +- 1.10
+> > <cross cluster>   7.40 +- 1.08         21.97 +- 4.19
+> > <cluster 64K>     2.14 +- 0.94         8.48 +- 1.66
+> > ----------------  -------------------  -------------------
+> > HDD:
+> > ----------------  -------------------  -------------------
+> >                    <qemu-img binary 1>  <qemu-img binary 2>
+> > <cluster front>   2.30 +- 0.01         6.19 +- 0.06
+> > <cluster middle>  2.20 +- 0.09         6.20 +- 0.06
+> > <cross cluster>   8.32 +- 0.16         8.26 +- 0.14
+> > <cluster 64K>     8.20 +- 0.05         6.26 +- 0.10
+> > ----------------  -------------------  -------------------
+> > 
+> > Suggested-by: Denis V. Lunev <den@openvz.org>
+> > Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > ---
+> >   scripts/simplebench/bench_write_req.py | 170 +++++++++++++++++++++++++++++++++
+> >   1 file changed, 170 insertions(+)
+> >   create mode 100755 scripts/simplebench/bench_write_req.py
+> > 
+> > diff --git a/scripts/simplebench/bench_write_req.py b/scripts/simplebench/bench_write_req.py
+> > new file mode 100755
+> > index 0000000..ca1178f
+> > --- /dev/null
+> > +++ b/scripts/simplebench/bench_write_req.py
+> > @@ -0,0 +1,170 @@
+> > +#!/usr/bin/env python3
+> > +#
+> > +# Test to compare performance of write requests for two qemu-img binary files.
+> > +#
+> > +# The idea of the test comes from intention to check the benefit of c8bb23cbdbe
+> > +# "qcow2: skip writing zero buffers to empty COW areas".
+> > +#
+> > +# Copyright (c) 2020 Virtuozzo International GmbH.
+> > +#
+> > +# This program is free software; you can redistribute it and/or modify
+> > +# it under the terms of the GNU General Public License as published by
+> > +# the Free Software Foundation; either version 2 of the License, or
+> > +# (at your option) any later version.
+> > +#
+> > +# This program is distributed in the hope that it will be useful,
+> > +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > +# GNU General Public License for more details.
+> > +#
+> > +# You should have received a copy of the GNU General Public License
+> > +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> > +#
+> > +
+> > +
+> > +import sys
+> > +import os
+> > +import subprocess
+> > +import simplebench
+> > +
+> > +
+> > +def bench_func(env, case):
+> > +    """ Handle one "cell" of benchmarking table. """
+> > +    return bench_write_req(env['qemu_img'], env['image_name'],
+> > +                           case['block_size'], case['block_offset'],
+> > +                           case['cluster_size'])
+> > +
+> > +
+> > +def qemu_img_pipe(*args):
+> > +    '''Run qemu-img and return its output'''
+> > +    subp = subprocess.Popen(list(args),
+> > +                            stdout=subprocess.PIPE,
+> > +                            stderr=subprocess.STDOUT,
+> > +                            universal_newlines=True)
+> > +    exitcode = subp.wait()
+> > +    if exitcode < 0:
+> > +        sys.stderr.write('qemu-img received signal %i: %s\n'
+> > +                         % (-exitcode, ' '.join(list(args))))
+> > +    return subp.communicate()[0]
+> > +
+> > +
+> > +def bench_write_req(qemu_img, image_name, block_size, block_offset,
+> > +                    cluster_size):
+> > +    """Benchmark write requests
+> > +
+> > +    The function creates a QCOW2 image with the given path/name. Then it runs
+> > +    the 'qemu-img bench' command and makes series of write requests on the
+> > +    image clusters. Finally, it returns the total time of the write operations
+> > +    on the disk.
+> > +
+> > +    qemu_img     -- path to qemu_img executable file
+> > +    image_name   -- QCOW2 image name to create
+> > +    block_size   -- size of a block to write to clusters
+> > +    block_offset -- offset of the block in clusters
+> > +    cluster_size -- size of the image cluster
+> > +
+> > +    Returns {'seconds': int} on success and {'error': str} on failure.
+> > +    Return value is compatible with simplebench lib.
+> > +    """
+> > +
+> > +    if not os.path.isfile(qemu_img):
+> > +        print(f'File not found: {qemu_img}')
+> > +        sys.exit(1)
+> > +
+> > +    image_dir = os.path.dirname(os.path.abspath(image_name))
+> > +    if not os.path.isdir(image_dir):
+> > +        print(f'Path not found: {image_name}')
+> > +        sys.exit(1)
+> > +
+> > +    image_size = 1024 * 1024 * 1024
+> > +
+> > +    args_create = [qemu_img, 'create', '-f', 'qcow2', '-o',
+> > +                   f'cluster_size={cluster_size}',
+> > +                   image_name, str(image_size)]
+> > +
+> > +    count = int(image_size / cluster_size) - 1
+> > +    step = str(cluster_size)
+> > +
+> > +    args_bench = [qemu_img, 'bench', '-w', '-n', '-t', 'none', '-c',
+> > +                  str(count), '-s', f'{block_size}', '-o', str(block_offset),
+> > +                  '-S', step, '-f', 'qcow2', image_name]
+> > +
+> > +    try:
+> > +        qemu_img_pipe(*args_create)
+> > +    except OSError as e:
+> > +        os.remove(image_name)
+> > +        return {'error': 'qemu_img create failed: ' + str(e)}
+> > +
+> > +    try:
+> > +        ret = qemu_img_pipe(*args_bench)
+> > +    except OSError as e:
+> > +        os.remove(image_name)
+> > +        return {'error': 'qemu_img bench failed: ' + str(e)}
+> > +
+> > +    os.remove(image_name)
+> > +
+> > +    if 'seconds' in ret:
+> > +        ret_list = ret.split()
+> > +        index = ret_list.index('seconds.')
+> > +        return {'seconds': float(ret_list[index-1])}
+> > +    else:
+> > +        return {'error': 'qemu_img bench failed: ' + ret}
+> > +
+> > +
+> > +if __name__ == '__main__':
+> > +
+> > +    if len(sys.argv) < 4:
+> > +        program = os.path.basename(sys.argv[0])
+> > +        print(f'USAGE: {program} <path to qemu-img binary file> '
+> > +              '<path to another qemu-img to compare performance with> '
+> > +              '<full or relative name for QCOW2 image to create>')
+> > +        exit(1)
+> > +
+> > +    # Test-cases are "rows" in benchmark resulting table, 'id' is a caption
+> > +    # for the row, other fields are handled by bench_func.
+> > +    test_cases = [
+> > +        {
+> > +            'id': '<cluster front>',
+> > +            'block_size': 4096,
+> > +            'block_offset': 0,
+> > +            'cluster_size': 1048576
+> > +        },
+> > +        {
+> > +            'id': '<cluster middle>',
+> > +            'block_size': 4096,
+> > +            'block_offset': 524288,
+> > +            'cluster_size': 1048576
+> > +        },
+> > +        {
+> > +            'id': '<cross cluster>',
+> > +            'block_size': 1048576,
+> > +            'block_offset': 4096,
+> > +            'cluster_size': 1048576
+> > +        },
+> > +        {
+> > +            'id': '<cluster 64K>',
+> > +            'block_size': 4096,
+> > +            'block_offset': 0,
+> > +            'cluster_size': 65536
+> > +        },
+> > +    ]
+> > +
+> > +    # Test-envs are "columns" in benchmark resulting table, 'id is a caption
+> > +    # for the column, other fields are handled by bench_func.
+> > +    # Set the paths below to desired values
+> > +    test_envs = [
+> > +        {
+> > +            'id': '<qemu-img binary 1>',
+> > +            'qemu_img': f'{sys.argv[1]}',
+> > +            'image_name': f'{sys.argv[3]}'
+> > +        },
+> > +        {
+> > +            'id': '<qemu-img binary 2>',
+> > +            'qemu_img': f'{sys.argv[2]}',
+> > +            'image_name': f'{sys.argv[3]}'
+> > +        },
+> > +    ]
+> > +
+> > +    result = simplebench.bench(bench_func, test_envs, test_cases, count=3,
+> > +                               initial_run=False)
+> > +    print(simplebench.ascii(result))
+> > 
+> 
+> 
+> -- 
+> Best regards,
+> Vladimir
+> 
+
+-- 
+Eduardo
+
 
