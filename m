@@ -2,85 +2,84 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 502D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD28C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 173EB204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:25:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1586F223AB
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:25:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6JLbOT+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173EB204EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iILhLyQY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1586F223AB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvNk8-0004gt-D4
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:25:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59616)
+	id 1jvNka-0005nk-A6
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:25:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNhg-0000BZ-AD
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:22:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38911
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNih-0001rV-6c
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:23:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32444
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNhe-0002Qz-M1
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:22:47 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvNif-0002dk-IO
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:23:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594743766;
+ s=mimecast20190719; t=1594743828;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ggAZPwgFaHH0Tr8NNCwCfFm3IdIMlzKerCSBSjJytO8=;
- b=A6JLbOT+G/+TJA4xb0h1fi7VIDfQ7MtruW5ERFNrgx6InJyN0hA8XYwPiGdv1JNf/OIdCu
- fKMzO5UuKd1jLw8Jnmpns3i9wbp3RP20W21HNn8rXUyje1drgJfk3iZGlh1nGdNK0YZ4zE
- jrqmini7j/tOXMu/YzTsU59ZM+egjeg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-B2klAhkfO0u5gOuxU2rW3Q-1; Tue, 14 Jul 2020 12:22:44 -0400
-X-MC-Unique: B2klAhkfO0u5gOuxU2rW3Q-1
-Received: by mail-wm1-f71.google.com with SMTP id z11so4678905wmg.5
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 09:22:44 -0700 (PDT)
+ bh=k5F/8Qp0O/rBEdrMGc9Q7dj9pBKOK3lqQIRexTAkmn8=;
+ b=iILhLyQYtd0NVbkm4T0hDamQKwYP7ZSg7cItLQdjppqAHTHRrw7ivCIfRcKs1W6ZeWYLZJ
+ s2WdKGjo53u1IMG+AGpWHR2kpEBsxECmMCMC+xnMTCp5lQxf+Si/383Hcat3NNw5C8sBx3
+ cFCiq3pHEtxfj0R5AlrsdvuA7qw/dms=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-zpJkezsPP9uGL-1wnqQigA-1; Tue, 14 Jul 2020 12:23:46 -0400
+X-MC-Unique: zpJkezsPP9uGL-1wnqQigA-1
+Received: by mail-wm1-f72.google.com with SMTP id g187so4687200wme.0
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 09:23:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=ggAZPwgFaHH0Tr8NNCwCfFm3IdIMlzKerCSBSjJytO8=;
- b=AiaJgcXmQv1mPeUfvQN8WvVpFYLYerv6hfd/bVf5bvgLLUZYq2+p+nfW3xS/AHtP/I
- gNKRo6hu1cEw/qD19nmcLRLEBkbVUiO9RsesTX+6IVOFoGezVrpBBWawKPdEfj+dkUCD
- MW2w7g/zFwzaC0exNfAOrNpKvxL/1y37an79uLs9v2MfoakSBGLlH5tJLLM1CQJqMjnt
- C+SZZn63GpeM4JrTthusIIb0ONcRsL8xh4F8iVHjYjgDeUEPGy/cLneQm5c3UXRZKSom
- RcH2+fxJhEcyC2hkSUzitl0cwGIj+7xiUNJZjqYvJfjxMr5o7PEVlUyvLYu7utxkB9KB
- nN3g==
-X-Gm-Message-State: AOAM533boBoB+sfMtV1LxLL0HUxfhae3LhmNk2rO5RTx+fITwspOc7aP
- /UlR7kInM4RLioMc4ykYyZLcq331P31syKjZrg7o7e4cqHQ/pBjH50Gs2PMmx4lkClZIinV1z5U
- KAFHCHxZcympdmc8=
-X-Received: by 2002:a05:6000:86:: with SMTP id
- m6mr6685854wrx.173.1594743763306; 
- Tue, 14 Jul 2020 09:22:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyi+FNASv89lhEDoQuarZSEdUz/fA9ZNMzorZ2H6o3IGk/z71Jt4tNVn3YtV+ofxL71tMtLFw==
-X-Received: by 2002:a05:6000:86:: with SMTP id
- m6mr6685828wrx.173.1594743763119; 
- Tue, 14 Jul 2020 09:22:43 -0700 (PDT)
+ bh=k5F/8Qp0O/rBEdrMGc9Q7dj9pBKOK3lqQIRexTAkmn8=;
+ b=smG4g5H/OWnPwQQN6qMVlnNqwfpLWohvJdkfGkhnSiE5qOfjA9C04deF2IkiwdfgbS
+ rdaEzZBIvHymMRvLJ1RAz22DCVveOPDjEVVTzbbAgWkBexI0G56KxexrjGRiBht7Zk2o
+ +bvwT9QNSkqoE7V/ZA8MuYaPkEtQdPYAorRV8NMQCaacYjwoC0Pckanj9hL/MqfAPznQ
+ YjPNxFJVmphdQAJxwzBKlgOSURC4o/cREjClCu4pVnSApbiSbxaFBFGXhvpvPaZy1j4I
+ uE4wqntRBC8uilbwht+I3Jc69EW6ml9/ELKDM5UYL+z+HC+95uyiRYht4ExcTtLyeFqv
+ V9xg==
+X-Gm-Message-State: AOAM531Qdlh5knC+UNSGB90APe0rtSyE+9XpuPNI/PWIODgBMRD6a/vV
+ d8uNNyx/LCsRTEla5tZx6JqTWZ3yRxDtpdzea5FfsHBXRokRfuvkZjsCWRm489t8nilv6MzOR94
+ gi41QkehdYGxAhKA=
+X-Received: by 2002:a5d:6a90:: with SMTP id s16mr6708227wru.8.1594743825569;
+ Tue, 14 Jul 2020 09:23:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzAYS7V4ohQ5sXyKMDHDtKSS0nH5jsj7xKA8ikHOma+cL8yb6FUH+vZpoktZsvxyClqr4i+Vw==
+X-Received: by 2002:a5d:6a90:: with SMTP id s16mr6708210wru.8.1594743825404;
+ Tue, 14 Jul 2020 09:23:45 -0700 (PDT)
 Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id q7sm31004817wra.56.2020.07.14.09.22.41
+ by smtp.gmail.com with ESMTPSA id a84sm5004513wmh.47.2020.07.14.09.23.44
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 09:22:42 -0700 (PDT)
-Subject: Re: [PATCH for-5.1 1/5] qdev: Fix device_add DRIVER, help to print to
- monitor
+ Tue, 14 Jul 2020 09:23:44 -0700 (PDT)
+Subject: Re: [PATCH for-5.1 4/5] qom: Document object_get_canonical_path()
+ returns malloced string
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200714160202.3121879-1-armbru@redhat.com>
- <20200714160202.3121879-2-armbru@redhat.com>
+ <20200714160202.3121879-5-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -105,12 +104,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <8b41b736-c987-bb9e-b2e1-9ece09e29932@redhat.com>
-Date: Tue, 14 Jul 2020 18:22:41 +0200
+Message-ID: <eedb53db-d5b4-852f-5aee-215d282e06c8@redhat.com>
+Date: Tue, 14 Jul 2020 18:23:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200714160202.3121879-2-armbru@redhat.com>
+In-Reply-To: <20200714160202.3121879-5-armbru@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -140,49 +139,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, thuth@redhat.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-stable@nongnu.org, pbonzini@redhat.com,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- alex.bennee@linaro.org
+ ehabkost@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/14/20 6:01 PM, Markus Armbruster wrote:
-> Help on device properties gets printed to stdout instead of the
-> monitor.  If you have the monitor anywhere else, no help for you.
-> Broken when commit e1043d674d "qdev: use object_property_help()"
-> accidentally switched from qemu_printf() to printf().  Switch right
-> back.
-> 
-> Fixes: e1043d674d792ff64aebae1a3eafc08b38a8a085
-> Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Cc: qemu-stable@nongnu.org
+On 7/14/20 6:02 PM, Markus Armbruster wrote:
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  qdev-monitor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  include/qom/object.h | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 71ebce19df..e9b7228480 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-
-#pragma GCC poison printf
-#pragma GCC poison fprintf
-
-;)
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 55d925d2c8..0f3a60617c 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -1467,8 +1467,9 @@ const char *object_get_canonical_path_component(const Object *obj);
+>  /**
+>   * object_get_canonical_path:
+>   *
+> - * Returns: The canonical path for a object.  This is the path within the
+> - * composition tree starting from the root.
+> + * Returns: The canonical path for a object, newly allocated.  This is
+> + * the path within the composition tree starting from the root.  Use
+> + * g_free() to free it.
+>   */
+>  char *object_get_canonical_path(const Object *obj);
+>  
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> @@ -300,7 +300,7 @@ int qdev_device_help(QemuOpts *opts)
->      }
->      g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp0);
->      for (i = 0; i < array->len; i++) {
-> -        printf("%s\n", (char *)array->pdata[i]);
-> +        qemu_printf("%s\n", (char *)array->pdata[i]);
->      }
->      g_ptr_array_set_free_func(array, g_free);
->      g_ptr_array_free(array, true);
-> 
 
 
