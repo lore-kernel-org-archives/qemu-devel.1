@@ -4,80 +4,92 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EED8C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E832C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:58:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D35120BED
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF39520BED
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:58:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dow2FcyF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D35120BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P81i2xbz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF39520BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvGkw-00018e-Pq
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 04:57:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42112)
+	id 1jvGlo-00027x-5m
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 04:58:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42386)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvGk7-0000Hz-Eo
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:56:51 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27062
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvGlE-0001a6-7H
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:58:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54784
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvGk5-0004u5-H8
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:56:51 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvGlC-0004zQ-H8
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:57:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594717008;
+ s=mimecast20190719; t=1594717077;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=LSdHcmvYmsAtymoblKX0gh0LcxDypuqG+SLuvDvfd08=;
- b=Dow2FcyFt8NwU/r/p4+33fhdLjLN45RXILKSY4preLiIrDB8MliuM4V97+uTCShdbVN4KV
- bdYU0Ze2Tn+nSaY2UgRmj0AhtVkvFe2J+xkI9dfoGfSYMBffSqK+Ph7OUYORFjyrxo4MXr
- XNVbkFjeC7rHJ/nRpJyxCyDbsW5H8Pw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-v61fjEOvPG6HZVnTYlT4Vg-1; Tue, 14 Jul 2020 04:56:47 -0400
-X-MC-Unique: v61fjEOvPG6HZVnTYlT4Vg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B6D6800685;
- Tue, 14 Jul 2020 08:56:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A20DC724D4;
- Tue, 14 Jul 2020 08:56:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3048E1267F16; Tue, 14 Jul 2020 10:56:41 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] docs/qdev-device-use: Clean up the sentences related to
- -usbdevice
-References: <20200710065520.24784-1-thuth@redhat.com>
-Date: Tue, 14 Jul 2020 10:56:41 +0200
-In-Reply-To: <20200710065520.24784-1-thuth@redhat.com> (Thomas Huth's message
- of "Fri, 10 Jul 2020 08:55:20 +0200")
-Message-ID: <87r1te79va.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ bh=d7qu47wrEa9Rra+uRd9zMX6T/4ahPlP/4qd4nYZVew8=;
+ b=P81i2xbz3BrVotNUlcjiS+smS+TyyyxtdMNNsaiUR655Sw+QakK9ioEg6zSeZYTpQ3soGq
+ Y5HQyjtiudYmdqQk3B1PVa/ddyTVNyZXx/izCBv24HRzugeJZuqzUx42/tdl1kihhT/keJ
+ 31QfK3cg2uEVBeQ/YBXS0/wTYLTzgss=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-xMXDFjiHP-KWPcL-IAWQAQ-1; Tue, 14 Jul 2020 04:57:55 -0400
+X-MC-Unique: xMXDFjiHP-KWPcL-IAWQAQ-1
+Received: by mail-wr1-f71.google.com with SMTP id v3so20801041wrq.10
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 01:57:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=d7qu47wrEa9Rra+uRd9zMX6T/4ahPlP/4qd4nYZVew8=;
+ b=IqCSxmzkYktrnm8YRX9VsMEwzzA3NmMLAYJsL8p2zqtf/5I170hcayTF/BURReW9hT
+ QRy3ZIRSB5on+5EyFjeuyW0GPljuRzFFJnqbcINvPddbjBEqiiib0rETvNQbIzUfan/y
+ 9Z9640BvO3yojixG+yMmHs6EM7DmXUJ1DrnXxIjbkGlDwVb/LKcvDHGrf+ANBW4UjseE
+ bNr0brC4vrm85o0r5dg/J4acw81Q8w63z4urisCddTZSf6SyNsmYSFWhDo+XAwxJwHFQ
+ myx5rEL6bejupURpOvT+fgR6SQSlMticyHyflX3qwBB1qnDkGFmZkBksthlia18DrpsG
+ 7nRw==
+X-Gm-Message-State: AOAM530gXDtx+eDhoeOXcpYLpWlv1dDAwhlkSXOvN4QvEjGtODfIq9ZU
+ fC2go4jn4u7LoQrIWvo6g0Gkn+Ho5pgm0HswvFfosxHEdQYR+PTFSb5K4MwTHFSMN5eZr59yl4g
+ F5U93s4q+JmsEMK0=
+X-Received: by 2002:adf:f885:: with SMTP id u5mr3894659wrp.402.1594717074234; 
+ Tue, 14 Jul 2020 01:57:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzZ0GVRP+PyF08+JHT5iWKfv4h4GYO0IG8jHLS+qDMIEoEWVEGYZEjg05letM82+pgr2pGaDA==
+X-Received: by 2002:adf:f885:: with SMTP id u5mr3894637wrp.402.1594717074006; 
+ Tue, 14 Jul 2020 01:57:54 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
+ by smtp.gmail.com with ESMTPSA id v7sm28837090wrp.45.2020.07.14.01.57.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jul 2020 01:57:53 -0700 (PDT)
+Date: Tue, 14 Jul 2020 04:57:50 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 3/4] hw/arm/virt-acpi-build: Only expose flash on older
+ machine types
+Message-ID: <20200714045537-mutt-send-email-mst@kernel.org>
+References: <20200629140938.17566-1-drjones@redhat.com>
+ <20200629140938.17566-4-drjones@redhat.com>
+ <20200713104907.335bf762@redhat.com>
+ <20200714055109.owrlob6m53notzh3@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+In-Reply-To: <20200714055109.owrlob6m53notzh3@kamzik.brq.redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -85,7 +97,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,196 +110,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: peter.maydell@linaro.org, eric.auger@redhat.com, lersek@redhat.com,
+ qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+ ard.biesheuvel@arm.com, Igor Mammedov <imammedo@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+On Tue, Jul 14, 2020 at 07:51:09AM +0200, Andrew Jones wrote:
+> On Mon, Jul 13, 2020 at 10:49:07AM +0200, Igor Mammedov wrote:
+> > On Mon, 29 Jun 2020 16:09:37 +0200
+> > Andrew Jones <drjones@redhat.com> wrote:
+> > 
+> > > The flash device is exclusively for the host-controlled firmware, so
+> > > we should not expose it to the OS. Exposing it risks the OS messing
+> > > with it, which could break firmware runtime services and surprise the
+> > > OS when all its changes disappear after reboot.
+> > > 
+> > > As firmware needs the device and uses DT, we leave the device exposed
+> > > there. It's up to firmware to remove the nodes from DT before sending
+> > > it on to the OS. However, there's no need to force firmware to remove
+> > > tables from ACPI (which it doesn't know how to do anyway), so we
+> > > simply don't add the tables in the first place. But, as we've been
+> > > adding the tables for quite some time and don't want to change the
+> > > default hardware exposed to versioned machines, then we only stop
+> > > exposing the flash device tables for 5.1 and later machine types.
+> > > 
+> > > Suggested-by: Ard Biesheuvel <ard.biesheuvel@arm.com>
+> > > Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > ---
+> > >  hw/arm/virt-acpi-build.c | 5 ++++-
+> > >  hw/arm/virt.c            | 3 +++
+> > >  include/hw/arm/virt.h    | 1 +
+> > >  3 files changed, 8 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > index 1384a2cf2ab4..91f0df7b13a3 100644
+> > > --- a/hw/arm/virt-acpi-build.c
+> > > +++ b/hw/arm/virt-acpi-build.c
+> > > @@ -749,6 +749,7 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
+> > >  static void
+> > >  build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> > >  {
+> > > +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+> > >      Aml *scope, *dsdt;
+> > >      MachineState *ms = MACHINE(vms);
+> > >      const MemMapEntry *memmap = vms->memmap;
+> > > @@ -767,7 +768,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> > >      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
+> > >      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+> > >                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
+> > > -    acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
+> > > +    if (vmc->acpi_expose_flash) {
+> > > +        acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
+> > > +    }
+> > >      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
+> > >      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+> > >                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > index cd0834ce7faf..5adc9ff799ef 100644
+> > > --- a/hw/arm/virt.c
+> > > +++ b/hw/arm/virt.c
+> > > @@ -2482,9 +2482,12 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+> > >  
+> > >  static void virt_machine_5_0_options(MachineClass *mc)
+> > >  {
+> > > +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> > > +
+> > >      virt_machine_5_1_options(mc);
+> > >      compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+> > >      mc->numa_mem_supported = true;
+> > > +    vmc->acpi_expose_flash = true;
+> > 
+> > we usually do not version ACPI tables changes
+> > (unless we have a good reason to do so)
+> 
+> Even when the change is to remove the exposure of hardware from the guest?
+> Before this change, if a guest looked, it had a flash, after this change,
+> if a guest looks, it doesn't.
 
-> Most of the -usbdevice paramaters have been removed already. Update
-> the doc accordingly.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  docs/qdev-device-use.txt | 28 +++-------------------------
->  1 file changed, 3 insertions(+), 25 deletions(-)
->
-> diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
-> index 4bbbcf561f..f8d0d2fe29 100644
-> --- a/docs/qdev-device-use.txt
-> +++ b/docs/qdev-device-use.txt
-> @@ -125,12 +125,7 @@ The -device argument differs in detail for each
-> type of drive:
+It's up to the relevant maintainers who know what the semantics are.
+FYI ACPI tables only change across a reset though.
+So it's a question of whether guests get confused even if this
+changes after a reboot.
+Versioning is generally safer, but it's a good idea to document
+the motivation for it.
 
-Additional context:
 
-   The various old ways to define drives all boil down to the common form
-
-       -drive if=TYPE,bus=BUS,unit=UNIT,OPTS...
-
-   TYPE, BUS and UNIT identify the controller device, which of its buses
-   to use, and the drive's address on that bus.  Details depend on TYPE.
-[...]
->  
->  * if=pflash, if=mtd, if=sd, if=xen are not yet available with -device
->  
-> -For USB devices, the old way is actually different:
-> -
-> -    -usbdevice disk:format=FMT:FILENAME
-> -
-> -Provides much less control than -drive's OPTS...  The new way fixes
-> -that:
-> +For USB storage devices, you can use something like:
->  
->      -device usb-storage,drive=DRIVE-ID,removable=RMB
->  
-
-Losing "the old way is actually different" makes "The various old ways
-to define drives all boil down to the common form" apply to USB.
-Misleading.
-
-We could choose to keep information on the old way, like this:
-
-   For USB devices, the old way was actually different:
-
-       -usbdevice disk:format=FMT:FILENAME
-
-   "Was" because "disk:" is gone since v2.12.0.
-
-   The old way provided much less control than -drive's OPTS...  The new
-   way fixes that:
-
-       -device usb-storage,drive=DRIVE-ID,removable=RMB
-
-If we prefer not to, then perhaps:
-
-   For USB devices, the old way was actually different, and is long
-   gone.  The new way looks like
-
-       -device usb-storage,drive=DRIVE-ID,removable=RMB
-
-> @@ -177,8 +172,6 @@ The appropriate DEVNAME depends on the machine type.  For type "pc":
->  
->    This lets you control I/O ports and IRQs.
->  
-> -* -usbdevice serial::chardev becomes -device usb-serial,chardev=dev.
-> -
-
-If we choose to keep information on old ways, we could
-
-   * -usbdevice serial::chardev is gone since v2.12.0.  It became
-     -device usb-serial,chardev=dev.
-
-Else:
-
-   * Use -device usb-serial,chardev=dev for USB serial devices.  The old
-     way is long gone.
-
->  * -usbdevice braille doesn't support LEGACY-CHARDEV syntax.  It always
->    uses "braille".  With -device, this useful default is gone, so you
->    have to use something like
-> @@ -238,10 +231,6 @@ The old way to define the guest part looks like this:
-
-Additional context:
-
-   === Network Devices ===
-
-   Host and guest part of network devices have always been separate.
-
-   The old way to define the guest part looks like this:
->  
->      -net nic,netdev=NET-ID,macaddr=MACADDR,model=MODEL,name=ID,addr=STR,vectors=V
->  
-> -Except for USB it looks like this:
-> -
-> -    -usbdevice net:netdev=NET-ID,macaddr=MACADDR,name=ID
-> -
->  The new way is -device:
->  
->      -device DEVNAME,netdev=NET-ID,mac=MACADDR,DEV-OPTS...
-
-As for block devices, this now reads as if USB was the same as all the
-others, which is misleading.
-
-If keep, then perhaps:
-
-   Except for USB it looked like this:
-
-       -usbdevice net:netdev=NET-ID,macaddr=MACADDR,name=ID
-
-   "Looked" because "net:" is gone since v2.12.0.
-
-If not:
-
-   For USB devices, the old way was actually different, and is long
-   gone.
-
-> @@ -336,12 +325,7 @@ The new way is -device DEVNAME,DEV-OPTS...  Details depend on DRIVER:
->  * mouse           -device usb-mouse
->  * tablet          -device usb-tablet
->  * wacom-tablet    -device usb-wacom-tablet
-> -* host:...        See "Host Device Assignment"
-> -* disk:...        See "Block Devices"
-> -* serial:...      See "Character Devices"
->  * braille         See "Character Devices"
-> -* net:...         See "Network Devices"
-> -* bt:...          not yet available with -device
->  
->  === Watchdog Devices ===
->  
-> @@ -358,17 +342,11 @@ and host USB devices.  PCI devices can only be assigned with -device:
-
-More context:
-
-   === Host Device Assignment ===
-
-   QEMU supports assigning host PCI devices (qemu-kvm only at this time)
-   and host USB devices.  PCI devices can only be assigned with -device:
->  
->      -device vfio-pci,host=ADDR,id=ID
->  
-> -The old way to assign a host USB device is
-> -
-> -    -usbdevice host:auto:BUS.ADDR:VID:PRID
-> -
-> -where any of BUS, ADDR, VID, PRID can be the wildcard *.
-> -
-> -The new way is
-> +To assign a host USB device use:
->  
->      -device usb-host,hostbus=BUS,hostaddr=ADDR,vendorid=VID,productid=PRID
->  
-> -Omitted options match anything, just like the old way's wildcard.
-> +Omitted options match anything.
-
-   QEMU supports assigning host PCI devices (qemu-kvm only at this time)
-   and host USB devices.  They can only be assigned with -device.
-
-   PCI:
-
-       -device vfio-pci,host=ADDR,id=ID
-
-   USB:
-
-       -device usb-host,hostbus=BUS,hostaddr=ADDR,vendorid=VID,productid=PRID
-
-   Omitted options match anything.
-
-If keep, add something like
-
-   The old way to assign a USB host device
-
-       -usbdevice host:auto:BUS.ADDR:VID:PRID
-
-   was removed in v2.12.0.  Any of BUS, ADDR, VID, PRID could be the
-   wildcard *.
-
->  
->  === Default Devices ===
-
-Since v2.12.0 was more than two years ago, keeping information on the
-old way may be no longer useful.
+> I'd feel much better versioning a change
+> like that, than not.
+> 
+> Thanks,
+> drew
+> 
+> > 
+> > >  }
+> > >  DEFINE_VIRT_MACHINE(5, 0)
+> > >  
+> > > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> > > index 31878ddc7223..c65be5fe0bb6 100644
+> > > --- a/include/hw/arm/virt.h
+> > > +++ b/include/hw/arm/virt.h
+> > > @@ -119,6 +119,7 @@ typedef struct {
+> > >      bool no_highmem_ecam;
+> > >      bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
+> > >      bool kvm_no_adjvtime;
+> > > +    bool acpi_expose_flash;
+> > >  } VirtMachineClass;
+> > >  
+> > >  typedef struct {
+> > 
+> > 
 
 
