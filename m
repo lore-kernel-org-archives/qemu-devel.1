@@ -2,163 +2,125 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF298C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7605FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:38:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63D8C2242E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BEF52242E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:38:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxV9CMv2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63D8C2242E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="irZ7Kkb/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BEF52242E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvPoG-0000Zd-Jj
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 14:37:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59876)
+	id 1jvPod-0001CS-Ht
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 14:38:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jvPn1-00080X-2k
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:36:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60968
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jvPmx-0007uQ-0K
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:36:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594751778;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=l0SV2lQCSevm9VHbhqpeawPbrGqpXrzqvz/6JU5f+bI=;
- b=IxV9CMv29jWV9GNd+nJCWFOF+eUMqTNKxxFKhbTfYO9DQviRqAj9O9JcPeNyWo+BvD1UNO
- xV4zw9JEL9oMb3UI2FBBkkrIzI0o5fI6jj6FU1w9MAmele/F70osU8Yfw/cloOfWj0LvoC
- HnwMbZn7PoNAazaZFdC0wWmBalBQuto=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-MHvpcruINriPARm43dUVBw-1; Tue, 14 Jul 2020 14:36:15 -0400
-X-MC-Unique: MHvpcruINriPARm43dUVBw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2A4E80183C
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 18:36:14 +0000 (UTC)
-Received: from [10.10.113.141] (ovpn-113-141.rdu2.redhat.com [10.10.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3CB2D6FDD1;
- Tue, 14 Jul 2020 18:36:14 +0000 (UTC)
-Subject: Re: [PATCH 1/1] python: add check-python target
-To: Cleber Rosa <crosa@redhat.com>
-References: <20200714013026.9019-1-jsnow@redhat.com>
- <20200714013026.9019-2-jsnow@redhat.com>
- <20200714043003.GA3012808@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <95fe73ec-1c37-b8d1-191e-37eaa33145f5@redhat.com>
-Date: Tue, 14 Jul 2020 14:36:13 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200714043003.GA3012808@localhost.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jvPno-0000EK-FW; Tue, 14 Jul 2020 14:37:16 -0400
+Received: from mail-vi1eur05on2126.outbound.protection.outlook.com
+ ([40.107.21.126]:8160 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jvPnm-0007yq-0Z; Tue, 14 Jul 2020 14:37:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MYI2gm2XfTLAiG7+R5pG3+9oYFAA8OTVLXKnFR6+TDMWw2K2rH7487sZ0lD1pQcHXMnxe4//dEX+gqVXt8vRFF6q2+khoRlRIQmzk4J3x9UyZQ0BwVA3yN9hBl1cbHb4k6i4Tyc2OIEBQFIIzhqxSdDHS6TQbIzqRNT9GOk1pDOZsSLGBDBDTAyqUEp94HgqThfkfHEoJ6JNOAx5mp+9sdAz5GKcGUuW8ixZIrd08QkY5x5cGRmw49pPJ3lgGT4RUxTDeoa8igkf34q6MSylcD/krGIH8/DdCmoLTamXGiK2cvlTmGcEl+EuxdzEhEFZxeSLL88wEG7Q+4cOv2Mrmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qJ9TT/sYmFeOAcRwI8xj+vHB5k75C81bQBnzRzBOi1k=;
+ b=VshFoo6vtA2AiDmk0g0mEax4wSPLxM7bbkzp+PuV5lt/AJ3rat/5fp835hGMyJRwyAMu2JjlZNR99829mL2zhZb2UjWRsRo+wOOeuHEiEJYw1vT8G5ug6TOP7aBSzgfvIqzIaRWrKaobzgFL5gjxzptfX2Bvy0ruvozhf5V1UPkLj7UuuAbJbDYBLrFZAuFVehdQrL8+DdfyPhUAH8VBHv8Hc7HPLqRUBqmjAxQnkPjlgKI2d95sykRDcYAbpgrcBLEG7CwFTZEQRxNhUOybXFRlcnNcAT2GFusv9F+m61eG/RzWW1RmoBxwL+ghWHvsHx0nOEewtJXL0aBg0SGbeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qJ9TT/sYmFeOAcRwI8xj+vHB5k75C81bQBnzRzBOi1k=;
+ b=irZ7Kkb/Vj3ILPdVLYrnw1Bh/kli2+2oHe6VQvTSNimICGtq1+/jYIlRqdRVvu0vnT1FMwkmD08UzCkYDMWNRJ6OWizkd2g7hKuHT9E6VY5LfzmlidHvR9BB5ayHh+fNCP3k6Gopw/7kVGs/ex8a4fzMa30d1fOfcntKdy8hinE=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM6PR08MB5030.eurprd08.prod.outlook.com (2603:10a6:20b:e1::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Tue, 14 Jul
+ 2020 18:37:09 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3174.025; Tue, 14 Jul 2020
+ 18:37:08 +0000
+Subject: Re: [PATCH v7 20/47] block: Iterate over children in refresh_limits
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-21-mreitz@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <9e4dc3da-2c5c-8da5-2d03-c144b9d8b4fd@virtuozzo.com>
+Date: Tue, 14 Jul 2020 21:37:05 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <20200625152215.941773-21-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Language: en-GB
+X-ClientProxiedBy: AM0PR06CA0121.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::26) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.191) by
+ AM0PR06CA0121.eurprd06.prod.outlook.com (2603:10a6:208:ab::26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3195.17 via Frontend Transport; Tue, 14 Jul 2020 18:37:07 +0000
+X-Originating-IP: [109.252.114.191]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f4451a69-24c0-4616-ff87-08d82824ea2d
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5030:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB5030775C92F07CC92597AAC7F4610@AM6PR08MB5030.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8BTPmkMdAAnHRICFpmPyHrZxGh7RArMFk2GfPDDtNfgjcI+ihQmjdEoI2/OQ+9Gxz9PjwDxdgVUyh9UotDMknGhNUspKDsdE4zvxEI2hEuQIiHB+Y2+LuGhcxVr8+1Hg8I/vHNOvJ3xSjsM5ZrgmZAvtghE2J3lGMQEVRFBaETyrfGfZCs3cz2UQodjI42m9FOTHseChAj8LZmcYqGYuX+7H0UCFpLCieSyPifDnkVGlQP7fSLiPlYgkuBvdVIkZ/blJ+IFNfMIwS/UMY6PvmoSCuqRbkv2LIJUy4Mv/Nrkq+42xGhifupnlKMZry2ZYOx0bh3tK7e2Sj7jC6klczoa3bgKq2gCW5o/LLhHD2UuGFuzJDno1BFDH5QGVJ27+
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(39840400004)(376002)(346002)(136003)(366004)(44832011)(52116002)(316002)(5660300002)(31696002)(16526019)(86362001)(186003)(2906002)(26005)(53546011)(6512007)(478600001)(66476007)(6506007)(36756003)(66556008)(66946007)(4326008)(956004)(2616005)(6486002)(83380400001)(54906003)(8936002)(31686004)(8676002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: WkkMyYWmPrU8SFAiaS4D+q2eQuOKpXhT6QIP5U908n3fupV89JpZUik/5OxPRCJSybZXvcHXH6QTM4iVffVYtvut0pzRz7IArFBNyyX4wLlocyTjaIuL0t/461R4agPs/Cu6UWvofuXq9vF1M3P5GDcSQzXzO7vSpiwvMJfzOTlDGPnY25qzjm3s/DhlsdMyf/v2ZOybo9w7unp6a2ij88XF33wcm32NhlVKKCfNdP1/BuCkg5rvtz49gHDwfcfN/QndOCX4rdg+tlj3uleqFXp336NLNW3gQ663rT75xhDG0dYge5wzT6d0bscA2+k9s6w6p/4ltaFDN62zFuO8/29uZv2xH/Ecu9pwIbLlrP/sRnoeHMMQfHF3VGwXmSx7MgckhmAarAp/TJ/GHzO6tvxKo0DmoF52wtu/pJC6Q/ZPBRaw3mKfBhMaQqDnvMwiDIXUKvFXQ6Dkd4R6OFCPU71yh0GsJyV+qFmsqdxOwqdrxnm6qpC+fS5z/nis7rfa
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4451a69-24c0-4616-ff87-08d82824ea2d
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2020 18:37:08.7710 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 14a3okrX0SBYxDleC7M2re9CTQkGuaxo/BPUW/VcTDhRzNUV45sLKZvg1J9EnlE/4UlDdUF9dz5OA4Qv+8pwcL/NuUmChZLOXjl7wM7V+iE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5030
+Received-SPF: pass client-ip=40.107.21.126;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 14:37:10
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -171,141 +133,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 25.06.2020 18:21, Max Reitz wrote:
+> Instead of looking at just bs->file and bs->backing, we should look at
+> all children that could end up receiving forwarded requests.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block/io.c | 32 ++++++++++++++++----------------
+>   1 file changed, 16 insertions(+), 16 deletions(-)
+>
+> diff --git a/block/io.c b/block/io.c
+> index c2af7711d6..37057f13e0 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -135,6 +135,8 @@ static void bdrv_merge_limits(BlockLimits *dst, const BlockLimits *src)
+>   void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>   {
+>       BlockDriver *drv = bs->drv;
+> +    BdrvChild *c;
+> +    bool have_limits;
+>       Error *local_err = NULL;
+>   
+>       memset(&bs->bl, 0, sizeof(bs->bl));
+> @@ -149,14 +151,21 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>                                   drv->bdrv_co_preadv_part) ? 1 : 512;
+>   
+>       /* Take some limits from the children as a default */
+> -    if (bs->file) {
+> -        bdrv_refresh_limits(bs->file->bs, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> +    have_limits = false;
+> +    QLIST_FOREACH(c, &bs->children, next) {
+> +        if (c->role & (BDRV_CHILD_DATA | BDRV_CHILD_FILTERED | BDRV_CHILD_COW))
+> +        {
+> +            bdrv_refresh_limits(c->bs, &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                return;
+> +            }
+> +            bdrv_merge_limits(&bs->bl, &c->bs->bl);
+> +            have_limits = true;
+>           }
+> -        bdrv_merge_limits(&bs->bl, &bs->file->bs->bl);
+> -    } else {
+> +    }
+> +
+> +    if (!have_limits) {
 
 
-On 7/14/20 12:30 AM, Cleber Rosa wrote:
-> On Mon, Jul 13, 2020 at 09:30:26PM -0400, John Snow wrote:
->> Move pylintrc and flake8 up to the root of the python folder where
->> they're the most useful. Add a requirements.cqa.txt file to house
->> the requirements necessary to build a venv sufficient for running
->> code quality analysis on the python folder. Add a makefile that
->> will build the venv and run the tests.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  Makefile                    |  1 +
->>  python/{qemu => }/.flake8   |  0
->>  python/Makefile.include     | 33 +++++++++++++++++++++++++++++++++
->>  python/{qemu => }/pylintrc  |  1 +
->>  python/requirements.cqa.txt |  3 +++
->>  5 files changed, 38 insertions(+)
->>  rename python/{qemu => }/.flake8 (100%)
->>  create mode 100644 python/Makefile.include
->>  rename python/{qemu => }/pylintrc (99%)
->>  create mode 100644 python/requirements.cqa.txt
->>
->> diff --git a/Makefile b/Makefile
->> index b1b8a5a6d0..41808be392 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -478,6 +478,7 @@ dummy := $(call unnest-vars,, \
->>                  trace-obj-y)
->>  
->>  include $(SRC_PATH)/tests/Makefile.include
->> +include $(SRC_PATH)/python/Makefile.include
->>  
->>  all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules $(vhost-user-json-y)
->>  
->> diff --git a/python/qemu/.flake8 b/python/.flake8
->> similarity index 100%
->> rename from python/qemu/.flake8
->> rename to python/.flake8
->> diff --git a/python/Makefile.include b/python/Makefile.include
->> new file mode 100644
->> index 0000000000..917808e2f1
->> --- /dev/null
->> +++ b/python/Makefile.include
->> @@ -0,0 +1,33 @@
->> +# -*- Mode: makefile -*-
->> +
->> +PYLIB_VENV_DIR=$(BUILD_DIR)/venv/cqa
->> +PYLIB_VENV_REQ=$(SRC_PATH)/python/requirements.cqa.txt
->> +
->> +$(PYLIB_VENV_DIR): $(PYLIB_VENV_REQ)
->> +	$(call quiet-command, \
->> +	    $(PYTHON) -m venv $@, \
->> +	    VENV, $@)
->> +	$(call quiet-command, \
->> +	    $(PYLIB_VENV_DIR)/bin/python3 -m pip -q install -r $(PYLIB_VENV_REQ), \
->> +	    PIP, $(PYLIB_VENV_REQ))
->> +	$(call quiet-command, touch $@)
->> +
-> 
-> Maybe we should try to create a generic rule that takes a directory
-> name and a requirements file and creates the venv accordingly, instead
-> of duplicating the other similar rules under tests/Makefile.include?
-> 
+This conditioned piece of code worked with (bs->file == NULL) only.
 
-Maybe, but I have to admit that my Makefile prowess is lacking and would
-be at the mercy of Somebody Else(tm) to do that.
+Now, it works only if there are neither bs->file, nor bs->backing, nor 
+else filtered children.
 
-Can I get away with saying "Patches welcome" here?
+Is it OK and doesn't break the logic for all cases?
 
->> +pylib-venv: $(PYLIB_VENV_DIR)
->> +
->> +check-python: pylib-venv
->> +	$(call quiet-command, cd $(SRC_PATH)/python && \
->> +	    $(PYLIB_VENV_DIR)/bin/python3 -m flake8 qemu, \
->> +	    FLAKE8, \
->> +	    $(SRC_PATH)/python/qemu \
-> 
-> I can see how this venv would be very useful to run the same checks on
-> other Python code (for instance, the acceptance tests themselves), so
-> we'd also need another "check-python"-like rule, or include those on
-> the same call.
-> 
-> Ideas? :)
-> 
-
-Not good ones at the moment... this is still fuzzy in my head.
-
-There's no reason to conflate development packages (mypy, flake8, and
-pylint) with runtime packages (avocado-framework, pycdlib).
-
-I consider the requirements.cqa.txt file I added the "development
-requirements". I pinned them to specific versions for the purposes of CI
-repeatability. (A future patch that may add a setup.py here would re-add
-these packages without pinned versions.)
-
-Since the acceptance test venv had a different use case (running the
-code) versus this one (analyzing the code) I kept them separate.
-
-That said; maybe it's not a problem to use the same actual venv, but use
-different pip setup steps as-needed. We would need to be careful not to
-pin conflicting versions between the two different directories!
-
-We'd also then want a test (somewhere) that did nothing but installed
-both sets of requirements and made sure it worked.
+Andrey
 
 
-Lastly, I want to point out that with future plans to package the python
-library as an independently installable entity I want to avoid putting
-anything in that directory that references python code it "doesn't
-manage". avocado-framework, for example, has no business being
-referenced in python/ yet.
-
-Ideally this folder would also have its own Makefile that ran the code
-quality analysis checks by itself without the Qemu infrastructure
-involved (e.g. you can just type 'make check' inside of ./qemu/python),
-but then there's code duplication between Makefile and Makefile.include.
-
-That got messy looking and stupid, so I opted for the top-level include
-instead for now so that it could be invoked from the build directory,
-but I'm not sure I made the right call.
-
-> Thanks!
-> - Cleber.
-> 
-
-Oh, and the final step that's needed is to add a gitlab CI job to run
-check-python as a test step, but that should be easy after Dan's changes.
-
---js
-
+>           bs->bl.min_mem_alignment = 512;
+>           bs->bl.opt_mem_alignment = qemu_real_host_page_size;
+>   
+> @@ -164,15 +173,6 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>           bs->bl.max_iov = IOV_MAX;
+>       }
+>   
+> -    if (bs->backing) {
+> -        bdrv_refresh_limits(bs->backing->bs, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> -        }
+> -        bdrv_merge_limits(&bs->bl, &bs->backing->bs->bl);
+> -    }
+> -
+>       /* Then let the driver override it */
+>       if (drv->bdrv_refresh_limits) {
+>           drv->bdrv_refresh_limits(bs, errp);
 
