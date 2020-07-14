@@ -7,76 +7,73 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A09BC433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADCCC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:42:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0248121973
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D871020890
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:42:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IsUPfnxG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0248121973
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbAz6nbm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D871020890
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvBmB-0005p0-AA
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 23:38:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55630)
+	id 1jvBq3-000716-6t
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 23:42:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvBlK-0005Oq-HI
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 23:37:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28173
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvBpI-0006a3-7Z
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 23:41:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59966
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvBlH-0002Cn-WD
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 23:37:45 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvBpG-0002tg-La
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 23:41:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594697862;
+ s=mimecast20190719; t=1594698093;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=qWHH107voNvrLByo1KuPa4tXhF+fVhuDYR8MuCuhjgU=;
- b=IsUPfnxGpB9Ui9oA37KSPCIPPNQHhsXDoW9shKBtdVBsnPSSFFHyUm1xxWSXm2fbLtbeQ4
- KLKIfuUfn/4oR3uIxgqOzqMG/+8C3w+enOsKZryLlL+/3JroTf6Rb7z77z8/NAqzTlhKCr
- ddPEhMXpo168Yv/SoA9D6CqBVzpfHGw=
+ bh=nzine5zUTfzjHELM+7HT/+0ie1Fy0kEudiYsc2REOI8=;
+ b=SbAz6nbmxBQkWXDsmQtEIiTa1f7QnCoDz2B8AHQovXjvRwXhAEifgPFmFWEfDGTqM8ojK8
+ VRJUZZN60PoD2Xf1KmfvRp8BA30uqIag5XLFV1FyoPrxRGFktWdX5yowpyOEzEOu07rGPr
+ Wybsb4YpjJZaUMWWuTDHa5QWB2JpUbI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-pfpq17VJPDGy-i_jre65BQ-1; Mon, 13 Jul 2020 23:37:38 -0400
-X-MC-Unique: pfpq17VJPDGy-i_jre65BQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-248-NIzCAzXfNQmpZCnYpQ2mpw-1; Mon, 13 Jul 2020 23:41:28 -0400
+X-MC-Unique: NIzCAzXfNQmpZCnYpQ2mpw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01A6D1009448;
- Tue, 14 Jul 2020 03:37:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE1171080;
+ Tue, 14 Jul 2020 03:41:27 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-112-247.rdu2.redhat.com
  [10.10.112.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 41B08797E9;
- Tue, 14 Jul 2020 03:37:33 +0000 (UTC)
-Date: Mon, 13 Jul 2020 23:37:31 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FCC178A41;
+ Tue, 14 Jul 2020 03:41:24 +0000 (UTC)
+Date: Mon, 13 Jul 2020 23:41:22 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v5 08/12] tests/acceptance: wait() instead of shutdown()
- where appropriate
-Message-ID: <20200714033731.GF2983508@localhost.localdomain>
+Subject: Re: [PATCH v5 09/12] tests/acceptance: Don't test reboot on cubieboard
+Message-ID: <20200714034122.GG2983508@localhost.localdomain>
 References: <20200710050649.32434-1-jsnow@redhat.com>
- <20200710050649.32434-9-jsnow@redhat.com>
+ <20200710050649.32434-10-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200710050649.32434-9-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+In-Reply-To: <20200710050649.32434-10-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NQTVMVnDVuULnIzU"
+ protocol="application/pgp-signature"; boundary="t4apE7yKrX2dGgJC"
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=crosa@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:30:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -107,49 +104,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---NQTVMVnDVuULnIzU
+--t4apE7yKrX2dGgJC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 10, 2020 at 01:06:45AM -0400, John Snow wrote:
-> When issuing 'reboot' to a VM with the no-reboot option, that VM will
-> exit. When then issuing a shutdown command, the cleanup may race.
+On Fri, Jul 10, 2020 at 01:06:46AM -0400, John Snow wrote:
+> cubieboard does not have a functioning reboot, it halts and QEMU does
+> not exit.
 >=20
-> Add calls to vm.wait() which will gracefully mark the VM as having
-> exited. Subsequent vm.shutdown() calls in generic tearDown code will not
-> race when called after completion of the call.
+> vm.shutdown() is modified in a forthcoming patch that makes it less toler=
+ant
+> of race conditions on shutdown; tests should consciously decide to WAIT
+> or to SHUTDOWN qemu.
+>=20
+> So long as this test is attempting to reboot, the correct choice would
+> be to WAIT for the VM to exit. However, since that's broken, we should
+> SHUTDOWN instead.
+>=20
+> SHUTDOWN is indeed what already happens when the test performs teardown,
+> however, if anyone fixes cubieboard reboot in the future, this test will
+> develop a new race condition that might be hard to debug.
+>=20
+> Therefore: remove the reboot test and make it obvious that the VM is
+> still running when the test concludes, where the test teardown will do
+> the right thing.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/acceptance/boot_linux_console.py   | 10 ++++++++++
->  tests/acceptance/linux_ssh_mips_malta.py |  2 ++
->  2 files changed, 12 insertions(+)
+>  tests/acceptance/boot_linux_console.py | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 >=20
 
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 Tested-by: Cleber Rosa <crosa@redhat.com>
 
---NQTVMVnDVuULnIzU
+--t4apE7yKrX2dGgJC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8NKHgACgkQZX6NM6Xy
-CfOvgQ//TiGcgenKSw4LCMGa0cJfbuSP76Rw38uvnU5uX7M/H4ov0Cnt4q5HUail
-gZTwawcf0F/FObza9nBpmEpiCXQJrD2602mYWZo04QlFd+VPp+SlLC7zb134Dt+d
-tuAr8WlbWdfz3ByqILAJrmu2K8245pKxMipGeJjgSv6iMf/wx3IIWWruWYjofweT
-xRy7Q2Zc3VMChR0j5VFAN51osKMbcUOrMpqGpVmIk3rVJj59NNCIBOi+7c/PhZRQ
-SMKlleB6fHhOfqg4dLh+jbnlDXknFE1zKHeDJGhr1/T2zSQRUy3p0JtrMeq9N9iC
-qejRSttJVlq6njmunV9NJbrPmZv4HWQc6p/v9MA576E6UexHZfDzsdpHgxq35x5O
-/aGsuq8IB7HpXDxNqGOxo8JoIg033JBDwYc9G22W6eUJsdXQ16EW0Ji0YDg9frUH
-UGXb46hRwXpGniFn5d5VBH19V0g7LxP0IqxgApZ4kz8KH+XCPOoKkZDa7IEj9oPv
-PE7sm5kr9owuUYZ1schgz1rsNlkz0PMXnRRoGTTh3l7jteSVUjh21UqiTCqgzIGg
-J7hqY0Vhjhdo7G1uYgsCmc125PkMNOV1PldmKEyKxxFSx8/jrOPGjTL2MmW4Mwa6
-fHdPbST0BlBKStEcS9ictLLNVn95tRDPMC+JOpfZBB0F48XJLHs=
-=dj3e
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8NKWIACgkQZX6NM6Xy
+CfNUpQ//QY8SUUpH17Y6hUdWDNFruBI5eubKDvcKy7XGUc11Il/mn06xW6ghSZ3l
+f7GLgBlA8uKHghdKg4NpQlvkHhzNKrXVyLyfhnBcJ9CUREInn8CUWj+utIFR+Z6q
+7izQq356zpdcisMW4wnYKWVfkayaXq4gsxF1Lz23229fSol9B8UPlnnQMsL6+maY
+ZC+AyUKq+7IYkYFTQUAi7BqHjDkYnNq9UFC8Jy5vylKTvpAmsT6gVISMd/oboFn2
+Re2av+rGOdnOyg6kB7pcZqDoqsDT/6edWhg35CfhZKdXk6Vhg+3LYl9Jjb+b2ABW
+ZWIN0zJHcYmHjX52gYtAY2EZ7BsBqgmAvtkOv/JutQT2QHj1NaTTGIuXSAGqCTCp
+hWp+bz39I3xh5emRSjpUVTDwAmCODqPv1UikvMJru7rdfMchDywl5rp7pbGXpIo8
+JuMVY00SHXs0pOMZjwX8WeiSM95eibzZzn9ekEW/PMMqYlgtebdDyDjddBVqwmrA
+1xUDQj1ANtR6uDTsVRyGfuZP/MaD6L0L0CZqeva6HETXtwm5KwGAqiewJ3xnXy0c
+lHN6ZV+7QeHx+35MTdc461rZScuLsmBCNu6Gs9oG3E7+TZTjWkRsHvrl7veIfuG1
+wDmOWRsypiq+jj1oHk6mE/4wEzOCL2/Uxyh+ukRjsVNbuLAhqCY=
+=pwLV
 -----END PGP SIGNATURE-----
 
---NQTVMVnDVuULnIzU--
+--t4apE7yKrX2dGgJC--
 
 
