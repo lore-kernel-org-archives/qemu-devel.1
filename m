@@ -7,79 +7,89 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F03C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B83DFC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:30:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EBF02053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:24:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 885BA2075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:30:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KO+bntPy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBF02053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISr/eqEB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 885BA2075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvHAx-0006Hk-Oy
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:24:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49908)
+	id 1jvHGj-0008Ij-SW
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:30:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jvHAG-0005bZ-IU
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:23:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33156
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvHFu-0007YC-Iz
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:29:42 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26786
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jvHAD-0000DS-D2
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:23:52 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvHFs-0000io-O1
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:29:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594718628;
+ s=mimecast20190719; t=1594718979;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rGSI4x/bOBZs9x91PCP+xXyktpW7V19mLrnFH4eiSgc=;
- b=KO+bntPy3dj8tfuR+XFz/Qb1QMhTSJSBujioPoYSLfyFEKIj1dOmV1m+2lEpjtnqpDkRn3
- +4bqIr5Go2gPdJQtM4ReCtwi1/5sZGDY4mSA4WZX8FjbPcWmBW/PSUTC1EtSqpfJDDKdw5
- 1Buunc5hDIlFgMxiu1rvOFGFEQy3vVk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-35xMovGSN-635zBldLFBjg-1; Tue, 14 Jul 2020 05:23:44 -0400
-X-MC-Unique: 35xMovGSN-635zBldLFBjg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A29A818FF69E;
- Tue, 14 Jul 2020 09:23:42 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.163])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADF9E7A460;
- Tue, 14 Jul 2020 09:23:28 +0000 (UTC)
-Date: Tue, 14 Jul 2020 11:23:25 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 3/4] hw/arm/virt-acpi-build: Only expose flash on older
- machine types
-Message-ID: <20200714092325.5klaeqelu46mhg76@kamzik.brq.redhat.com>
-References: <20200629140938.17566-1-drjones@redhat.com>
- <20200629140938.17566-4-drjones@redhat.com>
- <20200713104907.335bf762@redhat.com>
- <20200714055109.owrlob6m53notzh3@kamzik.brq.redhat.com>
- <20200714045537-mutt-send-email-mst@kernel.org>
+ bh=HGpOACpsO5PLTNiwYMGgeO+lwdDjYKSnWF5KlZbRky8=;
+ b=ISr/eqEBA8SyNTuUPdXVsW9aEbBDuGsPQjrOUW3u2pwu1gNLKwMWpThv5xFxE9t713Ed4l
+ 0gW2BWBY7Q/zG7sUIWnrPQWvUAYv3jrHqGM3+5Mm7xpQc60JIuHyhNTYKRxILpbFWZwbyK
+ QhkPyfRXgL0+TZbZlddmIouI+WpChkc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-2XiHyH4cNAu7T25WM4bWEg-1; Tue, 14 Jul 2020 05:29:36 -0400
+X-MC-Unique: 2XiHyH4cNAu7T25WM4bWEg-1
+Received: by mail-wm1-f70.google.com with SMTP id t18so3048044wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 02:29:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=73BpJpKOrRYkd7U50kdJ32miKHDKk0fb0NT30VcSyOU=;
+ b=espTZC2kBPYUI0ayPEzrFMct0VvvL+OVAmOd+8Uc5HIVRwbbiYgJMu1D1Hxzo4/2ic
+ 2S7HF7oBlrgG2GjKRmya3icQ96eQodOiwo82RUXaNrrM5CFQtxWK7/A7PTua/ZFYs4AE
+ N6iE8/R3Wn+IEDSC8GmwA/ApaPs+fn4fuiJ+le9+vaLH1rOoJWdY5v86hlRdlLEzY39z
+ JXkWTIGLoziPTAjAxW5yrNpSwwz7s2ye6637QrOJTqu0OqI3pIyTf4oygswuaRpcrxJR
+ ZDCbdOq+gk3eHxe7HUWshvpXnk1ITR3XiAe57g0mWM2vb8fSM7+gZhEycO5RCBURuxt0
+ kGUg==
+X-Gm-Message-State: AOAM531xFa+IShSNzEsmP6V5BdcGbNThkQJi3hHYdiL8Q8HmLBuspyM3
+ Mg8oqlR7cWjjwqzT1Y7zleE/AXEjodXCUQ2s9+GYFbFlX9mmad2H1qoVY53jYWu1YUr5oIjr5JR
+ Apgko0f/mjQQNRf4=
+X-Received: by 2002:a5d:46c7:: with SMTP id g7mr4011440wrs.365.1594718974879; 
+ Tue, 14 Jul 2020 02:29:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxzhQyYmmFdfjemZhE29TQvWvs04I65Pa5MihNnr/4AArb3JEDEAdFoSFbQnanjoDYzY4RBYw==
+X-Received: by 2002:a5d:46c7:: with SMTP id g7mr4011421wrs.365.1594718974665; 
+ Tue, 14 Jul 2020 02:29:34 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
+ by smtp.gmail.com with ESMTPSA id b62sm3444186wmh.38.2020.07.14.02.29.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jul 2020 02:29:33 -0700 (PDT)
+Date: Tue, 14 Jul 2020 05:29:31 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Subject: Re: [PATCH] Allow acpi-tmr size=2
+Message-ID: <20200714052807-mutt-send-email-mst@kernel.org>
+References: <5f12377f-b640-c4c5-1bcd-858c622c6c31@the-jedi.co.uk>
+ <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
 MIME-Version: 1.0
-In-Reply-To: <20200714045537-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+In-Reply-To: <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -100,108 +110,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, eric.auger@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
- ard.biesheuvel@arm.com, Igor Mammedov <imammedo@redhat.com>, lersek@redhat.com
+Cc: imammedo@redhat.com, Simon John <github@the-jedi.co.uk>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 14, 2020 at 04:57:50AM -0400, Michael S. Tsirkin wrote:
-> On Tue, Jul 14, 2020 at 07:51:09AM +0200, Andrew Jones wrote:
-> > On Mon, Jul 13, 2020 at 10:49:07AM +0200, Igor Mammedov wrote:
-> > > On Mon, 29 Jun 2020 16:09:37 +0200
-> > > Andrew Jones <drjones@redhat.com> wrote:
-> > > 
-> > > > The flash device is exclusively for the host-controlled firmware, so
-> > > > we should not expose it to the OS. Exposing it risks the OS messing
-> > > > with it, which could break firmware runtime services and surprise the
-> > > > OS when all its changes disappear after reboot.
-> > > > 
-> > > > As firmware needs the device and uses DT, we leave the device exposed
-> > > > there. It's up to firmware to remove the nodes from DT before sending
-> > > > it on to the OS. However, there's no need to force firmware to remove
-> > > > tables from ACPI (which it doesn't know how to do anyway), so we
-> > > > simply don't add the tables in the first place. But, as we've been
-> > > > adding the tables for quite some time and don't want to change the
-> > > > default hardware exposed to versioned machines, then we only stop
-> > > > exposing the flash device tables for 5.1 and later machine types.
-> > > > 
-> > > > Suggested-by: Ard Biesheuvel <ard.biesheuvel@arm.com>
-> > > > Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > ---
-> > > >  hw/arm/virt-acpi-build.c | 5 ++++-
-> > > >  hw/arm/virt.c            | 3 +++
-> > > >  include/hw/arm/virt.h    | 1 +
-> > > >  3 files changed, 8 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index 1384a2cf2ab4..91f0df7b13a3 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -749,6 +749,7 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
-> > > >  static void
-> > > >  build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> > > >  {
-> > > > +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-> > > >      Aml *scope, *dsdt;
-> > > >      MachineState *ms = MACHINE(vms);
-> > > >      const MemMapEntry *memmap = vms->memmap;
-> > > > @@ -767,7 +768,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> > > >      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
-> > > >      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
-> > > >                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
-> > > > -    acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-> > > > +    if (vmc->acpi_expose_flash) {
-> > > > +        acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-> > > > +    }
-> > > >      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
-> > > >      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-> > > >                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
-> > > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > > > index cd0834ce7faf..5adc9ff799ef 100644
-> > > > --- a/hw/arm/virt.c
-> > > > +++ b/hw/arm/virt.c
-> > > > @@ -2482,9 +2482,12 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
-> > > >  
-> > > >  static void virt_machine_5_0_options(MachineClass *mc)
-> > > >  {
-> > > > +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> > > > +
-> > > >      virt_machine_5_1_options(mc);
-> > > >      compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-> > > >      mc->numa_mem_supported = true;
-> > > > +    vmc->acpi_expose_flash = true;
-> > > 
-> > > we usually do not version ACPI tables changes
-> > > (unless we have a good reason to do so)
+On Mon, Jul 13, 2020 at 10:20:12AM +0300, Michael Tokarev wrote:
+> 12.07.2020 15:00, Simon John wrote:
+> > macos guests no longer boot after commit 5d971f9e672507210e77d020d89e0e89165c8fc9
 > > 
-> > Even when the change is to remove the exposure of hardware from the guest?
-> > Before this change, if a guest looked, it had a flash, after this change,
-> > if a guest looks, it doesn't.
+> > acpi-tmr needs 2 byte memory accesses, so breaks as that commit only allows 4 bytes.
+> > 
+> > Fixes: 5d971f9e672507210e7 (memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1886318
 > 
-> It's up to the relevant maintainers who know what the semantics are.
-> FYI ACPI tables only change across a reset though.
-> So it's a question of whether guests get confused even if this
-> changes after a reboot.
+> Actually this fixes 77d58b1e47c8d1c661f98f12b47ab519d3561488
+> Author: Gerd Hoffmann <kraxel@redhat.com>
+> Date:   Thu Nov 22 12:12:30 2012 +0100
+> Subject: apci: switch timer to memory api
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> 
+> because this is the commit which put min_access_size = 4 in there
+> (5d971f9e672507210e7 is just a messenger, actual error were here
+> earlier but it went unnoticed).
+> 
+> While min_access_size=4 was most likely an error, I wonder why
+> we use 1 now, while the subject says it needs 2? What real min
+> size is here for ACPI PM timer?
+> 
+> /mjt
 
-Yup, but it's still the same "machine", so a user may wonder why it
-changed.
+And looking at that:
 
-> Versioning is generally safer, but it's a good idea to document
-> the motivation for it.
->
+-    case 0x08:
+-        val = acpi_pm_tmr_get(&s->ar);
+-        break;
+     default:
+         val = 0;
+         break;
 
-Well, in this case, we could probably push this change to old machine
-types and nobody would notice. If a guest is using ACPI, then it must
-be using firmware, and if they're using firmware, then they can't be
-using the flash. So the user shouldn't care if it's there or not. The
-only justification for the versioning is because "it's safer". If
-people feel strongly about avoiding versioning when it's not obviously
-necessary, then I can respin without it.
+So what was going on is reads from 0x10 would just give you 0.
+It looks like Mac OSX does not care much about the value it gets,
+as long as it does not crash :).
 
-Thanks,
-drew
+
+
+> > Signed-off-by: Simon John <git@the-jedi.co.uk>
+> > ---
+> >  hw/acpi/core.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> > index f6d9ec4f13..05ff29b9d7 100644
+> > --- a/hw/acpi/core.c
+> > +++ b/hw/acpi/core.c
+> > @@ -527,7 +527,7 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
+> >  static const MemoryRegionOps acpi_pm_tmr_ops = {
+> >      .read = acpi_pm_tmr_read,
+> >      .write = acpi_pm_tmr_write,
+> > -    .valid.min_access_size = 4,
+> > +    .valid.min_access_size = 1,
+> >      .valid.max_access_size = 4,
+> >      .endianness = DEVICE_LITTLE_ENDIAN,
+> >  };
 
 
