@@ -7,83 +7,81 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45413C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 22:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F52C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 22:30:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CE5C2072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 22:29:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58ECF2072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 22:30:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DuTNakhX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE5C2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fsmy7iX3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58ECF2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvTQC-0004Pq-A4
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 18:29:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50580)
+	id 1jvTRW-0006Qd-IQ
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 18:30:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvTKJ-00023P-9n
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 18:23:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55618
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvTJw-0001Iy-3o
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 18:22:40 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49130
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvTKH-0004wy-Eb
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 18:23:02 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvTJr-0004mW-NR
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 18:22:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594765380;
+ s=mimecast20190719; t=1594765354;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=34BOciJNToD087b3DmEPBjP+atCQ4f8lF8uOK0B/VQo=;
- b=DuTNakhX71xD8GeB9sLqIaANETRwQUsTiY18bZKFdSbqhCnh5EiamS1VYSAmzg6GcpA53r
- tKE04hvDDM1xAXENrJ1TNN6uQgAXjD9BznRdviLd9wflB5acGxyPI8B1OJM5N/a3V4Gssh
- 9LBhH2UW3rIE6gMi7OI6Qs7A21DsJWQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79--Crii8NfNNOcjMzSqN41iQ-1; Tue, 14 Jul 2020 18:22:57 -0400
-X-MC-Unique: -Crii8NfNNOcjMzSqN41iQ-1
-Received: by mail-wm1-f71.google.com with SMTP id w25so3502521wmc.0
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 15:22:57 -0700 (PDT)
+ bh=8hzthc4qYvhQKW4qzzIgQcGvyaWLPgPNTx6+69cJTCU=;
+ b=fsmy7iX3dmfRVchp5g2FdxstGo+V/X6Ey4wFat02jc0epxC1lYmRnXr00ztzLGQJDQmSdJ
+ dlXqsU2nAtEtDz2Jnxhmm1PLQOM68n/9KOSy3t1jQifOLeRubEFio5frKVZoBKSVKvSnW4
+ VBmgcknlNAjDE52IPavrJ7GWr+AfRE8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-vmVq7gf8NDOjhmpU18Zz4g-1; Tue, 14 Jul 2020 18:22:32 -0400
+X-MC-Unique: vmVq7gf8NDOjhmpU18Zz4g-1
+Received: by mail-wr1-f70.google.com with SMTP id j16so24307wrw.3
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 15:22:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=34BOciJNToD087b3DmEPBjP+atCQ4f8lF8uOK0B/VQo=;
- b=GiJamUMrS+XyxFcomsCHKM2z1o1Wb/j68Wws1HE5VGzcAqXk2n1OeGuNuRxMGfqEWx
- 76AQkRlbcfSnl+t6o+Y+qdsU6V72gFi6up+YM3afKh46iEIqGvu2n0wlu4vKEIi/sP+8
- i0B6RU6G1yKBoVxrp49RU7M0ALG4oZ81eyrHfOF64BQ52EtRButtdneLAmSkJ7fZG5iK
- hfq44PFqj9hlfKc3fPJS+vqHN5zGMGLYzBpgyTClFqnRBbRt0nXr7cRCkJrlSkr7aqVX
- YX+sprsp5AomVban5MJMR3syuaTRG9dwBAA1XMTog2g0Tv5NqevZZ1BoIpdEu64kL2EV
- 1tOA==
-X-Gm-Message-State: AOAM532ejtBAioPntoL4tMobxCvgupUflit4Vz/xNkuzWVRiHOX7dBL6
- EylC03wkefh/BkUOwzbR38eHJD32JK8HRl5B6SQ+zW7VAFlJklgNEwBOY+yDPlBYcl/xcVQVHjl
- /imLL8FEeYS+CJVg=
-X-Received: by 2002:adf:e80d:: with SMTP id o13mr7963494wrm.112.1594765375651; 
- Tue, 14 Jul 2020 15:22:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwwNHB5UaUZCpE+Fa7BIw0lDObJzVZX+kL0W1LO6KAsXyqyguMPGZdBEvEHX7rhy4WGiyA3dg==
-X-Received: by 2002:adf:e80d:: with SMTP id o13mr7963479wrm.112.1594765375473; 
- Tue, 14 Jul 2020 15:22:55 -0700 (PDT)
+ bh=8hzthc4qYvhQKW4qzzIgQcGvyaWLPgPNTx6+69cJTCU=;
+ b=QmrJCsuEWQdHEaYnYrw//XSBGOU0Q7ZE0V/RP9at1ZL3zY/fR/RYu+iERtYv9kXtJr
+ Kj+opY/VKUFWB8JpVcYHp1u4h5sU5+1NasSM0Q+ZONfzbIw/b0uG44Zqn4swZtHzHlmI
+ 5NtoPVcpeJ1wMbBpuNGBrn75Twkqao8FUHlkbcSrRYtOuJIgh3zEPbF+iJNgvuL29XJJ
+ AlU71DWGh96CnbYf14msPCWgNUCl7GQV0cwnv7UvoNc2XEYLpnvJ3PVeOWraGFAThbOz
+ SyUOyicJY8IEDHx2w/zQ6aPLCketG+3u4OCpi+5mwMT97yT6Geg9YRShZiFzTSe57Nbx
+ F7iQ==
+X-Gm-Message-State: AOAM530duhG/XiVWzOwfwRfxXb1XUf0bO/6M+/j9KjCjimFwoOXyMEg2
+ zqQH+TrxOolyNL2nzHI9d4lNafNTK5QfsOK8s35e5iDN38xnAmwUZmUUdcHylVPUPprzjeROSWF
+ 0SZBABoB55EscdtE=
+X-Received: by 2002:a1c:4143:: with SMTP id o64mr5968361wma.28.1594765351521; 
+ Tue, 14 Jul 2020 15:22:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUaBM960e1W2k0JPK2oz/7iOCe0w8tZXN2hSZVzOC+HuJsoZl+NLiRrqi5sJLjA9e40K7m6w==
+X-Received: by 2002:a1c:4143:: with SMTP id o64mr5968348wma.28.1594765351309; 
+ Tue, 14 Jul 2020 15:22:31 -0700 (PDT)
 Received: from localhost.localdomain
  (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id a2sm160275wrn.68.2020.07.14.15.22.54
+ by smtp.gmail.com with ESMTPSA id c25sm299889wml.18.2020.07.14.15.22.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jul 2020 15:22:54 -0700 (PDT)
+ Tue, 14 Jul 2020 15:22:30 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/19] python/qmp.py: Do not return None from cmd_obj
-Date: Wed, 15 Jul 2020 00:21:30 +0200
-Message-Id: <20200714222132.10815-18-philmd@redhat.com>
+Subject: [PULL 12/19] python/machine.py: re-add sigkill warning suppression
+Date: Wed, 15 Jul 2020 00:21:25 +0200
+Message-Id: <20200714222132.10815-13-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200714222132.10815-1-philmd@redhat.com>
 References: <20200714222132.10815-1-philmd@redhat.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
@@ -113,64 +111,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- John Snow <jsnow@redhat.com>, Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: John Snow <jsnow@redhat.com>
 
-This makes typing the qmp library difficult, as it necessitates wrapping
-Optional[] around the type for every return type up the stack. At some
-point, it becomes difficult to discern or remember why it's None instead
-of the expected object.
-
-Use the python exception system to tell us exactly why we didn't get an
-object. Remove this special-cased return.
+If the user kills QEMU on purpose, we don't need to warn
+them about that having happened: they know already.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200710052220.3306-5-jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20200710050649.32434-12-jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- python/qemu/qmp.py | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ python/qemu/machine.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-index aa8a666b8a..ef3c919b76 100644
---- a/python/qemu/qmp.py
-+++ b/python/qemu/qmp.py
-@@ -225,22 +225,18 @@ def accept(self, timeout=15.0):
-         self.__sockfile = self.__sock.makefile(mode='r')
-         return self.__negotiate_capabilities()
+diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+index a955e3f221..736a3c906f 100644
+--- a/python/qemu/machine.py
++++ b/python/qemu/machine.py
+@@ -22,6 +22,7 @@
+ import os
+ import subprocess
+ import shutil
++import signal
+ import socket
+ import tempfile
+ from typing import Optional, Type
+@@ -133,6 +134,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+         self._console_address = None
+         self._console_socket = None
+         self._remove_files = []
++        self._user_killed = False
+         self._console_log_path = console_log
+         if self._console_log_path:
+             # In order to log the console, buffering needs to be enabled.
+@@ -327,7 +329,8 @@ def _post_shutdown(self):
+             self._remove_if_exists(self._remove_files.pop())
  
--    def cmd_obj(self, qmp_cmd):
-+    def cmd_obj(self, qmp_cmd: QMPMessage) -> QMPMessage:
-         """
-         Send a QMP command to the QMP Monitor.
+         exitcode = self.exitcode()
+-        if exitcode is not None and exitcode < 0:
++        if (exitcode is not None and exitcode < 0
++                and not (self._user_killed and exitcode == -signal.SIGKILL)):
+             msg = 'qemu received signal %i; command: "%s"'
+             if self._qemu_full_args:
+                 command = ' '.join(self._qemu_full_args)
+@@ -335,6 +338,7 @@ def _post_shutdown(self):
+                 command = ''
+             LOG.warning(msg, -int(exitcode), command)
  
-         @param qmp_cmd: QMP command to be sent as a Python dict
--        @return QMP response as a Python dict or None if the connection has
--                been closed
-+        @return QMP response as a Python dict
-         """
-         self.logger.debug(">>> %s", qmp_cmd)
--        try:
--            self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
--        except OSError as err:
--            if err.errno == errno.EPIPE:
--                return None
--            raise err
-+        self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
-         resp = self.__json_read()
-+        if resp is None:
-+            raise QMPConnectError("Unexpected empty reply from server")
-         self.logger.debug("<<< %s", resp)
-         return resp
++        self._user_killed = False
+         self._launched = False
  
+     def launch(self):
+@@ -469,6 +473,7 @@ def shutdown(self, has_quit: bool = False,
+ 
+         try:
+             if hard:
++                self._user_killed = True
+                 self._hard_shutdown()
+             else:
+                 self._do_shutdown(has_quit, timeout=timeout)
 -- 
 2.21.3
 
