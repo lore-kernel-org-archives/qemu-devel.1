@@ -2,121 +2,83 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E0FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB72EC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:58:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B08A122200
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:58:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9668522200
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 10:58:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C/PENxJk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B08A122200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQ7zKssZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9668522200
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvIdR-0005t6-1b
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 06:58:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46092)
+	id 1jvIdb-00069h-TW
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 06:58:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvIcU-0004pN-22
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:57:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38592
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jvIcN-0004nX-Jy
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:57:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36544
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvIcS-0004Nt-Av
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:57:05 -0400
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jvIcL-0004NE-Sl
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 06:56:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594724221;
+ s=mimecast20190719; t=1594724217;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=etprOSjj5ufJtLQjzfFPIW2kynJKt7RtjKDFY3yw2GA=;
- b=C/PENxJky+L6LeiKrKlGZAwvoBp2eU3xMg5jnbsKs+i3n3oE4tHJGch9Daac1AT2f9yyNe
- s3rerKw/FBWqWmK3mGTXxOEKCEKT5YltjcRVNNZDe8OeuZyNKWrhKjiZmr9wqL6/FHp8Jk
- /v4HCtcnxM/mfYJKxldzyrmzuuw88Vw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-_5WfNwdXNTq8kgHuEujudQ-1; Tue, 14 Jul 2020 06:56:58 -0400
-X-MC-Unique: _5WfNwdXNTq8kgHuEujudQ-1
-Received: by mail-wr1-f69.google.com with SMTP id 89so21135976wrr.15
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 03:56:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=etprOSjj5ufJtLQjzfFPIW2kynJKt7RtjKDFY3yw2GA=;
- b=JStGnIvbXzu8oRAbbgHjIIZJAO2NPVZJsF5NA0B/2m/GjeUn7wNXOg+kErFEZmsZBN
- wHQv54RcwGqALB4+x1otHGlhe7T6g0iYRZFAPhz4KWcoK5wtp6bROf3zb7oh2L4Fqwse
- kZLhcBWdUXcrWApWHK6bWOAkxL+6GAfiIxza22a/N8etmWG4uOOhUEy4X4JWjkoI6+MI
- DoIJnGUfmWI7vX6ZA+A3e94KH4dXniGu4cdICsrlMcR5+NILmEfZnuCmxNJnsNN33/52
- WSIykQZnUy7PiQ7e92k5E/JrXCQROEL0vaEKNDtHKyGZ73+Gv41Gkun9sctAwk3x9CLH
- xbzw==
-X-Gm-Message-State: AOAM530ScILz3qg/BRsRLo/Q+kqY9n9drbk+9xGphtZb6vAVMv+bMYLM
- FuyNcHakHau5Xdfuy6UNeZNi5zdXehZ+fgljGu3h2mggPKWxPiK5zQ9ggeWSi+eQvIIcwDHBQu7
- XjaSkC7ab+/3BBUc=
-X-Received: by 2002:a5d:6a90:: with SMTP id s16mr4454374wru.8.1594724217173;
- Tue, 14 Jul 2020 03:56:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCfNNvU/t4u/7bsk5rZF6KZpw6xwwr8YofNqAjQUzzbGNL2Pp/maBHie8w1a3gQ945c/QQow==
-X-Received: by 2002:a5d:6a90:: with SMTP id s16mr4454356wru.8.1594724217034;
- Tue, 14 Jul 2020 03:56:57 -0700 (PDT)
-Received: from [192.168.1.43] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id u20sm3680661wmm.15.2020.07.14.03.56.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 03:56:56 -0700 (PDT)
-Subject: Re: [PATCH for-5.1] acpi-pm-tmr: allow 2-byte reads
-To: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org
-References: <20200714095518.16241-1-mjt@msgid.tls.msk.ru>
- <464386eb-ad88-2fe8-d943-6febe511eb6a@redhat.com>
- <44bb4516-197d-27dd-4977-dfc6c064154c@msgid.tls.msk.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <17588aac-6a14-0aef-6e60-a38436d2046c@redhat.com>
-Date: Tue, 14 Jul 2020 12:56:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ in-reply-to:in-reply-to:references:references;
+ bh=BkD3nJgdt08CwzUbQp6tN0BzIevzpa/9L9UdWzEcFug=;
+ b=AQ7zKssZoRL4vmR+7oe2h9E/MIVWvLIO8t2U9Ti3goHv3HPAecALoBcaqpPRgFCVm+sUjD
+ 13ThzpsU+AGNCLi5BLq/tn407ccfBU65+IsebcfgiFt3zSeQvAouQ2jqe3zFp4YciHZ5tD
+ Qwy9PPM6SowYpgE7LJNZhiNQAw/4p+A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-FON2jF2eNcit5BqHxhHCgg-1; Tue, 14 Jul 2020 06:56:53 -0400
+X-MC-Unique: FON2jF2eNcit5BqHxhHCgg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 988D51086;
+ Tue, 14 Jul 2020 10:56:52 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-110.ams2.redhat.com
+ [10.36.114.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88D967B408;
+ Tue, 14 Jul 2020 10:56:51 +0000 (UTC)
+Subject: Re: [RFC 2/3] x86: cphp: prevent guest crash on CPU hotplug when
+ broadcast SMI is in use
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200710161704.309824-1-imammedo@redhat.com>
+ <20200710161704.309824-3-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <e3598f14-2e91-436c-9a8c-c3b3a36b9190@redhat.com>
+Date: Tue, 14 Jul 2020 12:56:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <44bb4516-197d-27dd-4977-dfc6c064154c@msgid.tls.msk.ru>
+In-Reply-To: <20200710161704.309824-3-imammedo@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -137,36 +99,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Simon John <git@the-jedi.co.uk>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: boris.ostrovsky@oracle.com, liran.alon@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/14/20 12:55 PM, Michael Tokarev wrote:
-> 14.07.2020 13:26, Philippe Mathieu-Daudé пишет:
->> On 7/14/20 11:55 AM, Michael Tokarev wrote:
->>> As found in LP#964247, MacOS Catalina performs 2-byte reads
->>> on the acpi timer address space while the spec says it should
->>> be 4-byte. Allow 2-byte reads.
->>
->> https://bugs.launchpad.net/qemu/+bug/964247 is about Unity-2D shell...
-> 
-> It's a debian bug# ( http://bugs.debian.org/964247 ), not LP, the
-> right LP bug is LP#1886318 . Mixed the two wrongly, I'm sorry for that.
+On 07/10/20 18:17, Igor Mammedov wrote:
+> There were reports of guest crash on CPU hotplug, when using q35 machine
+> type and QVMF with Secure Boot, due to hotplugged CPU trying to process SMI
 
-Ah, no worry. Please include in the tags:
+(1) typo: s/QVMF/OVMF/ please
 
-BugLink: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=964247
+(2) Please replace "Secure Boot" with "SMM". In everyday practice it's
+OK to use them interchangeably, but in this commit message I'd like us
+to be more precise.
 
-> I resent a v2, also allowing 1-byte access as suggested by mst.
-> 
->> What is the target hardware used here?
-> 
-> It's x86.
-> 
-> Thanks,
-> 
-> /mjt
-> 
+> at default SMI handler location without it being relocated by firmware first.
+>
+> Fix it by refusing hotplug if firmware hasn't negotiatiad CPU hotplug SMI
+
+(3) s/negotiatiad/negotiated/
+
+> support while SMI broadcast is in use.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/acpi/ich9.c | 12 +++++++++++-
+>  hw/i386/pc.c   | 11 +++++++++++
+>  2 files changed, 22 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+> index 2d204babc6..a22b434e0b 100644
+> --- a/hw/acpi/ich9.c
+> +++ b/hw/acpi/ich9.c
+> @@ -408,10 +408,20 @@ void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+>
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+> -        !lpc->pm.acpi_memory_hotplug.is_enabled)
+> +        !lpc->pm.acpi_memory_hotplug.is_enabled) {
+>          error_setg(errp,
+>                     "memory hotplug is not enabled: %s.memory-hotplug-support "
+>                     "is not set", object_get_typename(OBJECT(lpc)));
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> +        uint64_t negotiated = lpc->smi_negotiated_features;
+
+Wow, this is a relief. I thought it would be a difficult problem to
+access the ICH9-LPC object cleanly, on the call stack of the device_add
+command. I didn't imagine it would be at our disposal immediately.
+
+> +
+> +        if (negotiated & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT) &&
+> +            !(negotiated & BIT_ULL(ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT))) {
+> +            error_setg(errp, "cpu hotplug SMI was not enabled by firmware");
+
+(4) Please let's call this
+
+  cpu hotplug *with* SMI
+
+not just
+
+  cpu hotplug SMI
+
+(Emphasis added on "with" just for the sake of this discussion; no need
+to embed the asterisks in the message.)
+
+Because:
+
+In my thinking, the feature that the firmware negotiates is not:
+
+  SMI or no SMI, on CPU hotplug
+
+Instead, the firmware negotiates:
+
+  CPU hotplug with SMI, or no CPU hotplug
+
+IOW, "SMI-or-no-SMI" is not a sub-feature of CPU hotplug; the feature
+being negotiated, when SMI broadcast is enabled, is CPU hotplug as a
+whole. That's exactly what this patch implements.
+
+
+> +            error_append_hint(errp, "update machine type to newer than 5.0 "
+> +                "and firmware that suppors CPU hotplug in Secure Boot mode");
+
+(5) Please replace
+
+  "in Secure Boot mode"
+
+with
+
+  "with SMM"
+
+(for "firmware that suppors CPU hotplug with SMM")
+
+> +        }
+> +    }
+>  }
+>
+>  void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 6fe80c84d7..dc1e9157d7 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1508,6 +1508,17 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          return;
+>      }
+>
+> +    if (pcms->acpi_dev) {
+> +        Error *local_err = NULL;
+> +
+> +        hotplug_handler_pre_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
+> +                                 &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            return;
+> +        }
+> +    }
+> +
+>      init_topo_info(&topo_info, x86ms);
+>
+>      env->nr_dies = x86ms->smp_dies;
+>
+
+(6) This looks sane to me, but I have a question for the *pre-patch*
+code.
+
+I notice that hotplug_handler_pre_plug() is already called from the
+(completely unrelated) function pc_memory_pre_plug().
+
+In pc_memory_pre_plug(), we have the following snippet:
+
+    /*
+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
+     * addition to cover this case.
+     */
+    if (!pcms->acpi_dev || !x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
+        error_setg(errp,
+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
+        return;
+    }
+
+Whereas in pc_cpu_pre_plug(), the present patch only adds a
+"pcms->acpi_dev" nullity check.
+
+Should pc_cpu_pre_plug() check for ACPI enablement similarly to
+pc_memory_pre_plug()?
+
+I'm asking for two reasons:
+
+(6a) for the feature at hand (CPU hotplug with SMI), maybe we should
+write:
+
+    if (pcms->acpi_dev && x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
+
+(6b) or maybe more strictly, copy the check from memory hotplug (just
+update the error message):
+
+    if (!pcms->acpi_dev || !x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
+        error_setg(errp,
+                   "CPU hotplug is not enabled: missing acpi device or acpi disabled");
+        return;
+    }
+
+Because CPU hotplug depends on ACPI too, just like memory hotplug,
+regardless of firmware, and regardless of guest-SMM. Am I correct to
+think that?
+
+Basically, I'm asking if we should replicate original commit
+8cd91acec8df ("pc: fail memory hot-plug/unplug with -no-acpi and Q35
+machine type", 2018-01-12) for CPU hotplug first (in a separate patch!),
+before dealing with "lpc->smi_negotiated_features" in this patch.
+
+Hmm... I'm getting confused. I *do* see similar checks in pc_cpu_plug()
+and pc_cpu_unplug_request_cb(). But:
+
+- I don't understand what determines whether we put the ACPI check in
+*PRE* plug functions, or the plug functions,
+
+- and I don't understand why pc_cpu_plug() and
+pc_cpu_unplug_request_cb() only check "pcms->acpi_dev", and not
+x86_machine_is_acpi_enabled().
+
+
+(7) According to my request under patch#1, I propose that we should
+implement a similar rejection for CPU hot-unplug, in this series. (Can
+be a separate patch, of course.)
+
+Thanks!
+Laszlo
 
 
