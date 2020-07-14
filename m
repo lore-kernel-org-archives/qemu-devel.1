@@ -2,75 +2,87 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDC3C433EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E82FC43446
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 21:02:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3A202067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 20:55:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3A202067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CA1562064C
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 21:02:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HVrNrLxb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA1562064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvRxV-0003gb-2q
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 16:55:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48120)
+	id 1jvS3x-0006iW-35
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 17:02:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jvRwu-0002mp-7W
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:54:48 -0400
-Resent-Date: Tue, 14 Jul 2020 16:54:48 -0400
-Resent-Message-Id: <E1jvRwu-0002mp-7W@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21376)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jvS2M-0005jL-QG
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 17:00:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27433
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jvRwq-0003Ue-Dv
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 16:54:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594760072; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mGu95dcJ6DVJtfdZhNuP6JSDzqxBr7HV32Wmuqzk9OmDKPb/Ibpo21tc0swZA58ulPTsCZj3gJtweSbUxCKZchqNTG2UCntxJ3wQECfKJVL7BKGV+qqbcEUsQpGSRIrSAzeirnasdOd4XI3NOfBtrUwV/lrNWjReh+qL0kM9PBY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594760072;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=hpaGPo/DF3Jw9JT2efN6fyjMJdOmHBXjMm1HwX5ARnA=; 
- b=kzyrjSbjFS40uf8X0wjxJ2n88lZZDwC7ENaqKGJVtC4v34RvA6g7wNIjQJe0/UrICoWerpmFuTHrkOFJOHgmdIbIIM2m7W05aVF2Cg7fKYPqvp7QWFT/zMda07fa74Vtnp7SV0pJ88XO26UW5kbUnDyTmEgaAyEpbE3IS10GTA8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1594760070798381.2792955351945;
- Tue, 14 Jul 2020 13:54:30 -0700 (PDT)
-Subject: Re: [PATCH] linux-user: Add strace support for printing arguments for
- ioctls used for terminals and serial lines
-Message-ID: <159476006968.11884.18325341812064512094@07a7f0d89f7d>
-In-Reply-To: <20200714200439.11328-1-Filip.Bozuta@syrmia.com>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jvS2J-0004e3-6h
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 17:00:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594760421;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cSM5fxb0uVcO9SHCvJ1b0FiIX2VVoi8pq0fYNwpoFkw=;
+ b=HVrNrLxbLswJwFhfp3/lfBw8E6Qf9MMWuB9okMw5m88QBratG9EajfAMye0aAwxNKvVGoQ
+ oTB6MynKn4I0JZTncLLc0cYtE8cmciKDb2EvWD52y6kNf4B8MpuR/PbVO9PrhEhrZcBzor
+ M8sbxbPPzEAwl/K8rewbdLu3eRyD5XM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-435-CagJpU0GMwKjZGZf3TfEbQ-1; Tue, 14 Jul 2020 17:00:18 -0400
+X-MC-Unique: CagJpU0GMwKjZGZf3TfEbQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B450A4D15;
+ Tue, 14 Jul 2020 21:00:12 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C8DB610013C3;
+ Tue, 14 Jul 2020 20:59:48 +0000 (UTC)
+Date: Tue, 14 Jul 2020 14:59:48 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200714145948.17b95eb3@x1.home>
+In-Reply-To: <20200714171946.GL2728@work-vm>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <20200714102129.GD25187@redhat.com>
+ <20200714101616.5d3a9e75@x1.home> <20200714171946.GL2728@work-vm>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: Filip.Bozuta@syrmia.com
-Date: Tue, 14 Jul 2020 13:54:30 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 16:54:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Received-SPF: pass client-ip=207.211.31.81;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 12:02:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,72 +95,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, Filip.Bozuta@syrmia.com,
- laurent@vivier.eu
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+ corbet@lwn.net, openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>, eskultet@redhat.com,
+ jian-feng.ding@intel.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, cohuck@redhat.com,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcxNDIwMDQzOS4xMTMy
-OC0xLUZpbGlwLkJvenV0YUBzeXJtaWEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA3MTQyMDA0Mzku
-MTEzMjgtMS1GaWxpcC5Cb3p1dGFAc3lybWlhLmNvbQpTdWJqZWN0OiBbUEFUQ0hdIGxpbnV4LXVz
-ZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIGZvciBpb2N0bHMg
-dXNlZCBmb3IgdGVybWluYWxzIGFuZCBzZXJpYWwgbGluZXMKCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
-dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogICBkMjYyOGIxLi44YmZhMjVhICBtYXN0ZXIgICAgIC0+IG1hc3RlcgpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFlOWYxOWEgbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBw
-b3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgZm9yIGlvY3RscyB1c2VkIGZvciB0ZXJtaW5hbHMg
-YW5kIHNlcmlhbCBsaW5lcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IHN0b3JhZ2UgY2xh
-c3Mgc2hvdWxkIGJlIGF0IHRoZSBiZWdpbm5pbmcgb2YgdGhlIGRlY2xhcmF0aW9uCiM3NTogRklM
-RTogbGludXgtdXNlci9zdHJhY2UuYzoxMTk2OgorVU5VU0VEIHN0YXRpYyBzdHJ1Y3QgZmxhZ3Mg
-dGVybWlvc19pZmxhZ3NbXSA9IHsKCkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0
-aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJhdGlvbgojOTM6IEZJTEU6IGxpbnV4LXVzZXIvc3Ry
-YWNlLmM6MTIxNDoKK1VOVVNFRCBzdGF0aWMgc3RydWN0IGZsYWdzIHRlcm1pb3Nfb2ZsYWdzW10g
-PSB7CgpFUlJPUjogc3RvcmFnZSBjbGFzcyBzaG91bGQgYmUgYXQgdGhlIGJlZ2lubmluZyBvZiB0
-aGUgZGVjbGFyYXRpb24KIzEwNTogRklMRTogbGludXgtdXNlci9zdHJhY2UuYzoxMjI2OgorVU5V
-U0VEIHN0YXRpYyBzdHJ1Y3QgZmxhZ3MgdGVybWlvc19vZmxhZ3NfTkxETFlbXSA9IHsKCkVSUk9S
-OiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJh
-dGlvbgojMTExOiBGSUxFOiBsaW51eC11c2VyL3N0cmFjZS5jOjEyMzI6CitVTlVTRUQgc3RhdGlj
-IHN0cnVjdCBmbGFncyB0ZXJtaW9zX29mbGFnc19DUkRMWVtdID0gewoKRVJST1I6IHN0b3JhZ2Ug
-Y2xhc3Mgc2hvdWxkIGJlIGF0IHRoZSBiZWdpbm5pbmcgb2YgdGhlIGRlY2xhcmF0aW9uCiMxMTk6
-IEZJTEU6IGxpbnV4LXVzZXIvc3RyYWNlLmM6MTI0MDoKK1VOVVNFRCBzdGF0aWMgc3RydWN0IGZs
-YWdzIHRlcm1pb3Nfb2ZsYWdzX1RBQkRMWVtdID0gewoKRVJST1I6IHN0b3JhZ2UgY2xhc3Mgc2hv
-dWxkIGJlIGF0IHRoZSBiZWdpbm5pbmcgb2YgdGhlIGRlY2xhcmF0aW9uCiMxMjc6IEZJTEU6IGxp
-bnV4LXVzZXIvc3RyYWNlLmM6MTI0ODoKK1VOVVNFRCBzdGF0aWMgc3RydWN0IGZsYWdzIHRlcm1p
-b3Nfb2ZsYWdzX1ZURExZW10gPSB7CgpFUlJPUjogc3RvcmFnZSBjbGFzcyBzaG91bGQgYmUgYXQg
-dGhlIGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzEzMzogRklMRTogbGludXgtdXNlci9z
-dHJhY2UuYzoxMjU0OgorVU5VU0VEIHN0YXRpYyBzdHJ1Y3QgZmxhZ3MgdGVybWlvc19vZmxhZ3Nf
-RkZETFlbXSA9IHsKCkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5u
-aW5nIG9mIHRoZSBkZWNsYXJhdGlvbgojMTM5OiBGSUxFOiBsaW51eC11c2VyL3N0cmFjZS5jOjEy
-NjA6CitVTlVTRUQgc3RhdGljIHN0cnVjdCBmbGFncyB0ZXJtaW9zX29mbGFnc19CU0RMWVtdID0g
-ewoKRVJST1I6IHN0b3JhZ2UgY2xhc3Mgc2hvdWxkIGJlIGF0IHRoZSBiZWdpbm5pbmcgb2YgdGhl
-IGRlY2xhcmF0aW9uCiMxNDU6IEZJTEU6IGxpbnV4LXVzZXIvc3RyYWNlLmM6MTI2NjoKK1VOVVNF
-RCBzdGF0aWMgc3RydWN0IGZsYWdzIHRlcm1pb3NfY2ZsYWdzX0NCQVVEW10gPSB7CgpFUlJPUjog
-c3RvcmFnZSBjbGFzcyBzaG91bGQgYmUgYXQgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRp
-b24KIzE2OTogRklMRTogbGludXgtdXNlci9zdHJhY2UuYzoxMjkwOgorVU5VU0VEIHN0YXRpYyBz
-dHJ1Y3QgZmxhZ3MgdGVybWlvc19jZmxhZ3NfQ1NJWkVbXSA9IHsKCkVSUk9SOiBzdG9yYWdlIGNs
-YXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJhdGlvbgojMTc3OiBG
-SUxFOiBsaW51eC11c2VyL3N0cmFjZS5jOjEyOTg6CitVTlVTRUQgc3RhdGljIHN0cnVjdCBmbGFn
-cyB0ZXJtaW9zX2NmbGFnc1tdID0gewoKRVJST1I6IHN0b3JhZ2UgY2xhc3Mgc2hvdWxkIGJlIGF0
-IHRoZSBiZWdpbm5pbmcgb2YgdGhlIGRlY2xhcmF0aW9uCiMxODg6IEZJTEU6IGxpbnV4LXVzZXIv
-c3RyYWNlLmM6MTMwOToKK1VOVVNFRCBzdGF0aWMgc3RydWN0IGZsYWdzIHRlcm1pb3NfbGZsYWdz
-W10gPSB7Cgp0b3RhbDogMTIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNjAgbGluZXMgY2hlY2tlZAoK
-Q29tbWl0IGFlOWYxOWExNjVhNiAobGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBw
-cmludGluZyBhcmd1bWVudHMgZm9yIGlvY3RscyB1c2VkIGZvciB0ZXJtaW5hbHMgYW5kIHNlcmlh
-bCBsaW5lcykgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3MTQyMDA0MzkuMTEzMjgtMS1GaWxp
-cC5Cb3p1dGFAc3lybWlhLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+On Tue, 14 Jul 2020 18:19:46 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+
+> * Alex Williamson (alex.williamson@redhat.com) wrote:
+> > On Tue, 14 Jul 2020 11:21:29 +0100
+> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >  =20
+> > > On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote: =20
+> > > > hi folks,
+> > > > we are defining a device migration compatibility interface that hel=
+ps upper
+> > > > layer stack like openstack/ovirt/libvirt to check if two devices are
+> > > > live migration compatible.
+> > > > The "devices" here could be MDEVs, physical devices, or hybrid of t=
+he two.
+> > > > e.g. we could use it to check whether
+> > > > - a src MDEV can migrate to a target MDEV,
+> > > > - a src VF in SRIOV can migrate to a target VF in SRIOV,
+> > > > - a src MDEV can migration to a target VF in SRIOV.
+> > > >   (e.g. SIOV/SRIOV backward compatibility case)
+> > > >=20
+> > > > The upper layer stack could use this interface as the last step to =
+check
+> > > > if one device is able to migrate to another device before triggerin=
+g a real
+> > > > live migration procedure.
+> > > > we are not sure if this interface is of value or help to you. pleas=
+e don't
+> > > > hesitate to drop your valuable comments.
+> > > >=20
+> > > >=20
+> > > > (1) interface definition
+> > > > The interface is defined in below way:
+> > > >=20
+> > > >              __    userspace
+> > > >               /\              \
+> > > >              /                 \write
+> > > >             / read              \
+> > > >    ________/__________       ___\|/_____________
+> > > >   | migration_version |     | migration_version |-->check migration
+> > > >   ---------------------     ---------------------   compatibility
+> > > >      device A                    device B
+> > > >=20
+> > > >=20
+> > > > a device attribute named migration_version is defined under each de=
+vice's
+> > > > sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/mi=
+gration_version).
+> > > > userspace tools read the migration_version as a string from the sou=
+rce device,
+> > > > and write it to the migration_version sysfs attribute in the target=
+ device.
+> > > >=20
+> > > > The userspace should treat ANY of below conditions as two devices n=
+ot compatible:
+> > > > - any one of the two devices does not have a migration_version attr=
+ibute
+> > > > - error when reading from migration_version attribute of one device
+> > > > - error when writing migration_version string of one device to
+> > > >   migration_version attribute of the other device
+> > > >=20
+> > > > The string read from migration_version attribute is defined by devi=
+ce vendor
+> > > > driver and is completely opaque to the userspace.
+> > > > for a Intel vGPU, string format can be defined like
+> > > > "parent device PCI ID" + "version of gvt driver" + "mdev type" + "a=
+ggregator count".
+> > > >=20
+> > > > for an NVMe VF connecting to a remote storage. it could be
+> > > > "PCI ID" + "driver version" + "configured remote storage URL"
+> > > >=20
+> > > > for a QAT VF, it may be
+> > > > "PCI ID" + "driver version" + "supported encryption set".
+> > > >=20
+> > > > (to avoid namespace confliction from each vendor, we may prefix a d=
+river name to
+> > > > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_=
+8-1) =20
+> >=20
+> > It's very strange to define it as opaque and then proceed to describe
+> > the contents of that opaque string.  The point is that its contents
+> > are defined by the vendor driver to describe the device, driver version,
+> > and possibly metadata about the configuration of the device.  One
+> > instance of a device might generate a different string from another.
+> > The string that a device produces is not necessarily the only string
+> > the vendor driver will accept, for example the driver might support
+> > backwards compatible migrations. =20
+>=20
+> (As I've said in the previous discussion, off one of the patch series)
+>=20
+> My view is it makes sense to have a half-way house on the opaqueness of
+> this string; I'd expect to have an ID and version that are human
+> readable, maybe a device ID/name that's human interpretable and then a
+> bunch of other cruft that maybe device/vendor/version specific.
+>=20
+> I'm thinking that we want to be able to report problems and include the
+> string and the user to be able to easily identify the device that was
+> complaining and notice a difference in versions, and perhaps also use
+> it in compatibility patterns to find compatible hosts; but that does
+> get tricky when it's a 'ask the device if it's compatible'.
+
+In the reply I just sent to Dan, I gave this example of what a
+"compatibility string" might look like represented as json:
+
+{
+  "device_api": "vfio-pci",
+  "vendor": "vendor-driver-name",
+  "version": {
+    "major": 0,
+    "minor": 1
+  },
+  "vfio-pci": { // Based on above device_api
+    "vendor": 0x1234, // Values for the exposed device
+    "device": 0x5678,
+      // Possibly further parameters for a more specific match
+  },
+  "mdev_attrs": [
+    { "attribute0": "VALUE" }
+  ]
+}
+
+Are you thinking that we might allow the vendor to include a vendor
+specific array where we'd simply require that both sides have matching
+fields and values?  ie.
+
+  "vendor_fields": [
+    { "unknown_field0": "unknown_value0" },
+    { "unknown_field1": "unknown_value1" },
+  ]
+
+We could certainly make that part of the spec, but I can't really
+figure the value of it other than to severely restrict compatibility,
+which the vendor could already do via the version.major value.  Maybe
+they'd want to put a build timestamp, random uuid, or source sha1 into
+such a field to make absolutely certain compatibility is only determined
+between identical builds?  Thanks,
+
+Alex
+
 
