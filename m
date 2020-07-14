@@ -2,101 +2,80 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE1FFC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEC0C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:11:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CAFB2247F
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:58:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 958AD21D79
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:11:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ift1fHL5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CAFB2247F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUnGGU+F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958AD21D79
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvKVU-0001Kg-OW
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 08:58:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47906)
+	id 1jvKiJ-0004bt-Mu
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 09:11:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jvKUj-0000pB-EW
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:57:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29936
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jvKhe-0003ze-SP
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:10:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46799
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jvKUh-0003dK-I6
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:57:13 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jvKhc-0005bX-3U
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:10:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594731430;
+ s=mimecast20190719; t=1594732230;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hM4SskHi4B+9ZBfR/onSBH+8Gs8ITTY9Uzu0XBQ0Kko=;
- b=ift1fHL5Je33OpH0vnv60zZruu4NGdMhe9Kx/poY86sItuf7FpFpQ9uTF80+d4yQTyEd/3
- 1UOSSCsEPcwj6HNF+i6yWwoVi7u0JyVfhd77/KX9s1hrq21JXXBxwZEzfaHT6yfLO/zXcT
- ReAKMIHZIuSbgdet0kyy28+wsSL4434=
+ in-reply-to:in-reply-to:references:references;
+ bh=FKRvD68ipKohwE5zewGkEezEMPP9hlme5Xedm2n5j0g=;
+ b=PUnGGU+FN0Zo/FQajOTNc0TeMZYX/7WxjDpFqG57GRJunNjitJbF2HoHHE+eALrUNaHIif
+ EskScp3X61TTroh1+4ryJ7Gab2gDTi6YAEfGnLe5hE2whZnQ7aB8meGWqHDqpIUovXCo89
+ YnZpokdcwu+U2CfZTVYPbnpPKwJWlK4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-AzeRurNRN6eWop_GKaR47A-1; Tue, 14 Jul 2020 08:57:01 -0400
-X-MC-Unique: AzeRurNRN6eWop_GKaR47A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-386-Xv0ibhBONlG11mZAcGqnCA-1; Tue, 14 Jul 2020 09:10:26 -0400
+X-MC-Unique: Xv0ibhBONlG11mZAcGqnCA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C79DD107ACCA;
- Tue, 14 Jul 2020 12:57:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-179.ams2.redhat.com
- [10.36.113.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C54760BEC;
- Tue, 14 Jul 2020 12:56:58 +0000 (UTC)
-Subject: Re: [PATCH v11 00/34] Add subcluster allocation to qcow2
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1594396418.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e428a843-f27a-4e8e-8be2-bf6566c76a2f@redhat.com>
-Date: Tue, 14 Jul 2020 14:56:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28D778014D7;
+ Tue, 14 Jul 2020 13:10:25 +0000 (UTC)
+Received: from kaapi (unknown [10.33.36.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 12D4510013C1;
+ Tue, 14 Jul 2020 13:10:13 +0000 (UTC)
+Date: Tue, 14 Jul 2020 18:40:11 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 1/1] MAINTAINERS: introduce cve or security quotient field
+In-Reply-To: <20200714064921-mutt-send-email-mst@kernel.org>
+Message-ID: <nycvar.YSQ.7.78.906.2007141723140.6870@xnncv>
+References: <20200714083631.888605-1-ppandit@redhat.com>
+ <20200714083631.888605-2-ppandit@redhat.com>
+ <CAFEAcA9QWLmi1fGuPW93GXFKV2KCwNs6Xp3U9MU2r4wtendzhg@mail.gmail.com>
+ <20200714095233.GC25187@redhat.com>
+ <20200714060916-mutt-send-email-mst@kernel.org>
+ <CAFEAcA_ca4JN655GW=eGyjrjDmiv0EktaZZ7RMghO5rBwm9tGQ@mail.gmail.com>
+ <20200714064921-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1594396418.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="P9tCDLgHt17PtVLGknt88pz94Zfctg54s"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -106,7 +85,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,67 +98,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---P9tCDLgHt17PtVLGknt88pz94Zfctg54s
-Content-Type: multipart/mixed; boundary="zztbmGMezMaXebg6DpmffZT5s5IebGLS3"
+  Hello all,
 
---zztbmGMezMaXebg6DpmffZT5s5IebGLS3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Thank you so much for the comments and inptus, I appreciate it.
 
-On 10.07.20 18:12, Alberto Garcia wrote:
-> Hi,
->=20
-> here's the new version of the patches to add subcluster allocation
-> support to qcow2.
->=20
-> Please refer to the cover letter of the first version for a full
-> description of the patches:
->=20
->    https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
->=20
-> This version is rebased on top of the latest master (f2a1cf9180),
-> fixes the relevant conflicts (particularly after df373fb0a3) and
-> updates the test expectations.
->=20
-> Berto
++-- On Tue, 14 Jul 2020, Michael S. Tsirkin wrote --+
+| On Tue, Jul 14, 2020 at 11:22:28AM +0100, Peter Maydell wrote:
+| > On Tue, 14 Jul 2020 at 11:12, Michael S. Tsirkin <mst@redhat.com> wrote:
+| > > And for people who want to build QEMU with lots of functionality (like
+| > > Fedora does), I think a -security flag would be a useful addition.
+| > > We can then tell security researchers "only a high security issue
+| > > if it reproduces with -security=high, only a security issue
+| > > if it reproduces with -security=low".
+| > 
+| > I think a -security option would also be useful to users -- it makes it 
+| > easier for them to check "is this configuration using something that I 
+| > didn't realize was not intended to be secure". For me, something useful 
+| > for our users is much more compelling than "this might make security 
+| > researchers' lives a bit easier".
 
-Thanks, fixed up patch 21 (by initializing expected_type to just
-anything, I chose QCOW2_SUBCLUSTER_NORMAL, which I preferred over just
-using 0), resolved some iotest conflicts (I=E2=80=99m sure, more are to com=
-e
-before the release, but we=E2=80=99ll see), and applied the series to my
-block-next branch:
+* General consensus seems to be that MAINTAINERS file is not best suited for 
+  such security related annotation.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
+* We generally ask researchers if the issue is reproducible with 
+  '-enable-kvm', so it excludes TCG use cases.
 
 
---zztbmGMezMaXebg6DpmffZT5s5IebGLS3--
+| -security level
+| 	Set minimal required security level of QEMU.
+| 
+| 	high: block use of QEMU functionality which is intended to be secure against
+| 	malicious guests.
 
---P9tCDLgHt17PtVLGknt88pz94Zfctg54s
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+   secure -> insecure, I think?
 
------BEGIN PGP SIGNATURE-----
+| 	low: allow use of all QEMU functionality, best effort security
+| 		against malicious guests.
+| 
+| Default would be -security low.
+| 
+| Does this look reasonable?
+| 
+| Just a correction to what I wrote: I no longer think it's reasonable to
+| classify the severity of a security issue automatically. E.g. a qemu
+| crash in virtio code is a high severity security issue if it triggers
+| with platform_iommu=on since it is then driver from guest userspace, and
+| low severity one without since then it's driven from a guest driver.
+| 
+| So I think we can add something like this to security.rst and to
+| the wiki:
+| 
+| 	only a security issue if it
+| 	reproduces with -security high, a regular bug if it only reproduces with
+| 	-security low
+| 
+| Prasad?
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8Nq5kACgkQ9AfbAGHV
-z0Cz4AgArJ4e5y0IGSnnGGVMYEngNqsXVWs4ta6c6YVFUNRvMgHdmPSbeVb//dKi
-wlaihe8bJes3Upcm15ZrJf4hzVBjp1VQsoVYBiQfam7WIj+/IvBFKnFVc3KL0Lv7
-6MHx4no/DYZJXQp1pVFoOZa/5Vszn7k4l+y2/TEc6Rb7J5DIv4ZlOc6hG6/dybHW
-0xtKTl3x1nJ0iBhegvXlaeGw5/47UUa0wpV1ZLN5HK1RGEcme4a2j5HBbjU3hzn7
-ZjgmuJ5+m5vcNSwduKeFI7NiAk0vWTmm7xvLiIAiweQjvPITdYFs/YwYLuFxydHM
-4FqB3t9MwVsMvteeU7hrR42pui/Nag==
-=uR4f
------END PGP SIGNATURE-----
+IIUC:
 
---P9tCDLgHt17PtVLGknt88pz94Zfctg54s--
+ * QEMU would abort(3), if a user attempts to start QEMU with insecure options 
+   like say -virtfs OR -fda fat:floopy OR -netdev user OR -device tulip ?  
+
+ * One way could be to abort(3) at options parsing stage, if 'security' flag 
+   is set to high(1) and continue further if it is low(0).
+
+ * ie. for each option we'd need do define if it is safe or not?
+
+Does that seem right? OR do we maintain a run time list of features/options 
+deemed to be safe? Either way, we need to define some place, which QEMU 
+functions/devices/backends etc. are safe.
+
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
