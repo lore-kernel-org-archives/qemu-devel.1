@@ -2,123 +2,83 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AACDC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74448C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18984223AB
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:25:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CE9E223AB
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 16:28:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DJ1OUPZq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18984223AB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2QuocY2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE9E223AB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvNkb-0005p1-AW
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:25:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59682)
+	id 1jvNms-0000aw-Gl
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 12:28:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jvNhn-0000Pi-8o; Tue, 14 Jul 2020 12:22:55 -0400
-Received: from mail-db8eur05on2116.outbound.protection.outlook.com
- ([40.107.20.116]:22897 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jvNhl-0002R9-4E; Tue, 14 Jul 2020 12:22:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nfSYb7HzzEZzo2UxLr/dl5N5iac+mS8CCL5Gt9KQvcenkEOj+db1X+ARe7WqUhtuIFbD2zxnyMHijdejBS79Iagx7t34TQ5m6gZbEJGc8qkLk2NuplW3oH9LfoaLA0VTjNNa3UZp/vTVqQ65j4Xv6+Ds9LEXLIq2AovI3i1BTFDdxq/jxAIya4Ngyzk86w/oMf5FClXfFhQzKT2nNQOwFr45QQt31wvlA7v1d8RYDCQrFue6JZEAnUVGeho4phlNAqyRyCnqXTyl8Nlsk/dAZbEuCPpPVk1xcU4oY3Ev+fkX//Trf+cAjcBnPteYZzLDh5DPqUKJpyCb5Gb6LnMqtw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nB89ZtR6zLX+6CEa+d7FQHhB0EflJGod8Oh1atQHoKQ=;
- b=LFAB0kO3tvN8gR06ifzfCT1pscaDPZ+DJIreIAhQlRa1JqEpwn0pgETX0VbtZaGKTBR7nXKSVvg2AKTO0yTpCOBSIMQwH7Qz4UVdfot2n8SwbonejRepW+fUDpFer0x+79C2x7M2wLTedriraOHDi7pL4YcxzX10imdWxyyDPHBGnoutplFW46z0Aa604WJwy5ODgPGFVtTFCc0/lXQuRd5+0IivHGuxMMIYl0o9E+KwPz8ESu+xygvTthpphnDpfvohPwhla7PZuXuw0O0gTqWtTSBh+MjFCw0sy3izTaeW65daHu8GN2nJyTtpbVKM2U2v3zZUkud9vAY+da1Kqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nB89ZtR6zLX+6CEa+d7FQHhB0EflJGod8Oh1atQHoKQ=;
- b=DJ1OUPZqnV/h3n8Smyk6v+VhmdGgsZV+hWJbBhIu3ZFhoNSC6bchp1L1pbY5UnT2iBwks2Q1vNl+2H2qHQ/EwWCxA8hEnIk1ISrQoQuyCeUDs+NLw8moR6BeONPVq4C3pKbU5jkvPg6+oPMYP6f+qz3qZ60NlL90zgrLxt28L9g=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB2982.eurprd08.prod.outlook.com (2603:10a6:209:43::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Tue, 14 Jul
- 2020 16:22:47 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3174.025; Tue, 14 Jul 2020
- 16:22:47 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 1/2] nbd: make nbd_export_close_all() synchronous
-Date: Tue, 14 Jul 2020 19:22:33 +0300
-Message-Id: <20200714162234.13113-2-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200714162234.13113-1-vsementsov@virtuozzo.com>
-References: <20200714162234.13113-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM4PR0101CA0075.eurprd01.prod.exchangelabs.com
- (2603:10a6:200:41::43) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvNlt-0008GW-QP
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:27:09 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21045
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvNlr-0003oU-Sl
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 12:27:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594744027;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=D01p+tWmBT4PZHPuHyTyUvbeoiIa/o+Z403q1mmhPSQ=;
+ b=Z2QuocY2w9TMTwLn78SAELvHk3u07j1up8hrt9Tux2SKsUuplZaXC3E1XIEIjNL49I+46w
+ 8K0MIDrEfk0IjM94E5MtNp+a+Xr/ChsiGgJ+Vc9vUsQPM01+vsvhYlxXZpeh+SGuRdtLri
+ F/9TYIcL6AgasfvKjfSOpcURx7yveZk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-LhEWiLGsNMWxWzJ78BA6vA-1; Tue, 14 Jul 2020 12:27:05 -0400
+X-MC-Unique: LhEWiLGsNMWxWzJ78BA6vA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1671380040A;
+ Tue, 14 Jul 2020 16:27:04 +0000 (UTC)
+Received: from domokun.gsslab.fab.redhat.com (unknown [10.33.8.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5474660BEC;
+ Tue, 14 Jul 2020 16:27:00 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for 5.1] docs: fix trace docs build with sphinx 3.1.1
+Date: Tue, 14 Jul 2020 17:26:59 +0100
+Message-Id: <20200714162659.1017432-1-berrange@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.164) by
- AM4PR0101CA0075.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::43) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17 via Frontend
- Transport; Tue, 14 Jul 2020 16:22:46 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.164]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 19599f24-e721-4989-5912-08d82812250d
-X-MS-TrafficTypeDiagnostic: AM6PR08MB2982:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB2982AAC6CDB21CCB52165A75C1610@AM6PR08MB2982.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: z47pkKYGTZk0CUiNIPgbSc3RaSepl6B+z8jGY5w/4pkLlY0J0P6DaUcNLeQYGZJWqV9zVWTd4JKj1jOmQ0MuG9bje5zoqYSRm3w1JX/uEOJrqLP1IidtyQtGXfW2/hT9WMquXbEHE2Hyk2YxKKu2uNljlce0JmlJz0IzJuv5e+FzEjUO87rOsRZTWCNE3p80209fquD+GjoC3w//0jsUL7dZ4aeFR1az1rlSMPHYTuZoV5nHLNn9Gzh7E/xf858eYc+otGc9gPscGEben7CsVEu0lsinu7orBzzx/2Vx2MzbW6NBt2lUfmj4LbtnZMvj9MCan8N8nNDeJNE3np6shw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(366004)(346002)(39840400004)(396003)(136003)(86362001)(6512007)(8676002)(6916009)(6486002)(5660300002)(66946007)(107886003)(8936002)(2906002)(6506007)(66476007)(36756003)(66556008)(26005)(956004)(186003)(52116002)(16526019)(478600001)(1076003)(6666004)(316002)(2616005)(4326008)(83380400001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Y98NMZtm/K3ijumVRHP9jx9j8enX7/Ed80TbJceaX5dplwkK2NmzhF50mj94gJVgMC4q1JEIIbLhgPA25Qd3odleUl3TWsFDU3z90YE9Z6Rv47V8EzybF3zzokF1kNtplVoLhPYRLesFc8zCQFpIUwOLA7zfe7okGLWJu0HHKYzS04MkDSIYxXC67nv7Ds4F0xuzino1PEP58ZeL+BXvLeaO+68Q6TG5sFYHc11BhXmsI2l+PWinQ9o4wnLaRMqIxZ0wzrcvhKchSH+AroaqO/NiaEm6sLWM9Aedh5PdKObpiafpsrS/g4Gc5OkBhQp4uibCRNXNY8ZJINMEpbbGQmVaa/+g/mO108tNMwIo7S+cTxWTIN+mebj/IhW2XY6ymrj6XBLN1Ct1BF+TvCwoKEPAUzoRscryEm/HbPhsNNMPo9K/fn4OU09YDIVAQGgFEhnNTJVVe/UbuiBM0J/Gv49PVBQ5ctCeV9WT7OhOM1RO7PFjYm0a0XRsluGdRt1c
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19599f24-e721-4989-5912-08d82812250d
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2020 16:22:47.0692 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: r59tPlDv1oxWz3MWAHvJg8I8RFpmy33/GcToqQOXUcs3MuMd3rcHsDFaklq4cZHty0ajEL6L3lonNUKpumQiLobzUq/QxEzLw5r0TPaTfME=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2982
-Received-SPF: pass client-ip=40.107.20.116;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 12:22:47
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 12:02:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -132,84 +92,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Consider nbd_export_close_all(). The call-stack looks like this:
- nbd_export_close_all() -> nbd_export_close -> call client_close() for
-each client.
+In Fedora 33 rawhide, we now have sphinx 3.1.1, as opposed
+to previous 2.2.2. This new version generates a warning on
+the source:
 
-client_close() doesn't guarantee that client is closed: nbd_trip()
-keeps reference to it. So, nbd_export_close_all() just reduce
-reference counter on export and removes it from the list, but doesn't
-guarantee that nbd_trip() finished neither export actually removed.
+docs/qemu-option-trace.rst.inc:4:Malformed option description
+  '[enable=]PATTERN', should look like "opt", "-opt args",
+  "--opt args", "/opt args" or "+opt args"
 
-Let's wait for all exports actually removed.
+This turns into an error when QEMU passes -W to sphinx-build
 
-Without this fix, the following crash is possible:
+Strangely the previous 2.2.2 code has the exact same logic
+for checking the syntax, but it is not being triggered. While
+it is only complaining about the first option, I changed all
+the options to give consistency.
 
-- export bitmap through internal Qemu NBD server
-- connect a client
-- shutdown Qemu
-
-On shutdown nbd_export_close_all is called, but it actually don't wait
-for nbd_trip() to finish and to release its references. So, export is
-not release, and exported bitmap remains busy, and on try to remove the
-bitmap (which is part of bdrv_close()) the assertion fails:
-
-bdrv_release_dirty_bitmap_locked: Assertion `!bdrv_dirty_bitmap_busy(bitmap)' failed
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- nbd/server.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ docs/qemu-option-trace.rst.inc | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 5357f588f0..4752a6c8bc 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -102,6 +102,8 @@ struct NBDExport {
- };
+diff --git a/docs/qemu-option-trace.rst.inc b/docs/qemu-option-trace.rst.inc
+index 7e09773a9c..e79b0b43fc 100644
+--- a/docs/qemu-option-trace.rst.inc
++++ b/docs/qemu-option-trace.rst.inc
+@@ -1,7 +1,7 @@
  
- static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
-+static QTAILQ_HEAD(, NBDExport) closed_exports =
-+        QTAILQ_HEAD_INITIALIZER(closed_exports);
+ Specify tracing options.
  
- /* NBDExportMetaContexts represents a list of contexts to be exported,
-  * as selected by NBD_OPT_SET_META_CONTEXT. Also used for
-@@ -1659,6 +1661,7 @@ void nbd_export_close(NBDExport *exp)
-         g_free(exp->name);
-         exp->name = NULL;
-         QTAILQ_REMOVE(&exports, exp, next);
-+        QTAILQ_INSERT_TAIL(&closed_exports, exp, next);
-     }
-     g_free(exp->description);
-     exp->description = NULL;
-@@ -1722,7 +1725,9 @@ void nbd_export_put(NBDExport *exp)
-             g_free(exp->export_bitmap_context);
-         }
+-.. option:: [enable=]PATTERN
++.. option:: -trace [enable=]PATTERN
  
-+        QTAILQ_REMOVE(&closed_exports, exp, next);
-         g_free(exp);
-+        aio_wait_kick();
-     }
- }
+   Immediately enable events matching *PATTERN*
+   (either event name or a globbing pattern).  This option is only
+@@ -11,7 +11,7 @@ Specify tracing options.
  
-@@ -1742,6 +1747,9 @@ void nbd_export_close_all(void)
-         nbd_export_close(exp);
-         aio_context_release(aio_context);
-     }
-+
-+    AIO_WAIT_WHILE(NULL, !(QTAILQ_EMPTY(&exports) &&
-+                           QTAILQ_EMPTY(&closed_exports)));
- }
+   Use :option:`-trace help` to print a list of names of trace points.
  
- static int coroutine_fn nbd_co_send_iov(NBDClient *client, struct iovec *iov,
+-.. option:: events=FILE
++.. option:: -trace events=FILE
+ 
+   Immediately enable events listed in *FILE*.
+   The file must contain one event name (as listed in the ``trace-events-all``
+@@ -19,7 +19,7 @@ Specify tracing options.
+   available if QEMU has been compiled with the ``simple``, ``log`` or
+   ``ftrace`` tracing backend.
+ 
+-.. option:: file=FILE
++.. option:: -trace file=FILE
+ 
+   Log output traces to *FILE*.
+   This option is only available if QEMU has been compiled with
 -- 
-2.21.0
+2.24.1
 
 
