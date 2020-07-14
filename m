@@ -1,71 +1,94 @@
-Return-Path: <SRS0=6r5r=AY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4E3C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 23:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA71C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 00:43:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 998BE2184D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jul 2020 23:59:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB4AE21835
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 00:43:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ncF7eSkz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 998BE2184D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Xraz5Vef"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB4AE21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv8Lq-0002xB-Up
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 19:59:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36562)
+	id 1jv930-0007Pg-1T
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 20:43:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jv8L4-0002Wk-II; Mon, 13 Jul 2020 19:58:26 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36055 helo=ozlabs.org)
+ (Exim 4.90_1)
+ (envelope-from <prvs=457b4eeb6=alistair.francis@wdc.com>)
+ id 1jv91m-0005nl-R9
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 20:42:35 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:30774)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jv8L0-0001Ir-Qq; Mon, 13 Jul 2020 19:58:26 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B5LFM5n3kz9sRR; Tue, 14 Jul 2020 09:58:15 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1594684695;
- bh=vzMs5Ty1L4T8zt3kKDg3utWeNhy+zgJc80fa1hEzfRo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ncF7eSkzgv7Ihpf1i0I8WNrp2yFiIj8R9Ntl5LYdDkR1AG43hCu9g97AAjRmWjLOI
- oRaNqL0g9ks5C56G2gghJJXZ/9zC6TZDmDN9lstZjAtxsicyWKGPf6rXQ07UFgL1F9
- 0TP8tXk1DgVLzVlAvG+oFNIltZVAzG6dwYJ6pwto=
-Date: Tue, 14 Jul 2020 09:47:20 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Lijun Pan <ljp@linux.vnet.ibm.com>
-Subject: Re: [PATCH v4 06/11] Update PowerPC AT_HWCAP2 definition
-Message-ID: <20200713234720.GF93134@umbus.fritz.box>
-References: <20200701234344.91843-1-ljp@linux.ibm.com>
- <20200701234344.91843-7-ljp@linux.ibm.com>
- <20200713051400.GA93134@umbus.fritz.box>
- <BDB7FF22-BF16-45B7-B67E-94DD415A5E5C@linux.vnet.ibm.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=457b4eeb6=alistair.francis@wdc.com>)
+ id 1jv91k-0008OU-6V
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 20:42:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1594687352; x=1626223352;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=1xXuQ4TniOj1hkkB9+p7RfrA8EtARMPpg+dYXAzRK1g=;
+ b=Xraz5VefSbt7KaYkP+3+9Env6/cVvGpuF1nx8ZxWHnn52LzQBNfHRf2y
+ sIJpt0hB6p3iAv+0Cx5Zy0en7hcARVAjGwlM8nJZ9do7wz5EjWuZ4p7FF
+ LT3u4e5I25qfGTHDVfaMaScBtYIb9uRZ0AjxnsU5HqsZDq+ev77d/937Y
+ qFyfCcLbg4nMpkFGF9mso6jigaASUNvUYt2F/7YHLY5zO8qcpWyis2GWS
+ /v6Yh5ZAjHPClu18l+ZVkyzcdWz8F0bqaaLKLs3LSLTUgSfhtkB6/8gYD
+ qan5WW6ZkthJgb1QDZmn+jOE/Jj/If3jvX3i+hudmQrJcD2L2/iaWN1Cd A==;
+IronPort-SDR: vbI1rtL/IO7dQASJWUZVCH32jwJwYcSya0SLcewq8K5/WkWHhG5tuKgXiypu0ZDex95LEJzw4h
+ nXfw1E78466XvxqDaapQ/jcQdE+G1PubXuaa3a+pVCnaOwT3H7MaKnVnzEIyTFzvf/C/qmmhlH
+ Z+fcmOUNxRRjvIjQBgYMSorULawGhiQpMlglvxSkREWyI4eFhRWArBQk8TrCHjC6ZVOe0ujrmU
+ /+t84cxsfrK91/xxQIPtETogCTEBNlQI2i6Y0VxuiJcBgufDS6HYs0W3LUhZbXFQz5KRcl80E0
+ Ru8=
+X-IronPort-AV: E=Sophos;i="5.75,349,1589212800"; d="scan'208";a="142511916"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 14 Jul 2020 08:42:27 +0800
+IronPort-SDR: waUOr4o0YLpeF5rYTWbCSnHLrdeEy/8hcQqo+PfZCgOx6U6Bdk4uT6iYZfFYHZA+lb3OTK8/am
+ tucr7ZG3Y9wt/YP0YNy9eGYNO9+xGWj4U=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 13 Jul 2020 17:30:56 -0700
+IronPort-SDR: LCXzX4vxD1OCz+I3EWdjWIkmTLctD6OX2BaPnn1Om5h31cD4SHWaljOLjJRIB3ug107ouhOhbW
+ dxvdO7uEQ4rw==
+WDCIronportException: Internal
+Received: from usa002626.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.57.178])
+ by uls-op-cesaip02.wdc.com with ESMTP; 13 Jul 2020 17:42:28 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/15] riscv-to-apply queue
+Date: Mon, 13 Jul 2020 17:32:39 -0700
+Message-Id: <20200714003254.4044149-1-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8S1fMsFYqgBC+BN/"
-Content-Disposition: inline
-In-Reply-To: <BDB7FF22-BF16-45B7-B67E-94DD415A5E5C@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.144;
+ envelope-from=prvs=457b4eeb6=alistair.francis@wdc.com;
+ helo=esa5.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 20:42:28
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,85 +101,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 20c1df5476e1e9b5d3f5b94f9f3ce01d21f14c46:
 
---8S1fMsFYqgBC+BN/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20200713-pull-request' into staging (2020-07-13 16:58:44 +0100)
 
-On Mon, Jul 13, 2020 at 02:20:20PM -0500, Lijun Pan wrote:
->=20
->=20
-> > On Jul 13, 2020, at 12:14 AM, David Gibson <david@gibson.dropbear.id.au=
-> wrote:
-> >=20
-> > On Wed, Jul 01, 2020 at 06:43:41PM -0500, Lijun Pan wrote:
-> >> Add PPC2_FEATURE2_ARCH_3_10 to the PowerPC AT_HWCAP2 definitions.
-> >>=20
-> >> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
-> >> ---
-> >> v4: add missing changes, and split to 5/11, 6/11, 7/11
-> >> v3: use tcg_gen_gvec_mul()
-> >> v2: fix coding style
-> >>    use Power ISA 3.1 flag
-> >>=20
-> >> include/elf.h | 1 +
-> >> 1 file changed, 1 insertion(+)
-> >>=20
-> >> diff --git a/include/elf.h b/include/elf.h
-> >> index 8fbfe60e09..1858b95acf 100644
-> >> --- a/include/elf.h
-> >> +++ b/include/elf.h
-> >> @@ -554,6 +554,7 @@ typedef struct {
-> >> #define PPC_FEATURE2_HTM_NOSC           0x01000000
-> >> #define PPC_FEATURE2_ARCH_3_00          0x00800000
-> >> #define PPC_FEATURE2_HAS_IEEE128        0x00400000
-> >> +#define PPC_FEATURE2_ARCH_3_10          0x00200000
-> >>=20
-> >> /* Bits present in AT_HWCAP for Sparc.  */
-> >=20
-> >=20
-> > Um.. in the corresponding #defines in the kernel 0x00200000 is given
-> > to PPC_FEATURE2_DARN, and several more bits are allocated past that
-> > point.
->=20
-> Then what do you recommend to use?
+are available in the Git repository at:
 
-This is part of exposed userland ABI, so it needs to be standardized
-at least semi-formally.  I'm not actually sure who allocates these in
-general.
+  git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200713
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+for you to fetch changes up to cfad709bceb629a4ebeb5d8a3acd1871b9a6436b:
 
---8S1fMsFYqgBC+BN/
-Content-Type: application/pgp-signature; name="signature.asc"
+  target/riscv: Fix pmp NA4 implementation (2020-07-13 17:25:37 -0700)
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+This is a colection of bug fixes and small imrprovements for RISC-V.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8M8oMACgkQbDjKyiDZ
-s5JfkxAAlAwDp989axQA78HW7C/l6z7SlYy2L/jtwQnKXN+xUp3JmJJbVnNOl2N/
-ZsqKEkW0TU1NUbgmaBicg/5Ej9o3GSQVO926LBjaVlRrxWa2SY7tF9r9HRrDUGph
-ddLXV/w6xeVYV3ciUQDK7pRHYfXwKDy7p1Mz0aiwNLmhaeND0xAiTv1VLHtjHHYi
-zVCQ19+kiXzWCpRAJgUJ3u8InwcsxLwiCV0ghYrgveFx5Byf+4Rxob5RFTvagjNJ
-SFOmdHSprU7h11/DKZHKWpYQUJCkPfT8ksNooVr1Sgk3luQW23ZC8Q66bPh9FbVj
-FhyO2MvA1Gm6Wq5TndfMHT/+PIeZzIHVaTzvo08ig5zmvDF+p7Pp0+Y40mkLp3W2
-QS8ZSwjpa95OgiFEORVL4t012CcE6hIWRlaMulEVClopohH5p+Fal7XbukV/UTbN
-/YsgCUL2Du8mLWfN3F+31y0fkMxjCImSyuPImjN6hVryYP3tY3hrrBxv8s/U7hXl
-y/nRVxu0CiuaOT+l+gfTjMkFAwCg+zhH+f8BtnjHO+NdKGAbxCVwyXMWdmXuQG/6
-kLXsHrBVEzuGk2xXj8wf8RS8isKP23EB57m9RSj/3544iSwRirVsoyMk1iKhE9yV
-wIc2E5ImRzro7EsohTvzWVgrxebWG+QPCUac5PD8Efu7QfipbIo=
-=vWCe
------END PGP SIGNATURE-----
+This includes some vector extensions fixes, a PMP bug fix, OpenTitan
+UART bug fix and support for OpenSBI dynamic firmware.
 
---8S1fMsFYqgBC+BN/--
+----------------------------------------------------------------
+Alexandre Mergnat (1):
+      target/riscv: Fix pmp NA4 implementation
+
+Alistair Francis (2):
+      hw/char: Convert the Ibex UART to use the qdev Clock model
+      hw/char: Convert the Ibex UART to use the registerfields API
+
+Atish Patra (4):
+      riscv: Unify Qemu's reset vector code path
+      RISC-V: Copy the fdt in dram instead of ROM
+      riscv: Add opensbi firmware dynamic support
+      RISC-V: Support 64 bit start address
+
+Bin Meng (3):
+      MAINTAINERS: Add an entry for OpenSBI firmware
+      hw/riscv: virt: Sort the SoC memmap table entries
+      hw/riscv: Modify MROM size to end at 0x10000
+
+Frank Chang (4):
+      target/riscv: fix rsub gvec tcg_assert_listed_vecop assertion
+      target/riscv: correct the gvec IR called in gen_vec_rsub16_i64()
+      target/riscv: fix return value of do_opivx_widen()
+      target/riscv: fix vill bit index in vtype register
+
+Liao Pingfang (1):
+      tcg/riscv: Remove superfluous breaks
+
+ include/hw/char/ibex_uart.h             |  79 ++++++++--------
+ include/hw/riscv/boot.h                 |   7 ++
+ include/hw/riscv/boot_opensbi.h         |  58 ++++++++++++
+ target/riscv/cpu.h                      |   2 +-
+ hw/char/ibex_uart.c                     | 158 ++++++++++++++++++--------------
+ hw/riscv/boot.c                         | 107 +++++++++++++++++++++
+ hw/riscv/sifive_u.c                     |  53 ++++++-----
+ hw/riscv/spike.c                        |  59 ++++--------
+ hw/riscv/virt.c                         |  63 ++++---------
+ target/riscv/insn_trans/trans_rvv.inc.c |   9 +-
+ target/riscv/pmp.c                      |   2 +-
+ tcg/riscv/tcg-target.inc.c              |   2 -
+ MAINTAINERS                             |   7 ++
+ 13 files changed, 387 insertions(+), 219 deletions(-)
+ create mode 100644 include/hw/riscv/boot_opensbi.h
 
