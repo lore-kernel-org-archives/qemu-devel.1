@@ -2,83 +2,80 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD39C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EED8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:57:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3899120BED
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D35120BED
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 08:57:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFHfzzyx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3899120BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dow2FcyF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D35120BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvGk5-00006G-IY
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 04:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41904)
+	id 1jvGkw-00018e-Pq
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 04:57:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvGjY-00087h-7l
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:56:16 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60514
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvGk7-0000Hz-Eo
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:56:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27062
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvGjW-0004r6-JJ
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:56:15 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvGk5-0004u5-H8
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 04:56:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594716973;
+ s=mimecast20190719; t=1594717008;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mb3xLadYgvtGafOIOLevZL13nk6RJbho9+GF8PQ1eMI=;
- b=SFHfzzyxca/jJUvKEHiOkXziZcp2IbM8+yukVAWXU9RU97mY7MUgx7bRl6qnaNet/WvnOs
- DdHJHIcBcv9tofHwLd8uh8rZKXToNYIqoHpj28HfX1i4v0RWCuBIxfITludI9i7rvqw13u
- s2rBJb03rXuWkeo4QWNO46uc2gMXE88=
+ bh=LSdHcmvYmsAtymoblKX0gh0LcxDypuqG+SLuvDvfd08=;
+ b=Dow2FcyFt8NwU/r/p4+33fhdLjLN45RXILKSY4preLiIrDB8MliuM4V97+uTCShdbVN4KV
+ bdYU0Ze2Tn+nSaY2UgRmj0AhtVkvFe2J+xkI9dfoGfSYMBffSqK+Ph7OUYORFjyrxo4MXr
+ XNVbkFjeC7rHJ/nRpJyxCyDbsW5H8Pw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-S8PbshMIOImGDo3JKpNcBw-1; Tue, 14 Jul 2020 04:56:11 -0400
-X-MC-Unique: S8PbshMIOImGDo3JKpNcBw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-72-v61fjEOvPG6HZVnTYlT4Vg-1; Tue, 14 Jul 2020 04:56:47 -0400
+X-MC-Unique: v61fjEOvPG6HZVnTYlT4Vg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 169701083;
- Tue, 14 Jul 2020 08:56:10 +0000 (UTC)
-Received: from [10.72.12.168] (ovpn-12-168.pek2.redhat.com [10.72.12.168])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A7A45D9DC;
- Tue, 14 Jul 2020 08:56:07 +0000 (UTC)
-Subject: Re: [Bug 1886362] [NEW] Heap use-after-free in lduw_he_p through
- e1000e_write_to_rx_buffers
-To: Li Qiang <liq3ea@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
- <CAKXe6S+J3nARveToQjECbwV224gs66WkqGHybUhfw35t1+V8og@mail.gmail.com>
- <2cbdf822-c74c-1af9-e5e6-7dd71412201e@redhat.com>
- <CAKXe6S+ct7D+ibGmrAMJnqKBBKyUpwVnCem8=d=jB-0tUT-N2Q@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <e4a34525-dbd1-1f85-475b-b5004885215b@redhat.com>
-Date: Tue, 14 Jul 2020 16:56:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B6D6800685;
+ Tue, 14 Jul 2020 08:56:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A20DC724D4;
+ Tue, 14 Jul 2020 08:56:42 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3048E1267F16; Tue, 14 Jul 2020 10:56:41 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] docs/qdev-device-use: Clean up the sentences related to
+ -usbdevice
+References: <20200710065520.24784-1-thuth@redhat.com>
+Date: Tue, 14 Jul 2020 10:56:41 +0200
+In-Reply-To: <20200710065520.24784-1-thuth@redhat.com> (Thomas Huth's message
+ of "Fri, 10 Jul 2020 08:55:20 +0200")
+Message-ID: <87r1te79va.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6S+ct7D+ibGmrAMJnqKBBKyUpwVnCem8=d=jB-0tUT-N2Q@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,70 +98,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bug 1886362 <1886362@bugs.launchpad.net>,
- Qemu Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Thomas Huth <thuth@redhat.com> writes:
 
-On 2020/7/10 下午6:37, Li Qiang wrote:
-> Paolo Bonzini <pbonzini@redhat.com> 于2020年7月10日周五 上午1:36写道：
->> On 09/07/20 17:51, Li Qiang wrote:
->>> Maybe we should check whether the address is a RAM address in 'dma_memory_rw'?
->>> But it is a hot path. I'm not sure it is right. Hope more discussion.
->> Half of the purpose of dma-helpers.c (as opposed to address_space_*
->> functions in exec.c) is exactly to support writes to MMIO.  This is
-> Hi Paolo,
+> Most of the -usbdevice paramaters have been removed already. Update
+> the doc accordingly.
 >
-> Could you please explain more about this(to support writes to MMIO).
-> I can just see the dma helpers with sg DMA, not related with MMIO.
-
-
-Please refer doc/devel/memory.rst.
-
-The motivation of memory API is to allow support modeling different 
-memory regions. DMA to MMIO is allowed in hardware so Qemu should 
-emulate this behaviour.
-
-
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  docs/qdev-device-use.txt | 28 +++-------------------------
+>  1 file changed, 3 insertions(+), 25 deletions(-)
 >
->
->> especially true of dma_blk_io, which takes care of doing the DMA via a
->> bounce buffer, possibly in multiple steps and even blocking due to
->> cpu_register_map_client.
->>
->> For dma_memory_rw this is not needed, so it only needs to handle
->> QEMUSGList, but I think the design should be the same.
->>
->> However, this is indeed a nightmare for re-entrancy.  The easiest
->> solution is to delay processing of descriptors to a bottom half whenever
->> MMIO is doing something complicated.  This is also better for latency
->> because it will free the vCPU thread more quickly and leave the work to
->> the I/O thread.
-> Do you mean we define a per-e1000e bottom half. And in the MMIO write
-> or packet send
-> trigger this bh?
+> diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
+> index 4bbbcf561f..f8d0d2fe29 100644
+> --- a/docs/qdev-device-use.txt
+> +++ b/docs/qdev-device-use.txt
+> @@ -125,12 +125,7 @@ The -device argument differs in detail for each
+> type of drive:
 
+Additional context:
 
-Probably a TX bh.
+   The various old ways to define drives all boil down to the common form
 
+       -drive if=TYPE,bus=BUS,unit=UNIT,OPTS...
 
-> So even if we again trigger the MMIO write, then
-> second bh will not be executed?
+   TYPE, BUS and UNIT identify the controller device, which of its buses
+   to use, and the drive's address on that bus.  Details depend on TYPE.
+[...]
+>  
+>  * if=pflash, if=mtd, if=sd, if=xen are not yet available with -device
+>  
+> -For USB devices, the old way is actually different:
+> -
+> -    -usbdevice disk:format=FMT:FILENAME
+> -
+> -Provides much less control than -drive's OPTS...  The new way fixes
+> -that:
+> +For USB storage devices, you can use something like:
+>  
+>      -device usb-storage,drive=DRIVE-ID,removable=RMB
+>  
 
+Losing "the old way is actually different" makes "The various old ways
+to define drives all boil down to the common form" apply to USB.
+Misleading.
 
-Bh is serialized so no re-entrancy issue.
+We could choose to keep information on the old way, like this:
 
-Thanks
+   For USB devices, the old way was actually different:
 
+       -usbdevice disk:format=FMT:FILENAME
 
->
->
-> Thanks,
-> Li Qiang
->
->> Paolo
->>
+   "Was" because "disk:" is gone since v2.12.0.
+
+   The old way provided much less control than -drive's OPTS...  The new
+   way fixes that:
+
+       -device usb-storage,drive=DRIVE-ID,removable=RMB
+
+If we prefer not to, then perhaps:
+
+   For USB devices, the old way was actually different, and is long
+   gone.  The new way looks like
+
+       -device usb-storage,drive=DRIVE-ID,removable=RMB
+
+> @@ -177,8 +172,6 @@ The appropriate DEVNAME depends on the machine type.  For type "pc":
+>  
+>    This lets you control I/O ports and IRQs.
+>  
+> -* -usbdevice serial::chardev becomes -device usb-serial,chardev=dev.
+> -
+
+If we choose to keep information on old ways, we could
+
+   * -usbdevice serial::chardev is gone since v2.12.0.  It became
+     -device usb-serial,chardev=dev.
+
+Else:
+
+   * Use -device usb-serial,chardev=dev for USB serial devices.  The old
+     way is long gone.
+
+>  * -usbdevice braille doesn't support LEGACY-CHARDEV syntax.  It always
+>    uses "braille".  With -device, this useful default is gone, so you
+>    have to use something like
+> @@ -238,10 +231,6 @@ The old way to define the guest part looks like this:
+
+Additional context:
+
+   === Network Devices ===
+
+   Host and guest part of network devices have always been separate.
+
+   The old way to define the guest part looks like this:
+>  
+>      -net nic,netdev=NET-ID,macaddr=MACADDR,model=MODEL,name=ID,addr=STR,vectors=V
+>  
+> -Except for USB it looks like this:
+> -
+> -    -usbdevice net:netdev=NET-ID,macaddr=MACADDR,name=ID
+> -
+>  The new way is -device:
+>  
+>      -device DEVNAME,netdev=NET-ID,mac=MACADDR,DEV-OPTS...
+
+As for block devices, this now reads as if USB was the same as all the
+others, which is misleading.
+
+If keep, then perhaps:
+
+   Except for USB it looked like this:
+
+       -usbdevice net:netdev=NET-ID,macaddr=MACADDR,name=ID
+
+   "Looked" because "net:" is gone since v2.12.0.
+
+If not:
+
+   For USB devices, the old way was actually different, and is long
+   gone.
+
+> @@ -336,12 +325,7 @@ The new way is -device DEVNAME,DEV-OPTS...  Details depend on DRIVER:
+>  * mouse           -device usb-mouse
+>  * tablet          -device usb-tablet
+>  * wacom-tablet    -device usb-wacom-tablet
+> -* host:...        See "Host Device Assignment"
+> -* disk:...        See "Block Devices"
+> -* serial:...      See "Character Devices"
+>  * braille         See "Character Devices"
+> -* net:...         See "Network Devices"
+> -* bt:...          not yet available with -device
+>  
+>  === Watchdog Devices ===
+>  
+> @@ -358,17 +342,11 @@ and host USB devices.  PCI devices can only be assigned with -device:
+
+More context:
+
+   === Host Device Assignment ===
+
+   QEMU supports assigning host PCI devices (qemu-kvm only at this time)
+   and host USB devices.  PCI devices can only be assigned with -device:
+>  
+>      -device vfio-pci,host=ADDR,id=ID
+>  
+> -The old way to assign a host USB device is
+> -
+> -    -usbdevice host:auto:BUS.ADDR:VID:PRID
+> -
+> -where any of BUS, ADDR, VID, PRID can be the wildcard *.
+> -
+> -The new way is
+> +To assign a host USB device use:
+>  
+>      -device usb-host,hostbus=BUS,hostaddr=ADDR,vendorid=VID,productid=PRID
+>  
+> -Omitted options match anything, just like the old way's wildcard.
+> +Omitted options match anything.
+
+   QEMU supports assigning host PCI devices (qemu-kvm only at this time)
+   and host USB devices.  They can only be assigned with -device.
+
+   PCI:
+
+       -device vfio-pci,host=ADDR,id=ID
+
+   USB:
+
+       -device usb-host,hostbus=BUS,hostaddr=ADDR,vendorid=VID,productid=PRID
+
+   Omitted options match anything.
+
+If keep, add something like
+
+   The old way to assign a USB host device
+
+       -usbdevice host:auto:BUS.ADDR:VID:PRID
+
+   was removed in v2.12.0.  Any of BUS, ADDR, VID, PRID could be the
+   wildcard *.
+
+>  
+>  === Default Devices ===
+
+Since v2.12.0 was more than two years ago, keeping information on the
+old way may be no longer useful.
 
 
