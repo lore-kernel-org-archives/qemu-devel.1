@@ -2,93 +2,105 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1FBC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 17:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3A7C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09C9C2256C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 17:56:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECF8A22582
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:01:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mXVRAz4+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C9C2256C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qpoLFamb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECF8A22582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvPA2-0001Kb-C3
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 13:56:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43686)
+	id 1jvPF4-0002wN-2S
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 14:01:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jvP9M-0000tn-Es
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 13:55:28 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36895)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jvP9K-0001Ml-NO
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 13:55:28 -0400
-Received: by mail-wm1-x344.google.com with SMTP id o2so7951520wmh.2
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 10:55:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=te1Lipa6RAlKihwVxFQMxJOFkEWkdgE8ydfZcX6Ytlo=;
- b=mXVRAz4+5aNHllwYiljrg1VX9rt2esWD0298i0FmSjz7izS9wndZoC6Z+BgQ3gHG+T
- rfSQGpmLSQv1Xh9f1cosJLFwSsGVT1TOrjgJZrjhfxKLjjAgzcdO89S2sW17EaCExfKK
- 6dsasCuGs5Qck9p6qXaShSM1a6IJ5Yym0HRN9F7QY/h0kmCLBDZb/mwJFpKfn9dayFQ2
- g2NiOvIsvFSaDK+LfNGzhJZ+ElUTOPRquVD7oxWprCXS+k4vWz7h0iA1UZeoJugGzQgx
- 5ip1iBHFM+1hOAOEwyrdwZlB48NR4rkSlYz0XgkYquCOa46GKhqCaSvOFWVtRLRTUzPf
- Pidw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=te1Lipa6RAlKihwVxFQMxJOFkEWkdgE8ydfZcX6Ytlo=;
- b=GHdB4eU7Z3HRTL+6s8jqPYCduWO7fEB8GDxVx6AGbr4sYZvivfd8ilxFO8LTIOkOCX
- lwQ9gihZqhBeD7AJUeLc1RyfyDJq8LgEIkbQH6ryOrRtnnpbmL8qWezJJan4G+tQg5a/
- lQGOiPIjFZY58/GPFm9RplvNrpTx73y+yoA1BjTaa8CbKm4sz5GShzAFX6Ros6uJLBM5
- W5OsXw/emC9F3tmh9aOTlmJefUFX+cU6zrV+7qUETYzN00X0iZf+As37hB3y5Xg7FTi6
- aCz+ZWb60ml9Q5Ylvjk2XfAPeE8rG1De3cPzUjejhy3AxaULLkiD4p1FcfLIfqtFuUst
- pMYA==
-X-Gm-Message-State: AOAM5300MHWGpLZTChKnef0FX5LrVNjLj7gxpIZeUVU3PCP4qs063uBh
- pFsVnx2UG9dZvRFVASynOMh7Ag==
-X-Google-Smtp-Source: ABdhPJw+c+y9FBB6+ZgJ9HlQZ5rfawK4mwbXr3gbX+FFj7FSxt5z2Pwwtiwcq0WNb5EUocyjyROdbw==
-X-Received: by 2002:a7b:c099:: with SMTP id r25mr5296558wmh.159.1594749324732; 
- Tue, 14 Jul 2020 10:55:24 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o21sm5386465wmh.18.2020.07.14.10.55.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jul 2020 10:55:23 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E51141FF7E;
- Tue, 14 Jul 2020 18:55:22 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] .travis.yml: skip ppc64abi32-linux-user with plugins
-Date: Tue, 14 Jul 2020 18:55:16 +0100
-Message-Id: <20200714175516.5475-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1jvPE9-0002Ob-LM
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:00:25 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:33680)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1jvPE7-000268-Hu
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:00:25 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06EHq5r1034562;
+ Tue, 14 Jul 2020 18:00:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=M5VvhOhaY11jqQnuKJwMbdI860Sao92ka9qy2jGvZZo=;
+ b=qpoLFambMZ7wPURNw5AGG1cphngMmaxGR9g3hAW6o1fvHjkOnHwVCuzvsUDYMtqfWtdp
+ 0i6IM1b8nnxakSX0hShQLbwCVE+TLDVuDjOdqwS0wz4MBlndl+7JWux5y9Yo1FzYw12r
+ 2zYxwhdS4t3r3XekuDXFnWZNzYidoThxdcCQWj7yoH/J5ZuFqatQmxp2cztLUpGzZetO
+ fg88KbKNjeA1oHP+JvNXyo4I8gNeJA38WPhCRF5e9M3Cchxrx7usZqAiuZBfypV+Uw6B
+ /xyQUKJeE1NgherqAUM4kLY/gj2uYU1wN3M0i6pImnKSN8+k206Lr5lklPZyUj8rN6Yb 9Q== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 3274ur70ds-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Tue, 14 Jul 2020 18:00:16 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06EHqdqB024132;
+ Tue, 14 Jul 2020 17:58:15 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 327qby5fyq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 14 Jul 2020 17:58:15 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06EHwExq009653;
+ Tue, 14 Jul 2020 17:58:14 GMT
+Received: from starbug-mbp.localdomain (/79.97.215.145)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 14 Jul 2020 10:58:14 -0700
+Received: by starbug-mbp.localdomain (Postfix, from userid 501)
+ id 6DC5CB94F18; Tue, 14 Jul 2020 18:58:06 +0100 (IST)
+From: Darren Kenny <darren.kenny@oracle.com>
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+Subject: Re: [PATCH] fuzz: Expect the cmdline in a freeable GString
+In-Reply-To: <20200714174616.20709-1-alxndr@bu.edu>
+References: <20200714174616.20709-1-alxndr@bu.edu>
+Date: Tue, 14 Jul 2020 18:58:06 +0100
+Message-ID: <m2eepekmhd.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9682
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=5
+ spamscore=0
+ mlxlogscore=999 bulkscore=0 malwarescore=0 mlxscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007140130
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9682
+ signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 impostorscore=0
+ suspectscore=5 phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
+ mlxscore=0 priorityscore=1501 adultscore=0 bulkscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007140130
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=darren.kenny@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 14:00:19
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,65 +113,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ f4bug@amsat.org, Alexander Bulekov <alxndr@bu.edu>,
+ Bandan Das <bsd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We actually see failures on threadcount running without plugins:
+On Tuesday, 2020-07-14 at 13:46:16 -04, Alexander Bulekov wrote:
+> In the initial FuzzTarget, get_init_cmdline returned a char *. With this
+> API, we had no guarantee about where the string came from. For example,
+> i440fx-qtest-reboot-fuzz simply returned a pointer to a string literal,
+> while the QOS-based targets build the arguments out in a GString an
+> return the gchar *str pointer. Since we did not try to free the cmdline,
+> we have a leak for any targets that do not simply return string
+> literals. Clean up this mess by forcing fuzz-targets to return
+> a GString, that we can free.
+>
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 
-  retry.py -n 1000 -c -- \
-    ./ppc64abi32-linux-user/qemu-ppc64abi32 \
-    ./tests/tcg/ppc64abi32-linux-user/threadcount
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 
-which reports:
-
-  0: 978 times (97.80%), avg time 0.270 (0.01 varience/0.08 deviation)
-  -6: 21 times (2.10%), avg time 0.336 (0.01 varience/0.12 deviation)
-  -11: 1 times (0.10%), avg time 0.502 (0.00 varience/0.00 deviation)
-  Ran command 1000 times, 978 passes
-
-But when running with plugins we hit the failure a lot more often:
-
-  0: 91 times (91.00%), avg time 0.302 (0.04 varience/0.19 deviation)
-  -11: 9 times (9.00%), avg time 0.558 (0.01 varience/0.11 deviation)
-  Ran command 100 times, 91 passes
-
-The crash occurs in guest code which is the same in both pass and fail
-cases. However we see various messages reported on the console about
-corrupted memory lists which seems to imply the guest memory allocation
-is corrupted. This lines up with the seg fault being in the guest
-__libc_free function. So we think this is a guest bug which is
-exacerbated by various modes of translation. If anyone has access to
-real hardware to soak test the test case we could prove this properly.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- .travis.yml | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index ab429500fc..6695c0620f 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -350,9 +350,10 @@ jobs:
-     # Run check-tcg against linux-user (with plugins)
-     # we skip sparc64-linux-user until it has been fixed somewhat
-     # we skip cris-linux-user as it doesn't use the common run loop
-+    # we skip ppc64abi32-linux-user as it seems to have a broken libc
-     - name: "GCC plugins check-tcg (user)"
-       env:
--        - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user"
-+        - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user,cris-linux-user,ppc64abi32-linux-user"
-         - TEST_BUILD_CMD="make build-tcg"
-         - TEST_CMD="make check-tcg"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
--- 
-2.20.1
-
+> ---
+>  tests/qtest/fuzz/fuzz.c        | 13 ++++++-------
+>  tests/qtest/fuzz/fuzz.h        |  6 +++---
+>  tests/qtest/fuzz/i440fx_fuzz.c |  4 ++--
+>  tests/qtest/fuzz/qos_fuzz.c    |  6 +++---
+>  4 files changed, 14 insertions(+), 15 deletions(-)
+>
+> diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+> index 0b66e43409..6bc17ef313 100644
+> --- a/tests/qtest/fuzz/fuzz.c
+> +++ b/tests/qtest/fuzz/fuzz.c
+> @@ -199,16 +199,15 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
+>      }
+>  
+>      /* Run QEMU's softmmu main with the fuzz-target dependent arguments */
+> -    const char *init_cmdline = fuzz_target->get_init_cmdline(fuzz_target);
+> -    init_cmdline = g_strdup_printf("%s -qtest /dev/null -qtest-log %s",
+> -                                   init_cmdline,
+> -                                   getenv("QTEST_LOG") ? "/dev/fd/2"
+> -                                                       : "/dev/null");
+> -
+> +    GString *cmd_line = fuzz_target->get_init_cmdline(fuzz_target);
+> +    g_string_append_printf(cmd_line,
+> +                           " -qtest /dev/null -qtest-log %s",
+> +                           getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null");
+>  
+>      /* Split the runcmd into an argv and argc */
+>      wordexp_t result;
+> -    wordexp(init_cmdline, &result, 0);
+> +    wordexp(cmd_line->str, &result, 0);
+> +    g_string_free(cmd_line, true);
+>  
+>      qemu_init(result.we_wordc, result.we_wordv, NULL);
+>  
+> diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
+> index 72d5710f6c..9ca3d107c5 100644
+> --- a/tests/qtest/fuzz/fuzz.h
+> +++ b/tests/qtest/fuzz/fuzz.h
+> @@ -50,10 +50,10 @@ typedef struct FuzzTarget {
+>  
+>  
+>      /*
+> -     * returns the arg-list that is passed to qemu/softmmu init()
+> -     * Cannot be NULL
+> +     * Returns the arguments that are passed to qemu/softmmu init(). Freed by
+> +     * the caller.
+>       */
+> -    const char* (*get_init_cmdline)(struct FuzzTarget *);
+> +    GString *(*get_init_cmdline)(struct FuzzTarget *);
+>  
+>      /*
+>       * will run once, prior to running qemu/softmmu init.
+> diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
+> index e2f31e56f9..bf966d478b 100644
+> --- a/tests/qtest/fuzz/i440fx_fuzz.c
+> +++ b/tests/qtest/fuzz/i440fx_fuzz.c
+> @@ -158,9 +158,9 @@ static void i440fx_fuzz_qos_fork(QTestState *s,
+>  
+>  static const char *i440fx_qtest_argv = TARGET_NAME " -machine accel=qtest"
+>                                         " -m 0 -display none";
+> -static const char *i440fx_argv(FuzzTarget *t)
+> +static GString *i440fx_argv(FuzzTarget *t)
+>  {
+> -    return i440fx_qtest_argv;
+> +    return g_string_new(i440fx_qtest_argv);
+>  }
+>  
+>  static void fork_init(void)
+> diff --git a/tests/qtest/fuzz/qos_fuzz.c b/tests/qtest/fuzz/qos_fuzz.c
+> index 0c68f5361f..d52f3ebd83 100644
+> --- a/tests/qtest/fuzz/qos_fuzz.c
+> +++ b/tests/qtest/fuzz/qos_fuzz.c
+> @@ -66,7 +66,7 @@ void *qos_allocate_objects(QTestState *qts, QGuestAllocator **p_alloc)
+>      return allocate_objects(qts, current_path + 1, p_alloc);
+>  }
+>  
+> -static const char *qos_build_main_args(void)
+> +static GString *qos_build_main_args(void)
+>  {
+>      char **path = fuzz_path_vec;
+>      QOSGraphNode *test_node;
+> @@ -88,7 +88,7 @@ static const char *qos_build_main_args(void)
+>      /* Prepend the arguments that we need */
+>      g_string_prepend(cmd_line,
+>              TARGET_NAME " -display none -machine accel=qtest -m 64 ");
+> -    return cmd_line->str;
+> +    return cmd_line;
+>  }
+>  
+>  /*
+> @@ -189,7 +189,7 @@ static void walk_path(QOSGraphNode *orig_path, int len)
+>      g_free(path_str);
+>  }
+>  
+> -static const char *qos_get_cmdline(FuzzTarget *t)
+> +static GString *qos_get_cmdline(FuzzTarget *t)
+>  {
+>      /*
+>       * Set a global variable that we use to identify the qos_path for our
+> -- 
+> 2.26.2
 
