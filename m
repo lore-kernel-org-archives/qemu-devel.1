@@ -2,92 +2,59 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEC0C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27346C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BB1A22280
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:32:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="irP91iMc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB1A22280
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EF93E22280
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 13:31:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF93E22280
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvL2N-0007h3-Dy
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 09:31:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56640)
+	id 1jvL24-00077H-4n
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 09:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jvL1L-0006OM-PY
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:30:55 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33378
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jvL1I-0008GH-TK
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:30:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594733451;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=tialLkh8pgx8clCmqzYXrMqwYmrrkhzfrNyZzgw9jjs=;
- b=irP91iMc+kDxf1TS846Dkk4aaRY/QOHheArWwtr/a5mWd6NkvuEeLoWtZJAGrX/vUwUeoJ
- qkSkNim7STJz00sxqQ8lOvZcLYAODevjcUfGzlkxkS83RZLdDs+7B087IkmkjKyhJmrLzs
- bhP6ABY+tVcy307JHn+yQv2NYC20uSg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-B1hVY583PXyzKiahcLFkfQ-1; Tue, 14 Jul 2020 09:30:40 -0400
-X-MC-Unique: B1hVY583PXyzKiahcLFkfQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57CC980BCBD;
- Tue, 14 Jul 2020 13:30:38 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADA545FC31;
- Tue, 14 Jul 2020 13:30:23 +0000 (UTC)
-Date: Tue, 14 Jul 2020 14:30:21 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 1/1] MAINTAINERS: introduce cve or security quotient field
-Message-ID: <20200714133021.GF25187@redhat.com>
-References: <20200714083631.888605-1-ppandit@redhat.com>
- <20200714083631.888605-2-ppandit@redhat.com>
- <CAFEAcA9QWLmi1fGuPW93GXFKV2KCwNs6Xp3U9MU2r4wtendzhg@mail.gmail.com>
- <20200714095233.GC25187@redhat.com>
- <20200714060916-mutt-send-email-mst@kernel.org>
- <CAFEAcA_ca4JN655GW=eGyjrjDmiv0EktaZZ7RMghO5rBwm9tGQ@mail.gmail.com>
- <20200714064921-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <lma@suse.de>) id 1jvL16-0006Cg-H5
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:30:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45754)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lma@suse.de>) id 1jvL14-0008E4-9v
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 09:30:40 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 1EE1EAE61;
+ Tue, 14 Jul 2020 13:30:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200714064921-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 03:57:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 14 Jul 2020 13:30:34 +0000
+From: Lin Ma <lma@suse.de>
+To: qemu-devel@nongnu.org
+Subject: The issue about adding multipath device's targets into
+ qemu-pr-helper's namespace
+User-Agent: Roundcube Webmail
+Message-ID: <a5a06a77fea035344943bdc930a344cd@suse.de>
+X-Sender: lma@suse.de
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=lma@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:34:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,65 +67,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, P J P <ppandit@redhat.com>,
- Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: mprivozn@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 14, 2020 at 07:02:59AM -0400, Michael S. Tsirkin wrote:
-> On Tue, Jul 14, 2020 at 11:22:28AM +0100, Peter Maydell wrote:
-> > On Tue, 14 Jul 2020 at 11:12, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > And for people who want to build QEMU with lots of functionality (like
-> > > Fedora does), I think a -security flag would be a useful addition.
-> > > We can then tell security researchers "only a high security issue
-> > > if it reproduces with -security=high, only a security issue
-> > > if it reproduces with -security=low".
-> > 
-> > I think a -security option would also be useful to users -- it
-> > makes it easier for them to check "is this configuration using
-> > something that I didn't realize was not intended to be secure".
-> > For me, something useful for our users is much more compelling
-> > than "this might make security researchers' lives a bit easier".
-> > 
-> > thanks
-> > -- PMM
-> 
-> True. And I guess downstreams can also force the option to high or set the
-> default to high rather easily if they want to.
-> 
-> So the option would be:
-> 
-> -security level
-> 	Set minimal required security level of QEMU.
-> 
-> 	high: block use of QEMU functionality which is intended to be secure against
-> 		malicious guests.
-> 	low: allow use of all QEMU functionality, best effort security
-> 		against malicious guests.
-> 
-> Default would be -security low.
-> 
-> Does this look reasonable?
+Hi all,
 
-The challenge I see is that wiring up a runtime flag into every relevant
-part of the QEMU codebase is an pretty large amount of work. Every device,
-every machine type, every backend type, every generic subsystem will all
-need checks for this flag. It is possible, but it isn't going to be quick
-or easy, especially with poor error reporting support in many areas.
+I have a namespace question about passthrough disk(multipath device).
+In case of enabling namespace and cgroups in qemu.conf, The target(s) of 
+the
+multipath device won't be added into qemu-pr-helper's namespace under 
+certain
+situation, It causes the PERSISTENT RESERVE command failure in guest.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+While user starts a vm,
+To build namespace, The qemuDomainSetupDisk() will be invoked via 
+threadA(this
+thread id will be the qemu's pid),
+To build cgroup, The qemuSetupImagePathCgroup() will be invoked via 
+threadB.
 
+Both of the functions invoke the virDevMapperGetTargets() trying to 
+parse a
+multipath device to target paths string, Then fill the targetPaths[].
+
+The issue I experienced is:
+After libvirtd started, Everything works well for the first booted vm 
+which has
+the passthrough multipath device.
+But If I shut it down & start it again, OR keep it running & start 
+another vm
+which has other passthrough multipath device, Then the target(s) of the 
+fresh
+started vm won't be added into the related qemu-pr-helper's namespace 
+and it
+causes PERSISTENT RESERVE command failure in the corresponding guest.
+I digged into code, In this situation, The targetPaths[] in 
+qemuDomainSetupDisk()
+won't be filled, it keeps NULL after virDevMapperGetTargets() returns.
+The virDevMapperGetTargets doesn't fill targetPaths[] because the 
+dm_task_run()
+of libdevmapper returns 0 with errno 9(Bad file descriptor).
+So far, I don't understand why the dm_task_run() return 0 in this 
+situation.
+BTW, The virDevMapperGetTargets() can always successfully fill the 
+targetPaths[]
+in qemuSetupImagePathCgroup().
+
+Please refer to the following 2 tests:
+The multipath configuration on host:
+host:~ # multipath -l
+vm1-data (3600140582d9024bc13f4b8db5ff12de0) dm-11 FreeNAS,lv68
+size=6.0G features='0' hwhandler='1 alua' wp=rw
+`-+- policy='service-time 0' prio=0 status=active
+   `- 2:0:0:2 sdd 8:48 active undef running
+vm2-data (36001405fc5f29ace3ec4fb8acd32aae5) dm-8 FreeNAS,lv46
+size=4.0G features='0' hwhandler='1 alua' wp=rw
+`-+- policy='service-time 0' prio=0 status=active
+   `- 2:0:0:1 sde 8:64 active undef running
+
+===================================================================
+Test A:
+host:~ # systemctl restart libvirtd
+host:~ # virsh list
+  Id   Name   State
+--------------------
+
+host:~ #
+host:~ # virsh domblklist vm1
+  Target   Source
+------------------------------------------
+  vda      /opt/vms/vm1/disk0.qcow2
+  sda      /dev/mapper/vm1-data
+
+host:~ #
+host:~ # virsh start vm1
+Domain vm1 started
+
+host:~ # virsh list
+  Id   Name        State
+---------------------------
+  1    vm1        running
+
+host:~ # nsenter -t $(pidof qemu-pr-helper) -a bash
+host:~ # ls -l /dev/sd*
+brw-rw---- 1 root disk 8, 48 Jul 14 16:30 /dev/sdd
+host:~ # exit
+exit
+host:~ #
+
+vm1:~ # lsscsi
+[0:0:0:0]    disk    FreeNAS  lv68             0123   /dev/sda
+vm1:~ #
+vm1:~ # sg_persist --in -k /dev/sda
+   FreeNAS   lv68              0123
+   Peripheral device type: disk
+   PR generation=0x0, there are NO registered reservation keys
+vm1:~ #
+
+host:~ # virsh shutdown vm1
+Domain vm1 is being shutdown
+
+host:~ # virsh list
+  Id   Name   State
+--------------------
+
+host:~ #
+host:~ # virsh start vm1
+Domain vm1 started
+
+host:~ # virsh list
+  Id   Name        State
+---------------------------
+  2    vm1        running
+
+host:~ # nsenter -t $(pidof qemu-pr-helper) -a bash
+host:~ # ls -l /dev/sd*
+ls: cannot access '/dev/sd*': No such file or directory
+host:~ # exit
+exit
+host:~ #
+
+vm1:~ # sg_persist --in -k /dev/sda
+   FreeNAS   lv68              0123
+   Peripheral device type: disk
+PR in (Read keys): Aborted command
+Aborted command
+vm1:~ #
+===================================================================
+Test B:
+host:~ # systemctl restart libvirtd
+host:~ # virsh list
+  Id   Name   State
+--------------------
+
+host:~ #
+host:~ # virsh domblklist vm1
+  Target   Source
+------------------------------------------
+  vda      /opt/vms/vm1/disk0.qcow2
+  sda      /dev/mapper/vm1-data
+
+host:~ #
+host:~ # virsh start vm1
+Domain vm1 started
+
+host:~ # virsh list
+  Id   Name        State
+---------------------------
+  1    vm1        running
+
+host:~ # nsenter -t $(pidof qemu-pr-helper) -a bash
+host:~ # ls -l /dev/sd*
+brw-rw---- 1 root disk 8, 48 Jul 14 17:28 /dev/sdd
+host:~ # exit
+exit
+host:~ #
+
+vm1:~ # lsscsi
+[2:0:0:0]    disk    FreeNAS  lv68             0123   /dev/sda
+vm1:~ #
+vm1:~ # sg_persist --in -k /dev/sda
+   FreeNAS   lv68              0123
+   Peripheral device type: disk
+   PR generation=0x0, there are NO registered reservation keys
+vm1:~ #
+
+host:~ # virsh list
+  Id   Name        State
+---------------------------
+  1    vm1        running
+
+host:~ #
+host:~ # virsh domblklist vm2
+  Target   Source
+------------------------------------------
+  vda      /opt/vms/vm2/disk0.qcow2
+  sda      /dev/mapper/vm2-data
+
+host:~ #
+host:~ # virsh start vm2
+Domain vm2 started
+
+host:~ # virsh list
+  Id   Name        State
+---------------------------
+  1    vm1        running
+  2    vm2        running
+
+host:~ # nsenter -t $(qemu-pr-helper pid of vm2) -a bash
+host:~ # ls -l /dev/sd*
+ls: cannot access '/dev/sd*': No such file or directory
+host:~ # exit
+exit
+host:~ #
+
+vm2:~ # lsscsi
+[0:0:0:0]    disk    FreeNAS  lv46             0123   /dev/sda
+vm2:~ #
+vm2:~ # sg_persist --in -k /dev/sda
+   FreeNAS   lv46              0123
+   Peripheral device type: disk
+PR in (Read keys): Aborted command
+Aborted command
+vm2:~ #
+===================================================================
+
+Any comments will be much appreciated.
+
+Thanks in advance,
+Lin
 
