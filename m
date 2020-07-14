@@ -2,95 +2,87 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 925D1C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5F6C433DF
 	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 00:48:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62AF821835
+	by mail.kernel.org (Postfix) with ESMTPS id 11F4121835
 	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 00:48:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bl1RLLlg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62AF821835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gzJZkbsc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11F4121835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jv97u-0000dy-NO
+	id 1jv97u-0000dG-C5
 	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 20:48:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52012)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=457b4eeb6=alistair.francis@wdc.com>)
- id 1jv91s-0005vJ-Rf
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 20:42:40 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:30779)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=457b4eeb6=alistair.francis@wdc.com>)
- id 1jv91q-0008Or-Rm
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 20:42:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1594687359; x=1626223359;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=KXSZcRXg15OipwdCW8WzVkF8p3aOIw9mUtt4EreI9JE=;
- b=bl1RLLlg8AiI6ZYTgyjRIk8JaPSrXpsk8twS7064eezZQzUgCYazqpqf
- inbFYsk1nIjVxKUVJwhd/mFsmX6AMTJJfG98F+YvyBcoF95Zz+kBjezYg
- qEw+zz5AdUexDSicfGX+qWgmdD+BJnfxEjlhGFvvFpoyuHLJlqPEZuol9
- 9YvjPC28CLwjht+zdb98/kKz6QWYObOmVWv8lqZJa+X2YiHRpre/gJacO
- gAXX/qzFVLyraTzwhDhyAcOuK1CeiHnqgGRy2tumPc8yOicBIWSKbLWiN
- Z13y0NOc9E4srlwMc+Y/79hGu5yWYQpTdFrQIFifcjrREW9qrigTRojRh Q==;
-IronPort-SDR: LefF5gXf2PZXjm3fo/lZwOe50krRFsDUggKTFZZtyKwtjDlwXC3sR3qZBmQOVrKuQQlKn5gloK
- bzJ1IAHvgCLBTVrZSwR0BSQAXpYVB2cY8BQguQx3k/7xCUB1d+nSvk237bSESLjOSwX1QD4b0S
- Er43U4e0UddfkcV/+APxCWHFmFUYPuP1xzQ18rQWwT4sgTbOFgeJfn13RgZaNpLT8Uo57c1HZk
- WrH4w6RJr0/eKEcNTK1T4JKCU9eh/INvTRMx7QE/t/lgytXyC4WfF9GtioInDwWM9Otj+lN008
- kUM=
-X-IronPort-AV: E=Sophos;i="5.75,349,1589212800"; d="scan'208";a="142511926"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 14 Jul 2020 08:42:29 +0800
-IronPort-SDR: NBEs80AlU08iXQ3qVfROSj/vrhSaIzfp4oYDV9IoIsYple1og0hdMOaX3sF5cXMwSEH0qxMyvI
- VAu8mE48Y4IVr7rrotNyYMS9UM0ABCRwA=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 13 Jul 2020 17:30:57 -0700
-IronPort-SDR: HFJU4Ca9Mx66YoU6neAAKqfa0IIOmx5QGI540uwtxyxaQofDwArAJeP9+x8fzHAp+3oBjqAZJd
- JGoVtIPE8GnQ==
-WDCIronportException: Internal
-Received: from usa002626.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.57.178])
- by uls-op-cesaip02.wdc.com with ESMTP; 13 Jul 2020 17:42:29 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 08/15] target/riscv: fix rsub gvec tcg_assert_listed_vecop
- assertion
-Date: Mon, 13 Jul 2020 17:32:47 -0700
-Message-Id: <20200714003254.4044149-9-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200714003254.4044149-1-alistair.francis@wdc.com>
-References: <20200714003254.4044149-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jv96A-0005ql-9D
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 20:47:06 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:45298)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jv968-0000TP-FR
+ for qemu-devel@nongnu.org; Mon, 13 Jul 2020 20:47:05 -0400
+Received: by mail-il1-x144.google.com with SMTP id o3so12820925ilo.12
+ for <qemu-devel@nongnu.org>; Mon, 13 Jul 2020 17:47:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=H+hudOttfDclAnxM2JLa3xf5XAEG1u+Ej4AzrhEiGxc=;
+ b=gzJZkbscQ0thti5SuRZsOGl6rsKx0bwCiVzkBnyec5G9QFxCjkfNtE6+fhxV4USwBS
+ BWENthY/LAfi5ZWlZlfP4+Wt2zC7JeEMFPkMWghIF1Nkvp3IzsoCd+88+s1PSBdh8h6l
+ fIAxdVF03gjFNYKzrg3WygzSd/C3+4MXC95KcnQq8K89PpXqXKZBYu/9yOroXXOpw4NR
+ iSGsttVBCMUWp77N/liJmDFwR+IGXLMVfg9MhpcPLK1VTXJ0Yd3FdAxEozTZEaX1epCC
+ rJOjr/SeDWf3APJqhg0U9iq4VDHeBFndmYLjWeqJm/tl5Oq0P6j1cWNoGZuWPJDQDKN1
+ b09g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=H+hudOttfDclAnxM2JLa3xf5XAEG1u+Ej4AzrhEiGxc=;
+ b=LukjA23xs+0Q46XwJdSt/L7TwNM20yVelKZHVMBYPhSaTFDLt8d8VsdjlYXMzz5I5H
+ Hx6IrGPaZ2+HJHHmP0jgHr4C72M0ru8Oj3J/4kFveW8rmNfE/g270Iqx6k9/jcRewvBf
+ KUgnu0dN4I4WWxAsB6zzn5UH1MohVYgPYVtiC211iR6y82QU4fqviQ6TnbmsrsW1l8Bv
+ zBwRKUnyTt0AWUQCU6wb3/Cv83eZ09kChbgf6nLk/6FrPiubXsv7J9Zka8QL3VtdmgnO
+ AzfcQW9Hje2mSFnmxAqp7ssI7Zpb16jB0lvOI4VOs5NuaGNl4D6yDLfEfbZFXySgafWr
+ 4Z4w==
+X-Gm-Message-State: AOAM533BqkBENovb+XLW916eswzbrJsP2uOSYkZAqnw+WK6m8dqYW98G
+ zYJH7Z2BpgsOd9xCIhanPlcjnBgieZoSbMDSTCMh38Op
+X-Google-Smtp-Source: ABdhPJwcnMc3s2JUw7Altr4V0MRl2TkuEJzcumfVaSvrGHTAQgJXBMQl4Vh35ZRYXWYwydhKiKBlAhNesr1tSXGqlFg=
+X-Received: by 2002:a92:c213:: with SMTP id j19mr2570473ilo.40.1594687623217; 
+ Mon, 13 Jul 2020 17:47:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.144;
- envelope-from=prvs=457b4eeb6=alistair.francis@wdc.com;
- helo=esa5.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 20:42:28
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+References: <20200714003254.4044149-1-alistair.francis@wdc.com>
+In-Reply-To: <20200714003254.4044149-1-alistair.francis@wdc.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 13 Jul 2020 17:37:04 -0700
+Message-ID: <CAKmqyKP+bRqky7YB6Gv-1uybvZfGnH2sRh0g_9mLoh=1+03GcA@mail.gmail.com>
+Subject: Re: [PULL 00/15] riscv-to-apply queue
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,59 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+On Mon, Jul 13, 2020 at 5:43 PM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> The following changes since commit 20c1df5476e1e9b5d3f5b94f9f3ce01d21f14c46:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20200713-pull-request' into staging (2020-07-13 16:58:44 +0100)
+>
+> are available in the Git repository at:
+>
+>   git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200713
+>
+> for you to fetch changes up to cfad709bceb629a4ebeb5d8a3acd1871b9a6436b:
+>
+>   target/riscv: Fix pmp NA4 implementation (2020-07-13 17:25:37 -0700)
 
-gvec should provide vecop_list to avoid:
-"tcg_tcg_assert_listed_vecop: code should not be reached bug" assertion.
+Sorry these are a little late, I was hoping to send them out last week
+but I was chasing down some bugs and waiting on a few patches.
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200710104920.13550-2-frank.chang@sifive.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/insn_trans/trans_rvv.inc.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Alistair
 
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index dc333e6a91..433cdacbe1 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -958,22 +958,27 @@ static void gen_rsub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
- static void tcg_gen_gvec_rsubs(unsigned vece, uint32_t dofs, uint32_t aofs,
-                                TCGv_i64 c, uint32_t oprsz, uint32_t maxsz)
- {
-+    static const TCGOpcode vecop_list[] = { INDEX_op_sub_vec, 0 };
-     static const GVecGen2s rsub_op[4] = {
-         { .fni8 = gen_vec_rsub8_i64,
-           .fniv = gen_rsub_vec,
-           .fno = gen_helper_vec_rsubs8,
-+          .opt_opc = vecop_list,
-           .vece = MO_8 },
-         { .fni8 = gen_vec_rsub16_i64,
-           .fniv = gen_rsub_vec,
-           .fno = gen_helper_vec_rsubs16,
-+          .opt_opc = vecop_list,
-           .vece = MO_16 },
-         { .fni4 = gen_rsub_i32,
-           .fniv = gen_rsub_vec,
-           .fno = gen_helper_vec_rsubs32,
-+          .opt_opc = vecop_list,
-           .vece = MO_32 },
-         { .fni8 = gen_rsub_i64,
-           .fniv = gen_rsub_vec,
-           .fno = gen_helper_vec_rsubs64,
-+          .opt_opc = vecop_list,
-           .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-           .vece = MO_64 },
-     };
--- 
-2.27.0
-
+>
+> ----------------------------------------------------------------
+> This is a colection of bug fixes and small imrprovements for RISC-V.
+>
+> This includes some vector extensions fixes, a PMP bug fix, OpenTitan
+> UART bug fix and support for OpenSBI dynamic firmware.
+>
+> ----------------------------------------------------------------
+> Alexandre Mergnat (1):
+>       target/riscv: Fix pmp NA4 implementation
+>
+> Alistair Francis (2):
+>       hw/char: Convert the Ibex UART to use the qdev Clock model
+>       hw/char: Convert the Ibex UART to use the registerfields API
+>
+> Atish Patra (4):
+>       riscv: Unify Qemu's reset vector code path
+>       RISC-V: Copy the fdt in dram instead of ROM
+>       riscv: Add opensbi firmware dynamic support
+>       RISC-V: Support 64 bit start address
+>
+> Bin Meng (3):
+>       MAINTAINERS: Add an entry for OpenSBI firmware
+>       hw/riscv: virt: Sort the SoC memmap table entries
+>       hw/riscv: Modify MROM size to end at 0x10000
+>
+> Frank Chang (4):
+>       target/riscv: fix rsub gvec tcg_assert_listed_vecop assertion
+>       target/riscv: correct the gvec IR called in gen_vec_rsub16_i64()
+>       target/riscv: fix return value of do_opivx_widen()
+>       target/riscv: fix vill bit index in vtype register
+>
+> Liao Pingfang (1):
+>       tcg/riscv: Remove superfluous breaks
+>
+>  include/hw/char/ibex_uart.h             |  79 ++++++++--------
+>  include/hw/riscv/boot.h                 |   7 ++
+>  include/hw/riscv/boot_opensbi.h         |  58 ++++++++++++
+>  target/riscv/cpu.h                      |   2 +-
+>  hw/char/ibex_uart.c                     | 158 ++++++++++++++++++--------------
+>  hw/riscv/boot.c                         | 107 +++++++++++++++++++++
+>  hw/riscv/sifive_u.c                     |  53 ++++++-----
+>  hw/riscv/spike.c                        |  59 ++++--------
+>  hw/riscv/virt.c                         |  63 ++++---------
+>  target/riscv/insn_trans/trans_rvv.inc.c |   9 +-
+>  target/riscv/pmp.c                      |   2 +-
+>  tcg/riscv/tcg-target.inc.c              |   2 -
+>  MAINTAINERS                             |   7 ++
+>  13 files changed, 387 insertions(+), 219 deletions(-)
+>  create mode 100644 include/hw/riscv/boot_opensbi.h
+>
 
