@@ -4,91 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EBEC433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F03C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:24:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 221452053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EBF02053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:24:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aToWjyqp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221452053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KO+bntPy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBF02053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvH9U-0004ck-Fa
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:23:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49574)
+	id 1jvHAx-0006Hk-Oy
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:24:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvH8v-0004B6-Ti
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:22:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57492
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jvHAG-0005bZ-IU
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:23:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33156
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvH8u-0008Tk-6x
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:22:29 -0400
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1jvHAD-0000DS-D2
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:23:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594718547;
+ s=mimecast20190719; t=1594718628;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=M3t1bq4CUoNn/AA04AXC4uVYJX8ueX8wsnFj6FZyRMs=;
- b=aToWjyqpnW7Ciu6r8PArPajD5iJTz4BvHCoiRiJZuev0reL7Rx+Rncbff/s5OPUh0HA4lz
- plZWWCi9Er91WrF6bGdvBkK4z49QO128XO1KADCSzvac25+rUlryhJR1Hqoo7yMY6VxEOZ
- 3OxnKbc7dhQMQ9U+BAt4NOLcpKBqbQg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-MVD466hKOdyfrF09IdGDdA-1; Tue, 14 Jul 2020 05:22:25 -0400
-X-MC-Unique: MVD466hKOdyfrF09IdGDdA-1
-Received: by mail-wm1-f72.google.com with SMTP id o13so3028388wmh.9
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 02:22:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=M3t1bq4CUoNn/AA04AXC4uVYJX8ueX8wsnFj6FZyRMs=;
- b=RZ2fmjZJh5jJS0eWE4ewQ6sMAF39S+UTbVMeEm0zJpJn5+dqlbH7DQikUGVU5rfoFL
- FJ6aAC58XiAb8maKVEzUVicBdi0hwt1BpXViV3Qdcg49bWnCOkPMi9WhnkytJjtepjvl
- VZ5vdGg6/syE417pqZ3xcN6UYkaGZNLq6MlLyQZaYZZDDv8vZpS4Hz9/T398VFMWV4Vq
- uK8419xd9nMiEq1/aarHLWcsNp73X5VRW4VPRV9sF5omksHJbuyN2yVki9NOmQZTSd9+
- QmACkB/O3Dm9YEZjLne0zP3mo1/c5jT4Qrlmex4ZYa9Ymm401sQCIVyDX2lkXTyYFiHg
- npAw==
-X-Gm-Message-State: AOAM5317RemuCo6m4AwkjeUNIryzKcJ0XWlY27kesDHmlnaUqHJ/U0vH
- 0jjlV/1QB7oQ98wNjFBUgRYQinUdNZtWqO7mQx/QQRs+TgozfwPI76aQoVzu0q4TsIAnfhfh5I9
- t1X2qOd+lmAnD3fk=
-X-Received: by 2002:adf:edc8:: with SMTP id v8mr3920062wro.125.1594718544369; 
- Tue, 14 Jul 2020 02:22:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyHFwWeg5biEpXtjbjxcTZmaNkJiDG6aBFgxdsxLeVZownuLxZiAuD1iCbC4FpZImySIkZqXw==
-X-Received: by 2002:adf:edc8:: with SMTP id v8mr3920046wro.125.1594718544152; 
- Tue, 14 Jul 2020 02:22:24 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
- by smtp.gmail.com with ESMTPSA id g13sm28899975wro.84.2020.07.14.02.22.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jul 2020 02:22:23 -0700 (PDT)
-Date: Tue, 14 Jul 2020 05:22:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [RFC PATCH 3/5] hw/i386/acpi-build: Add ACPI PCI hot-plug
- methods to q35
-Message-ID: <20200714052137-mutt-send-email-mst@kernel.org>
-References: <20200708224615.114077-1-jusual@redhat.com>
- <20200708224615.114077-4-jusual@redhat.com>
- <20200713163954.565722a5@redhat.com>
+ bh=rGSI4x/bOBZs9x91PCP+xXyktpW7V19mLrnFH4eiSgc=;
+ b=KO+bntPy3dj8tfuR+XFz/Qb1QMhTSJSBujioPoYSLfyFEKIj1dOmV1m+2lEpjtnqpDkRn3
+ +4bqIr5Go2gPdJQtM4ReCtwi1/5sZGDY4mSA4WZX8FjbPcWmBW/PSUTC1EtSqpfJDDKdw5
+ 1Buunc5hDIlFgMxiu1rvOFGFEQy3vVk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-35xMovGSN-635zBldLFBjg-1; Tue, 14 Jul 2020 05:23:44 -0400
+X-MC-Unique: 35xMovGSN-635zBldLFBjg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A29A818FF69E;
+ Tue, 14 Jul 2020 09:23:42 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.163])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ADF9E7A460;
+ Tue, 14 Jul 2020 09:23:28 +0000 (UTC)
+Date: Tue, 14 Jul 2020 11:23:25 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 3/4] hw/arm/virt-acpi-build: Only expose flash on older
+ machine types
+Message-ID: <20200714092325.5klaeqelu46mhg76@kamzik.brq.redhat.com>
+References: <20200629140938.17566-1-drjones@redhat.com>
+ <20200629140938.17566-4-drjones@redhat.com>
+ <20200713104907.335bf762@redhat.com>
+ <20200714055109.owrlob6m53notzh3@kamzik.brq.redhat.com>
+ <20200714045537-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200713163954.565722a5@redhat.com>
+In-Reply-To: <20200714045537-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 01:42:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -109,101 +100,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
- kraxel@redhat.com
+Cc: peter.maydell@linaro.org, eric.auger@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+ ard.biesheuvel@arm.com, Igor Mammedov <imammedo@redhat.com>, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 13, 2020 at 04:39:54PM +0200, Igor Mammedov wrote:
-> On Thu,  9 Jul 2020 00:46:13 +0200
-> Julia Suvorova <jusual@redhat.com> wrote:
-> 
-> > Implement notifications and gpe to support q35 ACPI PCI hot-plug.
-> > The addresses specified in [1] remain the same to make fewer changes.
+On Tue, Jul 14, 2020 at 04:57:50AM -0400, Michael S. Tsirkin wrote:
+> On Tue, Jul 14, 2020 at 07:51:09AM +0200, Andrew Jones wrote:
+> > On Mon, Jul 13, 2020 at 10:49:07AM +0200, Igor Mammedov wrote:
+> > > On Mon, 29 Jun 2020 16:09:37 +0200
+> > > Andrew Jones <drjones@redhat.com> wrote:
+> > > 
+> > > > The flash device is exclusively for the host-controlled firmware, so
+> > > > we should not expose it to the OS. Exposing it risks the OS messing
+> > > > with it, which could break firmware runtime services and surprise the
+> > > > OS when all its changes disappear after reboot.
+> > > > 
+> > > > As firmware needs the device and uses DT, we leave the device exposed
+> > > > there. It's up to firmware to remove the nodes from DT before sending
+> > > > it on to the OS. However, there's no need to force firmware to remove
+> > > > tables from ACPI (which it doesn't know how to do anyway), so we
+> > > > simply don't add the tables in the first place. But, as we've been
+> > > > adding the tables for quite some time and don't want to change the
+> > > > default hardware exposed to versioned machines, then we only stop
+> > > > exposing the flash device tables for 5.1 and later machine types.
+> > > > 
+> > > > Suggested-by: Ard Biesheuvel <ard.biesheuvel@arm.com>
+> > > > Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > > ---
+> > > >  hw/arm/virt-acpi-build.c | 5 ++++-
+> > > >  hw/arm/virt.c            | 3 +++
+> > > >  include/hw/arm/virt.h    | 1 +
+> > > >  3 files changed, 8 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > > index 1384a2cf2ab4..91f0df7b13a3 100644
+> > > > --- a/hw/arm/virt-acpi-build.c
+> > > > +++ b/hw/arm/virt-acpi-build.c
+> > > > @@ -749,6 +749,7 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
+> > > >  static void
+> > > >  build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> > > >  {
+> > > > +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+> > > >      Aml *scope, *dsdt;
+> > > >      MachineState *ms = MACHINE(vms);
+> > > >      const MemMapEntry *memmap = vms->memmap;
+> > > > @@ -767,7 +768,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> > > >      acpi_dsdt_add_cpus(scope, vms->smp_cpus);
+> > > >      acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+> > > >                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
+> > > > -    acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
+> > > > +    if (vmc->acpi_expose_flash) {
+> > > > +        acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
+> > > > +    }
+> > > >      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
+> > > >      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+> > > >                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+> > > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > > index cd0834ce7faf..5adc9ff799ef 100644
+> > > > --- a/hw/arm/virt.c
+> > > > +++ b/hw/arm/virt.c
+> > > > @@ -2482,9 +2482,12 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+> > > >  
+> > > >  static void virt_machine_5_0_options(MachineClass *mc)
+> > > >  {
+> > > > +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> > > > +
+> > > >      virt_machine_5_1_options(mc);
+> > > >      compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+> > > >      mc->numa_mem_supported = true;
+> > > > +    vmc->acpi_expose_flash = true;
+> > > 
+> > > we usually do not version ACPI tables changes
+> > > (unless we have a good reason to do so)
 > > 
-> > [1] docs/spec/acpi_pci_hotplug.txt
+> > Even when the change is to remove the exposure of hardware from the guest?
+> > Before this change, if a guest looked, it had a flash, after this change,
+> > if a guest looks, it doesn't.
 > 
-> CCing Gerd his opinion on reusing piix4 IO port range for q35
-> 
->  
-> > Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> > ---
-> >  hw/i386/acpi-build.c | 20 +++++++++++++-------
-> >  1 file changed, 13 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index 11c598f955..5c5ad88ad6 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -201,10 +201,6 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-> >          /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
-> >          pm->fadt.rev = 1;
-> >          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
-> > -        pm->pcihp_io_base =
-> > -            object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-> > -        pm->pcihp_io_len =
-> > -            object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
-> >      }
-> >      if (lpc) {
-> >          struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
-> > @@ -214,6 +210,10 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-> >          pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
-> >          pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
-> >      }
-> > +    pm->pcihp_io_base =
-> > +        object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-> > +    pm->pcihp_io_len =
-> > +        object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
-> >  
-> >      /* The above need not be conditional on machine type because the reset port
-> >       * happens to be the same on PIIX (pc) and ICH9 (q35). */
-> > @@ -472,7 +472,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-> >          QLIST_FOREACH(sec, &bus->child, sibling) {
-> >              int32_t devfn = sec->parent_dev->devfn;
-> >  
-> > -            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
-> > +            if (pci_bus_is_root(sec)) {
-> >                  continue;
-> >              }
-> >  
-> > @@ -1586,7 +1586,12 @@ static void build_piix4_pci_hotplug(Aml *table)
-> >      aml_append(table, scope);
-> >  }
-> >  
-> > -static Aml *build_q35_osc_method(void)
-> > +static void build_q35_pci_hotplug(Aml *table)
-> > +{
-> > +    build_piix4_pci_hotplug(table);
-> > +}
-> 
-> s/build_piix4_pci_hotplug/build_i386_acpi_pci_hotplug/
-> 
-> and reuse it in both cases, instead of adding wrapper?
+> It's up to the relevant maintainers who know what the semantics are.
+> FYI ACPI tables only change across a reset though.
+> So it's a question of whether guests get confused even if this
+> changes after a reboot.
 
-I'm not sure about that - we have microvm too ...
+Yup, but it's still the same "machine", so a user may wonder why it
+changed.
 
-> > +
-> > +static Aml *build_q35_osc_method(AcpiPmInfo *pm)
-> >  {
-> >      Aml *if_ctx;
-> >      Aml *if_ctx2;
-> > @@ -1698,6 +1703,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> >          build_hpet_aml(dsdt);
-> >          build_q35_isa_bridge(dsdt);
-> >          build_isa_devices_aml(dsdt);
-> > +        build_q35_pci_hotplug(dsdt);
-> >          build_q35_pci0_int(dsdt);
-> >          if (pcms->smbus && !pcmc->do_not_add_smb_acpi) {
-> >              build_smb0(dsdt, pcms->smbus, ICH9_SMB_DEV, ICH9_SMB_FUNC);
-> > @@ -1724,7 +1730,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> >      {
-> >          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
-> >  
-> > -        if (misc->is_piix4) {
-> > +        if (misc->is_piix4 || pm->pcihp_bridge_en) {
-> >              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
-> >              aml_append(method,
-> >                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
+> Versioning is generally safer, but it's a good idea to document
+> the motivation for it.
+>
+
+Well, in this case, we could probably push this change to old machine
+types and nobody would notice. If a guest is using ACPI, then it must
+be using firmware, and if they're using firmware, then they can't be
+using the flash. So the user shouldn't care if it's there or not. The
+only justification for the versioning is because "it's safer". If
+people feel strongly about avoiding versioning when it's not obviously
+necessary, then I can respin without it.
+
+Thanks,
+drew
 
 
