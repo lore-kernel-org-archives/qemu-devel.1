@@ -2,153 +2,119 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CDDC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4644EC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:18:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1260A2242C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F85C2255F
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 19:18:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gPHTP3BR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1260A2242C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e592i9lz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F85C2255F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvQQ6-00032E-9G
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 15:16:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41186)
+	id 1jvQRX-00043h-CJ
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 15:18:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jvQPR-0002ao-0R
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:16:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57340
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvQQx-0003YM-1K
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:17:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34004
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jvQPO-0004jm-48
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:16:08 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvQQu-0004wY-O1
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 15:17:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594754164;
+ s=mimecast20190719; t=1594754259;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=EWLymV1lFwquQq5PBLrtF3kifRkDA+VDRI+8ZQproFY=;
- b=gPHTP3BRks1XGYDnoplFDmquXCfRjwskbEe5aUcA29F+tl05fYp2Jm7qkYNU+D/eqtXh1A
- lT1o1uT6p/3bmCrINRep3qcVhWpAKwZagvbLB7LsN4roM6+OUVT7VrnPchAEbDLq8FMhOS
- ElMkBijiIUb+yhhWfY1o6aJ5JqVuFuE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-kynIACANPmG8K7yBr-vv_A-1; Tue, 14 Jul 2020 15:16:00 -0400
-X-MC-Unique: kynIACANPmG8K7yBr-vv_A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC85DC7467;
- Tue, 14 Jul 2020 19:15:58 +0000 (UTC)
-Received: from [10.10.113.141] (ovpn-113-141.rdu2.redhat.com [10.10.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1088F710C5;
- Tue, 14 Jul 2020 19:15:57 +0000 (UTC)
-Subject: Re: [PATCH 1/1] MAINTAINERS: Add Python library stanza
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200710215718.13034-1-jsnow@redhat.com>
- <20200710215718.13034-2-jsnow@redhat.com> <87365v1qsx.fsf@linaro.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4c3cc9f4-475f-d2d1-6ef3-c5a1e5856b43@redhat.com>
-Date: Tue, 14 Jul 2020 15:15:57 -0400
+ bh=1FhVWs3JKd3uEIBrnVXU/Jqx35HNlZ9v975jexPoM9g=;
+ b=e592i9lzrQswBcs6Ibl71hrkdsWPxQWXyCzw0M7VerERf8iN4aYqLKWH7fpph5eZHm1N9/
+ miRLM48N4NF8Uk+yswFIpNgbGmQ638S5bJhjrj9llu8y4S6AzneOwRauCgJCxTHlvO4OLU
+ wYI3RB8qPQawzAN8vUgVaJ0zr1WAsbg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-rTnnA7M1PXydwDKtzXWP_A-1; Tue, 14 Jul 2020 15:17:37 -0400
+X-MC-Unique: rTnnA7M1PXydwDKtzXWP_A-1
+Received: by mail-wm1-f69.google.com with SMTP id g124so5308379wmg.6
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 12:17:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=1FhVWs3JKd3uEIBrnVXU/Jqx35HNlZ9v975jexPoM9g=;
+ b=ZXLrMWtHkK5Lr+Yz+MB07EX9qJkCvTJx06PdkrTcbMolySp2COYdaIsGtV5UftA84I
+ vQEv1L+R89ch8aUgNl6VfUiIlp4IO2X8xooIfvuVurhxuaKHWyGzg9GbsB09t36PVkaX
+ yp1Vdtg4m5KJaa5MJa6+vXQPsPgr3rx4LUHu6JpokLnEqSmXgVi/4e8jUqn5fkTc9XRq
+ CSrH+bs5E4M0FUlq8IaR/LlmZqaruvxs1dbhoiOzM0hq0iW2943rYezJ7u3ok8XMIjPR
+ Z8sRH/ZWJXMDN/O+KwK/B48XTFo/SbwUT1NxUu2RUAlJlm+MFwmGgADhC/3mFOrOTaAC
+ VwUg==
+X-Gm-Message-State: AOAM533AxCYpM0DHV5a3VzpDPbSf6zMU7CizKd/yiUcbbBsZmJa3jnLq
+ xr6piFx8NBqfVqt4jto45I5lmZ7xYMMhH2e0lHdKjPQWXa42G1UktqluuRIhyLOan1eqgyC+l7F
+ im5pTOWRMUvyYb7w=
+X-Received: by 2002:adf:db4d:: with SMTP id f13mr7393686wrj.336.1594754256851; 
+ Tue, 14 Jul 2020 12:17:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyVWp4h19Y7JABsKk/QSLRbIr/I3wLyX0icLB/wnhNqQhS14qrgkb1y6DgUSlAv1bThuG59sg==
+X-Received: by 2002:adf:db4d:: with SMTP id f13mr7393665wrj.336.1594754256609; 
+ Tue, 14 Jul 2020 12:17:36 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id b18sm30505580wrs.46.2020.07.14.12.17.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Jul 2020 12:17:36 -0700 (PDT)
+Subject: Re: [PATCH v5 00/12] python/machine.py: refactor shutdown
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200710050649.32434-1-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <19310630-6101-4b4a-42c5-6354081c783e@redhat.com>
+Date: Tue, 14 Jul 2020 21:17:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87365v1qsx.fsf@linaro.org>
+In-Reply-To: <20200710050649.32434-1-jsnow@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -171,67 +137,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, crosa@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com
+Cc: kwolf@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/10/20 7:06 AM, John Snow wrote:
+> v5: More or less rewritten.
+> 
+> This series is motivated by a desire to move python/qemu onto a strict
+> mypy/pylint regime to help prevent regressions in the python codebase.
+> 
+> 1. Remove the "bare except" pattern in the existing shutdown code, which
+>    can mask problems and make debugging difficult.
+> 
+> 2. Ensure that post-shutdown cleanup is always performed, even when
+>    graceful termination fails.
+> 
+> 3. Unify cleanup paths such that no matter how the VM is terminated, the
+>    same functions and steps are always taken to reset the object state.
+> 
+> 4. Rewrite shutdown() such that any error encountered when attempting a
+>    graceful shutdown will be raised as an AbnormalShutdown exception.
+>    The pythonic idiom is to allow the caller to decide if this is a
+>    problem or not.
+> 
+> Previous versions of this series did not engage the fourth goal, and ran
+> into race conditions. When I was trying to allow shutdown to succeed if
+> QEMU was already closed, it became impossible to tell in which cases
+> QEMU not being present was "OK" and in which cases it was evidence of a
+> problem.
+> 
+> This refactoring is even more explicit. If a graceful shutdown is
+> requested and cannot be performed, an exception /will/ be raised.
+> 
+> In cases where the test writer expects QEMU to already have exited,
+> vm.wait() should be used in preference to vm.shutdown(). In cases where
+> a graceful shutdown is not interesting or necessary to the test,
+> vm.kill() should be used.
+> 
+> John Snow (12):
+>   python/machine.py: consolidate _post_shutdown()
+>   python/machine.py: Close QMP socket in cleanup
+>   python/machine.py: Add _early_cleanup hook
+>   python/machine.py: Perform early cleanup for wait() calls, too
+>   python/machine.py: Prohibit multiple shutdown() calls
+>   python/machine.py: Add a configurable timeout to shutdown()
+>   python/machine.py: Make wait() call shutdown()
+>   tests/acceptance: wait() instead of shutdown() where appropriate
+>   tests/acceptance: Don't test reboot on cubieboard
+>   python/machine.py: split shutdown into hard and soft flavors
+>   python/machine.py: re-add sigkill warning suppression
+>   python/machine.py: change default wait timeout to 3 seconds
 
-
-On 7/13/20 9:35 AM, Alex Bennée wrote:
-> 
-> John Snow <jsnow@redhat.com> writes:
-> 
->> I'm proposing that I split the actual Python library off from the other
->> miscellaneous python scripts we have and declare it maintained. Add
->> myself as a maintainer of this folder, along with Cleber.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  MAINTAINERS | 9 ++++++++-
->>  1 file changed, 8 insertions(+), 1 deletion(-)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 6aa54f7f8f..fe1dcd5a76 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -2280,11 +2280,18 @@ S: Maintained
->>  F: include/sysemu/cryptodev*.h
->>  F: backends/cryptodev*.c
->>  
->> +Python library
->> +M: John Snow <jsnow@redhat.com>
->> +M: Cleber Rosa <crosa@redhat.com>
->> +R: Eduardo Habkost <ehabkost@redhat.com>
->> +S: Maintained
->> +F: python/*
-> 
-> I don't think that's equivalent to what you drop bellow:
-> 
->     F:	drivers/net/	all files in and below drivers/net
->     F:	drivers/net/*	all files in drivers/net, but not below
-> 
-> So I think you should drop the *
-> 
->> +T: git https://gitlab.com/jsnow/qemu.git python
->> +
->>  Python scripts
->>  M: Eduardo Habkost <ehabkost@redhat.com>
->>  M: Cleber Rosa <crosa@redhat.com>
->>  S: Odd fixes
->> -F: python/qemu/*py
->>  F: scripts/*.py
->>  F: tests/*.py
-> 
-> Otherwise:
-> 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-
-ACK on the edit, I think otherwise I'm still technically waiting for
-Cleber to approve this before I would ask for someone to stage it.
-
---js
+Series (finally) queued on python-next, thanks.
 
 
