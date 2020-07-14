@@ -2,132 +2,66 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3774CC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F56C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01F1A22515
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:34:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OP7JOCbm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01F1A22515
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 386CF22515
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:30:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386CF22515
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvM1H-0002t5-7n
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:34:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47650)
+	id 1jvLwe-0000lk-E2
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:30:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvM0S-0002EM-9M
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:34:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21481
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvM0P-0000Q2-90
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:34:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594737240;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=UB8M4CZu44kJhtEc5ZmxxCl71WvAqj2QdKusJMHGvv8=;
- b=OP7JOCbmxh3A9WXPvz9hT8efaoGW4JYbnv44Uf8gbGfzX0u4FYvDRWvnGX1SZRzXFuumiz
- hc7/t0aISHosl/4UG2iEN47X20D6/6H4r2Cg1/ZUTQ4K79MHz6YvPamdpw4tuoSJ0nnntj
- yVTkNNHGaGS8yNmKGIhOYlMmZvTZrew=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77--TJ1uoljPVCbxCTxIt5hhw-1; Tue, 14 Jul 2020 10:33:58 -0400
-X-MC-Unique: -TJ1uoljPVCbxCTxIt5hhw-1
-Received: by mail-wr1-f71.google.com with SMTP id 89so21943733wrr.15
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:33:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=UB8M4CZu44kJhtEc5ZmxxCl71WvAqj2QdKusJMHGvv8=;
- b=bhGxocvKiS4KkjdRhBY6F2UVZ+PmWxnaM2BZ9Z3V/Pks8TU5DZ2EGRkNay8tnPkv4C
- 8tKitxc1rQboe+rHz9d5Zdy6HAOwB8xAq0kq1Icw8AaD78WRZ0+I8ywds0Tfw+qnKTIf
- dUtOh1Os0Ik2D0Hx5sTp3MuHVC+Vx0jatvoNB2jXJWJel90L7hYmGTNUU4iXkEll8vVg
- f2G4DgbQOBvjAsgobrcbbat1pR1mqMzrz9EUJ0uUqxEzpXoUgS1qeTahr0bogzoKEpli
- GuU/pFBstXNDW3raHTHmiin8gKdwjw1KnEqAshqh8cJNYl3fP/o3KLvyJ0YyM+Vk63re
- oxmQ==
-X-Gm-Message-State: AOAM530ViOY6RMzKUqVZnUAZ6u9Wr/Ttpon6OrFV0Ijn3ML4iaW1z73N
- ++DevdbgyqlpNDYfh5zYHw1d7zdk3NeEJx9TcdjAU+oi9PH54DBxX9VJZuFItrbykZ7e7Q8hrRe
- GnlbveH1tsKWyA6U=
-X-Received: by 2002:adf:d842:: with SMTP id k2mr6171001wrl.239.1594737236950; 
- Tue, 14 Jul 2020 07:33:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzMdDdxqMQQdUh3G7nUReNyxf//0PDBsKImjrY27/nt5ciaL6FHYIntdPwaN5xwzUgunUnv1A==
-X-Received: by 2002:adf:d842:: with SMTP id k2mr6170940wrl.239.1594737236595; 
- Tue, 14 Jul 2020 07:33:56 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id j75sm19644190wrj.22.2020.07.14.07.33.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 07:33:55 -0700 (PDT)
-Subject: Re: [PATCH v2 0/7] colo: Introduce resource agent and test suite/CI
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
-References: <cover.1591456338.git.lukasstraub2@web.de>
- <20200705113750.45175374@luklap>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <71686e50-1dda-5aca-c1c4-2906cac38da4@redhat.com>
-Date: Tue, 14 Jul 2020 16:33:54 +0200
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jvLw1-0000Gi-UQ
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:29:29 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55648)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jvLvz-0007Ml-BP
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:29:29 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 49BA8AC85;
+ Tue, 14 Jul 2020 14:29:27 +0000 (UTC)
+Subject: Re: migration: broken snapshot saves appear on s390 when small fields
+ in migration stream removed
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, 
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf
+ <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+References: <8bbafdec-836d-b7de-cab8-7a325b6e238d@suse.de>
+ <55c406cd-b9ca-4e9b-0acd-d33cfe2a70e3@redhat.com>
+ <bf074240-8cc3-96ff-e95e-bd301822b756@suse.de>
+Message-ID: <ea3b617f-c2ea-534c-06ba-f5f9f43828a7@suse.de>
+Date: Tue, 14 Jul 2020 16:29:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200705113750.45175374@luklap>
+In-Reply-To: <bf074240-8cc3-96ff-e95e-bd301822b756@suse.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:34:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,96 +74,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Zhang Chen <chen.zhang@intel.com>,
- Alberto Garcia <berto@igalia.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Liang Yan <lyan@suse.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/5/20 11:37 AM, Lukas Straub wrote:
-> On Sat, 6 Jun 2020 21:17:32 +0200
-> Lukas Straub <lukasstraub2@web.de> wrote:
-> 
->> Hello Everyone,
->> So here is v2. Patch 1 can already be merged independently of the others.
->>
->> Regards,
->> Lukas Straub
->>
->> Changes:
->> v2:
->>  -use new yank api
->>  -drop disk_size parameter
->>  -introduce pick_qemu_util function and use it
->>
->> Overview:
->>
->> Hello Everyone,
->> These patches introduce a resource agent for fully automatic management of colo
->> and a test suite building upon the resource agent to extensively test colo.
->>
->> Test suite features:
->> -Tests failover with peer crashing and hanging and failover during checkpoint
->> -Tests network using ssh and iperf3
->> -Quick test requires no special configuration
->> -Network test for testing colo-compare
->> -Stress test: failover all the time with network load
->>
->> Resource agent features:
->> -Fully automatic management of colo
->> -Handles many failures: hanging/crashing qemu, replication error, disk error, ...
->> -Recovers from hanging qemu by using the "yank" oob command
->> -Tracks which node has up-to-date data
->> -Works well in clusters with more than 2 nodes
->>
->> Run times on my laptop:
->> Quick test: 200s
->> Network test: 800s (tagged as slow)
->> Stress test: 1300s (tagged as slow)
->>
->> The test suite needs access to a network bridge to properly test the network,
->> so some parameters need to be given to the test run. See
->> tests/acceptance/colo.py for more information.
->>
->> I wonder how this integrates in existing CI infrastructure. Is there a common
->> CI for qemu where this can run or does every subsystem have to run their own
->> CI?
->>
->> Regards,
->> Lukas Straub
->>
->>
->> Lukas Straub (7):
->>   block/quorum.c: stable children names
->>   avocado_qemu: Introduce pick_qemu_util to pick qemu utility binaries
->>   boot_linux.py: Use pick_qemu_util
->>   colo: Introduce resource agent
->>   colo: Introduce high-level test suite
->>   configure,Makefile: Install colo resource-agent
->>   MAINTAINERS: Add myself as maintainer for COLO resource agent
->>
->>  MAINTAINERS                               |    6 +
->>  Makefile                                  |    5 +
->>  block/quorum.c                            |   20 +-
->>  configure                                 |   10 +
->>  scripts/colo-resource-agent/colo          | 1466 +++++++++++++++++++++
->>  scripts/colo-resource-agent/crm_master    |   44 +
->>  scripts/colo-resource-agent/crm_resource  |   12 +
->>  tests/acceptance/avocado_qemu/__init__.py |   15 +
->>  tests/acceptance/boot_linux.py            |   11 +-
->>  tests/acceptance/colo.py                  |  677 ++++++++++
->>  10 files changed, 2251 insertions(+), 15 deletions(-)
->>  create mode 100755 scripts/colo-resource-agent/colo
->>  create mode 100755 scripts/colo-resource-agent/crm_master
->>  create mode 100755 scripts/colo-resource-agent/crm_resource
->>  create mode 100644 tests/acceptance/colo.py
->>
->> --
->> 2.20.1
-> 
-> Ping...
+Hello,
 
-Ping^2?
+I have some tiny progress in narrowing down this issue, possibly a qcow2 issue, still unclear,
+but involving Kevin Wolf and Max Reitz.
+
+
+The reproducer again:
+
+> --------------------------------------------cut-------------------------------------------
+> diff --git a/cpus.c b/cpus.c
+> index 41d1c5099f..443b88697a 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -643,7 +643,7 @@ static void qemu_account_warp_timer(void)
+>  
+>  static bool icount_state_needed(void *opaque)
+>  {
+> -    return use_icount;
+> +    return 0;
+>  }
+>  
+>  static bool warp_timer_state_needed(void *opaque)
+> --------------------------------------------cut-------------------------------------------
+
+
+
+This issue for now appears on s390 only:
+
+On s390 hardware, test 267 fails (both kvm and tcg) in the qcow2 backing file part, with broken migration stream data in the s390-skeys vmsave (old style).
+
+What is new?
+It is possible to work around the problem by adding back to the stream simply by extending, for example, the existing UNUSED field in the timers vmstate.
+
+So this "fixes it", applied on top of the reproducer:
+
+--------------------------------------------cut-------------------------------------------
+@@ -728,7 +728,7 @@ static const VMStateDescription vmstate_timers = {
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+         VMSTATE_INT64(cpu_ticks_offset, TimersState),
+-        VMSTATE_UNUSED(8),
++        VMSTATE_UNUSED(119),
+         VMSTATE_INT64_V(cpu_clock_offset, TimersState, 2),
+         VMSTATE_END_OF_LIST()
+     },
+--------------------------------------------cut-------------------------------------------
+
+
+NB: Exactly 111 bytes need to be added, not one byte less.
+
+Using VMSTATE_UNUSED(118) again breaks.
+Using VMSTATE_UNUSED(120) or more is _fine_. Seems that a certain threshold needs to be reached in the stream, before the transfer of old style vmsave fields in s390-skeys is successful.
+
+So here is the output, with some logging, of the VMSTATE_UNUSED(118) run (FAILURE, marked by error "-22"), followed by the VMSTATE_UNUSED(119) run (SUCCESS).
+qemu_fflush logs when called, as well as s390 save key code, just before and just after writing the skey fields.
+
+VMSTATE_UNUSED(118):
+
+QA output created by 267
+
+=== -blockdev with a backing file ===
+
+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
+Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT.base,node-name=backing-file -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,backing=backing-file,node-name=fmt
+QEMU X.Y.Z monitor - type 'help' for more information
+(qemu) savevm snap0
+qemu_fflush: written: 82, expected: 82 - done.
+qemu_fflush: written: 78, expected: 78 - done.
+qemu_fflush: - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 81907, expected: 81907 - done.
+qemu_fflush: written: 36, expected: 36 - done.
+saving keys to stream...
+bytes_xfer=344418 xfer_limit=0 pos=344247 buf_index=331 buf_size=0
+iov cnt=1
+[0] base=0x2aa38733778 len=331 [~]
+
+qemu_fflush: written: 32768, expected: 32768 - done.
+saved keys to stream.
+bytes_xfer=377210 xfer_limit=0 pos=377015 buf_index=355 buf_size=0
+iov cnt=1
+[0] base=0x2aa38733778 len=355 []
+
+qemu_fflush: written: 16201, expected: 16201 - done.
+qemu_fflush: - done.
+qemu_fflush: - done.
+(qemu) info snapshots
+List of snapshots present on all disks:
+ID        TAG                     VM SIZE                DATE       VM CLOCK
+--        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+(qemu) loadvm snap0
+Unexpected storage key flag data: 0
+error while loading state for instance 0x0 of device 's390-skeys'
+qemu_fflush: not writable!
+Error: Error -22 while loading VM state
+(qemu) quit
+
+*** done
+
+
+
+===================================================================================================================================
+
+
+
+VMSTATE_UNUSED(119):
+
+
+QA output created by 267
+
+=== -blockdev with a backing file ===
+
+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
+Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT.base,node-name=backing-file -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file -blockdev driver=IMGFMT,file=file,backing=backing-file,node-name=fmt
+QEMU X.Y.Z monitor - type 'help' for more information
+(qemu) savevm snap0
+qemu_fflush: written: 82, expected: 82 - done.
+qemu_fflush: written: 78, expected: 78 - done.
+qemu_fflush: - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 32768, expected: 32768 - done.
+qemu_fflush: written: 81907, expected: 81907 - done.
+qemu_fflush: written: 36, expected: 36 - done.
+saving keys to stream...
+bytes_xfer=344419 xfer_limit=0 pos=344247 buf_index=332 buf_size=0
+iov cnt=1
+[0] base=0x2aa1bc41778 len=332 [~]
+
+qemu_fflush: written: 32768, expected: 32768 - done.
+saved keys to stream.
+bytes_xfer=377211 xfer_limit=0 pos=377015 buf_index=356 buf_size=0
+iov cnt=1
+[0] base=0x2aa1bc41778 len=356 []
+
+qemu_fflush: written: 16202, expected: 16202 - done.
+qemu_fflush: - done.
+qemu_fflush: - done.
+(qemu) info snapshots
+List of snapshots present on all disks:
+
+
+=================================================
+
+Here is the diff between failed and successful runs:
+
+--- bad_extra_118.txt   2020-07-14 09:52:48.054023509 -0400
++++ good_extra_119.txt  2020-07-14 09:48:30.823977732 -0400
+@@ -21,17 +21,17 @@
+ qemu_fflush: written: 81907, expected: 81907 - done.
+ qemu_fflush: written: 36, expected: 36 - done.
+ saving keys to stream...
+-bytes_xfer=344418 xfer_limit=0 pos=344247 buf_index=331 buf_size=0
++bytes_xfer=344419 xfer_limit=0 pos=344247 buf_index=332 buf_size=0
+ iov cnt=1
+-[0] base=0x2aa38733778 len=331 [~]
++[0] base=0x2aa1bc41778 len=332 [~]
+ 
+ qemu_fflush: written: 32768, expected: 32768 - done.
+ saved keys to stream.
+-bytes_xfer=377210 xfer_limit=0 pos=377015 buf_index=355 buf_size=0
++bytes_xfer=377211 xfer_limit=0 pos=377015 buf_index=356 buf_size=0
+ iov cnt=1
+-[0] base=0x2aa38733778 len=355 []
++[0] base=0x2aa1bc41778 len=356 []
+ 
+-qemu_fflush: written: 16201, expected: 16201 - done.
++qemu_fflush: written: 16202, expected: 16202 - done.
+ qemu_fflush: - done.
+ qemu_fflush: - done.
+ (qemu) info snapshots
+@@ -39,10 +39,7 @@
+ ID        TAG                     VM SIZE                DATE       VM CLOCK
+ --        snap0                      SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+ (qemu) loadvm snap0
+-Unexpected storage key flag data: 0
+-error while loading state for instance 0x0 of device 's390-skeys'
+ qemu_fflush: not writable!
+-Error: Error -22 while loading VM state
+ (qemu) quit
+ 
+ *** done
+
+=================================================
+
+
+If someone has a good idea let me know - first attempts to reproduce on x86 failed, but maybe more work could lead to it.
+
+Thanks,
+
+Claudio
+
+
+
+On 7/13/20 11:11 AM, Claudio Fontana wrote:
+> Hi Paolo,
+> 
+> On 7/12/20 6:11 PM, Paolo Bonzini wrote:
+>> On 12/07/20 12:00, Claudio Fontana wrote:
+>>> Note: only the === -blockdev with a backing file === part of test 267 fails. -blockdev with NBD is ok, like all the rest.
+>>>
+>>>
+>>> Interesting facts about s390 in particular: its save/load code includes the transfer of "storage keys",
+>>> which include a buffer of 32768 bytes of keydata in the stream.
+>>>
+>>> The code (hw/s390x/s390-skeys.c),
+>>> is modeled similarly to RAM transfer (like in migration/ram.c), with an EOS (end of stream) marker.
+>>>
+>>> Countrary to RAM transfer code though, after qemu_put_be64(f, EOS), the s390 code does not qemu_fflush(f).
+>>
+>> 1) Are there unexpected differences in the migration stream?  That is,
+>> you could modify qcow2.c to fopen/fwrite/fclose the bytes as they're
+>> written and read, and see if something does not match.
+> 
+> I hooked qcow2_co_pwritev_task and qcow2_co_preadv_task to also write to an external file using your suggestion.
+> 
+> I am seeing very interesting differences with and without the reproducer patch (ie, forcing icount_state_needed to 0 or not):
+> 
+> * without the reproducer patch, everything past the s390-skeys data field is in order: there is the EOS, and then the next idstr follows ("cpu_common").
+> 
+> * with the reproducer patch, every single byte past the s390-skeys data field is ZERO. There is no EOS, there is no next idstr "cpu_common", there is absolutely nothing else than zeroes until the end of the file.
+> 
+> 
+>>
+>> 2) If it matches, are there unexpected differences other than the lack
+>> of icount section when you apply the reproducer patch?
+> 
+> they do not match at all.
+> 
+> 
+>>
+>> The fflush part makes me put more hope in the first, but both could help
+>> you debug it.
+>>
+>> Thanks,
+>>
+>> Paolo
+>>
+> 
+> Thanks,
+> 
+> Claudio
+> 
 
 
