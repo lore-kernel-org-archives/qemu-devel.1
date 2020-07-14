@@ -2,154 +2,87 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB25AC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8123CC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:27:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB9682242B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:16:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E90B227BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 18:27:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IDoMGrWN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB9682242B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EiEpJSj1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E90B227BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvPTf-0001cm-Vv
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 14:16:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52456)
+	id 1jvPeF-0003jM-F1
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 14:27:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jvPSo-0001Ae-CM
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:15:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57122
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jvPdP-0003Gm-Sj
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:26:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25567
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jvPSm-00051Y-JP
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:15:33 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jvPdK-0006b3-1w
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 14:26:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594750531;
+ s=mimecast20190719; t=1594751184;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9sDdsDnW5jX0YHKE0pLLnys6eqpofMt71fk+CdfuPzA=;
- b=IDoMGrWNEBsCVeYSeLhLC82/UTbR0VQ4Jl7zP70FNlo8N5kQ5aH2Ev0BehG33zTfMI7kAc
- lrtmb0/2l1fjG4zgg7BTbnoq2t10v/nZlnFhnQyz0tGzi8xbSO0uRrpfLoHoMpVmadNDLa
- 08gexrdMLf8pEpKUSrUuv1iZBtbhyQY=
+ in-reply-to:in-reply-to:references:references;
+ bh=10xMJSS7p8b4GsDXUjYqGIch84xHtrXP/90RBtKSuDI=;
+ b=EiEpJSj1vVo4ImMHUWwfT5YGxwvnvyFOC2G/G6sV03k8UHea0ohF4rPPFYlPCl5xaC5MrL
+ uobdEeYWSg8L/2P/hCVvI95wcb/8Psh/80eszIub0oBJlwzTK8N/JGy9aIohbSmFV5S4q0
+ sOtUeTOD/HbibVtUVty04WGfiivL6cY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-uXDiYLgpOKm-jD6JSV1p1w-1; Tue, 14 Jul 2020 14:15:28 -0400
-X-MC-Unique: uXDiYLgpOKm-jD6JSV1p1w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-65-Dsb8hNV9MRaVgv_cnPH2Gw-1; Tue, 14 Jul 2020 14:26:19 -0400
+X-MC-Unique: Dsb8hNV9MRaVgv_cnPH2Gw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A4CE800400;
- Tue, 14 Jul 2020 18:15:27 +0000 (UTC)
-Received: from [10.10.113.141] (ovpn-113-141.rdu2.redhat.com [10.10.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E7FE5FC1A;
- Tue, 14 Jul 2020 18:15:22 +0000 (UTC)
-Subject: Re: [PATCH v5 12/12] python/machine.py: change default wait timeout
- to 3 seconds
-To: Cleber Rosa <crosa@redhat.com>
-References: <20200710050649.32434-1-jsnow@redhat.com>
- <20200710050649.32434-13-jsnow@redhat.com>
- <20200714042000.GJ2983508@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <3c73d3fa-a0d8-549b-d1d6-51bb69b3a649@redhat.com>
-Date: Tue, 14 Jul 2020 14:15:22 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 083DE1005260;
+ Tue, 14 Jul 2020 18:26:18 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 260E71D9;
+ Tue, 14 Jul 2020 18:26:14 +0000 (UTC)
+Date: Tue, 14 Jul 2020 20:26:12 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+ CpuInstanceProperties
+Message-ID: <20200714202612.0be2688c@redhat.com>
+In-Reply-To: <ac92599f-5e14-5c07-6641-22ac13ed9d4f@amd.com>
+References: <159362436285.36204.986406297373871949.stgit@naples-babu.amd.com>
+ <159362466108.36204.3751851750959980962.stgit@naples-babu.amd.com>
+ <20200713110822.5495e1c6@redhat.com>
+ <78809d9f-a491-8c99-3f35-7f012c7d75bf@amd.com>
+ <20200713181740.16a357a6@redhat.com>
+ <47dc6238-bb71-d679-f58a-f574eb36d572@amd.com>
+ <20200713193221.27674630@redhat.com>
+ <4003b476-afdb-74a1-4f9f-1387aae6c4e8@amd.com>
+ <20200714184154.12c686bf@redhat.com>
+ <ac92599f-5e14-5c07-6641-22ac13ed9d4f@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20200714042000.GJ2983508@localhost.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -159,7 +92,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -172,48 +105,550 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 14 Jul 2020 12:26:56 -0500
+Babu Moger <babu.moger@amd.com> wrote:
 
-
-On 7/14/20 12:20 AM, Cleber Rosa wrote:
-> On Fri, Jul 10, 2020 at 01:06:49AM -0400, John Snow wrote:
->> Machine.wait() does not appear to be used except in the acceptance tests,
->> and an infinite timeout by default in a test suite is not the most helpful.
->>
->> Change it to 3 seconds, like the default shutdown timeout.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  python/qemu/machine.py | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
+> > -----Original Message-----
+> > From: Igor Mammedov <imammedo@redhat.com>
+> > Sent: Tuesday, July 14, 2020 11:42 AM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; ehabkost@redhat.com;
+> > rth@twiddle.net
+> > Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+> > CpuInstanceProperties
+> > 
+> > On Mon, 13 Jul 2020 14:30:29 -0500
+> > Babu Moger <babu.moger@amd.com> wrote:
+> >   
+> > > > -----Original Message-----
+> > > > From: Igor Mammedov <imammedo@redhat.com>
+> > > > Sent: Monday, July 13, 2020 12:32 PM
+> > > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > > Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com; qemu-
+> > > > devel@nongnu.org
+> > > > Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+> > > > CpuInstanceProperties
+> > > >
+> > > > On Mon, 13 Jul 2020 11:43:33 -0500
+> > > > Babu Moger <babu.moger@amd.com> wrote:
+> > > >  
+> > > > > On 7/13/20 11:17 AM, Igor Mammedov wrote:  
+> > > > > > On Mon, 13 Jul 2020 10:02:22 -0500 Babu Moger
+> > > > > > <babu.moger@amd.com> wrote:
+> > > > > >  
+> > > > > >>> -----Original Message-----
+> > > > > >>> From: Igor Mammedov <imammedo@redhat.com>
+> > > > > >>> Sent: Monday, July 13, 2020 4:08 AM
+> > > > > >>> To: Moger, Babu <Babu.Moger@amd.com>
+> > > > > >>> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
+> > > > > >>> qemu- devel@nongnu.org
+> > > > > >>> Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+> > > > > >>> CpuInstanceProperties  
+> > > > > > [...]  
+> > > > > >>>> +
+> > > > > >>>> +/*
+> > > > > >>>> + * Initialize topo_ids from CpuInstanceProperties
+> > > > > >>>> + * node_id in CpuInstanceProperties(or in CPU device) is a
+> > > > > >>>> +sequential
+> > > > > >>>> + * number, but while building the topology  
+> > > > > >>>  
+> > > > > >>>> we need to separate it for
+> > > > > >>>> + * each socket(mod nodes_per_pkg).  
+> > > > > >>> could you clarify a bit more on why this is necessary?  
+> > > > > >>
+> > > > > >> If you have two sockets and 4 numa nodes, node_id in
+> > > > > >> CpuInstanceProperties will be number sequentially as 0, 1, 2, 3.
+> > > > > >> But in EPYC topology, it will be  0, 1, 0, 1( Basically mod %
+> > > > > >> number of nodes  
+> > > > per socket).  
+> > > > > >
+> > > > > > I'm confused, let's suppose we have 2 EPYC sockets with 2 nodes
+> > > > > > per socket so APIC id woulbe be composed like:
+> > > > > >
+> > > > > >  1st socket
+> > > > > >    pkg_id(0) | node_id(0)
+> > > > > >    pkg_id(0) | node_id(1)
+> > > > > >
+> > > > > >  2nd socket
+> > > > > >    pkg_id(1) | node_id(0)
+> > > > > >    pkg_id(1) | node_id(1)
+> > > > > >
+> > > > > > if that's the case, then EPYC's node_id here doesn't look like a
+> > > > > > NUMA node in the sense it's usually used (above config would
+> > > > > > have 4 different memory controllers => 4 conventional NUMA nodes).  
+> > > > >
+> > > > > EPIC model uses combination of socket id and node id to identify
+> > > > > the numa nodes. So, it internally uses all the information.  
+> > > >
+> > > > well with above values, EPYC's node_id doesn't look like it's
+> > > > specifying a machine numa node, but rather a node index within
+> > > > single socket. In which case, it doesn't make much sense calling it
+> > > > NUMA node_id, it's rather some index within a socket. (it starts
+> > > > looking like terminology is all mixed up)
+> > > >
+> > > > If you have access to a milti-socket EPYC machine, can you dump and
+> > > > post here its apic ids, pls?  
+> > >
+> > > Here is the output from my EPYC machine with 2 sockets and totally 8
+> > > nodes(SMT disabled). The cpus 0-31 are in socket 0 and  cpus 32-63 in
+> > > socket 1.
+> > >
+> > > # lscpu
+> > > Architecture:        x86_64
+> > > CPU op-mode(s):      32-bit, 64-bit
+> > > Byte Order:          Little Endian
+> > > CPU(s):              64
+> > > On-line CPU(s) list: 0-63
+> > > Thread(s) per core:  1
+> > > Core(s) per socket:  32
+> > > Socket(s):           2
+> > > NUMA node(s):        8
+> > > Vendor ID:           AuthenticAMD
+> > > CPU family:          23
+> > > Model:               1
+> > > Model name:          AMD Eng Sample: 1S1901A4VIHF5_30/19_N
+> > > Stepping:            2
+> > > CPU MHz:             2379.233
+> > > CPU max MHz:         1900.0000
+> > > CPU min MHz:         1200.0000
+> > > BogoMIPS:            3792.81
+> > > Virtualization:      AMD-V
+> > > L1d cache:           32K
+> > > L1i cache:           64K
+> > > L2 cache:            512K
+> > > L3 cache:            8192K
+> > > NUMA node0 CPU(s):   0-7
+> > > NUMA node1 CPU(s):   8-15
+> > > NUMA node2 CPU(s):   16-23
+> > > NUMA node3 CPU(s):   24-31
+> > > NUMA node4 CPU(s):   32-39
+> > > NUMA node5 CPU(s):   40-47
+> > > NUMA node6 CPU(s):   48-55
+> > > NUMA node7 CPU(s):   56-63
+> > >
+> > > Here is the output of #cpuid  -l 0x8000001e  -r
+> > >
+> > > You may want to refer
+> > > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.
+> > >  
+> > amd.com%2Fsystem%2Ffiles%2FTechDocs%2F54945_3.03_ppr_ZP_B2_pub.zip&
+> > amp  
+> > >  
+> > ;data=02%7C01%7Cbabu.moger%40amd.com%7C8027127197c440bc097008d8
+> > 2814e52  
+> > >  
+> > 5%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C6373034174951581
+> > 22&amp;  
+> > >  
+> > sdata=ViF%2FGTPxDFV6KcjicGedyACbjQ6Ikkq0oWUWw18pGbU%3D&amp;reser
+> > ved=0  
+> > > (section 2.1.12.2.1.3 ApicId Enumeration Requirements).
+> > > Note that this is a general guideline. We tried to generalize in qemu
+> > > as much as possible. It is bit complex.  
+> > Thanks, I'll look into it.
+> > Can you also dump SRAT table from that machine, please?
+> > I'd like to see CPUs relation to NUMA nodes described in SRAT.  
 > 
-> Well, for the acceptance tests, there's usually a test wide timeout,
-> but this is indeed a good idea!
+> Hope this helps.  Got this from acpidump tool.
+> Let me if you have any other tool.
+
+# acpidump -b
+and then
+# iasl -d dumped_table_blob
+that will produce human readble table
+
 > 
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
+> SRAT @ 0x0000000000000000
+>     0000: 53 52 41 54 C0 09 00 00 03 64 41 4D 44 00 00 00 SRAT.....dAMD...
+>     0010: 44 49 45 53 45 4C 20 20 01 00 00 00 41 4D 44 20  DIESEL  ....AMD
+>     0020: 01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0030: 00 10 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0040: 00 10 00 01 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0050: 00 10 00 02 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0060: 00 10 00 03 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0070: 00 10 00 04 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0080: 00 10 00 05 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0090: 00 10 00 06 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00A0: 00 10 00 07 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00B0: 00 10 00 08 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00C0: 00 10 00 09 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00D0: 00 10 00 0A 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00E0: 00 10 00 0B 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00F0: 00 10 00 0C 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0100: 00 10 00 0D 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0110: 00 10 00 0E 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0120: 00 10 00 0F 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0130: 00 10 01 10 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0140: 00 10 01 11 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0150: 00 10 01 12 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0160: 00 10 01 13 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0170: 00 10 01 14 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0180: 00 10 01 15 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0190: 00 10 01 16 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     01A0: 00 10 01 17 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     01B0: 00 10 01 18 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     01C0: 00 10 01 19 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     01D0: 00 10 01 1A 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     01E0: 00 10 01 1B 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     01F0: 00 10 01 1C 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0200: 00 10 01 1D 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0210: 00 10 01 1E 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0220: 00 10 01 1F 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0230: 00 10 02 20 01 00 00 00 00 00 00 00 00 00 00 00  ... ............
+>     0240: 00 10 02 21 01 00 00 00 00 00 00 00 00 00 00 00  ...!............
+>     0250: 00 10 02 22 01 00 00 00 00 00 00 00 00 00 00 00  ..."............
+>     0260: 00 10 02 23 01 00 00 00 00 00 00 00 00 00 00 00  ...#............
+>     0270: 00 10 02 24 01 00 00 00 00 00 00 00 00 00 00 00  ...$............
+>     0280: 00 10 02 25 01 00 00 00 00 00 00 00 00 00 00 00  ...%............
+>     0290: 00 10 02 26 01 00 00 00 00 00 00 00 00 00 00 00  ...&............
+>     02A0: 00 10 02 27 01 00 00 00 00 00 00 00 00 00 00 00  ...'............
+>     02B0: 00 10 02 28 01 00 00 00 00 00 00 00 00 00 00 00  ...(............
+>     02C0: 00 10 02 29 01 00 00 00 00 00 00 00 00 00 00 00  ...)............
+>     02D0: 00 10 02 2A 01 00 00 00 00 00 00 00 00 00 00 00  ...*............
+>     02E0: 00 10 02 2B 01 00 00 00 00 00 00 00 00 00 00 00  ...+............
+>     02F0: 00 10 02 2C 01 00 00 00 00 00 00 00 00 00 00 00  ...,............
+>     0300: 00 10 02 2D 01 00 00 00 00 00 00 00 00 00 00 00  ...-............
+>     0310: 00 10 02 2E 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0320: 00 10 02 2F 01 00 00 00 00 00 00 00 00 00 00 00  .../............
+>     0330: 00 10 03 30 01 00 00 00 00 00 00 00 00 00 00 00  ...0............
+>     0340: 00 10 03 31 01 00 00 00 00 00 00 00 00 00 00 00  ...1............
+>     0350: 00 10 03 32 01 00 00 00 00 00 00 00 00 00 00 00  ...2............
+>     0360: 00 10 03 33 01 00 00 00 00 00 00 00 00 00 00 00  ...3............
+>     0370: 00 10 03 34 01 00 00 00 00 00 00 00 00 00 00 00  ...4............
+>     0380: 00 10 03 35 01 00 00 00 00 00 00 00 00 00 00 00  ...5............
+>     0390: 00 10 03 36 01 00 00 00 00 00 00 00 00 00 00 00  ...6............
+>     03A0: 00 10 03 37 01 00 00 00 00 00 00 00 00 00 00 00  ...7............
+>     03B0: 00 10 03 38 01 00 00 00 00 00 00 00 00 00 00 00  ...8............
+>     03C0: 00 10 03 39 01 00 00 00 00 00 00 00 00 00 00 00  ...9............
+>     03D0: 00 10 03 3A 01 00 00 00 00 00 00 00 00 00 00 00  ...:............
+>     03E0: 00 10 03 3B 01 00 00 00 00 00 00 00 00 00 00 00  ...;............
+>     03F0: 00 10 03 3C 01 00 00 00 00 00 00 00 00 00 00 00  ...<............
+>     0400: 00 10 03 3D 01 00 00 00 00 00 00 00 00 00 00 00  ...=............
+>     0410: 00 10 03 3E 01 00 00 00 00 00 00 00 00 00 00 00  ...>............
+>     0420: 00 10 03 3F 01 00 00 00 00 00 00 00 00 00 00 00  ...?............
+>     0430: 00 10 04 40 01 00 00 00 00 00 00 00 00 00 00 00  ...@............
+>     0440: 00 10 04 41 01 00 00 00 00 00 00 00 00 00 00 00  ...A............
+>     0450: 00 10 04 42 01 00 00 00 00 00 00 00 00 00 00 00  ...B............
+>     0460: 00 10 04 43 01 00 00 00 00 00 00 00 00 00 00 00  ...C............
+>     0470: 00 10 04 44 01 00 00 00 00 00 00 00 00 00 00 00  ...D............
+>     0480: 00 10 04 45 01 00 00 00 00 00 00 00 00 00 00 00  ...E............
+>     0490: 00 10 04 46 01 00 00 00 00 00 00 00 00 00 00 00  ...F............
+>     04A0: 00 10 04 47 01 00 00 00 00 00 00 00 00 00 00 00  ...G............
+>     04B0: 00 10 04 48 01 00 00 00 00 00 00 00 00 00 00 00  ...H............
+>     04C0: 00 10 04 49 01 00 00 00 00 00 00 00 00 00 00 00  ...I............
+>     04D0: 00 10 04 4A 01 00 00 00 00 00 00 00 00 00 00 00  ...J............
+>     04E0: 00 10 04 4B 01 00 00 00 00 00 00 00 00 00 00 00  ...K............
+>     04F0: 00 10 04 4C 01 00 00 00 00 00 00 00 00 00 00 00  ...L............
+>     0500: 00 10 04 4D 01 00 00 00 00 00 00 00 00 00 00 00  ...M............
+>     0510: 00 10 04 4E 01 00 00 00 00 00 00 00 00 00 00 00  ...N............
+>     0520: 00 10 04 4F 01 00 00 00 00 00 00 00 00 00 00 00  ...O............
+>     0530: 00 10 05 50 01 00 00 00 00 00 00 00 00 00 00 00  ...P............
+>     0540: 00 10 05 51 01 00 00 00 00 00 00 00 00 00 00 00  ...Q............
+>     0550: 00 10 05 52 01 00 00 00 00 00 00 00 00 00 00 00  ...R............
+>     0560: 00 10 05 53 01 00 00 00 00 00 00 00 00 00 00 00  ...S............
+>     0570: 00 10 05 54 01 00 00 00 00 00 00 00 00 00 00 00  ...T............
+>     0580: 00 10 05 55 01 00 00 00 00 00 00 00 00 00 00 00  ...U............
+>     0590: 00 10 05 56 01 00 00 00 00 00 00 00 00 00 00 00  ...V............
+>     05A0: 00 10 05 57 01 00 00 00 00 00 00 00 00 00 00 00  ...W............
+>     05B0: 00 10 05 58 01 00 00 00 00 00 00 00 00 00 00 00  ...X............
+>     05C0: 00 10 05 59 01 00 00 00 00 00 00 00 00 00 00 00  ...Y............
+>     05D0: 00 10 05 5A 01 00 00 00 00 00 00 00 00 00 00 00  ...Z............
+>     05E0: 00 10 05 5B 01 00 00 00 00 00 00 00 00 00 00 00  ...[............
+>     05F0: 00 10 05 5C 01 00 00 00 00 00 00 00 00 00 00 00  ...\............
+>     0600: 00 10 05 5D 01 00 00 00 00 00 00 00 00 00 00 00
+>   ...]............
+>     0610: 00 10 05 5E 01 00 00 00 00 00 00 00 00 00 00 00  ...^............
+>     0620: 00 10 05 5F 01 00 00 00 00 00 00 00 00 00 00 00  ..._............
+>     0630: 00 10 06 60 01 00 00 00 00 00 00 00 00 00 00 00  ...`............
+>     0640: 00 10 06 61 01 00 00 00 00 00 00 00 00 00 00 00  ...a............
+>     0650: 00 10 06 62 01 00 00 00 00 00 00 00 00 00 00 00  ...b............
+>     0660: 00 10 06 63 01 00 00 00 00 00 00 00 00 00 00 00  ...c............
+>     0670: 00 10 06 64 01 00 00 00 00 00 00 00 00 00 00 00  ...d............
+>     0680: 00 10 06 65 01 00 00 00 00 00 00 00 00 00 00 00  ...e............
+>     0690: 00 10 06 66 01 00 00 00 00 00 00 00 00 00 00 00  ...f............
+>     06A0: 00 10 06 67 01 00 00 00 00 00 00 00 00 00 00 00  ...g............
+>     06B0: 00 10 06 68 01 00 00 00 00 00 00 00 00 00 00 00  ...h............
+>     06C0: 00 10 06 69 01 00 00 00 00 00 00 00 00 00 00 00  ...i............
+>     06D0: 00 10 06 6A 01 00 00 00 00 00 00 00 00 00 00 00  ...j............
+>     06E0: 00 10 06 6B 01 00 00 00 00 00 00 00 00 00 00 00  ...k............
+>     06F0: 00 10 06 6C 01 00 00 00 00 00 00 00 00 00 00 00  ...l............
+>     0700: 00 10 06 6D 01 00 00 00 00 00 00 00 00 00 00 00  ...m............
+>     0710: 00 10 06 6E 01 00 00 00 00 00 00 00 00 00 00 00  ...n............
+>     0720: 00 10 06 6F 01 00 00 00 00 00 00 00 00 00 00 00  ...o............
+>     0730: 00 10 07 70 01 00 00 00 00 00 00 00 00 00 00 00  ...p............
+>     0740: 00 10 07 71 01 00 00 00 00 00 00 00 00 00 00 00  ...q............
+>     0750: 00 10 07 72 01 00 00 00 00 00 00 00 00 00 00 00  ...r............
+>     0760: 00 10 07 73 01 00 00 00 00 00 00 00 00 00 00 00  ...s............
+>     0770: 00 10 07 74 01 00 00 00 00 00 00 00 00 00 00 00  ...t............
+>     0780: 00 10 07 75 01 00 00 00 00 00 00 00 00 00 00 00  ...u............
+>     0790: 00 10 07 76 01 00 00 00 00 00 00 00 00 00 00 00  ...v............
+>     07A0: 00 10 07 77 01 00 00 00 00 00 00 00 00 00 00 00  ...w............
+>     07B0: 00 10 07 78 01 00 00 00 00 00 00 00 00 00 00 00  ...x............
+>     07C0: 00 10 07 79 01 00 00 00 00 00 00 00 00 00 00 00  ...y............
+>     07D0: 00 10 07 7A 01 00 00 00 00 00 00 00 00 00 00 00  ...z............
+>     07E0: 00 10 07 7B 01 00 00 00 00 00 00 00 00 00 00 00  ...{............
+>     07F0: 00 10 07 7C 01 00 00 00 00 00 00 00 00 00 00 00  ...|............
+>     0800: 00 10 07 7D 01 00 00 00 00 00 00 00 00 00 00 00  ...}............
+>     0810: 00 10 07 7E 01 00 00 00 00 00 00 00 00 00 00 00  ...~............
+>     0820: 00 10 07 7F 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0830: 01 28 00 00 00 00 00 00 00 00 00 00 00 00 00 00  .(..............
+>     0840: 00 00 0A 00 00 00 00 00 00 00 00 00 01 00 00 00  ................
+>     0850: 00 00 00 00 00 00 00 00 01 28 00 00 00 00 00 00  .........(......
+>     0860: 00 00 10 00 00 00 00 00 00 00 F0 7F 00 00 00 00  ................
+>     0870: 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0880: 01 28 00 00 00 00 00 00 00 00 00 00 01 00 00 00  .(..............
+>     0890: 00 00 00 80 03 00 00 00 00 00 00 00 01 00 00 00  ................
+>     08A0: 00 00 00 00 00 00 00 00 01 28 01 00 00 00 00 00  .........(......
+>     08B0: 00 00 00 80 04 00 00 00 00 00 00 00 04 00 00 00  ................
+>     08C0: 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     08D0: 01 28 02 00 00 00 00 00 00 00 00 80 08 00 00 00  .(..............
+>     08E0: 00 00 00 00 04 00 00 00 00 00 00 00 01 00 00 00  ................
+>     08F0: 00 00 00 00 00 00 00 00 01 28 03 00 00 00 00 00  .........(......
+>     0900: 00 00 00 80 0C 00 00 00 00 00 00 00 04 00 00 00  ................
+>     0910: 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0920: 01 28 04 00 00 00 00 00 00 00 00 80 10 00 00 00  .(..............
+>     0930: 00 00 00 00 04 00 00 00 00 00 00 00 01 00 00 00  ................
+>     0940: 00 00 00 00 00 00 00 00 01 28 05 00 00 00 00 00  .........(......
+>     0950: 00 00 00 80 14 00 00 00 00 00 00 00 04 00 00 00  ................
+>     0960: 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+>     0970: 01 28 06 00 00 00 00 00 00 00 00 80 18 00 00 00  .(..............
+>     0980: 00 00 00 00 04 00 00 00 00 00 00 00 01 00 00 00  ................
+>     0990: 00 00 00 00 00 00 00 00 01 28 07 00 00 00 00 00  .........(......
+>     09A0: 00 00 00 80 1C 00 00 00 00 00 00 00 04 00 00 00  ................
+>     09B0: 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
+> ................
+> >   
+> > >
+> > > CPU 0:
+> > >    0x8000001e 0x00: eax=0x00000000 ebx=0x00000100 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 1:
+> > >    0x8000001e 0x00: eax=0x00000002 ebx=0x00000101 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 2:
+> > >    0x8000001e 0x00: eax=0x00000004 ebx=0x00000102 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 3:
+> > >    0x8000001e 0x00: eax=0x00000006 ebx=0x00000103 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 4:
+> > >    0x8000001e 0x00: eax=0x00000008 ebx=0x00000104 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 5:
+> > >    0x8000001e 0x00: eax=0x0000000a ebx=0x00000105 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 6:
+> > >    0x8000001e 0x00: eax=0x0000000c ebx=0x00000106 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 7:
+> > >    0x8000001e 0x00: eax=0x0000000e ebx=0x00000107 ecx=0x00000300
+> > > edx=0x00000000
+> > > CPU 8:
+> > >    0x8000001e 0x00: eax=0x00000010 ebx=0x00000108 ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 9:
+> > >    0x8000001e 0x00: eax=0x00000012 ebx=0x00000109 ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 10:
+> > >    0x8000001e 0x00: eax=0x00000014 ebx=0x0000010a ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 11:
+> > >    0x8000001e 0x00: eax=0x00000016 ebx=0x0000010b ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 12:
+> > >    0x8000001e 0x00: eax=0x00000018 ebx=0x0000010c ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 13:
+> > >    0x8000001e 0x00: eax=0x0000001a ebx=0x0000010d ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 14:
+> > >    0x8000001e 0x00: eax=0x0000001c ebx=0x0000010e ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 15:
+> > >    0x8000001e 0x00: eax=0x0000001e ebx=0x0000010f ecx=0x00000301
+> > > edx=0x00000000
+> > > CPU 16:
+> > >    0x8000001e 0x00: eax=0x00000020 ebx=0x00000110 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 17:
+> > >    0x8000001e 0x00: eax=0x00000022 ebx=0x00000111 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 18:
+> > >    0x8000001e 0x00: eax=0x00000024 ebx=0x00000112 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 19:
+> > >    0x8000001e 0x00: eax=0x00000026 ebx=0x00000113 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 20:
+> > >    0x8000001e 0x00: eax=0x00000028 ebx=0x00000114 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 21:
+> > >    0x8000001e 0x00: eax=0x0000002a ebx=0x00000115 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 22:
+> > >    0x8000001e 0x00: eax=0x0000002c ebx=0x00000116 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 23:
+> > >    0x8000001e 0x00: eax=0x0000002e ebx=0x00000117 ecx=0x00000302
+> > > edx=0x00000000
+> > > CPU 24:
+> > >    0x8000001e 0x00: eax=0x00000030 ebx=0x00000118 ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 25:
+> > >    0x8000001e 0x00: eax=0x00000032 ebx=0x00000119 ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 26:
+> > >    0x8000001e 0x00: eax=0x00000034 ebx=0x0000011a ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 27:
+> > >    0x8000001e 0x00: eax=0x00000036 ebx=0x0000011b ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 28:
+> > >    0x8000001e 0x00: eax=0x00000038 ebx=0x0000011c ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 29:
+> > >    0x8000001e 0x00: eax=0x0000003a ebx=0x0000011d ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 30:
+> > >    0x8000001e 0x00: eax=0x0000003c ebx=0x0000011e ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 31:
+> > >    0x8000001e 0x00: eax=0x0000003e ebx=0x0000011f ecx=0x00000303
+> > > edx=0x00000000
+> > > CPU 32:
+> > >    0x8000001e 0x00: eax=0x00000040 ebx=0x00000100 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 33:
+> > >    0x8000001e 0x00: eax=0x00000042 ebx=0x00000101 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 34:
+> > >    0x8000001e 0x00: eax=0x00000044 ebx=0x00000102 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 35:
+> > >    0x8000001e 0x00: eax=0x00000046 ebx=0x00000103 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 36:
+> > >    0x8000001e 0x00: eax=0x00000048 ebx=0x00000104 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 37:
+> > >    0x8000001e 0x00: eax=0x0000004a ebx=0x00000105 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 38:
+> > >    0x8000001e 0x00: eax=0x0000004c ebx=0x00000106 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 39:
+> > >    0x8000001e 0x00: eax=0x0000004e ebx=0x00000107 ecx=0x00000304
+> > > edx=0x00000000
+> > > CPU 40:
+> > >    0x8000001e 0x00: eax=0x00000050 ebx=0x00000108 ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 41:
+> > >    0x8000001e 0x00: eax=0x00000052 ebx=0x00000109 ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 42:
+> > >    0x8000001e 0x00: eax=0x00000054 ebx=0x0000010a ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 43:
+> > >    0x8000001e 0x00: eax=0x00000056 ebx=0x0000010b ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 44:
+> > >    0x8000001e 0x00: eax=0x00000058 ebx=0x0000010c ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 45:
+> > >    0x8000001e 0x00: eax=0x0000005a ebx=0x0000010d ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 46:
+> > >    0x8000001e 0x00: eax=0x0000005c ebx=0x0000010e ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 47:
+> > >    0x8000001e 0x00: eax=0x0000005e ebx=0x0000010f ecx=0x00000305
+> > > edx=0x00000000
+> > > CPU 48:
+> > >    0x8000001e 0x00: eax=0x00000060 ebx=0x00000110 ecx=0x00000306
+> > > edx=0x00000000
+> > >
+> > > CPU 49:
+> > >    0x8000001e 0x00: eax=0x00000062 ebx=0x00000111 ecx=0x00000306
+> > > edx=0x00000000
+> > > CPU 50:
+> > >    0x8000001e 0x00: eax=0x00000064 ebx=0x00000112 ecx=0x00000306
+> > > edx=0x00000000
+> > > CPU 51:
+> > >    0x8000001e 0x00: eax=0x00000066 ebx=0x00000113 ecx=0x00000306
+> > > edx=0x00000000
+> > > CPU 52:
+> > >    0x8000001e 0x00: eax=0x00000068 ebx=0x00000114 ecx=0x00000306
+> > > edx=0x00000000
+> > > CPU 53:
+> > >    0x8000001e 0x00: eax=0x0000006a ebx=0x00000115 ecx=0x00000306
+> > > edx=0x00000000
+> > > CPU 54:
+> > >    0x8000001e 0x00: eax=0x0000006c ebx=0x00000116 ecx=0x00000306
+> > > edx=0x00000000
+> > > CPU 55:
+> > >    0x8000001e 0x00: eax=0x0000006e ebx=0x00000117 ecx=0x00000306
+> > > edx=0x00000000
+> > > CPU 56:
+> > >    0x8000001e 0x00: eax=0x00000070 ebx=0x00000118 ecx=0x00000307
+> > > edx=0x00000000
+> > > CPU 57:
+> > >    0x8000001e 0x00: eax=0x00000072 ebx=0x00000119 ecx=0x00000307
+> > > edx=0x00000000
+> > > CPU 58:
+> > >    0x8000001e 0x00: eax=0x00000074 ebx=0x0000011a ecx=0x00000307
+> > > edx=0x00000000
+> > > CPU 59:
+> > >    0x8000001e 0x00: eax=0x00000076 ebx=0x0000011b ecx=0x00000307
+> > > edx=0x00000000
+> > > CPU 60:
+> > >    0x8000001e 0x00: eax=0x00000078 ebx=0x0000011c ecx=0x00000307
+> > > edx=0x00000000
+> > > CPU 61:
+> > >    0x8000001e 0x00: eax=0x0000007a ebx=0x0000011d ecx=0x00000307
+> > > edx=0x00000000
+> > > CPU 62:
+> > >    0x8000001e 0x00: eax=0x0000007c ebx=0x0000011e ecx=0x00000307
+> > > edx=0x00000000
+> > > CPU 63:
+> > >    0x8000001e 0x00: eax=0x0000007e ebx=0x0000011f ecx=0x00000307
+> > > edx=0x00000000
+> > >  
+> > > >  
+> > > > >  
+> > > > > >
+> > > > > > I wonder if linux guest actually uses node_id encoded in apic id
+> > > > > > for configuring/checking numa structures, or it just uses
+> > > > > > whatever ACPI SRAT table provided.
+> > > > > >  
+> > > > > >>>> + */
+> > > > > >>>> +static inline void x86_init_topo_ids(X86CPUTopoInfo *topo_info,
+> > > > > >>>> +                                     CpuInstanceProperties props,
+> > > > > >>>> +                                     X86CPUTopoIDs *topo_ids) {
+> > > > > >>>> +    topo_ids->smt_id = props.has_thread_id ? props.thread_id : 0;
+> > > > > >>>> +    topo_ids->core_id = props.has_core_id ? props.core_id : 0;
+> > > > > >>>> +    topo_ids->die_id = props.has_die_id ? props.die_id : 0;
+> > > > > >>>> +    topo_ids->node_id = props.has_node_id ?
+> > > > > >>>> +                        props.node_id % MAX(topo_info->nodes_per_pkg, 1) :  
+> > 0;  
+> > > > > >>>> +    topo_ids->pkg_id = props.has_socket_id ? props.socket_id :
+> > > > > >>>> +0; }
+> > > > > >>>>  /*
+> > > > > >>>>   * Make APIC ID for the CPU 'cpu_index'
+> > > > > >>>>   *
+> > > > > >>>>  
+> > > > > >>  
+> > > > > >  
+> > > > >  
+> > >
+> > >  
 > 
-
-Yes, there's a bigger timeout for acceptance tests, but iotests doesn't
-have the same just yet.
-
-In general, it helps for most of the python library methods to time out
-by default to prevent hangs in the various test suites.
-
-So, anticipating that iotest callers will probably want to use wait()
-sooner or later, I just went ahead and made the change primarily for
-consistency again.
-
---js
 
 
