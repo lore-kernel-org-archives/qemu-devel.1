@@ -2,120 +2,132 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57337C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3774CC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:34:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EFB222510
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:15:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01F1A22515
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 14:34:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="MdGycVQ+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EFB222510
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OP7JOCbm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01F1A22515
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvLi6-0005kp-Ey
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:15:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39306)
+	id 1jvM1H-0002t5-7n
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 10:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jvLhN-0005HP-O8
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:14:21 -0400
-Received: from mail-bn7nam10on2049.outbound.protection.outlook.com
- ([40.107.92.49]:6140 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jvLhK-0005aD-HB
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:14:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h+Z5XSfZjM5w+MrPQn9NW8ZeqoCdKPT/qNDjBGCEJHIH3N/lcmNVchznH+cbUm67oZ3WhundCoaFfLZmwHxAVsmN8cEtN/NQ0c5J4HZc5Fa/5CRUxINrBijAwLBL7O5U0hZWSoY8Q2y5SUuYm8vpVgW2WkZWYJ4Tu1UK+O6uxsF6ALYDJq5qsFnjGiWENUx+9dQTyRxxFmh2Xax1Y714kRL5oKeHETDblsZWb+DohOAuzdGGcgCkz6q4rvuvCgFKy8ftxjBKUS1dHEhk+vZx/VMETdnlq4db2uSm/JtQOPlFRPJKmUXGd3UJKCvydxXA4uqj3WF85fr2Ol6qUU7hDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5GzzZJVA/qrTz+x/Re6Oml0i4d2Dhtg5ztND6N+j/eI=;
- b=hwcIprL8MR5V/+vki4SILTD1eIChEpUFhk/KlHb/notow+0+2m5TyjdZxTEQOmgrFAyOLK6BqyuQuUASSkWSbOWP4VnmuUQBS6HYOExXBkrVMNLfStkJW5xKkS4mFT3DiECu4gJ/I0HNeYd0y/RjC1RSL34+0stFRig0pKz/pNdUU5hXCaTRDVY7cxx09VvAgBUVRANhMhZwSDoudkcR0z3Hd0hQw2UbfkhHglPDWXLUiEnmcmylHRNYTvkzujq84hiRWvapciBbEEt6qTExWnRhnhps2oA5D2uRjKYAheUb1PUPa3ZFBkUh7Gag8SOFdYTN/PO6mM4pzjK3bXXWAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5GzzZJVA/qrTz+x/Re6Oml0i4d2Dhtg5ztND6N+j/eI=;
- b=MdGycVQ+XEIXvEUdAJU31UBmcxkdvVY2PUcvkflQAF86oa+9DudYY/NMP+XeT2BJW2mbgUO8uQK6OLcCSsbanhcvwib7IE5/jg5ESlvkyWdHGIMqCJPjevLAtvj4aIR08mtERv2ZSQsYckYcLJABM6F4+8Qs+b1y8QK/42KgLkY=
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com (2603:10b6:a03:206::11)
- by BYAPR02MB4056.namprd02.prod.outlook.com (2603:10b6:a02:fa::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Tue, 14 Jul
- 2020 13:59:12 +0000
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::4477:7134:37a6:c828]) by BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::4477:7134:37a6:c828%3]) with mapi id 15.20.3174.025; Tue, 14 Jul 2020
- 13:59:12 +0000
-From: Sai Pavan Boddu <saipava@xilinx.com>
-To: Sai Pavan Boddu <saipava@xilinx.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster
- <armbru@redhat.com>
-Subject: RE: [PATCH v3 0/3] Make hcd-xhci independent of pci hooks
-Thread-Topic: [PATCH v3 0/3] Make hcd-xhci independent of pci hooks
-Thread-Index: AQHWVH9z5HwbdGG7uECzkfpq3kp5uKkHJK6A
-Date: Tue, 14 Jul 2020 13:59:12 +0000
-Message-ID: <BY5PR02MB6772B76423A07CFA4B4E5FA9CA610@BY5PR02MB6772.namprd02.prod.outlook.com>
-References: <1594140271-16462-1-git-send-email-sai.pavan.boddu@xilinx.com>
-In-Reply-To: <1594140271-16462-1-git-send-email-sai.pavan.boddu@xilinx.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: xilinx.com; dkim=none (message not signed)
- header.d=none;xilinx.com; dmarc=none action=none header.from=xilinx.com;
-x-originating-ip: [183.83.78.46]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 50e89763-2e62-45e5-e0f2-08d827fe16b1
-x-ms-traffictypediagnostic: BYAPR02MB4056:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR02MB4056761FB4E1FB3A7AC3B87FCA610@BYAPR02MB4056.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: EYaI6HY6Ca6OgneuhkC5chfOxWbCtulgSkOHY/W+tAvlIIB2dvofMleUzk+wf+TY5vhzub9amAfEYx+T6G8tLyMGsWUNVkkBwju5CEm8dbLXI6Eiidg6t6WGLYYNEOOHzcujXeDUhSjv3pAxrA6k9v44i259L3lu62rzp4hJPCLzpU3D8+7GL6VI8M9MKvVKOGeE/cyd5jx9NhBVsWEqzN85F9yD0edYXQxWsccjFfdkKqNkgnf1pLX/dGb1fKry2/Sx6v790nDWJt7i3ZjQszKtZeTBBznapHZrwbqSv9SkXqV5n0cEnzQxrhccTojVbj3jm6KLK2MLiXrqOFzaiA==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BY5PR02MB6772.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(39860400002)(366004)(376002)(396003)(136003)(346002)(71200400001)(8676002)(478600001)(33656002)(26005)(66946007)(110136005)(5660300002)(54906003)(55016002)(76116006)(4326008)(8936002)(9686003)(86362001)(186003)(52536014)(316002)(7416002)(6506007)(64756008)(83380400001)(66556008)(66476007)(66446008)(53546011)(2906002)(7696005);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata: 3gnyUlBTbb55n0NJymf60mKq88EH4I7xWJQiAZQZHP1bYLPczUKZQkg0pYbO9rlublRw0AGO7BPS/kY5/yJdj0QZApjkkLXz7lq18SUmKv0RoJM7UJI7bt8qBRQbEsEIhT9wHWjtJprSQA5kvW+fJzzVrbm2rcQdo8FLmDyIccMXBE8fgQLG1LLb3EBnZrnfO9/+UyoRKSDuj6Nz5rXN7c8rOYQyQZCLYpqp6bN/1DkUCUkk05i+DJ3buQhOsdhjKIP2ibYCjuRqUopSsX5OhB0+P++VG3FF9dpondzuHMJOanKXI+3JGdy8k0B9yaVZlDPZknw0iZqbj9N6eway96/pjvq7bQ1B3CR46mDpujXbC3q4X2TbgcOrq+Yr3SDQEWHEB2klwGOVHTW1dEE8zqSTnSaPTFkFsZZBn/Gt7O7L2c55YkxvfyD9J4aRbbKJRz7kMyqLc2V+jQExgDK/qcJ+4+7injqO+9nnnI2S0wo=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvM0S-0002EM-9M
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:34:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21481
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvM0P-0000Q2-90
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 10:34:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594737240;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=UB8M4CZu44kJhtEc5ZmxxCl71WvAqj2QdKusJMHGvv8=;
+ b=OP7JOCbmxh3A9WXPvz9hT8efaoGW4JYbnv44Uf8gbGfzX0u4FYvDRWvnGX1SZRzXFuumiz
+ hc7/t0aISHosl/4UG2iEN47X20D6/6H4r2Cg1/ZUTQ4K79MHz6YvPamdpw4tuoSJ0nnntj
+ yVTkNNHGaGS8yNmKGIhOYlMmZvTZrew=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-77--TJ1uoljPVCbxCTxIt5hhw-1; Tue, 14 Jul 2020 10:33:58 -0400
+X-MC-Unique: -TJ1uoljPVCbxCTxIt5hhw-1
+Received: by mail-wr1-f71.google.com with SMTP id 89so21943733wrr.15
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 07:33:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=UB8M4CZu44kJhtEc5ZmxxCl71WvAqj2QdKusJMHGvv8=;
+ b=bhGxocvKiS4KkjdRhBY6F2UVZ+PmWxnaM2BZ9Z3V/Pks8TU5DZ2EGRkNay8tnPkv4C
+ 8tKitxc1rQboe+rHz9d5Zdy6HAOwB8xAq0kq1Icw8AaD78WRZ0+I8ywds0Tfw+qnKTIf
+ dUtOh1Os0Ik2D0Hx5sTp3MuHVC+Vx0jatvoNB2jXJWJel90L7hYmGTNUU4iXkEll8vVg
+ f2G4DgbQOBvjAsgobrcbbat1pR1mqMzrz9EUJ0uUqxEzpXoUgS1qeTahr0bogzoKEpli
+ GuU/pFBstXNDW3raHTHmiin8gKdwjw1KnEqAshqh8cJNYl3fP/o3KLvyJ0YyM+Vk63re
+ oxmQ==
+X-Gm-Message-State: AOAM530ViOY6RMzKUqVZnUAZ6u9Wr/Ttpon6OrFV0Ijn3ML4iaW1z73N
+ ++DevdbgyqlpNDYfh5zYHw1d7zdk3NeEJx9TcdjAU+oi9PH54DBxX9VJZuFItrbykZ7e7Q8hrRe
+ GnlbveH1tsKWyA6U=
+X-Received: by 2002:adf:d842:: with SMTP id k2mr6171001wrl.239.1594737236950; 
+ Tue, 14 Jul 2020 07:33:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzMdDdxqMQQdUh3G7nUReNyxf//0PDBsKImjrY27/nt5ciaL6FHYIntdPwaN5xwzUgunUnv1A==
+X-Received: by 2002:adf:d842:: with SMTP id k2mr6170940wrl.239.1594737236595; 
+ Tue, 14 Jul 2020 07:33:56 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id j75sm19644190wrj.22.2020.07.14.07.33.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Jul 2020 07:33:55 -0700 (PDT)
+Subject: Re: [PATCH v2 0/7] colo: Introduce resource agent and test suite/CI
+To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
+References: <cover.1591456338.git.lukasstraub2@web.de>
+ <20200705113750.45175374@luklap>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <71686e50-1dda-5aca-c1c4-2906cac38da4@redhat.com>
+Date: Tue, 14 Jul 2020 16:33:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR02MB6772.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50e89763-2e62-45e5-e0f2-08d827fe16b1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2020 13:59:12.7921 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9jv35nGYa9WLsXdsTK2qnDyK1hNV2jN8ff1zOdnQdqfJyOhzlow9BswquCJJwO5kT5QJ1QyGGLZzTPvfAFh2Vw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4056
-Received-SPF: pass client-ip=40.107.92.49; envelope-from=saipava@xilinx.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 10:14:17
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200705113750.45175374@luklap>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,72 +140,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Vikram Garhwal <fnuv@xilinx.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ying Fang <fangying1@huawei.com>,
- =?iso-8859-1?Q?=27Marc-Andr=E9_Lureau=27?= <marcandre.lureau@redhat.com>,
- =?iso-8859-1?Q?=27Philippe_Mathieu-Daud=E9=27?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Zhang Chen <chen.zhang@intel.com>,
+ Alberto Garcia <berto@igalia.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd,
+On 7/5/20 11:37 AM, Lukas Straub wrote:
+> On Sat, 6 Jun 2020 21:17:32 +0200
+> Lukas Straub <lukasstraub2@web.de> wrote:
+> 
+>> Hello Everyone,
+>> So here is v2. Patch 1 can already be merged independently of the others.
+>>
+>> Regards,
+>> Lukas Straub
+>>
+>> Changes:
+>> v2:
+>>  -use new yank api
+>>  -drop disk_size parameter
+>>  -introduce pick_qemu_util function and use it
+>>
+>> Overview:
+>>
+>> Hello Everyone,
+>> These patches introduce a resource agent for fully automatic management of colo
+>> and a test suite building upon the resource agent to extensively test colo.
+>>
+>> Test suite features:
+>> -Tests failover with peer crashing and hanging and failover during checkpoint
+>> -Tests network using ssh and iperf3
+>> -Quick test requires no special configuration
+>> -Network test for testing colo-compare
+>> -Stress test: failover all the time with network load
+>>
+>> Resource agent features:
+>> -Fully automatic management of colo
+>> -Handles many failures: hanging/crashing qemu, replication error, disk error, ...
+>> -Recovers from hanging qemu by using the "yank" oob command
+>> -Tracks which node has up-to-date data
+>> -Works well in clusters with more than 2 nodes
+>>
+>> Run times on my laptop:
+>> Quick test: 200s
+>> Network test: 800s (tagged as slow)
+>> Stress test: 1300s (tagged as slow)
+>>
+>> The test suite needs access to a network bridge to properly test the network,
+>> so some parameters need to be given to the test run. See
+>> tests/acceptance/colo.py for more information.
+>>
+>> I wonder how this integrates in existing CI infrastructure. Is there a common
+>> CI for qemu where this can run or does every subsystem have to run their own
+>> CI?
+>>
+>> Regards,
+>> Lukas Straub
+>>
+>>
+>> Lukas Straub (7):
+>>   block/quorum.c: stable children names
+>>   avocado_qemu: Introduce pick_qemu_util to pick qemu utility binaries
+>>   boot_linux.py: Use pick_qemu_util
+>>   colo: Introduce resource agent
+>>   colo: Introduce high-level test suite
+>>   configure,Makefile: Install colo resource-agent
+>>   MAINTAINERS: Add myself as maintainer for COLO resource agent
+>>
+>>  MAINTAINERS                               |    6 +
+>>  Makefile                                  |    5 +
+>>  block/quorum.c                            |   20 +-
+>>  configure                                 |   10 +
+>>  scripts/colo-resource-agent/colo          | 1466 +++++++++++++++++++++
+>>  scripts/colo-resource-agent/crm_master    |   44 +
+>>  scripts/colo-resource-agent/crm_resource  |   12 +
+>>  tests/acceptance/avocado_qemu/__init__.py |   15 +
+>>  tests/acceptance/boot_linux.py            |   11 +-
+>>  tests/acceptance/colo.py                  |  677 ++++++++++
+>>  10 files changed, 2251 insertions(+), 15 deletions(-)
+>>  create mode 100755 scripts/colo-resource-agent/colo
+>>  create mode 100755 scripts/colo-resource-agent/crm_master
+>>  create mode 100755 scripts/colo-resource-agent/crm_resource
+>>  create mode 100644 tests/acceptance/colo.py
+>>
+>> --
+>> 2.20.1
+> 
+> Ping...
 
-Any review on V3. So that I can work on.
-
-Regards,
-Sai Pavan
-
-> -----Original Message-----
-> From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-> Sent: Tuesday, July 7, 2020 10:14 PM
-> To: Gerd Hoffmann <kraxel@redhat.com>; Peter Maydell
-> <peter.maydell@linaro.org>; Markus Armbruster <armbru@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>; Eduardo Habkost
-> <ehabkost@redhat.com>; qemu-devel@nongnu.org; Alistair Francis
-> <alistair.francis@wdc.com>; 'Marc-Andr=E9 Lureau'
-> <marcandre.lureau@redhat.com>; Ying Fang <fangying1@huawei.com>;
-> Paolo Bonzini <pbonzini@redhat.com>; 'Philippe Mathieu-Daud=E9'
-> <philmd@redhat.com>; Vikram Garhwal <fnuv@xilinx.com>; Paul
-> Zimmerman <pauldzim@gmail.com>; Sai Pavan Boddu <saipava@xilinx.com>
-> Subject: [PATCH v3 0/3] Make hcd-xhci independent of pci hooks
->=20
-> Hi
->=20
-> This patch series attempts to make 'hcd-xhci' an independent model so it =
-can
-> be used by both pci and system-bus interface.
->=20
-> Changes for V2:
->     Make XHCIState non-qom
->     Use container_of functions for retriving pci device instance
->     Initialize the AddressSpace pointer in PATCH 1/3 itself Changes for V=
-3:
->     Convert XHCIState to TYPE_DEVICE and register as a child of XHCIPciSt=
-ate.
->=20
->=20
-> Sai Pavan Boddu (3):
->   usb/hcd-xhci: Make dma read/writes hooks pci free
->   usb/hcd-xhci: Move qemu-xhci device to hcd-xhci-pci.c
->   usb/hcd-xhci: Split pci wrapper for xhci base model
->=20
->  hw/usb/Kconfig        |   6 ++
->  hw/usb/Makefile.objs  |   1 +
->  hw/usb/hcd-xhci-nec.c |  18 ++--
->  hw/usb/hcd-xhci-pci.c | 242
-> ++++++++++++++++++++++++++++++++++++++++++++++
->  hw/usb/hcd-xhci-pci.h |  45 +++++++++
->  hw/usb/hcd-xhci.c     | 259 ++++++++++----------------------------------=
-------
->  hw/usb/hcd-xhci.h     |  20 ++--
->  7 files changed, 367 insertions(+), 224 deletions(-)  create mode 100644
-> hw/usb/hcd-xhci-pci.c  create mode 100644 hw/usb/hcd-xhci-pci.h
->=20
-> --
-> 2.7.4
+Ping^2?
 
 
