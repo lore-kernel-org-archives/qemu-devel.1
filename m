@@ -2,87 +2,71 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E912C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA308C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:36:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EF63206D9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:23:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g7CPVloi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF63206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B11632193E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 03:36:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B11632193E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvBXM-0001rp-Ex
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 23:23:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51812)
+	id 1jvBk3-0004nD-V3
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jul 2020 23:36:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvBWh-0001Mo-PN
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 23:22:39 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36608
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jvBWg-00006H-AT
- for qemu-devel@nongnu.org; Mon, 13 Jul 2020 23:22:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594696957;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tRWwIyu4oOMvqLNRZsAVngXFQsyNwrIHohrJD16Bqps=;
- b=g7CPVloikc5j37IJTp+jI2tg9ICWob12tt80EZwAsqW67DT0/0EByO3i+YYUeslQ0F1VRu
- Yy9Umd9Y56zHX0a80qE4cAEUTe7rHfkg5vrWPF58ZZPF5PZb1zwjO0PZyTJfEswHam1X+M
- dvq6zgDYZqYvMYOXFshXnbApejeKMRM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-E2h5FCvjPVmnLwda2u0xaw-1; Mon, 13 Jul 2020 23:22:34 -0400
-X-MC-Unique: E2h5FCvjPVmnLwda2u0xaw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 875338018A1;
- Tue, 14 Jul 2020 03:22:32 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-112-247.rdu2.redhat.com
- [10.10.112.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8246C6FDD1;
- Tue, 14 Jul 2020 03:22:28 +0000 (UTC)
-Date: Mon, 13 Jul 2020 23:22:26 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v2 4/9] tests/acceptance/boot_linux: Expand SD card image
- to power of 2
-Message-ID: <20200714032226.GE2983508@localhost.localdomain>
-References: <20200713183209.26308-1-f4bug@amsat.org>
- <20200713183209.26308-5-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jvBjU-0004N3-6h; Mon, 13 Jul 2020 23:35:52 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57536)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jvBjQ-0001u8-Va; Mon, 13 Jul 2020 23:35:51 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07578062|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.108965-0.0422159-0.848819;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03275; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.I1Nahlc_1594697733; 
+Received: from 30.225.208.64(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.I1Nahlc_1594697733)
+ by smtp.aliyun-inc.com(10.147.41.138);
+ Tue, 14 Jul 2020 11:35:33 +0800
+Subject: Re: [RFC 05/65] target/riscv: remove vsll.vi, vsrl.vi, vsra.vi insns
+ from using gvec
+To: Frank Chang <frank.chang@sifive.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+ <20200710104920.13550-6-frank.chang@sifive.com>
+ <452e8bc7-4622-77c2-ec81-9aa6f25705fc@linaro.org>
+ <CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <407ef5d5-d9d9-9619-b6e3-456f8a5b4bfb@c-sky.com>
+Date: Tue, 14 Jul 2020 11:35:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200713183209.26308-5-f4bug@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="pY3vCvL1qV+PayAL"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 23:07:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com>
+Content-Type: multipart/alternative;
+ boundary="------------81764C5E5A682BD8AF0E482C"
+Content-Language: en-US
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 23:35:37
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,90 +79,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>, qemu-block@nongnu.org,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>, Niek Linnenbank <nieklinnenbank@gmail.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---pY3vCvL1qV+PayAL
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is a multi-part message in MIME format.
+--------------81764C5E5A682BD8AF0E482C
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 13, 2020 at 08:32:04PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> In few commits we won't allow SD card images with invalid size
-> (not aligned to a power of 2). Prepare the tests: add the
-> pow2ceil() and image_pow2ceil_expand() methods and resize the
-> images (expanding) of the tests using SD cards.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> Since v1: Addressed review comments
-> - truncate -> expand reword (Alistair Francis)
-> - expand after uncompress (Niek Linnenbank)
-> ---
->  tests/acceptance/boot_linux_console.py | 27 +++++++++++++++++---------
->  1 file changed, 18 insertions(+), 9 deletions(-)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index b7e8858c2d..8f2a6aa8a4 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -28,6 +28,18 @@
->  except CmdNotFoundError:
->      P7ZIP_AVAILABLE =3D False
-> =20
-> +# round up to next power of 2
-> +def pow2ceil(x):
-> +    return 1 if x =3D=3D 0 else 2**(x - 1).bit_length()
-> +
 
-Nitpick: turn the comment into a docstring.
 
-Then, I was going to have a second nitpick about the method name, but
-realized it was following qemu-common.h's implementation.
+On 2020/7/14 10:59, Frank Chang wrote:
+> On Sat, Jul 11, 2020 at 12:27 AM Richard Henderson 
+> <richard.henderson@linaro.org <mailto:richard.henderson@linaro.org>> 
+> wrote:
+>
+>     On 7/10/20 3:48 AM, frank.chang@sifive.com
+>     <mailto:frank.chang@sifive.com> wrote:
+>     > From: Frank Chang <frank.chang@sifive.com
+>     <mailto:frank.chang@sifive.com>>
+>     >
+>     > vsll.vi <http://vsll.vi>, vsrl.vi <http://vsrl.vi>, vsra.vi
+>     <http://vsra.vi> cannot use shli gvec as it requires the
+>     > shift immediate value to be within the range: [0.. SEW bits].
+>     > Otherwise, it will hit the assertion:
+>     > tcg_debug_assert(shift >= 0 && shift < (8 << vece));
+>     >
+>     > However, RVV spec does not have such constraint, therefore we
+>     have to
+>     > use helper functions instead.
+>
+>     Why do you say that?  It does have such a constraint:
+>
+>     # Only the low lg2(SEW) bits are read to obtain the shift amount
+>     from a
+>     register value.
+>
+>     While that only talks about the register value, I sincerely doubt
+>     that the same
+>     truncation does not actually apply to immediates.
+>
+>     And if the entire immediate value does apply, the manual should
+>     certainly
+>     specify what should happen in that case.  And at present it doesn't.
+>
+>     It seems to me the bug is the bare use of GEN_OPIVI_GVEC_TRANS and
+>     thence
+>     do_opivi_gvec.  The ZX parameter should be extended to more than
+>     just "zero vs
+>     sign-extend", it should have an option for truncating the
+>     immediate to s->sew.
+>
+>
+>     r~
+>
+>
+> The latest spec specified:
+>
+> Only the low *lg2(SEW) bits* are read to obtain the shift amount from 
+> a *register value*.
+> The *immediate* is treated as an *unsigned shift amount*, with a 
+> *maximum shift amount of 31*.
+>
+> Looks like the shift amount in the immediate value is not relevant 
+> with SEW setting.
+> If so, is it better to just use do_opivi_gvec() and implement the 
+> logic by our own rather than using gvec IR?
 
-> +# expand file size to next power of 2
-> +def image_pow2ceil_expand(path):
-> +        size =3D os.path.getsize(path)
-> +        size_aligned =3D pow2ceil(size)
-> +        if size !=3D size_aligned:
-> +            with open(path, 'ab+') as fd:
-> +                fd.truncate(size_aligned)
-> +
+In my opinion, it doesn't matter to truncate the immediate to s->sew 
+before calling the gvec IR,
+whether the constraint of immediate exits or not.
 
-Same nitpick comment about comment -> docstring here.
+Zhiwei
+>
+> Frank Chang
 
-Either way,
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+--------------81764C5E5A682BD8AF0E482C
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
---pY3vCvL1qV+PayAL
-Content-Type: application/pgp-signature; name="signature.asc"
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <br>
+    <br>
+    <div class="moz-cite-prefix">On 2020/7/14 10:59, Frank Chang wrote:<br>
+    </div>
+    <blockquote type="cite"
+cite="mid:CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com">
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <div dir="ltr">
+        <div dir="ltr">On Sat, Jul 11, 2020 at 12:27 AM Richard
+          Henderson &lt;<a href="mailto:richard.henderson@linaro.org"
+            moz-do-not-send="true">richard.henderson@linaro.org</a>&gt;
+          wrote:<br>
+        </div>
+        <div class="gmail_quote">
+          <blockquote class="gmail_quote" style="margin:0px 0px 0px
+            0.8ex;border-left:1px solid
+            rgb(204,204,204);padding-left:1ex">On 7/10/20 3:48 AM, <a
+              href="mailto:frank.chang@sifive.com" target="_blank"
+              moz-do-not-send="true">frank.chang@sifive.com</a> wrote:<br>
+            &gt; From: Frank Chang &lt;<a
+              href="mailto:frank.chang@sifive.com" target="_blank"
+              moz-do-not-send="true">frank.chang@sifive.com</a>&gt;<br>
+            &gt; <br>
+            &gt; <a href="http://vsll.vi" rel="noreferrer"
+              target="_blank" moz-do-not-send="true">vsll.vi</a>, <a
+              href="http://vsrl.vi" rel="noreferrer" target="_blank"
+              moz-do-not-send="true">vsrl.vi</a>, <a
+              href="http://vsra.vi" rel="noreferrer" target="_blank"
+              moz-do-not-send="true">vsra.vi</a> cannot use shli gvec as
+            it requires the<br>
+            &gt; shift immediate value to be within the range: [0.. SEW
+            bits].<br>
+            &gt; Otherwise, it will hit the assertion:<br>
+            &gt; tcg_debug_assert(shift &gt;= 0 &amp;&amp; shift &lt; (8
+            &lt;&lt; vece));<br>
+            &gt; <br>
+            &gt; However, RVV spec does not have such constraint,
+            therefore we have to<br>
+            &gt; use helper functions instead.<br>
+            <br>
+            Why do you say that?  It does have such a constraint:<br>
+            <br>
+            # Only the low lg2(SEW) bits are read to obtain the shift
+            amount from a<br>
+            register value.<br>
+            <br>
+            While that only talks about the register value, I sincerely
+            doubt that the same<br>
+            truncation does not actually apply to immediates.<br>
+            <br>
+            And if the entire immediate value does apply, the manual
+            should certainly<br>
+            specify what should happen in that case.  And at present it
+            doesn't.<br>
+            <br>
+            It seems to me the bug is the bare use of
+            GEN_OPIVI_GVEC_TRANS and thence<br>
+            do_opivi_gvec.  The ZX parameter should be extended to more
+            than just "zero vs<br>
+            sign-extend", it should have an option for truncating the
+            immediate to s-&gt;sew.<br>
+            <br>
+            <br>
+            r~<br>
+          </blockquote>
+          <div><br>
+          </div>
+          <div>The latest spec specified:</div>
+          <div><br>
+          </div>
+          Only the low <b>lg2(SEW) bits</b> are read to obtain the
+          shift amount from a <b>register value</b>.<br>
+          <div>The <b>immediate</b> is treated as an <b>unsigned shift
+              amount</b>, with a <b>maximum shift amount of 31</b>.</div>
+          <div><br>
+          </div>
+          <div>Looks like the shift amount in the immediate value is not
+            relevant with SEW setting.</div>
+          <div>If so, is it better to just use do_opivi_gvec() and
+            implement the logic by our own rather than using gvec IR?</div>
+        </div>
+      </div>
+    </blockquote>
+    <br>
+    In my opinion, it doesn't matter to truncate the immediate to
+    s-&gt;sew before calling the gvec IR, <br>
+    whether the constraint of immediate exits or not. <br>
+    <br>
+    Zhiwei<br>
+    <blockquote type="cite"
+cite="mid:CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com">
+      <div dir="ltr">
+        <div class="gmail_quote">
+          <div><br>
+          </div>
+          <div>Frank Chang</div>
+        </div>
+      </div>
+    </blockquote>
+    <br>
+  </body>
+</html>
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl8NJO8ACgkQZX6NM6Xy
-CfPUPxAAtsPyCQD1q8QrePFWiB5+sbKOY4cEc3Fa6RXApnDDwXmbdBRF+f4+quub
-jXQDTYoTuEfmYGQwRy0OrNwfYSbdUOBLwMGOp4W6ZnhzUIqFjUK5l6J8rzHNZQ8Y
-WthT5jmq5WGN3VyFNbrDiMR+OkIpZYBH06D++i/Q9/40LQ4NHdlDT1fxDix0O0pR
-/wb/w8kQozK1BId01YxRH0WBapvegVQR41caN9wNb3H4jYNeaT0OlY6c7cu2AF+I
-6elmZj8E1gCJO/3iEkXpvVjXwdnegDgiwP7ba8O5zphVVYd8tOPiNWab10epysxi
-EIowe27y1Dm6faHN/MSzabEayk0GuHGDXMqo1Ro51br0yaaznh88pLGy0OgSICie
-75ftPdyRO7GUnONodahv0pEiug8zeFfA7sR3rnAR75g9QkAg58qDA44S1Ctgsn0y
-jtQGKoM2flUJC7A6LhZbWtAhbIbIJQG0m+ipHtRO1dnHyDq+Y2N/jSKKOV+/C6qJ
-DXrVadFuQMwO4KN7yfs1S8WATC6tMraMVRefVmP8pMAtTdAof8Gp2VXhHUGSXjqb
-a9Giy5IMmh4sYaT+qs9qFmtN8xexKdC0nN4dyWpXqQRd0yX4XAcIR/5ng3e4bZQk
-LPPy57IA3ZiAvMsgvcivbvS6vuGMvZqmtdOu45AolAWCLtfQdTg=
-=FZzv
------END PGP SIGNATURE-----
-
---pY3vCvL1qV+PayAL--
-
+--------------81764C5E5A682BD8AF0E482C--
 
