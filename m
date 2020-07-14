@@ -2,115 +2,96 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46669C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5270FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 111F3221F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:58:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2084C221F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:58:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjSV9eZ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111F3221F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lx3Smhaa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2084C221F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvHiB-0005pZ-B7
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:58:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59524)
+	id 1jvHi6-0005iC-ED
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:58:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jvHgS-0003Ze-Tt
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:57:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57723
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jvHgQ-0004V6-Nw
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:57:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594720625;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=VwKcDdsg/OXOrmnsK5bs//b70l6vWj9ndeaTGw4eJqI=;
- b=cjSV9eZ7Tu3Fk7oNSsHzbOcgek2owE5aqXKKp87SROIv3fTD7WALFPwzkRB8yhsRNYbXff
- gdhOCgNvZ1fIldjaecHUy/U00rPD/SQfERQan0aVJCMZEFzN3a2LdfwaRYGpnGDNTkE4eH
- 6gsIIjjoqZWuH2ufeVRIgDT7ihbK5z4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-22z65CXwOc-M9AE0vniaZQ-1; Tue, 14 Jul 2020 05:57:03 -0400
-X-MC-Unique: 22z65CXwOc-M9AE0vniaZQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F207A1030C21;
- Tue, 14 Jul 2020 09:57:01 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-179.ams2.redhat.com
- [10.36.113.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E368D5C1B2;
- Tue, 14 Jul 2020 09:57:00 +0000 (UTC)
-Subject: Re: [PATCH for-5.1 1/2] block: Require aligned image size to avoid
- assertion failure
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200710142149.40962-1-kwolf@redhat.com>
- <20200710142149.40962-2-kwolf@redhat.com>
- <e608699f-b2c2-d7a0-cb59-703832ae732a@redhat.com>
- <20200713142949.GD10318@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b91329db-303f-41ab-5638-3ec7543b55ac@redhat.com>
-Date: Tue, 14 Jul 2020 11:56:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvHcW-0003fr-8V
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:53:04 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:43052)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvHcU-0003zh-ET
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:53:03 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id j4so20514258wrp.10
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 02:53:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Qk3ABZq413c4i38F0xqHIViOGrZppkOMvKepCv8uPHk=;
+ b=Lx3SmhaaqaTP2jWtLNDyloCEHO8D54gCtmrdZYTtd/Avt7x5mvkpFksjqy6Hx2oXHa
+ RfE/O12//wuzgMRQmaVHnQRCURbHRApcWjb0uEz/VjGszCnre2unhWFVnzYLUoLwtdmg
+ 9axHL0oTAIdTRuw/Lhi/cX+x5O6Kp/0z4v3U9b//24CVZhYFDE6+jTRWdFhBgSZbhwpk
+ zvAzoqWxWSYBP1BojvT80KoxUQ5XaBWrjzDY9hLxOEfKb5QF4hQw+WDRI3758f4JyyAt
+ esllrcVKxTziAye5aVVI7cwMu8jMphMZCxs0vUK9Pc0HRwlY/Bne4CLPM0nl9RFycXb4
+ owcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Qk3ABZq413c4i38F0xqHIViOGrZppkOMvKepCv8uPHk=;
+ b=kZs++6Ld8OhMtoE36lqoFQ0/nzxzqtEWah1JEDKlZNfXLd4VKD2xh5dDBQ1qiFNW4T
+ xKqBxm2skPaXm6xnhyj5JVU++w2V53iFEcCMambpcvmYctubPbiKHGVlY2cv8Lbt3A3W
+ gv3BdlpEi3nqDANIwQGpadul6drOn6SaWam9Cx0Qary2xSkChvoFqiogL/MucDcF/T60
+ nBZxxaCM1ctxuaj07QSoCuDeZ/6O8ARvMD1KXeZF7/BUl6jdIi9AmG8ldlAwcLhzwy5N
+ 1/rHf2V8fi32oVf6s54vzmUx4HPqdWXHe97vdV+Hk+UHm8iHmNEvh3U5gKMmDaxGRpRE
+ ejAQ==
+X-Gm-Message-State: AOAM532CDxg86ReKKtTac1UQ/cBi63LtHlb9jdZc/MOYj/lVUCPoCCsf
+ RZk3zRRJU2+2fmiCXHDqzQDEsQ==
+X-Google-Smtp-Source: ABdhPJwSpTIlynN4SIs7kUE0jjohYof84f5Vd0am6OaJu1uyMkqrb8QSbSbEs486ibXF6eH5UsOt3w==
+X-Received: by 2002:a5d:44d1:: with SMTP id z17mr4097874wrr.259.1594720381061; 
+ Tue, 14 Jul 2020 02:53:01 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p14sm30359670wrj.14.2020.07.14.02.52.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jul 2020 02:52:55 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 22A311FF98;
+ Tue, 14 Jul 2020 10:52:48 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 9/9] plugins: expand the bb plugin to be thread safe and track
+ per-cpu
+Date: Tue, 14 Jul 2020 10:52:47 +0100
+Message-Id: <20200714095247.19573-10-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200714095247.19573-1-alex.bennee@linaro.org>
+References: <20200714095247.19573-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200713142949.GD10318@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="dKsPRmCKFBqI88YErtcs0NFlNHeS8JWgR"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,138 +104,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: nsoffer@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org, Dave Bort <dbort@dbort.com>,
+ Robert Foley <robert.foley@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dKsPRmCKFBqI88YErtcs0NFlNHeS8JWgR
-Content-Type: multipart/mixed; boundary="qzTuiNTWtAfVPVeFvqLvxVCCjQHw3LkCI"
+While there isn't any easy way to make the inline counts thread safe
+we can ensure the callback based ones are. While we are at it we can
+reduce introduce a new option ("idle") to dump a report of the current
+bb and insn count each time a vCPU enters the idle state.
 
---qzTuiNTWtAfVPVeFvqLvxVCCjQHw3LkCI
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Robert Foley <robert.foley@linaro.org>
+Cc: Dave Bort <dbort@dbort.com>
 
-On 13.07.20 16:29, Kevin Wolf wrote:
-> Am 13.07.2020 um 13:19 hat Max Reitz geschrieben:
->> On 10.07.20 16:21, Kevin Wolf wrote:
->>> Unaligned requests will automatically be aligned to bl.request_alignmen=
-t
->>> and we don't want to extend requests to access space beyond the end of
->>> the image, so it's required that the image size is aligned.
->>>
->>> With write requests, this could cause assertion failures like this if
->>> RESIZE permissions weren't requested:
->>>
->>> qemu-img: block/io.c:1910: bdrv_co_write_req_prepare: Assertion `end_se=
-ctor <=3D bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
->>>
->>> This was e.g. triggered by qemu-img converting to a target image with 4=
-k
->>> request alignment when the image was only aligned to 512 bytes, but not
->>> to 4k.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>  block.c | 10 ++++++++++
->>>  1 file changed, 10 insertions(+)
->>
->> (I think we had some proposal like this before, but I can=E2=80=99t find=
- it,
->> unfortunately...)
->>
->> I can=E2=80=99t see how with this patch you could create qcow2 images an=
-d then
->> use them with direct I/O, because AFAICS, qemu-img create doesn=E2=80=99=
-t allow
->> specifying caching options, so AFAIU you=E2=80=99re stuck with:
->>
->> $ ./qemu-img create -f qcow2 /mnt/tmp/foo.qcow2 1M
->> Formatting '/mnt/tmp/foo.qcow2', fmt=3Dqcow2 cluster_size=3D65536
->> compression_type=3Dzlib size=3D1048576 lazy_refcounts=3Doff refcount_bit=
-s=3D16
->>
->> $ sudo ./qemu-io -t none /mnt/tmp/foo.qcow2
->> qemu-io: can't open device /mnt/tmp/foo.qcow2: Image size is not a
->> multiple of request alignment
->>
->> (/mnt/tmp is a filesystem on a =E2=80=9Closetup -b 4096=E2=80=9D device.=
-)
->=20
-> Hm, that looks like some regrettable collateral damage...
->=20
-> Well, you could argue that we should be writing full L1 tables with zero
-> padding instead of just the used part. I thought we had fixed this long
-> ago. But looks like we haven't.
+Message-Id: <20200713200415.26214-8-alex.bennee@linaro.org>
 
-That would help for the standard case.  It wouldn=E2=80=99t when the cluste=
-r
-size is smaller than the request alignment, which, while maybe not
-important, would still be a shame.
-
-> But we should still avoid crashing in other cases, so what is the
-> difference between both? Is it just that qcow2 has the RESIZE permission
-> anyway so it doesn't matter?
-
-I assume so.
-
-> If so, maybe attaching to a block node with WRITE, but not RESIZE is
-> what needs to fail when the image size is unaligned?
-
-That sounds reasonable.
-
-The obvious question is what happens when the RESIZE capability is
-removed.  Dropping capabilities may never fail =E2=80=93 I suppose we could
-force-keep the RESIZE capability for such nodes?
-
-Or we could immediately align such files to the block size once they are
-opened (with the RESIZE capability).
-
->> Or you use blockdev-create, that seems to work (because of course you
->> can set the cache mode on the protocol node when you open it for
->> formatting).  But, well, I think there should be a working qemu-img
->> create case.
->>
->> Also, I=E2=80=99m afraid of breaking existing use cases with this patch =
-(just
->> qemu-img create + using the image with cache=3Dnone).
->=20
-> I think for raw images, failure on start is better than crashing when
-> the VM is running.
-
-Agreed.
-
-> The qcow2 case needs to be fixed, of course.
->=20
-> Either case, I guess patch 2 can already be merged and would solve at
-> least the immediate bug report.
-
-Also true.
-
-Max
-
-
---qzTuiNTWtAfVPVeFvqLvxVCCjQHw3LkCI--
-
---dKsPRmCKFBqI88YErtcs0NFlNHeS8JWgR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8NgWoACgkQ9AfbAGHV
-z0CikAgAwz2xEd/mv+GM7MJXemgpbS7dy5gZhOmYEnTrh1HaaE6AveNN2pUwhktz
-BYeryiKexBY2OlCalpDH4pUda+rkGTB3aUH0bEEsLlm1RN6y1RI9eO2QplBw/rkZ
-wtyO34+9HIryebjSSbo5m+k6CcPg5AkY+S1/OLS4jLvqq1mfkvUXnkBwoyJBXhtG
-FP9lLOEle9bml2Mh97THhrAIisVxiiO4pTPh9oBwAPvBXkmlg43yppwZRwCJ3dhT
-+D1cwr9D4hHU5mypNXXsv0LsaiSpMQtidrW2BZHRc+WHODSRIPkrktzYi+BXlkEi
-9sk0O1OksUtJ4Rbu1pkua+cBnaLQrQ==
-=xyBH
------END PGP SIGNATURE-----
-
---dKsPRmCKFBqI88YErtcs0NFlNHeS8JWgR--
+diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
+index df19fd359d..e4cc7fdd6e 100644
+--- a/tests/plugin/bb.c
++++ b/tests/plugin/bb.c
+@@ -16,24 +16,67 @@
+ 
+ QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
+ 
+-static uint64_t bb_count;
+-static uint64_t insn_count;
++typedef struct {
++    GMutex lock;
++    int index;
++    uint64_t bb_count;
++    uint64_t insn_count;
++} CPUCount;
++
++/* Used by the inline & linux-user counts */
+ static bool do_inline;
++static CPUCount inline_count;
++
++/* Dump running CPU total on idle? */
++static bool idle_report;
++static GPtrArray *counts;
++static int max_cpus;
++
++static void gen_one_cpu_report(CPUCount *count, GString *report)
++{
++    if (count->bb_count) {
++        g_string_append_printf(report, "CPU%d: "
++                               "bb's: %" PRIu64", insns: %" PRIu64 "\n",
++                               count->index,
++                               count->bb_count, count->insn_count);
++    }
++}
+ 
+ static void plugin_exit(qemu_plugin_id_t id, void *p)
+ {
+-    g_autofree gchar *out = g_strdup_printf(
+-        "bb's: %" PRIu64", insns: %" PRIu64 "\n",
+-        bb_count, insn_count);
+-    qemu_plugin_outs(out);
++    g_autoptr(GString) report = g_string_new("");
++
++    if (do_inline || !max_cpus) {
++        g_string_printf(report, "bb's: %" PRIu64", insns: %" PRIu64 "\n",
++                        inline_count.bb_count, inline_count.insn_count);
++    } else {
++        g_ptr_array_foreach(counts, (GFunc) gen_one_cpu_report, report);
++    }
++    qemu_plugin_outs(report->str);
++}
++
++static void vcpu_idle(qemu_plugin_id_t id, unsigned int cpu_index)
++{
++    CPUCount *count = g_ptr_array_index(counts, cpu_index);
++    g_autoptr(GString) report = g_string_new("");
++    gen_one_cpu_report(count, report);
++
++    if (report->len > 0) {
++        g_string_prepend(report, "Idling ");
++        qemu_plugin_outs(report->str);
++    }
+ }
+ 
+ static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
+ {
+-    unsigned long n_insns = (unsigned long)udata;
++    CPUCount *count = max_cpus ?
++        g_ptr_array_index(counts, cpu_index) : &inline_count;
+ 
+-    insn_count += n_insns;
+-    bb_count++;
++    unsigned long n_insns = (unsigned long)udata;
++    g_mutex_lock(&count->lock);
++    count->insn_count += n_insns;
++    count->bb_count++;
++    g_mutex_unlock(&count->lock);
+ }
+ 
+ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+@@ -42,9 +85,10 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+ 
+     if (do_inline) {
+         qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
+-                                                 &bb_count, 1);
++                                                 &inline_count.bb_count, 1);
+         qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
+-                                                 &insn_count, n_insns);
++                                                 &inline_count.insn_count,
++                                                 n_insns);
+     } else {
+         qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
+                                              QEMU_PLUGIN_CB_NO_REGS,
+@@ -56,8 +100,35 @@ QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
+                                            const qemu_info_t *info,
+                                            int argc, char **argv)
+ {
+-    if (argc && strcmp(argv[0], "inline") == 0) {
+-        do_inline = true;
++    int i;
++
++    for (i = 0; i < argc; i++) {
++        char *opt = argv[i];
++        if (g_strcmp0(opt, "inline") == 0) {
++            do_inline = true;
++        } else if (g_strcmp0(opt, "idle") == 0) {
++            idle_report = true;
++        } else {
++            fprintf(stderr, "option parsing failed: %s\n", opt);
++            return -1;
++        }
++    }
++
++    if (info->system_emulation && !do_inline) {
++        max_cpus = info->system.max_vcpus;
++        counts = g_ptr_array_new();
++        for (i = 0; i < max_cpus; i++) {
++            CPUCount *count = g_new0(CPUCount, 1);
++            g_mutex_init(&count->lock);
++            count->index = i;
++            g_ptr_array_add(counts, count);
++        }
++    } else if (!do_inline) {
++        g_mutex_init(&inline_count.lock);
++    }
++
++    if (idle_report) {
++        qemu_plugin_register_vcpu_idle_cb(id, vcpu_idle);
+     }
+ 
+     qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
+-- 
+2.20.1
 
 
