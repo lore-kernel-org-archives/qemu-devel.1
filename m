@@ -2,98 +2,86 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBA3C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D87C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:53:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79C8B22464
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:52:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA1B222464
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 12:53:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlcZfQt9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C8B22464
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FcUAjYZF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1B222464
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvKQI-0006LG-Pt
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 08:52:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46214)
+	id 1jvKQr-00077H-6i
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 08:53:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jvKOy-0004IP-Ux; Tue, 14 Jul 2020 08:51:16 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43667)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jvKPr-0005hm-RI
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:52:11 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:47077)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jvKOx-0002lK-5H; Tue, 14 Jul 2020 08:51:16 -0400
-Received: by mail-wr1-x441.google.com with SMTP id j4so21385329wrp.10;
- Tue, 14 Jul 2020 05:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=DPfgLaHyWMOKNDsYqcI84DHhj8g+HLYXFdDwtMOO4js=;
- b=nlcZfQt90gS3a2tmc7XIbqtFDkqVyE2c9CL22VB83UtKwgvhnQBHTeJFiGUHrB9xP4
- xuKkaboY1MHWyoIT1+iUbjU7VF43xrTD2wIUDCSvkxPKBL6a23xCYjVadkiVJ93CbQRl
- 9TMAqiaHp56oF2eBpAUOi5OJWID2HA6t9lmPjnQsLtdnPtFT427elr1oAzToe70cPK0O
- 3Bzf/ru9Wn3Uegb6jobIXmSv8WfQR8wZF94A4Jv88oGUwGxemqrfT6kH6/BivRbFDcZ4
- LLcIPBSwX66561Dvh8gclSFR97y2c+xXvLHBCWkzeXX92M0s+4qxU/3YhWfClMSvD849
- Jf0Q==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jvKPp-0002rE-QF
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 08:52:11 -0400
+Received: by mail-ot1-x336.google.com with SMTP id n24so12900801otr.13
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 05:52:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Y+IXLran2n5JRXTBl5jxItH0XAnVJdyNDfRZvC0s+CI=;
+ b=FcUAjYZFcUKxBFekCpPM0hNdHJqvhzf+uWVJe4d7BsFVgJeQa0iLZxxUMztu5vf8WN
+ AN0huTscXgV0ayVkymdeXbK1st9yJeTQf4kjqXsr76QNiuokS1cTleE3qt/uXfVC+CGE
+ LpYZjmkL/sC4uZhutnXJATz4fS8oNHnuzK5zpn+g9q0D/jNPDR+igRJDjH1PRjc9laGj
+ WGZjL9mgoUMByzaY8qC+lfxBmS5D8OoGX+fhdT9J4WAE5HCuDE2CHw1KNsjTqavZMWjY
+ yYgq2tSLYiwtiMwlJON3ORnMYXrxOpbDaea3sNFfp9ceTIydzCYVeAcaC4MMeFpwBO+q
+ 2AnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=DPfgLaHyWMOKNDsYqcI84DHhj8g+HLYXFdDwtMOO4js=;
- b=lMUL5GNs1/U9WbqBuoQdoBtMifTwfGdzc8oS/BjVhPKBQk1TgVZpLuSYXla+ckINMR
- UUQfrBt12l/K9bt3WWGJmZeS5HRSI8bX5mdbNGuFWXxlj6QoEbDKsSwO6lxUJlVuM8IP
- SAgfu/EbZII10Sl7AUUc/nBFxLaA8n3ZzKdj8BoO0mCWc6SdDI1FDWBs2MRycNiE4AyD
- YAot3QoWlt6+L2hl9UCQXXmZb1go2n+rFh2lhd8QJSKozEtsq2Bkgm+UKyHZLAl0oovv
- MwuSvvkNP4rZleSQbspLTxkk3sG3UE1YSGDl8briYPhZtgjbgNNBsaUVOKWVSGWFCipi
- HasQ==
-X-Gm-Message-State: AOAM530eEvjXbJjVfBacQ4nLvS0rFuzhJr+drh99+2AgO1v9YyUpamhD
- lKYj2iH8aM5zge4/xiHpTiwgHGgzeRc=
-X-Google-Smtp-Source: ABdhPJx2Mv3jYJYjI9Ya7x16DdqutiB2Gzjr4obYvlJDa3slc8jmhmeR3KDDbDCcRZoZZ227VAitEg==
-X-Received: by 2002:a5d:6603:: with SMTP id n3mr5372081wru.142.1594731072909; 
- Tue, 14 Jul 2020 05:51:12 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id q188sm4578922wma.46.2020.07.14.05.51.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Jul 2020 05:51:12 -0700 (PDT)
-Subject: Re: [PATCH for-5.1 1/4] docs/system: Briefly document canon-a1100
- board
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200713175746.5936-1-peter.maydell@linaro.org>
- <20200713175746.5936-2-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5425cea6-8211-d780-dcc8-33e327fda82d@amsat.org>
-Date: Tue, 14 Jul 2020 14:51:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Y+IXLran2n5JRXTBl5jxItH0XAnVJdyNDfRZvC0s+CI=;
+ b=OtTXtEGHAqP6ThXDQqrjYHEpO5n0Z4n0dZeAgTD2vmqFxaMBqY9uK/rE7JeXBMAeRb
+ ZEEL3X+3AE/fv33Whp3yCgvEPcdRExF0b1gXzgCvd1ueh5E11J3Ix66GUJr2G8Z5lkbT
+ EY/LuIhGm+6Ub7whsge/2VprxqiqWrHjtaRkBdiA+P0I0CBw+50m1HfOx9nr3MRIRLH2
+ MESmb8STZuA2bKJDqvIu2sM/TfGVxrZXcaDfGke157Re8F9ZVuufC8isnZ3e3V9bykM8
+ I2cLkwpGORLTZoMmcuBAZwu4WHhBXK/qDLZZTvhqiv7fPwT/gJUe5wfB+lwm0FNwhARy
+ 9MTQ==
+X-Gm-Message-State: AOAM532lk94DN0BzQJ9VMWPcI+3pyfokRI7vi/0rmzegKbOm3y7wX0Ca
+ oCLt/vGeDcfBbc8KdNk8aSAY7ZhKEOHO0J51Vgn8/A==
+X-Google-Smtp-Source: ABdhPJzOqJRjFgdqXj4wPy1lbdfaGTu1e9HGTlRw3khciUkJhqXw66cknOgeR/crTCWiUxIzEpJkQlNYKFxhartH/5E=
+X-Received: by 2002:a05:6830:10ce:: with SMTP id
+ z14mr4027504oto.135.1594731128485; 
+ Tue, 14 Jul 2020 05:52:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200713175746.5936-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+References: <20200713143306.311143-1-kwolf@redhat.com>
+In-Reply-To: <20200713143306.311143-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Jul 2020 13:51:57 +0100
+Message-ID: <CAFEAcA8wHhVdw4-0amwHbn8STddUsK7C+oiFzSRW-0dWJ4dFhg@mail.gmail.com>
+Subject: Re: [PULL v3] Block layer patches
+To: Kevin Wolf <kwolf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::336;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x336.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,64 +94,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/13/20 7:57 PM, Peter Maydell wrote:
-> Add skeletal documentation of the canon-a1100 board.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  docs/system/arm/digic.rst  | 11 +++++++++++
->  docs/system/target-arm.rst |  1 +
->  MAINTAINERS                |  1 +
->  3 files changed, 13 insertions(+)
->  create mode 100644 docs/system/arm/digic.rst
-> 
-> diff --git a/docs/system/arm/digic.rst b/docs/system/arm/digic.rst
-> new file mode 100644
-> index 00000000000..2b3520ff5e1
-> --- /dev/null
-> +++ b/docs/system/arm/digic.rst
-> @@ -0,0 +1,11 @@
-> +Canon A1100 (``canon-a1100``)
-> +=============================
-> +
-> +This machine is a model of the Canon PowerShot A1100 camera, which
-> +uses the DIGIC SoC. This model is based on reverse engineering efforts
-> +by the contributors to the `CHDK <http://chdk.wikia.com/>`_ and
-> +`Magic Lantern <http://www.magiclantern.fm/>`_ projects.
-> +
-> +The emulation is incomplete. In particular it can't be used
-> +to run the original camera firmware, but it can successfully run
-> +an experimental version of the `barebox bootloader <http://www.barebox.org/>`_.
-> diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-> index 1bd477a2936..8fa51a22817 100644
-> --- a/docs/system/target-arm.rst
-> +++ b/docs/system/target-arm.rst
-> @@ -82,6 +82,7 @@ undocumented; you can get a complete list by running
->     arm/versatile
->     arm/vexpress
->     arm/aspeed
-> +   arm/digic
->     arm/musicpal
->     arm/nseries
->     arm/orangepi
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fe8139f3675..0f578040b99 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -634,6 +634,7 @@ F: include/hw/arm/digic.h
->  F: hw/*/digic*
->  F: include/hw/*/digic*
->  F: tests/acceptance/machine_arm_canona1100.py
-> +F: docs/system/arm/digic.rst
->  
->  Goldfish RTC
->  M: Anup Patel <anup.patel@wdc.com>
-> 
+On Mon, 13 Jul 2020 at 15:33, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit 6c87d9f311dba0641bdc2df556056938a8bf2a12:
+>
+>   Merge remote-tracking branch 'remotes/elmarco/tags/chardev-pull-request' into staging (2020-07-13 09:34:24 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 7637b225a8d59a3b9b0e31bbc4eb8a0788792ac5:
+>
+>   block: Avoid stale pointer dereference in blk_get_aio_context() (2020-07-13 15:57:13 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - file-posix: Mitigate file fragmentation with extent size hints
+> - Tighten qemu-img rules on missing backing format
+> - qemu-img map: Don't limit block status request size
+> - Fix crash with virtio-scsi and iothreads
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Fails on OpenBSD:
 
+  TEST    iotest-qcow2: 114 [fail]
+QEMU          --
+"/home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
+-nodefaults -display none -machine virt -accel qtest
+QEMU_IMG      --
+"/home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       --
+"/home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/../../qemu-io"
+--cache writeback --aio threads -f qcow2
+QEMU_NBD      --
+"/home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- OpenBSD/amd64 openbsd 6.6
+TEST_DIR      -- /home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/scratch
+SOCK_DIR      -- /tmp/tmp.fiTIG5IIBg
+SOCKET_SCM_HELPER --
+
+--- /home/qemu/qemu-test.yVOWVF/src/tests/qemu-iotests/114.out  Mon
+Jul 13 17:59:07 2020
++++ /home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/114.out.bad
+ Tue Jul 14 12:39:01 2020
+@@ -1,8 +1,9 @@
+ QA output created by 114
+-qemu-img: warning: Deprecated use of backing file without explicit
+backing format (detected format of raw)
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+backing_file=TEST_DIR/t.IMGFMT.orig
++./114: line 48: truncate: command not found
++qemu-img: TEST_DIR/t.IMGFMT: Could not open 'TEST_DIR/t.IMGFMT.orig':
+No such file or directory
++Could not open backing image.
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
+-qemu-img: warning: Deprecated use of backing file without explicit
+backing format
++qemu-img: Could not open
+'/home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/scratch/t.qcow2.orig':
+Could not open '/home/qemu/qemu-test.yVOWVF/build/tests/qemu-iotests/scratch/t.qcow2.orig':
+No such file or directory
+ qemu-img: warning: Deprecated use of backing file without explicit
+backing format (detected format of IMGFMT)
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
+ qemu-img: warning: Deprecated use of unopened backing file without
+explicit backing format, use of this image requires potentially unsafe
+format probing
+  TEST    iotest-qcow2: 117
+
+thanks
+-- PMM
 
