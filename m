@@ -2,59 +2,95 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA89C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953B9C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:57:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E29D921897
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:56:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E29D921897
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 62AE2217A0
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 09:57:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HAfT/rP2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62AE2217A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvHfy-0001e2-5x
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59124)
+	id 1jvHgR-00033T-La
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 05:57:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1jvHex-0008Mw-7i
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:55:35 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:53383)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1jvHet-0004A4-T3
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:55:34 -0400
-Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
- by isrv.corpit.ru (Postfix) with ESMTP id EF4CF40482;
- Tue, 14 Jul 2020 12:55:20 +0300 (MSK)
-Received: from tls.msk.ru (mjt.vpn.tls.msk.ru [192.168.177.99])
- by tsrv.corpit.ru (Postfix) with SMTP id 0BB97B3;
- Tue, 14 Jul 2020 12:55:21 +0300 (MSK)
-Received: (nullmailer pid 16287 invoked by uid 1000);
- Tue, 14 Jul 2020 09:55:20 -0000
-From: Michael Tokarev <mjt@tls.msk.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.1] acpi-pm-tmr: allow 2-byte reads
-Date: Tue, 14 Jul 2020 12:55:18 +0300
-Message-Id: <20200714095518.16241-1-mjt@msgid.tls.msk.ru>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvHcT-0003Z8-Np
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:53:01 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:40611)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvHcR-0003yD-S9
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 05:53:01 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id f2so20457982wrp.7
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 02:52:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=V+m4RDPdg9U+KIn2pEcS3MKP2lWACszi+kXcKRp9FQM=;
+ b=HAfT/rP2joqyeWRIqkXnpz45G4d0CgKCxAFmJyYlm6rT4xcD/Ii0N9dVRlG9/YLgkb
+ tVhqazQDPWVprmr8QjIP7AA+QlM2vmvhKDDyoxDutxQEdkOtPVEf3h/obHy6OOdHH8c6
+ karrwlKfWLdMyyBTabVKQARqiM9vBdHVgZRr/k596rsYIRI+5jMbbDxXt/y9NiPU5Mdk
+ JPWRuVdYgOGmyqwo0bDeW82Ie9c5Abs20EVVhrwIs+RsqKOhJodkGhpSeK5mqM3/Wbk4
+ JzobYRRNgnhRObU8reI1rQXiQ65oKTvVhts75tBLS8G+DjYOYO07eKpbwKceGWQAUZee
+ c4ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=V+m4RDPdg9U+KIn2pEcS3MKP2lWACszi+kXcKRp9FQM=;
+ b=rM16BvTahyZ7VfO25cAJRLkyWf1qURnWon/0amTU0LLaffs9EQ0ra4KqW9elAb/D/j
+ GiHrIiawFf620gRR1iRdtlXmgdLeHdYxs/IgqbMDnM7ARINxAJuEemmNvzcPOCEVc4Ah
+ xfqsHOrRisSVY3qiqUpdrRbJVMoIUxi21WmmFdU74FTTTckRar9xmVkbhSYnYHuex+Cx
+ z5evuTcIwjhjYu7bZ0BV96YmoGUraLGf/l4VCPk6u8QFvHLAISdnuXgWjJJL/mLLAKef
+ PBsuyGqLJGfRlL2CuuYS6wjGJHzqMl+nV4MqBPeWAmGHpegIDYQDGgcxjeNm9X7CPTxw
+ ypWQ==
+X-Gm-Message-State: AOAM531u6YFgYRinJNMq/pZO94cHwfjhfr7hUU6jjHJAx41tzR+pPqTV
+ 8fXh4PqOrFrr8rh2bCKWAGGn6A==
+X-Google-Smtp-Source: ABdhPJxYKvRRDHNT8ywAwrxFwWy2cW9BAytjqX+4jPE+qWR7yp8Stts79J75qmUPPr8E1Pf/z1GGHA==
+X-Received: by 2002:adf:f3cd:: with SMTP id g13mr3953705wrp.45.1594720378394; 
+ Tue, 14 Jul 2020 02:52:58 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j75sm18206267wrj.22.2020.07.14.02.52.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jul 2020 02:52:53 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E6D991FF93;
+ Tue, 14 Jul 2020 10:52:47 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 7/9] tests/plugins: don't unconditionally add -Wpsabi
+Date: Tue, 14 Jul 2020 10:52:45 +0100
+Message-Id: <20200714095247.19573-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200714095247.19573-1-alex.bennee@linaro.org>
+References: <20200714095247.19573-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=86.62.121.231; envelope-from=mjt@tls.msk.ru;
- helo=isrv.corpit.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 05:55:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,41 +103,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Simon John <git@the-jedi.co.uk>, Michael Tokarev <mjt@tls.msk.ru>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As found in LP#964247, MacOS Catalina performs 2-byte reads
-on the acpi timer address space while the spec says it should
-be 4-byte. Allow 2-byte reads.
+Not all compilers support the -Wpsabi (clang-9 in my case). To handle
+this gracefully we pare back the shared build machinery so the
+Makefile is relatively "standalone". We still take advantage of
+config-host.mak as configure has done a bunch of probing for us but
+that is it.
 
-Reported-By: Simon John <git@the-jedi.co.uk>
-Signed-Off-By: Michael Tokarev <mjt@tls.msk.ru>
----
- hw/acpi/core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Fixes: bac8d222a
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200713200415.26214-6-alex.bennee@linaro.org>
 
-I'm applying this to debian qemu package, need the fix
-faster in order to release security updates for other
-branches.
-
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 45cbed49ab..9be38aa2ac 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -530,7 +530,9 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
- static const MemoryRegionOps acpi_pm_tmr_ops = {
-     .read = acpi_pm_tmr_read,
-     .write = acpi_pm_tmr_write,
--    .valid.min_access_size = 4,
-+    .impl.min_access_size = 4,
-+     /* at least MacOS Catalina reads 2 bytes and fails if it doesn't work */
-+    .valid.min_access_size = 2,
-     .valid.max_access_size = 4,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/configure b/configure
+index e1de2f5b24..08eaa99d19 100755
+--- a/configure
++++ b/configure
+@@ -7112,6 +7112,9 @@ echo "GIT_UPDATE=$git_update" >> $config_host_mak
+ 
+ echo "ARCH=$ARCH" >> $config_host_mak
+ 
++echo "GLIB_CFLAGS=$glib_cflags" >> $config_host_mak
++echo "GLIB_LDFLAGS=$glib_ldflags" >> $config_host_mak
++
+ if test "$default_devices" = "yes" ; then
+   echo "CONFIG_MINIKCONF_MODE=--defconfig" >> $config_host_mak
+ else
+diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+index 3a50451428..e9348fde4a 100644
+--- a/tests/plugin/Makefile
++++ b/tests/plugin/Makefile
+@@ -1,9 +1,16 @@
++# -*- Mode: makefile -*-
++#
++# This Makefile example is fairly independent from the main makefile
++# so users can take and adapt it for their build. We only really
++# include config-host.mak so we don't have to repeat probing for
++# cflags that the main configure has already done for us.
++#
++
+ BUILD_DIR := $(CURDIR)/../..
+ 
+ include $(BUILD_DIR)/config-host.mak
+-include $(SRC_PATH)/rules.mak
+ 
+-$(call set-vpath, $(SRC_PATH)/tests/plugin)
++VPATH += $(SRC_PATH)/tests/plugin
+ 
+ NAMES :=
+ NAMES += bb
+@@ -17,11 +24,18 @@ NAMES += lockstep
+ 
+ SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
+ 
+-QEMU_CFLAGS += -fPIC -Wpsabi
+-QEMU_CFLAGS += -I$(SRC_PATH)/include/qemu
++# The main QEMU uses Glib extensively so it's perfectly fine to use it
++# in plugins (which many example do).
++CFLAGS = $(GLIB_CFLAGS)
++CFLAGS += -fPIC
++CFLAGS += $(if $(findstring no-psabi,$(QEMU_CFLAGS)),-Wpsabi)
++CFLAGS += -I$(SRC_PATH)/include/qemu
+ 
+ all: $(SONAMES)
+ 
++%.o: %.c
++	$(CC) $(CFLAGS) -c -o $@ $<
++
+ lib%.so: %.o
+ 	$(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
+ 
 -- 
 2.20.1
 
