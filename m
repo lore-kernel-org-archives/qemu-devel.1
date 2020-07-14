@@ -2,104 +2,99 @@ Return-Path: <SRS0=DUFB=AZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FORGED_YAHOO_RCVD,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF8FC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 11:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6E9C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 11:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88DC62084C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 11:13:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5CC522208
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jul 2020 11:17:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RjpKqAIP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88DC62084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="BUXkWxwQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5CC522208
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvIs4-0004un-Ng
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 07:13:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49836)
+	id 1jvIvj-000644-TP
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 07:16:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvIrV-0004VZ-Tm
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 07:12:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57747
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jvIrU-0006Vk-1s
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 07:12:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594725155;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bX7JHxFm/38ZQuxn3bHweSgOSEJRRueQJ6aA137wLAc=;
- b=RjpKqAIPjzDSPB/tYqAKpBZ5Xv1zi2OvTYpNTKIh/31mP8MblD70W2dW/hulS0Mg80cxdI
- beSbTSyISqtHJXJbGHJNmZ8bkxozfyOr40YXtsKTqOTpTq5iV8/bBzT18t9Av7mFnvAPUa
- XQKnAIHpDIibAPpjrH0KSPUiUwrlsRk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-rtvmBap0NHm9U_f9TOCVmg-1; Tue, 14 Jul 2020 07:12:33 -0400
-X-MC-Unique: rtvmBap0NHm9U_f9TOCVmg-1
-Received: by mail-wm1-f72.google.com with SMTP id f68so2286125wmf.1
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 04:12:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=bX7JHxFm/38ZQuxn3bHweSgOSEJRRueQJ6aA137wLAc=;
- b=BUmXK5koeJiZephDjSyy3GHP57GBtLP12xb2Jx5vAaCd2f46n4A/xhfDeTH7GZpB0/
- 8HPSWdHP3SnIu/tmlp7wo8UENbpwLUPleunWTdO0lFN6Rs3jsXOZ3VDmTs65A3WHMRat
- gGBo7dPs0Dw9nqqK6MqtTskw2E9WrWz4q7XoDA2w3MfE7XK/U2mz4eXr8g4yC151XS4B
- GSTjTZXTtIEVSn7s1057b0OYA/4owVwpUfbE5MJ79q7Cfczh/nQCcC5j2CKcPqVDcrle
- C+oh4UByV92yZsbelbjVUYyLMYvbTKgwlo7xAq28EfrQe8aD1gOSm7ER3jdOm4SNKpXO
- iS/A==
-X-Gm-Message-State: AOAM531eDiFmjDpcesm6jCYJ5q96y9YWdx7mLJq7OQDLoYMlHwTlywKU
- zmBSpvZfyhhh9OxN+ScN4k0JuNWMFdhL5XG4CxkBaKsxToM/PEa794oAMCo9KMzuuDFyekphNHF
- k5mKuZweOC5p+5Ug=
-X-Received: by 2002:adf:8444:: with SMTP id 62mr4389441wrf.278.1594725152495; 
- Tue, 14 Jul 2020 04:12:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxvgm2y/eENp2joIaEb9fxRA1Zn/dn+rUQr41gPXK9ZPAr4a6oF9pMlW/+LKVfZoNOFz5Yk4g==
-X-Received: by 2002:adf:8444:: with SMTP id 62mr4389328wrf.278.1594725151297; 
- Tue, 14 Jul 2020 04:12:31 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
- by smtp.gmail.com with ESMTPSA id y16sm29132131wro.71.2020.07.14.04.12.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jul 2020 04:12:30 -0700 (PDT)
-Date: Tue, 14 Jul 2020 07:12:27 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] Allow acpi-tmr size=2
-Message-ID: <20200714071055-mutt-send-email-mst@kernel.org>
-References: <5f12377f-b640-c4c5-1bcd-858c622c6c31@the-jedi.co.uk>
- <4a5cfe21-d370-8ebf-b905-c37d39b68353@msgid.tls.msk.ru>
- <20200713070946-mutt-send-email-mst@kernel.org>
- <cf26ffdf-3165-8f54-267f-70f150c73c37@redhat.com>
+ (Exim 4.90_1) (envelope-from <pr0f3ss0r1492@yahoo.com>)
+ id 1jvIv1-0005de-JK
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 07:16:15 -0400
+Received: from sonic308-56.consmr.mail.ne1.yahoo.com ([66.163.187.31]:43284)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pr0f3ss0r1492@yahoo.com>)
+ id 1jvIuz-0006uc-Gz
+ for qemu-devel@nongnu.org; Tue, 14 Jul 2020 07:16:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
+ t=1594725370; bh=6CCeUxcm4NCxr2KBppn5W9fngEgyiL0nSWgPbaXu2YU=;
+ h=References:In-Reply-To:From:Date:Subject:To:From:Subject;
+ b=BUXkWxwQ+i020A0e9LLCuNfVTs5AAPpcwLUVDrSLbvEu93aHbJiRLYdTt0p1dMHpqyt7SyN2g7np/snE0jJtAVmG7+yNMloE4pdJ/4iwbhgIS3gaICSOMyragCtkpgv/ynVY3oEcs6FpcLf+SNp6uMvjo+pl+F0gHHMG2pBoZ1aU0T3HnzRSl5ypoZ7j75TG7P4nEPVaiUwNWhkuVlzsell5kBJeCLZEj62FI344bQsU4fkOS3p/IZYEnVGUZdI7+15vrBKJcJ0VitKdk7+Fw47oz3VcsOkS1IJv0iEDSEVyfrb1wZz//2yu2fhFgmq/lGV5W0fbDX/fGtob4kZPHg==
+X-YMail-OSG: 6fpd5h4VM1ldHoD7KsxcBMKb6EWtQzNulUR8.tFGaFVpOXOAv1GNTMix.PSTAvO
+ EkegtUZv3Z_0fMmM39LOV_On1R0rl1DCCXjovVs58q17eaA5CGblyQW_uQ9tk8Pl_9bzXnJRcoaF
+ ZmpcipH0IBowE7vbMTpPvX.IVObNI0FIVYqRGmI27xte6V8itsxHPCjx9Rrz6qEtIXZ1Ef4R6TTZ
+ 6HYNC_7bjKRANpl.y5FbBlrdyTuEdmxgZfTSukiutInFxjG18So6E8Sfnhf_S_kiaK4fmro2TPdS
+ 16efLaTwuoQytXVzAZQi1JdGs7CgGTeJ.Uh.SvMNOpNqe1l3GyeObZ2ua1fA9FedcN_ggwTgOOOu
+ p0dBlC61dhmLopsjUT2vLGvVpzGgpYBMW9Frkr7uYQvuIc3bg2_1WamkBTsblK5AXRDu.kHnbd1r
+ yQyUBo4xjsQVLsZuMTeMcTsfK._L0BSMf5W9HPMyASe_hrF6SB6RxW3_0xWiokKA.18mUhi3mAqL
+ phJNpEPA8DtnhzlOWEHRuQo8_AyoQJmBOjbfxTmk6f0NqqvtwyO2d_2kDrpLKnW1b6VZUULdz.YA
+ qqn6537__VfCtuY7s.SbIm9n.JUROcmv5xYVPBAxLN.jyWTV1nOe_b19wGKuNx5Yza530uGaBO2Z
+ zk7M.ntdVYBp_ARhWzZcRGRwS3Ex2sIu1n6WRUj6HgObT5hEvq3tG7.xXszQQg.7TWN5zYC8G6.E
+ RjOCRdHphH9eeyTx7LMd3xC8ohPgqQHHLJFlRfvMXBbXU8bmh.7PI2OOgX5rlvYiUnvTM4d_Sqek
+ .J9GeN.TigRNRbzkKyJhSXoQ9Pbi4i.Depai5.wA0qO7pTpBZvcBiKlea.WeoNOTbqCXdDncumJp
+ gTFQW4oFPGG3Ubf4OeoblRDd71cDiity3n3uZcpt7jdcLrDySdOVPxqZhuZaGRzHWr_l7vp8fUDV
+ u9svmjxj4EmrFevPm6bUgLJFpQnwLhWUhQihKMHgq_FrH3Wx37t0j4i0s9jrm.0cvlX_UWCHo9tm
+ hvTl9BvEJVGecpXaxR41WA5sBxCoXQKowk3TASTHZLBiNxc3oCLmgzbWH3fRLRzE7_TE2gWE6Lfl
+ cJ6hdxOqJlRP9aHjokeWRPIKpip.ZvUphq.e7JPzqAXaydl7pFSFcpFiIJD5fb2hNitKL0gaXt1L
+ i8nQvCefaAcdstaUPoGr65Fgp4Z9tuR3QECb.gxTgsQBi8uxG2OKJlukkSWRyflGvYbwzGLuSQN1
+ KiJjBctg76Tu7BG1sJg5LLndKtgogJmTIr_js7P1bpaBg.y65Z4Hs7xzxtaqLwRv9pVZhISt1qpz
+ 6pqgO1XjDz0mpLlzGQcqSJidIOsm7ZKWjHEStmH0wBdA3ipM6GlMdX.H1JBZtCX.wHQ.m0SzXF56
+ kAsRqSemn_M0zJX1swnhD
+Received: from sonic.gate.mail.ne1.yahoo.com by
+ sonic308.consmr.mail.ne1.yahoo.com with HTTP; Tue, 14 Jul 2020 11:16:10 +0000
+Received: by smtp432.mail.ne1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA
+ ID 46bee7e279955da6bda8b6ec82fc28f9; 
+ Tue, 14 Jul 2020 11:16:04 +0000 (UTC)
+Received: by mail-pf1-f171.google.com with SMTP id 1so7433640pfn.9
+ for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 04:16:04 -0700 (PDT)
+X-Gm-Message-State: AOAM533klT2hvE8QlJMGsbbs1rFrIbRPEwbcdKZckKLokJGcE3G/yq7j
+ Gqh9xsk1Pgb8WQsnPxOb865+GLV+hDwMS2FyH1A=
+X-Google-Smtp-Source: ABdhPJx+G5+5OCXmdsTvzyrENYnRnhuHvTqtupWggRfqTk5zWSqBoM8Yhw2mQlj5A8MODx35qfvPUJjImiXnlMWoHEY=
+X-Received: by 2002:aa7:9a84:: with SMTP id w4mr3785444pfi.13.1594725363995;
+ Tue, 14 Jul 2020 04:16:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <cf26ffdf-3165-8f54-267f-70f150c73c37@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/13 21:44:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+References: <CAEJNuHy+CqveTjiCxpjiLX-D=NczSveUSDSAZyz=D5F0XvL5QQ@mail.gmail.com>
+In-Reply-To: <CAEJNuHy+CqveTjiCxpjiLX-D=NczSveUSDSAZyz=D5F0XvL5QQ@mail.gmail.com>
+From: Ottavio Caruso <ottavio2006-usenet2012@yahoo.com>
+Date: Tue, 14 Jul 2020 12:15:48 +0100
+X-Gmail-Original-Message-ID: <CAEJNuHze25wdA_Kjw8ryi+hmg0eLP8nhZMR50_2yqXPu_Jir9A@mail.gmail.com>
+Message-ID: <CAEJNuHze25wdA_Kjw8ryi+hmg0eLP8nhZMR50_2yqXPu_Jir9A@mail.gmail.com>
+Subject: Is traceroute supposed to work in user mode networking (slirp) ?
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: WebService/1.1.16271 hermes_yahoo Apache-HttpAsyncClient/4.1.4
+ (Java/11.0.7)
+Received-SPF: pass client-ip=66.163.187.31;
+ envelope-from=pr0f3ss0r1492@yahoo.com;
+ helo=sonic308-56.consmr.mail.ne1.yahoo.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 07:16:10
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,151 +107,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Simon John <github@the-jedi.co.uk>, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 14, 2020 at 12:55:44PM +0200, Philippe Mathieu-Daudé wrote:
-> +Peter/Paolo
-> 
-> On 7/13/20 1:14 PM, Michael S. Tsirkin wrote:
-> > On Mon, Jul 13, 2020 at 10:20:12AM +0300, Michael Tokarev wrote:
-> >> 12.07.2020 15:00, Simon John wrote:
-> >>> macos guests no longer boot after commit 5d971f9e672507210e77d020d89e0e89165c8fc9
-> >>>
-> >>> acpi-tmr needs 2 byte memory accesses, so breaks as that commit only allows 4 bytes.
-> >>>
-> >>> Fixes: 5d971f9e672507210e7 (memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
-> >>> Buglink: https://bugs.launchpad.net/qemu/+bug/1886318
-> >>
-> >> Actually this fixes 77d58b1e47c8d1c661f98f12b47ab519d3561488
-> >> Author: Gerd Hoffmann <kraxel@redhat.com>
-> >> Date:   Thu Nov 22 12:12:30 2012 +0100
-> >> Subject: apci: switch timer to memory api
-> >> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> >>
-> >> because this is the commit which put min_access_size = 4 in there
-> >> (5d971f9e672507210e7 is just a messenger, actual error were here
-> >> earlier but it went unnoticed).
-> >>
-> >> While min_access_size=4 was most likely an error, I wonder why
-> >> we use 1 now, while the subject says it needs 2? What real min
-> >> size is here for ACPI PM timer?
-> >>
-> >> /mjt
-> > 
-> > 
-> > Well the ACPI spec 1.0b says
-> > 
-> > 4.7.3.3 Power Management Timer (PM_TMR)
-> > 
-> > ...
-> > 
-> > This register is accessed as 32 bits.
-> > 
-> > and this text is still there in 6.2.
-> > 
-> > 
-> > So it's probably worth it to cite this in the commit log
-> > and explain it's a spec violation.
-> > I think it's better to be restrictive and only allow the
-> > minimal variation from spec - in this case I guess this means 2 byte
-> > reads.
-> 
-> Now reading this thread, I guess understand this register is
-> accessed via the I/O address space, where 8/16/32-bit accesses
-> are always valid if the CPU supports an I/O bus.
+[Originally asked on qemu-discuss but I didn't get any feedback.
+Thanks for your patience.
 
-They are valid from bus POV, but not from the device POV.
+Hi,
 
+I have enabled pinging from the guest changing the
+"net.ipv4.ping_group_range" on my Linux host. I can now ping any host
+using icmp. But I cannot get  traceroute to work with standard udp
+from any of my guests.
 
-> We have 3 different devices providing this register:
-> - ICH9
-> - PIIX4 (abused in PIIX3)
-> - VT82C686
-> 
-> All are PCI devices, exposing this register via an ISA function.
-> 
-> The ISA MemoryRegion should allow 8/16/32-bit accesses.
-> 
-> For these devices we use:
-> 
-> MemoryRegion *pci_address_space_io(PCIDevice *dev)
-> {
->     return pci_get_bus(dev)->address_space_io;
-> }
-> 
-> Which comes from:
-> 
-> static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
->                               MemoryRegion *address_space_mem,
->                               MemoryRegion *address_space_io,
->                               uint8_t devfn_min)
-> {
->     ...
->     bus->address_space_mem = address_space_mem;
->     bus->address_space_io = address_space_io;
->     ...
-> 
-> 
-> In i440fx_init():
-> 
->     b = pci_root_bus_new(dev, NULL, pci_address_space,
->                          address_space_io, 0, TYPE_PCI_BUS);
-> 
-> q35_host_initfn() uses get_system_io() from pc_q35_init().
-> 
-> If the guest did a 16-bit read, it should work ...:
-> 
-> uint16_t cpu_inw(uint32_t addr)
-> {
->     uint8_t buf[2];
->     uint16_t val;
-> 
->     address_space_read(&address_space_io, addr, MEMTXATTRS_UNSPECIFIED,
-> buf, 2);
->     val = lduw_p(buf);
->     trace_cpu_in(addr, 'w', val);
->     return val;
-> }
-> 
-> ... but it is indeed prevented by min_access_size=4.
-> 
-> Maybe we should have the ISA MemoryRegion accepts min_access_size=1
-> and adjust the access sizes.
+$ traceroute 8.8.8.8
+traceroute to 8.8.8.8 (8.8.8.8), 64 hops max, 40 byte packets
+ 1  * * *
+ 2  * * *
+ 3  * * *
+ 4  * * *
+[and so on]
 
-What started all this is that device code isn't really prepared
-to handle such accesses.
+And if I use traceroute over icmp, I only get one hop shown:
 
+$ traceroute -I 8.8.8.8
+traceroute to 8.8.8.8 (8.8.8.8), 64 hops max, 60 byte packets
+ 1  dns.google (8.8.8.8)  26.147 ms  27.88 ms  20.048 ms
 
-> > 
-> > In any case pls do include an explanation for why you picked
-> > one over the other.
-> > 
-> >>
-> >>> Signed-off-by: Simon John <git@the-jedi.co.uk>
-> >>> ---
-> >>> Ãƒâ€šÃ‚Â hw/acpi/core.c | 2 +-
-> >>> Ãƒâ€šÃ‚Â 1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-> >>> index f6d9ec4f13..05ff29b9d7 100644
-> >>> --- a/hw/acpi/core.c
-> >>> +++ b/hw/acpi/core.c
-> >>> @@ -527,7 +527,7 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
-> >>> Ãƒâ€šÃ‚Â static const MemoryRegionOps acpi_pm_tmr_ops = {
-> >>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .read = acpi_pm_tmr_read,
-> >>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .write = acpi_pm_tmr_write,
-> >>> -Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .valid.min_access_size = 4,
-> >>> +Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .valid.min_access_size = 1,
-> >>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .valid.max_access_size = 4,
-> >>> Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â Ãƒâ€šÃ‚Â  .endianness = DEVICE_LITTLE_ENDIAN,
-> >>> Ãƒâ€šÃ‚Â };
-> > 
-> > 
+I have tested this with various guest OSes (OpenBSD, FreeBSD, NetBSD,
+Small Damn Linux).
 
+I've played around with various virtual interfaces but I have the same result.
+
+Any clues? Is this intended behaviour? Any workarounds that don't
+involve tap/tun/bridges?
+
+--
+Ottavio Caruso
 
