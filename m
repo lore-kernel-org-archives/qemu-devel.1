@@ -2,74 +2,94 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB06C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2548EC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66AB220658
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:15:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66AB220658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E7AB820720
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:16:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ghCO0HQp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7AB820720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvfNz-0005ru-Mv
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 07:15:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36520)
+	id 1jvfOy-0006xH-0S
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 07:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jvfNL-0005L6-4t
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:14:59 -0400
-Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:45588)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jvfNJ-0003FB-4r
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:14:58 -0400
-Received: from player690.ha.ovh.net (unknown [10.108.35.232])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 04DD598AE6
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 13:14:52 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player690.ha.ovh.net (Postfix) with ESMTPSA id 1EF89143C8C84;
- Wed, 15 Jul 2020 11:14:45 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-106R006291ada97-3e5f-48d6-9e92-59fa6296690f,D756FEFB7EDC1B892B7A3E282F77C60775DBB805)
- smtp.auth=groug@kaod.org
-Date: Wed, 15 Jul 2020 13:14:42 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v3 4/4] spapr: Forbid nested KVM-HV in pre-power9 compat
- mode
-Message-ID: <20200715131442.2ab70206@bahia.lan>
-In-Reply-To: <20200713045330.GK2666@umbus.fritz.box>
-References: <159188280345.70166.14940592691021389043.stgit@bahia.lan>
- <159188283391.70166.16995399489383620172.stgit@bahia.lan>
- <20200613071804.GE5861@umbus.fritz.box>
- <20200615112031.679512c3@bahia.lan>
- <20200703161924.7131e87f@bahia.lan>
- <20200713045330.GK2666@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvfNz-00063i-GB
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:15:39 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:35846)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvfNx-0003Tt-Qz
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:15:39 -0400
+Received: by mail-wm1-x333.google.com with SMTP id 17so5376801wmo.1
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 04:15:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=YL18sbQaPsXZZ77+m9PEXztauEuRKeQmOj6/CVJU0lo=;
+ b=ghCO0HQp3Jg/azWOc0GdPHLpv96SeZfFOia67GPfHZxJY+FEznaV0iYOfxoJvsY08Z
+ bXn+XOaKtQ+FCpGoT3xMdly5oCePMbxyYYyUi6gCjscp+xQ1PROtJx87M2ZLur5uOTth
+ x7stls69CudvQlCOnq4ZZ6x4v68B3jstDIW66gvjGggusQVJn+UEmK1NohMh0iAlxYjE
+ 1Vktl6IjEvuLZQn1rrllsCzKnD8ZHcKsM1IDa4dw326tz/uI27g87Lt+E6MG65j9kI9e
+ UMtn6LCZc8hbgjWJFCRjj0xrfnxDjqhR1LRTe9lTqTnyAqjdCB0pp4cJnk6072ZKfKbX
+ mJXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=YL18sbQaPsXZZ77+m9PEXztauEuRKeQmOj6/CVJU0lo=;
+ b=VCNYZCWI5EQuAbfEdyroV5cPT9sfHwHchDLx1axZttyVRz5hvZv2a6LhPgmBqdsBXv
+ TS/M5ttimJYsBEERbqn4Le1424kPn8iaM2S4SZ6q+eCXZP+sIwAvABJg/qyBn69R4wiz
+ tV6dH0gnPSfmfro0F7u1lH1n5mB8QEc0CIQjt4kP/m4ezn7PuPQEkWF/fQNjSqdvOkx8
+ lu3YwqK/E4RqkoA0kE5ryv7M64AE7qY/obEWGfAA44vHVu00ZmCpWd/sFTuGJlG3lD/p
+ ECAFOfAubtBNKr98XiHgZZkSTULX6jaASDS7xDSMuvVrYIsZBY8v2C4KEeKPEUO6C5Fn
+ tzww==
+X-Gm-Message-State: AOAM532MYfM+6lxWWwmXYkSQ+3/1Y/1tOoxiGCg7cczfOSCpax7TONcJ
+ 7GloY6fxVuXKAli81uGLQTEjekr4xjE=
+X-Google-Smtp-Source: ABdhPJyFTs6N8QDss37AlokvxXWsZV9n6PrebpY6pQC2OVtdZCZzW0Uffs0CMRMaiTEQo1Go1MiqDQ==
+X-Received: by 2002:a7b:c3d0:: with SMTP id t16mr8726285wmj.117.1594811735838; 
+ Wed, 15 Jul 2020 04:15:35 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id w16sm3656165wrg.95.2020.07.15.04.15.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Jul 2020 04:15:34 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DAA701FF7E;
+ Wed, 15 Jul 2020 12:15:32 +0100 (BST)
+References: <20200715105542.14428-1-alex.bennee@linaro.org>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: Re: [PULL v2 0/8] final misc fixes for 5.1-rc0
+In-reply-to: <20200715105542.14428-1-alex.bennee@linaro.org>
+Date: Wed, 15 Jul 2020 12:15:32 +0100
+Message-ID: <87imepxc4r.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/IemqJ0HIXiPT4CyeEbOCmij";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 16513573936932297190
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfedvgdegudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgesghdtreerredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepgefgkeduvddutdfgkeekjeelgeejffehudeuhfeltdetfedthffftdfggeeihfdvnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=178.33.251.173; envelope-from=groug@kaod.org;
- helo=1.mo69.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 07:14:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::333;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x333.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,101 +103,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/IemqJ0HIXiPT4CyeEbOCmij
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, 13 Jul 2020 14:53:30 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> On Fri, Jul 03, 2020 at 04:19:24PM +0200, Greg Kurz wrote:
-> > On Mon, 15 Jun 2020 11:20:31 +0200
-> > Greg Kurz <groug@kaod.org> wrote:
-> >=20
-> > > On Sat, 13 Jun 2020 17:18:04 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >=20
-> > > > On Thu, Jun 11, 2020 at 03:40:33PM +0200, Greg Kurz wrote:
-> > > > > Nested KVM-HV only works on POWER9.
-> > > > >=20
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > > Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> > > >=20
-> > > > Hrm.  I have mixed feelings about this.  It does bring forward an
-> > > > error that we'd otherwise only discover when we try to load the kvm
-> > > > module in the guest.
-> > > >=20
-> > > > On the other hand, it's kind of a layering violation - really it's
-> > > > KVM's business to report what it can and can't do, rather than havi=
-ng
-> > > > qemu anticipate it.
-> > > >=20
-> > >=20
-> > > Agreed and it seems that we can probably get KVM to report that
-> > > already. I'll have closer look.
-> > >=20
-> >=20
-> > Checking the KVM_CAP_PPC_NESTED_HV extension only reports what the host
-> > supports. It can't reasonably take into account that we're going to
-> > switch vCPUs in some compat mode later on. KVM could possibly check
-> > that it has a vCPU in pre-power9 compat mode when we try to enable
-> > the capability and fail... but it would be a layering violation all
-> > the same. The KVM that doesn't like pre-power9 CPUs isn't the one in
-> > the host, it is the one in the guest, and it's not even directly
-> > related to the CPU type but to the MMU mode currently in use:
-> >=20
-> > long kvmhv_nested_init(void)
-> > {
-> > 	long int ptb_order;
-> > 	unsigned long ptcr;
-> > 	long rc;
-> >=20
-> > 	if (!kvmhv_on_pseries())
-> > 		return 0;
-> > =3D=3D>	if (!radix_enabled())
-> > 		return -ENODEV;
-> >=20
-> > We cannot know either for sure the MMU mode the guest will run in
-> > when we enable the nested cap during the initial machine reset.
-> > So it seems we cannot do anything better than denylisting well
-> > known broken setups, in which case QEMU seems a better fit than
-> > KVM.
-> >=20
-> > Makes sense ?
->=20
-> Yeah, good points.
->=20
+> Dropped configure patch
+>
+> ---
+> The following changes since commit c920fdba39480989cb5f1af3cc63acccef021b=
+54:
+>
+>   Merge remote-tracking branch 'remotes/mdroth/tags/qga-pull-2020-07-13-t=
+ag' into staging (2020-07-14 21:21:58 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-misc-for-rc0-150720-2
 
-So, should I just rebase/repost this or do you think of another
-way ?
+Just sent v3 to add the Travis patch we tested yesterday. Sorry for the noi=
+se.
 
---Sig_/IemqJ0HIXiPT4CyeEbOCmij
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl8O5SIACgkQcdTV5YIv
-c9Z2sA/9GHLgpnlHH/KjX6VLmbZ+ziFUxyW5zg08BddJNxnxZFArgZALnk3B0NJB
-egbgxpbYOy3INaeYtgtZxvKbwbjKD9NHLSZVMxQuAmP1DBKUBJ40tQEoy+4m6OpY
-6jLlWyfciSPi+ZGalTkpsKv27SzCqSNjFwWXiuKdfqvVORX4MGD4FRjZhwDmKdtn
-I+sZ7uZEwy87piTBRoDqJwqCzKa/HbIdeuac5jPzHv0ga0SdGOGf4AZjLwu4jQv5
-dMIdsdwLdb1QTs9Y6VTSD+UC2+mZsddyN6JX/TY5R2bh2nUKKXKymMqtDlWCaOB5
-vhpP8956cU0YUnjth6SOF8beva9SfpPQSTOeBNi7zZdBoKT+vlkOirfNJQEKIc7/
-4nODrBoxfAAELYAmK1Yps34bhQiXRsnBrRLrEKZNLqRSbm57XC87Kes2LgB7t98z
-KiXur96yf6uCvMVUALvO0zGkNZN5BiQl89WijEC9B9+IrHjj4fk0ojuMsnI+1Rxt
-S0cjL6cL9B/qoP5N7IEEGXt3mxVjKi69UbGJzlZzMjMXNr1He5IVJS5Ne/b5SGxm
-dGE5UiDkMIFY3y8O1APdLS7E0uTbUr3CxW6Yz2Lh0k3UA4trfmLQsAS1gjpRJbi6
-JzfP6RIkAnL/UYIQ9UP57XkiaCpssyJIyrUtXmGbssO32apj82Y=
-=/PgY
------END PGP SIGNATURE-----
-
---Sig_/IemqJ0HIXiPT4CyeEbOCmij--
+--=20
+Alex Benn=C3=A9e
 
