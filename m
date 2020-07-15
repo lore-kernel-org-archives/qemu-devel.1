@@ -2,66 +2,74 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 359A5C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 04:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC5FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 04:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06FAB206D5
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 04:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06FAB206D5
+	by mail.kernel.org (Postfix) with ESMTPS id 4E0962067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 04:26:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E0962067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvYcB-0001U5-4Z
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 00:01:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41100)
+	id 1jvZ03-0006Io-HB
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 00:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jvYbA-00013r-LS
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 00:00:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46692)
+ id 1jvYzV-0005pz-8j
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 00:25:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50524)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jvYb8-0003ED-Ik
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 00:00:48 -0400
+ id 1jvYzT-0007A0-8L
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 00:25:57 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jvYb6-000771-H8
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 04:00:44 +0000
+ id 1jvYzQ-0001Dp-DD
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 04:25:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7C1912E80E7
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 04:00:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 619772E80EE
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 04:25:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Jul 2020 03:51:04 -0000
-From: Ralph G <1887604@bugs.launchpad.net>
+Date: Wed, 15 Jul 2020 04:18:25 -0000
+From: Ryutaroh Matsumoto <1886811@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: feature-request
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=Laurent@vivier.eu; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=New; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
+ status=Confirmed; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: linux-user
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: superflip
-X-Launchpad-Bug-Reporter: Ralph G (superflip)
-X-Launchpad-Bug-Modifier: Ralph G (superflip)
-Message-Id: <159478506417.12547.6442940817184262205.malonedeb@soybean.canonical.com>
-Subject: [Bug 1887604] [NEW] Forward host UNIX socket to guest TCP port
+X-Launchpad-Bug-Commenters: emojifreak laurent-vivier
+X-Launchpad-Bug-Reporter: Ryutaroh Matsumoto (emojifreak)
+X-Launchpad-Bug-Modifier: Ryutaroh Matsumoto (emojifreak)
+References: <159420830935.32230.13858618076699173558.malonedeb@gac.canonical.com>
+Message-Id: <159478670619.13034.13833244101108527317.malone@gac.canonical.com>
+Subject: [Bug 1886811] Re: systemd complains Failed to enqueue loopback
+ interface start request: Operation not supported
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 52af868b8fd8810b190601724dd7b6e15b1c8db1
+X-Launchpad-Hash: 190c2ee1c4add267d9e89d6ac41272d56d9bf30b
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 00:00:44
@@ -83,100 +91,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1887604 <1887604@bugs.launchpad.net>
+Reply-To: Bug 1886811 <1886811@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1887606
 
-Hello. I've been racking my brain trying to work out if this is
-possible.
+** No longer affects: qemu (Ubuntu)
 
-I would like to be able to forward to a guest TCP port, via a host UNIX
-socket to avoid opening a TCP port on the host. For example:
-
-qemu-system-i386 [...] -nic user,hostfwd=3Dunix:/path/to/socket-:22
-
-and then connect to the VM like:
-
-ssh -o "ProxyCommand socat - unix-connect:/path/to/socket" user@0.0.0.0
-
-QEMU, as versatile as it is, doesn't appreciate my intuited syntax
-"hostfwd=3Dunix:...". It is also unhappy with:
-
-qemu-system-i386 [...] \
-    -chardev socket,id=3Dfoo,path=3D/path/to/socket,server,nowait \
-    -nic user,hostfwd=3Dchardev:foo-:22
-
-And:
-
-qemu-system-i386 [...] \
-    -nic user \
-    -chardev socket,id=3Dfoo,path=3D/path/to/socket,server,nowait \
-    -chardev socket,id=3Dfoo,host=3D10.0.2.15,port=3D22
-
-I already found out how to connect in the opposite direction, **from**
-guest TCP to host UNIX, via guestfwd -> cmd -> socat. So I feel like
-there ought to be a way.
-
-If this is not yet a feature I would like to request it, and if it is,
-please tell me how!
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: feature-request
+** Also affects: qemu (Ubuntu)
+   Importance: Undecided
+       Status: New
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1887604
+https://bugs.launchpad.net/bugs/1886811
 
 Title:
-  Forward host UNIX socket to guest TCP port
+  systemd complains Failed to enqueue loopback interface start request:
+  Operation not supported
 
 Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
   New
+Status in qemu package in Debian:
+  Confirmed
 
 Bug description:
-  Hello. I've been racking my brain trying to work out if this is
-  possible.
+  This symptom seems similar to
+  https://bugs.launchpad.net/qemu/+bug/1823790
 
-  I would like to be able to forward to a guest TCP port, via a host
-  UNIX socket to avoid opening a TCP port on the host. For example:
+  Host Linux: Debian 11 Bullseye (testing) on x84-64 architecture
+  qemu version: latest git of git commit hash eb2c66b10efd2b914b56b20ae9065=
+5914310c925
+  compiled with "./configure --static --disable-system" =
 
-  qemu-system-i386 [...] -nic user,hostfwd=3Dunix:/path/to/socket-:22
 
-  and then connect to the VM like:
+  Down stream bug report at https://bugs.debian.org/cgi-bin/bugreport.cgi?b=
+ug=3D964289
+  Bug report (closed) to systemd: https://github.com/systemd/systemd/issues=
+/16359
 
-  ssh -o "ProxyCommand socat - unix-connect:/path/to/socket"
-  user@0.0.0.0
+  systemd in armhf and armel (both little endian 32-bit) containers fail to=
+ start with
+  Failed to enqueue loopback interface start request: Operation not support=
+ed
 
-  QEMU, as versatile as it is, doesn't appreciate my intuited syntax
-  "hostfwd=3Dunix:...". It is also unhappy with:
+  How to reproduce on Debian (and probably Ubuntu):
+  mmdebstrap --components=3D"main contrib non-free" --architectures=3Darmhf=
+ --variant=3Dimportant bullseye /var/lib/machines/armhf-bullseye
+  systemd-nspawn -D /var/lib/machines/armhf-bullseye -b
 
-  qemu-system-i386 [...] \
-      -chardev socket,id=3Dfoo,path=3D/path/to/socket,server,nowait \
-      -nic user,hostfwd=3Dchardev:foo-:22
+  When "armhf" architecture is replaced with "mips" (32-bit big endian) or =
+"ppc64"
+  (64-bit big endian), the container starts up fine.
 
-  And:
-
-  qemu-system-i386 [...] \
-      -nic user \
-      -chardev socket,id=3Dfoo,path=3D/path/to/socket,server,nowait \
-      -chardev socket,id=3Dfoo,host=3D10.0.2.15,port=3D22
-
-  I already found out how to connect in the opposite direction, **from**
-  guest TCP to host UNIX, via guestfwd -> cmd -> socat. So I feel like
-  there ought to be a way.
-
-  If this is not yet a feature I would like to request it, and if it is,
-  please tell me how!
+  The same symptom is also observed with "powerpc" (32-bit big endian)
+  architecture.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1887604/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1886811/+subscriptions
 
