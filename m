@@ -2,94 +2,70 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4897AC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A99C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17B4D20657
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:06:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOWsOJNM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B4D20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B7ACF20657
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:07:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7ACF20657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvh7C-0004Cd-0c
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:06:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48558)
+	id 1jvh8U-0005Iq-1i
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:07:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jvh6c-0003bc-Ec
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:05:50 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37592
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jvh6Z-00043Z-Sz
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:05:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594818346;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=mwDRxRl+3IUgJSVH3++6rWrApTzCoDqL0Oof74/RdKo=;
- b=fOWsOJNMnVZcDnPDbTFMIxYdP2jm+AL2PpjrxJU58a8As4pSYRPZM5xSx4V9wUqTt/nIpD
- IINBkH+Bo428g7eSvzrNUxhu2E6UiFl2RoRsPgk7D8HUoQQs+sEZxqtPBWPcvDojFFS3WG
- 2Ol+h8qquuTL6Ejy3mBaran3raw7Wbc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-X_kl0fCHPGCIgJaURL_ZtA-1; Wed, 15 Jul 2020 09:05:44 -0400
-X-MC-Unique: X_kl0fCHPGCIgJaURL_ZtA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AF2E107BEF5;
- Wed, 15 Jul 2020 13:05:43 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.230])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB75E78A50;
- Wed, 15 Jul 2020 13:05:33 +0000 (UTC)
-Date: Wed, 15 Jul 2020 15:05:30 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH 3/4] hw/arm/virt-acpi-build: Only expose flash on older
- machine types
-Message-ID: <20200715130530.gtgjyvxfol35i6lk@kamzik.brq.redhat.com>
-References: <20200629140938.17566-1-drjones@redhat.com>
- <20200629140938.17566-4-drjones@redhat.com>
- <20200713104907.335bf762@redhat.com>
- <20200714055109.owrlob6m53notzh3@kamzik.brq.redhat.com>
- <20200714045537-mutt-send-email-mst@kernel.org>
- <20200714092325.5klaeqelu46mhg76@kamzik.brq.redhat.com>
- <20200714164141.1ce6b122@redhat.com>
- <20200715063648.rigcdnaxveened6u@kamzik.brq.redhat.com>
- <b1593635-54aa-fd8c-951d-c2ef648ec6c9@redhat.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jvh7t-0004m4-W0
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:07:10 -0400
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:48097)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jvh7r-0004M2-W1
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:07:09 -0400
+Received: from player760.ha.ovh.net (unknown [10.108.35.131])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6CB701D06CC
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 15:07:05 +0200 (CEST)
+Received: from kaod.org (lfbn-tou-1-1163-216.w90-76.abo.wanadoo.fr
+ [90.76.222.216]) (Authenticated sender: clg@kaod.org)
+ by player760.ha.ovh.net (Postfix) with ESMTPSA id AF603146088DE;
+ Wed, 15 Jul 2020 13:06:57 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-98R00294115017-e106-4692-96f8-6419b92a0bb1,D1878713575E7557A8ED5F979EF3ECB62B482302)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] hw/arm/aspeed: Add board model for Supermicro X11 BMC
+To: erik-smit <erik.lucas.smit@gmail.com>
+References: <20200714203604.5676-1-erik.lucas.smit@gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <be8642a8-7fcd-db96-98e8-4f98bf736992@kaod.org>
+Date: Wed, 15 Jul 2020 15:06:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <b1593635-54aa-fd8c-951d-c2ef648ec6c9@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200714203604.5676-1-erik.lucas.smit@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 18408744955681016640
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfedvgdeiiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephfffgeelfeejudevuedvvdeigeduteetveffhfffudeggfegleeljeeuieefuedvnecukfhppedtrddtrddtrddtpdeltddrjeeirddvvddvrddvudeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeitddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=188.165.45.168; envelope-from=clg@kaod.org;
+ helo=20.mo1.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 09:07:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,38 +79,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ard.biesheuvel@arm.com,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, eric.auger@redhat.com,
- Igor Mammedov <imammedo@redhat.com>, philmd@redhat.com
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 15, 2020 at 02:26:19PM +0200, Laszlo Ersek wrote:
-> Hi Drew,
-> 
-> On 07/15/20 08:36, Andrew Jones wrote:
-> 
-> > So it sounds to me like we have some flexibility in our versioned machine
-> > maintenance. We can choose to forgo the usual compat code when the risk is
-> > deemed low enough. And, if somebody screams, we can always fix it later.
-> > I can live with that. I'll go ahead and respin without the versioning.
-> 
-> In that case, please don't simply remove the acpi_dsdt_add_flash() call
-> from build_dsdt(), because then "git blame" won't be able to help later.
-> Can you please replace the call with a comment instead, similar to the
-> RTC comment from commit 67736a25f865 ("ARM: virt: Don't generate RTC
-> ACPI device when using UEFI", 2016-01-15)?
->
 
-In the end I won't be respinning, as this patch is already merged. And,
-unless Igor twists my arm, then I don't plan to write another patch
-that removes the compat code. If I did remove it, I'd put a comment
-in there for git-blame to find. And, in the comment I'd write "Igor
-said to remove this", because git-blame would otherwise blame me :-)
+> Signed-off-by: erik-smit <erik.lucas.smit@gmail.com>
+> -- 
+> checkpatch was complaining about the length of
+> aspeed_machine_supermicrox11_bmc_class_init(ObjectClass *oc, void *data)
 
-Thanks,
-drew
+in which way ? line too long ? If so, you can insert a return inside
+the parameter list.
+
+> so I renamed it to aspeed_machine_smx11_bmc_class_init. Not sure if
+> that's the right way to go, since then it's out of sync with the machine
+> name "supermicrox11-bmc". But renaming the machine name to "smx11-bmc"
+> makes it less descriptive...
+
+You should put the patch comments below the '---' 
+ 
+> ---
+>  hw/arm/aspeed.c | 34 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 34 insertions(+)
+> 
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index 379f9672a5..e74a89f427 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -57,6 +57,20 @@ struct AspeedMachineState {
+>          SCU_HW_STRAP_VGA_SIZE_SET(VGA_16M_DRAM) |                       \
+>          SCU_AST2400_HW_STRAP_BOOT_MODE(AST2400_SPI_BOOT))
+>  
+> +/* TODO: Find the actual hardware value */
+
+If you can access the BMC console, you can do that from u-boot.
+
+> +#define SUPERMICROX11_BMC_HW_STRAP1 (                                   \
+> +        SCU_AST2400_HW_STRAP_DRAM_SIZE(DRAM_SIZE_128MB) |               \
+> +        SCU_AST2400_HW_STRAP_DRAM_CONFIG(2) |                           \
+> +        SCU_AST2400_HW_STRAP_ACPI_DIS |                                 \
+> +        SCU_AST2400_HW_STRAP_SET_CLK_SOURCE(AST2400_CLK_48M_IN) |       \
+> +        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
+> +        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
+> +        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_M_S_EN) |                \
+> +        SCU_AST2400_HW_STRAP_SET_CPU_AHB_RATIO(AST2400_CPU_AHB_RATIO_2_1) | \
+> +        SCU_HW_STRAP_SPI_WIDTH |                                        \
+> +        SCU_HW_STRAP_VGA_SIZE_SET(VGA_16M_DRAM) |                       \
+> +        SCU_AST2400_HW_STRAP_BOOT_MODE(AST2400_SPI_BOOT))
+> +
+>  /* AST2500 evb hardware value: 0xF100C2E6 */
+>  #define AST2500_EVB_HW_STRAP1 ((                                        \
+>          AST2500_HW_STRAP1_DEFAULTS |                                    \
+> @@ -600,6 +614,22 @@ static void aspeed_machine_palmetto_class_init(ObjectClass *oc, void *data)
+>          aspeed_soc_num_cpus(amc->soc_name);
+>  };
+>  
+> +static void aspeed_machine_smx11_bmc_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
+> +
+> +    mc->desc       = "Supermicro X11 BMC (ARM926EJ-S)";
+> +    amc->soc_name  = "ast2400-a1";
+> +    amc->hw_strap1 = SUPERMICROX11_BMC_HW_STRAP1;
+> +    amc->fmc_model = "mx25l25635e";
+> +    amc->spi_model = "mx25l25635e";
+> +    amc->num_cs    = 1;
+> +    amc->macs_mask = ASPEED_MAC0_ON | ASPEED_MAC1_ON;
+> +    amc->i2c_init  = palmetto_bmc_i2c_init;
+> +    mc->default_ram_size = 256 * MiB;
+> +}
+> +
+>  static void aspeed_machine_ast2500_evb_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -728,6 +758,10 @@ static const TypeInfo aspeed_machine_types[] = {
+>          .name          = MACHINE_TYPE_NAME("palmetto-bmc"),
+>          .parent        = TYPE_ASPEED_MACHINE,
+>          .class_init    = aspeed_machine_palmetto_class_init,
+> +    }, {
+> +        .name          = MACHINE_TYPE_NAME("supermicrox11-bmc"),
+> +        .parent        = TYPE_ASPEED_MACHINE,
+> +        .class_init    = aspeed_machine_smx11_bmc_class_init,
+>      }, {
+>          .name          = MACHINE_TYPE_NAME("ast2500-evb"),
+>          .parent        = TYPE_ASPEED_MACHINE,
+> -- 
+> 2.25.1
 
 
