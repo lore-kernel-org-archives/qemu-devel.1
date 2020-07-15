@@ -8,110 +8,111 @@ X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63654C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 21:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C1AC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 21:44:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E2C52065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 21:23:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CF102072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 21:44:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Bf7qsPrJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2C52065F
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KwWMCDQZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CF102072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvosY-0007sy-CK
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 17:23:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57888)
+	id 1jvpCu-0003WV-LF
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 17:44:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jvora-0007Mx-2p; Wed, 15 Jul 2020 17:22:50 -0400
-Received: from mail-eopbgr80099.outbound.protection.outlook.com
- ([40.107.8.99]:40963 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ id 1jvpCA-00031k-Mc; Wed, 15 Jul 2020 17:44:06 -0400
+Received: from mail-eopbgr00119.outbound.protection.outlook.com
+ ([40.107.0.119]:33858 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jvorW-0000bD-W9; Wed, 15 Jul 2020 17:22:48 -0400
+ id 1jvpC7-0005q9-7e; Wed, 15 Jul 2020 17:44:05 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mrf7w0YQPcy/5CNPrL5vsiyQkRxIuohj9KXvqRrdjQJXTmKOgbccfKD1Yy8BOBAhM5sJr3jvNhi1fWYDXSjJ0V4nWP/0vCX+0UCp3qYopPwIs54ghtMJe02XeaxWiVknHR2IjP3etmCvzO6mFrXwHFGwkDg0CmOF38CazJlXYvFCmFuaSNCLedJ5GPple8plGsORrtFB7KMyLbPFZ2MPpPtmPDajKcPqx3+MliRBIpT5q4H9rfzjIylBdxiAUo7X2KZ75F5ZW+BcKUHexXBHtr4WDdlTNdYjv7JeYEeRTmHV4/wySWfuF/d3tgJIIieSFecV6c3EG9mtgO1A7l6RiA==
+ b=Yu8un8HPsaAQ7WgFB9LGclln8SFD8nM37Y8sTH/9Jn5Wp+3kAvXYcnVKwTZaxvRySYDbWssavcal9OdpbKOayKjXuqjaVPeDuc3IbUu/pFCahgeDU9qIKGrV9oXKGi+JzcwjrVgZQb86CAjnQYrrfMGi7xc8RTLEnE7Mv9bGJXOSfvkUpGgwgglPTgY+twqmwJBUgyXqxRF/UFJF/kpzhF0l/5VRLCB0klfm2jQBv+3Ae4zezYBlBpKZRo+kyTPjYfx2+Xpaqmx3XwL2JkZ8GmY4iqmrlcym4G4hPGPz9guuL+5wqOdxehWx26tMOOMWRSs49E7zlJYYl0CuJsUxOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZWR8gGIvUDJFM5l7rrMpSa83lOvpX8R6kEsQPVMNfQQ=;
- b=fJxU6FSzqh+c488RQyQ7heDeqhZgCtvanoTNAyTyedLINczGdo4w7BPC9j+NWXmSb55W983gwR9roU7wYBGVoDiwPUgy9P4jZX+wznGntY2FXVs8HlZML0Nvjn9NdqxJILpCrXI66M/yW0ZzxhW4O0rzfT34IFlVSmktIk+M+pYZyJrZ9KVdTEbf4BAPSGuCrMxSjfnYslaCAIdYh9oWDOQCHVvDlF0Fmp1ky5wx8D5m2oRk+7PbRZO0K5V8tNJmwvhFIPAVN1voJ/9lBcZIj8PsxE1VlHRGjxp4uAQKlgeA2Zvifr4wQK9JcYzQskoTy7RX9eDki/N25uOrBaK3RA==
+ bh=OJftVOTv0RfvsipeihYQvmVdOW97adYk7vm2Deubovg=;
+ b=b9Q6y5/iAx/gqYCGyB4ENQGFbRx7C0tTd6VDI8CUWfQOpT9aaye6Fzjvy466q41Y/3JV2hos64pjo3L6yb8FJx8PNqU+86q9Wns+WrB6qd0RVGArvhsfYC1nlhcymiYeKAaLKUXaIckB2PfS4JGdceUYDCMIFPkqW2qQutU4WAQJZG/VelKP20+ASmX6gPmdsYkvbzeOFWBPZzuHeaOo/uuPe4WA241iB1X7CWmWIN125WlP9W+XSq1oRCEXbPsh6Tkwz6b5nFIkBSAiU+xHLaUia2CiO4eRBNzwLqFNrLiYWf3I/2KRJpxsGI/oXKVTK4fmt86XNNoCFLh3IxpAAA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZWR8gGIvUDJFM5l7rrMpSa83lOvpX8R6kEsQPVMNfQQ=;
- b=Bf7qsPrJhxEWYbTDg7oMkQGwUnkZrWQ0zVPdm3lM6DfgQ8q1aMBdrFQfezKHpk5UqCDIFTqNjdZebiSuipwb/q3WIYR9qETNtIDawG8Iu4CDObismyDru8uNRwRlm1k/xzLI+QdIXYcyJinrszkySzyAEXsHoSrlqLFOr22ZKv0=
+ bh=OJftVOTv0RfvsipeihYQvmVdOW97adYk7vm2Deubovg=;
+ b=KwWMCDQZA7kToIcHYkl7Pn1Fl1/aDbI87TDwhhtTBjVY2uXSlonFwG/CzSouQqitT7LqMaiZvkmHOvbezYWh2uQvgoPq2Me7KvPgf0LKB1hChGPeFUlgDPMwGXswtdwKmlTL6vY8rBc46y5qbaaxuLmOeb2Qzp3wn+itnjiIDWg=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB4471.eurprd08.prod.outlook.com (2603:10a6:20b:b9::13)
+ by AM6PR08MB4849.eurprd08.prod.outlook.com (2603:10a6:20b:c3::18)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17; Wed, 15 Jul
- 2020 21:22:42 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Wed, 15 Jul
+ 2020 21:43:59 +0000
 Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
  ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
  ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3195.018; Wed, 15 Jul 2020
- 21:22:42 +0000
-Subject: Re: [PATCH v7 23/47] block/snapshot: Fix fallback
+ 21:43:59 +0000
+Subject: Re: [PATCH v7 24/47] block: Use CAFs for debug breakpoints
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-24-mreitz@redhat.com>
+ <20200625152215.941773-25-mreitz@redhat.com>
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <4b87c07c-f907-129e-3019-5aec59ec476f@virtuozzo.com>
-Date: Thu, 16 Jul 2020 00:22:37 +0300
+Message-ID: <18a1e3e1-12d5-4689-89ce-a677fca6a3b5@virtuozzo.com>
+Date: Thu, 16 Jul 2020 00:43:55 +0300
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
  Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-24-mreitz@redhat.com>
+In-Reply-To: <20200625152215.941773-25-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-GB
-X-ClientProxiedBy: AM3PR07CA0127.eurprd07.prod.outlook.com
- (2603:10a6:207:8::13) To AM6PR08MB4070.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM0PR04CA0033.eurprd04.prod.outlook.com
+ (2603:10a6:208:122::46) To AM6PR08MB4070.eurprd08.prod.outlook.com
  (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from Admins-MacBook-Pro.local (109.252.114.191) by
- AM3PR07CA0127.eurprd07.prod.outlook.com (2603:10a6:207:8::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3195.16 via Frontend Transport; Wed, 15 Jul 2020 21:22:40 +0000
+ AM0PR04CA0033.eurprd04.prod.outlook.com (2603:10a6:208:122::46) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend
+ Transport; Wed, 15 Jul 2020 21:43:57 +0000
 X-Originating-IP: [109.252.114.191]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 563cf135-9bfb-4956-5617-08d829053540
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4471:
+X-MS-Office365-Filtering-Correlation-Id: bfa02f6f-7f17-4da6-aec2-08d829082e8f
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4849:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB447148FF577968FD65F92E7CF47E0@AM6PR08MB4471.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB48495F2D88621951DED9C9AAF47E0@AM6PR08MB4849.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hU2wCv/n6l9MdxRhH7mDiMU+tWB4ZXpVzPOCn+RP44kyPfWX3bSVZcYfvYdRfjFdubVUlHQ0wUJXVa38MhbmqohsFlnaw2RN2A+5eulSChX1Uy3McJgasT/jD5f4e2Oj1S+2S7q1iQQ8cc7T1t0q2GndJTGVqgB4pg6NjbrqaxN9TU6GsIiIMwDOWIN72GRk6kCVm7ffJT2ePX2/tVVI99wjmoikWwUTdwHCpJTIK+e/KkrTYet7hSmDZryUc8UPXdN+PrPGIOQ2uJ6s9ai4tsEIFxyLy5jML4pT7+WFIkoE/8ENVa5P6I/Sm8JKxCd0lMVvFjD6tDKNF6svwwWS8CXs3L0PHsYRNzGgUnITEfl4TQKU5ZYoAzTBQ0WUH0gD
+X-Microsoft-Antispam-Message-Info: F1MkfV9j/THz0te6xuMOF9xghdMtvxjjiVApRooFF3aBlWx5e/RbO7TmqRkW0ydRKa6zc1TnJZI/cWXrhl8UBu0qiOkBJDlPnqIYlPcZ4L0lwfIl2i3UbJfuL7LbAOnFrLvGxtWG36Or+vmwGgSp6lNbAnQkZkrA2+/jMqVqTBXLCF8JcAKkyfEuFUiKE4XfDhMCCmZWgFgtPX+4lOWaV1wFpZzAuPkVrx0FiQMQiz48XfFvxeHqVEtsWjGWcUnkwHkN+foTBUaoWOSas1ZAOt83prQ4NZYZdoNwFflkET7wduDc8kODhmyjEUemDFl/KXPf5rtzsuQ00IXGAroYKESrDK3nocO1nEebb0B4NkcLBSDlR5IUOAit1e+z4gtF
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(366004)(39840400004)(376002)(346002)(396003)(478600001)(956004)(2616005)(44832011)(31686004)(2906002)(52116002)(8936002)(8676002)(54906003)(316002)(36756003)(53546011)(6512007)(6486002)(31696002)(86362001)(26005)(4326008)(186003)(5660300002)(16526019)(6666004)(66946007)(66556008)(66476007)(6506007)(83380400001)(43740500002);
+ SFS:(4636009)(39840400004)(396003)(376002)(136003)(346002)(366004)(316002)(66556008)(66476007)(36756003)(6486002)(66946007)(54906003)(2906002)(478600001)(6506007)(53546011)(44832011)(6512007)(31696002)(8676002)(956004)(4326008)(86362001)(2616005)(31686004)(52116002)(16526019)(186003)(8936002)(83380400001)(5660300002)(26005)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: gNAfprkA2O1tSurwifGj/3pBMmOQHjBzMjN5MyzCiiIsiYLP12sOUp0qPxePOtHgNwrCiqfFrigs3fnOOHuUSIVp22qBlMGlIuyy4sdcRi6bJY/XGVAqjDDYIZet83soUNiPZv82Ir3DliTuAFUtlDj13Q5wd1sdUQfyBbQfIoCBt5EgkvWyDxTfw/DpWci/goQAmTzinO435UP+Y+t7qAOaV5rUA8mgBIQfU0VUifu/EL2ncKL5qNRNi/8sNQmia7JjP+Npn8i5p+GU9Ixax0r4Y0nws+imcHOqAkjXbt1xrM1KhtVZvkGyWbt/1afobXHBPjI2KLLAB0H8DBwhD86J4uDwxqNcXlOvKuDRBTsPznxzQMvmai+iLYcz4zwhJfRI1XFQWc6qIQj9FEuZalY3u/4OP1/bbA4H2QI+EKa0Cm/cIbevdzg/2eh2Hd3Wsk+5aBX9P2mgzOt3OJ+NqYkCyZAe+8JKt66rvRGBYr6GVp3SnSpxCKc5VwfeKVGw
+X-MS-Exchange-AntiSpam-MessageData: YKwmt9WL10lfqJJfDYOTnn27S5APc03dkRfjv2vqHHU5a/aKW3weywEGlnOw6+htE6/i2HGgPdvNuKYVIFFS5hOx8TT8BDZCB2XUghQcALAP4F+7nIP/BAHQwXy2GjF4xZoNVHmFqrKrd3r18rlDqTJNkcUwPA7TIYb1lwjHZeeKCDZanj3IHkr5o/Gy2BihzvY+GLPIfmPp8xXiDeIemkllOvh/xoIWVMneDbvv8MsmwJ+G5kdfXeF7nFt4K1sRhVFLZr6nujYjdncVhz91sXy2ZiJmIkncBmh21JCgPH/dl7UoLKXyi9H0S9Nm1PD7D2iNbDIXIMk29Inxr8H9PKK2AsK0i94p4Edpp/vMjEhTakz/tJb+rxSzRQm5CCCh8KiUdYxEbFIxCZVfwVm0+BiA9k/PGSnohBxWo/rzq5BfaGvElRwqsMMCtoAURW/WmCAbdJLTADWGJrfye0UpOqqN46GmdSKdKLQxysjjFkQG98PpDIibiYGfBs0I9Pdq
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 563cf135-9bfb-4956-5617-08d829053540
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfa02f6f-7f17-4da6-aec2-08d829082e8f
 X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2020 21:22:42.1657 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2020 21:43:59.4538 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x4I7p47TH7m9mrqXtM3zpU7xFAo292NwNPnAXPHVhl+1NF/H86q+NJgenfyxmpRp+S745dUcuPUc6dqowWrXdhyE4YI4bkAlFq7PTBaQGfQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4471
-Received-SPF: pass client-ip=40.107.8.99;
+X-MS-Exchange-CrossTenant-UserPrincipalName: KirnOlZ/myEPI3us7BOhrolUcJMbKuefePgqyyGM2reYUDFlxklfqToyqivNZenHefgQpvHSDogP/5BeAMUUMUZS8ToR+SEijxVkQo/1vFc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4849
+Received-SPF: pass client-ip=40.107.0.119;
  envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 17:22:43
+ helo=EUR02-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 17:44:00
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -140,46 +141,57 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 25.06.2020 18:21, Max Reitz wrote:
-> If the top node's driver does not provide snapshot functionality and we
-> want to fall back to a node down the chain, we need to snapshot all
-> non-COW children.  For simplicity's sake, just do not fall back if there
-
-I guess it comes to COW children like BDRV_CHILD_DATA | 
-BDRV_CHILD_METADATA  rather than non-COW ones, does it?
-
-Andrey
-
-
-> is more than one such child.  Furthermore, we really only can fall back
-> to bs->file and bs->backing, because bdrv_snapshot_goto() has to modify
-> the child link (notably, set it to NULL).
+> When looking for a blkdebug node (which implements debug breakpoints),
+> use bdrv_primary_bs() to iterate through the graph, because that is
+> where a blkdebug node would be.
 >
-> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->   block/snapshot.c | 104 +++++++++++++++++++++++++++++++++++++----------
->   1 file changed, 83 insertions(+), 21 deletions(-)
+>   block.c | 16 +++-------------
+>   1 file changed, 3 insertions(+), 13 deletions(-)
 >
-> diff --git a/block/snapshot.c b/block/snapshot.c
-...
-> +    /*
-> +     * Check that there are no other children that would need to be
-> +     * snapshotted.  If there are, it is not safe to fall back to
-> +     * *fallback.
-> +     */
-> +    QLIST_FOREACH(child, &bs->children, next) {
-> +        if (child->role & (BDRV_CHILD_DATA | BDRV_CHILD_METADATA |
-> +                           BDRV_CHILD_FILTERED) &&
-> +            child != *fallback)
-> +        {
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +    return fallback;
-> +}
+> diff --git a/block.c b/block.c
+> index 7c827fefa0..1c71ecab7c 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -5562,17 +5562,7 @@ void bdrv_debug_event(BlockDriverState *bs, BlkdebugEvent event)
+>   static BlockDriverState *bdrv_find_debug_node(BlockDriverState *bs)
+>   {
+>       while (bs && bs->drv && !bs->drv->bdrv_debug_breakpoint) {
+> -        if (bs->file) {
+> -            bs = bs->file->bs;
+> -            continue;
+> -        }
+> -
+> -        if (bs->drv->is_filter && bs->backing) {
+> -            bs = bs->backing->bs;
+> -            continue;
+> -        }
+> -
+> -        break;
+> +        bs = bdrv_primary_bs(bs);
+>       }
+>   
+>       if (bs && bs->drv && bs->drv->bdrv_debug_breakpoint) {
+> @@ -5607,7 +5597,7 @@ int bdrv_debug_remove_breakpoint(BlockDriverState *bs, const char *tag)
+>   int bdrv_debug_resume(BlockDriverState *bs, const char *tag)
+>   {
+>       while (bs && (!bs->drv || !bs->drv->bdrv_debug_resume)) {
+> -        bs = bs->file ? bs->file->bs : NULL;
+> +        bs = bdrv_primary_bs(bs);
+>       }
+>   
+>       if (bs && bs->drv && bs->drv->bdrv_debug_resume) {
+> @@ -5620,7 +5610,7 @@ int bdrv_debug_resume(BlockDriverState *bs, const char *tag)
+>   bool bdrv_debug_is_suspended(BlockDriverState *bs, const char *tag)
+>   {
+>       while (bs && bs->drv && !bs->drv->bdrv_debug_is_suspended) {
+> -        bs = bs->file ? bs->file->bs : NULL;
+> +        bs = bdrv_primary_bs(bs);
+>       }
+>   
+>       if (bs && bs->drv && bs->drv->bdrv_debug_is_suspended) {
 
-...
 
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
