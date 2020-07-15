@@ -2,128 +2,72 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 158C4C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8686EC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:13:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D68082065D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:09:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B5B220658
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:13:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXf1FRjS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68082065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="W9V8Xng3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B5B220658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvj2C-0005PI-5b
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 11:09:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35390)
+	id 1jvj5q-0007U0-I8
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 11:13:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jviwA-00067D-FM
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:03:10 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30273
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jviw8-0004uE-Fp
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:03:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594825387;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=I1h24an3vYlBDWkMm/4BfzBWNqu0PvO5FvEnUc3o0cE=;
- b=gXf1FRjS1c1PzdzTvwhWotXXTPAjokDSTdgwHvEEDnD2uSsp1hHFTPT31Wt7aZV72ERZj9
- AL47m0GmtQo91Pb4q+damzHfvk19H1NWXu4dAbzhVLtAbl+RJXq6CmboNXUAUxD7n5zQqU
- qohRE5X0dBYDIAiVqA+0142SIxysCRk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-gxASuQJAOb-0t_7bTe_XiA-1; Wed, 15 Jul 2020 11:02:45 -0400
-X-MC-Unique: gxASuQJAOb-0t_7bTe_XiA-1
-Received: by mail-wm1-f71.google.com with SMTP id f68so4104734wmf.1
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 08:02:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=I1h24an3vYlBDWkMm/4BfzBWNqu0PvO5FvEnUc3o0cE=;
- b=qVSPfBZ6IvY9edTB0UCRvmLExHWIiU6l0G3VwnwiwAxoQ5lsavI6yhGyNY4Q5wBg8L
- ipM9MnFT3qXVtw5jO42WL+3EYBEZmsPXNm/7hse5/ewzAu89gsxPKnXtVKcMNY0OaVKm
- 4o5WOmq0BnqMYWP1H1/jh1embdPcg2Ad+BKprI6HDZJp6XJM+0utZxAMgX9JpSVONClb
- NSjhejxC5/gn5W/hM16onShFJrGb9RK9ARG4PcjClMuRWRuVQ+HtxO0/EOAEgOC1Tlrr
- X4Kp8XfqOqXJFteYeYy2p1SMVb0u4eicJDiioqkLSDCIMzkrr4s85nBsBprVn+c477bA
- P7ng==
-X-Gm-Message-State: AOAM5301WZREaszl442k1ypJpGnsPRDkqGKh+yP5fJ5RaLOqYErH5JDM
- Xph2Ek7gRBk0vbplh36QZpLYaeSGbsCzdF8sAUElHYRidNoo46fdguPR4864i3Bkv5ggulr6EUC
- q5Nt5s3IFbeW8fFY=
-X-Received: by 2002:a5d:684f:: with SMTP id o15mr11983144wrw.148.1594825363910; 
- Wed, 15 Jul 2020 08:02:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyeyKTrQY4aIA7j6MdaHLBOqb2uIk/2irIWLdimvFz/0fRiwPfrT1EaUUI+P2GFHk4h/RKH8A==
-X-Received: by 2002:a5d:684f:: with SMTP id o15mr11983122wrw.148.1594825363714; 
- Wed, 15 Jul 2020 08:02:43 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id s15sm3677838wmj.41.2020.07.15.08.02.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Jul 2020 08:02:42 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1] net/colo: Remove unused trace event
-To: qemu-devel@nongnu.org
-References: <159482499077.11884.3340115804865619987@07a7f0d89f7d>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <8cff3dbe-9d98-f587-b9aa-bc7f41f23e57@redhat.com>
-Date: Wed, 15 Jul 2020 17:02:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <159482499077.11884.3340115804865619987@07a7f0d89f7d>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:01:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1jvj5B-00071Y-Ql
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:12:30 -0400
+Received: from mail-m971.mail.163.com ([123.126.97.1]:41992)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <liq3ea@163.com>) id 1jvj55-0007zt-Bw
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:12:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=From:Subject:Date:Message-Id; bh=Jt3NNPR5zOSZ30FiRv
+ 6kYMnF5H9aP3X0ia43q6OL6jk=; b=W9V8Xng3LTlM+yCiXHl6iWLVce+YzfWyz4
+ 1/EpM7UpRTPDNftg7uLLWNUeQ9sZ+xr1Kb/YZ0962pvk8BSBLccsmF9z0rk0rz8z
+ rIqI8x3zIw8OHqnpJfNW0Jx7eYnM6cwu+NkTdeuGrNnG8HWTx8+7OI3lZrQNAd1p
+ B21TUF6jU=
+Received: from localhost.localdomain (unknown [183.159.72.144])
+ by smtp1 (Coremail) with SMTP id GdxpCgC3xXG_HA9fikzLAA--.5882S4;
+ Wed, 15 Jul 2020 23:12:00 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: armbru@redhat.com,
+	mdroth@linux.vnet.ibm.com,
+	pbonzini@redhat.com
+Subject: [PATCH] qapi: record the last element in order to avoid memory leak
+Date: Wed, 15 Jul 2020 08:11:53 -0700
+Message-Id: <20200715151153.15054-1-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: GdxpCgC3xXG_HA9fikzLAA--.5882S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZFyDGFyDAFyrtFWxtw48Xrb_yoW5CF47pF
+ Z3Jr97KrZ5JFWfGr1DGr18Kr13tw4xJryUu3yrWw10yF15urWktF4kK3yjv3W8CrW8AF45
+ XFWktrZxuFWxAaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ub18PUUUUU=
+X-Originating-IP: [183.159.72.144]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiFAFibVaD6kJswgAAsJ
+Received-SPF: pass client-ip=123.126.97.1; envelope-from=liq3ea@163.com;
+ helo=mail-m971.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 11:12:07
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,30 +80,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com,
- jasowang@redhat.com, chen.zhang@intel.com, r.bolshakov@yadro.com,
- stefanha@redhat.com
+Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/15/20 4:56 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200715143130.11164-1-philmd@redhat.com/
-> 
-> In file included from /tmp/qemu-test/build/net/trace.h:6:0,
->                  from /tmp/qemu-test/src/net/colo-compare.c:18:
-> /tmp/qemu-test/src/net/colo-compare.c: In function 'colo_compare_packet_payload':
-> /tmp/qemu-test/src/net/colo-compare.c:330:40: error: 'TRACE_COLO_COMPARE_MISCOMPARE_ENABLED' undeclared (first use in this function)
->      if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
->                                         ^
-> /tmp/qemu-test/src/trace/control.h:120:7: note: in definition of macro 'trace_event_get_state_backends'
-> ---
-> /tmp/qemu-test/src/trace/control.h:120:7: note: in definition of macro 'trace_event_get_state_backends'
->      ((id ##_ENABLED) && id ##_BACKEND_DSTATE())
->        ^
-> /tmp/qemu-test/src/net/colo-compare.c:330:5: error: implicit declaration of function 'TRACE_COLO_COMPARE_MISCOMPARE_BACKEND_DSTATE' [-Werror=implicit-function-declaration]
->      if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+While executing 'tests/test-qobject-input-visitor'. I got
+following error:
 
-Ah, interesting :)
+/visitor/input/fail/alternate: OK
+/visitor/input/fail/union-list: OK
+
+=================================================================
+==4353==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 16 byte(s) in 1 object(s) allocated from:
+    #0 0x7f192d0c5d28 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xded28)
+    #1 0x7f192cd21b10 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x51b10)
+    #2 0x556725f6bbee in visit_next_list qapi/qapi-visit-core.c:86
+    #3 0x556725f49e15 in visit_type_UserDefOneList tests/test-qapi-visit.c:474
+    #4 0x556725f4489b in test_visitor_in_fail_struct_in_list tests/test-qobject-input-visitor.c:1086
+    #5 0x7f192cd42f29  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72f29)
+
+SUMMARY: AddressSanitizer: 16 byte(s) leaked in 1 allocation(s).
+
+This is because in 'visit_type_UserDefOneList' function when
+'visit_type_UserDefOne' failed and we go to out_obj. And have
+no chance to process the last element. The path is:
+visit_type_UserDefOneList
+    ->visit_type_UserDefOne(error occured)
+        ->qapi_free_UserDefOneList
+            -->visit_type_UserDefOneList(again)
+
+In the last 'visit_type_UserDefOneList' we will free the elements
+allocated in the first 'visit_type_UserDefOneList'. However we delete
+the element in 'qapi_dealloc_next_list'. If then 'visit_type_UserDefOne'
+return false we will skip the element that still in the 'obj' linked
+list. This is why the ASAN complains this memory leak.
+This patch store the recent processing elements in 'QapiDeallocVisitor'.
+In 'qapi_dealloc_end_list' if it is not NULL, we free it.
+
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ qapi/qapi-dealloc-visitor.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
+index ef283f2966..6335cadd9c 100644
+--- a/qapi/qapi-dealloc-visitor.c
++++ b/qapi/qapi-dealloc-visitor.c
+@@ -20,8 +20,14 @@
+ struct QapiDeallocVisitor
+ {
+     Visitor visitor;
++    void *last;
+ };
+ 
++static QapiDeallocVisitor *to_qdv(Visitor *v)
++{
++    return container_of(v, QapiDeallocVisitor, visitor);
++}
++
+ static bool qapi_dealloc_start_struct(Visitor *v, const char *name, void **obj,
+                                       size_t unused, Error **errp)
+ {
+@@ -46,19 +52,25 @@ static bool qapi_dealloc_start_list(Visitor *v, const char *name,
+                                     GenericList **list, size_t size,
+                                     Error **errp)
+ {
++    QapiDeallocVisitor *qdv = to_qdv(v);
++    qdv->last = *list;
+     return true;
+ }
+ 
+ static GenericList *qapi_dealloc_next_list(Visitor *v, GenericList *tail,
+                                            size_t size)
+ {
++    QapiDeallocVisitor *qdv = to_qdv(v);
+     GenericList *next = tail->next;
++    qdv->last = next;
+     g_free(tail);
+     return next;
+ }
+ 
+ static void qapi_dealloc_end_list(Visitor *v, void **obj)
+ {
++    QapiDeallocVisitor *qdv = to_qdv(v);
++    g_free(qdv->last);
+ }
+ 
+ static bool qapi_dealloc_type_str(Visitor *v, const char *name, char **obj,
+-- 
+2.17.1
 
 
