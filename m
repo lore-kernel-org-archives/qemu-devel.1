@@ -7,81 +7,84 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8132C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EA9C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:52:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF3EC2064B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:48:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D59BB20657
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:52:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iLpMBk9L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF3EC2064B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6yqQvAu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D59BB20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvhlx-0000w0-VB
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:48:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38752)
+	id 1jvhpj-0002DC-WF
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:52:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jvhlP-0000Vz-UQ
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:47:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35593
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jvhow-0001ln-Ur
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:51:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23564
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jvhlN-0004K0-Vr
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:47:59 -0400
+ id 1jvhou-0004yF-Tq
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:51:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594820876;
+ s=mimecast20190719; t=1594821095;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BmdxqR7zLiL7TCcohQREFbOVtkMWM12GKdegmd6+yDU=;
- b=iLpMBk9LSyX1RhOO+SP6RLEIEIeIPd3JXy9AAoH3okTPu3hk0/EO1xuUGCw2EzOJ5MDvMn
- 6DC8DHjPSbVgR5fbu4LuFUNrbdyUGukm9UhKAg/2psqY0F/QTHWw/m81qYeTLQF1bwpK5d
- zQW/W6Uyx31JN0QefrEIbndv75QkUQQ=
+ bh=UN5soKaOwoUz+tG5eU8l26rbAUC+AEwZw19ioFyWUY8=;
+ b=H6yqQvAuzBUxVK0CdYFWcxVE3mTHacq1sd9EVnPBmGQbmePKj2WF4rSfvB2KQMItOy/YT+
+ HlEZoG8v2wYwuaymFcA2A5PNIgqdW3t4ewhrMCYXUgiEBalzm9CjOiWaSF/b/5RUWvVnx5
+ ryPnEtfXlYTyDSie4RbFCBFmpT7A/WQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-vzgzwHiRM3eGJkktazkc6g-1; Wed, 15 Jul 2020 09:47:52 -0400
-X-MC-Unique: vzgzwHiRM3eGJkktazkc6g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-70-Ztf3Ac1HPbmhMyMjmuR51Q-1; Wed, 15 Jul 2020 09:51:31 -0400
+X-MC-Unique: Ztf3Ac1HPbmhMyMjmuR51Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 721968015F3;
- Wed, 15 Jul 2020 13:47:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A772D5AF00;
+ Wed, 15 Jul 2020 13:51:30 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EAA6B72E76;
- Wed, 15 Jul 2020 13:47:45 +0000 (UTC)
-Date: Wed, 15 Jul 2020 15:47:44 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 826BA5C57D;
+ Wed, 15 Jul 2020 13:51:25 +0000 (UTC)
+Date: Wed, 15 Jul 2020 15:51:23 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-To: Li Qiang <liq3ea@163.com>
-Subject: Re: [PATCH] qtest: bios-tables-test: fix a memory leak
-Message-ID: <20200715154744.1a2fdb39@redhat.com>
-In-Reply-To: <20200714153536.66060-1-liq3ea@163.com>
-References: <20200714153536.66060-1-liq3ea@163.com>
+To: Jon Doron <arilou@gmail.com>
+Subject: Re: [PATCH v5 1/2] acpi: i386: Move VMBus DSDT entry to SB
+Message-ID: <20200715155123.77fc5d60@redhat.com>
+In-Reply-To: <20200715084326.678715-2-arilou@gmail.com>
+References: <20200715084326.678715-1-arilou@gmail.com>
+ <20200715084326.678715-2-arilou@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:01:40
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,35 +97,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, liq3ea@gmail.com,
- qemu-devel@nongnu.org, eric.auger@redhat.com, pbonzini@redhat.com
+Cc: rvkagan@yandex-team.ru, pbonzini@redhat.com, vkuznets@redhat.com,
+ mail@maciej.szmigiero.name, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jul 2020 08:35:36 -0700
-Li Qiang <liq3ea@163.com> wrote:
+On Wed, 15 Jul 2020 11:43:25 +0300
+Jon Doron <arilou@gmail.com> wrote:
 
-> Fixes: 5da7c35e25a("bios-tables-test: Add Q35/TPM-TIS test")
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+> Signed-off-by: Jon Doron <arilou@gmail.com>
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 > ---
->  tests/qtest/bios-tables-test.c | 1 +
->  1 file changed, 1 insertion(+)
+>  hw/i386/acpi-build.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
 > 
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-> index c315156858..d49b3988ec 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -924,6 +924,7 @@ static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
->      g_free(variant);
->      g_free(tmp_path);
->      g_free(tmp_dir_name);
-> +    g_free(args);
->      free_test_data(&data);
->  #else
->      g_test_skip("TPM disabled");
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index b7bcbbbb2a..7708a27f70 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -975,7 +975,6 @@ static Aml *build_vmbus_device_aml(VMBusBridge *vmbus_bridge)
+>  
+>  static void build_isa_devices_aml(Aml *table)
+>  {
+> -    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
+>      bool ambiguous;
+>      Object *obj = object_resolve_path_type("", TYPE_ISA_BUS, &ambiguous);
+>      Aml *scope;
+> @@ -986,10 +985,6 @@ static void build_isa_devices_aml(Aml *table)
+>      build_acpi_ipmi_devices(scope, BUS(obj), "\\_SB.PCI0.ISA");
+>      isa_build_aml(ISA_BUS(obj), scope);
+>  
+> -    if (vmbus_bridge) {
+> -        aml_append(scope, build_vmbus_device_aml(vmbus_bridge));
+> -    }
+> -
+>      aml_append(table, scope);
+>  }
+>  
+> @@ -1485,6 +1480,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      PCIBus *bus = NULL;
+>      TPMIf *tpm = tpm_find();
+>      int i;
+> +    VMBusBridge *vmbus_bridge = vmbus_bridge_find();
+>  
+>      dsdt = init_aml_allocator();
+>  
+> @@ -1526,6 +1522,12 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          }
+>      }
+>  
+> +    if (vmbus_bridge) {
+> +        sb_scope = aml_scope("_SB");
+> +        aml_append(sb_scope, build_vmbus_device_aml(vmbus_bridge));
+> +        aml_append(dsdt, sb_scope);
+> +    }
+> +
+>      if (pcmc->legacy_cpu_hotplug) {
+>          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>      } else {
 
 
