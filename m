@@ -7,71 +7,68 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78951C433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88ECC433E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47AB520657
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8FA820657
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:57:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVKoCYeY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47AB520657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h3brp/m+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8FA820657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvhtC-0007U3-Gb
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:56:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40636)
+	id 1jvhuU-0001H5-01
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:57:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvhr3-00039X-AZ
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39261
+ id 1jvhrD-0003Vk-6l
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46790
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvhr0-0005ML-V0
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:49 -0400
+ id 1jvhrB-0005Mr-9b
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594821226;
+ s=mimecast20190719; t=1594821236;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rcS9JhqiNRxIxolYBZdtW2tdwI0vimd9/hYJ9NxOy5Y=;
- b=XVKoCYeYOuw8yZpdyM8bGXRcd7FFR9FbShiSGkO6qmTuvHlJDeseWs3OwPfrt32rx43MXJ
- bYDURDvT5XQcWZJ2Yszog8OgZoqR53zXec3Yw+iRpztLezE4Xsjf1uYwCHnx7HlhMrZh3J
- hoTSCviEoQC59M0RH1g7atQR9AkJS9U=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=Ppe8HFaAkuBHGro/MdNGmoORxrsqNsi5jhVHWKTZR5Y=;
+ b=h3brp/m+biMWvAxw7In6tCiYmy5K6mDUQ3yaO9XZDrEkCesOFAFnfiZrtMvM9NYJN3xhZo
+ P760apgnWaYrLb0smFFlDVqqZugDaC+BPn7tga+OIJUKUurX+NAogLbFvvPuXyhWhSqhqF
+ 3KpuR3zw+zDRtUU9XmK+1/+t94TMC/0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-SvgJtXYuMN6ct6jxnwb70w-1; Wed, 15 Jul 2020 09:53:44 -0400
-X-MC-Unique: SvgJtXYuMN6ct6jxnwb70w-1
+ us-mta-503-07HNpE0yOmGUqk0zfLcGZg-1; Wed, 15 Jul 2020 09:53:54 -0400
+X-MC-Unique: 07HNpE0yOmGUqk0zfLcGZg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42878E91A;
- Wed, 15 Jul 2020 13:53:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83E76E91C;
+ Wed, 15 Jul 2020 13:53:53 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-28.pek2.redhat.com
  [10.72.12.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E36D1755E;
- Wed, 15 Jul 2020 13:53:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2DC861477;
+ Wed, 15 Jul 2020 13:53:43 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 5/7] net: check if the file descriptor is valid before using it
-Date: Wed, 15 Jul 2020 21:53:19 +0800
-Message-Id: <1594821201-3708-6-git-send-email-jasowang@redhat.com>
+Subject: [PULL 6/7] net: detect errors from probing vnet hdr flag for TAP
+ devices
+Date: Wed, 15 Jul 2020 21:53:20 +0800
+Message-Id: <1594821201-3708-7-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1594821201-3708-1-git-send-email-jasowang@redhat.com>
 References: <1594821201-3708-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 05:07:28
@@ -96,285 +93,203 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-qemu_set_nonblock() checks that the file descriptor can be used and, if
-not, crashes QEMU. An assert() is used for that. The use of assert() is
-used to detect programming error and the coredump will allow to debug
-the problem.
+When QEMU sets up a tap based network device backend, it mostly ignores errors
+reported from various ioctl() calls it makes, assuming the TAP file descriptor
+is valid. This assumption can easily be violated when the user is passing in a
+pre-opened file descriptor. At best, the ioctls may fail with a -EBADF, but if
+the user passes in a bogus FD number that happens to clash with a FD number that
+QEMU has opened internally for another reason, a wide variety of errnos may
+result, as the TUNGETIFF ioctl number may map to a completely different command
+on a different type of file.
 
-But in the case of the tap device, this assert() can be triggered by
-a misconfiguration by the user. At startup, it's not a real problem, but it
-can also happen during the hot-plug of a new device, and here it's a
-problem because we can crash a perfectly healthy system.
+By ignoring all these errors, QEMU sets up a zombie network backend that will
+never pass any data. Even worse, when QEMU shuts down, or that network backend
+is hot-removed, it will close this bogus file descriptor, which could belong to
+another QEMU device backend.
 
-For instance:
- # ip link add link virbr0 name macvtap0 type macvtap mode bridge
- # ip link set macvtap0 up
- # TAP=/dev/tap$(ip -o link show macvtap0 | cut -d: -f1)
- # qemu-system-x86_64 -machine q35 -device pcie-root-port,id=pcie-root-port-0 -monitor stdio 9<> $TAP
- (qemu) netdev_add type=tap,id=hostnet0,vhost=on,fd=9
- (qemu) device_add driver=virtio-net-pci,netdev=hostnet0,id=net0,bus=pcie-root-port-0
- (qemu) device_del net0
- (qemu) netdev_del hostnet0
- (qemu) netdev_add type=tap,id=hostnet1,vhost=on,fd=9
- qemu-system-x86_64: .../util/oslib-posix.c:247: qemu_set_nonblock: Assertion `f != -1' failed.
- Aborted (core dumped)
+There's no obvious guaranteed reliable way to detect that a FD genuinely is a
+TAP device, as opposed to a UNIX socket, or pipe, or something else. Checking
+the errno from probing vnet hdr flag though, does catch the big common cases.
+ie calling TUNGETIFF will return EBADF for an invalid FD, and ENOTTY when FD is
+a UNIX socket, or pipe which catches accidental collisions with FDs used for
+stdio, or monitor socket.
 
-To avoid that, add a function, qemu_try_set_nonblock(), that allows to report the
-problem without crashing.
+Previously the example below where bogus fd 9 collides with the FD used for the
+chardev saw:
 
-In the same way, we also update the function for vhostfd in net_init_tap_one() and
-for fd in net_init_socket() (both descriptors are provided by the user and can
-be wrong).
+$ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+  -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+  -monitor stdio -vnc :0
+qemu-system-x86_64: -netdev tap,id=hostnet0,fd=9: TUNGETIFF ioctl() failed: Inappropriate ioctl for device
+TUNSETOFFLOAD ioctl() failed: Bad address
+QEMU 2.9.1 monitor - type 'help' for more information
+(qemu) Warning: netdev hostnet0 has no peer
 
+which gives a running QEMU with a zombie network backend.
+
+With this change applied we get an error message and QEMU immediately exits
+before carrying on and making a bigger disaster:
+
+$ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+  -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+  -monitor stdio -vnc :0
+qemu-system-x86_64: -netdev tap,id=hostnet0,vhost=on,fd=9: Unable to query TUNGETIFF on FD 9: Inappropriate ioctl for device
+
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-id: 20171027085548.3472-1-berrange@redhat.com
+[lv: to simplify, don't check on EINVAL with TUNGETIFF as it exists since v2.6.27]
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/qemu/sockets.h |  1 +
- net/socket.c           |  9 ++++++--
- net/tap.c              | 25 ++++++++++++++++++----
- util/oslib-posix.c     | 26 ++++++++++++++++-------
- util/oslib-win32.c     | 57 ++++++++++++++++++++++++++++----------------------
- 5 files changed, 79 insertions(+), 39 deletions(-)
+ net/tap-bsd.c     |  2 +-
+ net/tap-linux.c   |  8 +++++---
+ net/tap-solaris.c |  2 +-
+ net/tap-stub.c    |  2 +-
+ net/tap.c         | 25 ++++++++++++++++++++-----
+ net/tap_int.h     |  2 +-
+ 6 files changed, 29 insertions(+), 12 deletions(-)
 
-diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-index 57cd049..7d1f813 100644
---- a/include/qemu/sockets.h
-+++ b/include/qemu/sockets.h
-@@ -18,6 +18,7 @@ int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
- int socket_set_cork(int fd, int v);
- int socket_set_nodelay(int fd);
- void qemu_set_block(int fd);
-+int qemu_try_set_nonblock(int fd);
- void qemu_set_nonblock(int fd);
- int socket_set_fast_reuse(int fd);
+diff --git a/net/tap-bsd.c b/net/tap-bsd.c
+index a5c3707..77aaf67 100644
+--- a/net/tap-bsd.c
++++ b/net/tap-bsd.c
+@@ -211,7 +211,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+ {
+ }
  
-diff --git a/net/socket.c b/net/socket.c
-index c923540..2d21fdd 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -725,13 +725,18 @@ int net_init_socket(const Netdev *netdev, const char *name,
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     return 0;
+ }
+diff --git a/net/tap-linux.c b/net/tap-linux.c
+index e0dd442..b0635e9 100644
+--- a/net/tap-linux.c
++++ b/net/tap-linux.c
+@@ -147,13 +147,15 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+     }
+ }
+ 
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     struct ifreq ifr;
+ 
+     if (ioctl(fd, TUNGETIFF, &ifr) != 0) {
+-        error_report("TUNGETIFF ioctl() failed: %s", strerror(errno));
+-        return 0;
++        /* TUNGETIFF is available since kernel v2.6.27 */
++        error_setg_errno(errp, errno,
++                         "Unable to query TUNGETIFF on FD %d", fd);
++        return -1;
      }
  
-     if (sock->has_fd) {
--        int fd;
-+        int fd, ret;
+     return ifr.ifr_flags & IFF_VNET_HDR;
+diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+index d03165c..0475a58 100644
+--- a/net/tap-solaris.c
++++ b/net/tap-solaris.c
+@@ -207,7 +207,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+ {
+ }
  
-         fd = monitor_fd_param(cur_mon, sock->fd, errp);
-         if (fd == -1) {
-             return -1;
-         }
--        qemu_set_nonblock(fd);
-+        ret = qemu_try_set_nonblock(fd);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                             name, fd);
-+            return -1;
-+        }
-         if (!net_socket_fd_init(peer, "socket", name, fd, 1, sock->mcast,
-                                 errp)) {
-             return -1;
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     return 0;
+ }
+diff --git a/net/tap-stub.c b/net/tap-stub.c
+index a9ab8f8..de525a2 100644
+--- a/net/tap-stub.c
++++ b/net/tap-stub.c
+@@ -37,7 +37,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+ {
+ }
+ 
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     return 0;
+ }
 diff --git a/net/tap.c b/net/tap.c
-index f9dcc2e..32e4813 100644
+index 32e4813..14dc904 100644
 --- a/net/tap.c
 +++ b/net/tap.c
-@@ -690,6 +690,8 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-         }
+@@ -598,7 +598,11 @@ int net_init_bridge(const Netdev *netdev, const char *name,
+     }
  
-         if (vhostfdname) {
-+            int ret;
-+
-             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
-             if (vhostfd == -1) {
-                 if (tap->has_vhostforce && tap->vhostforce) {
-@@ -699,7 +701,12 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-                 }
-                 return;
-             }
--            qemu_set_nonblock(vhostfd);
-+            ret = qemu_try_set_nonblock(vhostfd);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                                 name, fd);
-+                return;
-+            }
-         } else {
-             vhostfd = open("/dev/vhost-net", O_RDWR);
-             if (vhostfd < 0) {
-@@ -767,6 +774,7 @@ int net_init_tap(const Netdev *netdev, const char *name,
-     Error *err = NULL;
-     const char *vhostfdname;
-     char ifname[128];
-+    int ret = 0;
+     qemu_set_nonblock(fd);
+-    vnet_hdr = tap_probe_vnet_hdr(fd);
++    vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++    if (vnet_hdr < 0) {
++        close(fd);
++        return -1;
++    }
+     s = net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
  
-     assert(netdev->type == NET_CLIENT_DRIVER_TAP);
-     tap = &netdev->u.tap;
-@@ -795,7 +803,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
+     snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=%s,br=%s", helper,
+@@ -810,7 +814,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
              return -1;
          }
  
--        qemu_set_nonblock(fd);
-+        ret = qemu_try_set_nonblock(fd);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                             name, fd);
+-        vnet_hdr = tap_probe_vnet_hdr(fd);
++        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++        if (vnet_hdr < 0) {
++            close(fd);
 +            return -1;
 +        }
  
-         vnet_hdr = tap_probe_vnet_hdr(fd);
- 
-@@ -810,7 +823,6 @@ int net_init_tap(const Netdev *netdev, const char *name,
-         char **fds;
-         char **vhost_fds;
-         int nfds = 0, nvhosts = 0;
--        int ret = 0;
- 
-         if (tap->has_ifname || tap->has_script || tap->has_downscript ||
-             tap->has_vnet_hdr || tap->has_helper || tap->has_queues ||
-@@ -842,7 +854,12 @@ int net_init_tap(const Netdev *netdev, const char *name,
-                 goto free_fail;
+         net_init_tap_one(tap, peer, "tap", name, NULL,
+                          script, downscript,
+@@ -862,8 +870,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
              }
  
--            qemu_set_nonblock(fd);
-+            ret = qemu_try_set_nonblock(fd);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "%s: Can't use file descriptor %d",
-+                                 name, fd);
-+                goto free_fail;
-+            }
- 
              if (i == 0) {
-                 vnet_hdr = tap_probe_vnet_hdr(fd);
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index e60aea8..36bf859 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -260,25 +260,35 @@ void qemu_set_block(int fd)
-     assert(f != -1);
- }
+-                vnet_hdr = tap_probe_vnet_hdr(fd);
+-            } else if (vnet_hdr != tap_probe_vnet_hdr(fd)) {
++                vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++                if (vnet_hdr < 0) {
++                    goto free_fail;
++                }
++            } else if (vnet_hdr != tap_probe_vnet_hdr(fd, NULL)) {
+                 error_setg(errp,
+                            "vnet_hdr not consistent across given tap fds");
+                 ret = -1;
+@@ -908,7 +919,11 @@ free_fail:
+         }
  
--void qemu_set_nonblock(int fd)
-+int qemu_try_set_nonblock(int fd)
- {
-     int f;
-     f = fcntl(fd, F_GETFL);
--    assert(f != -1);
--    f = fcntl(fd, F_SETFL, f | O_NONBLOCK);
--#ifdef __OpenBSD__
-     if (f == -1) {
-+        return -errno;
-+    }
-+    if (fcntl(fd, F_SETFL, f | O_NONBLOCK) == -1) {
-+#ifdef __OpenBSD__
-         /*
-          * Previous to OpenBSD 6.3, fcntl(F_SETFL) is not permitted on
-          * memory devices and sets errno to ENODEV.
-          * It's OK if we fail to set O_NONBLOCK on devices like /dev/null,
-          * because they will never block anyway.
-          */
--        assert(errno == ENODEV);
--    }
--#else
--    assert(f != -1);
-+        if (errno == ENODEV) {
-+            return 0;
+         qemu_set_nonblock(fd);
+-        vnet_hdr = tap_probe_vnet_hdr(fd);
++        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++        if (vnet_hdr < 0) {
++            close(fd);
++            return -1;
 +        }
- #endif
-+        return -errno;
-+    }
-+    return 0;
-+}
-+
-+void qemu_set_nonblock(int fd)
-+{
-+    int f;
-+    f = qemu_try_set_nonblock(fd);
-+    assert(f == 0);
- }
  
- int socket_set_fast_reuse(int fd)
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index 3b49d27..7eedbe5 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -132,31 +132,6 @@ struct tm *localtime_r(const time_t *timep, struct tm *result)
- }
- #endif /* CONFIG_LOCALTIME_R */
+         net_init_tap_one(tap, peer, "bridge", name, ifname,
+                          script, downscript, vhostfdname,
+diff --git a/net/tap_int.h b/net/tap_int.h
+index e3194b2..225a49e 100644
+--- a/net/tap_int.h
++++ b/net/tap_int.h
+@@ -34,7 +34,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+ ssize_t tap_read_packet(int tapfd, uint8_t *buf, int maxlen);
  
--void qemu_set_block(int fd)
--{
--    unsigned long opt = 0;
--    WSAEventSelect(fd, NULL, 0);
--    ioctlsocket(fd, FIONBIO, &opt);
--}
--
--void qemu_set_nonblock(int fd)
--{
--    unsigned long opt = 1;
--    ioctlsocket(fd, FIONBIO, &opt);
--    qemu_fd_register(fd);
--}
--
--int socket_set_fast_reuse(int fd)
--{
--    /* Enabling the reuse of an endpoint that was used by a socket still in
--     * TIME_WAIT state is usually performed by setting SO_REUSEADDR. On Windows
--     * fast reuse is the default and SO_REUSEADDR does strange things. So we
--     * don't have to do anything here. More info can be found at:
--     * http://msdn.microsoft.com/en-us/library/windows/desktop/ms740621.aspx */
--    return 0;
--}
--
--
- static int socket_error(void)
- {
-     switch (WSAGetLastError()) {
-@@ -233,6 +208,38 @@ static int socket_error(void)
-     }
- }
- 
-+void qemu_set_block(int fd)
-+{
-+    unsigned long opt = 0;
-+    WSAEventSelect(fd, NULL, 0);
-+    ioctlsocket(fd, FIONBIO, &opt);
-+}
-+
-+int qemu_try_set_nonblock(int fd)
-+{
-+    unsigned long opt = 1;
-+    if (ioctlsocket(fd, FIONBIO, &opt) != NO_ERROR) {
-+        return -socket_error();
-+    }
-+    qemu_fd_register(fd);
-+    return 0;
-+}
-+
-+void qemu_set_nonblock(int fd)
-+{
-+    (void)qemu_try_set_nonblock(fd);
-+}
-+
-+int socket_set_fast_reuse(int fd)
-+{
-+    /* Enabling the reuse of an endpoint that was used by a socket still in
-+     * TIME_WAIT state is usually performed by setting SO_REUSEADDR. On Windows
-+     * fast reuse is the default and SO_REUSEADDR does strange things. So we
-+     * don't have to do anything here. More info can be found at:
-+     * http://msdn.microsoft.com/en-us/library/windows/desktop/ms740621.aspx */
-+    return 0;
-+}
-+
- int inet_aton(const char *cp, struct in_addr *ia)
- {
-     uint32_t addr = inet_addr(cp);
+ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp);
+-int tap_probe_vnet_hdr(int fd);
++int tap_probe_vnet_hdr(int fd, Error **errp);
+ int tap_probe_vnet_hdr_len(int fd, int len);
+ int tap_probe_has_ufo(int fd);
+ void tap_fd_set_offload(int fd, int csum, int tso4, int tso6, int ecn, int ufo);
 -- 
 2.5.0
 
