@@ -2,88 +2,73 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0C4C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 01:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94ED5C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 02:54:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B593B2065E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 01:06:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDPMZyd/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B593B2065E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6841420663
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 02:54:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6841420663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvVsp-0007TA-V5
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 21:06:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47794)
+	id 1jvXYa-00040U-LB
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jul 2020 22:54:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jvVrf-0006NL-Q0
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 21:05:39 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:47103)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jvVrb-00033n-7d
- for qemu-devel@nongnu.org; Tue, 14 Jul 2020 21:05:37 -0400
-Received: by mail-ot1-x344.google.com with SMTP id n24so176735otr.13
- for <qemu-devel@nongnu.org>; Tue, 14 Jul 2020 18:05:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=HZ9hVUXZu9t9Vq4g+fiuPG4LRRLb1uijRffX5MHB3nM=;
- b=rDPMZyd/XDFaBpWXkJPt62+TEuT+cxOucJ3x+Ylf0OfM5d6B4QpdhAlSyUnaEbjEtI
- CVaI78/xb68KqX4UWXECh5d+7TNF4L3zQIoYPeF3VTQziLtInY+akFsNgxJJ6GOVfU/3
- 2fG0qBnzW8cb4EDDXBPIcky+JPsSZwWRrqYeVx947Q6WkX8rFCixGLUu38nZbbSefVDP
- hKZMf/ROPIvkR/AU49llmdufPXDAJQonAywhQeT7RyZpxxIbrUfKyeYzu7n78UgOsbF9
- HcLQ18vl5ov9aeE3p881Cw66OUo/ciTzi3cD+YH2Q6WO1LRWWn9LHZfb5EKCo+BtiKb8
- WhGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=HZ9hVUXZu9t9Vq4g+fiuPG4LRRLb1uijRffX5MHB3nM=;
- b=NxitNioBDIh1vTUm9/E4CDGxR+40f59D/gBvsTS3pnzzyK6sDj0rfiJfhciUjYf2NY
- 9x6AYtdPIugSvcBYg71A8euah5ocTkfyT/mYCO+2SCKrIqRJQlfVzv2g1CAHURQ/I/DH
- D79RviOyndUlSqOwxwkdOqdWx+gZv/bZ98+2WUgPY79MiMt/UFIcPM5RV+y19d6K6JkR
- onVcZRPaqT7Wq/MRRTi08/xYYuhb0fChc4gWHocSvp7T7EYrYCGU3CIoCeKab5A09hjK
- rQbQTNvzec28tbgLl5GSpDOJoU7l59Bcx51mM0DgG9xcVjReQPh4uLUfB/L/trmxxCJY
- GvIw==
-X-Gm-Message-State: AOAM531BfR1mzpCCW0m6S4t6vqDYy5jzSkbXZJx+5K+eb9wd2ycsMilq
- octb+EOjuuxaXWDtCBQU7wB91eTezoG8Y8rBVpU=
-X-Google-Smtp-Source: ABdhPJy7CI1Mpzxez9JOsYNYIn2eI3cqtHG0fthtD2yuvd5mEGv2B5EqIga/KEdts9/k+s3bcT2SuuZzKnmbsqMhCdM=
-X-Received: by 2002:a05:6830:1ad5:: with SMTP id
- r21mr6275930otc.181.1594775132287; 
- Tue, 14 Jul 2020 18:05:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jvXXe-0003WC-FF; Tue, 14 Jul 2020 22:53:06 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:33097)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jvXXZ-0001zp-TL; Tue, 14 Jul 2020 22:53:06 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07516912|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.0747618-0.0105898-0.914648;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03306; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.I1rnTxH_1594781569; 
+Received: from 30.225.208.24(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.I1rnTxH_1594781569)
+ by smtp.aliyun-inc.com(10.147.41.178);
+ Wed, 15 Jul 2020 10:52:49 +0800
+Subject: Re: [RFC 05/65] target/riscv: remove vsll.vi, vsrl.vi, vsra.vi insns
+ from using gvec
+To: Frank Chang <frank.chang@sifive.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20200710104920.13550-1-frank.chang@sifive.com>
+ <20200710104920.13550-6-frank.chang@sifive.com>
+ <452e8bc7-4622-77c2-ec81-9aa6f25705fc@linaro.org>
+ <CAE_xrPjWr2KShiwaCZi1DXueFnRAz41D3j9_k2vBL2j7-d9WOQ@mail.gmail.com>
+ <0ccc7311-02f4-821f-6272-73ab600a8cda@linaro.org>
+ <CAE_xrPg9otd9tbpHL_1DmvZ=3nFNdgkse_nUe=fApTQt1hPCYA@mail.gmail.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <5e56bedb-b404-19f9-4dbf-dfd675aee383@c-sky.com>
+Date: Wed, 15 Jul 2020 10:52:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200714164257.23330-1-f4bug@amsat.org>
- <20200714164257.23330-4-f4bug@amsat.org>
-In-Reply-To: <20200714164257.23330-4-f4bug@amsat.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 15 Jul 2020 09:04:56 +0800
-Message-ID: <CAKXe6S+KnKpgcaJ5MairhWpYJ3vGu8Fs12aD1i1onERm2x46rg@mail.gmail.com>
-Subject: Re: [PATCH-for-5.1 3/4] qemu-common: Document qemu_find_file()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAE_xrPg9otd9tbpHL_1DmvZ=3nFNdgkse_nUe=fApTQt1hPCYA@mail.gmail.com>
+Content-Type: multipart/alternative;
+ boundary="------------8C543CA8B571EB653508EBBC"
+Content-Language: en-US
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/14 22:52:51
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,56 +81,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Stefan Weil <sw@weilnetz.de>,
- Qemu Developers <qemu-devel@nongnu.org>, Michael Rolnik <mrolnik@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =E4=BA=8E2020=E5=B9=B47=E6=9C=
-=8815=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=8812:48=E5=86=99=E9=81=93=
-=EF=BC=9A
->
-> Document qemu_find_file(), in particular the returned
-> value which must be freed.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+This is a multi-part message in MIME format.
+--------------8C543CA8B571EB653508EBBC
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-> ---
->  include/qemu-common.h | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+
+On 2020/7/14 21:59, Frank Chang wrote:
+> On Tue, Jul 14, 2020 at 9:21 PM Richard Henderson 
+> <richard.henderson@linaro.org <mailto:richard.henderson@linaro.org>> 
+> wrote:
 >
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index d0142f29ac..d6a08259d3 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -110,6 +110,20 @@ const char *qemu_get_vm_name(void);
+>     On 7/13/20 7:59 PM, Frank Chang wrote:
+>     > The latest spec specified:
+>     >
+>     > Only the low *lg2(SEW) bits* are read to obtain the shift amount
+>     from a
+>     > *register value*.
+>     > The *immediate* is treated as an *unsigned shift amount*, with a
+>     *maximum shift
+>     > amount of 31*.
 >
->  #define QEMU_FILE_TYPE_BIOS   0
->  #define QEMU_FILE_TYPE_KEYMAP 1
-> +/**
-> + * qemu_find_file:
-> + * @type: QEMU_FILE_TYPE_BIOS (for BIOS, VGA BIOS)
-> + *        or QEMU_FILE_TYPE_KEYMAP (for keymaps).
-> + * @name: File name
-> + *
-> + * Search for @name file in the data directories, either configured at
-> + * build time (DATADIR) or registered with the -L command line option.
-> + *
-> + * The caller must use g_free() to free the returned data when it is
-> + * no longer required.
-> + *
-> + * Returns: absolute path to the file or NULL on error.
-> + */
->  char *qemu_find_file(int type, const char *name);
->
->  /* OS specific functions */
-> --
-> 2.21.3
+>     Which, I hope you will agree is underspecified, and should be
+>     reported as a bug
+>     in the manual.
 >
 >
+> Yes, you're correct.
+> I found out I missed the MASK part in GEN_VEXT_SHIFT_VV() macro,
+> which this macro is shared between OPIVV and OPIVI format of instructions.
+> So the same masking methodology should be applied to shift amounts 
+> coming from both register and immediate value.
+> Spike also does something like:
+> /vs2 >> (zimm5 & (sew - 1) & 0x1f);/ for SEW = 8.
+>
+> I think spec is kind of misleading to the reader by the way it expresses.
+>
+>
+>     > Looks like the shift amount in the immediate value is not
+>     relevant with SEW
+>     > setting.
+>
+>     How can it not be?  It is when the value comes from a register...
+>
+>     > If so, is it better to just use do_opivi_gvec() and implement
+>     the logic by our
+>     > own rather than using gvec IR?
+>
+>     No, it is not.  What is the logic you would apply on your own? 
+>     There should be
+>     a right answer.
+>
+>
+> I was talking about just calling GEN_OPIVI_TRANS() to generate the 
+> helper functions
+> defined in vector_helper.c as what I'm doing in the original patch.
+> But as long as the immediate value should also apply *lg2(SEW) bits* 
+> truncating,
+> I think I should update GEN_OPIVI_GVEC_TRANS() to utilize gvec IR.
+>
+>
+>     If the answer is that out-of-range shift produces zero, which some
+>     architectures use, then you can look at the immediate value, see
+>     that you must
+>     supply zero, and then fill the vector with zeros from translate. 
+>     You need not
+>     call a helper to perform N shifts when you know the result a-priori.
+>
+>     If the answer is that shift values are truncated, which riscv uses
+>     *everywhere
+>     else*, then you should truncate the immediate value during translate.
+>
+>
+> I think vsll.vi <http://vsll.vi>, vsrl.vi <http://vsrl.vi> and vsra.vi 
+> <http://vsra.vi> truncate the out-of-range shift as other riscv 
+> instructions.
+> I will double confirm that, thanks for the advice.
+>
+Perhaps the reason is that the assembler can't identify if an imm is 
+legal according to log(SEW),
+because the assembler can't get the SEW.
+
+To make more compliance with assembler directly users'  intuition, just 
+let the imm encoding to insn as itself(truncate to 31)
+and work as itself.
+
+Zhiwei
+> Frank Chang
+>
+>
+>
+>     r~
+>
+
+
+--------------8C543CA8B571EB653508EBBC
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <br>
+    <br>
+    <div class="moz-cite-prefix">On 2020/7/14 21:59, Frank Chang wrote:<br>
+    </div>
+    <blockquote type="cite"
+cite="mid:CAE_xrPg9otd9tbpHL_1DmvZ=3nFNdgkse_nUe=fApTQt1hPCYA@mail.gmail.com">
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <div dir="ltr">
+        <div dir="ltr">On Tue, Jul 14, 2020 at 9:21 PM Richard Henderson
+          &lt;<a href="mailto:richard.henderson@linaro.org"
+            moz-do-not-send="true">richard.henderson@linaro.org</a>&gt;
+          wrote:<br>
+        </div>
+        <div class="gmail_quote">
+          <blockquote class="gmail_quote" style="margin:0px 0px 0px
+            0.8ex;border-left:1px solid
+            rgb(204,204,204);padding-left:1ex">On 7/13/20 7:59 PM, Frank
+            Chang wrote:<br>
+            &gt; The latest spec specified:<br>
+            &gt; <br>
+            &gt; Only the low *lg2(SEW) bits* are read to obtain the
+            shift amount from a<br>
+            &gt; *register value*.<br>
+            &gt; The *immediate* is treated as an *unsigned shift
+            amount*, with a *maximum shift<br>
+            &gt; amount of 31*.<br>
+            <br>
+            Which, I hope you will agree is underspecified, and should
+            be reported as a bug<br>
+            in the manual.<br>
+          </blockquote>
+          <div><br>
+          </div>
+          <div>Yes, you're correct.</div>
+          <div>I found out I missed the MASK part in GEN_VEXT_SHIFT_VV()
+            macro,</div>
+          <div>which this macro is shared between OPIVV and OPIVI format
+            of instructions.</div>
+          <div>So the same masking methodology should be applied to
+            shift amounts coming from both register and immediate value.</div>
+          <div>Spike also does something like:</div>
+          <div><i>vs2 &gt;&gt; (zimm5 &amp; (sew - 1) &amp; 0x1f);</i>
+            for SEW = 8.</div>
+          <div><br>
+          </div>
+          <div>I think spec is kind of misleading to the reader by the
+            way it expresses.</div>
+          <div> </div>
+          <blockquote class="gmail_quote" style="margin:0px 0px 0px
+            0.8ex;border-left:1px solid
+            rgb(204,204,204);padding-left:1ex">
+            <br>
+            &gt; Looks like the shift amount in the immediate value is
+            not relevant with SEW<br>
+            &gt; setting.<br>
+            <br>
+            How can it not be?  It is when the value comes from a
+            register...<br>
+            <br>
+            &gt; If so, is it better to just use do_opivi_gvec() and
+            implement the logic by our<br>
+            &gt; own rather than using gvec IR?<br>
+            <br>
+            No, it is not.  What is the logic you would apply on your
+            own?  There should be<br>
+            a right answer.<br>
+          </blockquote>
+          <div><br>
+          </div>
+          <div>I was talking about just calling GEN_OPIVI_TRANS() to
+            generate the helper functions</div>
+          <div>defined in vector_helper.c as what I'm doing in the
+            original patch.</div>
+          <div>But as long as the immediate value should also
+            apply *lg2(SEW) bits* truncating,</div>
+          <div>I think I should update GEN_OPIVI_GVEC_TRANS() to utilize
+            gvec IR.</div>
+          <div> </div>
+          <blockquote class="gmail_quote" style="margin:0px 0px 0px
+            0.8ex;border-left:1px solid
+            rgb(204,204,204);padding-left:1ex">
+            <br>
+            If the answer is that out-of-range shift produces zero,
+            which some<br>
+            architectures use, then you can look at the immediate value,
+            see that you must<br>
+            supply zero, and then fill the vector with zeros from
+            translate.  You need not<br>
+            call a helper to perform N shifts when you know the result
+            a-priori.<br>
+            <br>
+            If the answer is that shift values are truncated, which
+            riscv uses *everywhere<br>
+            else*, then you should truncate the immediate value during
+            translate.<br>
+          </blockquote>
+          <div><br>
+          </div>
+          <div>I think <a href="http://vsll.vi" moz-do-not-send="true">vsll.vi</a>,
+            <a href="http://vsrl.vi" moz-do-not-send="true">vsrl.vi</a>
+            and <a href="http://vsra.vi" moz-do-not-send="true">vsra.vi</a>
+            truncate the out-of-range shift as other riscv instructions.</div>
+          <div>I will double confirm that, thanks for the advice.</div>
+          <div><br>
+          </div>
+        </div>
+      </div>
+    </blockquote>
+    Perhaps the reason is that the assembler can't identify if an imm is
+    legal according to log(SEW),<br>
+    because the assembler can't get the SEW.<br>
+    <br>
+    To make more compliance with assembler directly users'  intuition,
+    just let the imm encoding to insn as itself(truncate to 31)<br>
+    and work as itself.<br>
+    <br>
+    Zhiwei<br>
+    <blockquote type="cite"
+cite="mid:CAE_xrPg9otd9tbpHL_1DmvZ=3nFNdgkse_nUe=fApTQt1hPCYA@mail.gmail.com">
+      <div dir="ltr">
+        <div class="gmail_quote">
+          <div>Frank Chang</div>
+          <div> </div>
+          <blockquote class="gmail_quote" style="margin:0px 0px 0px
+            0.8ex;border-left:1px solid
+            rgb(204,204,204);padding-left:1ex">
+            <br>
+            <br>
+            r~<br>
+          </blockquote>
+        </div>
+      </div>
+    </blockquote>
+    <br>
+  </body>
+</html>
+
+--------------8C543CA8B571EB653508EBBC--
 
