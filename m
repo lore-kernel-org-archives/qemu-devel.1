@@ -2,97 +2,85 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CA7C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 19:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CDBC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 20:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB0E52065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 19:58:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A10B32065D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 20:52:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmOt6wH/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0E52065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QbH4X7ck"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A10B32065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvnXf-0007GI-W1
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 15:58:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34928)
+	id 1jvoOJ-0007Xb-S5
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 16:52:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1jvnX5-0006pH-Rt
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 15:57:35 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58734
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1jvnX2-0002NQ-Su
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 15:57:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594843049;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=iMYeVpzZujOS4X+0l6Lfg6+KSd7X84nrQM0K1wWhVcY=;
- b=SmOt6wH/caPStynbTZxs7jE4+ztVqnGz5r2KqRZMA6Q/KpOMqQONMy3A5AT+/2iKP8oI0x
- 84VN56laV126Oq2+3yAEOz2iUnlnrpoHBbWZ5onXnJCOtogOUSsvFQhpxGGXJH9gn+z+/6
- R5BdH2eueh8CXeGKx1Q6y09WS/1s134=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-10q5ZkL0MxyP9DDs7ghsLA-1; Wed, 15 Jul 2020 15:57:26 -0400
-X-MC-Unique: 10q5ZkL0MxyP9DDs7ghsLA-1
-Received: by mail-io1-f72.google.com with SMTP id b133so2089141iof.1
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 12:57:26 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jvoNM-0006jj-2K
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 16:51:36 -0400
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:43757)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jvoNJ-0007Yh-AU
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 16:51:35 -0400
+Received: by mail-pg1-x531.google.com with SMTP id w2so3678864pgg.10
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 13:51:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=8YG7sNe1WZD8WXiuBEhD8a7IbM25Es/A8eo5RXuxdNo=;
+ b=QbH4X7ckC0Wdb9nJHSHLI5mUrSt7SHUzmjDUUqGNXFAMYi8ABwY6k0YcTbb+ynfLMe
+ cmu+pxO5gsGsVEDGEJCV7qyczeoD8rKcfa76jjVaRpGWuvIxY6WFwjTU4EWdg+Wu5H54
+ 69m2IYFW1stR3TU/7MDFFEKVhFMyEejYYD8IZH+D1dgJ9JWFUsYbvVixlc0rnsznSNfB
+ lI65fPF13UyytLZrt8NO8E0QaSOWxKP64c0z/oEYcQ1zv+DOVgUKK8ht1qbNx4tTGRV1
+ zuj1P+pDUByqYyBIYhqUgTTKOMs+Gqmt8JLbOOaFgJ1dOhD4o00M1diHHQNqqMlUuT4N
+ OeYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=iMYeVpzZujOS4X+0l6Lfg6+KSd7X84nrQM0K1wWhVcY=;
- b=nUSdvtaT2eFX5aYnfKhqonllleIEBU2EIUCxF3Ikuy17rlfihgLS9UJO3nMRE1oI4K
- Qg85M35+mRmjpVgc4Z4SYQ/eBeoJGusdBDZCV2TmWyUScoTVVOjZle3m3HM1cBvVNmDx
- kpgxtSq+SqovfGV11ZDotdr/hEwc8sekntUfkLaRqcnsp3orjs90G6O22yQp9aRg9O6+
- inRq4jP+vqav7PwC5Ai4KuP2y0k9qKJq3FghexUUKwdGUddBjE+S4GGE3c8WtTy7Bfcu
- +1CmS1KhEqVhyKizTNvdeWPhxBt18JnAK9oNBQ+zCNtwJkPCDWRVDr3wtTdoTHYV54kQ
- RU1g==
-X-Gm-Message-State: AOAM5335gILTF0IB+sNiALcHRpfATAUfNWbmGspYyRlFpYwEXuij5xUL
- eORoBuztQYcMNulb4EFp4bY4eUn50eI/GGjOJMpMD1ZynF+ClJ1Mp1DArgAi9hmCQSuIbUJQR+1
- eJJwypCSxjUq1QbMJKrd6T1XqLrUjuIE=
-X-Received: by 2002:a92:c0c9:: with SMTP id t9mr1249320ilf.82.1594843045485;
- Wed, 15 Jul 2020 12:57:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzhtSP0yq4ayKML9DGmfzV2RBSC6N7Yiq3xuEyq3Ff5BwrL4yV/0lR0ZrN3sFOpgH1/a2Yw5ktAnKBXhJNVRoo=
-X-Received: by 2002:a92:c0c9:: with SMTP id t9mr1249299ilf.82.1594843045186;
- Wed, 15 Jul 2020 12:57:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200615225827.183062-1-joe.slater@windriver.com>
- <CAFEAcA_ZU_w7PaYFVVaW1vzGySOLaNaThVcNQFNmd_GV-hG6Qw@mail.gmail.com>
- <CAFEAcA8BtVkBbHtLt-kB-AcZnN9YWtBahKTQ0wSvHWojF9CinQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA8BtVkBbHtLt-kB-AcZnN9YWtBahKTQ0wSvHWojF9CinQ@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 15 Jul 2020 23:57:14 +0400
-Message-ID: <CAMxuvaxUqrq77_io9j6k7EU91vm7iEEBaTwLNsKd9YJ9NVR7rw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] os_find_datadir: search as in version 4.2
-To: Peter Maydell <peter.maydell@linaro.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlureau@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:01:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=8YG7sNe1WZD8WXiuBEhD8a7IbM25Es/A8eo5RXuxdNo=;
+ b=JfwR+I1PGcnktGHmD5qPm7L2G3ddPpiJrj87OULOdr0viJeODVRJ9PYCf5plW+HztB
+ egAoba7dYjPjmkUnTqq7fvEW/bt88+7d/Ao1u5cGbAEdNQOWpcQtUacYZWcQ1oos1ccv
+ 5z5DMsFIg8r+waNMO6IJw/MqT8xfSXQK+KTuH/4xCb360xpmPz9I8EDjbF9VXiKc7GA+
+ MU5QHzJS94crw0V2hY6sBu+ZFXpUqBaBH+0h9Oq42XHe/61lDS6VPS4vjTJmwOGx+7Nr
+ lQTxsb7HBGHRbWdtvurdLh4b6Ls4kkXS7ZYmGaiJ8TLS/fWibo8TztXYpKc6u72rXvEl
+ iSbw==
+X-Gm-Message-State: AOAM532b+EDrOq6FczSRtLJryw9UX/nNMeoA8bkIZa2c0NCfmwJQzbEV
+ S5Ew4ZwWgn6++LuamVPbJRAFDd4DEC97xg==
+X-Google-Smtp-Source: ABdhPJwL25qw6J5FV6yNrPuXp1P7yw95FXJt6MCT3YXHNoUxyZKEOB5Gdh9xeci1FhzUqC2oCYJ5og==
+X-Received: by 2002:a63:371d:: with SMTP id e29mr1333401pga.153.1594846286584; 
+ Wed, 15 Jul 2020 13:51:26 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ (c-73-47-162-176.hsd1.ma.comcast.net. [73.47.162.176])
+ by smtp.gmail.com with ESMTPSA id 66sm2687690pfg.63.2020.07.15.13.51.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Jul 2020 13:51:25 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] python/qemu: follow-up changes for ConsoleSocket
+Date: Wed, 15 Jul 2020 16:48:12 -0400
+Message-Id: <20200715204814.2630-1-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2607:f8b0:4864:20::531;
+ envelope-from=robert.foley@linaro.org; helo=mail-pg1-x531.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,81 +93,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Joe Slater <joe.slater@windriver.com>,
- QEMU Developers <qemu-devel@nongnu.org>, "MacLeod,
- Randy" <randy.macleod@windriver.com>
+Cc: alex.bennee@linaro.org, jsnow@redhat.com, robert.foley@linaro.org,
+ peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+This patch series introduces a few follow-up changes after the introduction of 
+ConsoleSocket.
 
-On Wed, Jul 15, 2020 at 11:37 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Tue, 16 Jun 2020 at 10:19, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >
-> > On Tue, 16 Jun 2020 at 00:00, Joe Slater <joe.slater@windriver.com> wrote:
-> > >
-> > > Always look for ../share/qemu then ../pc-bios when looking for datadir.
-> >
-> > Could you provide some more context, please? Why is this
-> > change useful; presumably we broke some setup in 5.0, but
-> > what exactly ?
-> >
-> > I'm guessing this might be a regression introduced by commit
-> > 6dd2dacedd83d12328 so I'm ccing the relevant people.
->
-> Marco, Paolo: ping? Another user has just asked me the status
-> of this as they also ran into this regression in what directories
-> we search...
+The first patch introduces cleanup changes for pylint and flake8.
 
-Thanks for the heads-up, I didn't see that bug/mail. Indeed, that
-commit assumed that either we run from a build directory or from an
-installed qemu. It seems this is hybrid approach, which I didn't know
-we supported. I'll check it.
+The second patch allows machine.py to use a single type for the console_socket,
+a ConsoleSocket.
+Since machine.py will use ConsoleSocket for both the draining and non-draining
+cases, we changed ConsoleSocket to handle the case where it does not drain the
+socket at all and essentially behaves like a socket.
 
-cheers
+Robert Foley (2):
+  python/qemu: Cleanup changes to ConsoleSocket
+  python/qemu: Change ConsoleSocket to optionally drain socket.
 
->
-> thanks
-> -- PMM
->
->
-> > > Signed-off-by: Joe Slater <joe.slater@windriver.com>
-> > > ---
-> > >  os-posix.c | 9 ++++++++-
-> > >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/os-posix.c b/os-posix.c
-> > > index 3cd52e1e70..f77da94bf6 100644
-> > > --- a/os-posix.c
-> > > +++ b/os-posix.c
-> > > @@ -82,8 +82,9 @@ void os_setup_signal_handling(void)
-> > >
-> > >  /*
-> > >   * Find a likely location for support files using the location of the binary.
-> > > + * Typically, this would be "$bindir/../share/qemu".
-> > >   * When running from the build tree this will be "$bindir/../pc-bios".
-> > > - * Otherwise, this is CONFIG_QEMU_DATADIR.
-> > > + * Otherwise, this is CONFIG_QEMU_DATADIR as constructed by configure.
-> > >   */
-> > >  char *os_find_datadir(void)
-> > >  {
-> > > @@ -93,6 +94,12 @@ char *os_find_datadir(void)
-> > >      exec_dir = qemu_get_exec_dir();
-> > >      g_return_val_if_fail(exec_dir != NULL, NULL);
-> > >
-> > > +    dir = g_build_filename(exec_dir, "..", "share", "qemu", NULL);
-> > > +    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-> > > +        return g_steal_pointer(&dir);
-> > > +    }
-> > > +    g_free(dir);  /* no autofree this time */
-> > > +
-> > >      dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
-> > >      if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-> > >          return g_steal_pointer(&dir);
-> > > --
-> > > 2.17.1
->
+ python/qemu/console_socket.py | 133 +++++++++++++++++++---------------
+ python/qemu/machine.py        |  14 ++--
+ python/qemu/pylintrc          |   2 +-
+ 3 files changed, 82 insertions(+), 67 deletions(-)
+
+-- 
+2.17.1
 
 
