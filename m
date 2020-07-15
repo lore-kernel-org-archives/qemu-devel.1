@@ -2,105 +2,87 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6E2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21939C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:12:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20107205CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:09:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20107205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D918B2065D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:12:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iyS6ApEg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D918B2065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvi5w-0004cO-Eu
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 10:09:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45070)
+	id 1jvi9P-00076B-4A
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 10:12:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jvi5I-0003qs-Sh
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:08:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31974
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jvi5H-0007rW-8e
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:08:32 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06FE2SiE105451
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 10:08:30 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 329apxmwpk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 10:08:29 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06FE3Ckl108728
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 10:08:29 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 329apxmwnt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 10:08:29 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06FE67af032500;
- Wed, 15 Jul 2020 14:08:27 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com
- (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
- by ppma04ams.nl.ibm.com with ESMTP id 329nmygqf4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 14:08:27 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06FE8Pjk50135108
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 15 Jul 2020 14:08:25 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 67EC942049;
- Wed, 15 Jul 2020 14:08:25 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C045642045;
- Wed, 15 Jul 2020 14:08:24 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 15 Jul 2020 14:08:24 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] pc-bios: s390x: Add a comment to the io and external new PSW
- setup
-Date: Wed, 15 Jul 2020 10:08:20 -0400
-Message-Id: <20200715140820.3401-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <033b0db7-7b7d-6eb0-9018-bcc342f13509@de.ibm.com>
-References: <033b0db7-7b7d-6eb0-9018-bcc342f13509@de.ibm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jvi8V-0006YM-Q9
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:11:51 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:39601)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jvi8U-0000CZ-6Z
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:11:51 -0400
+Received: by mail-oi1-x230.google.com with SMTP id w17so2298257oie.6
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 07:11:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=qa3PCUQ1OfduItsrVC4+c45iCBoyD4BdhhRaNmIb0us=;
+ b=iyS6ApEg8nepmGn6r2C1d9pfrz0aJyucsK8OC0wrPA66rEMccLD8COnuvyC5Xepyo6
+ JePdv/mBfuRUvU/FmwzQnrGi7S1dY2UlqAZbJlCHs3JvZp7PyLFXkbXnAw6yDHAPenyV
+ MUASmIGoqDKc72/4JC4laltCRrUBPehWZxtxHLTnin9kchgIEsjb7h+VG5bfnMFY1bjL
+ rK9FcDDOaaXyuujUfqdAFLq46/jpAOhYNRAbJOW3+T9wQbN2pZavte7y1jH0GsLaCCI9
+ b9Eb7hNJy4Qq6X/bYvGkRQf/ADWjBpMMQ1zkJ1RJEDHNXHrrg0s0vJ34cPE7/r/uzsHI
+ 4Bog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=qa3PCUQ1OfduItsrVC4+c45iCBoyD4BdhhRaNmIb0us=;
+ b=tlwSbX8Mv9mD1MfyZEF4XgThSsah2yq1qk4+RojOL1/MLpU8wLCondmeiPxo85U/a+
+ rvMb8+AHq8CV++mhuz3pkX+7RzfxRIupvx8qzPcj08cVVrL3Hh+jc2tjifLbGjOjWvjt
+ 24HbSAFOAfRp/fXj+G3IbAV8Y8CjGPnuTn69Q951REr0usst5oAnA6cZyrrkGcP8/KKi
+ V/ZQ3OdLK3gjSj9TvYO1ukyYA0EpoA6KRkx3nDHyl9vbTFWq8vcrbFDSnE4jXdpU79sn
+ 51CU/K8nAJYUPpgyE4Fi7hi7z2YwdvCViJp42lub8fe4yTBo8S397OhFYzGDk+TjIbFi
+ 9Q8g==
+X-Gm-Message-State: AOAM532FgPDa99fwwftRbDvq4gqHHWoxK2PCt5eh15+aEF4224FlNLki
+ tNSV06DBFW1fvXHndrgVIuXQRfTcTA+LIBEpv4E+Yg==
+X-Google-Smtp-Source: ABdhPJxORFd4uyiLd3qVnldqsnjzx6FzHWz347oczmtLazJcZmiQPVF2bXUNcr4z+F+ClDQ8xcy8/MazmG8K3FRwRi4=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr7356886oix.48.1594822308794;
+ Wed, 15 Jul 2020 07:11:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-15_11:2020-07-15,
- 2020-07-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxlogscore=944
- malwarescore=0 spamscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0
- phishscore=0 suspectscore=1 mlxscore=0 priorityscore=1501 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007150111
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 09:18:04
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <CA+aXn+EkkyiXmKpNhbggy0pjKVpiHxa+TUqEnZLB4v_D=T+7tA@mail.gmail.com>
+ <CA+aXn+HHXAmT6Ljj2tpovGAYSurHKSdtUL3y-89t31B0e7jpsA@mail.gmail.com>
+ <adb25c78-2edc-115a-5264-ca9f97864ec7@redhat.com>
+ <87365t18mp.fsf@dusky.pond.sub.org>
+ <CA+aXn+Guvt34PDD=N3FsD5w1C-aDXZ7gS8H_AZN-JEM8j8wBiQ@mail.gmail.com>
+In-Reply-To: <CA+aXn+Guvt34PDD=N3FsD5w1C-aDXZ7gS8H_AZN-JEM8j8wBiQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 15 Jul 2020 15:11:37 +0100
+Message-ID: <CAFEAcA-P723rFSv9nn6eSbzRuSwMzHDxDPTAR-68-i_AZsDUaQ@mail.gmail.com>
+Subject: Re: sysbus_create_simple Vs qdev_create
+To: Pratik Parvati <pratikp@vayavyalabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::230;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x230.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,51 +96,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com,
- david@redhat.com
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Normally they don't need to be set up before waiting for an interrupt
-but are set up on boot. The BIOS however might overwrite the lowcore
-(and hence the PSWs) when loading a blob into memory and therefore
-needs to set up those PSWs more often.
+On Wed, 15 Jul 2020 at 14:59, Pratik Parvati <pratikp@vayavyalabs.com> wrote:
+> Can you please explain to me in brief on buses and device hierarchies (i.e. BusState and DeviceState) and how they are related to each other? As I can see, the DeviceState class inherits the BusState
+>
+> struct DeviceState {
+>     /*< private >*/
+>     Object parent_obj;
+>     /*< public >*/
+>
+>     const char *id;
+>     char *canonical_path;
+>     bool realized;
+>     bool pending_deleted_event;
+>     QemuOpts *opts;
+>     int hotplugged;
+>     bool allow_unplug_during_migration;
+>     BusState *parent_bus; \\ BusState is inherited here
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- pc-bios/s390-ccw/start.S | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+This is not inheritance. The DeviceState has-a BusState parent_bus.
+Inheritance is the parent_obj at the top: a DeviceState is-a
+Object.
 
-diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
-index 01c4c21b26..b0fcb918cc 100644
---- a/pc-bios/s390-ccw/start.S
-+++ b/pc-bios/s390-ccw/start.S
-@@ -64,7 +64,10 @@ consume_sclp_int:
-         stctg   %c0,%c0,0(%r15)
-         oi      6(%r15),0x2
-         lctlg   %c0,%c0,0(%r15)
--        /* prepare external call handler */
-+        /*
-+         * Prepare external new PSW as it might have been overwritten
-+         * by a loaded blob
-+         */
-         larl %r1, external_new_code
-         stg %r1, 0x1b8
-         larl %r1, external_new_mask
-@@ -84,7 +87,10 @@ consume_io_int:
-         stctg %c6,%c6,0(%r15)
-         oi    4(%r15), 0xff
-         lctlg %c6,%c6,0(%r15)
--        /* prepare i/o call handler */
-+        /*
-+         * Prepare i/o new PSW as it might have been overwritten
-+         * by a loaded blob
-+         */
-         larl  %r1, io_new_code
-         stg   %r1, 0x1f8
-         larl  %r1, io_new_mask
--- 
-2.25.1
+>     QLIST_HEAD(, NamedGPIOList) gpios;
+>     QLIST_HEAD(, BusState) child_bus;
+>     int num_child_bus;
+>     int instance_id_alias;
+>     int alias_required_for_version;
+>     ResettableState reset;
+> };
+>
+> and BusState, in turn, inherits the DeviceState as
+>
+> /**
+>  * BusState:
+>  * @hotplug_handler: link to a hotplug handler associated with bus.
+>  * @reset: ResettableState for the bus; handled by Resettable interface.
+>  */
+> struct BusState {
+>     Object obj;
+>     DeviceState *parent; \\ DeviceState is inherited here
 
+This isn't inheritance either. A BusState is-a
+Object (which is the inheritance for this class),
+and it has-a DeviceState parent.
+
+Anyway, the two form a tree: every Device may
+be on exactly one Bus (that's the parent_bus link),
+and may have one or more child Buses (that's the
+child_bus list). Every Bus is owned by exactly
+one Device (its parent in the tree), may have
+multiple siblings (if its parent has more than
+one child bus), and has children (any Devices
+which are plugged into the bus). These parent-and-child
+links form the qdev or qbus tree. Note that this is
+an entirely separate thing from the QOM hierarchy
+of parent-and-child object relationships. It is
+also entirely separate from the class hierarchy
+of classes and subclasses.
+
+thanks
+-- PMM
 
