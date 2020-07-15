@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6670C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 18:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD03C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 18:03:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97A9320656
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 18:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D88820656
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 18:03:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M+cQHHD1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A9320656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KjWHh+Gc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D88820656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvljP-00049p-SB
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 14:02:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55874)
+	id 1jvlkt-0005Ll-DO
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 14:03:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvlgF-0001DT-1H
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 13:58:55 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30146
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvlgK-0001FQ-Nx
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 13:59:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60994
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvlgD-0005iS-0q
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 13:58:54 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvlgI-0005jD-J1
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 13:59:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594835932;
+ s=mimecast20190719; t=1594835937;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iQ244hAoGi3IzTNV0EQ3THzoSll/6gv8HvDdV/c+20I=;
- b=M+cQHHD1AnwtowOMRwaQj+EszFFtQmLsAUDsBAYz9DzuI7SVkJOZ20dkxqE3lb2ZqkCSp8
- RT6MESHxmrcoI4Qkzr7crQ0cOlb1oMTMst/yWrZhFzGfXb4CXjQgGOJRwq200yq1XC0FiJ
- /j/Yk14B/aFTTNcpgj61zabxPKsGSic=
+ bh=GX+Pu6ihdI/d+64Mnf3A4R4YJSyS5RVjuFow1cl3BQ0=;
+ b=KjWHh+GcWpyb5JMKJGJIPM0cY5nqyOCt33/vnbit5nFyDOeR7u7XUPe5ZhOtQVeZQ0TcrN
+ LMs6zD2vywVcXXCnMXo+4KZGHYKKU2FgZtJbgAAc+vya2eMn3zFl4S0bnDkWToHQAV4ePL
+ wSix4TZS1y9ncr1Q/K3dnApBPnxzbxw=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-iC2Wp-ZMMNGFVJNvvIgfDQ-1; Wed, 15 Jul 2020 13:58:49 -0400
-X-MC-Unique: iC2Wp-ZMMNGFVJNvvIgfDQ-1
-Received: by mail-wr1-f70.google.com with SMTP id d11so1836721wrw.12
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 10:58:48 -0700 (PDT)
+ us-mta-303-h985qMByPNK4CJMb3ZnIAQ-1; Wed, 15 Jul 2020 13:58:53 -0400
+X-MC-Unique: h985qMByPNK4CJMb3ZnIAQ-1
+Received: by mail-wr1-f70.google.com with SMTP id b14so1851956wrp.0
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 10:58:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=iQ244hAoGi3IzTNV0EQ3THzoSll/6gv8HvDdV/c+20I=;
- b=eiZO5xNG20ZbvDMznnyDXcrYycLXT7mFhwH/E2dxpQU5HNZv8VQ2kO7sSaoFwrDWKB
- I06MFu68zJSv8B3rLYnWpilfhutqbkDnGPWxQYEvWJNeIEJBbbCe4JjnDlUAvD4T8Kt4
- u42Wf4d8X92poO7Qoxvp65A03wY5g2bfPgTAMVxErxyGjsWu7RTXsKR/DfsBxUIah2Pl
- bd1tU3NhK5equy4sm3yIVpj5+26JMvme2nRkdRXctaA/lm3sL7AapUq9GeU7v1gb6Fkx
- oWw7hhbXxG1xlj/f1CWKtxG/Wx/BXXsnpa15mqt1aoW+LPrDe3n/47PgF8Ij7esv9J++
- FWUw==
-X-Gm-Message-State: AOAM533ng0i2Yw3SFPgBOpyXJM3NoxiCwZlc3nUZTq+BGPK/+6vQRdfy
- b3WL2DHippe2IRBJJSJ0MUgzp/ju+iVQLCfJu8wt2Yxw8ApXsM/uG0godJBEVIwoo/mTvinvUxi
- pYpKclefn2/AOQ9I=
-X-Received: by 2002:adf:e684:: with SMTP id r4mr589109wrm.68.1594835927507;
- Wed, 15 Jul 2020 10:58:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxgtfI0B57HqY3KN+gYhw8igk1TciTa0cEJZVEIhF87GAKjFLQsvm38a98uUXsW+H1iccQ8VA==
-X-Received: by 2002:adf:e684:: with SMTP id r4mr589089wrm.68.1594835927244;
- Wed, 15 Jul 2020 10:58:47 -0700 (PDT)
+ bh=GX+Pu6ihdI/d+64Mnf3A4R4YJSyS5RVjuFow1cl3BQ0=;
+ b=smvK9NzO2HMzB8uZaP7bLNrpg3eXwWTCYdD3AxUSNT5qTYQJ25zdLHNF5q27O45T22
+ /jtQvkJJ6Xs10SS+J6HXRO9baYtJ+OX2EJm2e/A40V2bccWCG5J2lezXYbJlIQJzxBEC
+ xhP01UmuX1U6uEkQE7qWGnLtbGY+YEANzrhtSlPmhLsUG3ajXwRINFvzsy0iEojZW8c9
+ p0WubKERlaRT64CUFfq9kyQ7aBIItUwYZ/9KrFumqxrDof2euqa9WRSBtoydXuURH7uA
+ 68E2Nli6oQRsRt+arF7GQB+jXi+ji6i4DeBB/qTmlFHbzNA6c/A/au15jYaxSpUbhBZm
+ J9tQ==
+X-Gm-Message-State: AOAM530nh3G/JcABE8Jz7LxXYmcDC54LvTdjiq2csUdJK4eV0R22ArxA
+ epltRJCuQWYyoOLZzyyqtcnJaPXArVhynvUHr7Mh4faG9/vy2+VcPgdqg/FR2eFa0ml6fxXCc2n
+ +DFL9WhYf3B4PMgg=
+X-Received: by 2002:adf:82a1:: with SMTP id 30mr609520wrc.210.1594835932403;
+ Wed, 15 Jul 2020 10:58:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzIVDI2Un16qgSYjlCxH4EP4ADqAA3AXmUk0lb3q51HUTWjkxbzBIIt5cYGHvwzbikcb5FeRg==
+X-Received: by 2002:adf:82a1:: with SMTP id 30mr609498wrc.210.1594835932110;
+ Wed, 15 Jul 2020 10:58:52 -0700 (PDT)
 Received: from x1w.redhat.com (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id v15sm4205562wmh.24.2020.07.15.10.58.46
+ by smtp.gmail.com with ESMTPSA id m4sm4246164wmi.48.2020.07.15.10.58.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 15 Jul 2020 10:58:46 -0700 (PDT)
+ Wed, 15 Jul 2020 10:58:51 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH-for-5.2 2/5] qom: Split ObjectPropertyAccessor as
- ObjectProperty[Get/Set]
-Date: Wed, 15 Jul 2020 19:58:32 +0200
-Message-Id: <20200715175835.27744-3-philmd@redhat.com>
+Subject: [PATCH-for-5.2 3/5] qom: Use g_autofree in ObjectPropertyGet functions
+Date: Wed, 15 Jul 2020 19:58:33 +0200
+Message-Id: <20200715175835.27744-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200715175835.27744-1-philmd@redhat.com>
 References: <20200715175835.27744-1-philmd@redhat.com>
@@ -88,17 +87,17 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:01:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,265 +118,189 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To make refactors easier, split the common ObjectPropertyAccessor
-type definition into ObjectPropertyGet() and ObjectPropertySet().
+By using g_autofree we make it easier to have ObjectPropertyGet
+methods return a value (see next commit).
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/qdev-core.h |  4 ++--
- include/qom/object.h   | 48 ++++++++++++++++++++++++++++--------------
- hw/ppc/spapr_caps.c    |  4 ++--
- qom/object.c           | 44 +++++++++++++++++++-------------------
- 4 files changed, 58 insertions(+), 42 deletions(-)
+ backends/tpm/tpm_util.c          |  3 +--
+ hw/block/xen-block.c             |  3 +--
+ hw/core/qdev-properties-system.c | 13 +++++--------
+ hw/mem/nvdimm.c                  |  3 +--
+ hw/ppc/spapr_caps.c              |  3 +--
+ qom/object.c                     |  6 ++----
+ 6 files changed, 11 insertions(+), 20 deletions(-)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index fe78073c70..e2930beab8 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -287,8 +287,8 @@ struct PropertyInfo {
-     int (*print)(DeviceState *dev, Property *prop, char *dest, size_t len);
-     void (*set_default_value)(ObjectProperty *op, const Property *prop);
-     void (*create)(ObjectClass *oc, Property *prop);
--    ObjectPropertyAccessor *get;
--    ObjectPropertyAccessor *set;
-+    ObjectPropertyGet *get;
-+    ObjectPropertySet *set;
-     ObjectPropertyRelease *release;
- };
+diff --git a/backends/tpm/tpm_util.c b/backends/tpm/tpm_util.c
+index b58d298c1a..235b006498 100644
+--- a/backends/tpm/tpm_util.c
++++ b/backends/tpm/tpm_util.c
+@@ -37,11 +37,10 @@ static void get_tpm(Object *obj, Visitor *v, const char *name, void *opaque,
+ {
+     DeviceState *dev = DEVICE(obj);
+     TPMBackend **be = qdev_get_prop_ptr(dev, opaque);
+-    char *p;
++    g_autofree char *p;
  
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 79c8f838b6..e9496ba970 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -310,20 +310,36 @@ typedef struct InterfaceInfo InterfaceInfo;
- typedef struct ObjectProperty ObjectProperty;
+     p = g_strdup(*be ? (*be)->id : "");
+     visit_type_str(v, name, &p, errp);
+-    g_free(p);
+ }
  
- /**
-- * ObjectPropertyAccessor:
-+ * ObjectPropertySet:
-  * @obj: the object that owns the property
-  * @v: the visitor that contains the property data
-  * @name: the name of the property
-  * @opaque: the object property opaque
-- * @errp: a pointer to an Error that is filled if getting/setting fails.
-+ * @errp: a pointer to an Error that is filled if setting fails.
-  *
-- * Called when trying to get/set a property.
-+ * Called when trying to set a property.
-  */
--typedef void (ObjectPropertyAccessor)(Object *obj,
--                                      Visitor *v,
--                                      const char *name,
--                                      void *opaque,
--                                      Error **errp);
-+typedef void (ObjectPropertySet)(Object *obj,
-+                                 Visitor *v,
-+                                 const char *name,
-+                                 void *opaque,
-+                                 Error **errp);
-+
-+/**
-+ * ObjectPropertyGet:
-+ * @obj: the object that owns the property
-+ * @v: the visitor that contains the property data
-+ * @name: the name of the property
-+ * @opaque: the object property opaque
-+ * @errp: a pointer to an Error that is filled if getting fails.
-+ *
-+ * Called when trying to get a property.
-+ */
-+typedef void (ObjectPropertyGet)(Object *obj,
-+                                 Visitor *v,
-+                                 const char *name,
-+                                 void *opaque,
-+                                 Error **errp);
+ static void set_tpm(Object *obj, Visitor *v, const char *name, void *opaque,
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index 8a7a3f5452..8c23b895d9 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -338,7 +338,7 @@ static void xen_block_get_vdev(Object *obj, Visitor *v, const char *name,
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     XenBlockVdev *vdev = qdev_get_prop_ptr(dev, prop);
+-    char *str;
++    g_autofree char *str = NULL;
  
- /**
-  * ObjectPropertyResolve:
-@@ -370,8 +386,8 @@ struct ObjectProperty
-     char *name;
-     char *type;
-     char *description;
--    ObjectPropertyAccessor *get;
--    ObjectPropertyAccessor *set;
-+    ObjectPropertyGet *get;
-+    ObjectPropertySet *set;
-     ObjectPropertyResolve *resolve;
-     ObjectPropertyRelease *release;
-     ObjectPropertyInit *init;
-@@ -1071,8 +1087,8 @@ void object_unref(Object *obj);
-  */
- ObjectProperty *object_property_try_add(Object *obj, const char *name,
-                                         const char *type,
--                                        ObjectPropertyAccessor *get,
--                                        ObjectPropertyAccessor *set,
-+                                        ObjectPropertyGet *get,
-+                                        ObjectPropertySet *set,
-                                         ObjectPropertyRelease *release,
-                                         void *opaque, Error **errp);
+     switch (vdev->type) {
+     case XEN_BLOCK_VDEV_TYPE_DP:
+@@ -366,7 +366,6 @@ static void xen_block_get_vdev(Object *obj, Visitor *v, const char *name,
+     }
  
-@@ -1083,8 +1099,8 @@ ObjectProperty *object_property_try_add(Object *obj, const char *name,
-  */
- ObjectProperty *object_property_add(Object *obj, const char *name,
-                                     const char *type,
--                                    ObjectPropertyAccessor *get,
--                                    ObjectPropertyAccessor *set,
-+                                    ObjectPropertyGet *get,
-+                                    ObjectPropertySet *set,
-                                     ObjectPropertyRelease *release,
-                                     void *opaque);
+     visit_type_str(v, name, &str, errp);
+-    g_free(str);
+ }
  
-@@ -1092,8 +1108,8 @@ void object_property_del(Object *obj, const char *name);
+ static int vbd_name_to_disk(const char *name, const char **endp,
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index 3e4f16fc21..28682eda31 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -56,7 +56,7 @@ static void get_drive(Object *obj, Visitor *v, const char *name, void *opaque,
+     Property *prop = opaque;
+     void **ptr = qdev_get_prop_ptr(dev, prop);
+     const char *value;
+-    char *p;
++    g_autofree char *p;
  
- ObjectProperty *object_class_property_add(ObjectClass *klass, const char *name,
-                                           const char *type,
--                                          ObjectPropertyAccessor *get,
--                                          ObjectPropertyAccessor *set,
-+                                          ObjectPropertyGet *get,
-+                                          ObjectPropertySet *set,
-                                           ObjectPropertyRelease *release,
-                                           void *opaque);
+     if (*ptr) {
+         value = blk_name(*ptr);
+@@ -72,7 +72,6 @@ static void get_drive(Object *obj, Visitor *v, const char *name, void *opaque,
+ 
+     p = g_strdup(value);
+     visit_type_str(v, name, &p, errp);
+-    g_free(p);
+ }
+ 
+ static void set_drive_helper(Object *obj, Visitor *v, const char *name,
+@@ -213,11 +212,10 @@ static void get_chr(Object *obj, Visitor *v, const char *name, void *opaque,
+ {
+     DeviceState *dev = DEVICE(obj);
+     CharBackend *be = qdev_get_prop_ptr(dev, opaque);
+-    char *p;
++    g_autofree char *p;
+ 
+     p = g_strdup(be->chr && be->chr->label ? be->chr->label : "");
+     visit_type_str(v, name, &p, errp);
+-    g_free(p);
+ }
+ 
+ static void set_chr(Object *obj, Visitor *v, const char *name, void *opaque,
+@@ -287,10 +285,10 @@ static void get_netdev(Object *obj, Visitor *v, const char *name,
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     NICPeers *peers_ptr = qdev_get_prop_ptr(dev, prop);
+-    char *p = g_strdup(peers_ptr->ncs[0] ? peers_ptr->ncs[0]->name : "");
++    g_autofree char *p;
+ 
++    p = g_strdup(peers_ptr->ncs[0] ? peers_ptr->ncs[0]->name : "");
+     visit_type_str(v, name, &p, errp);
+-    g_free(p);
+ }
+ 
+ static void set_netdev(Object *obj, Visitor *v, const char *name,
+@@ -367,10 +365,9 @@ static void get_audiodev(Object *obj, Visitor *v, const char* name,
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     QEMUSoundCard *card = qdev_get_prop_ptr(dev, prop);
+-    char *p = g_strdup(audio_get_id(card));
++    g_autofree char *p = g_strdup(audio_get_id(card));
+ 
+     visit_type_str(v, name, &p, errp);
+-    g_free(p);
+ }
+ 
+ static void set_audiodev(Object *obj, Visitor *v, const char* name,
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index d0d6e553cf..b55de7dbe1 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -69,12 +69,11 @@ static void nvdimm_get_uuid(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
+ {
+     NVDIMMDevice *nvdimm = NVDIMM(obj);
+-    char *value = NULL;
++    g_autofree char *value = NULL;
+ 
+     value = qemu_uuid_unparse_strdup(&nvdimm->uuid);
+ 
+     visit_type_str(v, name, &value, errp);
+-    g_free(value);
+ }
+ 
  
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 3225fc5a2e..7558db0c8b 100644
+index 7558db0c8b..cbc09b24b6 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -58,8 +58,8 @@ typedef struct SpaprCapabilityInfo {
-     int index;
+@@ -101,7 +101,7 @@ static void  spapr_cap_get_string(Object *obj, Visitor *v, const char *name,
+ {
+     SpaprCapabilityInfo *cap = opaque;
+     SpaprMachineState *spapr = SPAPR_MACHINE(obj);
+-    char *val = NULL;
++    g_autofree char *val = NULL;
+     uint8_t value = spapr_get_cap(spapr, cap->index);
  
-     /* Getter and Setter Function Pointers */
--    ObjectPropertyAccessor *get;
--    ObjectPropertyAccessor *set;
-+    ObjectPropertyGet *get;
-+    ObjectPropertySet *set;
-     const char *type;
-     /* Possible values if this is a custom string type */
-     SpaprCapPossible *possible;
+     if (value >= cap->possible->num) {
+@@ -112,7 +112,6 @@ static void  spapr_cap_get_string(Object *obj, Visitor *v, const char *name,
+     val = g_strdup(cap->possible->vals[value]);
+ 
+     visit_type_str(v, name, &val, errp);
+-    g_free(val);
+ }
+ 
+ static void spapr_cap_set_string(Object *obj, Visitor *v, const char *name,
 diff --git a/qom/object.c b/qom/object.c
-index 76f5f75239..e5324f2af7 100644
+index e5324f2af7..7c13117f7d 100644
 --- a/qom/object.c
 +++ b/qom/object.c
-@@ -1148,8 +1148,8 @@ void object_unref(Object *obj)
+@@ -1649,11 +1649,10 @@ static void object_get_child_property(Object *obj, Visitor *v,
+                                       Error **errp)
+ {
+     Object *child = opaque;
+-    char *path;
++    g_autofree char *path;
  
- ObjectProperty *
- object_property_try_add(Object *obj, const char *name, const char *type,
--                        ObjectPropertyAccessor *get,
--                        ObjectPropertyAccessor *set,
-+                        ObjectPropertyGet *get,
-+                        ObjectPropertySet *set,
-                         ObjectPropertyRelease *release,
-                         void *opaque, Error **errp)
- {
-@@ -1198,8 +1198,8 @@ object_property_try_add(Object *obj, const char *name, const char *type,
+     path = object_get_canonical_path(child);
+     visit_type_str(v, name, &path, errp);
+-    g_free(path);
+ }
  
- ObjectProperty *
- object_property_add(Object *obj, const char *name, const char *type,
--                    ObjectPropertyAccessor *get,
--                    ObjectPropertyAccessor *set,
-+                    ObjectPropertyGet *get,
-+                    ObjectPropertySet *set,
-                     ObjectPropertyRelease *release,
-                     void *opaque)
+ static Object *object_resolve_child_property(Object *parent, void *opaque,
+@@ -2099,7 +2098,7 @@ static void property_get_str(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
  {
-@@ -1211,8 +1211,8 @@ ObjectProperty *
- object_class_property_add(ObjectClass *klass,
-                           const char *name,
-                           const char *type,
--                          ObjectPropertyAccessor *get,
--                          ObjectPropertyAccessor *set,
-+                          ObjectPropertyGet *get,
-+                          ObjectPropertySet *set,
-                           ObjectPropertyRelease *release,
-                           void *opaque)
- {
-@@ -2486,8 +2486,8 @@ object_property_add_uint8_ptr(Object *obj, const char *name,
-                               const uint8_t *v,
-                               ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
+     StringProperty *prop = opaque;
+-    char *value;
++    g_autofree char *value = NULL;
+     Error *err = NULL;
  
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint8_ptr;
-@@ -2506,8 +2506,8 @@ object_class_property_add_uint8_ptr(ObjectClass *klass, const char *name,
-                                     const uint8_t *v,
-                                     ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
+     value = prop->get(obj, &err);
+@@ -2109,7 +2108,6 @@ static void property_get_str(Object *obj, Visitor *v, const char *name,
+     }
  
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint8_ptr;
-@@ -2526,8 +2526,8 @@ object_property_add_uint16_ptr(Object *obj, const char *name,
-                                const uint16_t *v,
-                                ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
+     visit_type_str(v, name, &value, errp);
+-    g_free(value);
+ }
  
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint16_ptr;
-@@ -2546,8 +2546,8 @@ object_class_property_add_uint16_ptr(ObjectClass *klass, const char *name,
-                                      const uint16_t *v,
-                                      ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
- 
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint16_ptr;
-@@ -2566,8 +2566,8 @@ object_property_add_uint32_ptr(Object *obj, const char *name,
-                                const uint32_t *v,
-                                ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
- 
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint32_ptr;
-@@ -2586,8 +2586,8 @@ object_class_property_add_uint32_ptr(ObjectClass *klass, const char *name,
-                                      const uint32_t *v,
-                                      ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
- 
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint32_ptr;
-@@ -2606,8 +2606,8 @@ object_property_add_uint64_ptr(Object *obj, const char *name,
-                                const uint64_t *v,
-                                ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
- 
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint64_ptr;
-@@ -2626,8 +2626,8 @@ object_class_property_add_uint64_ptr(ObjectClass *klass, const char *name,
-                                      const uint64_t *v,
-                                      ObjectPropertyFlags flags)
- {
--    ObjectPropertyAccessor *getter = NULL;
--    ObjectPropertyAccessor *setter = NULL;
-+    ObjectPropertyGet *getter = NULL;
-+    ObjectPropertySet *setter = NULL;
- 
-     if ((flags & OBJ_PROP_FLAG_READ) == OBJ_PROP_FLAG_READ) {
-         getter = property_get_uint64_ptr;
+ static void property_set_str(Object *obj, Visitor *v, const char *name,
 -- 
 2.21.3
 
