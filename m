@@ -2,77 +2,81 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DEEAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80B1C433EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46C3E206D5
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 692AF20658
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:08:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fE+/HjE4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46C3E206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhYt0dKK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 692AF20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jviwc-0006Eg-5Y
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 11:03:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35056)
+	id 1jvj0s-0004UB-N9
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 11:08:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jvivG-0004qv-3G
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:02:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34877
- helo=us-smtp-1.mimecast.com)
+ id 1jvivT-00057R-Hu
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:02:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50855
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jvivD-0004YG-6z
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:02:13 -0400
+ id 1jvivR-0004eD-S5
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:02:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594825329;
+ s=mimecast20190719; t=1594825345;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Uj+wU0mt1sV/8iDUjmjhd8DVIOts9z0ermRz2cyLVM4=;
- b=fE+/HjE4q3TbW6N5/TsgFZcaT7iyWWm+myJ2UTYdhOXIU78V1r2Kq/gZ+Bq5osAKM+V8PJ
- jmWVPEKGvX9r2XpLaNBPWGymM4rVjwtItsYZ5bIa10d+XAQB7UmiiVM5nPLmCEepxMpxP1
- vDCdpNoevYtYAd0Hpa9qB52zWo33w08=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+utk7vdtsJuSzO2tlgUo6VEKGiMN7Q7PQ8wDq9ljiog=;
+ b=dhYt0dKKiL1+7+tHnIGh3Q+pclJ26xYpXhMlljgEKIL3+pRG2uDqIM2pQc5nyambmG28Yn
+ QuTzO+d+FxxJXBYDepiO0vYLQ8JT4qf5KfL6R7CTOIrm2tAQkfWjw/XtNwz+er/x1hLqhg
+ +M4/h1O5+lXTp25GB52GlKGfGG4lag8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-ymEWgwn-Otigy6_o9e8icw-1; Wed, 15 Jul 2020 11:02:06 -0400
-X-MC-Unique: ymEWgwn-Otigy6_o9e8icw-1
+ us-mta-126-_DaDs8z-NkaQUDmSs3IxlQ-1; Wed, 15 Jul 2020 11:02:23 -0400
+X-MC-Unique: _DaDs8z-NkaQUDmSs3IxlQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F264F8027FB;
- Wed, 15 Jul 2020 15:02:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 661FF1005273;
+ Wed, 15 Jul 2020 15:02:21 +0000 (UTC)
 Received: from starship.redhat.com (unknown [10.35.206.178])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7FDF710D6;
- Wed, 15 Jul 2020 15:02:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40DA4710C8;
+ Wed, 15 Jul 2020 15:02:19 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/7] Fix scsi devices plug/unplug races w.r.t virtio-scsi
- iothread
-Date: Wed, 15 Jul 2020 18:01:52 +0300
-Message-Id: <20200715150159.95050-1-mlevitsk@redhat.com>
+Subject: [PATCH v3 5/7] virtio-scsi: don't touch scsi devices that are not yet
+ realized or about to be un-realized
+Date: Wed, 15 Jul 2020 18:01:57 +0300
+Message-Id: <20200715150159.95050-6-mlevitsk@redhat.com>
+In-Reply-To: <20200715150159.95050-1-mlevitsk@redhat.com>
+References: <20200715150159.95050-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:05
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -96,108 +100,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+ Maxim Levitsky <mlevitsk@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!=0D
-=0D
-This is a patch series that is a result of my discussion with Paulo on=0D
-how to correctly fix the root cause of the BZ #1812399.=0D
-=0D
-The root cause of this bug is the fact that IO thread is running mostly=0D
-unlocked versus main thread on which device hotplug is done.=0D
-=0D
-qdev_device_add first creates the device object, then places it on the bus,=
-=0D
-and only then realizes it.=0D
-=0D
-However some drivers and currently only virtio-scsi enumerate its child bus=
-=0D
-devices on each request that is received from the guest and that can happen=
- on the IO=0D
-thread.=0D
-=0D
-Thus we have a window when new device is on the bus but not realized and ca=
-n be accessed=0D
-by the virtio-scsi driver in that state.=0D
-=0D
-Fix that by doing two things:=0D
-=0D
-1. Add partial RCU protection to the list of a bus's child devices.=0D
-This allows the scsi IO thread to safely enumerate the child devices=0D
-while it races with the hotplug placing the device on the bus.=0D
-=0D
-2. Make the virtio-scsi driver check .realized property of the scsi device=
-=0D
-and avoid touching the device if it isn't=0D
-=0D
-Note that in the particular bug report the issue wasn't a race but rather d=
-ue=0D
-to combination of things, the .realize code in the middle managed to trigge=
-r IO on the virtqueue=0D
-which caused the virtio-scsi driver to access the half realized device. How=
-ever=0D
-since this can happen as well with real IO thread, this patch series was do=
-ne,=0D
-which fixes this as well.=0D
-=0D
-Changes from V1:=0D
-  * Patch 2 is new, as suggested by Stefan, added drain_call_rcu() to fix t=
-he failing unit test,=0D
-    make check pass now=0D
-=0D
-  * Patches 6,7 are new as well: I added scsi_device_get as suggested by St=
-efan as well, although=0D
-    this is more a refactoring that anything else as it doesn't solve=0D
-    an existing race.=0D
-=0D
-  * Addressed most of the review feedback from V1=0D
-    - still need to decide if we need QTAILQ_FOREACH_WITH_RCU_READ_LOCK=0D
-=0D
-Changes from V2:=0D
-=0D
-  * No longer RFC=0D
-  * Addressed most of the feedback from Stefan=0D
-  * Fixed reference count leak in patch 7 when device is about to be unreal=
-ized=0D
-  * Better testing=0D
-=0D
-This series was tested by adding a virtio-scsi drive with iothread,=0D
-then running fio stress job in the guest in a loop, and then adding/removin=
-g=0D
-the scsi drive on the host in the loop.=0D
-This test was failing usually on 1st iteration withouth this patch series,=
-=0D
-and now it seems to work smoothly.=0D
-=0D
-Best regards,=0D
-=09Maxim Levitsky=0D
-=0D
-Maxim Levitsky (7):=0D
-  scsi/scsi_bus: switch search direction in scsi_device_find=0D
-  Implement drain_call_rcu and use it in hmp_device_del=0D
-  device-core: use RCU for list of childs of a bus=0D
-  device-core: use atomic_set on .realized property=0D
-  virtio-scsi: don't touch scsi devices that are not yet realized or=0D
-    about to be un-realized=0D
-  scsi: Add scsi_device_get=0D
-  virtio-scsi: use scsi_device_get=0D
-=0D
- hw/core/bus.c          | 28 +++++++++++++--------=0D
- hw/core/qdev.c         | 56 +++++++++++++++++++++++++++++++-----------=0D
- hw/scsi/scsi-bus.c     | 48 +++++++++++++++++++++++++++++++-----=0D
- hw/scsi/virtio-scsi.c  | 47 ++++++++++++++++++++++++++++-------=0D
- include/hw/qdev-core.h | 11 +++++++++=0D
- include/hw/scsi/scsi.h |  2 ++=0D
- include/qemu/rcu.h     |  1 +=0D
- qdev-monitor.c         | 22 +++++++++++++++++=0D
- util/rcu.c             | 55 +++++++++++++++++++++++++++++++++++++++++=0D
- 9 files changed, 230 insertions(+), 40 deletions(-)=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1812399
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/scsi/virtio-scsi.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index d3cfc8dfb6..18952e0f1c 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -35,13 +35,30 @@ static inline int virtio_scsi_get_lun(uint8_t *lun)
+ 
+ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
+ {
++    SCSIDevice *device = NULL;
++
+     if (lun[0] != 1) {
+         return NULL;
+     }
+     if (lun[2] != 0 && !(lun[2] >= 0x40 && lun[2] < 0x80)) {
+         return NULL;
+     }
+-    return scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
++
++    device = scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
++
++    /*
++     * This function might run on the IO thread and we might race against
++     * main thread hot-plugging the device.
++     *
++     * We assume that as soon as .realized is set to true we can let
++     * the user access the device.
++     */
++
++    if (!device || !atomic_load_acquire(&device->qdev.realized)) {
++        return NULL;
++    }
++
++    return device;
+ }
+ 
+ void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
+-- 
+2.26.2
 
 
