@@ -2,76 +2,75 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5331C433E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1284AC433E6
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 812B120657
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:54:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D431A20657
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:54:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eyJ6+ZhV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 812B120657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Av7d6JyT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D431A20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvhro-00044t-Q5
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40546)
+	id 1jvhrr-0004CY-2p
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:54:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvhqq-0002np-Ej
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60136
+ id 1jvhqr-0002nx-T1
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45682
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvhqo-0005Jf-Tr
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:36 -0400
+ id 1jvhqp-0005Ju-IF
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:53:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594821213;
+ s=mimecast20190719; t=1594821214;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=XglhuBI3Z6I92UoY4R/O53JynhwzokF4jeojs1T2xzM=;
- b=eyJ6+ZhVUxqlLSghx02Yg/h90qF1pVEH/3Ktm4c2ZjvOk2bHFw/zgd7dILS7iZzPlGXzah
- wv/hH4vXebQ3Se7eXYDYXE5BoYCXIgk4EL+hdsFd9Qs141KXZeM64lCZ4DHItPjPCsqV48
- YnY9IF0R6w8uAOAA1ySrkq3bIgbTecQ=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=w85ALhbZJIWqBZs4TodH+Ktr0CFpkx0wPRvmrKgX/54=;
+ b=Av7d6JyTL7B+SSBqGftDVotZ9Rs6RPzvuoPX1zio8V1LbrCG+EtvpCX/g/lMmsVE4ss8eH
+ oQkDTVDnsK41MtZadgUxeNjie7JJ6q3pTKdAWQ8qLuZNaCQXyc0wOoDjS3hpffpN+t6Z+H
+ dlNMJmWrW+ktundD3Ew3z6lRpr911oU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-sAqNsp_qPU2kW-xuEMJ8iA-1; Wed, 15 Jul 2020 09:53:25 -0400
-X-MC-Unique: sAqNsp_qPU2kW-xuEMJ8iA-1
+ us-mta-507-mN0sqVA3PWavkmrTMDebzA-1; Wed, 15 Jul 2020 09:53:32 -0400
+X-MC-Unique: mN0sqVA3PWavkmrTMDebzA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AA09E91C;
- Wed, 15 Jul 2020 13:53:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81650E91C;
+ Wed, 15 Jul 2020 13:53:31 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-28.pek2.redhat.com
  [10.72.12.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A7A4661780;
- Wed, 15 Jul 2020 13:53:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B1FB5C57D;
+ Wed, 15 Jul 2020 13:53:25 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 0/7] Net patches
-Date: Wed, 15 Jul 2020 21:53:14 +0800
-Message-Id: <1594821201-3708-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
+Subject: [PULL 1/7] virtio-net: fix removal of failover device
+Date: Wed, 15 Jul 2020 21:53:15 +0800
+Message-Id: <1594821201-3708-2-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1594821201-3708-1-git-send-email-jasowang@redhat.com>
+References: <1594821201-3708-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 05:07:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -92,60 +91,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 673205379fb499d2b72f2985b47ec7114282f5fe:
+From: Juan Quintela <quintela@redhat.com>
 
-  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/python-next-20200714' into staging (2020-07-15 13:04:27 +0100)
+If you have a networking device and its virtio failover device, and
+you remove them in this order:
+- virtio device
+- the real device
 
-are available in the git repository at:
+You get qemu crash.
+See bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1820120
 
-  https://github.com/jasowang/qemu.git tags/net-pull-request
+Bug exist on qemu 4.2 and 5.0.
+But in 5.0 don't shows because commit
+77b06bba62034a87cc61a9c8de1309ae3e527d97
 
-for you to fetch changes up to a134321ef676723768973537bb9b49365ae2062e:
+somehow papers over it.
 
-  ftgmac100: fix dblac write test (2020-07-15 21:00:13 +0800)
+CC: Jason Wang <jasowang@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/net/virtio-net.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-Andrew (1):
-      hw/net: Added CSO for IPv6
-
-Daniel P. Berrangé (1):
-      net: detect errors from probing vnet hdr flag for TAP devices
-
-Juan Quintela (1):
-      virtio-net: fix removal of failover device
-
-Laurent Vivier (1):
-      net: check if the file descriptor is valid before using it
-
-Zhang Chen (2):
-      net/colo-compare.c: Expose compare "max_queue_size" to users
-      qemu-options.hx: Clean up and fix typo for colo-compare
-
-erik-smit (1):
-      ftgmac100: fix dblac write test
-
- hw/net/ftgmac100.c     | 14 +++++++------
- hw/net/net_tx_pkt.c    | 15 ++++++++++---
- hw/net/virtio-net.c    |  1 +
- include/qemu/sockets.h |  1 +
- net/colo-compare.c     | 43 ++++++++++++++++++++++++++++++++++++-
- net/socket.c           |  9 ++++++--
- net/tap-bsd.c          |  2 +-
- net/tap-linux.c        |  8 ++++---
- net/tap-solaris.c      |  2 +-
- net/tap-stub.c         |  2 +-
- net/tap.c              | 50 +++++++++++++++++++++++++++++++++++--------
- net/tap_int.h          |  2 +-
- qemu-options.hx        | 33 +++++++++++++++--------------
- util/oslib-posix.c     | 26 ++++++++++++++++-------
- util/oslib-win32.c     | 57 ++++++++++++++++++++++++++++----------------------
- 15 files changed, 188 insertions(+), 77 deletions(-)
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 10cc958..4895af1 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -3416,6 +3416,7 @@ static void virtio_net_device_unrealize(DeviceState *dev)
+     g_free(n->vlans);
+ 
+     if (n->failover) {
++        device_listener_unregister(&n->primary_listener);
+         g_free(n->primary_device_id);
+         g_free(n->standby_id);
+         qobject_unref(n->primary_device_dict);
+-- 
+2.5.0
 
 
