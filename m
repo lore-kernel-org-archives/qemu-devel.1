@@ -4,78 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D12A7C433E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 09:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FACC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 09:47:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A28CF2067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 09:46:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A28CF2067D
+	by mail.kernel.org (Postfix) with ESMTPS id 4AC5F2067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 09:47:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AC5F2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvdzj-0006lL-V3
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 05:46:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
+	id 1jve0u-0007xa-KL
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 05:47:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jvdus-0008OY-2P
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 05:41:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54284)
+ id 1jvdvz-0001nf-CJ
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 05:42:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52382
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jvduo-0006Gn-7c
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 05:41:29 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06F9VSqw070696
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 05:41:25 -0400
+ id 1jvdvx-0006Xl-H4
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 05:42:39 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06F9Y0cx156063
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 05:42:36 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 327u1jeqj7-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 329r1hmb68-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 05:41:24 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06F9VXZ6070921
- for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 05:41:23 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 327u1jeqh7-1
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 05:42:36 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06F9Z6Uj161885
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 05:42:36 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 329r1hmb5h-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 05:41:23 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06F9YjDG028744;
- Wed, 15 Jul 2020 09:41:20 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma03ams.nl.ibm.com with ESMTP id 327527v93a-1
+ Wed, 15 Jul 2020 05:42:36 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06F9ZRgJ011998;
+ Wed, 15 Jul 2020 09:42:34 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma02fra.de.ibm.com with ESMTP id 327527vc0n-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 09:41:20 +0000
+ Wed, 15 Jul 2020 09:42:34 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06F9fIIB63701204
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 06F9dsbS57147796
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 15 Jul 2020 09:41:18 GMT
+ Wed, 15 Jul 2020 09:39:54 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8F9354C052;
- Wed, 15 Jul 2020 09:41:18 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E7F764C040;
+ Wed, 15 Jul 2020 09:41:16 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E6F044C040;
- Wed, 15 Jul 2020 09:41:17 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4E9654C046;
+ Wed, 15 Jul 2020 09:41:16 +0000 (GMT)
 Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 15 Jul 2020 09:41:17 +0000 (GMT)
+ Wed, 15 Jul 2020 09:41:16 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/7] pc-bios: s390x: Rework data initialization
-Date: Wed, 15 Jul 2020 05:40:42 -0400
-Message-Id: <20200715094045.381984-5-frankja@linux.ibm.com>
+Subject: [PATCH 2/7] pc-bios: s390x: Cleanup jump to ipl code
+Date: Wed, 15 Jul 2020 05:40:40 -0400
+Message-Id: <20200715094045.381984-3-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200715094045.381984-1-frankja@linux.ibm.com>
 References: <20200715094045.381984-1-frankja@linux.ibm.com>
@@ -86,15 +87,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-15_07:2020-07-15,
  2020-07-15 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 malwarescore=0
- spamscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=946
- suspectscore=1 phishscore=0 bulkscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ clxscore=1015 malwarescore=0
+ priorityscore=1501 spamscore=0 mlxlogscore=999 lowpriorityscore=0
+ impostorscore=0 adultscore=0 mlxscore=0 bulkscore=0 phishscore=0
+ suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2007150077
 Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
+ helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 05:27:14
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -119,37 +120,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sometimes a memset is nicer to read than multiple struct->data = 0;
+jump_to_IPL_code takes a 64 bit address, masks it with the short psw
+address mask and later branches to it using a full 64 bit register.
+
+* As the masking is not necessary, let's remove it
+* Without the mask we can save the ipl address to a static 64 bit
+  function ptr as we later branch to it
+* Let's also clean up the variable names and remove the now unneeded
+  ResetInfo
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- pc-bios/s390-ccw/dasd-ipl.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ pc-bios/s390-ccw/jump2ipl.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
-index e8f2846740..0543334ed4 100644
---- a/pc-bios/s390-ccw/dasd-ipl.c
-+++ b/pc-bios/s390-ccw/dasd-ipl.c
-@@ -167,16 +167,13 @@ static void ipl1_fixup(void)
-     ccwSeek->cda = ptr2u32(seekData);
-     ccwSeek->chain = 1;
-     ccwSeek->count = sizeof(*seekData);
--    seekData->reserved = 0x00;
--    seekData->cyl = 0x00;
--    seekData->head = 0x00;
-+    memset(seekData, 0, sizeof(*seekData));
+diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+index 767012bf0c..aef37cea76 100644
+--- a/pc-bios/s390-ccw/jump2ipl.c
++++ b/pc-bios/s390-ccw/jump2ipl.c
+@@ -13,20 +13,15 @@
+ #define KERN_IMAGE_START 0x010000UL
+ #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
  
-     ccwSearchID->cmd_code = CCW_CMD_DASD_SEARCH_ID_EQ;
-     ccwSearchID->cda = ptr2u32(searchData);
-     ccwSearchID->chain = 1;
-     ccwSearchID->count = sizeof(*searchData);
--    searchData->cyl = 0;
--    searchData->head = 0;
-+    memset(searchData, 0, sizeof(*searchData));
-     searchData->record = 2;
+-typedef struct ResetInfo {
+-    uint64_t ipl_psw;
+-    uint32_t ipl_continue;
+-} ResetInfo;
+-
+-static ResetInfo save;
++static void (*ipl_continue)(void);
++static uint64_t psw_save;
  
-     /* Go back to Search CCW if correct record not yet found */
+ static void jump_to_IPL_2(void)
+ {
+-    ResetInfo *current = 0;
++    uint64_t *psw_current = 0;
+ 
+-    void (*ipl)(void) = (void *) (uint64_t) current->ipl_continue;
+-    *current = save;
+-    ipl(); /* should not return */
++    *psw_current = psw_save;
++    ipl_continue(); /* should not return */
+ }
+ 
+ void jump_to_IPL_code(uint64_t address)
+@@ -46,15 +41,15 @@ void jump_to_IPL_code(uint64_t address)
+      * content of non-BIOS memory after we loaded the guest, so we
+      * save the original content and restore it in jump_to_IPL_2.
+      */
+-    ResetInfo *current = 0;
++    uint64_t *psw_current = 0;
+ 
+-    save = *current;
++    psw_save = *psw_current;
+ 
+-    current->ipl_psw = (uint64_t) &jump_to_IPL_2;
+-    current->ipl_psw |= RESET_PSW_MASK;
+-    current->ipl_continue = address & PSW_MASK_SHORT_ADDR;
++    *psw_current = (uint64_t) &jump_to_IPL_2;
++    *psw_current |= RESET_PSW_MASK;
++    ipl_continue = (void *)address;
+ 
+-    debug_print_int("set IPL addr to", current->ipl_continue);
++    debug_print_int("set IPL addr to", (uint64_t)ipl_continue);
+ 
+     /* Ensure the guest output starts fresh */
+     sclp_print("\n");
 -- 
 2.25.1
 
