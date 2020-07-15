@@ -2,82 +2,84 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FA9AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440B6C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:03:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B5C920657
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 13:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DC9120658
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:03:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q640Z+xX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5C920657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XgmOrMsB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DC9120658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvhwP-0003G1-Bz
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 09:59:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41668)
+	id 1jvi0a-0005KQ-8v
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 10:03:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jvhvh-0002Ox-Ka
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:58:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40587
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jvi01-0004tg-4V
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:03:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30925
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jvhvf-00068x-0Q
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 09:58:37 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jvhzz-00072E-6r
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:03:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594821514;
+ s=mimecast20190719; t=1594821781;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=M+4XC1SlqIGAn0kUFK1R6xgWcnRLOtW1v2+ZJft6AKE=;
- b=Q640Z+xXk9mDhxuJa4NFYrh4YyOMzlQVEbMfq7Zoo3jLOoEySnBlv8jeYcPtPatPivnfHv
- jByXJO3JkvIDrlID2UDwsP4k7XYoWCLUAHO3Go6ANaKQdDasxMpO5tUPzd2nP4qBLXvjIG
- O0lBybG4eUltNx7Or51jHhB+CYkl2VE=
+ in-reply-to:in-reply-to:references:references;
+ bh=Emw2YgIRz2FKdOmzzPIki5N5g9IjY83QOnXLIsQ0MZA=;
+ b=XgmOrMsBchYClIAu+2FCVzE9p2qZVEhU+S6t/MG7zYkd5Yl38yq4rbAKXgauU4N1gcaPJB
+ cp0WHud1Wvr+H5u7kgmQ1evdj2H0iNcAkjpNFSjs7cIdFtQyHfTXKFWWx879zaaA/1Z/DJ
+ zI8suyMDbpl5q9xrgnUYWPobWzreE7k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-JTxxyMO3OaelNsAy6I2VQw-1; Wed, 15 Jul 2020 09:58:30 -0400
-X-MC-Unique: JTxxyMO3OaelNsAy6I2VQw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-74-wvcu17j5PRyOyHGpFtWkBg-1; Wed, 15 Jul 2020 10:03:00 -0400
+X-MC-Unique: wvcu17j5PRyOyHGpFtWkBg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36991800C64;
- Wed, 15 Jul 2020 13:58:29 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-26.ams2.redhat.com [10.36.112.26])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 02AC079CE4;
- Wed, 15 Jul 2020 13:58:20 +0000 (UTC)
-Subject: Re: [PATCH] fuzz: Expect the cmdline in a freeable GString
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <20200714174616.20709-1-alxndr@bu.edu>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7d253e0f-a6ce-b0da-b83b-8afefaf000c1@redhat.com>
-Date: Wed, 15 Jul 2020 15:58:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 319F21005269;
+ Wed, 15 Jul 2020 14:02:59 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
+ [10.36.115.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F41A972E74;
+ Wed, 15 Jul 2020 14:02:52 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id D4F6A9D57; Wed, 15 Jul 2020 16:02:51 +0200 (CEST)
+Date: Wed, 15 Jul 2020 16:02:51 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [RFC PATCH 3/5] hw/i386/acpi-build: Add ACPI PCI hot-plug
+ methods to q35
+Message-ID: <20200715140251.duv5j7uxqlqitfrn@sirius.home.kraxel.org>
+References: <20200708224615.114077-1-jusual@redhat.com>
+ <20200708224615.114077-4-jusual@redhat.com>
+ <20200713163954.565722a5@redhat.com>
+ <20200715065751.ogchtdqmnn7cxsyi@sirius.home.kraxel.org>
+ <20200715151720.21789077@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200714174616.20709-1-alxndr@bu.edu>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200715151720.21789077@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:05
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -98,54 +100,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, f4bug@amsat.org,
- darren.kenny@oracle.com, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/07/2020 19.46, Alexander Bulekov wrote:
-> In the initial FuzzTarget, get_init_cmdline returned a char *. With this
-> API, we had no guarantee about where the string came from. For example,
-> i440fx-qtest-reboot-fuzz simply returned a pointer to a string literal,
-> while the QOS-based targets build the arguments out in a GString an
-> return the gchar *str pointer. Since we did not try to free the cmdline,
-> we have a leak for any targets that do not simply return string
-> literals. Clean up this mess by forcing fuzz-targets to return
-> a GString, that we can free.
+> > While being at it:  Shouldn't we reserve these port ranges somehow?
+> > Using an acpi device for example, simliar to fw_cfg?  The guest OS
+> > should better know there is something at those ports ...
 > 
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> ---
->  tests/qtest/fuzz/fuzz.c        | 13 ++++++-------
->  tests/qtest/fuzz/fuzz.h        |  6 +++---
->  tests/qtest/fuzz/i440fx_fuzz.c |  4 ++--
->  tests/qtest/fuzz/qos_fuzz.c    |  6 +++---
->  4 files changed, 14 insertions(+), 15 deletions(-)
-      /* Prepend the arguments that we need */
->      g_string_prepend(cmd_line,
->              TARGET_NAME " -display none -machine accel=qtest -m 64 ");
-> -    return cmd_line->str;
-> +    return cmd_line;
->  }
->  
->  /*
-> @@ -189,7 +189,7 @@ static void walk_path(QOSGraphNode *orig_path, int len)
->      g_free(path_str);
->  }
->  
-> -static const char *qos_get_cmdline(FuzzTarget *t)
-> +static GString *qos_get_cmdline(FuzzTarget *t)
->  {
->      /*
->       * Set a global variable that we use to identify the qos_path for our
-> 
+> we do it at ACPI level in DSDT, look for comment
+> /* reserve PCIHP resources */
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Ah, good.
 
-... and queued to my "qtest-next" branch.
+> It should make Windows trip over in case of another range overlap with
+> reserved ports. (linux kernel is more tolerant and may silently ignore
+> or print a warning) 
 
- Thanks,
-  Thomas
+Hmm, linux doesn't list the device, can't see it neither in the kernel
+log nor in /proc/ioports ...
+
+take care,
+  Gerd
 
 
