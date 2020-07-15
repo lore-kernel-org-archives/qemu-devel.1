@@ -2,107 +2,88 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B01C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 19:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8517C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 19:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82C122065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 19:25:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C122065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 96F652065D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 19:28:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="S+trvLNz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96F652065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvn2F-0008B6-Qd
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 15:25:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54810)
+	id 1jvn4X-0000pm-UV
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 15:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jvmzu-0005yk-F5
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 15:23:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13182
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jvn3w-0000JA-7D
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 15:27:28 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:47578 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jvmzs-0001rK-92
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 15:23:18 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06FJ2YLE105617; Wed, 15 Jul 2020 15:23:13 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 329r1j5qqs-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 15:23:13 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06FJ2dKk106813;
- Wed, 15 Jul 2020 15:23:13 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0b-001b2d01.pphosted.com with ESMTP id 329r1j5qqf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 15:23:13 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06FJ59tC010227;
- Wed, 15 Jul 2020 19:23:12 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma04wdc.us.ibm.com with ESMTP id 3275293472-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 19:23:12 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06FJN9hR30409122
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 15 Jul 2020 19:23:10 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9244EC605A;
- Wed, 15 Jul 2020 19:23:11 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0B978C6055;
- Wed, 15 Jul 2020 19:23:11 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 15 Jul 2020 19:23:10 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v1 2/2] tests: tpm: Skip over pcrUpdateCounter byte in result
- comparison
-Date: Wed, 15 Jul 2020 15:23:07 -0400
-Message-Id: <20200715192307.1798092-3-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200715192307.1798092-1-stefanb@linux.vnet.ibm.com>
-References: <20200715192307.1798092-1-stefanb@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jvn3u-0002jj-MU
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 15:27:27 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 936F54C8F8;
+ Wed, 15 Jul 2020 19:27:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-transfer-encoding:content-disposition
+ :content-type:content-type:mime-version:references:message-id
+ :subject:subject:from:from:date:date:received:received:received;
+ s=mta-01; t=1594841242; x=1596655643; bh=lx2aqtn/jkaBS4uRrDnQ3E
+ wUb1Ns7Xc0mz4Z6F+/mes=; b=S+trvLNzo1IUX/lRnWMjKgEH2+KBKUSCz6rprq
+ 8PpcxnKoxXvaduDha+A+xNEAUMSm6K89gXi0F1eLGbgzhKUdTyVXE8gBIatHLa8H
+ G0YCS6rCkHofI5N//WxJa7J3nhbdLLJBPE/sRM+u7a2Po7/iGxbAfasodB2188dZ
+ H6zfE=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id o4v0C9WWvlEe; Wed, 15 Jul 2020 22:27:22 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 5270E4C8A0;
+ Wed, 15 Jul 2020 22:27:22 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Wed, 15
+ Jul 2020 22:27:22 +0300
+Date: Wed, 15 Jul 2020 22:27:21 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH-for-5.1] net/colo: Remove unused trace event
+Message-ID: <20200715192721.GD90799@SPB-NB-133.local>
+References: <20200715143130.11164-1-philmd@redhat.com>
+ <20200715151302.GE88416@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-15_12:2020-07-15,
- 2020-07-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 malwarescore=0
- priorityscore=1501 spamscore=0 mlxlogscore=999 lowpriorityscore=0
- impostorscore=0 adultscore=0 mlxscore=0 bulkscore=0 phishscore=0
- suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007150143
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 15:23:13
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200715151302.GE88416@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 14:36:19
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,45 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.ibm.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Zhang Chen <chen.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TPM 2 code in libtpms was fixed to handle the PCR 'TCB group' according
-to the PCClient profile. The change of the PCRs belonging to the 'TCB group'
-now affects the pcrUpdateCounter in the TPM2_PCRRead() responses where its
-value is now different (typically lower by '1') than what it was before. To
-not fail the tests, we skip the comparison of the 14th byte, which
-represents the pcrUpdateCounter.
+On Wed, Jul 15, 2020 at 04:13:02PM +0100, Daniel P. BerrangÈ wrote:
+> On Wed, Jul 15, 2020 at 04:31:30PM +0200, Philippe Mathieu-DaudÈ wrote:
+> > Unused trace event cause build failure when using the dtrace backend:
+> > 
+> >   "probe colo_compare_miscompare doesn't exist"
+> > 
+> > Fixes: f4b618360e ("colo-compare: add TCP, UDP, ICMP packet comparison")
+> > Reported-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> 
+> Note Roman indicated on IRC that this is seen with dtrace on macOS and
+> there were other problems too.
+> 
+> Unless someone knows that QEMU's dtrace support worked on macOS in the
+> past, I think we don't need  and simply consider dtrace unsupported on
+> macOS right now until someone can get it into more robust shape on
+> macOS.
+> 
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Reviewed-by: Marc-Andr√© Lureau <marcandre.lureau@redhat.com>
-Message-id: 20200707201625.4177419-3-stefanb@linux.vnet.ibm.com
----
- tests/qtest/tpm-util.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Hi Daniel,
 
-diff --git a/tests/qtest/tpm-util.c b/tests/qtest/tpm-util.c
-index 34efae8f18..58a9593745 100644
---- a/tests/qtest/tpm-util.c
-+++ b/tests/qtest/tpm-util.c
-@@ -139,7 +139,11 @@ void tpm_util_pcrread(QTestState *s, tx_func *tx,
- 
-     tx(s, tpm_pcrread, sizeof(tpm_pcrread), buffer, sizeof(buffer));
- 
--    g_assert_cmpmem(buffer, exp_resp_size, exp_resp, exp_resp_size);
-+    /* skip pcrUpdateCounter (14th byte) in comparison */
-+    g_assert(exp_resp_size >= 15);
-+    g_assert_cmpmem(buffer, 13, exp_resp, 13);
-+    g_assert_cmpmem(&buffer[14], exp_resp_size - 14,
-+                    &exp_resp[14], exp_resp_size - 14);
- }
- 
- bool tpm_util_swtpm_has_tpm2(void)
--- 
-2.24.1
+I've got it working and I can see qemu trace points from
+  sudo dtrace -m qemu-system-x86_64 -l
 
+I'm wrapping a series that resolves all the issues along the way.
+
+Thanks,
+Roman
 
