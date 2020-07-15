@@ -2,83 +2,96 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BF7C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:04:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE394C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F167320658
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:04:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAA28205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:06:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ipC67WAx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F167320658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THS0LGq9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAA28205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvi1k-00077I-7n
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 10:04:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43352)
+	id 1jvi32-0000l9-Tw
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 10:06:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvi0i-0005dr-PO
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:03:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28641
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1jvi10-00066C-P0
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:04:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50024
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvi0h-00077q-27
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:03:48 -0400
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1jvi0y-0007Ao-Hv
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 10:04:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594821825;
+ s=mimecast20190719; t=1594821843;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ukakhoyVrLdU7zvE4fTYSsg0S8TlcvHDcot9ZeBa/eg=;
- b=ipC67WAxEhIIGlbGRYmHAitKRdXRRd55kibu5w3PFVXBl/Q0O/VTjudjkLHk0ZoeOqWjo7
- VzzkmcDNWFM1vxqiPidL8VlMgiHTtCo9DzkXRrUuts29kN9dhNF4a9xb50Pured5PXKcoC
- gdB5NjShWshJ1111hmCiNmXVus2bBm4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-mVsj-rBIMbu3EvWUc9oZVw-1; Wed, 15 Jul 2020 10:03:43 -0400
-X-MC-Unique: mVsj-rBIMbu3EvWUc9oZVw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E54E107ACCA;
- Wed, 15 Jul 2020 14:03:42 +0000 (UTC)
-Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E6FB110013C2;
- Wed, 15 Jul 2020 14:03:36 +0000 (UTC)
-Subject: Re: [PATCH v4 0/2] net: tap: check file descriptor can be used
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20200707184515.371476-1-lvivier@redhat.com>
- <e4eb0b4a-aa07-0dfe-f6ca-3435b867df57@redhat.com>
- <01a66c39-0677-205c-120e-d7b4355efcdb@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <94550f94-afc9-51ee-351b-f8b43bcbf27d@redhat.com>
-Date: Wed, 15 Jul 2020 22:03:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ bh=LUdBEm3DX478dtRefPYNBoOIo+XYGvWzcSLoyAymS9I=;
+ b=THS0LGq9015Cp6yqnTFFIuU77OuaZKEV83creKc/0pS2A7btFLq8BXhQ2C9ulfziEbBq/D
+ ymugki/K0jbLPbBfdqQCZTHq6ivHMjT4R5Y0gMHHrAcfFQnZARwZ56UEAxn/zLn1foBVnR
+ HZcROiJVBvcSYq3P++81rKNBkEFsUCY=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-53-eW7vmluJO5qKFMqPBeL-Zg-1; Wed, 15 Jul 2020 10:04:00 -0400
+X-MC-Unique: eW7vmluJO5qKFMqPBeL-Zg-1
+Received: by mail-ot1-f69.google.com with SMTP id g18so1039918otj.12
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 07:04:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=LUdBEm3DX478dtRefPYNBoOIo+XYGvWzcSLoyAymS9I=;
+ b=dkTxnyarmnKyZR0kCc6jqfkYsmtN8PF1OUXZwXFQtcgmyeRPQKacaHQCXm0sl3sG5T
+ 6ITPGE9RyEadOXFr8+8AXaZMW7nMcMJyex+9NnRpK6jHuwyMaVoulfVZMLi8kDPMXS3/
+ kpsoyJ9uRt/mKz3zUSSLeGkbmvnp0KIhpGRg6YewCX+kckTEfiRGfUp9p6HDFquLPdEL
+ Pmyzwi9d8Nbhkg19MYKrAS/ZYsx9jTqWuqAZKCfT3JUtoc6ZE8MCIgujQvFPu5yIMLeQ
+ tyMDgqhgEHn8SSALTvbQ0wo6CixY5U13eYJ9yZkx+VH96vfXaAXoof+8ewmBFThoIRdF
+ WNSg==
+X-Gm-Message-State: AOAM532gqMyagrL/Q5KbtK34UKsmdNQrblPV+PMk6Iuyis2JVvv+D8yX
+ ueWUl549p7VQ52XAGjnBotz6mIX2hDs0ycqBL3liHIYTmUWCiCitnESam6PWI4QPjUtMtsgedDw
+ J859QfCxzPMlW1w7M8G8802Bg+6jwN1g=
+X-Received: by 2002:a05:6830:309b:: with SMTP id
+ f27mr9276722ots.315.1594821839922; 
+ Wed, 15 Jul 2020 07:03:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwnvS+jkoqVDZ00eut04A4TpreVEl0/pYkfKRcYukwGivF7r2SQmWIXvuZ6239t/SY8V4v0ELRSgjSh0BsQQ9E=
+X-Received: by 2002:a05:6830:309b:: with SMTP id
+ f27mr9276688ots.315.1594821839577; 
+ Wed, 15 Jul 2020 07:03:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <01a66c39-0677-205c-120e-d7b4355efcdb@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20200710142149.40962-1-kwolf@redhat.com>
+ <20200710142149.40962-2-kwolf@redhat.com>
+ <CAMRbyyux0eQo8vmz4JB8pT_1i4PJviQJPKiaJC6ehwjLhc649A@mail.gmail.com>
+ <20200713165637.GH10318@linux.fritz.box>
+ <CAMRbyysaB5MDWGz7upg-O=N2vhQn4OUdZVsqeBothYBtZyy6ZA@mail.gmail.com>
+ <20200715134229.GB8833@linux.fritz.box>
+In-Reply-To: <20200715134229.GB8833@linux.fritz.box>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Wed, 15 Jul 2020 17:03:43 +0300
+Message-ID: <CAMRbyytmc-6t4RJizfcgwFVVaoVeiFtCBmMoUs3HZOjt+pLCYQ@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 1/2] block: Require aligned image size to avoid
+ assertion failure
+To: Kevin Wolf <kwolf@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=nsoffer@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:03
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=nsoffer@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 05:07:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -86,7 +99,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,64 +112,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/7/15 下午5:16, Laurent Vivier wrote:
-> On 09/07/2020 07:46, Jason Wang wrote:
->> On 2020/7/8 上午2:45, Laurent Vivier wrote:
->>> v4: use qemu_try_set_nonblock() with vhostfd in net_init_tap_one(),
->>>       and with fd in net_init_socket()
->>>
->>> v3: move qemu_fd_is_valid() checking into a new function
->>>       qemu_try_set_nonblock(), and use qemu_try_set_nonblock() in
->>>       qemu_set_nonblock().
->>>
->>> v2: Add patch from Daniel to check the fd can be used
->>>
->>>       I have updated Daniel's patch not to check for EINVAL on TUNGETIFF
->>>       as I think we can avoid this special case because TUNGETIFF
->>>       is available since kernel v2.6.27 (October 2008)
->>>       Moreover I think the code was wrong as it was checking with
->>> -EINVAL and
->>>       not EINVAL.
->>>
->>> Daniel P. Berrangé (1):
->>>     net: detect errors from probing vnet hdr flag for TAP devices
->>>
->>> Laurent Vivier (1):
->>>     net: check if the file descriptor is valid before using it
->>>
->>>    include/qemu/sockets.h |  1 +
->>>    net/socket.c           |  9 +++++--
->>>    net/tap-bsd.c          |  2 +-
->>>    net/tap-linux.c        |  8 +++---
->>>    net/tap-solaris.c      |  2 +-
->>>    net/tap-stub.c         |  2 +-
->>>    net/tap.c              | 50 +++++++++++++++++++++++++++++-------
->>>    net/tap_int.h          |  2 +-
->>>    util/oslib-posix.c     | 26 +++++++++++++------
->>>    util/oslib-win32.c     | 57 ++++++++++++++++++++++++------------------
->>>    10 files changed, 108 insertions(+), 51 deletions(-)
->>
->> Applied.
-> It would have been great to have these fixes in 5.1
+On Wed, Jul 15, 2020 at 4:42 PM Kevin Wolf <kwolf@redhat.com> wrote:
 >
-> Thanks,
-> Laurent
+> Am 15.07.2020 um 15:22 hat Nir Soffer geschrieben:
+> > On Mon, Jul 13, 2020 at 7:56 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> > >
+> > > Am 13.07.2020 um 18:33 hat Nir Soffer geschrieben:
+> > > > On Fri, Jul 10, 2020 at 5:22 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> > > > >
+> > > > > Unaligned requests will automatically be aligned to bl.request_alignment
+> > > > > and we don't want to extend requests to access space beyond the end of
+> > > > > the image, so it's required that the image size is aligned.
+> > > > >
+> > > > > With write requests, this could cause assertion failures like this if
+> > > > > RESIZE permissions weren't requested:
+> > > > >
+> > > > > qemu-img: block/io.c:1910: bdrv_co_write_req_prepare: Assertion `end_sector <= bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
+> > > > >
+> > > > > This was e.g. triggered by qemu-img converting to a target image with 4k
+> > > > > request alignment when the image was only aligned to 512 bytes, but not
+> > > > > to 4k.
+> > > >
+> > > > Was it on NFS? Shouldn't this be fix by the next patch then?
+> > >
+> > > Patch 2 makes the problem go away for NFS because NFS doesn't even
+> > > require the 4k alignment. But on storage that legitimately needs 4k
+> > > alignment (or possibly other filesystems that are misdetected), you
+> > > would still hit the same problem.
+> >
+> > I want to add oVirt point of view on this. We enforce raw image
+> > alignment of 4k on file based storage, and 128m on block storage, so
+> > our raw images cannot have this issue.
+>
+> Yes, then you won't hit the problem.
+>
+> > We have an issue with empty qcow2 images which are unaligned size, but
+> > we don't create such images in normal flows.
+>
+> Can you give a reproducer where qcow2 images would be affected?
+> Generally speaking, the qcow2 driver either takes both WRITE and RESIZE
+> permissions or neither. So it should just automatically resize the image
+> as needed instead of crashing.
 
-
-Yes, pull has been sent.
-
-Sorry for the late.
-
-Thanks
-
+I think this is a theoretical issue in other programs trying to access
+the unaligned
+images using direct I/O.
 
 
