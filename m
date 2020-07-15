@@ -2,72 +2,90 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8686EC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA636C433EB
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:14:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B5B220658
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:13:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A53F720658
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 15:14:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="W9V8Xng3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B5B220658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbbcUNFf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53F720658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvj5q-0007U0-I8
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 11:13:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37936)
+	id 1jvj72-0008Q9-W3
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 11:14:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1jvj5B-00071Y-Ql
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:12:30 -0400
-Received: from mail-m971.mail.163.com ([123.126.97.1]:41992)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@163.com>) id 1jvj55-0007zt-Bw
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:12:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=Jt3NNPR5zOSZ30FiRv
- 6kYMnF5H9aP3X0ia43q6OL6jk=; b=W9V8Xng3LTlM+yCiXHl6iWLVce+YzfWyz4
- 1/EpM7UpRTPDNftg7uLLWNUeQ9sZ+xr1Kb/YZ0962pvk8BSBLccsmF9z0rk0rz8z
- rIqI8x3zIw8OHqnpJfNW0Jx7eYnM6cwu+NkTdeuGrNnG8HWTx8+7OI3lZrQNAd1p
- B21TUF6jU=
-Received: from localhost.localdomain (unknown [183.159.72.144])
- by smtp1 (Coremail) with SMTP id GdxpCgC3xXG_HA9fikzLAA--.5882S4;
- Wed, 15 Jul 2020 23:12:00 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: armbru@redhat.com,
-	mdroth@linux.vnet.ibm.com,
-	pbonzini@redhat.com
-Subject: [PATCH] qapi: record the last element in order to avoid memory leak
-Date: Wed, 15 Jul 2020 08:11:53 -0700
-Message-Id: <20200715151153.15054-1-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: GdxpCgC3xXG_HA9fikzLAA--.5882S4
-X-Coremail-Antispam: 1Uf129KBjvJXoWxZFyDGFyDAFyrtFWxtw48Xrb_yoW5CF47pF
- Z3Jr97KrZ5JFWfGr1DGr18Kr13tw4xJryUu3yrWw10yF15urWktF4kK3yjv3W8CrW8AF45
- XFWktrZxuFWxAaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ub18PUUUUU=
-X-Originating-IP: [183.159.72.144]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiFAFibVaD6kJswgAAsJ
-Received-SPF: pass client-ip=123.126.97.1; envelope-from=liq3ea@163.com;
- helo=mail-m971.mail.163.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 11:12:07
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvj5x-0007iT-OI
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:13:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21437
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvj5u-0008Gr-FN
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 11:13:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594825993;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=N3yPsmRXB3YwgMsPX0IiwyZqGtLSV0qsjSriIm/JkR4=;
+ b=cbbcUNFfHND5Zr6CTAV3jkmlXUU2cZ7qUZdKMZ1rcKtiB1rJAqAinv3ShHSKS0z/W2dahW
+ SLQSSfiZYOtRxumQ3D0YBNrZJkZLzb+mvRft2LNNE8KDAaW89YKmGHo5y42oholSDKoRzJ
+ FwNijWBhv9bVhusZHRMi79EtKGdy0wg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-437-s22FjWOgNQejGdaE7PxDiA-1; Wed, 15 Jul 2020 11:13:11 -0400
+X-MC-Unique: s22FjWOgNQejGdaE7PxDiA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB6061030C20;
+ Wed, 15 Jul 2020 15:13:09 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 591E5100164C;
+ Wed, 15 Jul 2020 15:13:05 +0000 (UTC)
+Date: Wed, 15 Jul 2020 16:13:02 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.1] net/colo: Remove unused trace event
+Message-ID: <20200715151302.GE88416@redhat.com>
+References: <20200715143130.11164-1-philmd@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20200715143130.11164-1-philmd@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:01:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,97 +98,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Zhang Chen <chen.zhang@intel.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While executing 'tests/test-qobject-input-visitor'. I got
-following error:
+On Wed, Jul 15, 2020 at 04:31:30PM +0200, Philippe Mathieu-Daudé wrote:
+> Unused trace event cause build failure when using the dtrace backend:
+> 
+>   "probe colo_compare_miscompare doesn't exist"
+> 
+> Fixes: f4b618360e ("colo-compare: add TCP, UDP, ICMP packet comparison")
+> Reported-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
-/visitor/input/fail/alternate: OK
-/visitor/input/fail/union-list: OK
+Note Roman indicated on IRC that this is seen with dtrace on macOS and
+there were other problems too.
 
-=================================================================
-==4353==ERROR: LeakSanitizer: detected memory leaks
+Unless someone knows that QEMU's dtrace support worked on macOS in the
+past, I think we don't need  and simply consider dtrace unsupported on
+macOS right now until someone can get it into more robust shape on
+macOS.
 
-Direct leak of 16 byte(s) in 1 object(s) allocated from:
-    #0 0x7f192d0c5d28 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xded28)
-    #1 0x7f192cd21b10 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x51b10)
-    #2 0x556725f6bbee in visit_next_list qapi/qapi-visit-core.c:86
-    #3 0x556725f49e15 in visit_type_UserDefOneList tests/test-qapi-visit.c:474
-    #4 0x556725f4489b in test_visitor_in_fail_struct_in_list tests/test-qobject-input-visitor.c:1086
-    #5 0x7f192cd42f29  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72f29)
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Cc: zhangchen.fnst@cn.fujitsu.com
+> ---
+>  net/trace-events | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/net/trace-events b/net/trace-events
+> index fa49c71533..c3f623d40c 100644
+> --- a/net/trace-events
+> +++ b/net/trace-events
+> @@ -17,7 +17,6 @@ colo_compare_udp_miscompare(const char *sta, int size) ": %s = %d"
+>  colo_compare_icmp_miscompare(const char *sta, int size) ": %s = %d"
+>  colo_compare_ip_info(int psize, const char *sta, const char *stb, int ssize, const char *stc, const char *std) "ppkt size = %d, ip_src = %s, ip_dst = %s, spkt size = %d, ip_src = %s, ip_dst = %s"
+>  colo_old_packet_check_found(int64_t old_time) "%" PRId64
+> -colo_compare_miscompare(void) ""
+>  colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int hdlen, int pdlen, int offset, int flags) "%s: seq/ack= %u/%u hdlen= %d pdlen= %d offset= %d flags=%d"
+>  
+>  # filter-rewriter.c
+> -- 
+> 2.21.3
+> 
+> 
 
-SUMMARY: AddressSanitizer: 16 byte(s) leaked in 1 allocation(s).
-
-This is because in 'visit_type_UserDefOneList' function when
-'visit_type_UserDefOne' failed and we go to out_obj. And have
-no chance to process the last element. The path is:
-visit_type_UserDefOneList
-    ->visit_type_UserDefOne(error occured)
-        ->qapi_free_UserDefOneList
-            -->visit_type_UserDefOneList(again)
-
-In the last 'visit_type_UserDefOneList' we will free the elements
-allocated in the first 'visit_type_UserDefOneList'. However we delete
-the element in 'qapi_dealloc_next_list'. If then 'visit_type_UserDefOne'
-return false we will skip the element that still in the 'obj' linked
-list. This is why the ASAN complains this memory leak.
-This patch store the recent processing elements in 'QapiDeallocVisitor'.
-In 'qapi_dealloc_end_list' if it is not NULL, we free it.
-
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- qapi/qapi-dealloc-visitor.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
-index ef283f2966..6335cadd9c 100644
---- a/qapi/qapi-dealloc-visitor.c
-+++ b/qapi/qapi-dealloc-visitor.c
-@@ -20,8 +20,14 @@
- struct QapiDeallocVisitor
- {
-     Visitor visitor;
-+    void *last;
- };
- 
-+static QapiDeallocVisitor *to_qdv(Visitor *v)
-+{
-+    return container_of(v, QapiDeallocVisitor, visitor);
-+}
-+
- static bool qapi_dealloc_start_struct(Visitor *v, const char *name, void **obj,
-                                       size_t unused, Error **errp)
- {
-@@ -46,19 +52,25 @@ static bool qapi_dealloc_start_list(Visitor *v, const char *name,
-                                     GenericList **list, size_t size,
-                                     Error **errp)
- {
-+    QapiDeallocVisitor *qdv = to_qdv(v);
-+    qdv->last = *list;
-     return true;
- }
- 
- static GenericList *qapi_dealloc_next_list(Visitor *v, GenericList *tail,
-                                            size_t size)
- {
-+    QapiDeallocVisitor *qdv = to_qdv(v);
-     GenericList *next = tail->next;
-+    qdv->last = next;
-     g_free(tail);
-     return next;
- }
- 
- static void qapi_dealloc_end_list(Visitor *v, void **obj)
- {
-+    QapiDeallocVisitor *qdv = to_qdv(v);
-+    g_free(qdv->last);
- }
- 
- static bool qapi_dealloc_type_str(Visitor *v, const char *name, char **obj,
+Regards,
+Daniel
 -- 
-2.17.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
