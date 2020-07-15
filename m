@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4940DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22466C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:31:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D32DF2063A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:31:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32DF2063A
+	by mail.kernel.org (Postfix) with ESMTPS id F09842063A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 11:31:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F09842063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvfda-0000GR-3T
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 07:31:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41196)
+	id 1jvfdd-0000J1-8O
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 07:31:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jvfcm-0007u0-5p
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:30:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46798)
+ id 1jvfcn-0007uA-4Y
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:30:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46818)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jvfck-0006iT-1I
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:30:55 -0400
+ id 1jvfck-0006iY-Ha
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 07:30:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jvfci-0002Rf-1S
+ id 1jvfci-0002Sa-I7
  for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 11:30:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 09B2C2E80ED
+ by loganberry.canonical.com (Postfix) with ESMTP id 86A302E80F0
  for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 11:30:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Jul 2020 11:15:17 -0000
+Date: Wed, 15 Jul 2020 11:16:08 -0000
 From: InfoLibre <1887641@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: balaton-4 david-vantyghem
 X-Launchpad-Bug-Reporter: InfoLibre (david-vantyghem)
 X-Launchpad-Bug-Modifier: InfoLibre (david-vantyghem)
 References: <159480389351.19763.4894026633511253778.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159481171744.8544.467215641912882517.malone@wampee.canonical.com>
+Message-Id: <159481176825.7530.3714713282711622992.malone@wampee.canonical.com>
 Subject: [Bug 1887641] Re: PCI bus not available for hda
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +61,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 11b4376d816adf9141b8bc76ebfcee9012ef6b32
+X-Launchpad-Hash: 4c2875aa593b688171b171c3203ec2135285a296
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:50:56
@@ -88,9 +88,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sorry, I made a mistake, I'm trying to boot PowerPC Debian edition, not
-Mac OS 9.2.2. I removed the sound card and it boots now. Thank uou very
-much for your help.
+How to close this bug report ???
 
 -- =
 
