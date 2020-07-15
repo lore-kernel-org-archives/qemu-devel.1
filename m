@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DA9C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 792CEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9EED206D5
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44234206E9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 14:51:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDR6bboN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9EED206D5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlHACp3x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44234206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvijm-0000Xr-Tc
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 10:50:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58384)
+	id 1jvilH-000261-GQ
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 10:51:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jviiZ-0008OW-R8; Wed, 15 Jul 2020 10:49:07 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:41691)
+ id 1jvijR-0000P3-M8; Wed, 15 Jul 2020 10:50:01 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40204)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jviiX-0000k0-B1; Wed, 15 Jul 2020 10:49:07 -0400
-Received: by mail-il1-x143.google.com with SMTP id q3so2184711ilt.8;
- Wed, 15 Jul 2020 07:49:03 -0700 (PDT)
+ id 1jvijP-0000yL-HA; Wed, 15 Jul 2020 10:50:01 -0400
+Received: by mail-io1-xd44.google.com with SMTP id l17so2492288iok.7;
+ Wed, 15 Jul 2020 07:49:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ZjNwVPAoqSbfouoFM+Try6jwW4/cFWew31JYb8/WKR0=;
- b=FDR6bboN68+tXVd+1BpZ9GSq9BJN8w3M4ufLbiv7nRIklRh+G9xX+WURccuGe7swY6
- C/SuGdjLzAtYQz8j2qj+N1R/IYtz0pEjWU8BeJFa3l3E3IAkqMM63Rhu9hnSwmHxHHLP
- 42fzT6cFZpBTUUyeIpXRa8fLB9wt+LM9dA6pdqnAjLL66iYFmRce8MufftEy/E0Q3DX9
- mgLUSzJ5hIRZzCuzg4AiwrTre7u3mypuKauZWheOvxwDxFQ6q0g0ok/v4b6Ord8pe9lL
- S6SwQF94pd9auGyn7zZFJkTVgkgwTaXAaUbMRxrTddVgKMs2R15fZGA+ynCaD/dy/ipL
- JT0A==
+ :cc; bh=GwF5kLecPGbFx7XOkpIQGvxC60yxwFLvNgeE86muLgE=;
+ b=TlHACp3x5i9hsSwEYd5uZlRy2gy8E+87mlYM+q+5Guzr5HR72CAwU7y60b5WKBmbzH
+ 1GeqG8K6sdZloe8KoS5ENliBn2iTZhUN9TLe1bdtMPd0DFieiZ8Jj4uJk5eV+ssnIPa7
+ Ef4QYgbGsV94DOHiEC5psLnS7j1GkA12OjgZDIr8YIPVkKdgPrlU1Hyldrhtropnw9rV
+ dJKhOUmC2tM8Oln+tAGBPzSLkWBFMNBngUGlybZJ3SV2778oU47QJfuwvbSvC5Wwo50e
+ m6avdTxv+134xNHSz1uCufpd+PQMQzCmXPZBDLhP/GBbvlvpkHuSjxE1rISIpjcmdKbv
+ qTNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=ZjNwVPAoqSbfouoFM+Try6jwW4/cFWew31JYb8/WKR0=;
- b=O3OxwBOIx816lm0IWdPtuEA+CpRkrBcCBO7a5dl3UVhrOoxtaIWlyBjYdEsWKFpYON
- IcimWaWT3DDZfM6Nprsgx6tMxnH0hx5gGfvB8FR824G/zaAAZcif8/AIMuNc4RF6mWe6
- +70Hv+8LckoEDFbWaqSoKvnCNVY/d3bRDh+dL+b+3xqMfhBIw6h/3kxczztE3Xs6BkB+
- fjXaFlINFm8zMcX19Nd4wUlAXDmDhZRyfL8it3yx68U6WqG9UJX31WWvtXDK1dypW5qL
- LIIR9Dp3XBwhkDmwmWm4rvkLgCPoAh9bDU9coYsEwnF45PkK8uDaFq/tjTdOaVVoi4Sm
- cl6g==
-X-Gm-Message-State: AOAM531DWRyRlsdB9T9B5LAgfLL5GswA/izBTeZ4tAMpjEIEGRWZOS8x
- 0Mj+Hc03LLxeec1w6ESWpvjVfMM2uBdlOL77x0k=
-X-Google-Smtp-Source: ABdhPJyGrJcQfu5S+ly7GD7abMhfqh/xrBcq/NQG4luJSp9TuLg7LexHuC/w1se43wMyuAeX4g9SO4hsDQ8S7IXXTKA=
-X-Received: by 2002:a92:c213:: with SMTP id j19mr10474891ilo.40.1594824542820; 
- Wed, 15 Jul 2020 07:49:02 -0700 (PDT)
+ bh=GwF5kLecPGbFx7XOkpIQGvxC60yxwFLvNgeE86muLgE=;
+ b=WswVbJc8gs7V5o1duh8zfJFCBJ1mScbxd2zPO0FvKlktq1SIVTo15sUb16UxpMpUCI
+ UEyCtL1flgIW/GdxjF02V7yYHZ/rr1LM/p6mGgf1ibsQY7PNliMgMgYXm6tUf9DBXN5o
+ ojvheSmq/qVBPwuTcr39UA3r2STDseAnjjBbrn2hlLMq87lL/qgLEFjRtZAmuIzE6NgD
+ uKEVNFggXZr9XocyZ8PeCWmOgxLF3MiP/gcgAKesFo+yzoaPCPIdsBC0fVdymhOYTn6C
+ zp9jBDBOSWUvazbz/R/DScqXbYUhz17SuMzaNekPxci67V+KvUmmKgFDVM2Cxbesblxd
+ ivKg==
+X-Gm-Message-State: AOAM532sKt5U0m2KKB8TPIh+b019oxPmZmsmtmO5//UpgtKYP0xE5zm9
+ 86SdBbMmLgV0m6m8Sp/CyWbfbzmxICIn2I7Fc3E=
+X-Google-Smtp-Source: ABdhPJwsZgn6x4T8xrU48LoKVza2qyTzj7srAnlPS3fzCtYbwsb/lU66jbQKICIDMh03drLI5AdRYfM0qb+1hBaOT3g=
+X-Received: by 2002:a5d:9306:: with SMTP id l6mr10611822ion.105.1594824597354; 
+ Wed, 15 Jul 2020 07:49:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200715140440.3540942-1-armbru@redhat.com>
- <20200715140440.3540942-2-armbru@redhat.com>
-In-Reply-To: <20200715140440.3540942-2-armbru@redhat.com>
+ <20200715140440.3540942-3-armbru@redhat.com>
+In-Reply-To: <20200715140440.3540942-3-armbru@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 15 Jul 2020 07:39:01 -0700
-Message-ID: <CAKmqyKO5KoK9rJ6JkcnJaHeXTVK1e8iMMS0UzBfygkUw30kudQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 1/2] msf2: Unbreak device-list-properties for
- "msf-soc"
+Date: Wed, 15 Jul 2020 07:39:56 -0700
+Message-ID: <CAKmqyKPuNqq+CrxQ7uqJNKNW54MLbjV-nXHh-yj=LsTObBjBBw@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 2/2] hw: Mark nd_table[] misuse in realize methods
+ FIXME
 To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -109,30 +109,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 15, 2020 at 7:08 AM Markus Armbruster <armbru@redhat.com> wrote:
+On Wed, Jul 15, 2020 at 7:06 AM Markus Armbruster <armbru@redhat.com> wrote:
 >
-> Watch this:
+> nd_table[] contains NIC configuration for boards to pick up.  Device
+> code has no business looking there.  Several devices do it anyway.
+> Two of them already have a suitable FIXME comment: "allwinner-a10" and
+> "msf2-soc".  Copy it to the others: "allwinner-h3", "xlnx-versal",
+> "xlnx,zynqmp", "sparc32-ledma", "riscv.sifive.u.soc".
 >
->     $ qemu-system-aarch64 -M ast2600-evb -S -display none -qmp stdio
->     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 5}, "package": "v5.0.0-2464-g3a9163af4e"}, "capabilities": ["oob"]}}
->     {"execute": "qmp_capabilities"}
->     {"return": {}}
->     {"execute": "device-list-properties", "arguments": {"typename": "msf2-soc"}}
->     Unsupported NIC model: ftgmac100
->     armbru@dusky:~/work/images$ echo $?
->     1
->
-> This is what breaks "make check SPEED=slow".
->
-> Root cause is m2sxxx_soc_initfn()'s messing with nd_table[] via
-> qemu_check_nic_model().  That's wrong.
->
-> We fixed the exact same bug for device "allwinner-a10" in commit
-> 8aabc5437b "hw/arm/allwinner-a10: Do not use nd_table in instance_init
-> function".  Fix this instance the same way: move the offending code to
-> m2sxxx_soc_realize(), where it's less wrong, and add a FIXME comment.
->
-> Fixes: 05b7374a58cd18aa3516e33513808896d0ac9b7b
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
@@ -140,36 +124,73 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/arm/msf2-soc.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>  hw/arm/allwinner-h3.c | 1 +
+>  hw/arm/xlnx-versal.c  | 1 +
+>  hw/arm/xlnx-zynqmp.c  | 1 +
+>  hw/dma/sparc32_dma.c  | 1 +
+>  hw/riscv/sifive_u.c   | 1 +
+>  5 files changed, 5 insertions(+)
 >
-> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-> index 16bb7c9916..33ea7df342 100644
-> --- a/hw/arm/msf2-soc.c
-> +++ b/hw/arm/msf2-soc.c
-> @@ -82,10 +82,6 @@ static void m2sxxx_soc_initfn(Object *obj)
->      }
+> diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
+> index 8e09468e86..ff92ded82c 100644
+> --- a/hw/arm/allwinner-h3.c
+> +++ b/hw/arm/allwinner-h3.c
+> @@ -358,6 +358,7 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+>                                "sd-bus");
 >
->      object_initialize_child(obj, "emac", &s->emac, TYPE_MSS_EMAC);
-> -    if (nd_table[0].used) {
-> -        qemu_check_nic_model(&nd_table[0], TYPE_MSS_EMAC);
-> -        qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
-> -    }
->  }
+>      /* EMAC */
+> +    /* FIXME use qdev NIC properties instead of nd_table[] */
+>      if (nd_table[0].used) {
+>          qemu_check_nic_model(&nd_table[0], TYPE_AW_SUN8I_EMAC);
+>          qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index ead038b971..e3aa4bd1e5 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -160,6 +160,7 @@ static void versal_create_gems(Versal *s, qemu_irq *pic)
+>          object_initialize_child(OBJECT(s), name, &s->lpd.iou.gem[i],
+>                                  TYPE_CADENCE_GEM);
+>          dev = DEVICE(&s->lpd.iou.gem[i]);
+> +        /* FIXME use qdev NIC properties instead of nd_table[] */
+>          if (nd->used) {
+>              qemu_check_nic_model(nd, "cadence_gem");
+>              qdev_set_nic_properties(dev, nd);
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 772cfa3771..5855e5d5bf 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -455,6 +455,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>      for (i = 0; i < XLNX_ZYNQMP_NUM_GEMS; i++) {
+>          NICInfo *nd = &nd_table[i];
 >
->  static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
-> @@ -187,6 +183,11 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
->          g_free(bus_name);
->      }
+> +        /* FIXME use qdev NIC properties instead of nd_table[] */
+>          if (nd->used) {
+>              qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
+>              qdev_set_nic_properties(DEVICE(&s->gem[i]), nd);
+> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+> index 9459178866..bcd1626fbd 100644
+> --- a/hw/dma/sparc32_dma.c
+> +++ b/hw/dma/sparc32_dma.c
+> @@ -341,6 +341,7 @@ static void sparc32_ledma_device_realize(DeviceState *dev, Error **errp)
+>      DeviceState *d;
+>      NICInfo *nd = &nd_table[0];
 >
 > +    /* FIXME use qdev NIC properties instead of nd_table[] */
-> +    if (nd_table[0].used) {
-> +        qemu_check_nic_model(&nd_table[0], TYPE_MSS_EMAC);
-> +        qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
-> +    }
->      dev = DEVICE(&s->emac);
->      object_property_set_link(OBJECT(&s->emac), "ahb-bus",
->                               OBJECT(get_system_memory()), &error_abort);
+>      qemu_check_nic_model(nd, TYPE_LANCE);
+>
+>      d = qdev_new(TYPE_LANCE);
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 19a976c9a6..e5682c38a9 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -714,6 +714,7 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
+>      }
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].base);
+>
+> +    /* FIXME use qdev NIC properties instead of nd_table[] */
+>      if (nd->used) {
+>          qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
+>          qdev_set_nic_properties(DEVICE(&s->gem), nd);
 > --
 > 2.26.2
 >
