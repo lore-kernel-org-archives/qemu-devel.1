@@ -2,90 +2,96 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	PDS_BTC_ID,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69639C433F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 16:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C27C433F2
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 16:45:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 222CD20672
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 16:40:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 433AE2065D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 16:45:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a31rT5zf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 222CD20672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aQOagnfz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 433AE2065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvkSU-0000g3-5p
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 12:40:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34792)
+	id 1jvkXL-0002NY-Dz
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 12:45:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jvkRl-0000AY-0U
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 12:39:53 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26714
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jvkRi-0005iP-83
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 12:39:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594831188;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=d0iYK7A9dcI5LKeRasncCAOJ0kThLrcDL5LSxMT9kmE=;
- b=a31rT5zfGAH1rLTBC1U6f8/Lo/Hu/GUuGbdBJt+xKIEyOGAXqoCHKoMUQgSqq/IKBKCiWF
- qazCQWxZgCwJ0ytojLVBaRJpO7ovHKtSlPpjNRgpHzHijZqn1Gsxa/7NDOIvieNUMuLgTj
- doPxMEYfnUMrh83uPsQlv0V3lX2i82k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-aPF_IbgjNeedEtCo6-DDzQ-1; Wed, 15 Jul 2020 12:39:38 -0400
-X-MC-Unique: aPF_IbgjNeedEtCo6-DDzQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D135E100CCC1;
- Wed, 15 Jul 2020 16:39:37 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 465A26FDD1;
- Wed, 15 Jul 2020 16:39:36 +0000 (UTC)
-Date: Wed, 15 Jul 2020 17:39:33 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2] crypto: use a stronger private key for tests
-Message-ID: <20200715163933.GG88416@redhat.com>
-References: <20200715154701.1041325-1-berrange@redhat.com>
- <24602c54-0a22-805e-b079-fd7838595af0@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvkWd-0001kO-Sn
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 12:44:55 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:35511)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jvkWb-0006xb-Vx
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 12:44:55 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id z2so3451961wrp.2
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 09:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=scY49mbUNKHZrdbIfXTfGUb/BOXGOeiwdsMsfe7K8d0=;
+ b=aQOagnfzn71psy5waK0/DWZOqsCBjOWbQuoEkV7AeBmaMomR6qyvxhHNDeyBUACad8
+ tqygAJN5Qtl8z9xToOvRD7cL91pYyKJuXpdb270/TQ0Ycy0ifbnFk5+aYoJV74o7gUac
+ RtWEuncBdvm+saUi4dQWlIGVeWLK4mSYZmnZ7VMooOuEOpbkvBXJ2OnYsFo4oM9wWK/d
+ 1HcLC+C4xbGcsqizCj5RbXY8IPJm8g4FS+mo5Hk9OTgWar4akTGyVGXBTdyjn7/XmWbY
+ c+9qRMoCO4tFBdmxVAhD7/E1nBLTH/JEw7+8TllH1cHUia71PHpz46Zo+djuMP1SF5Y0
+ J/1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=scY49mbUNKHZrdbIfXTfGUb/BOXGOeiwdsMsfe7K8d0=;
+ b=E20lsJBvW47yOYwYjNaEw5fFGg5aVLPXvTvpYl6/txslZSb2Wynbim9raRz41T4/2t
+ iCQlCTEy05VBtJO4GBv6GctGVZyHcUOQOH/vW1r4AHooCwq0KtdXH8740zMK8ZOzxbCf
+ Dl6kDIw2V+MJbLZOqzEkgwpGdX44us6A4+9aEUVX7v1YxZ5dQuGyIHo/sjQi+ny3GMtN
+ GBrKB1C5sgx43zVfgT07EkrdqNrtub/KX5WdlqUEzDqJWNk3l4jEx5RGCv/zuN0y/7Qh
+ YY805BuLn07DDSqituSSpoUjBpxHaFlEZ9CDrfl7DmabkwbkVBoAkhZRnSOrgifGjXlg
+ WIsA==
+X-Gm-Message-State: AOAM5319bsCsVhg+vIIn6Snd7kD5B+aiZBRp1Ghg77h4fBpn4iNXrZI3
+ 2GSvbZ/4e+F7POvWPy/g50wwaw==
+X-Google-Smtp-Source: ABdhPJxqCJAxO1Z/aM4Dkpxpe268YRDuzB0oQUo2Ktlydz81nlJFEhIipTm9uoq3YPYJU6WlyBbHNg==
+X-Received: by 2002:adf:f889:: with SMTP id u9mr259344wrp.149.1594831491338;
+ Wed, 15 Jul 2020 09:44:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m4sm3991733wmi.48.2020.07.15.09.44.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Jul 2020 09:44:50 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0BBF61FF7E;
+ Wed, 15 Jul 2020 17:44:49 +0100 (BST)
+References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
+ <20200715112342.GD18817@stefanha-x1.localdomain>
+ <deb5788e-c828-6996-025d-333cf2bca7ab@siemens.com>
+ <20200715153855.GA47883@stefanha-x1.localdomain>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
+In-reply-to: <20200715153855.GA47883@stefanha-x1.localdomain>
+Date: Wed, 15 Jul 2020 17:44:49 +0100
+Message-ID: <87y2nkwwvy.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <24602c54-0a22-805e-b079-fd7838595af0@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:01:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- PDS_BTC_ID=1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,197 +105,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: "John G. Johnson" <john.g.johnson@oracle.com>,
+ Andra-Irina Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>,
+ qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>,
+ Alexander Graf <graf@amazon.com>, Thanos Makatos <thanos.makatos@nutanix.com>,
+ Nikos Dragazis <ndragazis@arrikto.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 15, 2020 at 06:08:53PM +0200, Philippe Mathieu-Daudé wrote:
-> On 7/15/20 5:47 PM, Daniel P. Berrangé wrote:
-> > The unit tests using the x509 crypto functionality have started
-> > failing in Fedora 33 rawhide with a message like
-> > 
-> >       The certificate uses an insecure algorithm
-> > 
-> > This is result of Fedora changes to support strong crypto [1]. RSA
-> > with 1024 bit key is viewed as legacy and thus insecure. Generate
-> > a new private key which is 3072 bits long and reasonable future
-> > proof.
-> > 
-> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> 
-> This triggers a warning from some bot I haven't subscribed too...
-> 
-> "GitGuardian has detected the following Generic Private Key exposed
-> within your GitHub account."
 
-Yep, I got that warning email too :-) It is nice to know something
-is watching github for private keys, as there have been many documented
-mistakes where people committed important private keys to their public
-repo. In this case of course we're fine as this is just for unit tests.
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> > ---
-> > 
-> > Changed in v2:
-> > 
-> >  - ALso fix the I/O tests key
-> >  - Use RSA key again instead of EC, since it is needed
-> >    for the real TLS sessions in the I/O tests
-> > 
-> >  tests/crypto-tls-x509-helpers.c | 59 ++++++++++++++++++++++-----------
-> >  tests/qemu-iotests/common.tls   | 57 +++++++++++++++++++++----------
-> >  2 files changed, 79 insertions(+), 37 deletions(-)
-> > 
-> > diff --git a/tests/crypto-tls-x509-helpers.c b/tests/crypto-tls-x509-helpers.c
-> > index 9b669c2a4b..01b3daf358 100644
-> > --- a/tests/crypto-tls-x509-helpers.c
-> > +++ b/tests/crypto-tls-x509-helpers.c
-> > @@ -37,25 +37,46 @@ ASN1_TYPE pkix_asn1;
-> >   * here's one we prepared earlier :-)
-> >   */
-> >  gnutls_x509_privkey_t privkey;
-> > -# define PRIVATE_KEY                                              \
-> > -    "-----BEGIN PRIVATE KEY-----\n"                               \
-> > -    "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBALVcr\n"     \
-> > -    "BL40Tm6yq88FBhJNw1aaoCjmtg0l4dWQZ/e9Fimx4ARxFpT+ji4FE\n"     \
-> > -    "Cgl9s/SGqC+1nvlkm9ViSo0j7MKDbnDB+VRHDvMAzQhA2X7e8M0n9\n"     \
-> > -    "rPolUY2lIVC83q0BBaOBkCj2RSmT2xTEbbC2xLukSrg2WP/ihVOxc\n"     \
-> > -    "kXRuyFtzAgMBAAECgYB7slBexDwXrtItAMIH6m/U+LUpNe0Xx48OL\n"     \
-> > -    "IOn4a4whNgO/o84uIwygUK27ZGFZT0kAGAk8CdF9hA6ArcbQ62s1H\n"     \
-> > -    "myxrUbF9/mrLsQw1NEqpuUk9Ay2Tx5U/wPx35S3W/X2AvR/ZpTnCn\n"     \
-> > -    "2q/7ym9fyiSoj86drD7BTvmKXlOnOwQJBAPOFMp4mMa9NGpGuEssO\n"     \
-> > -    "m3Uwbp6lhcP0cA9MK+iOmeANpoKWfBdk5O34VbmeXnGYWEkrnX+9J\n"     \
-> > -    "bM4wVhnnBWtgBMCQQC+qAEmvwcfhauERKYznMVUVksyeuhxhCe7EK\n"     \
-> > -    "mPh+U2+g0WwdKvGDgO0PPt1gq0ILEjspMDeMHVdTwkaVBo/uMhAkA\n"     \
-> > -    "Z5SsZyCP2aTOPFDypXRdI4eqRcjaEPOUBq27r3uYb/jeboVb2weLa\n"     \
-> > -    "L1MmVuHiIHoa5clswPdWVI2y0em2IGoDAkBPSp/v9VKJEZabk9Frd\n"     \
-> > -    "a+7u4fanrM9QrEjY3KhduslSilXZZSxrWjjAJPyPiqFb3M8XXA26W\n"     \
-> > -    "nz1KYGnqYKhLcBAkB7dt57n9xfrhDpuyVEv+Uv1D3VVAhZlsaZ5Pp\n"     \
-> > -    "dcrhrkJn2sa/+O8OKvdrPSeeu/N5WwYhJf61+CPoenMp7IFci\n"         \
-> > -    "-----END PRIVATE KEY-----\n"
-> > +# define PRIVATE_KEY \
-> > +    "-----BEGIN RSA PRIVATE KEY-----\n" \
-> > +    "MIIG5AIBAAKCAYEAyjWyLSNm5PZvYUKUcDWGqbLX10b2ood+YaFjWSnJrqx/q3qh\n" \
-> > +    "rVGBJglD25AJENJsmZF3zPP1oMhfIxsXu63Hdkb6Rdlc2RUoUP34x9VC1izH25mR\n" \
-> > +    "6c8DPDp1d6IraZ/llDMI1HsBFz0qGWtvOHgm815XG4PAr/N8rDsuqfv/cJ01KlnO\n" \
-> > +    "0OdO5QRXCJf9g/dYd41MPu7wOXk9FqjQlmRoP59HgtJ+zUpE4z+Keruw9cMT9VJj\n" \
-> > +    "0oT+pQ9ysenqeZ3gbT224T1khrEhT5kifhtFLNyDssRchUUWH0hiqoOO1vgb+850\n" \
-> > +    "W6/1VdxvuPam48py4diSPi1Vip8NITCOBaX9FIpVp4Ruw4rTPVMNMjq9Cpx/DwMP\n" \
-> > +    "9MbfXfnaVaZaMrmq67/zPhl0eVbUrecH2hQ3ZB9oIF4GkNskzlWF5+yPy6zqk304\n" \
-> > +    "AKaiFR6jRyh3YfHo2XFqV8x/hxdsIEXOtEUGhSIcpynsW+ckUCartzu7xbhXjd4b\n" \
-> > +    "kxJT89+riPFYij09AgMBAAECggGBAKyFkaZXXROeejrmHlV6JZGlp+fhgM38gkRz\n" \
-> > +    "+Jp7P7rLLAY3E7gXIPQ91WqAAmwazFNdvHPd9USfkCQYmnAi/VoZhrCPmlsQZRxt\n" \
-> > +    "A5QjjOnEvSPMa6SrXZxGWDCg6R8uMCb4P+FhrPWR1thnRDZOtRTQ+crc50p3mHgt\n" \
-> > +    "6ktXWIJRbqnag8zSfQqCYGtRmhe8sfsWT+Yl4El4+jjaAVU/B364u7+PLmaiphGp\n" \
-> > +    "BdJfTsTwEpgtGkPj+osDmhzXcZkfq3V+fz5JLkemsCiQKmn4VJRpg8c3ZmE8NPNt\n" \
-> > +    "gRtGWZ4W3WKDvhotT65WpQx4+6R8Duux/blNPBmH1Upmwd7kj7GYFBArbCjgd9PT\n" \
-> > +    "xgfCSUZpgOZHHkcgSB+022a8XncXna7WYYij28SLtwImFyu0nNtqECFQHH5u+k6C\n" \
-> > +    "LRYBSN+3t3At8dQuk01NVrJBndmjmXRfxpqUtTdeaNgVpdUYRY98s30G68NYGSra\n" \
-> > +    "aEvhhRSghkcLNetkobpY9pUgeqW/tQKBwQDZHHK9nDMt/zk1TxtILeUSitPXcv1/\n" \
-> > +    "8ufXqO0miHdH23XuXhIEA6Ef26RRVGDGgpjkveDJK/1w5feJ4H/ni4Vclil/cm38\n" \
-> > +    "OwRqjjd7ElHJX6JQbsxEx/gNTk5/QW1iAL9TXUalgepsSXYT6AJ0/CJv0jmJSJ36\n" \
-> > +    "YoKMOM8uqzb2KhN6i+RlJRi5iY53kUhWTJq5ArWvNhUzQNSYODI4bNxlsKSBL2Ik\n" \
-> > +    "LZ5QKHuaEjQet0IlPlfIb4PzMm8CHa/urOcCgcEA7m3zW/lL5bIFoKPjWig5Lbn1\n" \
-> > +    "aHfrG2ngqzWtgWtfZqMH8OkZc1Mdhhmvd46titjiLjeI+UP/uHXR0068PnrNngzl\n" \
-> > +    "tTgwlakzu+bWzqhBm1F+3/341st/FEk07r0P/3/PhezVjwfO8c8Exj7pLxH4wrH0\n" \
-> > +    "ROHgDbClmlJRu6OO78wk1+Vapf5DWa8YfA+q+fdvr7KvgGyytheKMT/b/dsqOq7y\n" \
-> > +    "qZPjmaJKWAvV3RWG8lWHFSdHx2IAHMHfGr17Y/w7AoHBALzwZeYebeekiVucGSjq\n" \
-> > +    "T8SgLhT7zCIx+JMUPjVfYzaUhP/Iu7Lkma6IzWm9nW6Drpy5pUpMzwUWDCLfzU9q\n" \
-> > +    "eseFIl337kEn9wLn+t5OpgAyCqYmlftxbqvdrrBN9uvnrJjWvqk/8wsDrw9JxAGc\n" \
-> > +    "fjeD4nBXUqvYWLXApoR9mZoGKedmoH9pFig4zlO9ig8YITnKYuQ0k6SD0b8agJHc\n" \
-> > +    "Ir0YSUDnRGgpjvFBGbeOCe+FGbohk/EpItJc3IAh5740lwKBwAdXd2DjokSmYKn7\n" \
-> > +    "oeqKxofz6+yVlLW5YuOiuX78sWlVp87xPolgi84vSEnkKM/Xsc8+goc6YstpRVa+\n" \
-> > +    "W+mImoA9YW1dF5HkLeWhTAf9AlgoAEIhbeIfTgBv6KNZSv7RDrDPBBxtXx/vAfSg\n" \
-> > +    "x0ldwk0scZsVYXLKd67yzfV7KdGUdaX4N/xYgfZm/9gCG3+q8NN2KxVHQ5F71BOE\n" \
-> > +    "JeABOaGo9WvnU+DNMIDZjHJMUWVw4MHz/a/UArDf/2CxaPVBNQKBwASg6j4ohSTk\n" \
-> > +    "J7aE6RQ3OBmmDDpixcoCJt9u9SjHVYMlbs5CEJGVSczk0SG3y8P1lOWNDSRnMksZ\n" \
-> > +    "xWnHdP/ogcuYMuvK7UACNAF0zNddtzOhzcpNmejFj+WCHYY/UmPr2/Kf6t7Cxk2K\n" \
-> > +    "3cZ4tqWsiTmBT8Bknmah7L5DrhS+ZBJliDeFAA8fZHdMH0Xjr4UBp9kF90EMTdW1\n" \
-> > +    "Xr5uz7ZrMsYpYQI7mmyqV9SSjUg4iBXwVSoag1iDJ1K8Qg/L7Semgg==\n" \
-> > +    "-----END RSA PRIVATE KEY-----\n"
-> >  
-> >  /*
-> >   * This loads the private key we defined earlier
-> > diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tls
-> > index 54c331d7a5..6ba28a78d3 100644
-> > --- a/tests/qemu-iotests/common.tls
-> > +++ b/tests/qemu-iotests/common.tls
-> > @@ -50,24 +50,45 @@ tls_x509_init()
-> >      # use a fixed key so we don't waste system entropy on
-> >      # each test run
-> >      cat > "${tls_dir}/key.pem" <<EOF
-> > ------BEGIN PRIVATE KEY-----
-> > -MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBALVcr
-> > -BL40Tm6yq88FBhJNw1aaoCjmtg0l4dWQZ/e9Fimx4ARxFpT+ji4FE
-> > -Cgl9s/SGqC+1nvlkm9ViSo0j7MKDbnDB+VRHDvMAzQhA2X7e8M0n9
-> > -rPolUY2lIVC83q0BBaOBkCj2RSmT2xTEbbC2xLukSrg2WP/ihVOxc
-> > -kXRuyFtzAgMBAAECgYB7slBexDwXrtItAMIH6m/U+LUpNe0Xx48OL
-> > -IOn4a4whNgO/o84uIwygUK27ZGFZT0kAGAk8CdF9hA6ArcbQ62s1H
-> > -myxrUbF9/mrLsQw1NEqpuUk9Ay2Tx5U/wPx35S3W/X2AvR/ZpTnCn
-> > -2q/7ym9fyiSoj86drD7BTvmKXlOnOwQJBAPOFMp4mMa9NGpGuEssO
-> > -m3Uwbp6lhcP0cA9MK+iOmeANpoKWfBdk5O34VbmeXnGYWEkrnX+9J
-> > -bM4wVhnnBWtgBMCQQC+qAEmvwcfhauERKYznMVUVksyeuhxhCe7EK
-> > -mPh+U2+g0WwdKvGDgO0PPt1gq0ILEjspMDeMHVdTwkaVBo/uMhAkA
-> > -Z5SsZyCP2aTOPFDypXRdI4eqRcjaEPOUBq27r3uYb/jeboVb2weLa
-> > -L1MmVuHiIHoa5clswPdWVI2y0em2IGoDAkBPSp/v9VKJEZabk9Frd
-> > -a+7u4fanrM9QrEjY3KhduslSilXZZSxrWjjAJPyPiqFb3M8XXA26W
-> > -nz1KYGnqYKhLcBAkB7dt57n9xfrhDpuyVEv+Uv1D3VVAhZlsaZ5Pp
-> > -dcrhrkJn2sa/+O8OKvdrPSeeu/N5WwYhJf61+CPoenMp7IFci
-> > ------END PRIVATE KEY-----
-> > +-----BEGIN RSA PRIVATE KEY-----
-> > +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
-> > +-----END RSA PRIVATE KEY-----
-> >  EOF
-> >  }
-> >  
-> > 
-> 
+> On Wed, Jul 15, 2020 at 01:28:07PM +0200, Jan Kiszka wrote:
+>> On 15.07.20 13:23, Stefan Hajnoczi wrote:
+>> > Let's have a call to figure out:
+>> >=20
+>> > 1. What is unique about these approaches and how do they overlap?
+>> > 2. Can we focus development and code review efforts to get something
+>> >    merged sooner?
+>> >=20
+>> > Jan and Nikos: do you have time to join on Monday, 20th of July at 15:=
+00
+>> > UTC?
+>> > https://www.timeanddate.com/worldclock/fixedtime.html?iso=3D20200720T1=
+500
+>> >=20
+>>=20
+>> Not at that slot, but one hour earlier or later would work for me (so fa=
+r).
+>
+> Nikos: Please let us know which of Jan's timeslots works best for you.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I'm in - the earlier slot would be preferential for me to avoid clashing wi=
+th
+family time.
 
+--=20
+Alex Benn=C3=A9e
 
