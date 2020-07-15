@@ -2,104 +2,85 @@ Return-Path: <SRS0=mmJ2=A2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A41C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 10:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7029BC433EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 10:49:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 271C120656
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 10:44:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 271C120656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E1FF20656
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jul 2020 10:49:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FK6RkHlB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E1FF20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvetw-0007wd-El
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 06:44:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54608)
+	id 1jveyX-0000ho-GU
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 06:49:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hca@linux.ibm.com>)
- id 1jvetL-0007WZ-UQ; Wed, 15 Jul 2020 06:43:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61786
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hca@linux.ibm.com>)
- id 1jvetK-0004rI-93; Wed, 15 Jul 2020 06:43:59 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06FAaaV2174284; Wed, 15 Jul 2020 06:43:55 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 329r1yvgyr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 06:43:55 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06FAbsWP177000;
- Wed, 15 Jul 2020 06:43:55 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 329r1yvgyk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 06:43:55 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06FAel7l015943;
- Wed, 15 Jul 2020 10:43:53 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com
- (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
- by ppma03ams.nl.ibm.com with ESMTP id 327527vb1t-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 15 Jul 2020 10:43:53 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 06FAhocd63308228
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 15 Jul 2020 10:43:50 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 86DFBA404D;
- Wed, 15 Jul 2020 10:43:50 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 08184A4053;
- Wed, 15 Jul 2020 10:43:50 +0000 (GMT)
-Received: from osiris (unknown [9.171.91.154])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Wed, 15 Jul 2020 10:43:49 +0000 (GMT)
-Date: Wed, 15 Jul 2020 12:43:48 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH RFC 2/5] s390x: implement diag260
-Message-ID: <20200715104348.GB6927@osiris>
-References: <20200713091243.GB4359@osiris>
- <07E9FD5B-F07F-415B-9C00-A2A882F07CBC@redhat.com>
- <92b1a2a6-2348-d4ff-6d20-35f3bfef710a@de.ibm.com>
- <a0b52f65-d253-c51b-6dfc-0a61f939c759@redhat.com>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jvexx-0000HL-Er
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 06:48:45 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50015
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jvexu-00060g-1c
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 06:48:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594810120;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=3avbeeiKMsbtZyvQr8mMwj9H+rqG6YyQQLlq299naAA=;
+ b=FK6RkHlBlkMEW5Da6XnkqzHLbm/cAW4GH8j1uXmMuFrQlUQdaCOkOfeJJ0Yjz0TRwBgwaK
+ T2JoM+kXdCfCCHQOuoZs2+ch5cR8YJmFPSPK0bc4OU+AvoSe25kqaH04pGb1Qjwfk5vEh+
+ MQKB6vKCfpdaoDVQMf+lUzw5UDwElZc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-n3-4vE0fNaeDg5WfXZY1jQ-1; Wed, 15 Jul 2020 06:48:38 -0400
+X-MC-Unique: n3-4vE0fNaeDg5WfXZY1jQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BEA21800D42;
+ Wed, 15 Jul 2020 10:48:37 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
+ [10.36.115.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E1E8372E54;
+ Wed, 15 Jul 2020 10:48:33 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id F13419A81; Wed, 15 Jul 2020 12:48:32 +0200 (CEST)
+Date: Wed, 15 Jul 2020 12:48:32 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH v3 3/3] usb/hcd-xhci: Split pci wrapper for xhci base model
+Message-ID: <20200715104832.lu2xgyp6nvmenuue@sirius.home.kraxel.org>
+References: <1594140271-16462-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1594140271-16462-4-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
+In-Reply-To: <1594140271-16462-4-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a0b52f65-d253-c51b-6dfc-0a61f939c759@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-15_07:2020-07-15,
- 2020-07-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- bulkscore=0 adultscore=0 spamscore=0 mlxscore=0 phishscore=0
- malwarescore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- mlxlogscore=999 suspectscore=1 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2007150084
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=hca@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 05:27:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 02:37:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,66 +94,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ying Fang <fangying1@huawei.com>,
+ =?utf-8?Q?'Marc-Andr=C3=A9?= Lureau' <marcandre.lureau@redhat.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ 'Philippe =?utf-8?Q?Mathieu-Daud=C3=A9'?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 15, 2020 at 11:42:37AM +0200, David Hildenbrand wrote:
-> So, in summary, we want to indicate to the guest a memory region that
-> will be used to place memory devices ("device memory region"). The
-> region might have holes and the memory within this region might have
-> different semantics than ordinary system memory. Memory that belongs to
-> memory devices should only be detected+used if the guest OS has support
-> for them (e.g., virtio-mem, virtio-pmem, ...). An unmodified guest
-> (e.g., no virtio-mem driver) should not accidentally make use of such
-> memory.
-> 
-> We need a way to
-> a) Tell the guest about boot memory (currently ram_size)
-> b) Tell the guest about the maximum possible ram address, including
-> device memory. (We could also indicate the special "device memory
-> region" explicitly)
-> 
-> AFAIK, we have three options:
-> 
-> 1. Indicate maxram_size via SCLP, indicate ram_size via diag260(0x10)
-> 
-> This is what this series (RFCv1 does).
-> 
-> Advantages:
-> - No need for a new diag. No need for memory sensing kernel changes.
-> Disadvantages
-> - Older guests without support for diag260 (<v4.2, kvm-unit-tests) will
->   assume all memory is accessible. Bad.
+  Hi,
 
-Why would old guests assume that?
+> --- a/hw/usb/Kconfig
+> --- a/hw/usb/Makefile.objs
 
-At least in v4.1 the kernel will calculate the max address by using
-increment size * increment number and then test if *each* increment is
-available with tprot.
+These two hunks need to go to patch 2/3
 
-> - The semantics of the value returned in ry via diag260(0xc) is somewhat
->   unclear. Should we return the end address of the highest memory
->   device? OTOH, an unmodified guest OS (without support for memory
->   devices) should not have to care at all about any such memory.
+take care,
+  Gerd
 
-I'm confused. The kernel currently only uses diag260(0x10). How is
-diag260(0xc) relevant here?
-
-> 3. Indicate maxram_size and ram_size via SCLP (using the SCLP standby
->    memory)
-> 
-> I did not look into the details, because -ENODOCUMENTATION. At least we
-> would run into some alignment issues (again, having to align
-> ram_size/maxram_size to storage increments - which would no longer be
-> 1MB). We would run into issues later, trying to also support standby memory.
-
-That doesn't make sense to me: either support memory hotplug via
-sclp/standby memory, or with your new method. But trying to support
-both.. what's the use case?
 
