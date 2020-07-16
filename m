@@ -2,71 +2,91 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A398C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F69C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2204520775
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2204520775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7A0DC20775
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiAHd5/9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0DC20775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw0Zg-0002Ze-9v
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:53:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48356)
+	id 1jw0Zf-0002X0-Ob
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:53:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jw0Yz-0001XQ-GP; Thu, 16 Jul 2020 05:52:25 -0400
-Resent-Date: Thu, 16 Jul 2020 05:52:25 -0400
-Resent-Message-Id: <E1jw0Yz-0001XQ-GP@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21759)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw0Yw-0001VJ-Cv
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:52:22 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46774
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jw0Yw-0006yK-No; Thu, 16 Jul 2020 05:52:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594893122; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Xr1fAZkyCl52haAfP6JAcEgmusU5kR2UrMCZ/rhbWogdlvGVWQ3oC6XurO1gHCTBcKjAXs0XLW2YzTN53SkDaJR07JobcKabCw8YdD/d0Yt5Q2kSeMDNf1Rw1Sq0mA05bGcHz0vxiOl8coBFsaUXSSCies3P1D5lDnxWRYV9UWw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594893122;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=0kWqcMn/4x74uQxyZKAfe2eWfEtwRXw9nbOuRLDPVXw=; 
- b=hxr7XcrO4EwFxgSicA7GJnyZYPswwcylKc7d+IA5c/dipm9PywIKWB68pxgOLDxzKKbHayPsY0HeUOANGJRdmmey8ljHcb/bAFYgJ2zAxDwDCJkvCA73rgnDlJaeBtj9W/B+baMlo984UJ2zRSGmtYJP5WD5fkmGQnrJRL628tg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1594893117609631.3915426017187;
- Thu, 16 Jul 2020 02:51:57 -0700 (PDT)
-Subject: Re: [PATCH] hw/riscv: sifive_e: Correct debug block size
-Message-ID: <159489311546.24176.16290580199233458898@07a7f0d89f7d>
-In-Reply-To: <1594891856-15474-1-git-send-email-bmeng.cn@gmail.com>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw0Yu-0006xT-1i
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:52:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594893138;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=w/RhQm5bFXAXs8gAGrRUTLPFfDw67LI4nsCk2cX+WQw=;
+ b=hiAHd5/9sJVi3W5nf214Gk1c1nnsEl6KYXG2vCJNBoKOnwpyaeNbyeaAGl0697bwpbO/ss
+ iGTbGCepDAHAiFNt1XgfyiRGATl7737s5prsVDc0uERj4Bp9IFMVekAsHqoQVmUsVJPdSy
+ 8DDVwxhvKdYL/nIOFpgPojo7Ys4+j7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-FOGcY6y7NVa2tqD_TMkj_w-1; Thu, 16 Jul 2020 05:52:14 -0400
+X-MC-Unique: FOGcY6y7NVa2tqD_TMkj_w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 853AAE92D;
+ Thu, 16 Jul 2020 09:52:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BBC372AEE;
+ Thu, 16 Jul 2020 09:52:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9B5AF11385E0; Thu, 16 Jul 2020 11:52:07 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>
+Subject: Re: [PATCH v2] tests: qmp-cmd-test: fix memory leak
+References: <20200715154117.15456-1-liq3ea@163.com>
+ <874kq8roev.fsf@dusky.pond.sub.org>
+ <CAKXe6S+CvQ1rmnWXi2_=kiCF4yG-2T3iPut=51G25qwL+oO2Pw@mail.gmail.com>
+Date: Thu, 16 Jul 2020 11:52:07 +0200
+In-Reply-To: <CAKXe6S+CvQ1rmnWXi2_=kiCF4yG-2T3iPut=51G25qwL+oO2Pw@mail.gmail.com>
+ (Li Qiang's message of "Thu, 16 Jul 2020 14:43:31 +0800")
+Message-ID: <87blkfpz20.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: bmeng.cn@gmail.com
-Date: Thu, 16 Jul 2020 02:51:57 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 05:52:19
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 01:59:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,49 +99,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, palmerdabbelt@google.com,
- qemu-devel@nongnu.org, Alistair.Francis@wdc.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Auger Eric <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTk0ODkxODU2LTE1NDc0LTEt
-Z2l0LXNlbmQtZW1haWwtYm1lbmcuY25AZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhl
-IHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9j
-a2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2Vu
-dG9zNyBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNI
-T1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAg
-ICBjaGVjay11bml0OiB0ZXN0cy90ZXN0LWNyeXB0by1zZWNyZXQKICBURVNUICAgIGNoZWNrLXVu
-aXQ6IHRlc3RzL3Rlc3QtY2hhcgoqKgpFUlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVz
-dC1jaGFyLmM6MTIwNDpjaGFyX3NlcmlhbF90ZXN0OiAnY2hyJyBzaG91bGQgbm90IGJlIE5VTEwK
-RVJST1IgdGVzdC1jaGFyIC0gQmFpbCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0
-cy90ZXN0LWNoYXIuYzoxMjA0OmNoYXJfc2VyaWFsX3Rlc3Q6ICdjaHInIHNob3VsZCBub3QgYmUg
-TlVMTAptYWtlOiAqKiogW2NoZWNrLXVuaXRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9y
-IHVuZmluaXNoZWQgam9icy4uLi4KICBURVNUICAgIGlvdGVzdC1xY293MjogMDI0CiAgVEVTVCAg
-ICBpb3Rlc3QtcWNvdzI6IDAyNQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRj
-b2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8n
-LCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1
-aWQ9NGFjZjJiNjczZWZkNDlmMzhkNDQ4OTM3NDI2MzQ0ZmEnLCAnLXUnLCAnMTAwMycsICctLXNl
-Y3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRf
-TElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywg
-J0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hF
-X0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUt
-ZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAtNjdwZ2ZxZmcvc3JjL2RvY2tlci1zcmMuMjAyMC0wNy0xNi0wNS4zNi4zMy4y
-NjY1MzovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdS9jZW50b3M3JywgJy92YXIvdG1wL3FlbXUv
-cnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmls
-dGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NGFjZjJiNjczZWZkNDlm
-MzhkNDQ4OTM3NDI2MzQ0ZmEKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2Vb
-MV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtNjdwZ2Zx
-Zmcvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAy
-CgpyZWFsICAgIDE1bTIzLjI2M3MKdXNlciAgICAwbTguNjQzcwoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU5NDg5MTg1Ni0xNTQ3NC0xLWdp
-dC1zZW5kLWVtYWlsLWJtZW5nLmNuQGdtYWlsLmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50
-b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Li Qiang <liq3ea@gmail.com> writes:
+
+> Markus Armbruster <armbru@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8816=
+=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=881:59=E5=86=99=E9=81=93=EF=BC=
+=9A
+>>
+>> Li Qiang <liq3ea@163.com> writes:
+>>
+>> > Properly free each test response to avoid memory leak and separate
+>> > qtest_qmp() calls with spare lines, in a consistent manner.
+>> >
+>> > Fixes: 5b88849e7b9("tests/qmp-cmd-test: Add
+>> > qmp/object-add-failure-modes"
+>>
+>> The patch also fixes leaks introduced in 442b09b83d and 9fc719b869,
+>> actually.  At least it should, but the patch appears to be incomplete.
+
+442b09b83d was fine, actually.
+
+9fc719b869 wasn't, and your second patch hunk fixes it.  Please add a
+"Fixes: 9fc719b869' line to the commit message.
+
+>> >
+>> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>> > Signed-off-by: Li Qiang <liq3ea@163.com>
+>> > ---
+>> > Change sincve v1: add detailed commit message
+>> >
+>> > tests/qtest/qmp-cmd-test.c | 13 +++++++++++++
+>> >  1 file changed, 13 insertions(+)
+>> >
+>> > diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+>> > index c68f99f659..f7b1aa7fdc 100644
+>> > --- a/tests/qtest/qmp-cmd-test.c
+>> > +++ b/tests/qtest/qmp-cmd-test.c
+>> > @@ -230,6 +230,8 @@ static void test_object_add_failure_modes(void)
+>>    static void test_object_add_failure_modes(void)
+>>    {
+>>        QTestState *qts;
+>>        QDict *resp;
+>>
+>>        /* attempt to create an object without props */
+>>        qts =3D qtest_init(common_args);
+>>        resp =3D qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
+>>                         " {'qom-type': 'memory-backend-ram', 'id': 'ram1=
+' } }");
+>>        g_assert_nonnull(resp);
+>>        qmp_assert_error_class(resp, "GenericError");
+>>
+>> Doesn't @resp leak here, too?
+>
+> No, qmp_assert_error_class will call qobject_unref(rsp) will so will not =
+leak.
+
+You're right.
+
+With the additional Fixes:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+> In fact, I think this is a inconsistent for 'qtest_qmp'.
+> I think we can apply this patch first and then change the
+> 'qmp_assert_error_class' or/and others
+> to free resp. And just let the caller of 'qtest_qmp' frees unref the rsp.
+
+Do you mean "not to free @resp"?
+
+> What's your idea?
+
+Rename it to qmp_expect_error_and_unref()?
+
 
