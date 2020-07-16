@@ -2,127 +2,90 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE4EC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA5D9C433E6
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:52:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD1F32067D
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:51:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A20CC2074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:52:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="PG9eWNGE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD1F32067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJC8OVFk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A20CC2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvzbv-0002B7-0E
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 04:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32802)
+	id 1jvzcq-00036k-Sw
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 04:52:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jvzbJ-0001ez-P4; Thu, 16 Jul 2020 04:50:45 -0400
-Received: from mail-eopbgr10136.outbound.protection.outlook.com
- ([40.107.1.136]:65014 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jvzbH-0008KW-Di; Thu, 16 Jul 2020 04:50:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A11yDsUhjF+b8u9wzW7ZLvSgJno8AX1ePw4dunVCVlZgVu4IkfNM51dJT/WDA3aH5YR8U0nOWuX0JCmSMh0f86OgStGO30Wi/boJwrOj7uYQTU3/8TMNW0wszKAFLC5Zj07Haoccp6n1ES39+aBY4BYBnLIqGOR5wHLbourY5aNXxAv/MmgKpcxY6fjm/iWRkiuE5ycJjkHUNablqPmuPyGkxfzqobqm/pOJuHuuNrr2CvcJMFRds0GSbLLt4ywXE1cKfJBNCQ2fHJy/yMO1CWQNuzmrKlsp/2ZddW4M3tXfm9CHNQ5qXFGMKsItNkcfybDO9VrhYEpsEjPIZEjlNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kxx0uWzHJomwebp+MjOLTLfPEbIdmqQZJQaJXZ8FgAM=;
- b=ftx7eSthI7+zMYYHBHpWirWIeBrNdxvPBJ8HiN7K3kmMh491rqLBRYEuBe0472/SOX2tJkhU4cih8CDAoQ98xnWQRnfNjUREc6Rm8lNXqxXZl92bgAinIoE8lh3TYbO3F74CU5bhBiHUsNaq4FwI92oYnVyxyQn+0f/+Tp+UvadeH+5HR9GOzySjTEPqx6Yp5TikBwooGu6rcaLELWYqg9nl7I9czficWgK9fx/m8ndbtadcWVDH0+iDYVTzY+tq2KIt+eujnBjPpCH8h+hNU3iiIjx+SMIgXzezHYnCcsvoDIWegngg1bQ7Pl1bgLgiHXy8sd7VmxZ5UuVVBQzvOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kxx0uWzHJomwebp+MjOLTLfPEbIdmqQZJQaJXZ8FgAM=;
- b=PG9eWNGEMCB+5rvrgGuj7PaznOVNQTAUygMq3/aGOB6ZK7xMuD/M/an3E6Eh9fV3s05F0PvYgapLNvWeDPt5n+o//PlhmbijszXrHPJ+aWU5zmzUAB/DOh3Tf0AqyZxKs3sLUR9Xtrsq2RRIC4g3Y75sbuMHC/vt8dFtvoLBgcE=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0802MB2449.eurprd08.prod.outlook.com (2603:10a6:203:9c::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Thu, 16 Jul
- 2020 08:50:40 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3195.018; Thu, 16 Jul 2020
- 08:50:40 +0000
-Subject: Re: [PATCH v10 04/10] qcow2_format.py: dump bitmap flags in human
- readable way.
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <1594676203-436999-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1594676203-436999-5-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <fa0f27d9-d307-3ab9-0e11-a9f4e1f66422@virtuozzo.com>
-Date: Thu, 16 Jul 2020 11:50:38 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <1594676203-436999-5-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0048.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::28) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvzcJ-0002e3-Ao
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:51:47 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28796
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jvzcF-0000AT-MS
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:51:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594889502;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uWTfLHenUQIX9h8QBqtXVW74I2zNWknjSnfiV3m2D5Y=;
+ b=iJC8OVFk0tX/JFVp5oVWq9a0w0nNSagCyJM4f47BjG7/KujWT1l1ba+iL+vT1Bl+ygCxW3
+ 5c418bTp1RdF8GEB/uMrIas4aOWIxq/ADWEnHPH0PlUSTHy16MemIDAnJR7H4aCV3w9fV3
+ IHlsBdHb2VZCgKuHThwMRrC/i5IoZ2M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-JA2GCIXJOdGz6jkarcuUmA-1; Thu, 16 Jul 2020 04:51:36 -0400
+X-MC-Unique: JA2GCIXJOdGz6jkarcuUmA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58D8780183C;
+ Thu, 16 Jul 2020 08:51:35 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 51BBB79D16;
+ Thu, 16 Jul 2020 08:51:30 +0000 (UTC)
+Date: Thu, 16 Jul 2020 09:51:27 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+Subject: Re: [PATCH 4/4] net/colo: Match is-enabled probe to tracepoint
+Message-ID: <20200716085127.GB227735@redhat.com>
+References: <20200716081754.22422-1-r.bolshakov@yadro.com>
+ <20200716081754.22422-5-r.bolshakov@yadro.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.164) by
- AM0PR10CA0048.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend
- Transport; Thu, 16 Jul 2020 08:50:39 +0000
-X-Originating-IP: [185.215.60.164]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b217dbfb-1673-4f15-73ac-08d829655115
-X-MS-TrafficTypeDiagnostic: AM5PR0802MB2449:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0802MB2449108FCD2D523076D105E8C17F0@AM5PR0802MB2449.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:741;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: geQ9MBAqF9amxTFaR2iiODuefv+davSx3Vac2gcWTcyZB7D/vgTXuPzG+SYQKLeL+wUba6aWMbpQ7zUu63sxTZ2pl/H4RCSDea0IwteVFbxzKf93FQGGQwla1rDSRG5FfYuc6S58cnrjh/V0SOv1gYo1VEODE2TlcpLiSzsM/aSM3i7vnmnir4Fh1qSQWyXYdTp2Gi4RKyIL72XRBvfOM00LPqeef3Uzr18Mv7/W4sZmmSguVqjdCAX9lqV4qY6Hb+z1+/QWEN+qyq6+OUeF1QNYKB/So/gSU4WSQagdZYSF8AC7EA41V5aOBwQEKY+zFRVGKTpw1EBtaXlkThkJW7/+FFkol4gCrjExg/UMGY3W2rJlOtVBi8305ituIu2N
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(366004)(136003)(376002)(346002)(396003)(4326008)(2906002)(2616005)(16526019)(5660300002)(186003)(86362001)(31696002)(956004)(26005)(8676002)(31686004)(8936002)(4744005)(16576012)(36756003)(316002)(478600001)(66946007)(107886003)(66476007)(66556008)(52116002)(6486002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: SC2yiGKp2E+e7RwEpNYYSYz5lh8SN/Q2Tvy0Bpjiu7mbSoKer2ZR3LJxn9cWF+JioPjCMRUh3XJ4+WdKXbwdcfRxQbaauQ4j0Rv0pd9B/YsaThoaPNV1KF/Bh8t7GyXWGRHxZ8V370F27DUvN+kBruGvwXMsIthIqQ30HPCzmg1rCQJ9vdKbcJhgqaQcK+nfvWlkBJdp5PH7bX8yuYJfEkTrdsfg30efwCd0KTeJHiMd/WjaMMgMe/L1e47F1VZ/OcaqTfXTZe8Ltg6UUnfzT/ZL0BA8u16NJ5y02gC0IUl4YvwYQKsfYVFtf5TSte9vDz2wF8+pLVydpWEs4wNS/pV1ncC5v1t6peoUd7JrTYdn7UsRZF70pfYNJrEAdnS7leQg14cd8HoqTMfsqb5XxhzlOe15YPftevPrcNGqo09GdkhQTOKxvYAM6nv5DLqhPtt4GI6c2Rz314GGmf6achwc+gEg3IQrh0u0MES+othJig6mmrAQnxf4Vd+5khP5
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b217dbfb-1673-4f15-73ac-08d829655115
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 08:50:40.2706 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8LvMYC3kxL7WY8mHwAF/mcrimZXl57XPTr4K0OUsaMUGKMgRMFcl3ZxvjQGRMmzS6k/I6V5tcCwX870+Z/BZCWDxNU4et9yjYWdF7TZ1J1E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2449
-Received-SPF: pass client-ip=40.107.1.136;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:50:40
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200716081754.22422-5-r.bolshakov@yadro.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 01:59:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,20 +98,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+ Zhang Chen <chen.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-14.07.2020 00:36, Andrey Shinkevich wrote:
-> Introduce the class BitmapFlags that parses a bitmap flags mask.
+Adding Stefan to CC as the trace maintainer.
+
+On Thu, Jul 16, 2020 at 11:17:54AM +0300, Roman Bolshakov wrote:
+> Build of QEMU with dtrace fails on macOS:
 > 
-> Suggested-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
-> Signed-off-by: Andrey Shinkevich<andrey.shinkevich@virtuozzo.com>
+>   LINK    x86_64-softmmu/qemu-system-x86_64
+> error: probe colo_compare_miscompare doesn't exist
+> error: Could not register probes
+> ld: error creating dtrace DOF section for architecture x86_64
+> 
+> The reason of the error is explained by Adam Leventhal [1]:
+> 
+>   Note that is-enabled probes don't have the stability magic so I'm not
+>   sure how things would work if only is-enabled probes were used.
+> 
+> net/colo code uses is-enabled probes to determine if other probes should
+> be used but colo_compare_miscompare itself is not used explicitly.
+> Linker doesn't include the symbol and build fails.
+> 
+> The issue can be resolved if is-enabled probe matches the actual trace
+> point that is used inside the test.
+> 
+> 1. http://markmail.org/message/6grq2ygr5nwdwsnb
+> 
+> Fixes: f4b618360e ("colo-compare: add TCP, UDP, ICMP packet comparison")
+> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+>  net/colo-compare.c    | 12 +++++++-----
+>  net/filter-rewriter.c |  8 ++++++--
+>  net/trace-events      |  2 --
+>  3 files changed, 13 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 398b7546ff..9525ed703b 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -327,7 +327,7 @@ static int colo_compare_packet_payload(Packet *ppkt,
+>                                         uint16_t len)
+>  
+>  {
+> -    if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+> +    if (trace_event_get_state_backends(TRACE_COLO_COMPARE_IP_INFO)) {
+>          char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
+>  
+>          strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
+> @@ -492,7 +492,7 @@ sec:
+>          g_queue_push_head(&conn->primary_list, ppkt);
+>          g_queue_push_head(&conn->secondary_list, spkt);
+>  
+> -        if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+> +        if (trace_event_get_state_backends(TRACE_COLO_COMPARE_TCP_INFO)) {
+>              qemu_hexdump((char *)ppkt->data, stderr,
+>                          "colo-compare ppkt", ppkt->size);
+>              qemu_hexdump((char *)spkt->data, stderr,
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Not your fault, as this problem is pre-existing, but IMHO this block of code
+is simply broken by design. It is checking a trace event enablement state,
+and then not emitting any trace event, but instead dumping info to stderr.
+This is mis-use of the trace framework, and changing the event name fixes
+your immediate macOS bug but the code is still flawed.
 
+Basically it is using the trace framework as a way to dynamically turn on /
+off general debugging information.
+
+I'm not quite sure what todo to fix it, but I don't think it should be wrapped
+in any trace_event_get_state_backends() call at all.
+
+The simplest immediate option I think is to change it to be a compile time
+debug
+
+  // #define DEBUG_COLO_PACKETS
+
+and then use
+
+  #ifdef DEBUG_COLO_PACKETS
+      qemu_hexdump(...)
+  #endif
+
+and then leave it upto the maintainer to come up with a more advanced
+solution if they want to make it runtime configurable again, but not
+abusing the trace framework.
+
+> @@ -533,7 +533,8 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
+>                                      ppkt->size - offset)) {
+>          trace_colo_compare_udp_miscompare("primary pkt size", ppkt->size);
+>          trace_colo_compare_udp_miscompare("Secondary pkt size", spkt->size);
+> -        if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+> +        if (trace_event_get_state_backends(
+> +              TRACE_COLO_COMPARE_UDP_MISCOMPARE)) {
+>              qemu_hexdump((char *)ppkt->data, stderr, "colo-compare pri pkt",
+>                           ppkt->size);
+>              qemu_hexdump((char *)spkt->data, stderr, "colo-compare sec pkt",
+
+Same brokenness
+
+> @@ -576,7 +577,8 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
+>                                             ppkt->size);
+>          trace_colo_compare_icmp_miscompare("Secondary pkt size",
+>                                             spkt->size);
+> -        if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+> +        if (trace_event_get_state_backends(
+> +              TRACE_COLO_COMPARE_ICMP_MISCOMPARE)) {
+>              qemu_hexdump((char *)ppkt->data, stderr, "colo-compare pri pkt",
+>                           ppkt->size);
+>              qemu_hexdump((char *)spkt->data, stderr, "colo-compare sec pkt",
+
+Same brokenness
+
+> @@ -597,7 +599,7 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
+>      uint16_t offset = ppkt->vnet_hdr_len;
+>  
+>      trace_colo_compare_main("compare other");
+> -    if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
+> +    if (trace_event_get_state_backends(TRACE_COLO_COMPARE_IP_INFO)) {
+>          char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
+>  
+>          strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
+> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+> index 1aaad101b6..ff04165cc4 100644
+> --- a/net/filter-rewriter.c
+> +++ b/net/filter-rewriter.c
+> @@ -76,7 +76,9 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
+>      struct tcp_hdr *tcp_pkt;
+>  
+>      tcp_pkt = (struct tcp_hdr *)pkt->transport_header;
+> -    if (trace_event_get_state_backends(TRACE_COLO_FILTER_REWRITER_DEBUG)) {
+> +    if (trace_event_get_state_backends(TRACE_COLO_FILTER_REWRITER_PKT_INFO) ||
+> +        trace_event_get_state_backends(
+> +          TRACE_COLO_FILTER_REWRITER_CONN_OFFSET)) {
+>          trace_colo_filter_rewriter_pkt_info(__func__,
+>                      inet_ntoa(pkt->ip->ip_src), inet_ntoa(pkt->ip->ip_dst),
+>                      ntohl(tcp_pkt->th_seq), ntohl(tcp_pkt->th_ack),
+
+Since there are two separate trace events here, each should be wrapped with
+its own check. IOW, two completely separate if (...) trace(..); blocks
+
+> @@ -180,7 +182,9 @@ static int handle_secondary_tcp_pkt(RewriterState *rf,
+>  
+>      tcp_pkt = (struct tcp_hdr *)pkt->transport_header;
+>  
+> -    if (trace_event_get_state_backends(TRACE_COLO_FILTER_REWRITER_DEBUG)) {
+> +    if (trace_event_get_state_backends(TRACE_COLO_FILTER_REWRITER_PKT_INFO) ||
+> +        trace_event_get_state_backends(
+> +          TRACE_COLO_FILTER_REWRITER_CONN_OFFSET)) {
+>          trace_colo_filter_rewriter_pkt_info(__func__,
+>                      inet_ntoa(pkt->ip->ip_src), inet_ntoa(pkt->ip->ip_dst),
+>                      ntohl(tcp_pkt->th_seq), ntohl(tcp_pkt->th_ack),
+
+Same here.
+
+
+Regards,
+Daniel
 -- 
-Best regards,
-Vladimir
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
