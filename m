@@ -2,96 +2,102 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B82FC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 07:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A4FC433E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 07:36:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47C85206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 07:36:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0385206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 07:36:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ibFiya5B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C85206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIXhiJP9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0385206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvyQx-0006GA-J5
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 03:35:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40646)
+	id 1jvyRl-0007J6-9g
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 03:36:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvyOT-0003vQ-4R
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 03:33:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35748
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jvyOQ-0008LT-De
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 03:33:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594884800;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hQapggv2ZpDbOuefqhJPUM9GuRgISpJ2vvuWQpgvqfI=;
- b=ibFiya5Be/nr/uarEbetlBF7l8MweUw5xvCHNgaBa57/OLXXwazhPVj0T2LZcxPCxs8hkY
- 7+IIx6sFrRSiiNSk0aqhNRQs3OQx+IW/61olLaz2XGFC54PpnjcFjY+QRo60lolB+2XGPa
- Ky0uddqafZojdbxlxiIxUi4TdFane3w=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-pVzpEz9mM1u4yIVdFkcOPw-1; Thu, 16 Jul 2020 03:33:19 -0400
-X-MC-Unique: pVzpEz9mM1u4yIVdFkcOPw-1
-Received: by mail-ot1-f70.google.com with SMTP id e48so2288599ote.9
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 00:33:18 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jvyRA-0006ex-OI; Thu, 16 Jul 2020 03:36:12 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40645)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jvyR8-0000QR-Ty; Thu, 16 Jul 2020 03:36:12 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f2so5921919wrp.7;
+ Thu, 16 Jul 2020 00:36:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dyH8o4vzMlymGeUY9+yHBDYe1iWlqFQDVWjwN1WCOXk=;
+ b=lIXhiJP9Ma5CAeLTj0X6o0pnZuGcT3tsznlEecmzZHF7TIcI1wOXIQC44BUl3z3kBE
+ WymQ1CcbOUmSRT0wuMEGxGiPCY0LANpWX8XMoeRuQuIohwHa1RnxY3jVEIDjK9QfqjRn
+ KY8m36mh4KcNlkDqsgFXdd9lJ6nkt3rJipr1h6pcPMzzizn8a92DS42XSm563L0q/bfP
+ ujvsWywWPK2/EwZDLS9iXHgCj+EG3mrpFvfIle10a++QqYOfpMkhYYr7JoNaQXgrM0H6
+ n6c3vgENwRuRSUi+o5bx3sqWJI9Up/1Qj/2k2x0kPpmRcTxIMwwG/NdsdOBSWfQIWjYW
+ Fn+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=hQapggv2ZpDbOuefqhJPUM9GuRgISpJ2vvuWQpgvqfI=;
- b=j+Y2FtNbz5B+bhbHPtWW4NzDVNtEm/xspxsgFRfb6SndytRhs3zDlvNbAZl8gGtbJh
- Gw7JesK7b/cxFmErK6YYGaK6kn1namrOs5A62ORtAm28qr0LKr2K0lc5TfWzZzWYeEmA
- ym+0+MGAXvSNoTa7a/JfYUFcns8qyj1aFSPicVeKxEz9/x65SfvIQcITrWxl3udVyKrb
- XJgeDMLNPNi8m+JsyjxpK/kh7aYzH6oxLVP7jxBnjWwrvv2PeBP6f3Ri0gvvYyAT485A
- PS4KW207hKCFEI/JlUhfB2v5vNOCxCwepcjB9GuGygt+PZ5zopAYkhxuc+6YlBUhC3Sq
- I9yA==
-X-Gm-Message-State: AOAM5335UCj4Y35ztVrmELBRefbzCZnkSWcbsAcNs+cfLYrRzZKBb6+v
- ecZtWbnfZyRqi0oHsyIje3uFbZ4heYDmEOtXpQ+ZWZfEKJYAFdVmJberLpMA8fG/HizXHjHyutm
- fKr6PaQOeFuhhpZfm9WEaVC/a4360xDc=
-X-Received: by 2002:a9d:12f7:: with SMTP id g110mr3359921otg.79.1594884798345; 
- Thu, 16 Jul 2020 00:33:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzUj2qKc/xiSXiAiUwxgVOgCf8L6ZkT/2GClY5rkaPDAo9ZsPdU2Ge5PvPsEW7r9yV1tLM0bLMsVjO4K5puCwE=
-X-Received: by 2002:a9d:12f7:: with SMTP id g110mr3359901otg.79.1594884798071; 
- Thu, 16 Jul 2020 00:33:18 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dyH8o4vzMlymGeUY9+yHBDYe1iWlqFQDVWjwN1WCOXk=;
+ b=IoNGiCZ7uv6jEPtefRkxWm3VVaTNnegbVQvuuAZy+JWsClpvW1D8blckuXletJt9bs
+ zGJkz+4V71R/S6x8l1DDh+0Y7IVIbuwa1vjGAUV+crt0GCPvBDcyayALQMmogzs+79rs
+ SR+LqKNDQlOnFCO6HmIWy+6PqSnJQmMG3jTiqPSpVk4GpBEmFGAfU3BuSqiuYocra2DV
+ vE882XtNTBRk6MXA3ej6JPdiqlVwcQYkuShtiJL/Qve4eQXvYpiKYTIfTVLSjhq7uhpQ
+ ihrazg5Lp+2ozwwuPp7IQdrXhCdDrormLA/quPlcMOm7DjHKTs2E2dg9OagfRbZOOUBg
+ Xj9Q==
+X-Gm-Message-State: AOAM530QUtzKulXs85dg/N2M0hTgjsAC0GG/cCBwbvgZbVvPdkRCnMKD
+ OnZAlc2ba+4pVhwprqiNCzE=
+X-Google-Smtp-Source: ABdhPJxDZwWd4lO6JOSy6EdZZgYBOKgyW3tnymT98j8XoLXlJNeQwYE+QX1jyZnZqBzBe6VgbWd8VA==
+X-Received: by 2002:adf:e4cc:: with SMTP id v12mr3880049wrm.92.1594884968593; 
+ Thu, 16 Jul 2020 00:36:08 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id v15sm6772250wmh.24.2020.07.16.00.36.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 16 Jul 2020 00:36:07 -0700 (PDT)
+Subject: Re: [PATCH for-5.1 1/2] msf2: Unbreak device-list-properties for
+ "msf-soc"
+To: Thomas Huth <thuth@redhat.com>, sundeep subbaraya
+ <sundeep.lkml@gmail.com>, Markus Armbruster <armbru@redhat.com>
+References: <20200715140440.3540942-1-armbru@redhat.com>
+ <20200715140440.3540942-2-armbru@redhat.com>
+ <ef1d7fe4-0558-cc7b-16d7-906c4aa9915b@amsat.org>
+ <87wo34u9fv.fsf@dusky.pond.sub.org>
+ <CALHRZurw_HsyFmNWYuG_Cagx8cTTBCGzafWmx6JHJ+NS7aVKOw@mail.gmail.com>
+ <9b3f870c-481f-79f1-e55e-074ee0d95633@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4e08aa92-0db0-1a09-0716-5f5ff896910d@amsat.org>
+Date: Thu, 16 Jul 2020 09:36:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200716055655.24507-1-thuth@redhat.com>
- <ec2ae831-d666-3d0c-a8f3-0e16e2ffd3d1@amsat.org>
-In-Reply-To: <ec2ae831-d666-3d0c-a8f3-0e16e2ffd3d1@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Thu, 16 Jul 2020 09:33:07 +0200
-Message-ID: <CAP+75-U-wp3zyLqyWh8xTd-No1gMMqLW8sSgAibYpNWWSC293g@mail.gmail.com>
-Subject: Re: [PATCH] configure: Fix for running with --enable-werror on macOS
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 19:36:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <9b3f870c-481f-79f1-e55e-074ee0d95633@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,68 +110,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, nieklinnenbank@gmail.com,
+ qemu-arm <qemu-arm@nongnu.org>, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 16, 2020 at 9:32 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> On 7/16/20 7:56 AM, Thomas Huth wrote:
-> > The configure script currently refuses to succeed when run on macOS
-> > with --enable-werror:
-> >
-> >  ERROR: configure test passed without -Werror but failed with -Werror.
-> >
-> > The information in config.log indicates:
-> >
-> >  config-temp/qemu-conf.c:3:55: error: control reaches end of non-void
-> >  function [-Werror,-Wreturn-type]
-> >  static void *f(void *p) { pthread_setname_np("QEMU"); }
-> >                                                       ^
-> > And indeed, the return statement is missing here.
->
-> I have a similar commit dated "2019-07-13 17:13:51" that fixes that too,
-> because I had problem with a CI (cirrus?). I remember there was a
-> discussion about it, as I can't find on the list, I suppose it was
-> discussed on IRC.
-> I don't remember the outcome, it was negative or the patch was
-> incomplete. I'm happy if it get fixed, so:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 7/16/20 8:07 AM, Thomas Huth wrote:
+> On 16/07/2020 04.59, sundeep subbaraya wrote:
+>> On Wed, Jul 15, 2020 at 8:12 PM Markus Armbruster <armbru@redhat.com> wrote:
+>>>
+>>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>>>
+>>>> On 7/15/20 4:04 PM, Markus Armbruster wrote:
+>>>>> Watch this:
+>>>>>
+>>>>>     $ qemu-system-aarch64 -M ast2600-evb -S -display none -qmp stdio
+>>>>>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 5}, "package": "v5.0.0-2464-g3a9163af4e"}, "capabilities": ["oob"]}}
+>>>>>     {"execute": "qmp_capabilities"}
+>>>>>     {"return": {}}
+>>>>>     {"execute": "device-list-properties", "arguments": {"typename": "msf2-soc"}}
+>>>>>     Unsupported NIC model: ftgmac100
+>>>>>     armbru@dusky:~/work/images$ echo $?
+>>>>>     1
+>>>>>
+>>>>> This is what breaks "make check SPEED=slow".
+>>>>>
+>>>>> Root cause is m2sxxx_soc_initfn()'s messing with nd_table[] via
+>>>>> qemu_check_nic_model().  That's wrong.
+>>>>>
+>>>>> We fixed the exact same bug for device "allwinner-a10" in commit
+>>>>> 8aabc5437b "hw/arm/allwinner-a10: Do not use nd_table in instance_init
+>>>>> function".  Fix this instance the same way: move the offending code to
+>>>>> m2sxxx_soc_realize(), where it's less wrong, and add a FIXME comment.
+>>>>
+>>>> That addresses this other thread, right?
+>>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg720658.html
+>>>
+>>> Correct!  I wasn't aware of it, thanks for making the connection.
+>>>
+>>
+>> Thanks Markus for the fix.
+> 
+> It's rather just a work-around that avoids the crash than a real fix. I
+> think we can use it for the upcoming 5.1 release, but it would be great
+> if you could rework this code for 5.2, so that the nd_table handling is
+> moved to msf2-som.c instead.
 
-Oops the other one:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Yes this is not a 'fix' but rather a kludge.
+Thomas gave some tips to work on a fix here:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg720658.html
 
->
-> >
-> > Fixes: 479a57475e ("util: Implement debug-threads for macOS")
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  Note: There is another issue with --enable-werror on macOS, with the
-> >        atomic64, which I haven't quite figured out yet, so compiling
-> >        with --enable-werror is still not working there.
-> >
-> >  configure | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/configure b/configure
-> > index b751c853f5..e93836aaae 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -4198,7 +4198,7 @@ pthread_setname_np_wo_tid=3Dno
-> >  cat > $TMPC << EOF
-> >  #include <pthread.h>
-> >
-> > -static void *f(void *p) { pthread_setname_np("QEMU"); }
-> > +static void *f(void *p) { pthread_setname_np("QEMU"); return NULL; }
-> >  int main(void)
-> >  {
-> >      pthread_t thread;
-> >
->
->
+Thanks,
 
+Phil.
 
