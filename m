@@ -2,66 +2,71 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 915FBC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:36:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B81A5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:59:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CB0A208C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:36:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CB0A208C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 7836D20DD4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:59:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gZqIE3DB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7836D20DD4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwCUA-0006G4-Ly
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 18:36:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34874)
+	id 1jwCqQ-0005kY-Q8
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 18:59:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jwCTP-0005is-F8
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 18:35:27 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:10434)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jwCpo-0005Ct-J2; Thu, 16 Jul 2020 18:58:37 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:39555)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jwCTL-0001uT-8Z
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 18:35:26 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id B9DD674637F;
- Fri, 17 Jul 2020 00:35:10 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 85A50745702; Fri, 17 Jul 2020 00:35:10 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 841AA745712;
- Fri, 17 Jul 2020 00:35:10 +0200 (CEST)
-Date: Fri, 17 Jul 2020 00:35:10 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: TB Cache size grows out of control with qemu 5.0
-In-Reply-To: <871rlbwhlp.fsf@linaro.org>
-Message-ID: <alpine.BSF.2.22.395.2007170013020.78424@zero.eik.bme.hu>
-References: <CAATJJ0JDs78irZYRA7-wBefZhmTFK7SpCecuq79Ub-8n1jfy3A@mail.gmail.com>
- <alpine.LMD.2.03.2007151755360.31652@eik.bme.hu>
- <CAATJJ0L2V5QgPHoJW25HrT1_4_YhZJOLS=jFdCU6+JkHFG_MbA@mail.gmail.com>
- <871rlbwhlp.fsf@linaro.org>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jwCpl-0008Tx-Jc; Thu, 16 Jul 2020 18:58:36 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4B78mz3KM4z9sRf; Fri, 17 Jul 2020 08:58:27 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1594940307;
+ bh=LEt7S4JBoJob5ug/fBE47j/nEKgIvHPx1tLh0sV0WcM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=gZqIE3DBosKO0RtDrycItFw6HNymk7zwMDa2OSvVVfJa2Qfl1FXR+2vas3OYmDP9+
+ v8joY4QseMZycbNN+O/3LihAIb5baDdOiR/Z8Vc0BjqgUGKqwhqz+Rp5Q7eDrcYum9
+ +pvOEPbACUzYW+rQVL8lQdLsVXydmp/OX6xJBUUs=
+Date: Thu, 16 Jul 2020 23:22:49 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH qemu v9] spapr: Implement Open Firmware client interface
+Message-ID: <20200716132249.GB5607@umbus.fritz.box>
+References: <20200513035826.14205-1-aik@ozlabs.ru>
+ <e5ddf04a-0d68-3cb8-2b84-47a43e234a59@ozlabs.ru>
+ <f7e9ff41-de7a-c0d5-f004-51a2046ce0a0@ozlabs.ru>
+ <434cdf49-5b80-5620-2635-079ee4b4ebad@ozlabs.ru>
+ <86e79b6a-0032-56da-a066-9f02df361298@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-2130592759-1594938910=:78424"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 18:35:11
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="0eh6TmSyL6TZE2Uz"
+Content-Disposition: inline
+In-Reply-To: <86e79b6a-0032-56da-a066-9f02df361298@ozlabs.ru>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 5
+X-Spam_score: 0.5
+X-Spam_bar: /
+X-Spam_report: (0.5 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_06_12=1.543,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,130 +79,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
---3866299591-2130592759-1594938910=:78424
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+--0eh6TmSyL6TZE2Uz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 16 Jul 2020, Alex Bennée wrote:
-> Christian Ehrhardt <christian.ehrhardt@canonical.com> writes:
->> On Wed, Jul 15, 2020 at 5:58 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
->>> See commit 47a2def4533a2807e48954abd50b32ecb1aaf29a and the next two
->>> following it.
->>
->> Thank you Zoltan for pointing out this commit, I agree that this seems to be
->> the trigger for the issues I'm seeing. Unfortunately the common CI host size
->> is 1-2G. For example on Ubuntu Autopkgtests 1.5G.
->> Those of them running guests do so in 0.5-1G size in TCG mode
->> (as they often can't rely on having KVM available).
->>
->> The 1G TB buffer + 0.5G actual guest size + lack of dynamic downsizing
->> on memory pressure (never existed) makes these systems go OOM-Killing
->> the qemu process.
->
-> Ooops. I admit the assumption was that most people running system
-> emulation would be doing it on beefier machines.
->
->> The patches indicated that the TB flushes on a full guest boot are a
->> good indicator of the TB size efficiency. From my old checks I had:
->>
->> - Qemu 4.2 512M guest with 32M default overwritten by ram-size/4
->> TB flush count      14, 14, 16
->> - Qemu 5.0 512M guest with 1G default
->> TB flush count      1, 1, 1
->>
->> I agree that ram/4 seems odd, especially on huge guests that is a lot
->> potentially wasted. And most environments have a bit of breathing
->> room 1G is too big in small host systems and the common CI system falls
->> into this category. So I tuned it down to 256M for a test.
->>
->> - Qemu 4.2 512M guest with tb-size 256M
->> TB flush count      5, 5, 5
->> - Qemu 5.0 512M guest with tb-size 256M
->> TB flush count      5, 5, 5
->> - Qemu 5.0 512M guest with 256M default in code
->> TB flush count      5, 5, 5
->>
->> So performance wise the results are as much in-between as you'd think from a
->> TB size in between. And the memory consumption which (for me) is the actual
->> current issue to fix would be back in line again as expected.
->
-> So I'm glad you have the workaround.
->
->>
->> So on one hand I'm suggesting something like:
->> --- a/accel/tcg/translate-all.c
->> +++ b/accel/tcg/translate-all.c
->> @@ -944,7 +944,7 @@ static void page_lock_pair(PageDesc **re
->>   * Users running large scale system emulation may want to tweak their
->>   * runtime setup via the tb-size control on the command line.
->>   */
->> -#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (1 * GiB)
->> +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (256 * MiB)
->
-> The problem we have is any number we pick here is arbitrary. And while
-> it did regress your use-case changing it again just pushes a performance
-> regression onto someone else. The most (*) 64 bit desktop PCs have 16Gb
-> of RAM, almost all have more than 8gb. And there is a workaround.
->
-> * random number from Steams HW survey.
->
->>  #endif
->>  #endif
->>
->> OTOH I understand someone else might want to get the more speedy 1G
->> especially for large guests. If someone used to run a 4G guest in TCG the
->> TB Size was 1G all along.
->> How about picking the smaller of (1G || ram-size/4) as default?
->>
->> This might then look like:
->> --- a/accel/tcg/translate-all.c
->> +++ b/accel/tcg/translate-all.c
->> @@ -956,7 +956,12 @@ static inline size_t size_code_gen_buffe
->>  {
->>      /* Size the buffer.  */
->>      if (tb_size == 0) {
->> -        tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
->> +        unsigned long max_default = (unsigned long)(ram_size / 4);
->> +        if (max_default < DEFAULT_CODE_GEN_BUFFER_SIZE) {
->> +            tb_size = max_default;
->> +        } else {
->> +           tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
->> +        }
->>      }
->>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
->>          tb_size = MIN_CODE_GEN_BUFFER_SIZE;
->>
->> This is a bit more tricky than it seems as ram_sizes is no more
->> present in that context but it is enough to discuss it.
->> That should serve all cases - small and large - better as a pure
->> static default of 1G or always ram/4?
->
-> I'm definitely against re-introducing ram_size into the mix. The
-> original commit (a1b18df9a4) that broke this introduced an ordering
-> dependency which we don't want to bring back.
->
-> I'd be more amenable to something that took into account host memory and
-> limited the default if it was smaller than a threshold. Is there a way
-> to probe that that doesn't involve slurping /proc/meminfo?
+On Thu, Jul 16, 2020 at 07:04:56PM +1000, Alexey Kardashevskiy wrote:
+> Ping? I kinda realize it is not going to replace SLOF any time soon but
+> still...
 
-I agree that this should be dependent on host memory size not guest 
-ram_size but it might be tricky to get that value because different host 
-OSes would need different ways. Maybe a new qemu_host_mem_size portability 
-function will be needed that implements this for different host OSes. 
-POSIX may or may not have sysconf _SC_PHYS_PAGES and _SC_AVPHYS_PAGES and 
-linux has sysinfo but don't know how reliable these are.
+Yeah, I know.   I just haven't had time to consider it.  Priority
+starvation.
 
-Regards,
-BALATON Zoltan
---3866299591-2130592759-1594938910=:78424--
+> On 07/07/2020 10:34, Alexey Kardashevskiy wrote:
+> > Ping?
+> >=20
+> >=20
+> > On 24/06/2020 10:28, Alexey Kardashevskiy wrote:
+> >> Ping?
+> >>
+> >> On 02/06/2020 21:40, Alexey Kardashevskiy wrote:
+> >>> Ping?
+> >>>
+> >>> On 13/05/2020 13:58, Alexey Kardashevskiy wrote:
+> >>>> The PAPR platform which describes an OS environment that's presented=
+ by
+> >>>> a combination of a hypervisor and firmware. The features it specifies
+> >>>> require collaboration between the firmware and the hypervisor.
+> >>>>
+> >>>> Since the beginning, the runtime component of the firmware (RTAS) has
+> >>>> been implemented as a 20 byte shim which simply forwards it to
+> >>>> a hypercall implemented in qemu. The boot time firmware component is
+> >>>> SLOF - but a build that's specific to qemu, and has always needed to=
+ be
+> >>>> updated in sync with it. Even though we've managed to limit the amou=
+nt
+> >>>> of runtime communication we need between qemu and SLOF, there's some,
+> >>>> and it has become increasingly awkward to handle as we've implemented
+> >>>> new features.
+> >>>>
+> >>>> This implements a boot time OF client interface (CI) which is
+> >>>> enabled by a new "x-vof" pseries machine option (stands for "Virtual=
+ Open
+> >>>> Firmware). When enabled, QEMU implements the custom H_OF_CLIENT hcall
+> >>>> which implements Open Firmware Client Interface (OF CI). This allows
+> >>>> using a smaller stateless firmware which does not have to manage
+> >>>> the device tree.
+> >>>>
+> >>>> The new "vof.bin" firmware image is included with source code under
+> >>>> pc-bios/. It also includes RTAS blob.
+> >>>>
+> >>>> This implements a handful of CI methods just to get -kernel/-initrd
+> >>>> working. In particular, this implements the device tree fetching and
+> >>>> simple memory allocator - "claim" (an OF CI memory allocator) and up=
+dates
+> >>>> "/memory@0/available" to report the client about available memory.
+> >>>>
+> >>>> This implements changing some device tree properties which we know h=
+ow
+> >>>> to deal with, the rest is ignored. To allow changes, this skips
+> >>>> fdt_pack() when x-vof=3Don as not packing the blob leaves some room =
+for
+> >>>> appending.
+> >>>>
+> >>>> In absence of SLOF, this assigns phandles to device tree nodes to ma=
+ke
+> >>>> device tree traversing work.
+> >>>>
+> >>>> When x-vof=3Don, this adds "/chosen" every time QEMU (re)builds a tr=
+ee.
+> >>>>
+> >>>> This adds basic instances support which are managed by a hash map
+> >>>> ihandle -> [phandle].
+> >>>>
+> >>>> Before the guest started, the used memory is:
+> >>>> 0..4000 - the initial firmware
+> >>>> 10000..180000 - stack
+> >>>>
+> >>>> This OF CI does not implement "interpret".
+> >>>>
+> >>>> With this basic support, this can only boot into kernel directly.
+> >>>> However this is just enough for the petitboot kernel and initradmdis=
+k to
+> >>>> boot from any possible source. Note this requires reasonably recent =
+guest
+> >>>> kernel with:
+> >>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/c=
+ommit/?id=3Ddf5be5be8735
+> >>>>
+> >>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>>> ---
+> >>>>
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--0eh6TmSyL6TZE2Uz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8QVKcACgkQbDjKyiDZ
+s5K0ohAAlF7mKVb0FlVKf6SbB5Szp8tYGK4TAE3rmWzm0gGRxWwQpscKLmV79YjF
+8aosF35w/Xzv6xwukukI/jmSNWgr5JMowqkbNIS/Tj8Sai0wnibjRkZvMAaA6Pxf
+iMd8PfjrGd16HWC4GP/gkpgaVmJ5qBigsaGAkBMDCEO/fA/KTNXxcK9ex0fRCcyM
+jqeIJqKE8X/9C1OeSxxCI5VI+jhl+scIo8bkQb3GQS9nI7s60JZ0EI4qcXris+sq
+3XhoU9OvmGRoBfW0i8Lmpm1wQBGxGHDHYdkwtCO27/uC/YKdVEmVjWAWllIzipvz
+elFbL8nPuE0tUdqGwinIJTzuNw5wwQkLMUTOvQ93w6EwDYRmdmcOzlGO427FWZAR
+AOX+geP8Z5su6DmuknWlkaeC4XfELqBQkoo4IvfqwxDDMytKsJZP9q6tEMUTTg2p
+LcrRk354f5bCURMsAwNej2wbg5b3Pkutxr6lBEeJ28bGMF40/Ubnwvd7T2GTsfWk
+plGyD/HMWjgTwTjQ85B0HrUPqhJc7T0rXsqvNu7/qNORXPzKcj1/Az3QKmfy8Idp
+2ffFuu2XNH76qxciMPH+o8XGMIrWrXy91P/Hf5lfdfTrAeq9N8SyzB7Wrnjwm5r3
+pnoJPMy0nav+mzV7Ojpq7ZStgaVlTfRKf+woARbO+igMXoqLoh0=
+=9tqQ
+-----END PGP SIGNATURE-----
+
+--0eh6TmSyL6TZE2Uz--
 
