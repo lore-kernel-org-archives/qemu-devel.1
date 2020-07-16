@@ -2,76 +2,83 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9318AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FE8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:12:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 657C3207DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:11:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657C3207DD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6ED16207DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:12:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1m+GI/J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ED16207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw4bY-0001jW-L5
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39444)
+	id 1jw4cD-0002aT-N8
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:12:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1jw4am-0001BU-BX; Thu, 16 Jul 2020 10:10:32 -0400
-Received: from mail-oo1-f68.google.com ([209.85.161.68]:42119)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1jw4ak-0002ec-DB; Thu, 16 Jul 2020 10:10:32 -0400
-Received: by mail-oo1-f68.google.com with SMTP id y9so1197850oot.9;
- Thu, 16 Jul 2020 07:10:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=wWt5ahbOxhvdXh73SENCOrj8jOaH1VwJmV03whzLYgE=;
- b=AKdND31/S6iqbAhsfr//eHoEZX2S+i3Ifx5gXIQwnoTnTVWchcEtmcXXRBSIN10dPn
- iSGzLYp+JZI82OZrKSBwx5kkrlkYTISZzZVl1kKfe4keCQkZoMvEdB7/TRhniB3BOEaN
- UR1LjogU1EqgdpU97jIoUQOaJQwGYkYIe8sLcg+UGOB/Uc3E8N+NAW3zaKGQNJJp5Rph
- nf6+wBngKqpqam5mFNBQJfRtZ92Sbr/0uUjOmgWee6g+3jYJcuhtOoxyRMMZFmu2hkWT
- HA4hnAQNPqxWy7ApFW2ygPXJ63TOlQbaEpVReFQ2dtWZ2ciXpv/X98jKiLcooy9e9gRl
- +DDA==
-X-Gm-Message-State: AOAM532Jt+VPfEtWdCsC4PLKy0PavfkNz1vEk4gFrQBl2wigK5B8W6VU
- unTAuIWDY6IThK4ZJYJQhEzPAFTuDIXfuRFEZ9o=
-X-Google-Smtp-Source: ABdhPJw8wK+W7tpnF6N131Op+T2pjdMUds/9+LliMx2aV95aWg/91xH1jsNMr0L7zwbdga4KDdhVG+97BQ8Vdx4dD+A=
-X-Received: by 2002:a4a:5209:: with SMTP id d9mr4371731oob.40.1594908627931;
- Thu, 16 Jul 2020 07:10:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1jw4bV-0001pB-RD
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:11:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31494
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1jw4bT-0002uo-69
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:11:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594908673;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Cj/ZwXO30nCzdzQIaVw1/gDL65Xcwz653+gyjrcG7Bw=;
+ b=D1m+GI/JSzpileGgG4HfxdCQ3wfsKstIBRFL5dVOEIy/ciDxNGukb31ZJTNwZ9nINpDNNc
+ 9eI9R05XjDo2VyBs2hdCAhH+Pw8L9Gmjcg30URaxJEtPY7C356rdwOO2/8SKEkR1jQxN7Y
+ tOUCKQFlVKFjbXlSUYRlouIDd31VU6I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251--HZ8ONe0N6e9WcWWTooP0w-1; Thu, 16 Jul 2020 10:11:11 -0400
+X-MC-Unique: -HZ8ONe0N6e9WcWWTooP0w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F125100A633;
+ Thu, 16 Jul 2020 14:11:10 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B4C356FDD1;
+ Thu, 16 Jul 2020 14:11:03 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH] os-posix: fix regression for install-less datadir location
+Date: Thu, 16 Jul 2020 18:11:00 +0400
+Message-Id: <20200716141100.398296-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20200423090118.11199-1-geert+renesas@glider.be>
- <20200423090118.11199-5-geert+renesas@glider.be>
- <520d1d07-7530-e133-af6e-a8b4615829b8@amsat.org>
- <e279f622-3af6-5073-dac0-4c452a88c32b@amsat.org>
-In-Reply-To: <e279f622-3af6-5073-dac0-4c452a88c32b@amsat.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 16 Jul 2020 16:10:16 +0200
-Message-ID: <CAMuHMdU_d-Wd1G37=fUUmmoWgSwyu7M0Rjq1Kw-2H=pbo1CFNg@mail.gmail.com>
-Subject: Re: [PATCH QEMU v2 4/5] ARM: PL061: Add gpiodev support
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.161.68;
- envelope-from=geert.uytterhoeven@gmail.com; helo=mail-oo1-f68.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 10:10:28
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=marcandre.lureau@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:25:38
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 1
-X-Spam_score: 0.1
-X-Spam_bar: /
-X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,173 +91,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Linus Walleij <linus.walleij@linaro.org>, Magnus Damm <magnus.damm@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- qemu-arm <qemu-arm@nongnu.org>, Alexander Graf <graf@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Bartosz Golaszewski <bartekgola@gmail.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ joe.slater@windriver.com, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+os_find_datadir() used to check the ../share/qemu location (regardless
+of CONFIG_QEMU_DATADIR). It turns out that people rely on that location
+for running qemu in an arbitrary "install-less/portable" fashion. Change
+the logic to return that directory as a last resort.
 
-On Thu, Apr 23, 2020 at 12:08 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On 4/23/20 11:33 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 4/23/20 11:01 AM, Geert Uytterhoeven wrote:
-> >> Make the PL061 GPIO controller user-creatable, and allow the user to t=
-ie
-> >> a newly created instance to a gpiochip on the host.
-> >>
-> >> To create a new GPIO controller, the QEMU command line must be augment=
-ed
-> >> with:
-> >>
-> >>     -device pl061,host=3D<gpiochip>
-> >>
-> >> with <gpiochip> the name or label of the gpiochip on the host.
-> >>
-> >> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+(this is an alternative to the patch "[PATCH 1/1] os_find_datadir: search
+as in version 4.2" from Joe Slater)
 
-> >> --- a/hw/gpio/pl061.c
-> >> +++ b/hw/gpio/pl061.c
-> >> @@ -12,11 +12,14 @@
-> >>  #include "hw/arm/fdt.h"
-> >>  #include "hw/gpio/pl061.h"
-> >>  #include "hw/irq.h"
-> >> +#include "hw/qdev-properties.h"
-> >>  #include "hw/sysbus.h"
-> >>  #include "migration/vmstate.h"
-> >> +#include "qapi/error.h"
-> >>  #include "qemu/log.h"
-> >>  #include "qemu/module.h"
-> >>  #include "sysemu/device_tree.h"
-> >> +#include "sysemu/gpiodev.h"
-> >>
-> >>  //#define DEBUG_PL061 1
-> >>
-> >> @@ -41,6 +44,9 @@ static const uint8_t pl061_id_luminary[12] =3D
-> >>  typedef struct PL061State {
-> >>      SysBusDevice parent_obj;
-> >>
-> >> +#ifdef CONFIG_GPIODEV
-> >> +    char *host;
-> >> +#endif
-> >>      MemoryRegion iomem;
-> >>      uint32_t locked;
-> >>      uint32_t data;
-> >> @@ -370,10 +376,39 @@ static void pl061_init(Object *obj)
-> >>      qdev_init_gpio_out(dev, s->out, 8);
-> >>
-> >> +#ifdef CONFIG_GPIODEV
-> >> +static Property pl061_properties[] =3D {
-> >> +    DEFINE_PROP_STRING("host", PL061State, host),
-> >> +    DEFINE_PROP_END_OF_LIST(),
-> >> +};
-> >> +
-> >> +static void pl061_realize(DeviceState *dev, Error **errp)
-> >> +{
-> >> +    PL061State *s =3D PL061(dev);
-> >> +
-> >> +    if (!dev->opts) {
-> >> +        /* Not created by user */
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (!s->host) {
-> >> +        error_setg(errp, "'host' property is required");
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    qemu_gpiodev_add(dev, s->host, 8, errp);
-> >> +}
-> >> +#endif /* CONFIG_GPIODEV */
-> >> +
-> >>  static void pl061_class_init(ObjectClass *klass, void *data)
-> >>  {
-> >>      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >>
-> >> +#ifdef CONFIG_GPIODEV
-> >> +    device_class_set_props(dc, pl061_properties);
-> >> +    dc->realize =3D pl061_realize;
-> >> +    dc->user_creatable =3D true;
-> >> +#endif
-> >>      dc->vmsd =3D &vmstate_pl061;
-> >>      dc->reset =3D &pl061_reset;
-> >>  }
-> >> diff --git a/qemu-options.hx b/qemu-options.hx
-> >> index 292d4e7c0cef6097..182de7fb63923b38 100644
-> >> --- a/qemu-options.hx
-> >> +++ b/qemu-options.hx
-> >> @@ -875,6 +875,15 @@ SRST
-> >>  ``-device isa-ipmi-bt,bmc=3Did[,ioport=3Dval][,irq=3Dval]``
-> >>      Like the KCS interface, but defines a BT interface. The default p=
-ort
-> >>      is 0xe4 and the default interrupt is 5.
-> >> +
-> >> +#ifdef CONFIG_GPIODEV
-> >> +``-device pl061,host=3Dgpiochip``
-> >> +    Add a PL061 GPIO controller, and map its virtual GPIO lines to a =
-GPIO
-> >> +    controller on the host.
-> >> +
-> >> +    ``host=3Dgpiochip``
-> >> +        The name or label of the GPIO controller on the host.
-> >> +#endif
-> >>  ERST
-> >>
-> >>  DEF("name", HAS_ARG, QEMU_OPTION_name,
-> >>
-> >
-> > Instead of restricting this to the pl061, it would be cleaner you add a
-> > GPIO_PLUGGABLE_INTERFACE (or GPIO_BINDABLE_INTERFACE or better name),
-> > and have TYPE_PL061 implement it.
->
-> IOW your backend should consume devices implementing this generic interfa=
-ce.
+Fixes: 6dd2dacedd83d12328 ("os-posix: simplify os_find_datadir")
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ os-posix.c            | 15 ++++++++++++---
+ scripts/create_config |  2 +-
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
-Thanks for the suggestion! I had a look into implementing this.
+diff --git a/os-posix.c b/os-posix.c
+index b674b20b1b1..bd0ed0c14d1 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -82,8 +82,13 @@ void os_setup_signal_handling(void)
+ 
+ /*
+  * Find a likely location for support files using the location of the binary.
+- * When running from the build tree this will be "$bindir/../pc-bios".
+- * Otherwise, this is CONFIG_QEMU_DATADIR.
++ *
++ * If running from the install location (CONFIG_BINDIR), this will be
++ * CONFIG_QEMU_DATADIR.
++ *
++ * Otherwise, fallback on "$execdir/../pc-bios" if it exists (the build tree
++ * location), else on "$execdir/../share/qemu" (for the install-less/"portable"
++ * version).
+  */
+ char *os_find_datadir(void)
+ {
+@@ -93,12 +98,16 @@ char *os_find_datadir(void)
+     exec_dir = qemu_get_exec_dir();
+     g_return_val_if_fail(exec_dir != NULL, NULL);
+ 
++    if (g_str_has_prefix(exec_dir, CONFIG_BINDIR)) {
++        return g_strdup(CONFIG_QEMU_DATADIR);
++    }
++
+     dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
+     if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
+         return g_steal_pointer(&dir);
+     }
+ 
+-    return g_strdup(CONFIG_QEMU_DATADIR);
++    return g_build_filename(exec_dir, "..", "share", "qemu", NULL);
+ }
+ 
+ void os_set_proc_name(const char *s)
+diff --git a/scripts/create_config b/scripts/create_config
+index 6d8f08b39da..03f8cb1dc10 100755
+--- a/scripts/create_config
++++ b/scripts/create_config
+@@ -15,7 +15,7 @@ case $line in
+     echo "#define QEMU_VERSION_MINOR $minor"
+     echo "#define QEMU_VERSION_MICRO $micro"
+     ;;
+- qemu_*dir=* | qemu_*path=*) # qemu-specific directory configuration
++ bindir=* | qemu_*dir=* | qemu_*path=*) # qemu-specific directory configuration
+     name=${line%=*}
+     value=${line#*=}
+     define_name=$(echo $name | LC_ALL=C tr '[a-z]' '[A-Z]')
+-- 
+2.27.0.221.ga08a83db2b
 
-Please pardon my QEMU illiteracy, but I fail to see how adding an
-interface, and letting frontends like pl061.c implement it, will help:
-  - The backend never has to call directly into the frontend: all
-    communication is done indirectly, using existing core qemu irq and
-    qdev gpio calls.
-  - The frontend has to call into the backend once, at initialization
-    time, to pass the host=3D parameter, and the number of GPIOs supported
-    by the frontend (through qemu_gpiodev_add()).
-  - Generalizing host=3D parsing in the backend would be nice, to avoid
-    duplicating this in each and every frontend, but AFAIU, an interface
-    cannot use device_class_set_props(), as InterfaceClass is not
-    derived from DeviceClass.
-
-Note that when adding more features later (input support, and e.g.
-pull-up/down support), the frontend will have to call into the backend
-to change GPIO line configuration at runtime, but this is from frontend
-to backend again, not the other way around.
-
-I do agree that if we ever want to support multiple backends,
-implementing that through an interface (for the backend, not for the
-frontend) would be needed.
-
-What am I missing?
-Thanks again!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
