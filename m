@@ -2,84 +2,89 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C940C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A92C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:25:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16C6E20787
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:20:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50B64206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:25:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RranYTo7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C6E20787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O7iT4TTZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50B64206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw4kf-0007a0-Ba
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:20:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41836)
+	id 1jw4pf-0000X3-F2
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:25:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jw4jz-000784-RZ
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:20:03 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40333)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jw4jx-0004Jh-1B
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:20:03 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t198so5194521oie.7
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 07:20:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uASRpqHPiXfiRa6C+pweZx7I5OV8LvEDShTlFbn4CpY=;
- b=RranYTo7menvidtLK7PNdChPcF5H4ZD0pIoMFVjBXktVJgjUYqGhyZXULe01Epx0op
- Wy82Tqo5yVKVZocFsEKN42QZFCPQzq2HOgsYN/KY06GbvLu9NqQWU1OcGjQFQ0ctbiMn
- xsUS/A7NHMd25uqR13Xl9EaSzJ/98GejH8kNQB9ffPy08xHUZN7S8AUsy5Vesmf1iK4U
- 71ghzbCEcgByVBs9MaBK9LIBLoR9jgCY1t6w1r6y4rORayZRskUIpuhCrF392QyCdc+L
- qAGrR84NVaEQpElpumezwAIWmcTmJ0zZq4vO3LeoH+CaOYboU4OUn471viRdX4IGMj5d
- kg/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uASRpqHPiXfiRa6C+pweZx7I5OV8LvEDShTlFbn4CpY=;
- b=HgY6FMxbf+6SLmOpNe94TxFEgW5SyeJzIEAxFHdsEreCzEyRSnaSaaLWv0sbw3HSbd
- 8eP1FsGsrWZbeNqUX0ORTTMNQNkdGk0Hr6pBMJhIkELT6qww9oLKV3GNJNZxdunmrcLN
- nD0DaBgq9F6HVAVo4bP0cLshErI5FAyjHf4XIaWxpTx3sfAs8epPDdegT2IjEu71daOk
- SAC1g8uK5HfS1g7fSFNbWTQs+L0kAjjv3m4n17hDU/EsOyYaf1WeAZ4rJ14UToxRL7Y7
- 14nyF1xJ/F2KDSv2QhwN511TwAfcnM3hHpF0P7dL1/YBITMUUGnxvVaRlT/08otV1+H/
- 7cjg==
-X-Gm-Message-State: AOAM532peeJ6PTjtkXNwMVcZcC889x9hr2flmufnuN7cseqda0jtU3wx
- 2WxP2pjQcwF6z99AIqNrpMYCNqrgNkLiG57uP2Id7A==
-X-Google-Smtp-Source: ABdhPJz9GRxWyD1TfzCnbtiC7SNOTI0N6zpWy1dyTh9UYc1hHmAH9yeYuVdqttfTfnv7BqvWD47pAiuhHEvBo1M3YDo=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr3727900oix.48.1594909199636;
- Thu, 16 Jul 2020 07:19:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw4oa-0008Mz-B2
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:24:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29078
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw4oX-00058i-Dd
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:24:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594909483;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ULRFzT1+9w/flIndjLJFeRWF3FXNQiz5N1d+rhBFTdY=;
+ b=O7iT4TTZZ8IovYn1LJTXcVGbleqnGn5HMgpMal9yhncbquoesHI0QRf4ve6cdWi3iWTskB
+ fCcjFbbqotDvlAQeJYbW4l1COEfrjvISMSXBKToZUi/XfntEFaMNnKUg5jp3ESBE/hVdK9
+ 68dWqiwTjOyT2HMTLVCOmEtk7NU57Vw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-Osj9QRmgPk2b9pOEYgimiQ-1; Thu, 16 Jul 2020 10:24:39 -0400
+X-MC-Unique: Osj9QRmgPk2b9pOEYgimiQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D246082BA7C;
+ Thu, 16 Jul 2020 14:23:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D8A2710631DE;
+ Thu, 16 Jul 2020 14:23:53 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3B81511385E0; Thu, 16 Jul 2020 16:23:52 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH] spapr_pci: Robustify support of PCI bridges
+References: <159431476748.407044.16711294833569014964.stgit@bahia.lan>
+ <20200716044540.GL93134@umbus.fritz.box>
+ <20200716123244.1f854c63@bahia.lan>
+ <20200716131109.GA5607@umbus.fritz.box>
+Date: Thu, 16 Jul 2020 16:23:52 +0200
+In-Reply-To: <20200716131109.GA5607@umbus.fritz.box> (David Gibson's message
+ of "Thu, 16 Jul 2020 23:11:09 +1000")
+Message-ID: <87r1tblerr.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200713213341.590275-1-richard.henderson@linaro.org>
-In-Reply-To: <20200713213341.590275-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Jul 2020 15:19:48 +0100
-Message-ID: <CAFEAcA-VGqwpZTWZ054h+Sy3_db65Rdv5TfbsJEmpB2dzpnLCA@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 0/3] target/arm: MTE improvements
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:25:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,24 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jul 2020 at 22:33, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Since MTE is new, and guest support for MTE is still under
-> development, let's disable it by default.
->
-> Peter mentioned memory hotplug on IRC as something that
-> would break MTE's assumptions.  By putting the enable flag
-> on the machine it's much easier to control.
->
-> For 5.1, we won't have kvm support, so error for that combo.
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Applied to target-arm.next for 5.1, thanks.
+> On Thu, Jul 16, 2020 at 12:32:44PM +0200, Greg Kurz wrote:
+>> On Thu, 16 Jul 2020 14:45:40 +1000
+>> David Gibson <david@gibson.dropbear.id.au> wrote:
+>> 
+>> > On Thu, Jul 09, 2020 at 07:12:47PM +0200, Greg Kurz wrote:
+>> > > Some recent error handling cleanups unveiled issues with our support of
+>> > > PCI bridges:
+>> > > 
+>> > > 1) QEMU aborts when using non-standard PCI bridge types,
+>> > >    unveiled by commit 7ef1553dac "spapr_pci: Drop some dead error handling"
+>> > > 
+>> > > $ qemu-system-ppc64 -M pseries -device pcie-pci-bridge
+>> > > Unexpected error in object_property_find() at qom/object.c:1240:
+>> > > qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not found
+>> > > Aborted (core dumped)
+>> > 
+>> > Oops, I thought we had a check that we actually had a "pci-bridge"
+>> > device before continuing with the hotplug, but I guess not.
+>> 
+>> Ah... are you suggesting we should explicitly check the actual type
+>> of the bridge rather than looking for the "chassis_nr" property ?
+>
+> Uh.. I thought about it, but I don't think it matters much which way
+> we do it.
 
--- PMM
+Would it make sense to add the "chassis_nr" property to *all* PCI
+bridge devices?
+
+[...]
+
 
