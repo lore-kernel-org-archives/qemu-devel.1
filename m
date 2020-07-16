@@ -2,71 +2,100 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B81A5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D274DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:57:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7836D20DD4
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:59:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gZqIE3DB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7836D20DD4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 9D5D120DD4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:57:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D5D120DD4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwCqQ-0005kY-Q8
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 18:59:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41028)
+	id 1jwCpB-0004fz-Th
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 18:57:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jwCpo-0005Ct-J2; Thu, 16 Jul 2020 18:58:37 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:39555)
+ (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
+ id 1jwCoX-00049P-0k; Thu, 16 Jul 2020 18:57:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9438)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jwCpl-0008Tx-Jc; Thu, 16 Jul 2020 18:58:36 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B78mz3KM4z9sRf; Fri, 17 Jul 2020 08:58:27 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1594940307;
- bh=LEt7S4JBoJob5ug/fBE47j/nEKgIvHPx1tLh0sV0WcM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gZqIE3DBosKO0RtDrycItFw6HNymk7zwMDa2OSvVVfJa2Qfl1FXR+2vas3OYmDP9+
- v8joY4QseMZycbNN+O/3LihAIb5baDdOiR/Z8Vc0BjqgUGKqwhqz+Rp5Q7eDrcYum9
- +pvOEPbACUzYW+rQVL8lQdLsVXydmp/OX6xJBUUs=
-Date: Thu, 16 Jul 2020 23:22:49 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH qemu v9] spapr: Implement Open Firmware client interface
-Message-ID: <20200716132249.GB5607@umbus.fritz.box>
-References: <20200513035826.14205-1-aik@ozlabs.ru>
- <e5ddf04a-0d68-3cb8-2b84-47a43e234a59@ozlabs.ru>
- <f7e9ff41-de7a-c0d5-f004-51a2046ce0a0@ozlabs.ru>
- <434cdf49-5b80-5620-2635-079ee4b4ebad@ozlabs.ru>
- <86e79b6a-0032-56da-a066-9f02df361298@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="0eh6TmSyL6TZE2Uz"
-Content-Disposition: inline
-In-Reply-To: <86e79b6a-0032-56da-a066-9f02df361298@ozlabs.ru>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 5
-X-Spam_score: 0.5
-X-Spam_bar: /
-X-Spam_report: (0.5 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_06_12=1.543,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
- HEADER_FROM_DIFFERENT_DOMAINS=1, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
+ id 1jwCoV-0008Cl-0L; Thu, 16 Jul 2020 18:57:16 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06GMWAD0141771; Thu, 16 Jul 2020 18:57:00 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32auraq2pf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 16 Jul 2020 18:57:00 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06GMXTDu149059;
+ Thu, 16 Jul 2020 18:57:00 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32auraq2p4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 16 Jul 2020 18:57:00 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06GMtKUe015692;
+ Thu, 16 Jul 2020 22:56:58 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma01wdc.us.ibm.com with ESMTP id 3275294age-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 16 Jul 2020 22:56:58 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
+ [9.57.199.110])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06GMuwWZ55050624
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 16 Jul 2020 22:56:58 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 61DC1AE05C;
+ Thu, 16 Jul 2020 22:56:58 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AD0A5AE05F;
+ Thu, 16 Jul 2020 22:56:57 +0000 (GMT)
+Received: from arbab-laptop.localdomain (unknown [9.160.63.114])
+ by b01ledav005.gho.pok.ibm.com (Postfix) with SMTP;
+ Thu, 16 Jul 2020 22:56:57 +0000 (GMT)
+Received: by arbab-laptop.localdomain (Postfix, from userid 152845)
+ id 43D7C4609C6; Thu, 16 Jul 2020 17:56:55 -0500 (CDT)
+From: Reza Arbab <arbab@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
+Subject: [PATCH v4] spapr: Add a new level of NUMA for GPUs
+Date: Thu, 16 Jul 2020 17:56:55 -0500
+Message-Id: <20200716225655.24289-1-arbab@linux.ibm.com>
+X-Mailer: git-send-email 2.18.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-16_11:2020-07-16,
+ 2020-07-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 adultscore=0
+ mlxlogscore=999 suspectscore=2 clxscore=1011 bulkscore=0 spamscore=0
+ phishscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007160145
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=arbab@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 17:57:19
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,131 +108,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Daniel Henrique Barboza <danielhb@linux.ibm.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>, Greg Kurz <groug@kaod.org>,
+ Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+NUMA nodes corresponding to GPU memory currently have the same
+affinity/distance as normal memory nodes. Add a third NUMA associativity
+reference point enabling us to give GPU nodes more distance.
 
---0eh6TmSyL6TZE2Uz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is guest visible information, which shouldn't change under a
+running guest across migration between different qemu versions, so make
+the change effective only in new (pseries > 5.0) machine types.
 
-On Thu, Jul 16, 2020 at 07:04:56PM +1000, Alexey Kardashevskiy wrote:
-> Ping? I kinda realize it is not going to replace SLOF any time soon but
-> still...
+Before, `numactl -H` output in a guest with 4 GPUs (nodes 2-5):
 
-Yeah, I know.   I just haven't had time to consider it.  Priority
-starvation.
+node distances:
+node   0   1   2   3   4   5
+  0:  10  40  40  40  40  40
+  1:  40  10  40  40  40  40
+  2:  40  40  10  40  40  40
+  3:  40  40  40  10  40  40
+  4:  40  40  40  40  10  40
+  5:  40  40  40  40  40  10
 
-> On 07/07/2020 10:34, Alexey Kardashevskiy wrote:
-> > Ping?
-> >=20
-> >=20
-> > On 24/06/2020 10:28, Alexey Kardashevskiy wrote:
-> >> Ping?
-> >>
-> >> On 02/06/2020 21:40, Alexey Kardashevskiy wrote:
-> >>> Ping?
-> >>>
-> >>> On 13/05/2020 13:58, Alexey Kardashevskiy wrote:
-> >>>> The PAPR platform which describes an OS environment that's presented=
- by
-> >>>> a combination of a hypervisor and firmware. The features it specifies
-> >>>> require collaboration between the firmware and the hypervisor.
-> >>>>
-> >>>> Since the beginning, the runtime component of the firmware (RTAS) has
-> >>>> been implemented as a 20 byte shim which simply forwards it to
-> >>>> a hypercall implemented in qemu. The boot time firmware component is
-> >>>> SLOF - but a build that's specific to qemu, and has always needed to=
- be
-> >>>> updated in sync with it. Even though we've managed to limit the amou=
-nt
-> >>>> of runtime communication we need between qemu and SLOF, there's some,
-> >>>> and it has become increasingly awkward to handle as we've implemented
-> >>>> new features.
-> >>>>
-> >>>> This implements a boot time OF client interface (CI) which is
-> >>>> enabled by a new "x-vof" pseries machine option (stands for "Virtual=
- Open
-> >>>> Firmware). When enabled, QEMU implements the custom H_OF_CLIENT hcall
-> >>>> which implements Open Firmware Client Interface (OF CI). This allows
-> >>>> using a smaller stateless firmware which does not have to manage
-> >>>> the device tree.
-> >>>>
-> >>>> The new "vof.bin" firmware image is included with source code under
-> >>>> pc-bios/. It also includes RTAS blob.
-> >>>>
-> >>>> This implements a handful of CI methods just to get -kernel/-initrd
-> >>>> working. In particular, this implements the device tree fetching and
-> >>>> simple memory allocator - "claim" (an OF CI memory allocator) and up=
-dates
-> >>>> "/memory@0/available" to report the client about available memory.
-> >>>>
-> >>>> This implements changing some device tree properties which we know h=
-ow
-> >>>> to deal with, the rest is ignored. To allow changes, this skips
-> >>>> fdt_pack() when x-vof=3Don as not packing the blob leaves some room =
-for
-> >>>> appending.
-> >>>>
-> >>>> In absence of SLOF, this assigns phandles to device tree nodes to ma=
-ke
-> >>>> device tree traversing work.
-> >>>>
-> >>>> When x-vof=3Don, this adds "/chosen" every time QEMU (re)builds a tr=
-ee.
-> >>>>
-> >>>> This adds basic instances support which are managed by a hash map
-> >>>> ihandle -> [phandle].
-> >>>>
-> >>>> Before the guest started, the used memory is:
-> >>>> 0..4000 - the initial firmware
-> >>>> 10000..180000 - stack
-> >>>>
-> >>>> This OF CI does not implement "interpret".
-> >>>>
-> >>>> With this basic support, this can only boot into kernel directly.
-> >>>> However this is just enough for the petitboot kernel and initradmdis=
-k to
-> >>>> boot from any possible source. Note this requires reasonably recent =
-guest
-> >>>> kernel with:
-> >>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/c=
-ommit/?id=3Ddf5be5be8735
-> >>>>
-> >>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>>> ---
-> >>>>
->=20
->=20
+After:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+node distances:
+node   0   1   2   3   4   5
+  0:  10  40  80  80  80  80
+  1:  40  10  80  80  80  80
+  2:  80  80  10  80  80  80
+  3:  80  80  80  10  80  80
+  4:  80  80  80  80  10  80
+  5:  80  80  80  80  80  10
 
---0eh6TmSyL6TZE2Uz
-Content-Type: application/pgp-signature; name="signature.asc"
+These are the same distances as on the host, mirroring the change made
+to host firmware in skiboot commit f845a648b8cb ("numa/associativity:
+Add a new level of NUMA for GPU's").
 
------BEGIN PGP SIGNATURE-----
+Signed-off-by: Reza Arbab <arbab@linux.ibm.com>
+---
+v4:
+* Use nvslot->numa_id for distinction at all levels of ibm,associativity
+* Use ARRAY_SIZE(refpoints)
+* Rebase
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8QVKcACgkQbDjKyiDZ
-s5K0ohAAlF7mKVb0FlVKf6SbB5Szp8tYGK4TAE3rmWzm0gGRxWwQpscKLmV79YjF
-8aosF35w/Xzv6xwukukI/jmSNWgr5JMowqkbNIS/Tj8Sai0wnibjRkZvMAaA6Pxf
-iMd8PfjrGd16HWC4GP/gkpgaVmJ5qBigsaGAkBMDCEO/fA/KTNXxcK9ex0fRCcyM
-jqeIJqKE8X/9C1OeSxxCI5VI+jhl+scIo8bkQb3GQS9nI7s60JZ0EI4qcXris+sq
-3XhoU9OvmGRoBfW0i8Lmpm1wQBGxGHDHYdkwtCO27/uC/YKdVEmVjWAWllIzipvz
-elFbL8nPuE0tUdqGwinIJTzuNw5wwQkLMUTOvQ93w6EwDYRmdmcOzlGO427FWZAR
-AOX+geP8Z5su6DmuknWlkaeC4XfELqBQkoo4IvfqwxDDMytKsJZP9q6tEMUTTg2p
-LcrRk354f5bCURMsAwNej2wbg5b3Pkutxr6lBEeJ28bGMF40/Ubnwvd7T2GTsfWk
-plGyD/HMWjgTwTjQ85B0HrUPqhJc7T0rXsqvNu7/qNORXPzKcj1/Az3QKmfy8Idp
-2ffFuu2XNH76qxciMPH+o8XGMIrWrXy91P/Hf5lfdfTrAeq9N8SyzB7Wrnjwm5r3
-pnoJPMy0nav+mzV7Ojpq7ZStgaVlTfRKf+woARbO+igMXoqLoh0=
-=9tqQ
------END PGP SIGNATURE-----
+v3:
+* Squash into one patch
+* Add PHB compat property
+---
+ hw/ppc/spapr.c              | 21 +++++++++++++++++++--
+ hw/ppc/spapr_pci.c          |  2 ++
+ hw/ppc/spapr_pci_nvlink2.c  | 13 ++++++++++---
+ include/hw/pci-host/spapr.h |  1 +
+ include/hw/ppc/spapr.h      |  1 +
+ 5 files changed, 33 insertions(+), 5 deletions(-)
 
---0eh6TmSyL6TZE2Uz--
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 299908cc7396..0ae293ec9431 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -890,10 +890,16 @@ static int spapr_dt_rng(void *fdt)
+ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+ {
+     MachineState *ms = MACHINE(spapr);
++    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
+     int rtas;
+     GString *hypertas = g_string_sized_new(256);
+     GString *qemu_hypertas = g_string_sized_new(256);
+-    uint32_t refpoints[] = { cpu_to_be32(0x4), cpu_to_be32(0x4) };
++    uint32_t refpoints[] = {
++        cpu_to_be32(0x4),
++        cpu_to_be32(0x4),
++        cpu_to_be32(0x2),
++    };
++    uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
+     uint64_t max_device_addr = MACHINE(spapr)->device_memory->base +
+         memory_region_size(&MACHINE(spapr)->device_memory->mr);
+     uint32_t lrdr_capacity[] = {
+@@ -945,8 +951,12 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+                      qemu_hypertas->str, qemu_hypertas->len));
+     g_string_free(qemu_hypertas, TRUE);
+ 
++    if (smc->pre_5_1_assoc_refpoints) {
++        nr_refpoints = 2;
++    }
++
+     _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+-                     refpoints, sizeof(refpoints)));
++                     refpoints, nr_refpoints * sizeof(refpoints[0])));
+ 
+     _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
+                      maxdomains, sizeof(maxdomains)));
+@@ -4584,9 +4594,16 @@ DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
+  */
+ static void spapr_machine_5_0_class_options(MachineClass *mc)
+ {
++    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++    static GlobalProperty compat[] = {
++        { TYPE_SPAPR_PCI_HOST_BRIDGE, "pre-5.1-associativity", "on" },
++    };
++
+     spapr_machine_5_1_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
++    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+     mc->numa_mem_supported = true;
++    smc->pre_5_1_assoc_refpoints = true;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 2a6a48744aaa..16739334e35f 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2035,6 +2035,8 @@ static Property spapr_phb_properties[] = {
+                      pcie_ecs, true),
+     DEFINE_PROP_UINT64("gpa", SpaprPhbState, nv2_gpa_win_addr, 0),
+     DEFINE_PROP_UINT64("atsd", SpaprPhbState, nv2_atsd_win_addr, 0),
++    DEFINE_PROP_BOOL("pre-5.1-associativity", SpaprPhbState,
++                     pre_5_1_assoc, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
+index dd8cd6db9654..76ae77ebc851 100644
+--- a/hw/ppc/spapr_pci_nvlink2.c
++++ b/hw/ppc/spapr_pci_nvlink2.c
+@@ -362,9 +362,9 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
+                                                     &error_abort);
+         uint32_t associativity[] = {
+             cpu_to_be32(0x4),
+-            SPAPR_GPU_NUMA_ID,
+-            SPAPR_GPU_NUMA_ID,
+-            SPAPR_GPU_NUMA_ID,
++            cpu_to_be32(nvslot->numa_id),
++            cpu_to_be32(nvslot->numa_id),
++            cpu_to_be32(nvslot->numa_id),
+             cpu_to_be32(nvslot->numa_id)
+         };
+         uint64_t size = object_property_get_uint(nv_mrobj, "size", NULL);
+@@ -375,6 +375,13 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
+         _FDT(off);
+         _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
+         _FDT((fdt_setprop(fdt, off, "reg", mem_reg, sizeof(mem_reg))));
++
++        if (sphb->pre_5_1_assoc) {
++            associativity[1] = SPAPR_GPU_NUMA_ID;
++            associativity[2] = SPAPR_GPU_NUMA_ID;
++            associativity[3] = SPAPR_GPU_NUMA_ID;
++        }
++
+         _FDT((fdt_setprop(fdt, off, "ibm,associativity", associativity,
+                           sizeof(associativity))));
+ 
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 8877ff51fbf7..600eb55c3488 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -94,6 +94,7 @@ struct SpaprPhbState {
+     hwaddr nv2_gpa_win_addr;
+     hwaddr nv2_atsd_win_addr;
+     SpaprPhbPciNvGpuConfig *nvgpus;
++    bool pre_5_1_assoc;
+ };
+ 
+ #define SPAPR_PCI_MEM_WIN_BUS_OFFSET 0x80000000ULL
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index c421410e3fb8..3134d339e8fe 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -129,6 +129,7 @@ struct SpaprMachineClass {
+     bool linux_pci_probe;
+     bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
+     hwaddr rma_limit;          /* clamp the RMA to this size */
++    bool pre_5_1_assoc_refpoints;
+ 
+     void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio, 
+-- 
+2.18.2
+
 
