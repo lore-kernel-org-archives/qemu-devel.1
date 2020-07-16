@@ -2,79 +2,91 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 072C7C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 20:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC3FC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 20:46:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA721207E8
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 20:26:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA721207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E497820787
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 20:46:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QkaSLAar"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E497820787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwASV-0003FM-3J
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 16:26:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58274)
+	id 1jwAm7-0006O0-6V
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 16:46:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwARp-0002mF-On
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 16:25:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56310)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwAlQ-0005xL-5N
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 16:45:56 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:35512)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwARn-0003HB-9B
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 16:25:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jwARl-0006In-AC
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 20:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 492822E80EC
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 20:25:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwAlO-0006lo-7Z
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 16:45:55 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id k4so6216861oik.2
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 13:45:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=sw/VvXClaFYYO8XzzFjkPL5mDoi/5dWNns559Bxki8I=;
+ b=QkaSLAarU0AdNhX73p2owpjo40gDKcQDWAHKf2/NfZ+VfQEsytD+jDprHdxdinXWET
+ fAhihcM5kZjcz8DX74hFCSehNYM5ZDJD8G2JaCS9eyPrwuktXhR6ae7cZqChY7pwGV1F
+ o/TakudlsXuUiZOvIfeC0djHIQYZxsc0JrRmplkIw1RGNfutG3SSlBK4DPWInMPnLYtD
+ IbNFdRzKuiXwrIWAqdEbLjdrDMocGzyXgRbVBr4Y7K9YduxXGXFdlP3VoJJJjY5V5CsX
+ /I3VNQXe8WFQPVHSc5Ir0tx4DBOiYRQIk4VfBhrSni7ympOdch6xegye6idORIfS2r+7
+ IoGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=sw/VvXClaFYYO8XzzFjkPL5mDoi/5dWNns559Bxki8I=;
+ b=A9QkNpgGiFoN1huS7E+rboJRpObQU702SgHTu7mMc8DPNjOW7tp38xQFGcKoJs00M+
+ TEijReJeMD7wDrwVCTfOyYJHzLYn8ATcd4o1jybkXP3CRNQP9j4ei95fdr9n39HpRKml
+ mGesTENg3IYEs/MsHV+iLYh+uelAYY5HAKQlIxOLkgk5T7BLhke7HEoFrovZ0xOaNwo8
+ 8HPfY7lbrH7Q0oY+RJkcljLh/5ArxTsm2xfyeD7OHzZdeu68Igod8kB1wTj+1w4keZQ4
+ A7Fme07TjfLfiDtBW1oC8L9WfuqE1spBnc+b+N1w+j+TsixR1Kl2XGG5Jyma2ZWR3zWW
+ wHOw==
+X-Gm-Message-State: AOAM5300xxvG2qRINJtlEweWA7KNS3e2+iq63qKdx32CPZtSLt/Yd6/M
+ gZPelD8zC49fjKrFwGal3cUmAS6XsZ+FTChh6n5ljA==
+X-Google-Smtp-Source: ABdhPJwgjvKhpEjNKSQXucaqmfhzzgyaAkxJI6fDw+/s+KJPNsD2wbxr061JhufevtQNR37+3FkfKbYe0KWIr5XsvaU=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr4921959oix.48.1594932352698;
+ Thu, 16 Jul 2020 13:45:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200716174900.GL3235@minyard.net>
+In-Reply-To: <20200716174900.GL3235@minyard.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Jul 2020 21:45:41 +0100
+Message-ID: <CAFEAcA-UWJBpM_-G2RAe9B-WcPzBaKGZTas1njehQ7gcjsMpew@mail.gmail.com>
+Subject: Re: [GIT PULL] I2C updates
+To: Corey Minyard <minyard@acm.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Jul 2020 20:18:35 -0000
-From: Peter Maydell <1887854@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: opticron pmaydell
-X-Launchpad-Bug-Reporter: K (opticron)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <159492817809.19148.14056725236873205625.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159493071595.19308.8694050601357420771.malone@chaenomeles.canonical.com>
-Subject: [Bug 1887854] Re: Spurious Data Abort on qemu-system-aarch64
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9c98682ee57ee74854b4729a012b6c742be8d776
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 15:50:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::22f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,69 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1887854 <1887854@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Writing to SCTLR can cause QEMU to flush its TLB (as an internal
-implementation detail), so if adding SCTLR writes is sufficient to cause
-the problem to go away, I would be suspicious that your guest code is
-missing necessary TLB maintenance instructions.
+On Thu, 16 Jul 2020 at 18:49, Corey Minyard <minyard@acm.org> wrote:
+>
+> The following changes since commit 45db94cc90c286a9965a285ba19450f448760a=
+09:
+>
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-20200=
+707' into staging (2020-07-10 16:43:40 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cminyard/qemu.git tags/for-qemu-i2c-5
+>
+> for you to fetch changes up to 73d5f22ecbb76dfc785876779d47787084ff0f42:
+>
+>   hw/i2c: Document the I2C qdev helpers (2020-07-16 12:30:54 -0500)
+>
+> ----------------------------------------------------------------
+> Minor changes to:
+>
+> Add an SMBus config entry
+>
+> Cleanup/simplify/document some I2C interfaces
+>
+> ----------------------------------------------------------------
+> Philippe Mathieu-Daud=C3=A9 (6):
+>       hw/i2c/Kconfig: Add an entry for the SMBus
+>       hw/i2c/aspeed_i2c: Simplify aspeed_i2c_get_bus()
+>       hw/i2c: Rename i2c_try_create_slave() as i2c_slave_new()
+>       hw/i2c: Rename i2c_realize_and_unref() as i2c_slave_realize_and_unr=
+ef()
+>       hw/i2c: Rename i2c_create_slave() as i2c_slave_create_simple()
+>       hw/i2c: Document the I2C qdev helpers
 
-QEMU 3.1 and 4.1 are quite old -- can you reproduce with 5.0 or
-(ideally) head-of-git ?
+Hi; this failed to build on x86-64 Linux (incremental build):
 
--- =
+  LINK    i386-softmmu/qemu-system-i386
+../hw/i2c/smbus_eeprom.o: In function `smbus_eeprom_vmstate_needed':
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/smbus_eeprom.c:94:
+undefined reference to `smbus_vmstate_needed'
+../hw/i2c/smbus_eeprom.o:(.data.rel+0x50): undefined reference to
+`vmstate_smbus_device'
+../hw/i2c/pm_smbus.o: In function `smb_transaction':
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:93: undefined
+reference to `smbus_quick_command'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:97: undefined
+reference to `smbus_receive_byte'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:100: undefined
+reference to `smbus_send_byte'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:105: undefined
+reference to `smbus_read_byte'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:108: undefined
+reference to `smbus_write_byte'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:114: undefined
+reference to `smbus_read_word'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:117: undefined
+reference to `smbus_write_word'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:149: undefined
+reference to `smbus_read_block'
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:174: undefined
+reference to `smbus_write_block'
+../hw/i2c/pm_smbus.o: In function `smb_ioport_writeb':
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/pm_smbus.c:290: undefined
+reference to `smbus_write_block'
+../hw/ipmi/smbus_ipmi.o:(.data.rel+0x50): undefined reference to
+`vmstate_smbus_device'
+collect2: error: ld returned 1 exit status
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1887854
+(similarly for other qemu-system-* binary links)
 
-Title:
-  Spurious Data Abort on qemu-system-aarch64
-
-Status in QEMU:
-  New
-
-Bug description:
-  When running RTEMS test psxndbm01.exe built for AArch64-ilp32 (this code =
-is not yet publically available), the test generates a spurious data abort =
-(the MMU and alignment checks should be disabled according to bits 1, 0 of =
-SCTLR_EL1). The abort information is as follows:
-  Taking exception 4 [Data Abort]
-  ...from EL1 to EL1
-  ...with ESR 0x25/0x96000010
-  ...with FAR 0x104010ca28
-  ...with ELR 0x400195d8
-  ...to EL1 PC 0x40018200 PSTATE 0x3c5
-
-  The ESR indicates that a synchronous external abort has occurred.
-  ESR EC field: 0b100101
-
-  From the ARMv8 technical manual: Data Abort taken without a change in
-  Exception level. Used for MMU faults generated by data accesses,
-  alignment faults other than those caused by Stack Pointer
-  misalignment, and synchronous External aborts, including synchronous
-  parity or ECC errors. Not used for debug related exceptions.
-
-  ESR ISS field: 0b10000
-
-  From the ARMv8 technical manual: Synchronous External abort, not on
-  translation table walk or hardware update of translation table.
-
-  The following command line is used to invoke qemu:
-  qemu-system-aarch64 -machine virt -cpu cortex-a53 -m 256M -no-reboot -nog=
-raphic -serial mon:stdio -kernel build/aarch64/a53_ilp32_qemu/testsuites/ps=
-xtests/psxndbm01.exe -D qemu.log -d in_asm,int,cpu_reset,unimp,guest_errors
-
-  This occurs on Qemu 3.1.0 as distributed via Debian and on Qemu 4.1 as
-  built by the RTEMS source builder (4.1+minor patches).
-
-  Edit: This bug can be worked around by getting and setting SCTLR
-  without changing its value before each data abort would occur. This
-  test needs 6 of these workarounds to operate successfully.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1887854/+subscriptions
+thanks
+-- PMM
 
