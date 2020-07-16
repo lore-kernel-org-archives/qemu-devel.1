@@ -2,87 +2,109 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9910C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 21:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A75C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 21:58:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4AE420760
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 21:11:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZART+Tl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4AE420760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35E4320760
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 21:58:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E4320760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwBA5-0005xA-OE
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 17:11:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40054)
+	id 1jwBtL-0007eV-H8
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 17:58:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crobinso@redhat.com>)
- id 1jwB9K-0005R5-Kp
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 17:10:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40945
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crobinso@redhat.com>)
- id 1jwB9I-0002mm-AU
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 17:10:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594933834;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=2I/XJlgbziqhoZEwNHimsaK6o1vz57NyyApXFNIycRA=;
- b=VZART+TlB7pzU+xZn8aSa5dKtl0XUm1EHrJo24sSSsYgXxHZ4mCiPdBfxrM4XWdkFnaT/c
- yyXbOufDJg6ujEryzwj93oaSUAfM2eBytvedCPcM8pbuqJbSUgz/Pl1BDLufdmKpaRs9k5
- VgRa7HpNjR/2VlDyMBoUMg+gDGaJPhY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-EGISHTTmOkyGyOZ8Xzp1xw-1; Thu, 16 Jul 2020 17:10:31 -0400
-X-MC-Unique: EGISHTTmOkyGyOZ8Xzp1xw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C8F6107ACCA
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 21:10:30 +0000 (UTC)
-Received: from [10.10.116.132] (ovpn-116-132.rdu2.redhat.com [10.10.116.132])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E8CEA724B8;
- Thu, 16 Jul 2020 21:10:27 +0000 (UTC)
-To: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
-From: Cole Robinson <crobinso@redhat.com>
-Subject: hw-display-qxl.so: undefined symbol: qemu_qxl_io_log_semaphore
-Message-ID: <3a19e8c0-215a-bc18-9817-450affec7f08@redhat.com>
-Date: Thu, 16 Jul 2020 17:10:26 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jwBsZ-0006vL-GP
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 17:57:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24934)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jwBsX-0003D1-Gg
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 17:57:23 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06GLgt2w014315
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 17:57:18 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32auqudvyu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 17:57:18 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06GLpQk4036106
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 17:57:18 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32auqudvy4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 16 Jul 2020 17:57:18 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06GLjLWh023698;
+ Thu, 16 Jul 2020 21:57:17 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma01wdc.us.ibm.com with ESMTP id 32752940yj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 16 Jul 2020 21:57:17 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06GLvErI57606524
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 16 Jul 2020 21:57:14 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 333D96A04D;
+ Thu, 16 Jul 2020 21:57:16 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C0EDD6A047;
+ Thu, 16 Jul 2020 21:57:15 +0000 (GMT)
+Received: from [9.160.125.194] (unknown [9.160.125.194])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu, 16 Jul 2020 21:57:15 +0000 (GMT)
+Subject: Re: [PATCH 2/2] configure: add support for Control-Flow Integrity
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200702054948.10257-1-dbuono@linux.vnet.ibm.com>
+ <20200702054948.10257-3-dbuono@linux.vnet.ibm.com>
+ <20200702095252.GF1888119@redhat.com>
+From: Daniele Buono <dbuono@linux.vnet.ibm.com>
+Message-ID: <67e3ea49-a19b-732f-233e-f9fc27391df0@linux.vnet.ibm.com>
+Date: Thu, 16 Jul 2020 17:57:14 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20200702095252.GF1888119@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=crobinso@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 16:27:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-16_11:2020-07-16,
+ 2020-07-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0
+ adultscore=0 clxscore=1015 phishscore=0 spamscore=0 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007160140
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 17:57:19
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,84 +117,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd,
+On 7/2/2020 5:52 AM, Daniel P. Berrangé wrote:
+> The need to maintain this list of functions makes me feel very
+> uneasy.
+> 
+> How can we have any confidence that this list of functions is
+> accurate ? How will maintainers ensure that they correctly update
+> it as they are writing/changing code, and how will they test the
+> result ?
 
-I'm trying to build qemu 5.1.0-rc0 in Fedora. I'm hitting some issues.
+Hi Daniel,
 
-Using this configure line:
+I gave it some thought and studied more of clang's options. It is 
+possible to disable cfi on specific functions by using an __attribute__ 
+keyword, instead of providing a list in an external file.
+In terms of maintaining, this is much better since we are removing the 
+need to update the list. I would suggest defining a macro, 
+__disable_cfi__, that can be prepended to a function. The macro would 
+expand to nothing if cfi is disabled, or to the proper attribute if it 
+is enabled. Here's example code snippet
 
-./configure --prefix=/usr --libdir=/usr/lib64 --sysconfdir=/etc
---localstatedir=/var --libexecdir=/usr/libexec
---interp-prefix=/usr/qemu-%M --with-pkgversion=qemu-5.1.0-0.1.rc0.fc33
-'--extra-ldflags=-Wl,--build-id -Wl,-z,relro -Wl,-z,now'
-'--extra-cflags=-O2 -g -pipe -Wall -Werror=format-security
--Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions
--fstack-protector-strong -grecord-gcc-switches
--specs=/usr/lib/rpm/redhat/redhat-hardened-cc1
--specs=/usr/lib/rpm/redhat/redhat-annobin-cc1 -m64 -mtune=generic
--fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection'
---enable-trace-backend=dtrace --audio-drv-list=pa,sdl,alsa,oss
---enable-kvm --target-list=x86_64-softmmu --enable-pie --enable-modules
---enable-spice
+/* Disable CFI checks.
+  * The callback function has been loaded from an external library so we 
+do not
+  * have type information */
+__disable_cfi__
+void qemu_plugin_vcpu_syscall_ret(CPUState *cpu, int64_t num, int64_t ret)
+{
+...
+}
 
-Build and then run:
+This would take care of renaming and removal of functions that need cfi.
+It would also probably be beneficial to the developers since they can 
+see immediately that the function they are working with needs to have 
+CFI checks disabled, and why.
 
-$ ./x86_64-softmmu/qemu-system-x86_64 -device \? | grep qxl
-Failed to open module:
-/home/crobinso/src/qemu/x86_64-softmmu/../hw-display-qxl.so: undefined
-symbol: qemu_qxl_io_log_semaphore
-
-
-That error breaks iotests 127:
-
---- /home/crobinso/src/qemu/tests/qemu-iotests/127.out	2020-07-15
-04:00:10.589138586 -0400
-+++ /home/crobinso/src/qemu/tests/qemu-iotests/127.out.bad	2020-07-16
-16:44:37.717248172 -0400
-@@ -1,4 +1,5 @@
- QA output created by 127
-+Failed to open module:
-/home/crobinso/src/qemu/x86_64-softmmu/../hw-display-qxl.so: undefined
-symbol: qemu_qxl_io_log_semaphore
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
- Formatting 'TEST_DIR/t.IMGFMT.overlay0', fmt=IMGFMT size=65536
-backing_file=TEST_DIR/t.IMGFMT backing_fmt=IMGFMT
- Formatting 'TEST_DIR/t.IMGFMT.overlay1', fmt=IMGFMT size=65536
-backing_file=TEST_DIR/t.IMGFMT backing_fmt=IMGFMT
+If you think this is a better approach, I'll submit v2 with this 
+approach instead of the external function list.
 
 
-Doing a build with every target and running 'make check' will show
-undefined symbol errors for other targets with hw-display-qxl too. Most
-reference the qxl_io_log call but some are like:
+For new code, however, the best thing is proper education and testing.
+I'll work on a document for docs/devel to detail what it is and how to 
+make code cfi-safe.
+A good approach should be to test code changes with CFI enabled. CFI is, 
+after all, a sanitizer and therefore it makes sense to use it also 
+during development, together with ASan, UBSan and the likes. 
+Unfortunately, since it works only with clang, I don't think this can 
+ever be a hard requirement.
 
-Failed to open module:
-/home/crobinso/src/qemu/microblaze-softmmu/../hw-display-qxl.so:
-undefined symbol: vga_ioport_read
-
-
-Also as a side note though I think it's pre-existing: running the test
-suite with --enable-modules while there are host installed modules is
-very noisy with lots of repetitive warnings like:
-
-Failed to initialize module: /usr/lib64/qemu/audio-oss.so
-Note: only modules from the same build can be loaded.
-Failed to initialize module: /usr/lib64/qemu/audio-pa.so
-Note: only modules from the same build can be loaded.
-Failed to initialize module: /usr/lib64/qemu/audio-sdl.so
-Note: only modules from the same build can be loaded.
-Failed to initialize module: /usr/lib64/qemu/ui-curses.so
-Note: only modules from the same build can be loaded.
-Failed to initialize module: /usr/lib64/qemu/ui-gtk.so
-Note: only modules from the same build can be loaded.
-
-It would be nice if those could be avoided somehow. Maybe
-QEMU_MODULE_DIR can help?
-
-Thanks,
-Cole
-
+Daniele
 
