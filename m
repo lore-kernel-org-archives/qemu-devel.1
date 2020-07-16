@@ -2,172 +2,75 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLACK,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82043C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 688C6C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AE80207F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:05:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="NvXMuxTN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AE80207F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 3BD90207F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:06:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BD90207F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvzpy-0002Am-IJ
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:05:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35994)
+	id 1jvzqd-0003HD-Hj
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:06:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aik@ozlabs.ru>) id 1jvzpD-0001IQ-Ph
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:05:07 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:46680)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aik@ozlabs.ru>) id 1jvzpB-0003cQ-3X
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:05:07 -0400
-Received: by mail-pl1-x643.google.com with SMTP id k5so3578908plk.13
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 02:05:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=LwUfddnsSau6ifCY2PS/+Zwxil4+Lx3HzPXao6yhhr8=;
- b=NvXMuxTNFK/iWGkHiB5xYx+4RP+Rmy/du60tUR5yjwyLD71ztJFS8UcHXqIwffxS1J
- ibDxcmLrHHD3TN8sjDOHjZj1Gkx1nZ4dnsxLds08K+JMlUp/dTc6Diis0wAiewrvEouv
- Do/N00ymKd3whp0Fl6wglc2scjyw7YfqZN9zxoJDTXM5GBKAIuL2MixdvJcOjuNVGcbR
- ovpLpVlQISsZk1Ng4G+WlQ72Lz/TL4WFYLB7hJdzCRqE+8xXbUlKoCIP1me4D1c57iMf
- m51IhS91j1hEwBDxyCtJJ99nrkR8A7iCBUFWR/HwaG18eXDIXowKJVI+tZbRFfS5bUxX
- afbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=LwUfddnsSau6ifCY2PS/+Zwxil4+Lx3HzPXao6yhhr8=;
- b=Ulqa6hj6tKZMvxtnltYR0lmi4kocO1cosp4rbJWXChRWsNOawQti2nS28IkIfvyv9W
- sc/Udl8PEu/8/DfkPE8Yga/1+nbjsvB7097iYteNvi+ArVfL5X4Kkf1BidJBjZVDiwap
- wsSmK2dClTuVXHO6MsD6yYc+R8t5xWEQhBh7TwxFeOBYtubPW4K1Qm5iKzAttwWtiR3F
- Us1W54FaAQrh8C0uT31kAZwedT5flwTBDC1c6AyS9DICKzjaWWdjY/9m97svBG7TFK3w
- 6tgrX2x5D7o/huxhT3Z1zQC9p4HonadpSikPjUcXdJygtndIzW7m1Go9jUf9rGb91tJ5
- MOJA==
-X-Gm-Message-State: AOAM532b5k8q81Y0/pwGXSat92jUaZL7R01C+Nd50Jh3CJFv+onoNgwR
- pjuspcWrsuS6H/XzKgev9B0oVQ==
-X-Google-Smtp-Source: ABdhPJw4Rxev6qxUJULLUGl5kLKRP1Kw6ImIeNQ+vtIyJoBYPXhHRfKQqiVC8gziQx8vFOnxYN6NWQ==
-X-Received: by 2002:a17:902:8d95:: with SMTP id
- v21mr2835523plo.108.1594890301627; 
- Thu, 16 Jul 2020 02:05:01 -0700 (PDT)
-Received: from [192.168.10.94] (124-171-83-152.dyn.iinet.net.au.
- [124.171.83.152])
- by smtp.gmail.com with ESMTPSA id v28sm4617557pgn.81.2020.07.16.02.04.58
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Jul 2020 02:05:00 -0700 (PDT)
-Subject: Re: [PATCH qemu v9] spapr: Implement Open Firmware client interface
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-References: <20200513035826.14205-1-aik@ozlabs.ru>
- <e5ddf04a-0d68-3cb8-2b84-47a43e234a59@ozlabs.ru>
- <f7e9ff41-de7a-c0d5-f004-51a2046ce0a0@ozlabs.ru>
- <434cdf49-5b80-5620-2635-079ee4b4ebad@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <86e79b6a-0032-56da-a066-9f02df361298@ozlabs.ru>
-Date: Thu, 16 Jul 2020 19:04:56 +1000
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jvzpi-00023h-QJ
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:05:38 -0400
+Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:45861)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jvzpe-0003jQ-MP
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:05:38 -0400
+Received: from player696.ha.ovh.net (unknown [10.110.171.136])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id CAFA61D0A66
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 11:05:24 +0200 (CEST)
+Received: from kaod.org (lfbn-tou-1-1163-216.w90-76.abo.wanadoo.fr
+ [90.76.222.216]) (Authenticated sender: clg@kaod.org)
+ by player696.ha.ovh.net (Postfix) with ESMTPSA id C434A146F937B;
+ Thu, 16 Jul 2020 09:05:07 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-104R0057fe97b6c-7dff-48ac-8a1d-18a5fa079438,2A9D1999911B15737EB689736E4AAE1772229697)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] acpi: Fix access to PM1 control and status registers
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+ Anthony PERARD <anthony.perard@citrix.com>
+References: <20200701110549.148522-1-anthony.perard@citrix.com>
+ <20200701075914-mutt-send-email-mst@kernel.org>
+ <20200701124836.GD2030@perard.uk.xensource.com>
+ <20200702063310-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0a9c7f42-c6e3-4103-febc-3811319341d9@kaod.org>
+Date: Thu, 16 Jul 2020 11:05:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <434cdf49-5b80-5620-2635-079ee4b4ebad@ozlabs.ru>
+In-Reply-To: <20200702063310-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=aik@ozlabs.ru; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Ovh-Tracer-Id: 1753026158128892848
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfeeggdduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephfffgeelfeejudevuedvvdeigeduteetveffhfffudeggfegleeljeeuieefuedvnecukfhppedtrddtrddtrddtpdeltddrjeeirddvvddvrddvudeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=87.98.179.142; envelope-from=clg@kaod.org;
+ helo=17.mo1.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 05:05:25
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -180,84 +83,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, pbonzini@redhat.com,
+ Igor Mammedov <imammedo@redhat.com>, "open list:PReP" <qemu-ppc@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping? I kinda realize it is not going to replace SLOF any time soon but
-still...
-
-
-On 07/07/2020 10:34, Alexey Kardashevskiy wrote:
-> Ping?
-> 
-> 
-> On 24/06/2020 10:28, Alexey Kardashevskiy wrote:
->> Ping?
->>
->> On 02/06/2020 21:40, Alexey Kardashevskiy wrote:
->>> Ping?
+On 7/2/20 1:12 PM, Michael S. Tsirkin wrote:
+> On Wed, Jul 01, 2020 at 01:48:36PM +0100, Anthony PERARD wrote:
+>> On Wed, Jul 01, 2020 at 08:01:55AM -0400, Michael S. Tsirkin wrote:
+>>> On Wed, Jul 01, 2020 at 12:05:49PM +0100, Anthony PERARD wrote:
+>>>> The ACPI spec state that "Accesses to PM1 control registers are
+>>>> accessed through byte and word accesses." (In section 4.7.3.2.1 PM1
+>>>> Control Registers of my old spec copy rev 4.0a).
+>>>>
+>>>> With commit 5d971f9e6725 ("memory: Revert "memory: accept mismatching
+>>>> sizes in memory_region_access_valid""), it wasn't possible anymore to
+>>>> access the pm1_cnt register by reading a single byte, and that is use
+>>>> by at least a Xen firmware called "hvmloader".
+>>>>
+>>>> Also, take care of the PM1 Status Registers which also have "Accesses
+>>>> to the PM1 status registers are done through byte or word accesses"
+>>>> (In section 4.7.3.1.1 PM1 Status Registers).
+>>>>
+>>>> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 >>>
->>> On 13/05/2020 13:58, Alexey Kardashevskiy wrote:
->>>> The PAPR platform which describes an OS environment that's presented by
->>>> a combination of a hypervisor and firmware. The features it specifies
->>>> require collaboration between the firmware and the hypervisor.
->>>>
->>>> Since the beginning, the runtime component of the firmware (RTAS) has
->>>> been implemented as a 20 byte shim which simply forwards it to
->>>> a hypercall implemented in qemu. The boot time firmware component is
->>>> SLOF - but a build that's specific to qemu, and has always needed to be
->>>> updated in sync with it. Even though we've managed to limit the amount
->>>> of runtime communication we need between qemu and SLOF, there's some,
->>>> and it has become increasingly awkward to handle as we've implemented
->>>> new features.
->>>>
->>>> This implements a boot time OF client interface (CI) which is
->>>> enabled by a new "x-vof" pseries machine option (stands for "Virtual Open
->>>> Firmware). When enabled, QEMU implements the custom H_OF_CLIENT hcall
->>>> which implements Open Firmware Client Interface (OF CI). This allows
->>>> using a smaller stateless firmware which does not have to manage
->>>> the device tree.
->>>>
->>>> The new "vof.bin" firmware image is included with source code under
->>>> pc-bios/. It also includes RTAS blob.
->>>>
->>>> This implements a handful of CI methods just to get -kernel/-initrd
->>>> working. In particular, this implements the device tree fetching and
->>>> simple memory allocator - "claim" (an OF CI memory allocator) and updates
->>>> "/memory@0/available" to report the client about available memory.
->>>>
->>>> This implements changing some device tree properties which we know how
->>>> to deal with, the rest is ignored. To allow changes, this skips
->>>> fdt_pack() when x-vof=on as not packing the blob leaves some room for
->>>> appending.
->>>>
->>>> In absence of SLOF, this assigns phandles to device tree nodes to make
->>>> device tree traversing work.
->>>>
->>>> When x-vof=on, this adds "/chosen" every time QEMU (re)builds a tree.
->>>>
->>>> This adds basic instances support which are managed by a hash map
->>>> ihandle -> [phandle].
->>>>
->>>> Before the guest started, the used memory is:
->>>> 0..4000 - the initial firmware
->>>> 10000..180000 - stack
->>>>
->>>> This OF CI does not implement "interpret".
->>>>
->>>> With this basic support, this can only boot into kernel directly.
->>>> However this is just enough for the petitboot kernel and initradmdisk to
->>>> boot from any possible source. Note this requires reasonably recent guest
->>>> kernel with:
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=df5be5be8735
->>>>
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>> ---
->>>>
+>>>
+>>> Can't we set impl.min_access_size to convert byte accesses
+>>> to word accesses?
+>>
+>> I actually tried, but when reading `addr` or `addr+1` I had the same
+>> value. So I guess `addr` wasn't taken into account.
+>>
+>> I've checked again, with `.impl.min_access_size = 2`, the width that the
+>> function acpi_pm_cnt_read() get is 2, but addr isn't changed so the
+>> function is still supposed to shift the result (or the value to write)
+>> based on addr, I guess.
+> 
+> True address is misaligned.  I think memory core should just align it -
+> this is what devices seem to expect.
+> However result is shifted properly so just align addr and be done with
+> it.
+> 
+> 
+> In fact I have a couple more questions. Paolo - maybe you can answer some of these?
+> 
+> 
+> 
+>     if (!access_size_min) {
+>         access_size_min = 1;
+>     }
+>     if (!access_size_max) {
+>         access_size_max = 4;
+>     }
+> 
+>>>>>
+> 
+> So 8 byte accesses are split up unless one requests 8 bytes.
+> Undocumented right?  Why are we doing this?
+> 
+>>>>>
+> 
+> 
+>     /* FIXME: support unaligned access? */
+> 
+>>>>>
+> 
+> Shouldn't we document impl.unaligned is ignored right now?
+> Shouldn't we do something to make sure callbacks do not get
+> unaligned accesses they don't expect?
+> 
+> 
+> In fact, there are just 2 devices which set valid.unaligned but
+> not impl.unaligned:
+>     aspeed_smc_ops
+>     raven_io_ops
+> 
+> 
+> Is this intentional? 
 
+I think it is a leftover from the initial implementation. The model works fine 
+without valid.unaligned being set and with your patch.
 
--- 
-Alexey
+C. 
+ 
+
+> Do these in fact expect memory core to
+> provide aligned addresses to the callbacks?
+> Given impl.unaligned is not implemented, can we drop it completely?
+> Cc a bunch of people who might know.
+> 
+> Can relevant maintainers please comment? Thanks a lot!
+> 
+>>>>>
+> 
+> 
+>     access_size = MAX(MIN(size, access_size_max), access_size_min);
+>     access_mask = MAKE_64BIT_MASK(0, access_size * 8);
+> 
+>>>>>
+> 
+> 
+> So with a 1 byte access at address 1, with impl.min_access_size = 2, we get:
+>     access_size = 2
+>     access_mask = 0xffff
+>     addr = 1
+> 
+> 
+> 
+> <<<<
+> 
+> 
+>     if (memory_region_big_endian(mr)) {
+>         for (i = 0; i < size; i += access_size) {
+>             r |= access_fn(mr, addr + i, value, access_size,
+>                         (size - access_size - i) * 8, access_mask, attrs);
+> 
+>>>>
+> 
+> now shift is -8.
+> 
+> <<<<
+> 
+> 
+>         }
+>     } else {
+>         for (i = 0; i < size; i += access_size) {
+>             r |= access_fn(mr, addr + i, value, access_size, i * 8,
+>                         access_mask, attrs);
+>         }
+>     }
+> 
+> 
+> <<<<
+> 
+> callback is invoked with addr 1 and size 2:
+> 
+>>>>>
+> 
+> 
+>     uint64_t tmp;
+> 
+>     tmp = mr->ops->read(mr->opaque, addr, size);
+>     if (mr->subpage) {
+>         trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, size);
+>     } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_READ)) {
+>         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
+>         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
+>     }
+>     memory_region_shift_read_access(value, shift, mask, tmp);
+>     return MEMTX_OK;
+> 
+> <<<<
+> 
+> let's assume callback returned 0xabcd
+> 
+> this is where we are shifting the return value:
+> 
+>>>>>
+> 
+> 
+> static inline void memory_region_shift_read_access(uint64_t *value,
+>                                                    signed shift,
+>                                                    uint64_t mask,
+>                                                    uint64_t tmp)
+> {
+>     if (shift >= 0) {
+>         *value |= (tmp & mask) << shift;
+>     } else {
+>         *value |= (tmp & mask) >> -shift;
+>     }
+> }
+> 
+> 
+> So we do 0xabcd & 0xffff >> 8, and we get 0xab.
+> 
+>>>>
+> 
+> How about aligning address for now? Paolo?
+> 
+> -->
+> 
+> memory: align to min access size
+> 
+> If impl.min_access_size > valid.min_access_size access callbacks
+> can get a misaligned access as size is increased.
+> They don't expect that, let's fix it in the memory core.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ---
+> 
+> 
+> diff --git a/memory.c b/memory.c
+> index 9200b20130..ea489ce405 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -532,6 +532,7 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+>      }
+>  
+>      /* FIXME: support unaligned access? */
+> +    addr &= ~(access_size_min - 1);
+>      access_size = MAX(MIN(size, access_size_max), access_size_min);
+>      access_mask = MAKE_64BIT_MASK(0, access_size * 8);
+>      if (memory_region_big_endian(mr)) {
+>> -- 
+>> Anthony PERARD
+> 
+
 
