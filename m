@@ -2,74 +2,125 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F24C433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:44:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C09C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:48:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D7AF20775
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:44:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7AF20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1B00D20775
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:48:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OOGifmRc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B00D20775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvzUy-0007j9-Em
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 04:44:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59340)
+	id 1jvzYn-0000SS-9x
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 04:48:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jvzUR-0007IS-Co
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:43:39 -0400
-Received: from mga07.intel.com ([134.134.136.100]:51454)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jvzY7-0008P8-Lw; Thu, 16 Jul 2020 04:47:28 -0400
+Received: from mail-eopbgr10125.outbound.protection.outlook.com
+ ([40.107.1.125]:5237 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jvzUO-0006DR-8m
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:43:39 -0400
-IronPort-SDR: 87KtNLBEDBd5OQbDSjEhXsW0WYZBBDXxCKAD4U+FDwZMX5jo/T+lIH0o470rtJfjsgXtHXdIqY
- UIhL+tCu3DWw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="214077322"
-X-IronPort-AV: E=Sophos;i="5.75,358,1589266800"; d="scan'208";a="214077322"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 16 Jul 2020 01:43:28 -0700
-IronPort-SDR: pS0mlfERo4yWffrQWy+T1/c/BGFOynW3Hp24gWXd3/zJVKo5yaU/uRBlnnQO5fqh5oTHeTRwcW
- v7AyWXGodU7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,358,1589266800"; d="scan'208";a="391036069"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga001.fm.intel.com with ESMTP; 16 Jul 2020 01:43:23 -0700
-Date: Thu, 16 Jul 2020 16:32:30 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200716083230.GA25316@joy-OptiPlex-7040>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
- <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jvzY5-0007Ds-2h; Thu, 16 Jul 2020 04:47:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OzEGf8kBULugNqqxMtvr4+NHQzrW8Js8Fw1LB8T2tKbtI/DJL5LtNf/+4pq++cyUokDk957wmZuGxa212OKFmDpbdCnTZCmBp5l2D1bIoMwGLyO9etm+eq4fhOGU6DTQnzF/G9ZPDJhlapSzC/OC1vPkepVRDOcClTALLmQQOIV62jAHsftTtJn0gf+O6NmmraKoL9ADU7RR5NnxvtNuhRMUiMHPKanV4bBVj5/P0DdjBaLZpGOEIcDNDTx71g19UyoGSxXMsX2nQUVPaobRx3dnTcYEDTWqGtVLto2qs7Je8odT/nuxZdC2fQxruOnAAGWmCXZKbMB2mdB0UJ+sEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AdNVTJHDpkQkP6ftEkWYL/A+7jDdm1SdTHOwdWIXWVA=;
+ b=AXtDlXEy8Ox0oGtSYf0JrrsYB/j98wh1AbbtkAPqFXE+6U2KBf2H5VgtWE8GdyCWNlmFdcDPGu8Oy+zyvoNqRo7r9qmO9IWoVGNPGRJFmLsswNPZ3sXM7N6ZejDMxyWvSXnqpLv6aaJ8cqRoBfbmp8DRRirVUqK9uIXtrC7YwBJqLsxovdjzkVl9ivHfa4lGeHfGKvfEEFzdfTVZxoiwQGBJuIHjjrntlvKSOsukbCS0eOCDRzw8guO8ipIPQDlBUJW7Gs02dQZ27sAIgK2clHGfBgnwZMTq/zAYx37ahPv02ZHDPM64gV4Hz15aERMpCQP9GjV9H+1WusDN3D1nIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AdNVTJHDpkQkP6ftEkWYL/A+7jDdm1SdTHOwdWIXWVA=;
+ b=OOGifmRcKT97vvZGcyQJe6pvxhxYmh/hseyMqvJdP+FbhY2HRpKE/t0HVbXW2h8THzQj0/a4ea+4T572C1B6GRUM8gBvHaFGh8fGa9Z70xFATmrfXS3nSIWqV4ZaFzGsZXY+mPOBU5KJz1vxc1W8P3ZJKjN4o3ari/Dc9bc4zgw=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0802MB2449.eurprd08.prod.outlook.com (2603:10a6:203:9c::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Thu, 16 Jul
+ 2020 08:47:19 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3195.018; Thu, 16 Jul 2020
+ 08:47:19 +0000
+Subject: Re: [PATCH v10 03/10] qcow2_format.py: change Qcow2BitmapExt
+ initialization method
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1594676203-436999-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1594676203-436999-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <4eba577b-2c71-79bf-d011-0e2c4d43e8fc@virtuozzo.com>
+Date: Thu, 16 Jul 2020 11:47:17 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <1594676203-436999-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR03CA0025.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::38) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=134.134.136.100;
- envelope-from=yan.y.zhao@intel.com; helo=mga07.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:43:29
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.164) by
+ AM0PR03CA0025.eurprd03.prod.outlook.com (2603:10a6:208:14::38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3195.17 via Frontend Transport; Thu, 16 Jul 2020 08:47:18 +0000
+X-Originating-IP: [185.215.60.164]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5fd78ede-4efb-42a0-898d-08d82964d92f
+X-MS-TrafficTypeDiagnostic: AM5PR0802MB2449:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB2449B99A1FB81D62527F3599C17F0@AM5PR0802MB2449.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8QZWl5xkWosYdiM7VJSd5xb0qLnFMX/SqDinc8GzFzezW3Ow8xXoN13FaOhx1fgIYoemsIjIX3pnsk4wFzRq7BecH5JM3N70xYfpmmK/B6bMFGnIFVjxQQm2f+n9IxpeS51BcPvK0DXwEQOHCZiFrgSBf2htxFWQ5cpOAdBVLWo9dUWBVl9G0jzMBto4oMwOTEocxBxzenQLZd0tjd88BSDhSHVnG49urvja8AT/WIeLVxE1Wa6lmYzAn73a1z7nDIe8ygVap2bh5kAgLIO9keuXmfDeQ6N1bXm9GYwWiWcpe3Y2tk/4xPXD/Wl3cbPFlb8Nl8asR0Wrd9DTA5ev8lK62cOL60flrn9SLJIFkPqur+pCUkse0dbbGsjMzlDy
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39840400004)(366004)(136003)(376002)(346002)(396003)(4326008)(2906002)(2616005)(83380400001)(16526019)(5660300002)(186003)(86362001)(31696002)(956004)(26005)(8676002)(31686004)(8936002)(16576012)(36756003)(316002)(478600001)(66946007)(107886003)(66476007)(66556008)(52116002)(6486002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: uyBedQzuVciRBWTjlKhpXPbh0iW7O65sMHjC3TkhqrGRKCJvRYk0872pCy4NyOdSC4nl6HNgVG9DvvEcm/F8MMbncaEqWoIn0L48C0hkxvrinKAoLOzbw1ikG6iB+3tYgVLz7YnFwW212blg4NoOnkyCWzUPkZXOM4nwJYVG/cYngGnh9iwe7QLnt4RsCkASjEvx2Eghle0MXpVBWDY4fpbakNJIiDjd4peTZgNX6Cva8UgsXo2dNaSni4dVTP90ocCZNCVEcNFRtr9SuCTAA1zyBUbWGX2ZQo2n2iih2y4ZvungyKMapj4H3lq50cPj5og9p+sJla2tLOdzUQprR8rz7yGlfbYjFqLprg5Qls5Cv6x+DwO350sHAbgdTWwllvNBUIsRxLzbc1dkm87u1P9vBFJrjoMPRkMYkTKOjh9HH0vUJgw3vdiF7o8Bxhc7+HnWoDbvOOOK8xwbG5tnjmJctDjV3Fi9DFX7Qef3DINHJf3Q8PsLgP1FhXaccwcP
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fd78ede-4efb-42a0-898d-08d82964d92f
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 08:47:19.1240 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ficMptYiip3FxnxF8UdKcoAeM1KilIZwQG0yDYqhS3lyW1eWDCCYBhIQr1sODnHna/p2LsxGj2We2yVOtlK4bwi6qdGgOWBDeCikT755ryk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2449
+Received-SPF: pass client-ip=40.107.1.125;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:47:20
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,222 +134,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
- kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
- corbet@lwn.net, openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
- dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
- bao.yumeng@zte.com.cn, alex.williamson@redhat.com, smooney@redhat.com,
- intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, cohuck@redhat.com,
- dinechin@redhat.com, devel@ovirt.org
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 16, 2020 at 12:16:26PM +0800, Jason Wang wrote:
+14.07.2020 00:36, Andrey Shinkevich wrote:
+> There are two ways to initialize a class derived from Qcow2Struct:
+> 1. Pass a block of binary data to the constructor.
+> 2. Pass the file descriptor to allow reading the file from constructor.
+> Let's change the Qcow2BitmapExt initialization method from 1 to 2 to
+> support a scattered reading in the initialization chain.
+> The implementation comes with the patch that follows.
 > 
-> On 2020/7/14 上午7:29, Yan Zhao wrote:
-> > hi folks,
-> > we are defining a device migration compatibility interface that helps upper
-> > layer stack like openstack/ovirt/libvirt to check if two devices are
-> > live migration compatible.
-> > The "devices" here could be MDEVs, physical devices, or hybrid of the two.
-> > e.g. we could use it to check whether
-> > - a src MDEV can migrate to a target MDEV,
-> > - a src VF in SRIOV can migrate to a target VF in SRIOV,
-> > - a src MDEV can migration to a target VF in SRIOV.
-> >    (e.g. SIOV/SRIOV backward compatibility case)
-> > 
-> > The upper layer stack could use this interface as the last step to check
-> > if one device is able to migrate to another device before triggering a real
-> > live migration procedure.
-> > we are not sure if this interface is of value or help to you. please don't
-> > hesitate to drop your valuable comments.
-> > 
-> > 
-> > (1) interface definition
-> > The interface is defined in below way:
-> > 
-> >               __    userspace
-> >                /\              \
-> >               /                 \write
-> >              / read              \
-> >     ________/__________       ___\|/_____________
-> >    | migration_version |     | migration_version |-->check migration
-> >    ---------------------     ---------------------   compatibility
-> >       device A                    device B
-> > 
-> > 
-> > a device attribute named migration_version is defined under each device's
-> > sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/migration_version).
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/qcow2_format.py | 33 +++++++++++++++++++--------------
+>   1 file changed, 19 insertions(+), 14 deletions(-)
 > 
-> 
-> Are you aware of the devlink based device management interface that is
-> proposed upstream? I think it has many advantages over sysfs, do you
-> consider to switch to that?
-not familiar with the devlink. will do some research of it.
-> 
-> 
-> > userspace tools read the migration_version as a string from the source device,
-> > and write it to the migration_version sysfs attribute in the target device.
-> > 
-> > The userspace should treat ANY of below conditions as two devices not compatible:
-> > - any one of the two devices does not have a migration_version attribute
-> > - error when reading from migration_version attribute of one device
-> > - error when writing migration_version string of one device to
-> >    migration_version attribute of the other device
-> > 
-> > The string read from migration_version attribute is defined by device vendor
-> > driver and is completely opaque to the userspace.
-> 
-> 
-> My understanding is that something opaque to userspace is not the philosophy
+> diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+> index 2f3681b..cbaffc4 100644
+> --- a/tests/qemu-iotests/qcow2_format.py
+> +++ b/tests/qemu-iotests/qcow2_format.py
+> @@ -113,6 +113,11 @@ class Qcow2BitmapExt(Qcow2Struct):
+>           ('u64', '{:#x}', 'bitmap_directory_offset')
+>       )
+>   
+> +    def __init__(self, fd):
+> +        super().__init__(fd=fd)
+> +        pad = (struct.calcsize(self.fmt) + 7) & ~7
 
-but the VFIO live migration in itself is essentially a big opaque stream to userspace.
+It's a size of structure rounded up to 8-bytes boundary. But after super init, we should alread be at the end of the structure and need to add only padding, not the whole structure rounded up. I think, correct code should be:
 
-> of Linux. Instead of having a generic API but opaque value, why not do in a
-> vendor specific way like:
-> 
-> 1) exposing the device capability in a vendor specific way via sysfs/devlink
-> or other API
-> 2) management read capability in both src and dst and determine whether we
-> can do the migration
-> 
-> This is the way we plan to do with vDPA.
->
-yes, in another reply, Alex proposed to use an interface in json format.
-I guess we can define something like
-
-{ "self" :
-  [
-    { "pciid" : "8086591d",
-      "driver" : "i915",
-      "gvt-version" : "v1",
-      "mdev_type"   : "i915-GVTg_V5_2",
-      "aggregator"  : "1",
-      "pv-mode"     : "none",
-    }
-  ],
-  "compatible" :
-  [
-    { "pciid" : "8086591d",
-      "driver" : "i915",
-      "gvt-version" : "v1",
-      "mdev_type"   : "i915-GVTg_V5_2",
-      "aggregator"  : "1"
-      "pv-mode"     : "none",
-    },
-    { "pciid" : "8086591d",
-      "driver" : "i915",
-      "gvt-version" : "v1",
-      "mdev_type"   : "i915-GVTg_V5_4",
-      "aggregator"  : "2"
-      "pv-mode"     : "none",
-    },
-    { "pciid" : "8086591d",
-      "driver" : "i915",
-      "gvt-version" : "v2",
-      "mdev_type"   : "i915-GVTg_V5_4",
-      "aggregator"  : "2"
-      "pv-mode"     : "none, ppgtt, context",
-    }
-    ...
-  ]
-}
-
-But as those fields are mostly vendor specific, the userspace can
-only do simple string comparing, I guess the list would be very long as
-it needs to enumerate all possible targets.
-also, in some fileds like "gvt-version", is there a simple way to express
-things like v2+?
-
-If the userspace can read this interface both in src and target and
-check whether both src and target are in corresponding compatible list, I
-think it will work for us.
-
-But still, kernel should not rely on userspace's choice, the opaque
-compatibility string is still required in kernel. No matter whether
-it would be exposed to userspace as an compatibility checking interface,
-vendor driver would keep this part of code and embed the string into the
-migration stream. so exposing it as an interface to be used by libvirt to
-do a safety check before a real live migration is only about enabling
-the kernel part of check to happen ahead.
+    tail = struct.calcsize(self.fmt) % 8
+    if tail:
+        fd.seek(8 - tail, 1)
 
 
-Thanks
-Yan
+> +        if pad:
+> +            fd.seek(pad, 1)
+>   
+>   QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
+>   
+> @@ -161,21 +166,21 @@ class QcowHeaderExtension(Qcow2Struct):
+>           else:
+
+Hmm, you parse data now only for this "else:" branch. Prior to this patch, it was parsed for "if fd is None:" branch as well, after the whole "if" statement. This is wrong.
+
+>               assert all(v is None for v in (magic, length, data))
+>               super().__init__(fd=fd)
+> -            padded = (self.length + 7) & ~7
+> -            self.data = fd.read(padded)
+> -            assert self.data is not None
+> -
+> -        data_str = self.data[:self.length]
+> -        if all(c in string.printable.encode('ascii') for c in data_str):
+> -            data_str = f"'{ data_str.decode('ascii') }'"
+> -        else:
+> -            data_str = '<binary>'
+> -        self.data_str = data_str
+> +            if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
+> +                self.obj = Qcow2BitmapExt(fd=fd)
+> +            else:
+> +                padded = (self.length + 7) & ~7
+> +                self.data = fd.read(padded)
+> +                assert self.data is not None
+> +                self.obj = None
+> +                data_str = self.data[:self.length]
+> +                if all(c in string.printable.encode(
+> +                    'ascii') for c in data_str):
+> +                    data_str = f"'{ data_str.decode('ascii') }'"
+> +                else:
+> +                    data_str = '<binary>'
+> +                self.data_str = data_str
+>   
+> -        if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
+> -            self.obj = Qcow2BitmapExt(data=self.data)
+> -        else:
+> -            self.obj = None
+>   
+>       def dump(self):
+>           super().dump()
+> 
 
 
-> 
-> 
-> > for a Intel vGPU, string format can be defined like
-> > "parent device PCI ID" + "version of gvt driver" + "mdev type" + "aggregator count".
-> > 
-> > for an NVMe VF connecting to a remote storage. it could be
-> > "PCI ID" + "driver version" + "configured remote storage URL"
-> > 
-> > for a QAT VF, it may be
-> > "PCI ID" + "driver version" + "supported encryption set".
-> > 
-> > (to avoid namespace confliction from each vendor, we may prefix a driver name to
-> > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_8-1)
-> > 
-> > 
-> > (2) backgrounds
-> > 
-> > The reason we hope the migration_version string is opaque to the userspace
-> > is that it is hard to generalize standard comparing fields and comparing
-> > methods for different devices from different vendors.
-> > Though userspace now could still do a simple string compare to check if
-> > two devices are compatible, and result should also be right, it's still
-> > too limited as it excludes the possible candidate whose migration_version
-> > string fails to be equal.
-> > e.g. an MDEV with mdev_type_1, aggregator count 3 is probably compatible
-> > with another MDEV with mdev_type_3, aggregator count 1, even their
-> > migration_version strings are not equal.
-> > (assumed mdev_type_3 is of 3 times equal resources of mdev_type_1).
-> > 
-> > besides that, driver version + configured resources are all elements demanding
-> > to take into account.
-> > 
-> > So, we hope leaving the freedom to vendor driver and let it make the final decision
-> > in a simple reading from source side and writing for test in the target side way.
-> > 
-> > 
-> > we then think the device compatibility issues for live migration with assigned
-> > devices can be divided into two steps:
-> > a. management tools filter out possible migration target devices.
-> >     Tags could be created according to info from product specification.
-> >     we think openstack/ovirt may have vendor proprietary components to create
-> >     those customized tags for each product from each vendor.
-> >     e.g.
-> >     for Intel vGPU, with a vGPU(a MDEV device) in source side, the tags to
-> >     search target vGPU are like:
-> >     a tag for compatible parent PCI IDs,
-> >     a tag for a range of gvt driver versions,
-> >     a tag for a range of mdev type + aggregator count
-> > 
-> >     for NVMe VF, the tags to search target VF may be like:
-> >     a tag for compatible PCI IDs,
-> >     a tag for a range of driver versions,
-> >     a tag for URL of configured remote storage.
-> > 
-> > b. with the output from step a, openstack/ovirt/libvirt could use our proposed
-> >     device migration compatibility interface to make sure the two devices are
-> >     indeed live migration compatible before launching the real live migration
-> >     process to start stream copying, src device stopping and target device
-> >     resuming.
-> >     It is supposed that this step would not bring any performance penalty as
-> >     -in kernel it's just a simple string decoding and comparing
-> >     -in openstack/ovirt, it could be done by extending current function
-> >      check_can_live_migrate_destination, along side claiming target resources.[1]
-> > 
-> > 
-> > [1] https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/libvirt-neutron-sriov-livemigration.html
-> > 
-> > Thanks
-> > Yan
-> > 
-> 
+-- 
+Best regards,
+Vladimir
 
