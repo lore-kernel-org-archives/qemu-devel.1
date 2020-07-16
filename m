@@ -2,91 +2,91 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F69C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E8DC433E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A0DC20775
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 223D3207F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:53:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiAHd5/9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0DC20775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L/B91BoK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 223D3207F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw0Zf-0002X0-Ob
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:53:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48342)
+	id 1jw0a2-00034z-DC
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:53:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw0Yw-0001VJ-Cv
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:52:22 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46774
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jw0Z9-0001nf-L3
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:52:35 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45276
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw0Yu-0006xT-1i
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:52:21 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jw0Z7-0006zm-Vh
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:52:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594893138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1594893152;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=w/RhQm5bFXAXs8gAGrRUTLPFfDw67LI4nsCk2cX+WQw=;
- b=hiAHd5/9sJVi3W5nf214Gk1c1nnsEl6KYXG2vCJNBoKOnwpyaeNbyeaAGl0697bwpbO/ss
- iGTbGCepDAHAiFNt1XgfyiRGATl7737s5prsVDc0uERj4Bp9IFMVekAsHqoQVmUsVJPdSy
- 8DDVwxhvKdYL/nIOFpgPojo7Ys4+j7k=
+ bh=mogIbW5Vp4Tt8nWB3B80QZOT06yGrcgAieGXxXOOBHo=;
+ b=L/B91BoKWVcj55AN2nUYvaCXiKZOewqYMGAxbeoJxV63MQ7LUjYZuKWGSK/OSDgseMZduC
+ BioteX6sR9vgObbBaUqPRzsoC/x05OHl9bZ8gpKwzGyNwxftLuYfMX5WJOkZAVKS5oEYLL
+ rytF1Qb1v1xI6u1L885ExwlUoEIA8aw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-FOGcY6y7NVa2tqD_TMkj_w-1; Thu, 16 Jul 2020 05:52:14 -0400
-X-MC-Unique: FOGcY6y7NVa2tqD_TMkj_w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-513-whbr3DosOqeiLLggog8aBg-1; Thu, 16 Jul 2020 05:52:31 -0400
+X-MC-Unique: whbr3DosOqeiLLggog8aBg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 853AAE92D;
- Thu, 16 Jul 2020 09:52:13 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BBC372AEE;
- Thu, 16 Jul 2020 09:52:09 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9B5AF11385E0; Thu, 16 Jul 2020 11:52:07 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Li Qiang <liq3ea@gmail.com>
-Subject: Re: [PATCH v2] tests: qmp-cmd-test: fix memory leak
-References: <20200715154117.15456-1-liq3ea@163.com>
- <874kq8roev.fsf@dusky.pond.sub.org>
- <CAKXe6S+CvQ1rmnWXi2_=kiCF4yG-2T3iPut=51G25qwL+oO2Pw@mail.gmail.com>
-Date: Thu, 16 Jul 2020 11:52:07 +0200
-In-Reply-To: <CAKXe6S+CvQ1rmnWXi2_=kiCF4yG-2T3iPut=51G25qwL+oO2Pw@mail.gmail.com>
- (Li Qiang's message of "Thu, 16 Jul 2020 14:43:31 +0800")
-Message-ID: <87blkfpz20.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E74C80183C;
+ Thu, 16 Jul 2020 09:52:29 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 204E0106F752;
+ Thu, 16 Jul 2020 09:52:21 +0000 (UTC)
+Date: Thu, 16 Jul 2020 10:52:19 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 01/18] migration/vmstate: Document vmstate_dummy
+Message-ID: <20200716095219.GJ227735@redhat.com>
+References: <20200703201911.26573-1-f4bug@amsat.org>
+ <20200703201911.26573-2-f4bug@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200703201911.26573-2-f4bug@amsat.org>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 01:59:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:55:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,81 +99,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
- Auger Eric <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Laurent Vivier <laurent@vivier.eu>, Joel Stanley <joel@jms.id.au>,
+ qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Li Qiang <liq3ea@gmail.com> writes:
+On Fri, Jul 03, 2020 at 10:18:54PM +0200, Philippe Mathieu-Daudé wrote:
+> vmstate_dummy is special and restricted to linux-user. See commit
+> c71c3e99b8 ("Add a vmstate_dummy struct for CONFIG_USER_ONLY").
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/migration/vmstate.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index f68ed7db13..af7d80cd4e 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -194,7 +194,7 @@ struct VMStateDescription {
+>      const VMStateDescription **subsections;
+>  };
+>  
+> -extern const VMStateDescription vmstate_dummy;
+> +extern const VMStateDescription vmstate_dummy; /* Exclusively for linux-user */
 
-> Markus Armbruster <armbru@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8816=
-=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=881:59=E5=86=99=E9=81=93=EF=BC=
-=9A
->>
->> Li Qiang <liq3ea@163.com> writes:
->>
->> > Properly free each test response to avoid memory leak and separate
->> > qtest_qmp() calls with spare lines, in a consistent manner.
->> >
->> > Fixes: 5b88849e7b9("tests/qmp-cmd-test: Add
->> > qmp/object-add-failure-modes"
->>
->> The patch also fixes leaks introduced in 442b09b83d and 9fc719b869,
->> actually.  At least it should, but the patch appears to be incomplete.
+Originally in the commit mentioned above, this was enforced at build time:
 
-442b09b83d was fine, actually.
+  +#ifdef CONFIG_USER_ONLY
+  +extern const VMStateDescription vmstate_dummy;
+  +#endif
 
-9fc719b869 wasn't, and your second patch hunk fixes it.  Please add a
-"Fixes: 9fc719b869' line to the commit message.
 
->> >
->> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
->> > Signed-off-by: Li Qiang <liq3ea@163.com>
->> > ---
->> > Change sincve v1: add detailed commit message
->> >
->> > tests/qtest/qmp-cmd-test.c | 13 +++++++++++++
->> >  1 file changed, 13 insertions(+)
->> >
->> > diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
->> > index c68f99f659..f7b1aa7fdc 100644
->> > --- a/tests/qtest/qmp-cmd-test.c
->> > +++ b/tests/qtest/qmp-cmd-test.c
->> > @@ -230,6 +230,8 @@ static void test_object_add_failure_modes(void)
->>    static void test_object_add_failure_modes(void)
->>    {
->>        QTestState *qts;
->>        QDict *resp;
->>
->>        /* attempt to create an object without props */
->>        qts =3D qtest_init(common_args);
->>        resp =3D qtest_qmp(qts, "{'execute': 'object-add', 'arguments':"
->>                         " {'qom-type': 'memory-backend-ram', 'id': 'ram1=
-' } }");
->>        g_assert_nonnull(resp);
->>        qmp_assert_error_class(resp, "GenericError");
->>
->> Doesn't @resp leak here, too?
->
-> No, qmp_assert_error_class will call qobject_unref(rsp) will so will not =
-leak.
+but this was removed in
 
-You're right.
+  commit 6afc14e92ac81b29c25f097468f7751d5df1b5bc
+  Author: Stefan Weil <sw@weilnetz.de>
+  Date:   Fri Feb 6 22:43:10 2015 +0100
 
-With the additional Fixes:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+    migration: Fix warning caused by missing declaration of vmstate_dummy
+    
+    Warning from the Sparse static analysis tool:
+    
+    stubs/vmstate.c:4:26: warning:
+     symbol 'vmstate_dummy' was not declared. Should it be static?
 
-> In fact, I think this is a inconsistent for 'qtest_qmp'.
-> I think we can apply this patch first and then change the
-> 'qmp_assert_error_class' or/and others
-> to free resp. And just let the caller of 'qtest_qmp' frees unref the rsp.
 
-Do you mean "not to free @resp"?
+So if this is really intended to only be used by linux-user, then I
+suggest we put CONFIG_USER_ONLY back, and figure out a different
+way to address the undeclared symbol problem. I guess the problem
+was that stub code is shared both both user/softmmu builds. So
+perhaps we need to stub this in linux-user only code, instead of
+having it in the main stub library that is common.
 
-> What's your idea?
 
-Rename it to qmp_expect_error_and_unref()?
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
