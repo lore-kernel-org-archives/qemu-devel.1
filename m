@@ -2,95 +2,110 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 252AFC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 00:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D693C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 01:01:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B812D20658
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 00:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26A192078C
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 01:01:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Na9nWLTF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B812D20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWnh6L6A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26A192078C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvsAA-0000Fn-VZ
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 20:54:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38478)
+	id 1jvsGm-0001bc-Ec
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 21:01:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
- id 1jvs9B-0007vl-Pc
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 20:53:14 -0400
-Received: from smtpbg506.qq.com ([203.205.250.33]:53461 helo=smtpbg510.qq.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
- id 1jvs93-0003tP-7N
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 20:53:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
- t=1594860775; bh=b0MSZ2vM8X1AWhueZOYHY7iPuJLeHp8WLCA9jQ0JYXM=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=Na9nWLTFsKpRzKrmITwRQrXTsKAkCQgnY1WdmqboKZdnNyOIYRM5o7gZyybI5kB7S
- J5zV9qyFRTwQksbq0gnsK9jVEqqUMRXe69oyaQ1vMgtP+00LpMxZo7jLpwr8V567OS
- Tw38QheWCDOhG2kajEaURGrW7XCbY33KR0Ave2mY=
-X-QQ-FEAT: jc59yJNqHg4QbkGoIcRHAv42zYJ81y3IJUR/o94rlCFWSB9jU/ZkUYgQM0+fa
- ClrYU1S6crWKXq/pldKlHJf+0hvRKpyAx93vPg2VqL402hWI3DhQT6H9mLbrmUu0Ic51eAB
- zI3aPiw1V2/1fKXiwE5s/cXBIsDXiWCPX7X77W4Olg49dJ0Mgk+BE/HN1uUihT/0HJG+N87
- k9kCSHqtfllFdNDeXgbwccJ9AKfPGQNNeBzoYZG184jIuSlW6MUBxc0jCcy0Nscc1YUf/+h
- jWxA8z7l+pZJFY
-X-QQ-SSF: 00010000000000F000000000000000D
-X-QQ-XMAILINFO: Nra3PiPV2aHd2Z3idYbfiLK1HVEQlYqqMO8Oc7W8i/OAwHv7br8cwpiVDhlXXC
- jLBmMIA01X1ThOr3xeueQF5v0Hq1AW/3qn7h3nmR4CiZFwobo2K2paJLSDhtWS3qFlzWc16JnPukq
- s/xbIZL8DmU5lpk5PRPmxdndp95Me35JdpZSpWeAsuEggCg9jA8n4rRgo/S4pKqoohGbPU2tkObX4
- XU5uGD4ARwVoqL2om5PgnlPuFj91B++nbvmC5Cdt4DAq1jNV+8px71pn104l2nz2eHeGjd7GrwVgG
- 13FN9rNky9GpKGmdEveYOVeF/IRhnFp+IzS3Mpo9lgWRsKbxaLm8iyB7WY2m8StYMhreLt3fItuzU
- FTm7ii/bLXaHQ2rF4C4yEmIjETJFXWdiyXWo1Ixw/o3tgBdJ9YvcqUtTzY7bMZuVNVNSHZvav987u
- URek3gfQ9c7QtVAMXLTL8Um+oy3H4F/wdSO0FW70WUD8vCdILc9xISv+S0z9FsBc+zL49SCQAi4od
- AfqhY53f29WInT+BtfJTtiB5W6z+v2UEeBfVayXTK12qFA/TD00lku3/DBWmdW6fbWlAUzc2uvgNT
- ltWzj23KutVZD9Px/kFUCGORzDKjn1CTT3EijRZWVgzuk5kHRWEKXzRrZ8cbrKcv5leOU9buDYRe1
- L+Ln2IYvsLlr7d/bJLkS/QfJ/MmUORkv3eATVhM6tW0QYmlMk=
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 124.64.78.116
-X-QQ-STYLE: 
-X-QQ-mid: webmail725t1594860713t7910447
-From: "=?ISO-8859-1?B?Y2FzbWFj?=" <climber.cui@qq.com>
-To: "=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
-Subject: Implement standard file operation with QEMU
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
- boundary="----=_NextPart_5F0FA4A9_1164FA40_25D64628"
-Content-Transfer-Encoding: 8Bit
-Date: Thu, 16 Jul 2020 08:51:53 +0800
-X-Priority: 3
-Message-ID: <tencent_BF749AEC7484FAFD4D5356B065C6679BF705@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Thu, 16 Jul 2020 08:51:54 +0800 (CST)
-Feedback-ID: webmail:qq.com:bgweb:bgweb2
-Received-SPF: pass client-ip=203.205.250.33; envelope-from=climber.cui@qq.com;
- helo=smtpbg510.qq.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 20:52:55
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_EXCESS_BASE64=0.001, HTML_MESSAGE=0.001, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jvsG0-00016Y-W1
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 21:00:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45790
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jvsFx-000571-LP
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 21:00:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594861211;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BVJqRen2FlRThoCe2vo06blEUNfPh3TRfo0te8r0r+A=;
+ b=jWnh6L6A4bjdDWZ06zZN3eMgD2hWhpI9AM3pkA85olj07xqOyl3CMOEBXzRGnlHvV1GObQ
+ SGEbxDjKfkK+bq/sZpxUgPbCaROx2NjmKR9t579QW4zZFqFwHL4zUo/6O3beAfGsZGUky2
+ zu6u1lDx8vwikPD0Q6Ebw6dtDp1zAks=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-Cn-ANwnTNOqYH2s7I1Jxqw-1; Wed, 15 Jul 2020 21:00:09 -0400
+X-MC-Unique: Cn-ANwnTNOqYH2s7I1Jxqw-1
+Received: by mail-qk1-f200.google.com with SMTP id p126so2685799qkf.15
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 18:00:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=BVJqRen2FlRThoCe2vo06blEUNfPh3TRfo0te8r0r+A=;
+ b=YmGM716cV2p5mrn8zBNv6ulTdnBmM+UA7xdd2BY2rW9cR8cmR/aCqtCNDv8InNnl0V
+ iF6AsFrYL+L5auuwQiDsa35ZU+bpkVjmkcu1bec5Uym4c2MbW7G8XCViuvO+wi21kHwd
+ TakD7R2CJF8xme92hnkY865pP6waRnja9jEuSphcxxSS8FFKQPpTaHiUpbECyS/lnVJW
+ glMdymMrYpsA7h5V96Ggd1S7WUhtBsKHm3tbm9SzTfZ1jd5Qc2x4/E3++Sgq+KmOOM82
+ cFM0YbJuHcNc6XRAfpUgd/Q6NUZf4gcRsjRlG06OnkqL/itajpwRYM4SORXFu0wyD7o4
+ OjjQ==
+X-Gm-Message-State: AOAM531D1HqQcOX2tOLQ45MGcaxlmP2zu43i2mJMbppUmyNUHhZ0Feq8
+ 8rZWXwv1B/MBAK+ht6fYK0EPJ8VxocYYrP28QJtXMoBhGJRkIDA+A3FMGxFXWpv4W0P3oYIo6wq
+ bmrNLQLyAkzjyxao=
+X-Received: by 2002:a37:61cb:: with SMTP id v194mr1658993qkb.314.1594861209032; 
+ Wed, 15 Jul 2020 18:00:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxWb7ms7XZguAAJ/6ItHf+ZZewc3gbEI43Gvrur4OF8s2YY6Ofny+YO4Bw0ku6KP4+yPpqOCA==
+X-Received: by 2002:a37:61cb:: with SMTP id v194mr1658966qkb.314.1594861208574; 
+ Wed, 15 Jul 2020 18:00:08 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
+ by smtp.gmail.com with ESMTPSA id j24sm4365453qkl.79.2020.07.15.18.00.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Jul 2020 18:00:07 -0700 (PDT)
+Date: Wed, 15 Jul 2020 21:00:05 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+Message-ID: <20200716010005.GA535743@xz-x1>
+References: <20200703130338.GD6677@xz-x1>
+ <c985b804-126c-94a1-b05e-430075f9e390@redhat.com>
+ <20200707195429.GF88106@xz-x1>
+ <5004a059-6eb0-4ef3-40b7-94dfbf9ec08f@redhat.com>
+ <20200708141657.GA199122@xz-x1>
+ <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
+ <20200709141037.GF199122@xz-x1>
+ <fb2f8d35-3f04-55ac-e0c0-7eeedbaf2429@redhat.com>
+ <20200710133005.GL199122@xz-x1>
+ <05bb512c-ca0a-e80e-1eed-446e918ad729@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <05bb512c-ca0a-e80e-1eed-446e918ad729@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 21:00:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,137 +118,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
+On Mon, Jul 13, 2020 at 12:04:16PM +0800, Jason Wang wrote:
+> 
+> On 2020/7/10 下午9:30, Peter Xu wrote:
+> > On Fri, Jul 10, 2020 at 02:34:11PM +0800, Jason Wang wrote:
+> > > On 2020/7/9 下午10:10, Peter Xu wrote:
+> > > > On Thu, Jul 09, 2020 at 01:58:33PM +0800, Jason Wang wrote:
+> > > > > > > - If we care the performance, it's better to implement the MAP event for
+> > > > > > > vhost, otherwise it could be a lot of IOTLB miss
+> > > > > > I feel like these are two things.
+> > > > > > 
+> > > > > > So far what we are talking about is whether vt-d should have knowledge about
+> > > > > > what kind of events one iommu notifier is interested in.  I still think we
+> > > > > > should keep this as answered in question 1.
+> > > > > > 
+> > > > > > The other question is whether we want to switch vhost from UNMAP to MAP/UNMAP
+> > > > > > events even without vDMA, so that vhost can establish the mapping even before
+> > > > > > IO starts.  IMHO it's doable, but only if the guest runs DPDK workloads.  When
+> > > > > > the guest is using dynamic iommu page mappings, I feel like that can be even
+> > > > > > slower, because then the worst case is for each IO we'll need to vmexit twice:
+> > > > > > 
+> > > > > >      - The first vmexit caused by an invalidation to MAP the page tables, so vhost
+> > > > > >        will setup the page table before IO starts
+> > > > > > 
+> > > > > >      - IO/DMA triggers and completes
+> > > > > > 
+> > > > > >      - The second vmexit caused by another invalidation to UNMAP the page tables
+> > > > > > 
+> > > > > > So it seems to be worse than when vhost only uses UNMAP like right now.  At
+> > > > > > least we only have one vmexit (when UNMAP).  We'll have a vhost translate()
+> > > > > > request from kernel to userspace, but IMHO that's cheaper than the vmexit.
+> > > > > Right but then I would still prefer to have another notifier.
+> > > > > 
+> > > > > Since vtd_page_walk has nothing to do with device IOTLB. IOMMU have a
+> > > > > dedicated command for flushing device IOTLB. But the check for
+> > > > > vtd_as_has_map_notifier is used to skip the device which can do demand
+> > > > > paging via ATS or device specific way. If we have two different notifiers,
+> > > > > vhost will be on the device iotlb notifier so we don't need it at all?
+> > > > But we can still have iommu notifier that only registers to UNMAP even after we
+> > > > introduce dev-iotlb notifier?  We don't want to do page walk for them as well.
+> > > > TCG should be the only one so far, but I don't know.. maybe there can still be
+> > > > new ones?
+> > > 
+> > > I think you're right. But looking at the codes, it looks like the check of
+> > > vtd_as_has_map_notifier() was only used in:
+> > > 
+> > > 1) vtd_iommu_replay()
+> > > 2) vtd_iotlb_page_invalidate_notify() (PSI)
+> > > 
+> > > For the replay, it's expensive anyhow. For PSI, I think it's just about one
+> > > or few mappings, not sure it will have obvious performance impact.
+> > > 
+> > > And I had two questions:
+> > > 
+> > > 1) The codes doesn't check map for DSI or GI, does this match what spec
+> > > said? (It looks to me the spec is unclear in this part)
+> > Both DSI/GI should cover maps too?  E.g. vtd_sync_shadow_page_table() in
+> > vtd_iotlb_domain_invalidate().
+> 
+> 
+> I meant the code doesn't check whether there's an MAP notifier :)
 
-------=_NextPart_5F0FA4A9_1164FA40_25D64628
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+It's actually checked, because it loops over vtd_as_with_notifiers, and only
+MAP notifiers register to that. :)
 
-SGkgYWxsLA0KJm5ic3A7IEkgYW0gdHJ5aW5nIHRvIGltcGxtZW50IHN0YW5kYXJkIGZpbGUg
-b3BlcmF0aW9uIChzdGRpbykgd2l0aCBRRU1VIGZvciBEU1AgYXJjaGl0ZWN0dXJlLiBUaGUg
-bWFudWZhY3R1cmUgKFRJKSBwcm92aWRlcyBhIHJ1bnRpbWUgbGlicmFyeSB0aGF0IHN1cHBv
-cnQgcG9zaXggc3RhbmRhcmQgSU8sIGJ1dCBpdCBsZWZ0IHRoZSBkZXZpY2UgbGV2ZWwgaW1w
-bG1lbnRhdGlvbiBhcyBob29rIGZ1bmN0aW9uIGNhbGxzLCBsaWtlICBpbiB0aGUgbGlicmFy
-eSBzb3VyY2UgLCBpdCBjb250YWlucyZuYnNwOyBhZGRfZGV2aWNlKCkgZnVuY3Rpb24sIGFu
-ZCB3cml0ZSgpLHJlYWQoKSxvcGVuKCkgYXJlIG5vdCBpbXBsZW1lbnRlZDoNCg0KDQoNCmlu
-dCBhZGRfZGV2aWNlKGNoYXImbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICpuYW1lLA0KJm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyB1bnNpZ25lZCAmbmJzcDsgZmxhZ3MsDQombmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsgJm5ic3A7IGludCZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgKCpkb3Bl
-bikmbmJzcDsgKGNvbnN0IGNoYXIgKnBhdGgsIHVuc2lnbmVkIGZsYWdzLCBpbnQgZm9vKSwN
-CiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNw
-OyAoKmRjbG9zZSkgKGludCBmbm8pLA0KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyBpbnQm
-bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICgqZHJlYWQpJm5ic3A7IChpbnQgZm5vLCBjaGFy
-ICpidWYsIHVuc2lnbmVkIGNvdW50KSwNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgaW50
-Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAoKmR3cml0ZSkgKGludCBmbm8sIGNvbnN0IGNo
-YXIgKmJ1ZiwgdW5zaWduZWQgY291bnQpLA0KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyBm
-cG9zX3QmbmJzcDsmbmJzcDsgJm5ic3A7ICgqZGxzZWVrKSAoaW50IGZubywgZnBvc190IG9m
-ZnNldCwgaW50IG9yaWdpbiksDQombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IGludCZuYnNw
-OyZuYnNwOyZuYnNwOyAmbmJzcDsgKCpkdW5saW5rKShjb25zdCBjaGFyICpwYXRoKSwNCiZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAo
-KmRyZW5hbWUpKGNvbnN0IGNoYXIgKm9sZF9uYW1lLCBjb25zdCBjaGFyICpuZXdfbmFtZSkp
-DQp7DQombmJzcDsmbmJzcDsgX0RFVklDRSAqZHQ7DQoNCiZuYnNwOyZuYnNwOyBzdHJuY3B5
-KGR0LSZndDtuYW1lLG5hbWUsOCk7DQombmJzcDsmbmJzcDsgZHQtJmd0O25hbWVbOF0gPSAn
-XDAnOw0KJm5ic3A7Jm5ic3A7IGR0LSZndDtmbGFncyAmbmJzcDsgPSBmbGFnczsNCiZuYnNw
-OyZuYnNwOyBkdC0mZ3Q7T1BFTiZuYnNwOyAmbmJzcDsgPSBkb3BlbjsNCiZuYnNwOyZuYnNw
-OyBkdC0mZ3Q7Q0xPU0UgJm5ic3A7ID0gZGNsb3NlOw0KJm5ic3A7Jm5ic3A7IGR0LSZndDtS
-RUFEJm5ic3A7ICZuYnNwOyA9IGRyZWFkOw0KJm5ic3A7Jm5ic3A7IGR0LSZndDtXUklURSAm
-bmJzcDsgPSBkd3JpdGU7DQombmJzcDsmbmJzcDsgZHQtJmd0O0xTRUVLICZuYnNwOyA9IGRs
-c2VlazsNCiZuYnNwOyZuYnNwOyBkdC0mZ3Q7VU5MSU5LJm5ic3A7ID0gZHVubGluazsNCiZu
-YnNwOyZuYnNwOyBkdC0mZ3Q7UkVOQU1FJm5ic3A7ID0gZHJlbmFtZTsNCn0NCg0KDQppbnQg
-d3JpdGUoaW50Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7ICZuYnNwOyBmaWxkZXMsDQombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgJm5ic3A7IGNvbnN0IGNoYXIgJm5ic3A7ICpidWZwdHIsDQombmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IHVuc2lnbmVkJm5ic3A7
-Jm5ic3A7Jm5ic3A7ICZuYnNwOyBjbnQpDQp7DQombmJzcDsmbmJzcDsgLyotLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0qLw0KJm5ic3A7Jm5ic3A7IC8qIENBTEwgRlVOQ1RJT04gRlJPTSBERVZJQ0Ug
-VEFCTEUgVE8gUEVSRk9STSBXUklURSBGT1IgVEhJUyBERVZJQ0UvRklMRSZuYnNwOyAqLw0K
-Jm5ic3A7Jm5ic3A7IC8qLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKi8NCiZuYnNwOyZuYnNwOyByZXR1
-cm4gKCooX3N0cmVhbVtmaWxkZXNdLSZndDtXUklURSkpIChmaWxkZXMsYnVmcHRyLGNudCk7
-DQp9DQoNCg0KDQombmJzcDsmbmJzcDsgVGhlbiwgaG93IGNhbiB3ZSB1c2UgdGhpcyBydW50
-aW1lIGxpYnJhcnkgdG9nZXRoZXIgd2l0aCBRRU11IHRvIGltcGxlbWVudCBmdWxsLXN0YWNr
-IGZpbGUgb2VyYXRpb25zPyZuYnNwOyBJICByZWFsbHkgYXBwcmVhY2lhdGUgYW55IGFkdmlj
-ZS4NCg0KDQombmJzcDsgVGhhbmtzLg0KcmVnYXJkcywNCnhpYW9sZWk=
+But I agree with you that it should be cleaner to introduce the dev-iotlb
+notifier type.
 
-------=_NextPart_5F0FA4A9_1164FA40_25D64628
-Content-Type: text/html;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+> 
+> 
+> > 
+> > > 2) for the replay() I don't see other implementations (either spapr or
+> > > generic one) that did unmap (actually they skip unmap explicitly), any
+> > > reason for doing this in intel IOMMU?
+> > I could be wrong, but I'd guess it's because vt-d implemented the caching mode
+> > by leveraging the same invalidation strucuture, so it's harder to make all
+> > things right (IOW, we can't clearly identify MAP with UNMAP when we receive an
+> > invalidation request, because MAP/UNMAP requests look the same).
+> > 
+> > I didn't check others, but I believe spapr is doing it differently by using
+> > some hypercalls to deliver IOMMU map/unmap requests, which seems a bit close to
+> > what virtio-iommu is doing.  Anyway, the point is if we have explicit MAP/UNMAP
+> > from the guest, logically the replay indeed does not need to do any unmap
+> > because we don't need to call replay() on an already existing device but only
+> > for e.g. hot plug.
+> 
+> 
+> But this looks conflict with what memory_region_iommu_replay( ) did, for
+> IOMMU that doesn't have a replay method, it skips UNMAP request:
+> 
+>     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
+>         iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iommu_idx);
+>         if (iotlb.perm != IOMMU_NONE) {
+>             n->notify(n, &iotlb);
+>         }
+> 
+> I guess there's no knowledge of whether guest have an explicit MAP/UMAP for
+> this generic code. Or replay implies that guest doesn't have explicit
+> MAP/UNMAP?
 
-PG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNo
-YXJzZXQ9R0IxODAzMCI+PGRpdj5IaSBhbGwsPC9kaXY+PGRpdj4mbmJzcDsgSSBhbSB0cnlp
-bmcgdG8gaW1wbG1lbnQgc3RhbmRhcmQgZmlsZSBvcGVyYXRpb24gKHN0ZGlvKSB3aXRoIFFF
-TVUgZm9yIERTUCBhcmNoaXRlY3R1cmUuIFRoZSBtYW51ZmFjdHVyZSAoVEkpIHByb3ZpZGVz
-IGEgcnVudGltZSBsaWJyYXJ5IHRoYXQgc3VwcG9ydCBwb3NpeCBzdGFuZGFyZCBJTywgYnV0
-IGl0IGxlZnQgdGhlIGRldmljZSBsZXZlbCBpbXBsbWVudGF0aW9uIGFzIGhvb2sgZnVuY3Rp
-b24gY2FsbHMsIGxpa2UgCmluIHRoZSBsaWJyYXJ5IHNvdXJjZSAsIGl0IGNvbnRhaW5zJm5i
-c3A7IGFkZF9kZXZpY2UoKSBmdW5jdGlvbiwgYW5kIHdyaXRlKCkscmVhZCgpLG9wZW4oKSBh
-cmUgbm90IGltcGxlbWVudGVkOjxicj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PmludCBh
-ZGRfZGV2aWNlKGNoYXImbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICpuYW1lLDxicj4mbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgJm5ic3A7IHVuc2lnbmVkICZuYnNwOyBmbGFncyw8YnI+Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7ICZuYnNwOyBpbnQmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICgqZG9w
-ZW4pJm5ic3A7IChjb25zdCBjaGFyICpwYXRoLCB1bnNpZ25lZCBmbGFncywgaW50IGZvbyks
-PGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZu
-YnNwOyAoKmRjbG9zZSkgKGludCBmbm8pLDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7
-IGludCZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgKCpkcmVhZCkmbmJzcDsgKGludCBmbm8s
-IGNoYXIgKmJ1ZiwgdW5zaWduZWQgY291bnQpLDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5i
-c3A7IGludCZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgKCpkd3JpdGUpIChpbnQgZm5vLCBj
-b25zdCBjaGFyICpidWYsIHVuc2lnbmVkIGNvdW50KSw8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-ICZuYnNwOyBmcG9zX3QmbmJzcDsmbmJzcDsgJm5ic3A7ICgqZGxzZWVrKSAoaW50IGZubywg
-ZnBvc190IG9mZnNldCwgaW50IG9yaWdpbiksPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJz
-cDsgaW50Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAoKmR1bmxpbmspKGNvbnN0IGNoYXIg
-KnBhdGgpLDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IGludCZuYnNwOyZuYnNwOyZu
-YnNwOyAmbmJzcDsgKCpkcmVuYW1lKShjb25zdCBjaGFyICpvbGRfbmFtZSwgY29uc3QgY2hh
-ciAqbmV3X25hbWUpKTxicj57PGJyPiZuYnNwOyZuYnNwOyBfREVWSUNFICpkdDs8YnI+PGJy
-PiZuYnNwOyZuYnNwOyBzdHJuY3B5KGR0LSZndDtuYW1lLG5hbWUsOCk7PGJyPiZuYnNwOyZu
-YnNwOyBkdC0mZ3Q7bmFtZVs4XSA9ICdcMCc7PGJyPiZuYnNwOyZuYnNwOyBkdC0mZ3Q7Zmxh
-Z3MgJm5ic3A7ID0gZmxhZ3M7PGJyPiZuYnNwOyZuYnNwOyBkdC0mZ3Q7T1BFTiZuYnNwOyAm
-bmJzcDsgPSBkb3Blbjs8YnI+Jm5ic3A7Jm5ic3A7IGR0LSZndDtDTE9TRSAmbmJzcDsgPSBk
-Y2xvc2U7PGJyPiZuYnNwOyZuYnNwOyBkdC0mZ3Q7UkVBRCZuYnNwOyAmbmJzcDsgPSBkcmVh
-ZDs8YnI+Jm5ic3A7Jm5ic3A7IGR0LSZndDtXUklURSAmbmJzcDsgPSBkd3JpdGU7PGJyPiZu
-YnNwOyZuYnNwOyBkdC0mZ3Q7TFNFRUsgJm5ic3A7ID0gZGxzZWVrOzxicj4mbmJzcDsmbmJz
-cDsgZHQtJmd0O1VOTElOSyZuYnNwOyA9IGR1bmxpbms7PGJyPiZuYnNwOyZuYnNwOyBkdC0m
-Z3Q7UkVOQU1FJm5ic3A7ID0gZHJlbmFtZTs8YnI+fTwvZGl2PjxkaXY+PGJyPjwvZGl2Pjxk
-aXY+aW50IHdyaXRlKGludCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyAmbmJzcDsgZmlsZGVzLDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IGNvbnN0IGNoYXIgJm5ic3A7ICpidWZwdHIsPGJy
-PiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgdW5z
-aWduZWQmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IGNudCk8YnI+ezxicj4mbmJzcDsmbmJz
-cDsgLyotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0qLzxicj4mbmJzcDsmbmJzcDsgLyogQ0FMTCBGVU5D
-VElPTiBGUk9NIERFVklDRSBUQUJMRSBUTyBQRVJGT1JNIFdSSVRFIEZPUiBUSElTIERFVklD
-RS9GSUxFJm5ic3A7ICovPGJyPiZuYnNwOyZuYnNwOyAvKi0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSov
-PGJyPiZuYnNwOyZuYnNwOyByZXR1cm4gKCooX3N0cmVhbVtmaWxkZXNdLSZndDtXUklURSkp
-IChmaWxkZXMsYnVmcHRyLGNudCk7PGJyPn08YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRp
-dj4mbmJzcDsmbmJzcDsgVGhlbiwgaG93IGNhbiB3ZSB1c2UgdGhpcyBydW50aW1lIGxpYnJh
-cnkgdG9nZXRoZXIgd2l0aCBRRU11IHRvIGltcGxlbWVudCBmdWxsLXN0YWNrIGZpbGUgb2Vy
-YXRpb25zPyZuYnNwOyBJIApyZWFsbHkgYXBwcmVhY2lhdGUgYW55IGFkdmljZS48L2Rpdj48
-ZGl2Pjxicj48L2Rpdj48ZGl2PiZuYnNwOyBUaGFua3MuPC9kaXY+PGRpdj5yZWdhcmRzLDwv
-ZGl2PnhpYW9sZWk=
+I think it matches exactly with a hot plug case?  Note that when IOMMU_NONE
+could also mean the translation does not exist.  So it's actually trying to map
+everything that can be translated and then notify().
 
-------=_NextPart_5F0FA4A9_1164FA40_25D64628--
+> 
+> (btw, the code shortcut the memory_region_notify_one(), not sure the reason)
+
+I think it's simply because memory_region_notify_one() came later. :)
+
+> 
+> 
+> >   VT-d does not have that clear interface, so VT-d needs to
+> > maintain its own mapping structures, and also vt-d is using the same replay &
+> > page_walk operations to sync all these structures, which complicated the vt-d
+> > replay a bit.  With that, we assume replay() can be called anytime on a device,
+> > and we won't notify duplicated MAPs to lower layer like vfio if it is mapped
+> > before.  At the meantime, since we'll compare the latest mapping with the one
+> > we cached in the iova tree, UNMAP becomes possible too.
+> 
+> 
+> AFAIK vtd_iommu_replay() did a completely UNMAP:
+> 
+>     /*
+>      * The replay can be triggered by either a invalidation or a newly
+>      * created entry. No matter what, we release existing mappings
+>      * (it means flushing caches for UNMAP-only registers).
+>      */
+>     vtd_address_space_unmap(vtd_as, n);
+> 
+> Since it doesn't do any comparison with iova tree. Will this cause
+> unnecessary UNMAP to be sent to VFIO?
+
+I feel like that can be removed now, but needs some testings...
+
+Thanks,
+
+-- 
+Peter Xu
 
 
