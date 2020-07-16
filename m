@@ -2,91 +2,102 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E1EC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F19DC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:42:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ACA420760
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC3DE2074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:42:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iVIxF69w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ACA420760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fofgSrAM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC3DE2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw1L0-0008NQ-Bk
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:42:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33866)
+	id 1jw1Li-00017z-5Q
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:42:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jw1Jt-0007LC-64
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:40:53 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:34023)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jw1L2-0000FV-Ae
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:42:04 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53684)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jw1Jp-0003iu-B7
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:40:52 -0400
-Received: by mail-ed1-x543.google.com with SMTP id a8so4423495edy.1
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 03:40:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=CkBQjPpokRRSOD3d3LoQgCJvGglsJwGJes84iBBLdZI=;
- b=iVIxF69wwyaDb3mTXmEE9mxKCjNe2ATDQQxGGXFWeZXDdZMzGpC6LsH9PneEGcGbv4
- 6jqQcqXXuY7PhY9nE5z4TbnXzvZxjucgdfEsE4001IVivKrzhigBDKjwoMUrRG0KIvSH
- a0cO46KvvinfL8395nGmp0PNg4IT/km6SV3F0SoYhP2yFJqMxxVPFiTdxbFGs7PjZQpE
- 84OcyKvzldXIvKpwHzunCXFS+WObM6XTl975xE9nfDb0YM+rKWe5lqls6U9tvJQjUgDS
- VkC+d74iKQ++BwDQijUE6MrWJRoV0BRmryJyfMbyAj3ukkUrr1G1gx88gRfVUtnlSrhT
- sYEw==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jw1Kz-00048F-HT
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:42:03 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j18so9837395wmi.3
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 03:42:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=4i+E/XD1djUTB8jHJezAQEDPSBzS1oVhfMfRV/lVR64=;
+ b=fofgSrAMJ65hRk1gu4OKRsor8bn+K42n0KISHppewCSDUyngGLrrOR8gsI7Fwl5BeN
+ ThDOyU98Q1eKg11JN5db/wiUoGqwqip4GsWJag0A4Dch1GfCh1/4AjLtQZlmM3iRnqDO
+ 5Bt4QjHaM8zrlDsBCBq661NRk5tweBC4V52WcQ5MXzoumOm1WDHCpYIpZGmraHmgizt1
+ Unfkl74428letQh8GqhQZ0UMWN/MP3vM/FBzZl2diO42nszsAyzEwxwGdya2mFOvS3eC
+ pKASl6lUqqqIT99hnu0QXQp4bt5ZAtrzD+Sra6cBsgoXu+oCrCsaWtgBAk7w3O/afFGA
+ hd1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=CkBQjPpokRRSOD3d3LoQgCJvGglsJwGJes84iBBLdZI=;
- b=lfeyooA7LVWfK5b1qpRSKiv0axVV5mSmHCvb+LiCcOXwqQaVQrs+UGR1iEQikV/Q4d
- OJ7/r7NqswzgtdK7jwcRMjNl6SdXCKpmy062kSa1bQ0ikJri6szWOk3X9omtBh9NUqSM
- C5tt09RBQOQCOrnP4ULUcauDvtluCtbTNTaesn5iNfNJhFx3aYwv5qrYFOKdVn9PzFAk
- 0cEdxCaqe2OvSJqXoBbsleCdp8R1zqqv2Ag3/OYQM62W1HySuQMoYoBRcK56rg6ii5Px
- jgQefuk6ewM713i9RMef2/sMK5K2DqlFCunu5T+oxSwonclCMlzBwvKplVcyYOj89ZVE
- I9Ng==
-X-Gm-Message-State: AOAM531utR/QCtrm9PnRzO+OrO94TLJXs9T71Y+B/g2xyu1CvxuTrbCA
- rLn98CNY/OxZUJkhy56hLuPH8qM7
-X-Google-Smtp-Source: ABdhPJw4GKx0xDZ1St+uhszMmzdarSVT4/s4CF7Zf52qSkOK87I5KVcoJwXRwaAMsuR70uKnGc4iwg==
-X-Received: by 2002:a50:e801:: with SMTP id e1mr3736751edn.251.1594896047535; 
- Thu, 16 Jul 2020 03:40:47 -0700 (PDT)
-Received: from localhost.localdomain ([197.58.201.14])
- by smtp.gmail.com with ESMTPSA id w8sm4707892ejb.10.2020.07.16.03.40.20
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=4i+E/XD1djUTB8jHJezAQEDPSBzS1oVhfMfRV/lVR64=;
+ b=Px7pjsIQaAlYXsrEDltU3T9RRZcGJ1A3iYX51B+oX27kXaVGfkT7E9HAurxl9urKzW
+ SpBOdN4pscA9u36CjhYF8EUYMzXOsRQharhbyeZxVXD3VIa0xsMsFPhsGFEMvEhek/Um
+ uXVqPAJNE1YdfaROOa11s4Efx+vk3hhfDm62Y+jQw8+aIEWa+pC0DmozTgTvAl8jeLMs
+ QmvH4Llkv3lYWnr5dGEwrbAhYF9FHqs3Xs1bB4z6T49ldqg4iGKp9fGYJl3q6exUgwKf
+ GFAmcbtVliLPhVhyqfrtBuQYcmH/2M/5nsbYgqV8n/SJF7OtgZrl/2Zz9ne7XeeIK9fQ
+ T61g==
+X-Gm-Message-State: AOAM5332sz6e+gFlBhqWoLTY7Zq2AFPj8D1cUqQJzH/G7snYNCJ2pA5W
+ 9eFp9+hYbBrzWqUujUa6nB719w==
+X-Google-Smtp-Source: ABdhPJxUYT4Gp6e+G1WS6B4ZJuzG/TfiMkPx7jXnpfUOmxjjRQx56xBP9moDplv3221N95RmFM26rQ==
+X-Received: by 2002:a05:600c:2317:: with SMTP id
+ 23mr3944339wmo.72.1594896119788; 
+ Thu, 16 Jul 2020 03:41:59 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n125sm8356997wme.30.2020.07.16.03.41.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jul 2020 03:40:47 -0700 (PDT)
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-To: qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com, philmd@redhat.com,
- alex.bennee@linaro.org, eblake@redhat.com, ldoktor@redhat.com,
- rth@twiddle.net, ehabkost@redhat.com, crosa@redhat.com
-Subject: [PATCH v2 2/2] scripts/performance: Add list_helpers.py script
-Date: Thu, 16 Jul 2020 12:39:21 +0200
-Message-Id: <20200716103921.6605-3-ahmedkhaledkaraman@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200716103921.6605-1-ahmedkhaledkaraman@gmail.com>
-References: <20200716103921.6605-1-ahmedkhaledkaraman@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-ed1-x543.google.com
+ Thu, 16 Jul 2020 03:41:58 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 995A31FF7E;
+ Thu, 16 Jul 2020 11:41:57 +0100 (BST)
+References: <20200612014606.147691-1-jkz@google.com>
+ <20200612014606.147691-5-jkz@google.com> <87h7vbyowf.fsf@linaro.org>
+ <CADgy-2uOn835LrnOBDacbqznW8MR7ZQy55kBmpjDbK2Uy1xPEg@mail.gmail.com>
+ <877dvy9opz.fsf@linaro.org>
+ <CADgy-2tB0Z133RB1i8OdnpKMD3xATL059dFoduHOjdim11G4-A@mail.gmail.com>
+ <87k0zw7opa.fsf@linaro.org>
+ <CADgy-2ug-vUStvRCUivM9AYp9qBzdLtt3pwMONvjahpcJajVqw@mail.gmail.com>
+User-agent: mu4e 1.5.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Josh Kunz <jkz@google.com>
+Subject: Re: [PATCH 4/5] linux-user: Support CLONE_VM and extended clone
+ options
+In-reply-to: <CADgy-2ug-vUStvRCUivM9AYp9qBzdLtt3pwMONvjahpcJajVqw@mail.gmail.com>
+Date: Thu, 16 Jul 2020 11:41:57 +0100
+Message-ID: <87eepbwxl6.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,270 +110,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Python script that prints executed helpers of a QEMU invocation.
 
-Syntax:
-list_helpers.py [-h] -- \
-               <qemu executable> [<qemu executable options>] \
-               <target executable> [<target executable options>]
+Josh Kunz <jkz@google.com> writes:
 
-[-h] - Print the script arguments help message.
+> Sorry for the late reply, response inline. Also I noticed a couple
+> mails ago I seemed to have removed the devel list and maintainers.
+> I've re-added them to the CC line.
+>
+> On Wed, Jun 24, 2020 at 3:17 AM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>>
+>>
+>> Josh Kunz <jkz@google.com> writes:
+>>
+>> > On Tue, Jun 23, 2020, 1:21 AM Alex Benn=C3=A9e <alex.bennee@linaro.org=
+> wrote:
+>> >
+>> > (snip)
+>> >
+>> >> >> > * Non-standard libc extension to allow creating TLS images indep=
+endent
+>> >> >> >   of threads. This would allow us to just `clone` the child dire=
+ctly
+>> >> >> >   instead of this complicated maneuver. Though we probably would=
+ still
+>> >> >> >   need the cleanup logic. For libcs, TLS image allocation is tig=
+htly
+>> >> >> >   connected to thread stack allocation, which is also arch-speci=
+fic. I
+>> >> >> >   do not have enough experience with libc development to know if
+>> >> >> >   maintainers of any popular libcs would be open to supporting s=
+uch an
+>> >> >> >   API. Additionally, since it will probably take years before a =
+libc
+>> >> >> >   fix would be widely deployed, we need an interim solution anyw=
+ays.
+>> >> >>
+>> >> >> We could consider a custom lib stub that intercepts calls to the g=
+uests
+>> >> >> original libc and replaces it with a QEMU aware one?
+>> >> >
+>> >> > Unfortunately the problem here is host libc, rather than guest libc.
+>> >> > We need to make TLS variables in QEMU itself work, so intercepting
+>> >> > guest libc calls won't help much. Or am I misunderstanding the poin=
+t?
+>> >>
+>> >> Hold up - I'm a little confused now. Why does the host TLS affect the
+>> >> guest TLS? We have complete control over the guests view of the world=
+ so
+>> >> we should be able to control it's TLS storage.
+>> >
+>> > Guest TLS is unaffected, just like in the existing case for guest
+>> > threads. Guest TLS is handled by the guest libc and the CPU emulation.
+>> > Just to be clear: This series changes nothing about guest TLS.
+>> >
+>> > The complexity of this series is to deal with *host* usage of TLS.
+>> > That is to say: use of thread local variables in QEMU itself. Host TLS
+>> > is needed to allow the subprocess created with `clone(CLONE_VM, ...)`
+>> > to run at all. TLS variables are used in QEMU for the RCU
+>> > implementation, parts of the TCG, and all over the place to access the
+>> > CPU/TaskState for the running thread. Host TLS is managed by the host
+>> > libc, and TLS is only set up for host threads created via
+>> > `pthread_create`. Subprocesses created with `clone(CLONE_VM)` share a
+>> > virtual memory map *and* TLS data with their parent[1], since libcs
+>> > provide no special handling of TLS when `clone(CLONE_VM)` is used.
+>> > Without the workaround used in this patch, both the parent and child
+>> > process's thread local variables reference the same memory locations.
+>> > This just doesn't work, since thread local data is assumed to actually
+>> > be thread local.
+>> >
+>> > The "alternative" proposed was to make the host libc support TLS for
+>> > processes created using clone (there are several ways to go about
+>> > this, each with different tradeoffs). You mentioned that "We could
+>> > consider a custom lib stub that intercepts calls to the guests
+>> > original libc..." in your comment. Since *guest* libc is not involved
+>> > here I was a bit confused about how this could help, and wanted to
+>> > clarify.
+>> >
+>> >> >> Have you considered a daemon which could co-ordinate between the
+>> >> >> multiple processes that are sharing some state?
+>> >> >
+>> >> > Not really for the `CLONE_VM` support added in this patch series. I
+>> >> > have considered trying to pull tcg out of the guest process, but not
+>> >> > very seriously, since it seems like a pretty heavyweight approach.
+>> >> > Especially compared to the solution included in this series. Do you
+>> >> > think there's a simpler approach that involves using a daemon to do
+>> >> > coordination?
+>> >>
+>> >> I'm getting a little lost now. Exactly what state are we trying to sh=
+are
+>> >> between two QEMU guests which are now in separate execution contexts?
+>> >
+>> > Since this series only deals with `clone(CLONE_VM)` we always want to
+>> > share guest virtual memory between the execution contexts. There is
+>> > also some extra state that needs to be shared depending on which flags
+>> > are provided to `clone()`. E.g., signal handler tables for
+>> > CLONE_SIGHAND, file descriptor tables for CLONE_FILES, etc.
+>> >
+>> > The problem is that since QEMU and the guest live in the same virtual
+>> > memory map, keeping the mappings the same between the guest parent and
+>> > guest child means that the mappings also stay the same between the
+>> > host (QEMU) parent and host child. Two hosts can live in the same
+>> > virtual memory map, like we do right now with threads, but *only* with
+>> > valid TLS for each thread/process. That's why we bend-over backwards
+>> > to get set-up TLS for emulation in the child process.
+>>
+>> OK thanks for that. I'd obviously misunderstood from my first read
+>> through. So while hiding the underlying bits of QEMU from the guest is
+>> relatively easy it's quite hard to hide QEMU from itself in this
+>> CLONE_VM case.
+>
+> Yes exactly.
+>
+>> The other approach would be to suppress CLONE_VM for the actual process
+>> (thereby allowing QEMU to safely have a new instance and no clashing
+>> shared data) but emulate CLONE_VM for the guest itself (making the guest
+>> portions of memory shared and visible to each other). The trouble then
+>> would be co-ordination of mapping operations and other things that
+>> should be visible in a real CLONE_VM setup. This is the sort of
+>> situation I envisioned a co-ordination daemon might be useful.
+>
+> Ah. This is interesting. Effectively the inverse of this patch. I had
+> not considered this approach. Thinking more about it, a "no shared
+> memory" approach does seem more straightforward implementation wise.
+> Unfortunately I think there would be a few substantial drawbacks:
+>
+> 1. Memory overhead. Every guest thread would need a full copy of QEMU
+> memory, including the translated guest binary.
 
-Example of usage:
-list_helpers.py -- qemu-mips coulomb_double-mips -n10
+Sure although I suspect the overhead is not that great. For linux-user
+on 64 bit systems we only allocate 128Mb of translation buffer per
+process. What sort of size systems are you expecting to run on and how
+big are the binaries?
 
-Example output:
- Total number of instructions: 108,933,695
+> 2. Performance overhead. To keep virtual memory maps consistent across
+> tasks, a heavyweight 2 phase commit scheme, or similar, would be
+> needed for every `mmap`. That could have substantial performance
+> overhead for the guest. This could be a huge problem for processes
+> that use a large number of threads *and* do a lot of memory mapping or
+> frequently change page permissions.
 
- Executed QEMU Helpers:
+I suspect that cross-arch highly threaded apps are still in the realm of
+"wow, that actually works, neat :-)" for linux-user. We don't have the
+luxury of falling back to a single thread like we do for system
+emulation so things like strong-on-weak memory order bugs can still trip
+us up.
 
- No. Ins     Percent  Calls Ins/Call Helper Name             Source File
- --- ------- ------- ------ -------- --------------------    ---------------
-   1 183,021  0.168%  1,305      140 helper_float_sub_d      <qemu>/target/mips/fpu_helper.c
-   2 177,111  0.163%    770      230 helper_float_madd_d     <qemu>/target/mips/fpu_helper.c
-   3 171,537  0.157%  1,014      169 helper_float_mul_d      <qemu>/target/mips/fpu_helper.c
-   4 157,298  0.144%  2,443       64 helper_lookup_tb_ptr    <qemu>/accel/tcg/tcg-runtime.c
-   5 138,123  0.127%    897      153 helper_float_add_d      <qemu>/target/mips/fpu_helper.c
-   6  47,083  0.043%    207      227 helper_float_msub_d     <qemu>/target/mips/fpu_helper.c
-   7  24,062  0.022%    487       49 helper_cmp_d_lt         <qemu>/target/mips/fpu_helper.c
-   8  22,910  0.021%    150      152 helper_float_div_d      <qemu>/target/mips/fpu_helper.c
-   9  15,497  0.014%    321       48 helper_cmp_d_eq         <qemu>/target/mips/fpu_helper.c
-  10   9,100  0.008%     52      175 helper_float_trunc_w_d  <qemu>/target/mips/fpu_helper.c
-  11   7,059  0.006%     10      705 helper_float_sqrt_d     <qemu>/target/mips/fpu_helper.c
-  12   3,000  0.003%     40       75 helper_cmp_d_ule        <qemu>/target/mips/fpu_helper.c
-  13   2,720  0.002%     20      136 helper_float_cvtd_w     <qemu>/target/mips/fpu_helper.c
-  14   2,477  0.002%     27       91 helper_swl              <qemu>/target/mips/op_helper.c
-  15   2,000  0.002%     40       50 helper_cmp_d_le         <qemu>/target/mips/fpu_helper.c
-  16   1,800  0.002%     40       45 helper_cmp_d_un         <qemu>/target/mips/fpu_helper.c
-  17   1,164  0.001%     12       97 helper_raise_exception_ <qemu>/target/mips/op_helper.c
-  18     720  0.001%     10       72 helper_cmp_d_ult        <qemu>/target/mips/fpu_helper.c
-  19     560  0.001%    140        4 helper_cfc1             <qemu>/target/mips/fpu_helper.c
+> 3. There would be lots of similarly-fiddly bits that need to be shared
+> and coordinated in addition to guest memory. At least the signal
+> handler tables and fd_trans tables, but there are likely others I'm
+> missing.
+>
+> The performance drawbacks could be largely mitigated by using the
+> current thread-only `CLONE_VM` support, but having *any* threads in
+> the process at all would lead to deadlocks after fork() or similar
+> non-CLONE_VM clone() calls. This could be worked around with a "stop
+> the world" button somewhat like `start_exclusive`, but expanded to
+> include all emulator threads. That will substantially slow down
+> fork().
+>
+> Given all this I think the approach used in this series is probably at
+> least as "good" as a "no shared memory" approach. It has its own
+> complexities and drawbacks, but doesn't have obvious performance
+> issues. If you or other maintainers disagree, I'd be happy to write up
+> an RFC comparing the approaches in more detail (or we can just use
+> this thread), just let me know. Until then I'll keep pursuing this
+> patch.
 
-Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
----
- scripts/performance/list_helpers.py | 207 ++++++++++++++++++++++++++++
- 1 file changed, 207 insertions(+)
- create mode 100755 scripts/performance/list_helpers.py
+I think that's fair. I'll leave it to the maintainers to chime in if
+they have something to add. I'd already given some comments on patch 1 and
+given it needs a re-spin I'll have another look on the next iteration.
 
-diff --git a/scripts/performance/list_helpers.py b/scripts/performance/list_helpers.py
-new file mode 100755
-index 0000000000..a97c7ed4fe
---- /dev/null
-+++ b/scripts/performance/list_helpers.py
-@@ -0,0 +1,207 @@
-+#!/usr/bin/env python3
-+
-+#  Print the executed helpers of a QEMU invocation.
-+#
-+#  Syntax:
-+#  list_helpers.py [-h] -- \
-+#                 <qemu executable> [<qemu executable options>] \
-+#                 <target executable> [<target executable options>]
-+#
-+#  [-h] - Print the script arguments help message.
-+#
-+#  Example of usage:
-+#  list_helpers.py -- qemu-mips coulomb_double-mips
-+#
-+#  This file is a part of the project "TCG Continuous Benchmarking".
-+#
-+#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-+#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-+#
-+#  This program is free software: you can redistribute it and/or modify
-+#  it under the terms of the GNU General Public License as published by
-+#  the Free Software Foundation, either version 2 of the License, or
-+#  (at your option) any later version.
-+#
-+#  This program is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+#  GNU General Public License for more details.
-+#
-+#  You should have received a copy of the GNU General Public License
-+#  along with this program. If not, see <https://www.gnu.org/licenses/>.
-+
-+import argparse
-+import os
-+import subprocess
-+import sys
-+import tempfile
-+
-+
-+def find_JIT_line(callgrind_data):
-+    """
-+    Search for the line with the JIT call in the callgrind_annotate
-+    output when ran using --tre=calling.
-+    All the helpers should be listed after that line.
-+
-+    Parameters:
-+    callgrind_data (list): callgrind_annotate output
-+
-+    Returns:
-+    (int): Line number of JIT call
-+    """
-+    line = -1
-+    for i in range(len(callgrind_data)):
-+        split_line = callgrind_data[i].split()
-+        if len(split_line) > 2 and \
-+                split_line[1] == "*" and \
-+                split_line[-1] == "[???]":
-+            line = i
-+            break
-+    return line
-+
-+
-+def get_helpers(JIT_line, callgrind_data):
-+    """
-+    Get all helpers data given the line number of the JIT call.
-+
-+    Parameters:
-+    JIT_line (int): Line number of the JIT call
-+    callgrind_data (list): callgrind_annotate output
-+
-+    Returns:
-+    (list):[[number_of_instructions(int), helper_name(str),
-+             number_of_calls(int), source_file(str)]]
-+    """
-+    helpers = []
-+    next_helper = JIT_line + 1
-+    while (callgrind_data[next_helper] != "\n"):
-+        split_line = callgrind_data[next_helper].split()
-+        number_of_instructions = int(split_line[0].replace(",", ""))
-+        source_file = split_line[2].split(":")[0]
-+        callee_name = split_line[2].split(":")[1]
-+        number_of_calls = int(split_line[3][1:-2])
-+        helpers.append([number_of_instructions, callee_name,
-+                        number_of_calls, source_file])
-+        next_helper += 1
-+    return sorted(helpers, reverse=True)
-+
-+
-+def main():
-+    # Parse the command line arguments
-+    parser = argparse.ArgumentParser(
-+        usage="list_helpers.py [-h] -- "
-+        "<qemu executable> [<qemu executable options>] "
-+        "<target executable> [<target executable options>]")
-+
-+    parser.add_argument("command", type=str, nargs="+", help=argparse.SUPPRESS)
-+
-+    args = parser.parse_args()
-+
-+    # Extract the needed variables from the args
-+    command = args.command
-+
-+    # Insure that valgrind is installed
-+    check_valgrind = subprocess.run(
-+        ["which", "valgrind"], stdout=subprocess.DEVNULL)
-+    if check_valgrind.returncode:
-+        sys.exit("Please install valgrind before running the script.")
-+
-+    # Save all intermediate files in a temporary directory
-+    with tempfile.TemporaryDirectory() as tmpdirname:
-+        # callgrind output file path
-+        data_path = os.path.join(tmpdirname, "callgrind.data")
-+        # callgrind_annotate output file path
-+        annotate_out_path = os.path.join(tmpdirname, "callgrind_annotate.out")
-+
-+        # Run callgrind
-+        callgrind = subprocess.run((["valgrind",
-+                                     "--tool=callgrind",
-+                                     "--callgrind-out-file=" + data_path]
-+                                    + command),
-+                                   stdout=subprocess.DEVNULL,
-+                                   stderr=subprocess.PIPE)
-+        if callgrind.returncode:
-+            sys.exit(callgrind.stderr.decode("utf-8"))
-+
-+        # Save callgrind_annotate output
-+        with open(annotate_out_path, "w") as output:
-+            callgrind_annotate = subprocess.run(
-+                ["callgrind_annotate", data_path,
-+                    "--threshold=100", "--tree=calling"],
-+                stdout=output,
-+                stderr=subprocess.PIPE)
-+            if callgrind_annotate.returncode:
-+                sys.exit(callgrind_annotate.stderr.decode("utf-8"))
-+
-+        # Read the callgrind_annotate output to callgrind_data[]
-+        callgrind_data = []
-+        with open(annotate_out_path, "r") as data:
-+            callgrind_data = data.readlines()
-+
-+        # Line number with the total number of instructions
-+        total_instructions_line_number = 20
-+        # Get the total number of instructions
-+        total_instructions_line_data = \
-+            callgrind_data[total_instructions_line_number]
-+        total_instructions = total_instructions_line_data.split()[0]
-+
-+        print("Total number of instructions: {}\n".format(total_instructions))
-+
-+        # Remove commas and convert to int
-+        total_instructions = int(total_instructions.replace(",", ""))
-+
-+        # Line number with the JIT call
-+        JIT_line = find_JIT_line(callgrind_data)
-+        if JIT_line == -1:
-+            sys.exit("Couldn't locate the JIT call ... Exiting")
-+
-+        # Get helpers
-+        helpers = get_helpers(JIT_line, callgrind_data)
-+
-+        print("Executed QEMU Helpers:\n")
-+
-+        # Print table header
-+        print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
-+              format(
-+                  "No.",
-+                  "Instructions",
-+                  "Percentage",
-+                  "Calls",
-+                  "Ins/Call",
-+                  "Helper Name",
-+                  "Source File")
-+              )
-+
-+        print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
-+              format(
-+                  "-" * 4,
-+                  "-" * 15,
-+                  "-" * 10,
-+                  "-" * 15,
-+                  "-" * 10,
-+                  "-" * 25,
-+                  "-" * 30)
-+              )
-+
-+        for (index, callee) in enumerate(helpers, start=1):
-+            instructions = callee[0]
-+            percentage = (callee[0] / total_instructions) * 100
-+            calls = callee[2]
-+            instruction_per_call = int(callee[0] / callee[2])
-+            helper_name = callee[1]
-+            source_file = callee[3]
-+            # Print extracted data
-+            print("{:>4}  {:>15}  {:>9.3f}%  {:>15}  {:>10}  {:<25}  {}".
-+                  format(
-+                      index,
-+                      format(instructions, ","),
-+                      round(percentage, 3),
-+                      format(calls, ","),
-+                      format(instruction_per_call, ","),
-+                      helper_name,
-+                      source_file)
-+                  )
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.17.1
+I will say expect the system to get some testing on multiple backends so
+if you can expand your testing beyond an x86_64 host please do.
 
+>
+>> > [1] At least on x86_64, because TLS references are defined in terms of
+>> > the %fs segment, which is inherited on linux. Theoretically it's up to
+>> > the architecture to specify how TLS is inherited across execution
+>> > contexts. t's possible that the child actually ends up with no valid
+>> > TLS rather than using the parent TLS data. But that's not really
+>> > relevant here. The important thing is that the child ends up with
+>> > *valid* TLS, not invalid or inherited TLS.
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+
+
+--=20
+Alex Benn=C3=A9e
 
