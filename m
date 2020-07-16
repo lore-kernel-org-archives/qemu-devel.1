@@ -2,86 +2,73 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 371A8C433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00C422074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:55:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WEg/dTzp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00C422074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C4C6206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:56:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C4C6206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw7AY-0003EF-4z
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 12:55:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57874)
+	id 1jw7BH-0004d3-RJ
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 12:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jw79m-0002OW-4U
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:54:50 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45091)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jw79k-0003nK-6e
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:54:49 -0400
-Received: by mail-oi1-x243.google.com with SMTP id j11so5601883oiw.12
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 09:54:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xrxbVp0+KfRQ5lEE8m1hgWS4brHe9TqmR01tWtTDzN0=;
- b=WEg/dTzpYAtO3ZRgF7di3YcRR9Bafk1+DykITVCPE6YSnlz/cXOkqqigpV9IVAqKrv
- Q4pNWgQMO7aT9m1qJIxTGZQqO2RP//mwYjjrp1WR4HnS1JTsneVDtbuleE8SmMvbLc+A
- hMhuxccX/nU2tvokdGXE6PlFB02fuHWgDkpkhUXgZX53rjQCSxHRfzqpHyMd3vT30hh6
- HAAKSbwFguAkRHiEzmnT6xUvGWuFMKVr0fl1i4AO+FW+ArS6anP4s+JfixlebH6bDG0R
- Z5OBfyEUKBAKYreMdgJdGRWH7D+2WbfjehKPJoucDIhpJvQsfcGPEirua0vT18pRjfho
- dhJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xrxbVp0+KfRQ5lEE8m1hgWS4brHe9TqmR01tWtTDzN0=;
- b=eBeRjpfZ9GPiVx1hS1sKr3U/NqWZxgqLwRTWRS9yCcQVEAVKJfqar3RrAAl6Q6sg7h
- XndgsYq4I4yJVaSj32F149wgNj7hGGAv9WMkmUY0eoscCKY2vk96i4NladAENLY6CMm4
- f5bizbFY41waeYU/Sn7WOGfGokuo27Vx1ijui5XvVf9ihV53yOqzI5gF+stIN69yeqIV
- pBdhZGZrRRYOudqZBc31XVc3Ilv8XNqiFyfvz6ZkNvr3Kel1K+XITVLGsjVPxiKG/Nyq
- osVxbe3W5Rpcujf7T4nkpugMH0ksqvluhgcVe0bk4v5YDErXNLiSjH2zj3JP1cwkcUSi
- eIrQ==
-X-Gm-Message-State: AOAM530Idh6moYkeYddyMCZn7BnKlNuQ2saQiDW6bVEWrVeccQfQ+WyI
- rkIXl9zY63AkYV/ql89ytFgYQYVukvT3ijKoL5sv2Q==
-X-Google-Smtp-Source: ABdhPJw+ZRY0s4ItArEp8luG1n/hK+5ZJNHq5bFizzTj2JJNOGB/EJsE6p4tEBEh6iINe36h46pNJrDf4JQc3cECm+s=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr4257028oix.48.1594918486642;
- Thu, 16 Jul 2020 09:54:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jw7AS-0003Nr-7y
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:55:32 -0400
+Resent-Date: Thu, 16 Jul 2020 12:55:32 -0400
+Resent-Message-Id: <E1jw7AS-0003Nr-7y@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21761)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jw7AP-0003wb-MN
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:55:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1594918506; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=FEy+hydaowoyMr2Kvl79TJZokijwKtJYpsT40oATM9GiEQFJHeJmtBY7HpdNV86SxQDesKaRs5PQAuTPqllRnVYYzHqFthkWAFN0R8qFAwtzRLH1mjKzZKA0VBmqYiUN6eAJb2qgOh9pA8BQPsPk0cTsDqLCA2XyVx1N4/7AscI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1594918506;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=oguoznBU5jYt0K1LGoHKmkW0K+27RiGjwJrIkcVhLeo=; 
+ b=JGiHj2tmrFP2ZTmIqB7Wew64InpxXYk4h18uvcnf8i2Ci0aZixIqzmfGs/KE3ly0RKUBFPFToO7gui6cyBbqYYc+xEBbHzugJddjiWKgDkYt08oWFISY1BOuerkKww5vP/2Iz1xgSYKpIl+bzEYGdtLyB5aLhb+MjGnBeP6xRhk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1594918501055356.1654493265838;
+ Thu, 16 Jul 2020 09:55:01 -0700 (PDT)
+Subject: Re: [PATCH] introduce VFIO-over-socket protocol specificaion
+Message-ID: <159491849925.9423.8070197069187026249@07a7f0d89f7d>
+In-Reply-To: <1594913503-52271-1-git-send-email-thanos.makatos@nutanix.com>
 MIME-Version: 1.0
-References: <20200630122710.1119158-1-ppandit@redhat.com>
- <20200630122710.1119158-3-ppandit@redhat.com>
-In-Reply-To: <20200630122710.1119158-3-ppandit@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Jul 2020 17:54:35 +0100
-Message-ID: <CAFEAcA_ux5iTNhCuevNz6O7_umhkZcVm+o68owhbNKGOUHZnGg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/9] pci-host: add pcie-msi read method
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thanos.makatos@nutanix.com
+Date: Thu, 16 Jul 2020 09:55:01 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 12:55:26
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,88 +81,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: qemu-devel@nongnu.org
+Cc: benjamin.walker@intel.com, elena.ufimtseva@oracle.com, felipe@nutanix.com,
+ jag.raman@oracle.com, james.r.harris@intel.com, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, yuvalkashtan@gmail.com, konrad.wilk@oracle.com,
+ tina.zhang@intel.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ marcandre.lureau@redhat.com, ismael@linux.com, alex.williamson@redhat.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, tomassetti.andrea@gmail.com,
+ changpeng.liu@intel.com, raphael.norwitz@nutanix.com,
+ Kanth.Ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 at 13:30, P J P <ppandit@redhat.com> wrote:
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> Add pcie-msi mmio read method to avoid NULL pointer dereference
-> issue.
-
-This change is specific to the designware pci host controller;
-it would be nice to have "designware" in the commit subject.
-
-
-> Reported-by: Lei Sun <slei.casper@gmail.com>
-> Reviewed-by: Li Qiang <liq3ea@gmail.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/pci-host/designware.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> Update v3: Add Reviewed-by: ...
->   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09400.html
-
-> +static uint64_t designware_pcie_root_msi_read(void *opaque, hwaddr addr,
-> +                                              unsigned size)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
-> +    return 0;
-
-This is the right change, but is missing an explanation
-of why it's right:
-
-Looking at the data sheet, in the real hardware MSI interrupts
-are handled by looking at writes to see whether they match the
-configured address; if so then the write gets quashed and never
-gets put out onto the AXI bus (to the CPU, memory, etc). This only
-happens for writes, so reads from the magic address are just
-allowed to pass through and will read from the system address
-space like any other read from any other address. That's not trivial
-to implement, though, and well-behaved guests won't care, so
-we can just explain why we're not doing anything with a suitable
-comment:
-
-    /*
-     * Attempts to read from the MSI address are undefined in
-     * the PCI specifications. For this hardware, the datasheet
-     * specifies that a read from the magic address is simply not
-     * intercepted by the MSI controller, and will go out to the
-     * AHB/AXI bus like any other PCI-device-initiated DMA read.
-     * This is not trivial to implement in QEMU, so since
-     * well-behaved guests won't ever ask a PCI device to DMA from
-     * this address we just log the missing functionality.
-     */
-    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
-    return 0;
-
-> +}
-> +
->  static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
->                                             uint64_t val, unsigned len)
->  {
-> @@ -77,6 +85,7 @@ static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
->  }
->
->  static const MemoryRegionOps designware_pci_host_msi_ops = {
-> +    .read = designware_pcie_root_msi_read,
->      .write = designware_pcie_root_msi_write,
->      .endianness = DEVICE_LITTLE_ENDIAN,
->      .valid = {
-
-With that comment,
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTk0OTEzNTAzLTUyMjcxLTEt
+Z2l0LXNlbmQtZW1haWwtdGhhbm9zLm1ha2F0b3NAbnV0YW5peC5jb20vCgoKCkhpLAoKVGhpcyBz
+ZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBm
+aW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBo
+YXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2Fs
+bHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14
+ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRv
+Y2tlci10ZXN0LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKICBDQyAgICAgIGJsb2NrL3FhcGkubwogIENDICAgICAgYmxvY2svZmlsZS13aW4zMi5v
+CgpXYXJuaW5nLCB0cmVhdGVkIGFzIGVycm9yOgovdG1wL3FlbXUtdGVzdC9zcmMvZG9jcy9kZXZl
+bC92ZmlvLW92ZXItc29ja2V0LnJzdDoyODE6TWFsZm9ybWVkIHRhYmxlLgoKKy0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0rCi0t
+LQogIENDICAgICAgY3J5cHRvL2htYWMubwogIENDICAgICAgY3J5cHRvL2htYWMtbmV0dGxlLm8K
+ICBDQyAgICAgIGNyeXB0by9kZXNyZmIubwptYWtlOiAqKiogW01ha2VmaWxlOjEwOTA6IGRvY3Mv
+ZGV2ZWwvaW5kZXguaHRtbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hl
+ZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90
+ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA3MDgsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFp
+c2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9j
+ZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFi
+ZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD03MzlhODBmODVlOTE0NmQ1OWUzODI2ZjBkNjNk
+YWE2YycsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5l
+ZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVf
+T1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAn
+U0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9o
+b21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eics
+ICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtZ3d0cW0zbHkvc3JjL2RvY2tlci1z
+cmMuMjAyMC0wNy0xNi0xMi41MS41NS44MjYzOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11L2Zl
+ZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16
+ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5j
+ZS51dWlkPTczOWE4MGY4NWU5MTQ2ZDU5ZTM4MjZmMGQ2M2RhYTZjCm1ha2VbMV06ICoqKiBbZG9j
+a2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0
+Y2hldy10ZXN0ZXItdG1wLWd3dHFtM2x5L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3Qt
+bWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDNtNC45MzlzCnVzZXIgICAgMG04LjcxNnMK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1
+OTQ5MTM1MDMtNTIyNzEtMS1naXQtc2VuZC1lbWFpbC10aGFub3MubWFrYXRvc0BudXRhbml4LmNv
+bS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
