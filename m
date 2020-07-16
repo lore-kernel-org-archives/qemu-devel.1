@@ -7,68 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 098B3C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:34:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6768CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:37:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C822B2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:34:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D0D120656
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 09:37:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1ehUuzk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C822B2074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KtIEQ8bj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D0D120656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw0HM-0001VP-3Z
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:34:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43058)
+	id 1jw0K8-0003HK-Fq
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 05:37:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jw0En-0006V5-MT
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:31:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45635
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw0Ja-0002pm-Rh
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:36:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53615
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jw0Ek-0002Nx-7W
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:31:33 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jw0JZ-0003aO-1t
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 05:36:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594891889;
+ s=mimecast20190719; t=1594892188;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=8jqvyBBFqiJ+Hi23niTtYK6jymS8r/+nxU61U47Diro=;
- b=R1ehUuzkgRq2LDndhZ9Io1L0HOC5fVLI+nz4BQqyrR2UgXSy7+hsuBE74aiEY6ZIdMbiBQ
- N/n9j9WMDKBthh/dB2QQSFa2mHSfXVCpSiaW2SKNP4DLctIFADoLppmLjP8oscl//utvrb
- QFfA08uTcriNDJSRjHfKup1lrWn2yrI=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tpGxZWG7L/pqcdQ2zfyJUay5xdjxjmNolauiLOkIyXs=;
+ b=KtIEQ8bjrHtE77ngbW/FZvEe77D2UBlAb3NS8gbWCWraDzmJR15rKMbdsQAz8xFp2nZNYY
+ CVpeJvIh0swfO/Ng/0XtcADELzs19409Pc4WzceZGPDBqDLzN10R+EZbTGevcX0534eZJh
+ IDsdXLB0/n+cswP3Z6olTEoOGz7IIOs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-BOamg8qNMGCBHVOTXK9MTg-1; Thu, 16 Jul 2020 05:31:27 -0400
-X-MC-Unique: BOamg8qNMGCBHVOTXK9MTg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-506-9yJ7mME9PmOj6H4rw6SqGA-1; Thu, 16 Jul 2020 05:36:26 -0400
+X-MC-Unique: 9yJ7mME9PmOj6H4rw6SqGA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 989E11009440
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 09:31:26 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
- [10.36.115.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C26A378481;
- Thu, 16 Jul 2020 09:31:20 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id B00689DA0; Thu, 16 Jul 2020 11:31:19 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/2] vfio: fix use-after-free in display
-Date: Thu, 16 Jul 2020 11:31:18 +0200
-Message-Id: <20200716093119.10740-2-kraxel@redhat.com>
-In-Reply-To: <20200716093119.10740-1-kraxel@redhat.com>
-References: <20200716093119.10740-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED6D810059C4
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 09:36:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 57FFB78A59;
+ Thu, 16 Jul 2020 09:36:23 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id DAF7D11385E0; Thu, 16 Jul 2020 11:36:21 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.2 1/5] hw/core/qdev-properties: Simplify
+ get_reserved_region()
+References: <20200715175835.27744-1-philmd@redhat.com>
+ <20200715175835.27744-2-philmd@redhat.com>
+ <87o8ofrhgl.fsf@dusky.pond.sub.org>
+ <699828e5-83bd-1dfa-904a-8d38a0178e63@redhat.com>
+Date: Thu, 16 Jul 2020 11:36:21 +0200
+In-Reply-To: <699828e5-83bd-1dfa-904a-8d38a0178e63@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 16 Jul 2020 10:38:12
+ +0200")
+Message-ID: <87h7u7pzsa.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 01:59:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -91,41 +102,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Calling ramfb_display_update() might replace the DisplaySurface with the
-boot display, which in turn will free the currently active
-DisplaySurface.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-So clear our DisplaySurface pinter (dpy->region.surface pointer) to (a)
-avoid use-after-free and (b) force replacing the boot display with the
-real display when switching back.
+> On 7/16/20 10:29 AM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>=20
+>>> Use the safer g_strdup_printf() over snprintf() + abort().
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>>  hw/core/qdev-properties.c | 9 +++------
+>>>  1 file changed, 3 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>>> index 098298c78e..d5f5aa150b 100644
+>>> --- a/hw/core/qdev-properties.c
+>>> +++ b/hw/core/qdev-properties.c
+>>> @@ -581,13 +581,10 @@ static void get_reserved_region(Object *obj, Visi=
+tor *v, const char *name,
+>>>      DeviceState *dev =3D DEVICE(obj);
+>>>      Property *prop =3D opaque;
+>>>      ReservedRegion *rr =3D qdev_get_prop_ptr(dev, prop);
+>>> -    char buffer[64];
+>>> -    char *p =3D buffer;
+>>> -    int rc;
+>>> +    g_autofree char *p;
+>>> =20
+>>> -    rc =3D snprintf(buffer, sizeof(buffer), "0x%"PRIx64":0x%"PRIx64":%=
+u",
+>>> -                  rr->low, rr->high, rr->type);
+>>> -    assert(rc < sizeof(buffer));
+>>> +    p =3D g_strdup_printf("0x%"PRIx64":0x%"PRIx64":%u",
+>>> +                        rr->low, rr->high, rr->type);
+>>> =20
+>>>      visit_type_str(v, name, &p, errp);
+>>>  }
+>>=20
+>> I don't buy "safer" (the old code is already safe).
+>
+> I'm suspicious when I find an assert/abort in a code reachable by
+> management interface, as IIUC we don't want to crash the process.
+> I agree this shouldn't happen and if it happens we are screwed
+> anyway.
+>
+>> I could buy
+>> "simpler".
+>>=20
+>> It's also less efficient, but that shouldn't matter in a property
+>> getter.
+>
+> If we want more efficient code, we should replace all the
+> g_strdup_printf() calls by snprintf() + assert() in the places
+> where we don't expect failure. This seems counterproductive from
+> a maintenance PoV.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-Message-id: 20200713124520.23266-1-kraxel@redhat.com
----
- hw/vfio/display.c | 1 +
- 1 file changed, 1 insertion(+)
+Mind, I'm not opposed to your patch.  I just find the commit message's
+rationale misleading.  Your patch doesn't make the code safer (it
+already is).  It does make it simpler.
 
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index a57a22674d62..342054193b3c 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -405,6 +405,7 @@ static void vfio_display_region_update(void *opaque)
-     if (!plane.drm_format || !plane.size) {
-         if (dpy->ramfb) {
-             ramfb_display_update(dpy->con, dpy->ramfb);
-+            dpy->region.surface = NULL;
-         }
-         return;
-     }
--- 
-2.18.4
+>                    At some point we should make a decision and
+> not allow more than 3 similar APIs at a time. We have been
+> recommended to use GLib instead of snprintf() because it is "safer".
+> Can we be consistent with recommendations? Else we should stop
+> recommending to use GLib and friends.
+
+We recommend g_strdup_printf() over snprintf() because it's easier to
+use correctly, and usually easier to read.
+
+Incorrect use of snprintf() is commonly unsafe.  Correct use of
+snprintf() is safe, but commonly less readable than the equivalent
+g_strdup_printf().  snprintf()'s efficiency advantage rarely matters.
 
 
