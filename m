@@ -2,87 +2,71 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 247D9C433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FCFC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:21:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3F50206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:20:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="HSA2pmY4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3F50206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7CAC0206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:21:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAC0206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvz8F-0002jw-57
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 04:20:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51222)
+	id 1jvz9O-0004UY-OS
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 04:21:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jvz6A-0007hJ-GO
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:18:34 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:43094 helo=mta-01.yadro.com)
+ (Exim 4.90_1) (envelope-from <xiaoyao.li@intel.com>)
+ id 1jvz85-0002p3-L0
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:20:33 -0400
+Received: from mga06.intel.com ([134.134.136.31]:38840)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jvz68-0008Qj-II
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:18:34 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 3AF804C902;
- Thu, 16 Jul 2020 08:18:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- content-type:content-type:content-transfer-encoding:mime-version
- :references:in-reply-to:x-mailer:message-id:date:date:subject
- :subject:from:from:received:received:received; s=mta-01; t=
- 1594887509; x=1596701910; bh=ZWdQaxpJ7cyhetjiwBvj58UmJ/1Ud70+cJ8
- wULIywVM=; b=HSA2pmY4+MBD2JkQBeF32sk9Lm929GvDzKmA2t/QVB3Wrs3h0GX
- 3WZNhSi2uaSSPu1FaKxKfTmFYAE5AecN6hb+LWJtM12WWtvzxkTiE/da60V2dJkl
- h7+FxRG7OXvi1DZLncpB7/vLH293aPWlihN8Vf2p7DaqrzT4LmGuHDS0=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sV9xFw0sIT2g; Thu, 16 Jul 2020 11:18:29 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id B7F324C83C;
- Thu, 16 Jul 2020 11:18:29 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 16
- Jul 2020 11:18:29 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH 3/4] build: Don't make object files for dtrace on macOS
-Date: Thu, 16 Jul 2020 11:17:53 +0300
-Message-ID: <20200716081754.22422-4-r.bolshakov@yadro.com>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <20200716081754.22422-1-r.bolshakov@yadro.com>
-References: <20200716081754.22422-1-r.bolshakov@yadro.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:18:26
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <xiaoyao.li@intel.com>)
+ id 1jvz83-0000Hh-Nx
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 04:20:33 -0400
+IronPort-SDR: 1ObO1bXvFmHof383yI7zaM/A7YuqvqP1dPszPftm7YYAArmU0ARQF50zfICIQ4KK6pkjX0S/pP
+ 9afJFoa+gY0w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="210871089"
+X-IronPort-AV: E=Sophos;i="5.75,358,1589266800"; d="scan'208";a="210871089"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 16 Jul 2020 01:20:27 -0700
+IronPort-SDR: 1N7LCXM+bfDWOvADM/qwYmGdTkP85zTcUZLCxuo/Ro/+ZplEJPB06VIN/s3O8sYhk1aXnvefUU
+ bwKiIM+/ubVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,358,1589266800"; d="scan'208";a="286403894"
+Received: from lxy-dell.sh.intel.com ([10.239.159.21])
+ by orsmga006.jf.intel.com with ESMTP; 16 Jul 2020 01:20:23 -0700
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
+Subject: [PATCH 1/2] i386/cpu: Clear FEAT_XSAVE_COMP_{LO,
+ HI} when XSAVE is not available
+Date: Thu, 16 Jul 2020 16:20:18 +0800
+Message-Id: <20200716082019.215316-2-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.18.4
+In-Reply-To: <20200716082019.215316-1-xiaoyao.li@intel.com>
+References: <20200716082019.215316-1-xiaoyao.li@intel.com>
+Received-SPF: pass client-ip=134.134.136.31; envelope-from=xiaoyao.li@intel.com;
+ helo=mga06.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:20:23
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,41 +79,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Cameron Esfahani <dirty@apple.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-dtrace on macOS uses unresolved symbols with a special prefix to define
-probes [1], only headers should be generated for USDT (dtrace(1)). But
-it doesn't support backwards compatible no-op -G flag [2] and implicit
-build rules fail.
+Per Intel SDM vol 1, 13.2, if CPUID.1:ECX.XSAVE[bit 26] is 0, the
+processor provides no further enumeration through CPUID function 0DH.
 
-1. https://markmail.org/message/6grq2ygr5nwdwsnb
-2. https://markmail.org/message/5xrxt2w5m42nojkz
-
-Cc: Cameron Esfahani <dirty@apple.com>
-Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- Makefile.objs | 2 ++
+ target/i386/cpu.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index d22b3b45d7..982f15ba30 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -211,5 +211,7 @@ trace-events-files = $(SRC_PATH)/trace-events $(trace-events-subdirs:%=$(SRC_PAT
- trace-obj-y = trace-root.o
- trace-obj-y += $(trace-events-subdirs:%=%/trace.o)
- trace-obj-$(CONFIG_TRACE_UST) += trace-ust-all.o
-+ifneq ($(CONFIG_DARWIN),y)
- trace-obj-$(CONFIG_TRACE_DTRACE) += trace-dtrace-root.o
- trace-obj-$(CONFIG_TRACE_DTRACE) += $(trace-events-subdirs:%=%/trace-dtrace.o)
-+endif
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1e5123251d74..f5f11603e805 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6261,6 +6261,8 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
+     uint64_t mask;
+ 
+     if (!(env->features[FEAT_1_ECX] & CPUID_EXT_XSAVE)) {
++        env->features[FEAT_XSAVE_COMP_LO] = 0;
++        env->features[FEAT_XSAVE_COMP_HI] = 0;
+         return;
+     }
+ 
 -- 
-2.26.1
+2.18.4
 
 
