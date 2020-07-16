@@ -2,109 +2,89 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A75C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 21:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D97C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:22:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35E4320760
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 21:58:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E4320760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id B92AB207DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 22:22:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dX9Yr7wZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B92AB207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwBtL-0007eV-H8
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 17:58:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52846)
+	id 1jwCGm-0002tM-1v
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 18:22:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1jwBsZ-0006vL-GP
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 17:57:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24934)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1jwBsX-0003D1-Gg
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 17:57:23 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06GLgt2w014315
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 17:57:18 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32auqudvyu-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 17:57:18 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06GLpQk4036106
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 17:57:18 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32auqudvy4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 16 Jul 2020 17:57:18 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06GLjLWh023698;
- Thu, 16 Jul 2020 21:57:17 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma01wdc.us.ibm.com with ESMTP id 32752940yj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 16 Jul 2020 21:57:17 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06GLvErI57606524
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 16 Jul 2020 21:57:14 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 333D96A04D;
- Thu, 16 Jul 2020 21:57:16 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C0EDD6A047;
- Thu, 16 Jul 2020 21:57:15 +0000 (GMT)
-Received: from [9.160.125.194] (unknown [9.160.125.194])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 16 Jul 2020 21:57:15 +0000 (GMT)
-Subject: Re: [PATCH 2/2] configure: add support for Control-Flow Integrity
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200702054948.10257-1-dbuono@linux.vnet.ibm.com>
- <20200702054948.10257-3-dbuono@linux.vnet.ibm.com>
- <20200702095252.GF1888119@redhat.com>
-From: Daniele Buono <dbuono@linux.vnet.ibm.com>
-Message-ID: <67e3ea49-a19b-732f-233e-f9fc27391df0@linux.vnet.ibm.com>
-Date: Thu, 16 Jul 2020 17:57:14 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jwCG4-0002QB-Bo
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 18:21:40 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37744
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jwCG1-0007mK-PL
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 18:21:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594938096;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=+q7/sEJ73N6zfPZJBh83bZ1wXwyZ+AGf4cECSGLmj4s=;
+ b=dX9Yr7wZKcNB2htFwvCFO5OHks+avWy6XjXx2j8KIsM0+hIKhi7le6NqkoC/e9VOeRajZ8
+ dTA5kaXQOlr8FXo7y2CH/TTvmoaw0uaEFZTVkdNfnWfJKea1ZVa0fpK9fDZjBrKedJP0n2
+ AsdDLijvOWti3zHI1ITB4Zn+W4mEDK8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-dKrHDvqUNzerexU-E5ZBzA-1; Thu, 16 Jul 2020 18:21:33 -0400
+X-MC-Unique: dKrHDvqUNzerexU-E5ZBzA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F4701085;
+ Thu, 16 Jul 2020 22:21:32 +0000 (UTC)
+Received: from localhost (ovpn-119-232.rdu2.redhat.com [10.10.119.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B2575D9E4;
+ Thu, 16 Jul 2020 22:21:31 +0000 (UTC)
+Date: Thu, 16 Jul 2020 18:21:30 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: sysbus_create_simple Vs qdev_create
+Message-ID: <20200716222130.GO1274972@habkost.net>
+References: <CA+aXn+EkkyiXmKpNhbggy0pjKVpiHxa+TUqEnZLB4v_D=T+7tA@mail.gmail.com>
+ <CA+aXn+HHXAmT6Ljj2tpovGAYSurHKSdtUL3y-89t31B0e7jpsA@mail.gmail.com>
+ <adb25c78-2edc-115a-5264-ca9f97864ec7@redhat.com>
+ <87365t18mp.fsf@dusky.pond.sub.org>
+ <CA+aXn+Guvt34PDD=N3FsD5w1C-aDXZ7gS8H_AZN-JEM8j8wBiQ@mail.gmail.com>
+ <87lfjkvo81.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20200702095252.GF1888119@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-16_11:2020-07-16,
- 2020-07-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=0
- adultscore=0 clxscore=1015 phishscore=0 spamscore=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007160140
-Received-SPF: none client-ip=148.163.156.1;
- envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 17:57:19
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87lfjkvo81.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 18:21:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,58 +97,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Pratik Parvati <pratikp@vayavyalabs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/2/2020 5:52 AM, Daniel P. Berrangé wrote:
-> The need to maintain this list of functions makes me feel very
-> uneasy.
+On Wed, Jul 15, 2020 at 04:37:18PM +0200, Markus Armbruster wrote:
+> Pratik Parvati <pratikp@vayavyalabs.com> writes:
 > 
-> How can we have any confidence that this list of functions is
-> accurate ? How will maintainers ensure that they correctly update
-> it as they are writing/changing code, and how will they test the
-> result ?
+> > Hi Markus and Philippe,
+> >
+> > Thanks for your reply. Now I am pretty clear about Qdev and sysbus helper
+> > function.
+> >
+> > Can you please explain to me in brief on buses and device hierarchies (i.e.
+> > BusState and DeviceState) and how they are related to each other? As I can
+> > see, the DeviceState class inherits the BusState
+> >
+> > struct DeviceState {
+> >     /*< private >*/
+> >     Object parent_obj;
+> >     /*< public >*/
+> >
+> >     const char *id;
+> >     char *canonical_path;
+> >     bool realized;
+> >     bool pending_deleted_event;
+> >     QemuOpts *opts;
+> >     int hotplugged;
+> >     bool allow_unplug_during_migration;
+> >     BusState *parent_bus; \\ BusState is inherited here
+> >     QLIST_HEAD(, NamedGPIOList) gpios;
+> >     QLIST_HEAD(, BusState) child_bus;
+> >     int num_child_bus;
+> >     int instance_id_alias;
+> >     int alias_required_for_version;
+> >     ResettableState reset;
+> > };
+> >
+> > and BusState, in turn, inherits the DeviceState as
+> >
+> > /**
+> >  * BusState:
+> >  * @hotplug_handler: link to a hotplug handler associated with bus.
+> >  * @reset: ResettableState for the bus; handled by Resettable interface.
+> >  */struct BusState {
+> >     Object obj;
+> >     DeviceState *parent; \\ DeviceState is inherited here
+> >     char *name;
+> >     HotplugHandler *hotplug_handler;
+> >     int max_index;
+> >     bool realized;
+> >     int num_children;
+> >     QTAILQ_HEAD(, BusChild) children;
+> >     QLIST_ENTRY(BusState) sibling;
+> >     ResettableState reset;
+> > };
+> >
+> > I am a bit confused. Can you brief me this relation!
+> 
+> We sorely lack introductory documentation on both qdev and QOM.  I
+> believe most developers are more or less confused about them most of the
+> time.  I've done a bit of work on both, so I'm probably less confused
+> than average.  I'm cc'ing maintainers in the hope of reducing average
+> confusion among participants in this thread.
+> 
+> DeviceState does not inherit from BusState, and BusState does not
+> inherit from DeviceState.  The relation you marked in the code is
+> actually "has a".
+> 
+> A DeviceState may have a BusState, namely the bus the device is plugged
+> into.  "May", because some devices are bus-less (their
+> DEVICE_GET_CLASS(dev)->bus_type is null), and the others get plugged
+> into their bus only at realize time.
+> 
+> Example: PCI device "pci-serial" plugs into a PCI bus.
+> 
+> Example: device "serial" does not plug into a bus (its used as component
+> device of "pci-serial" and other devices).
+> 
+> Example: device "pc-dimm" does not plug into a bus.
+> 
+> A bus has a DeviceState, namely the device providing this bus.
+> 
+> Example: device "i440FX-pcihost" provides PCI bus "pci.0".
+> 
+> Both DeviceState and BusState are QOM subtypes of Object.  I prefer to
+> avoid use of "inherit" for that, because it can mean different things to
+> different people.
 
-Hi Daniel,
+I'd also note that the use of "parent" in the code is also
+ambiguous.  It can mean:
 
-I gave it some thought and studied more of clang's options. It is 
-possible to disable cfi on specific functions by using an __attribute__ 
-keyword, instead of providing a list in an external file.
-In terms of maintaining, this is much better since we are removing the 
-need to update the list. I would suggest defining a macro, 
-__disable_cfi__, that can be prepended to a function. The macro would 
-expand to nothing if cfi is disabled, or to the proper attribute if it 
-is enabled. Here's example code snippet
+* QOM parent type, i.e. TypeInfo.parent.  Related fields:
+  * parent_class members of class structs
+  * parent_obj members of object structs
+* QOM composition tree parent object, i.e. Object::parent
+* qdev device parent bus, i.e. DeviceState::parent_bus
+* parent device of of qdev bus, i.e. BusState::parent
 
-/* Disable CFI checks.
-  * The callback function has been loaded from an external library so we 
-do not
-  * have type information */
-__disable_cfi__
-void qemu_plugin_vcpu_syscall_ret(CPUState *cpu, int64_t num, int64_t ret)
-{
-...
-}
+-- 
+Eduardo
 
-This would take care of renaming and removal of functions that need cfi.
-It would also probably be beneficial to the developers since they can 
-see immediately that the function they are working with needs to have 
-CFI checks disabled, and why.
-
-If you think this is a better approach, I'll submit v2 with this 
-approach instead of the external function list.
-
-
-For new code, however, the best thing is proper education and testing.
-I'll work on a document for docs/devel to detail what it is and how to 
-make code cfi-safe.
-A good approach should be to test code changes with CFI enabled. CFI is, 
-after all, a sanitizer and therefore it makes sense to use it also 
-during development, together with ASan, UBSan and the likes. 
-Unfortunately, since it works only with clang, I don't think this can 
-ever be a hard requirement.
-
-Daniele
 
