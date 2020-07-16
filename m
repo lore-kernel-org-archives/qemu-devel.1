@@ -2,97 +2,86 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E49C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 13:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA4EC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 13:44:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65F3420760
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 13:43:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA944207DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 13:44:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UldtFR9v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65F3420760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZvXAAPGz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA944207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw4AI-0005FS-Mk
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 09:43:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59332)
+	id 1jw4BE-0006a0-4n
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 09:44:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jw49j-0004p9-1z
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 09:42:35 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38098)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jw49h-0006CT-2i
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 09:42:34 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z13so7119919wrw.5
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 06:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=evWRxzCsBS6rugw++k5qjyYFRBbto4of/HvSlbDac1M=;
- b=UldtFR9vh/G/SYAy4g2raekzDwsmu6c4IQHnt2gPJUOolCDb9mF1VeWGZio8DR7Ixg
- 8ATYsv07FvYthoTA8zMTIhm/16agyH57k6Fjj8G7wC8zrsducyfEl6LU07BWWvx5a4kC
- nShX0020poWr7qZipAOCdPTPAGHBRp2T6T+9/8PqQYUUGND7vN63z84W005iWfySfF/D
- NyA896q7dkSBMzZVEx9l2XFwn71k83/QZL2rW8EgosC1i5gYyWzNR6N2Pst22EDs7W7u
- 3AM7LQkob1Y1o/BuT8x88uMBRVgfA30M9o4Y0v7VK5mRQV27u4hRqkBCT9DTDq+wKvxw
- wOmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=evWRxzCsBS6rugw++k5qjyYFRBbto4of/HvSlbDac1M=;
- b=kd2RQVY2dm7/n3bRvMGPeuVx24F6JypuoU8VmKCRw9oMbpZdrj7K+31430+WIFLmNT
- lfJvCd5v8s5fMA7L1WrS/p/KPfrgZqEbEznxRq96KwC2Hcrm1tgmYIFyW6ctWTMR1rdf
- 0XICm7gADUwQBA/Xdlm38A4z78zAsd/crd0rRTQHfI3l2sB+khsLdxjmwXQO/AXYwxsv
- hl6xkZv4cn/G0irps58Buarm3QPkvpPkuV0jyBMDl8I2F+w6oPIJUHL4g7r/OunQHxCX
- ptgJKFtuiqqRRYHPO+vWxSDuwvbNh0wdi2PYyiP/0zMrXxyOuEM9RS1t+KxjUjB05GzV
- qUzA==
-X-Gm-Message-State: AOAM531f4mNCaq57EzJsurWS8tEt8JRzczx+jC+cheLi8ukjjJeJDo9l
- MxP7TiBUgju/NBybWbF4/S2YgA==
-X-Google-Smtp-Source: ABdhPJyC6QBPO5enBnoW0vRfpcKpMOEBkqCFLQLJPnrNMI2K3Ra9RYjDLH6L5bIXBuPz3JudybSwyQ==
-X-Received: by 2002:adf:fac8:: with SMTP id a8mr5146535wrs.368.1594906951373; 
- Thu, 16 Jul 2020 06:42:31 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f15sm8798589wrx.91.2020.07.16.06.42.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jul 2020 06:42:30 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 733CE1FF7E;
- Thu, 16 Jul 2020 14:42:29 +0100 (BST)
-References: <20200715204814.2630-1-robert.foley@linaro.org>
- <20200715204814.2630-3-robert.foley@linaro.org>
-User-agent: mu4e 1.5.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH 2/2] python/qemu: Change ConsoleSocket to optionally
- drain socket.
-In-reply-to: <20200715204814.2630-3-robert.foley@linaro.org>
-Date: Thu, 16 Jul 2020 14:42:29 +0100
-Message-ID: <875zanwp8a.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jw4AT-0005aR-IQ
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 09:43:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20983
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jw4AR-0006K0-6R
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 09:43:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594906997;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/ySTIa6cNC6EDm9bKUehXmbkXOL8bUZv0WDuVb4VfAE=;
+ b=ZvXAAPGzhMziT//6NfZUbYe3ODRbpl0V1IPfpk+Kd9WQBIT7Ss4uYNyzVzUqZ2cKTWcGGJ
+ p5FhF+f1kYOGuoeSi8D2dUTvC86wpjDo7s2oRQAc/P67XWJpO2gqaHNlmskSJe1jUlvqSH
+ WtE4HkBymj3uYAITwHloLBA7U1FoBQ0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-nktLm9ViMiKD8LVvtMO1xg-1; Thu, 16 Jul 2020 09:43:15 -0400
+X-MC-Unique: nktLm9ViMiKD8LVvtMO1xg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46A1B193F560;
+ Thu, 16 Jul 2020 13:43:09 +0000 (UTC)
+Received: from gondolin (ovpn-113-57.ams2.redhat.com [10.36.113.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EABA5710D7;
+ Thu, 16 Jul 2020 13:43:07 +0000 (UTC)
+Date: Thu, 16 Jul 2020 15:43:05 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 0/2] virtio: non-legacy device handling
+Message-ID: <20200716154305.0fc2d2b4.cohuck@redhat.com>
+In-Reply-To: <20200707105446.677966-1-cohuck@redhat.com>
+References: <20200707105446.677966-1-cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:55:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,185 +94,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, Cleber Rosa <crosa@redhat.com>, jsnow@redhat.com,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue,  7 Jul 2020 12:54:44 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Robert Foley <robert.foley@linaro.org> writes:
+> As discussed in "virtio-fs: force virtio 1.x usage", it seems like
+> a good idea to make sure that any new virtio device (which does not
+> support legacy virtio) is indeed a non-transitional device, just to
+> catch accidental misconfigurations. We can easily compile a list
+> of virtio devices with legacy support and have transports verify
+> in their plugged callbacks that legacy support is off for any device
+> not in that list.
+> 
+> Most new virtio devices force non-transitional already, so nothing
+> changes for them. vhost-user-fs-pci even does not allow to configure
+> a non-transitional device, so it is fine as well.
+> 
+> One problematic device, however, is virtio-iommu-pci. It currently
+> offers both the transitional and the non-transitional variety of the
+> device, and does not force anything. I'm unsure whether we should
+> consider transitional virtio-iommu unsupported, or if we should add
+> some compat handling. (The support for legacy or not generally may
+> change based upon the bus, IIUC, so I'm unsure how to come up with
+> something generic.)
+> 
+> Cornelia Huck (2):
+>   virtio: list legacy-capable devices
+>   virtio: verify that legacy support is not accidentally on
+> 
+>  hw/s390x/virtio-ccw.c      |  6 ++++++
+>  hw/virtio/virtio-pci.c     |  4 ++++
+>  hw/virtio/virtio.c         | 25 +++++++++++++++++++++++++
+>  include/hw/virtio/virtio.h |  2 ++
+>  4 files changed, 37 insertions(+)
+> 
 
-> The primary purpose of this change is to clean up
-> machine.py's console_socket property to return a single type,
-> a ConsoleSocket.
->
-> ConsoleSocket now derives from a socket, which means that
-> in the default case (of not draining), machine.py
-> will see the same behavior as it did prior to ConsoleSocket.
->
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> ---
->  python/qemu/console_socket.py | 81 +++++++++++++++++++++--------------
->  python/qemu/machine.py        | 13 ++----
->  2 files changed, 54 insertions(+), 40 deletions(-)
->
-> diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
-> index 6a746c1dbf..475de5b101 100644
-> --- a/python/qemu/console_socket.py
-> +++ b/python/qemu/console_socket.py
-> @@ -13,68 +13,76 @@ which can drain a socket and optionally dump the byte=
-s to file.
->  # the COPYING file in the top-level directory.
->  #
->=20=20
-> -import asyncore
->  import socket
->  import threading
->  from collections import deque
->  import time
->=20=20
->=20=20
-> -class ConsoleSocket(asyncore.dispatcher):
-> +class ConsoleSocket(socket.socket):
->      """
->      ConsoleSocket represents a socket attached to a char device.
->=20=20
-> -    Drains the socket and places the bytes into an in memory buffer
-> -    for later processing.
-> +    Optionally (if drain=3D=3DTrue), drains the socket and places the by=
-tes
-> +    into an in memory buffer for later processing.
->=20=20
->      Optionally a file path can be passed in and we will also
->      dump the characters to this file for debugging purposes.
->      """
-> -    def __init__(self, address, file=3DNone):
-> +    def __init__(self, address, file=3DNone, drain=3DFalse):
->          self._recv_timeout_sec =3D 300
->          self._sleep_time =3D 0.5
->          self._buffer =3D deque()
-> -        self._asyncore_thread =3D None
-> -        self._sock =3D socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-> -        self._sock.connect(address)
-> +        self._drain_thread =3D None
-> +        socket.socket.__init__(self, socket.AF_UNIX, socket.SOCK_STREAM)
-> +        self.connect(address)
-> +        self._drain =3D drain
+Friendly ping.
 
-We end up with two variables that represent the fact we have draining
-happening. Could we rationalise it into:
-
-  if drain:
-     self._drain_thread =3D self._thread_start()
-  else
-     self._drain_thread =3D None # if this is needed
-
-And then tests for:
-
-  if not self._drain:
-
-become
-
-  if self._drain_thread is None:
-
->          self._logfile =3D None
->          if file:
->              self._logfile =3D open(file, "w")
-> -        asyncore.dispatcher.__init__(self, sock=3Dself._sock)
->          self._open =3D True
-> -        self._thread_start()
-> +        if drain:
-> +            self._thread_start()
-> +
-> +    def _drain_fn(self):
-> +        """Drains the socket and runs while the socket is open."""
-> +        while self._open:
-> +            try:
-> +                self._drain_socket()
-> +            except socket.timeout:
-> +                # The socket is expected to timeout since we set a
-> +                # short timeout to allow the thread to exit when
-> +                # self._open is set to False.
-> +                time.sleep(self._sleep_time)
->=20=20
->      def _thread_start(self):
-> -        """Kick off a thread to wait on the asyncore.loop"""
-> -        if self._asyncore_thread is not None:
-> +        """Kick off a thread to drain the socket."""
-> +        if self._drain_thread is not None:
->              return
-> -        self._asyncore_thread =3D threading.Thread(target=3Dasyncore.loo=
-p,
-> -                                                 kwargs=3D{'timeout':1})
-> -        self._asyncore_thread.daemon =3D True
-> -        self._asyncore_thread.start()
-> -
-> -    def handle_close(self):
-> -        """redirect close to base class"""
-> -        # Call the base class close, but not self.close() since
-> -        # handle_close() occurs in the context of the thread which
-> -        # self.close() attempts to join.
-> -        asyncore.dispatcher.close(self)
-> +        # Configure socket to not block and timeout.
-> +        # This allows our drain thread to not block
-> +        # on recieve and exit smoothly.
-> +        socket.socket.setblocking(self, 0)
-> +        socket.socket.settimeout(self, 1)
-> +        self._drain_thread =3D threading.Thread(target=3Dself._drain_fn)
-> +        self._drain_thread.daemon =3D True
-> +        self._drain_thread.start()
->=20=20
->      def close(self):
->          """Close the base object and wait for the thread to terminate"""
->          if self._open:
->              self._open =3D False
-> -            asyncore.dispatcher.close(self)
-> -            if self._asyncore_thread is not None:
-> -                thread, self._asyncore_thread =3D self._asyncore_thread,=
- None
-> +            if self._drain and self._drain_thread is not None:
-> +                thread, self._drain_thread =3D self._drain_thread, None
-
-Would self._drain ever not have self._drain_thread set?
-
->                  thread.join()
-> +            socket.socket.close(self)
-<snip>
-> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> index 6769359766..62709d86e4 100644
-> --- a/python/qemu/machine.py
-> +++ b/python/qemu/machine.py
-> @@ -22,7 +22,6 @@ import logging
->  import os
->  import subprocess
->  import shutil
-> -import socket
-
-FYI minor patch conflict here with master
-
->  import tempfile
->  from typing import Optional, Type
->  from types import TracebackType
-> @@ -591,12 +590,8 @@ class QEMUMachine:
->          Returns a socket connected to the console
->          """
->          if self._console_socket is None:
-> -            if self._drain_console:
-> -                self._console_socket =3D console_socket.ConsoleSocket(
-> -                    self._console_address,
-> -                    file=3Dself._console_log_path)
-> -            else:
-> -                self._console_socket =3D socket.socket(socket.AF_UNIX,
-> -                                                     socket.SOCK_STREAM)
-> -                self._console_socket.connect(self._console_address)
-> +            self._console_socket =3D console_socket.ConsoleSocket(
-> +                self._console_address,
-> +                file=3Dself._console_log_path,
-> +                drain=3Dself._drain_console)
->          return self._console_socket
-
-
---=20
-Alex Benn=C3=A9e
 
