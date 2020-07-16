@@ -2,65 +2,66 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 053E5C433E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C8EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3F2D206F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:47:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C229C206F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:47:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhC4hFnc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3F2D206F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iujwCyjF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C229C206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw5AM-0008NF-0w
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:47:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48850)
+	id 1jw5Ab-0000NH-38
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:47:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jw58Z-0006qZ-4Q
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:45:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25882
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jw59Y-0007Vo-DQ
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:46:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33171
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jw58X-0000NN-CM
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:45:26 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jw59W-0000aQ-RR
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:46:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594910724;
+ s=mimecast20190719; t=1594910786;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=98Y3+XnxCRQ2kZFsiLS4SOaxMOl8h7L9yufeFxyZrOQ=;
- b=NhC4hFncvDLZjyNOQ057AoU88BUs3iPuAQ84NSQJ5JiotiG3X+S2/wi7rr7cMSKQ6yNGNL
- SScHSgUtGs5cLgKdBMU24yeAfuNwLl7vWReWPzcqkB0JatNrCyMo4esST9sMMX8+FVn4jt
- KkXrC2y6Qk3M/lyUJEFk1Qr5qIz50RI=
+ bh=7DelS5N2dTTJuyl7q6v4yf6hEXAdzfevBgyZFcGL9W4=;
+ b=iujwCyjF82/lCwIeCsIgGASjXzQ2+u1/1Z/urBiWF0YUiV9o1ok7EBf/qZlMwUZnnIoaHg
+ Gw+l5rtSktVPZrS/dQLo8AA3AYYvTQKI46bplcXKdpeP8LBIhDcAl5My4h3q5PMgsqLaPu
+ qJyltrwPOk3uE9ZorielK8T3Tq+bVEY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-jqTPPa0wOY26eDiWzp2ylQ-1; Thu, 16 Jul 2020 10:45:22 -0400
-X-MC-Unique: jqTPPa0wOY26eDiWzp2ylQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-196-8dleW9RyNCOVg4AxRO7-Hw-1; Thu, 16 Jul 2020 10:46:22 -0400
+X-MC-Unique: 8dleW9RyNCOVg4AxRO7-Hw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CB0C15C20;
- Thu, 16 Jul 2020 14:45:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41443106B276;
+ Thu, 16 Jul 2020 14:46:06 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-112-160.ams2.redhat.com
  [10.36.112.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 786557A4A4;
- Thu, 16 Jul 2020 14:45:16 +0000 (UTC)
-Subject: Re: [PATCH for-5.1] iotests/030: Reduce job speed to make race less
- likely
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200716132829.20127-1-kwolf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0053710013D0;
+ Thu, 16 Jul 2020 14:46:04 +0000 (UTC)
+Subject: Re: [PATCH v7 01/47] block: Add child access functions
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-2-mreitz@redhat.com>
+ <12e568be-f931-fc16-0ca2-a7ec54e538ea@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,21 +87,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <54bab231-775e-aa20-fed3-bea1a741c696@redhat.com>
-Date: Thu, 16 Jul 2020 16:45:14 +0200
+Message-ID: <6a40dbf6-5756-8483-680b-23916a6a962b@redhat.com>
+Date: Thu, 16 Jul 2020 16:46:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200716132829.20127-1-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <12e568be-f931-fc16-0ca2-a7ec54e538ea@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="u48zThU7kWKGsg25zO6tRE0Zbe0N6y6rG"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ boundary="fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:25:38
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 19:36:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -108,7 +109,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,54 +122,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u48zThU7kWKGsg25zO6tRE0Zbe0N6y6rG
-Content-Type: multipart/mixed; boundary="uHA6cAtcPeOKBJCsLJrvR39sScEuO6Sn8"
+--fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww
+Content-Type: multipart/mixed; boundary="agDegy1On7lw5PhEzEALwnIQ4t4qjedoZ"
 
---uHA6cAtcPeOKBJCsLJrvR39sScEuO6Sn8
+--agDegy1On7lw5PhEzEALwnIQ4t4qjedoZ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 16.07.20 15:28, Kevin Wolf wrote:
-> It can happen that the throttling of the stream job doesn't make it slow
-> enough that we can be sure that it still exists when it is referenced
-> again. Just use a much smaller speed to make this very unlikely to
-> happen again.
+On 13.07.20 11:06, Vladimir Sementsov-Ogievskiy wrote:
+> 25.06.2020 18:21, Max Reitz wrote:
+>> There are BDS children that the general block layer code can access,
+>> namely bs->file and bs->backing.=C2=A0 Since the introduction of filters=
+ and
+>> external data files, their meaning is not quite clear.=C2=A0 bs->backing=
+ can
+>> be a COW source, or it can be a filtered child; bs->file can be a
+>> filtered child, it can be data and metadata storage, or it can be just
+>> metadata storage.
+>>
+>> This overloading really is not helpful.=C2=A0 This patch adds functions =
+that
+>> retrieve the correct child for each exact purpose.=C2=A0 Later patches i=
+n
+>> this series will make use of them.=C2=A0 Doing so will allow us to handl=
+e
+>> filter nodes in a meaningful way.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
 >=20
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/030 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> [..]
+>=20
+>> +/*
+>> + * Return the primary child of this node: For filters, that is the
+>> + * filtered child.=C2=A0 For other nodes, that is usually the child sto=
+ring
+>> + * metadata.
+>> + * (A generally more helpful description is that this is (usually) the
+>> + * child that has the same filename as @bs.)
+>> + *
+>> + * Drivers do not necessarily have a primary child; for example quorum
+>> + * does not.
+>> + */
+>> +BdrvChild *bdrv_primary_child(BlockDriverState *bs)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 BdrvChild *c;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(c, &bs->children, next) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (c->role & BDRV_CHILD_PRI=
+MARY) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
+rn c;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 return NULL;
+>> +}
+>>
+>=20
+> Suggest squash-in to also assert that not more than one primary child:
+> --- a/block.c
+> +++ b/block.c
+> @@ -6998,13 +6998,14 @@ BdrvChild
+> *bdrv_filter_or_cow_child(BlockDriverState *bs)
+> =C2=A0 */
+> =C2=A0BdrvChild *bdrv_primary_child(BlockDriverState *bs)
+> =C2=A0{
+> -=C2=A0=C2=A0=C2=A0 BdrvChild *c;
+> +=C2=A0=C2=A0=C2=A0 BdrvChild *c, *found =3D NULL;
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(c, &bs->children, next) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (c->role & BDRV_CHILD=
+_PRIMARY) {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retur=
+n c;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 asser=
+t(!found);
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Hm, why not.
+
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 found=
+ =3D c;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> =C2=A0=C2=A0=C2=A0=C2=A0 }
+> =C2=A0
+> -=C2=A0=C2=A0=C2=A0 return NULL;
+> +=C2=A0=C2=A0=C2=A0 return c;
+> =C2=A0}
+>=20
+>=20
+> with or without:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+In any case, thanks for reviewing!
+
+Max
 
 
---uHA6cAtcPeOKBJCsLJrvR39sScEuO6Sn8--
+--agDegy1On7lw5PhEzEALwnIQ4t4qjedoZ--
 
---u48zThU7kWKGsg25zO6tRE0Zbe0N6y6rG
+--fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8QZ/oACgkQ9AfbAGHV
-z0CijQgAmKqdhP++QgOxDJTOPhH9x+WfWpilZX1XwfW4vwIKxL0UQhfiQNxdZhC9
-Z/GuXXednUbpgFNyDcJwb99v4/nm5zEmTrSf8hSQUS2uXhk4LxXWau1IeKBBUN9Y
-luR2ClQC7N+Uyf+5goK2XHejRHvoVeYf0MQj4SxEl9SrTOw5qeQflXUIBbGZ58Qk
-Kwsb+nzNS+uj9JsDCF1H7A1H6ZQyVHSE+QjK9pq53yDQ3IJtG4xVS1VoS9llTfZ/
-CqonVDvBlupirhG1Hu3tqwAVRhX/7xt1SeSmaq/ZKn/ydKOBi2NgcxZuUPu+iBor
-5/ddKIandByyuDyPynzRRO0DcrhAQw==
-=erEe
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8QaCsACgkQ9AfbAGHV
+z0BbQwf+Prf2dHfnnpHeHpvU9TxshsvIw4u89cyi8q+D208LAEYPFnpNxCPiBfQP
+zkkzWYRdb0yP21s8fZ874lX4yZ+z0dVU0wTYRJ2SRUOrGhrTbcLVqhmXAaTzX3Jr
+BBQTgZ2SB1jUZOVQBDWpepUsZbE+9FLbvlApowchT8Eee7Sf9VbdwuU0i1aGKI9L
+LX4wHnt4dxqKyNZMxmDKSeVwrSv/LOf3k0w7K9NKNPoa+Zi5wBiJe8YEkePUivOn
+Xw5ZPtlDPg4H2aLz03320t5eYRF00IFelSh5JTk9gCqKySU+OZb21p4j0qFsPobz
+ajM63uJDv1fUfZyDfW90WWQOVlHpeA==
+=MWap
 -----END PGP SIGNATURE-----
 
---u48zThU7kWKGsg25zO6tRE0Zbe0N6y6rG--
+--fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww--
 
 
