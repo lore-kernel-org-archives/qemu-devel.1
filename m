@@ -2,95 +2,99 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C64C2C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 17:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAAD3C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 17:58:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90E1D205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 17:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7507B205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 17:58:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/qdyeDA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90E1D205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XcuvIu39"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7507B205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw871-0000rS-Np
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 13:56:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46990)
+	id 1jw88y-00024F-PL
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 13:58:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jw86L-0000Dz-F2
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 13:55:21 -0400
-Received: from mail-oo1-xc2a.google.com ([2607:f8b0:4864:20::c2a]:33229)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jw88F-0001e5-1y
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 13:57:19 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43144)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jw86I-0007lM-W7
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 13:55:21 -0400
-Received: by mail-oo1-xc2a.google.com with SMTP id d125so1356685oob.0
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 10:55:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:mime-version:content-transfer-encoding:from:user-agent:to
- :references:in-reply-to:message-id:subject:date;
- bh=0yW0JmZURen0kdfxNgJAT7ZcuZVipB3zSQg+knhVqpM=;
- b=k/qdyeDAiAIq0LV9kP+UhV/z9CsRqfsAGcPflXIueVS5C1F5izIRq0/d9hnerf4nf9
- v0nM93dj5ixs9FszoV5QHq82ueEOkYgcaVdU0Y0WkzYTgsWDpHUN7f3EVlpUINtbUJcv
- C4MzbRDca7NlKOKjeBGAyh6QeSQFAgeIgCyPUXn8weYKz28GoJwYm/PnDDLpVotvOH1R
- u0xm1cGINmr5WiaJm4RFLX6/4msPRzrK0M3Q/M1b2vcr7UcA1MXI6hccH8H1aA9Jfsfa
- vBKlP/cMexxVMndtTYnu11B96Q07Fqyo+BID7hqM5aMHo62BSspc9TcYyxRGNEvgy4Bv
- 91lQ==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jw88B-0008Lv-F7
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 13:57:18 -0400
+Received: by mail-pl1-x642.google.com with SMTP id x8so4186535plm.10
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 10:57:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=RrgqiPB0Qv2gZiXHILw3ySKJGCdCSp7qOOeYOK/QHHc=;
+ b=XcuvIu39ReNXG3YvldPeLYlh44j8vJk00qmACoptBRy80CgdGh8JCY5EkigCp9GA2G
+ AWTTaWHRBnl20wkQK18pv+6GjNVC3jpUT95F/FjR7pqMH9/CqTiBFbd6Wx1u6VVywBro
+ 8vCksNOkcyKQYwgskao5ZTDGtuSdQ3mwmnxTknOdU/JuOp4TLnws9TWmsVOFMPFg6gdd
+ S6cuzrW4odglJ5c6bYnSK0MJhB19kNCmiggzSll1Jp+NbQdBT0kkLLgA5sWfC5RwVZH4
+ zW8Pd90BopAeoUm1BvOWfjCUpQ5N+O+eIiMR8ZyHKKCN7BFOfDKLXXzkSM2MVCyvUctl
+ bOqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:mime-version:content-transfer-encoding
- :from:user-agent:to:references:in-reply-to:message-id:subject:date;
- bh=0yW0JmZURen0kdfxNgJAT7ZcuZVipB3zSQg+knhVqpM=;
- b=ZvOsjsv3juS4c+QCl7EavHSqkUAttl5taqpbKzz2PWu0z8t8T+UzXLXbx07bg/84gv
- b3od5mHbFMCVNlN0YtyamhjFC86ZzcI9XabSLma7cJSf60ZohNXIYbZbbMWg0IN1X2kp
- 9uRKqM3Stj6gnyw/TuQMaMGr61/sTtp+2x6mNPOeFm0SQSkjqtpSD3g5rgSXfnxBcBEZ
- SvMFlTFQxy7/XnxgD6iHdikUpvK0OpNNcsKmOM7nqohdXgWqbg0wOf/3r9SyhUXLGMGc
- IUUk1H/iXnBxU+STVIoOxrO6Q/ZUQTGILAcW3DvLFkTfK+j//0/60dajk79v5T2v/DXI
- Uo7g==
-X-Gm-Message-State: AOAM5300VCA3WF0wtIb0POwrJWsvkLtbDJRrv1MK/0qM/U5Wo5F4WIr1
- 5HGpgsBmCipIY8D4EfPGgT8=
-X-Google-Smtp-Source: ABdhPJywYxi8HtJPRvUqtlR6lpWHZBudl4YNyxkn+J3aDfldlPmJrRBXjecws4FRniZuQ0SPyABQTQ==
-X-Received: by 2002:a4a:b503:: with SMTP id r3mr5217529ooo.92.1594922117061;
- Thu, 16 Jul 2020 10:55:17 -0700 (PDT)
-Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
- [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id j8sm1382956ooh.34.2020.07.16.10.55.16
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 16 Jul 2020 10:55:16 -0700 (PDT)
-Content-Type: text/plain; charset="utf-8"
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RrgqiPB0Qv2gZiXHILw3ySKJGCdCSp7qOOeYOK/QHHc=;
+ b=LjNHqCtXTtNJjESaflKj6T4sQjOUcU+EYv19t6e5kzL3tnLDCkKT7xUOHBDLzvog5b
+ TjD2afvoNdjzCtctqz7FtQ8fKyVgPo6Q8ZvnNyxIR7xJ8KMlXOG1FswAPUsvcq6LOzrU
+ Ev3LgS0bjb0EJbvgjE2/pHKTzKI3fZvqhX311sm/q7n9dRW9XKWHFECctTCEmx1vHfw0
+ V5B4YT7S2317EforUXyBw8QBmorEHmuOBLT028Gv72XWqZ8rPr/ZJSPyAsGr4EFMLPZk
+ HDHs8o8T35BSosYePSPxG89nwBJ6Fm0NF405H2C9GG6YNscSgc2y41QQmFJvWtvThGTn
+ ftGw==
+X-Gm-Message-State: AOAM531FE6wm07Mdy66UI2rYpcGupbI5ytWynKZCAkRiyrvSOhUHYyXx
+ 2cMWdGLqxoFbH65w4wilwHFMiA==
+X-Google-Smtp-Source: ABdhPJyBC0S3XnXwXjcT4tArg9Gd7+7qrjU8hssfB6yXEiDOwsj6fLowerx5XryWN0wBXZKQ5a1jNQ==
+X-Received: by 2002:a17:90a:1f08:: with SMTP id
+ u8mr6302407pja.154.1594922230681; 
+ Thu, 16 Jul 2020 10:57:10 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-148-13.tukw.qwest.net. [174.21.148.13])
+ by smtp.gmail.com with ESMTPSA id y6sm669216pji.2.2020.07.16.10.57.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 16 Jul 2020 10:57:09 -0700 (PDT)
+Subject: Re: [RFC PATCH] tcg/cpu-exec: precise single-stepping after an
+ exception
+To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+References: <20200716100445.3748740-1-luc.michel@greensocs.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2117589b-5f08-f162-cace-f45e3cfd4f66@linaro.org>
+Date: Thu, 16 Jul 2020 10:57:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-User-Agent: alot/0.7
-To: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <CAFEAcA-reu8gKpBMgEffStTRA+M02OWj75riXqBYXjgtOh5Z_A@mail.gmail.com>
-In-Reply-To: <CAFEAcA-reu8gKpBMgEffStTRA+M02OWj75riXqBYXjgtOh5Z_A@mail.gmail.com>
-Message-ID: <159492211230.15440.2651129078319986183@sif>
-Subject: Re: qemu test-qga failure on mergebuild after VERSION file change:
- dependency issues??
-Date: Thu, 16 Jul 2020 12:55:12 -0500
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c2a;
- envelope-from=flukshun@gmail.com; helo=mail-oo1-xc2a.google.com
+In-Reply-To: <20200716100445.3748740-1-luc.michel@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,54 +111,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Quoting Peter Maydell (2020-07-16 05:53:17)
-> The first merge I tried to process after bumping VERSION for rc0
-> failed on test-qga like this:
-> =
+On 7/16/20 3:04 AM, Luc Michel wrote:
+> When single-stepping with a debugger attached to QEMU, and when an
+> exception is raised, the debugger misses the first instruction after the
+> exception:
+> 
+> $ qemu-system-aarch64 -M virt -display none -cpu cortex-a53 -s -S
+> 
+> $ aarch64-linux-gnu-gdb
+> GNU gdb (GDB) 9.2
+> [...]
+> (gdb) tar rem :1234
+> Remote debugging using :1234
+> warning: No executable has been specified and target does not support
+> determining executable automatically.  Try using the "file" command.
+> 0x0000000000000000 in ?? ()
+> (gdb) # writing nop insns to 0x200 and 0x204
+> (gdb) set *0x200 = 0xd503201f
+> (gdb) set *0x204 = 0xd503201f
+> (gdb) # 0x0 address contains 0 which is an invalid opcode.
+> (gdb) # The CPU should raise an exception and jump to 0x200
+> (gdb) si
+> 0x0000000000000204 in ?? ()
+> 
+> With this commit, the same run steps correctly on the first instruction
+> of the exception vector:
+> 
+> (gdb) si
+> 0x0000000000000200 in ?? ()
+> 
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> ---
+> 
+> RFC because I'm really not sure this is the good place to do that since
+> EXCP_DEBUG are usually raised in each target translate.c. It could also
+> have implications with record/replay I'm not aware of.
+> 
+> ---
+>  accel/tcg/cpu-exec.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index d95c4848a4..e85fab5d40 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -502,10 +502,21 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+>              CPUClass *cc = CPU_GET_CLASS(cpu);
+>              qemu_mutex_lock_iothread();
+>              cc->do_interrupt(cpu);
+>              qemu_mutex_unlock_iothread();
+>              cpu->exception_index = -1;
+> +
+> +            if (unlikely(cpu->singlestep_enabled)) {
+> +                /*
+> +                 * After processing the exception, ensure an EXCP_DEBUG is
+> +                 * raised when single-stepping so that GDB doesn't miss the
+> +                 * next instruction.
+> +                 */
+> +                cpu->exception_index = EXCP_DEBUG;
+> +                return cpu_handle_exception(cpu, ret);
 
-> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> tests/test-qga -m=3Dquick -k --tap < /dev/null | ./scripts/tap-driv
-> er.pl --test-name=3D"test-qga"
-> PASS 1 test-qga /qga/sync-delimited
-> PASS 2 test-qga /qga/sync
-> PASS 3 test-qga /qga/ping
-> **
-> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-qga.c:303:test_qga=
-_info:
-> assertion failed (version =3D=3D QEMU_VERSION): ("5.0.9
-> 0" =3D=3D "5.0.50")
-> ERROR test-qga - Bail out!
-> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-qga.c:303:test_qga=
-_info:
-> assertion failed (versio
-> n =3D=3D QEMU_VERSION): ("5.0.90" =3D=3D "5.0.50")
-> Aborted (core dumped)
-> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:659:
-> recipe for target 'check-unit' failed
-> =
+Plausible.  Although recursion on an inline function is going to defeat the
+inline, in general.
 
-> Looking at timestamps on files, tests/test-qga.o never got rebuilt,
-> even though config-host.h has been updated (and so has the new
-> QEMU_VERSION). Any idea what's gone wrong here?
-> =
+We could expand the recursion by hand with
 
-> Also weird: this build tree has no .d files in it.
+    if (unlikely(cpu->singlestep_enabled)) {
+        *ret = EXCP_DEBUG;
+        cpu_handle_debug_exception(cpu);
+        return true;
+    }
 
-I've been trying to reproduce with:
+which might even be clearer.
 
-make
-make check-unit
-*bump VERSION
-make check-unit
 
-but test-qga.o gets rebuilt as expected and the test passed.
+r~
 
-This is with ubuntu 18.04, x86, with out-of-tree build directory. Are you a=
-ware
-of any other factors that might be needed to reproduce this?
+> +            }
+> +
+>          } else if (!replay_has_interrupt()) {
+>              /* give a chance to iothread in replay mode */
+>              *ret = EXCP_INTERRUPT;
+>              return true;
+>          }
+> 
 
-> =
-
-> thanks
-> -- PMM
 
