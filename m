@@ -2,91 +2,87 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B66DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 03:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0212FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 03:24:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3694A2076C
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 03:01:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEFC7205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 03:24:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gc4Cnvvx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3694A2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="ixTD+W8R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEFC7205CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvu9W-0006qu-GP
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 23:01:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41554)
+	id 1jvuW2-0003ih-0p
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jul 2020 23:24:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvu8a-0005vY-38
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 23:00:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42187
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jvu8X-0004X5-Ps
- for qemu-devel@nongnu.org; Wed, 15 Jul 2020 23:00:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594868440;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=R3UfTp4BIgAKkuMqkS4pQYOqNyz5sK9nfykS4N+Dpac=;
- b=Gc4Cnvvx//fRcfeiBQO82tcul3VAGwNpuMg9YqIr4wJyWEgDX6JQypoTRGJ/x1eIbukTXo
- MF0IyIK+HmFuh6+MwVpYHv/JxKSVV9k1mqCbti/OQQnvTbCI1W4bbJmtiamARS+t+eSYBn
- th4SrrEryTH3ny9krjUZLBPRQM2DoBA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-NbI-BdTgOby8CWnVvUM9bg-1; Wed, 15 Jul 2020 23:00:26 -0400
-X-MC-Unique: NbI-BdTgOby8CWnVvUM9bg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33C20108B;
- Thu, 16 Jul 2020 03:00:25 +0000 (UTC)
-Received: from [10.72.12.131] (ovpn-12-131.pek2.redhat.com [10.72.12.131])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F8A15C1BD;
- Thu, 16 Jul 2020 03:00:23 +0000 (UTC)
-Subject: Re: [PULL 0/7] Net patches
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1594821201-3708-1-git-send-email-jasowang@redhat.com>
- <CAFEAcA8q1WnAG7jDOh1AjqLnf5Hc0Gxr1oACEAz5U3uQQLy41w@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <86032619-ee9d-14b0-1080-d7e0b9dd7e48@redhat.com>
-Date: Thu, 16 Jul 2020 11:00:22 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jvuVP-0003HY-R2
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 23:24:19 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41223)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jvuVN-0000yL-UZ
+ for qemu-devel@nongnu.org; Wed, 15 Jul 2020 23:24:19 -0400
+Received: by mail-lj1-x241.google.com with SMTP id z24so5389824ljn.8
+ for <qemu-devel@nongnu.org>; Wed, 15 Jul 2020 20:24:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=a7u1Ij1MelKzsNucC0SNKnQ17KYi/uecqZBTYZr/WKA=;
+ b=ixTD+W8Rrdhh86mi5Py1bZK4HeGNcObuAOzpXU9BNwfmblCoF7pCj+5TMJLDajPEmf
+ xBDI0CfqFnhA1XS5FesNS7sZKA/C2hH8/9nRuiIxV7Z+amktqRmI/L9VW05lvP19QAlX
+ Xd+e9/EDp+rYehZN1IDY08T2I0f9zKu0GXhNW9wJmhIma8F9Ohsw2VLzswm5yuahJ0zo
+ IaZLx0z9nLUxwUceXyVcPrFmt+C1u85OACzzS9+XFKJrrAYDfB+laGlqj1hLRvictv/+
+ +gDb2RCFguyJg2+6u2gMfr6SuheFNSuZhCNk5nw/r4yN9g353bhkn258OrovSKzRM8hR
+ lQzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=a7u1Ij1MelKzsNucC0SNKnQ17KYi/uecqZBTYZr/WKA=;
+ b=R5itUXdjMPD+jcNKvjXt+xmQppQU/N7o52MOnn+XFLOAUOYVll31a6YsRd7o6UdYSp
+ Rwbpr0rdsHWP6y9QXy6OR8ERhVdjO7kbxKgSzr7NVUd1S1Q/s4V0o2z8dJlJiW74U9Z3
+ n3gH/bYij2SZ+sWO5p6N7E+iJvoAzX1lsTJP1MMVwEJudaZiR/b2cx4DJSGHh+bMg2jS
+ NgZO4/7Y7yua2BO0pjIX9k62q0dbxZq5vpASieqoyqkxJGBJhY/L7x5vuMQ4FgIQU8Vx
+ HnadIl8mzns++V0C5ns/M8LXuSVxES5neZYrWcZPTo4u7aWmJ1JYYvHX+WjJLAWCN4FQ
+ AOVg==
+X-Gm-Message-State: AOAM533qpw8l33TcLKHrX4J1IFSZfWLiUjqN+n3EwhybA+A1P9Zn1w8d
+ VAaB92w8HCUBy0dz4qoHaP7Ff7zGGJsU9Q==
+X-Google-Smtp-Source: ABdhPJwMn61+tx889eLjuf34pVtBVBC5b5V2CPN6unUG79n8zJjnPFvIusjn6vr8fDtAwVZe9O6wNg==
+X-Received: by 2002:a2e:a375:: with SMTP id i21mr1007716ljn.403.1594869855034; 
+ Wed, 15 Jul 2020 20:24:15 -0700 (PDT)
+Received: from navi.cosmonova.net.ua ([95.67.24.131])
+ by smtp.gmail.com with ESMTPSA id o1sm774772ljj.82.2020.07.15.20.24.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Jul 2020 20:24:14 -0700 (PDT)
+From: andrew@daynix.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/2] hw/net: Added plen fix for IPv6
+Date: Thu, 16 Jul 2020 06:53:24 +0300
+Message-Id: <20200716035325.1406919-1-andrew@daynix.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8q1WnAG7jDOh1AjqLnf5Hc0Gxr1oACEAz5U3uQQLy41w@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 19:36:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: none client-ip=2a00:1450:4864:20::241;
+ envelope-from=andrew@daynix.com; helo=mail-lj1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,40 +95,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: jasowang@redhat.com, dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Andrew <andrew@daynix.com>
 
-On 2020/7/16 上午2:06, Peter Maydell wrote:
-> On Wed, 15 Jul 2020 at 14:53, Jason Wang <jasowang@redhat.com> wrote:
->> The following changes since commit 673205379fb499d2b72f2985b47ec7114282f5fe:
->>
->>    Merge remote-tracking branch 'remotes/philmd-gitlab/tags/python-next-20200714' into staging (2020-07-15 13:04:27 +0100)
->>
->> are available in the git repository at:
->>
->>    https://github.com/jasowang/qemu.git tags/net-pull-request
->>
->> for you to fetch changes up to a134321ef676723768973537bb9b49365ae2062e:
->>
->>    ftgmac100: fix dblac write test (2020-07-15 21:00:13 +0800)
->>
->> ----------------------------------------------------------------
->>
->> ----------------------------------------------------------------
-> just a note that this has missed rc0 but will go into rc1.
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1708065
+With network backend with 'virtual header' - there was an issue
+in 'plen' field. Overall, during TSO, 'plen' would be changed,
+but with 'vheader' this field should be set to the size of the
+payload itself instead of '0'.
 
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+---
+ hw/net/net_tx_pkt.c | 23 +++++++++++++++++++++++
+ hw/net/net_tx_pkt.h | 14 ++++++++++++++
+ include/net/eth.h   |  1 +
+ 3 files changed, 38 insertions(+)
 
-Yes, I think it's fine.
-
-Thanks
-
-
->
-> thanks
-> -- PMM
->
+diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+index 331c73cfc0..9560e4a49e 100644
+--- a/hw/net/net_tx_pkt.c
++++ b/hw/net/net_tx_pkt.c
+@@ -626,6 +626,7 @@ bool net_tx_pkt_send(struct NetTxPkt *pkt, NetClientState *nc)
+ 
+     if (pkt->has_virt_hdr ||
+         pkt->virt_hdr.gso_type == VIRTIO_NET_HDR_GSO_NONE) {
++        net_tx_pkt_fix_ip6_payload_len(pkt);
+         net_tx_pkt_sendv(pkt, nc, pkt->vec,
+             pkt->payload_frags + NET_TX_PKT_PL_START_FRAG);
+         return true;
+@@ -644,3 +645,25 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *pkt, NetClientState *nc)
+ 
+     return res;
+ }
++
++void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt)
++{
++    struct iovec *l2 = &pkt->vec[NET_TX_PKT_L2HDR_FRAG];
++    if (eth_get_l3_proto(l2, 1, l2->iov_len) == ETH_P_IPV6) {
++        struct ip6_header *ip6 = (struct ip6_header *) pkt->l3_hdr;
++        /*
++         * TODO: if qemu would support >64K packets - add jumbo option check
++         * something like that:
++         * 'if (ip6->ip6_plen == 0 && !has_jumbo_option(ip6)) {'
++         */
++        if (ip6->ip6_plen == 0) {
++            if (pkt->payload_len <= ETH_MAX_IP_DGRAM_LEN) {
++                ip6->ip6_plen = htons(pkt->payload_len);
++            }
++            /*
++             * TODO: if qemu would support >64K packets
++             * add jumbo option for packets greater then 65,535 bytes
++             */
++        }
++    }
++}
+diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h
+index 212ecc62fc..4ec8bbe9bd 100644
+--- a/hw/net/net_tx_pkt.h
++++ b/hw/net/net_tx_pkt.h
+@@ -187,4 +187,18 @@ bool net_tx_pkt_parse(struct NetTxPkt *pkt);
+ */
+ bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt);
+ 
++/**
++ * Fix IPv6 'plen' field.
++ * If ipv6 payload length field is 0 - then there should be Hop-by-Hop
++ * option for packets greater than 65,535.
++ * For packets with a payload less than 65,535: fix 'plen' field.
++ * For backends with vheader, we need just one packet with proper
++ * payload size. For now, qemu drops every packet with size greater 64K
++ * (see net_tx_pkt_send()) so, there is no reason to add jumbo option to ip6
++ * hop-by-hop extension if it's missed
++ *
++ * @pkt            packet
++ */
++void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt);
++
+ #endif
+diff --git a/include/net/eth.h b/include/net/eth.h
+index 7f45c678e7..0671be6916 100644
+--- a/include/net/eth.h
++++ b/include/net/eth.h
+@@ -186,6 +186,7 @@ struct tcp_hdr {
+ 
+ #define ip6_nxt      ip6_ctlun.ip6_un1.ip6_un1_nxt
+ #define ip6_ecn_acc  ip6_ctlun.ip6_un3.ip6_un3_ecn
++#define ip6_plen     ip6_ctlun.ip6_un1.ip6_un1_plen
+ 
+ #define PKT_GET_ETH_HDR(p)        \
+     ((struct eth_header *)(p))
+-- 
+2.27.0
 
 
