@@ -2,126 +2,88 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC276C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842A5C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:21:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85F8C204EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:21:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EA6C204EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:21:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Apkfu6A/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85F8C204EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T7TSYdoO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EA6C204EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw10g-0003b7-Ks
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:21:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56156)
+	id 1jw11N-0004Te-Jx
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:21:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jw0zu-00032k-MU; Thu, 16 Jul 2020 06:20:14 -0400
-Received: from mail-db8eur05on2136.outbound.protection.outlook.com
- ([40.107.20.136]:57377 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jw0zr-0005si-DX; Thu, 16 Jul 2020 06:20:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GXI05gXADXUuwWMLtq31jDsdcegNsTvfxOWCGOWXSD4oUKXQElDR0UNZqJOIcGFtXuUaZKujPJuvm2xTtSHc8qJv9z3B9CM4oy/W5sVXiRSFUngJlOmYKmBLHmMECWQcMtqpuf4rfhfHN71HkDD3GtfVfPnWb1swkdPTu1v9pn+UjzVj55PcZpgAdDlBZUN27Hz5LjW48wy4P/KgeKgyq0kJE1vtnIa5spHgEb0nuVGBcv9V+Eg4SRzkc7RCUP5wSz3df5+pv7z/lPQeGFadJ3NVaTW7dzy7FLyzFx+1Kbmo8vOa/rrjApj9GEc/cXzIOm0zwCWX8npc2URO3g40LQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Ttzd2bnfectXNzvMGAL1BlRg5739IRJt4EmIJ2g9NI=;
- b=Xl37Qfny0b3fse+aAjZTj8hVJ9Ng1k+bIJgF5jKWTqEMHPt/t3XZNW00RqlXXd6BfyMaXtGkkaFki9H6fmhuPJD7FBecFCsbpg5j3uvm13x+NtaNNYmwwzWFPJbJzg3dEkCqkHlmsVxBtloPcaYgUxjWWwqWeuUYF/QOKOH/blMqJC+ZolO85aEw/CBNUYofVUKS/ngVGlC49M0GZJmHXp9EOoF8sRlrOXxRP3akjUDDsM4oIkDYj2r2zflglrRRQF2rUUmx5xpwx5vatYr0NFOzREIMq7+Dr5ooFRuvz7rwP6FkAW6R3+kIuZCgOE5MOOTB6yKWRN80TSEw++9TDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Ttzd2bnfectXNzvMGAL1BlRg5739IRJt4EmIJ2g9NI=;
- b=Apkfu6A/3+j+wJODeOuJrFDkjLo61/YSynTTc7t+xNO/zIsomw6Y/T+d+GWqsSVwRMzwvevnpwTjpfb674K/HTt6Y8TjzXnXgLkFN9HT+9ztDk4hLlompTLMNN0Haoik5swhosdYCJKYSa8lA2phBMpmAYyRz1J5r1FFYJ4AuGE=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4851.eurprd08.prod.outlook.com (2603:10a6:20b:c9::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Thu, 16 Jul
- 2020 10:20:08 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3195.018; Thu, 16 Jul 2020
- 10:20:08 +0000
-Subject: Re: [PATCH v10 08/10] qcow2.py: Introduce '-j' key to dump in JSON
- format
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <1594676203-436999-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1594676203-436999-9-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <761829e6-ba9c-c8c0-8f37-976e37fcb6d0@virtuozzo.com>
-Date: Thu, 16 Jul 2020 13:20:06 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <1594676203-436999-9-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR04CA0139.eurprd04.prod.outlook.com (2603:10a6:207::23)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jw10e-0003jf-Nb
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:21:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36934
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jw10b-0006GT-JI
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:20:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594894856;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=woR58QtC6e/BY7sYhXn+6nzar860dxN3DNbjQCj1qWo=;
+ b=T7TSYdoOm/+Dqv89NnM6ybkWatUXW7fyRKkvtY/ShwmIe9sJmjm9W0n5rzvpxSZEK1gkYi
+ Re5GAWgOrm9BaKaSwYgEUkqcN8eoS1UGaiox6AmweRpHLkXIAzwOZ6nP9wTOT/LZ6H4GAc
+ GbsEjHTtHTWG743qEEousegMBJgh8xw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-nUSF_VHIOaW7SXHW64aFpw-1; Thu, 16 Jul 2020 06:20:54 -0400
+X-MC-Unique: nUSF_VHIOaW7SXHW64aFpw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A70001081
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 10:20:53 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C93247B422;
+ Thu, 16 Jul 2020 10:20:41 +0000 (UTC)
+Date: Thu, 16 Jul 2020 12:20:39 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: unable to boot windows with 256 cpus
+Message-ID: <20200716122039.15448e86@redhat.com>
+In-Reply-To: <20200715182819.GF502441@xz-x1.hitronhub.home>
+References: <20200715194513.5b19ca27@redhat.com>
+ <20200715182819.GF502441@xz-x1.hitronhub.home>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.164) by
- AM3PR04CA0139.eurprd04.prod.outlook.com (2603:10a6:207::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3195.17 via Frontend Transport; Thu, 16 Jul 2020 10:20:07 +0000
-X-Originating-IP: [185.215.60.164]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5971fde9-4beb-40f9-359e-08d82971d0bb
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4851:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB48516FA5AABDDD67C4BB926CC17F0@AM6PR08MB4851.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1265;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ByNyN0DAE7y0haAVAJNsEqjI99fH9kpbuyF8Phv7NKEwf4l/ZkQkrtdacxN7dhMpD3aEjOUNofeJv+vOQQJTOPdNuFts8S8n5O0ihXxYn5KPaGMJkk+qqNIVJZUoGUa79GHozUbKRPx9L36WJgjmEjBEpbYJxpj2A+Lv9lWAJEEpWYA0urVPNb71uj+Xp3KFKdvF/38o+zuZ5hOz/k06PVzhgGtHjZnMcBK24Ga3drVenTWSFO3daJbPblDwe+gJz3lYf/l/d2Invv7QPt8UJHlkwDz5mKT/ZNsoTG6rnbBogRrn6JWI6DPke0KR7UAvpHmFvxwF2Loyuyj56fd1/9JdwhlELG1KmFqjV0zllGoHf6REHJQXsdArquzA9kek
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(366004)(136003)(396003)(346002)(376002)(66476007)(16576012)(66946007)(2616005)(956004)(186003)(8936002)(31696002)(16526019)(26005)(86362001)(66556008)(83380400001)(4326008)(6486002)(36756003)(52116002)(107886003)(5660300002)(316002)(8676002)(478600001)(2906002)(31686004)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: IaBniU5gbPmJmH8qHN1L3I/DzldtL07Z+Pfz/leJwcs2ZjDaKNUogs7rMymctD83Fqnud3XG6M4WW7inS49ikt5sip7fWEOTTkoyS2bovqmRgH84EIPOHlyHinCAA/2a8xNwddKTad9dySoOnjemW5tNVszx5jHGuP0lFoXZj5XOGEvoZoe1rMa5QFadtWs+c18/2aGIQEqpk1rfeajVospDH7SY1oGoBE/9MfQvwhmvuK5VdBckZhs+0MGf2etc1uRPqQzGge5VJo2BbFYAOUAg7QA2nO7aFHGCao0pIDDG1QESd12pROXm/fZFj7DO0TX1BFQcaXe437T7uJeFIKFMpR9F2AUo1NeHwAlKEPW/oY0NMYdbumBLppYN5ZPXIxWJKjf703Q+3x6zLsGu4PmZ8KQhhHACnCkSHTa2DcAwW91Scr6zwsZKlBod12pz/JVGcxIBqLkZ2VybYIZ58KCg6oZiBY8Bt9aft5KYyB/o7je3Ph/zWdwDGBR7Gr+a
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5971fde9-4beb-40f9-359e-08d82971d0bb
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 10:20:08.4879 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T5VCzkAMoH0fiQs0dby0qlNZMLr9L47M1ceAZ9oi0zqc6j20AAXD/0NdHxWV/UPEaOTnBw83HJIi/MgOSgK2OAs6hbdZaZjGU49Gm9YD0pQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4851
-Received-SPF: pass client-ip=40.107.20.136;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 06:20:09
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:25:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,157 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, alex.williamson@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-14.07.2020 00:36, Andrey Shinkevich wrote:
-> Add the command key to the qcow2.py arguments list to dump QCOW2
-> metadata in JSON format. Here is the suggested way to do that. The
-> implementation of the dump in JSON format is in the patch that follows.
+On Wed, 15 Jul 2020 14:28:19 -0400
+Peter Xu <peterx@redhat.com> wrote:
+
+> On Wed, Jul 15, 2020 at 07:45:13PM +0200, Igor Mammedov wrote:
+> > While testing ACPI cpu hotplug changes I stumbled on BSOD in case
+> > QEMU is configured with 256 CPUs, Windows Server 2012R2x64 fails to boot
+> > with bugcheck 5C
+> > 
+> > 
+> > qemu-system-x86_64 -m 4G -smp 2,sockets=64,cores=4,maxcpus=256 -M q35,kernel-irqchip=split  -enable-kvm -device intel-iommu,intremap=on,eim=on ws2012r2x64DCchk.qcow2
+> > 
+> > Looking at stacktrace, it seems that is fails when trying to initialize iommu
+> > 
+> > hal_interrupt_remapping_setup_failure_nt!initbootprocessor
+> > 
+> > Any idea what to try to figure out what QEMU is missing wrt intremap?
+> > 
+> > PS:
+> > WS2016 boots eventually, but CPU hotplug doesn't work, symptoms (unconfirmed yet) like SCI isn't being delivered.
+> > With RHEL76 the same config works fine.  
 > 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->   tests/qemu-iotests/qcow2.py        | 19 +++++++++++++++----
->   tests/qemu-iotests/qcow2_format.py | 16 ++++++++--------
->   2 files changed, 23 insertions(+), 12 deletions(-)
+> Igor,
 > 
-> diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
-> index 0910e6a..7402279 100755
-> --- a/tests/qemu-iotests/qcow2.py
-> +++ b/tests/qemu-iotests/qcow2.py
-> @@ -26,16 +26,19 @@ from qcow2_format import (
->   )
->   
->   
-> +dump_json = False
-> +
-> +
->   def cmd_dump_header(fd):
->       h = QcowHeader(fd)
-> -    h.dump()
-> +    h.dump(dump_json)
->       print()
-> -    h.dump_extensions()
-> +    h.dump_extensions(dump_json)
->   
->   
->   def cmd_dump_header_exts(fd):
->       h = QcowHeader(fd)
-> -    h.dump_extensions()
-> +    h.dump_extensions(dump_json)
->   
->   
->   def cmd_set_header(fd, name, value):
-> @@ -134,6 +137,11 @@ cmds = [
->   
->   
->   def main(filename, cmd, args):
-> +    global dump_json
-> +    dump_json = '-j' in sys.argv
-> +    if dump_json:
-> +        sys.argv.remove('-j')
-> +        args.remove('-j')
+> Could you try this again but with vtd tracepoints enabled?
+> 
+>   -trace enable="vtd_*"
+> 
+> I think we don't need to capture all the trace outputs, but only until when the
+> HAL error message triggered should work.
 
-I'd prefer to access sys.argv in one place (in "if __name__ ...").
+here is all it outputs.
 
->       fd = open(filename, "r+b")
->       try:
->           for name, handler, num_args, desc in cmds:
-> @@ -151,11 +159,14 @@ def main(filename, cmd, args):
->   
->   
->   def usage():
-> -    print("Usage: %s <file> <cmd> [<arg>, ...]" % sys.argv[0])
-> +    print("Usage: %s <file> <cmd> [<arg>, ...] [<key>, ...]" % sys.argv[0])
->       print("")
->       print("Supported commands:")
->       for name, handler, num_args, desc in cmds:
->           print("    %-20s - %s" % (name, desc))
-> +    print("")
-> +    print("Supported keys:")
-> +    print("    %-20s - %s" % ('-j', 'Dump in JSON format'))
->   
->   
->   if __name__ == '__main__':
-> diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-> index 2c78d46..e0e14b5 100644
-> --- a/tests/qemu-iotests/qcow2_format.py
-> +++ b/tests/qemu-iotests/qcow2_format.py
-> @@ -109,7 +109,7 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
->           self.__dict__ = dict((field[2], values[i])
->                                for i, field in enumerate(self.fields))
->   
-> -    def dump(self):
-> +    def dump(self, dump_json=None):
->           for f in self.fields:
->               value = self.__dict__[f[2]]
->               if isinstance(f[1], str):
-> @@ -145,8 +145,8 @@ class Qcow2BitmapExt(Qcow2Struct):
->               [Qcow2BitmapDirEntry(fd, cluster_size=self.cluster_size)
->                for _ in range(self.nb_bitmaps)]
->   
-> -    def dump(self):
-> -        super().dump()
-> +    def dump(self, dump_json=None):
+480969@1594894035.927040:vtd_context_cache_reset 
+480969@1594894035.928033:vtd_switch_address_space Device 00:00.0 switching address space (iommu enabled=0)
+480969@1594894035.934110:vtd_switch_address_space Device 00:01.0 switching address space (iommu enabled=0)
+480969@1594894035.935382:vtd_switch_address_space Device 00:02.0 switching address space (iommu enabled=0)
+480969@1594894035.936661:vtd_switch_address_space Device 00:1f.0 switching address space (iommu enabled=0)
+480969@1594894035.937957:vtd_switch_address_space Device 00:1f.2 switching address space (iommu enabled=0)
+480969@1594894035.939258:vtd_switch_address_space Device 00:1f.3 switching address space (iommu enabled=0)
+480969@1594894035.950198:vtd_context_cache_reset 
+480969@1594894035.950213:vtd_switch_address_space Device 00:00.0 switching address space (iommu enabled=0)
+480969@1594894035.950219:vtd_switch_address_space Device 00:01.0 switching address space (iommu enabled=0)
+480969@1594894035.950224:vtd_switch_address_space Device 00:02.0 switching address space (iommu enabled=0)
+480969@1594894035.950229:vtd_switch_address_space Device 00:1f.0 switching address space (iommu enabled=0)
+480969@1594894035.950234:vtd_switch_address_space Device 00:1f.2 switching address space (iommu enabled=0)
+480969@1594894035.950238:vtd_switch_address_space Device 00:1f.3 switching address space (iommu enabled=0)
 
-strange to make None the default value for boolean. Why not just False?
-
-Also, why not call it just "json"? We are already in "dump" context, no needs to add prefix to the name.
-
-> +        super().dump(dump_json)
->           for entry in self.bitmap_directory:
->               print()
->               entry.dump()
-
-How will it work? You are interleaving json dump and non-json?
-
-Looking at this, I think that json and non-json dumps has more differences than similarities, and it probably simpler to make a separate function dump_json.. But I'm absolutely against an option, if it will be done consistently.
-
-> @@ -190,7 +190,7 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
->           self.bitmap_table = Qcow2BitmapTable(raw_table=table,
->                                                cluster_size=self.cluster_size)
->   
-> -    def dump(self):
-> +    def dump(self, dump_json=None):
->           print(f'{"Bitmap name":<25} {self.name}')
->           super(Qcow2BitmapDirEntry, self).dump()
->           self.bitmap_table.dump()
-
-Here the new option just not passed to the nested dump() calls..
-
-> @@ -291,13 +291,13 @@ class QcowHeaderExtension(Qcow2Struct):
->                       data_str = '<binary>'
->                   self.data_str = data_str
->   
-> -    def dump(self):
-> +    def dump(self, dump_json=None):
->           super().dump()
->   
->           if self.obj is None:
->               print(f'{"data":<25} {self.data_str}')
->           else:
-> -            self.obj.dump()
-> +            self.obj.dump(dump_json)
->   
->       @classmethod
->       def create(cls, magic, data):
-> @@ -396,8 +396,8 @@ class QcowHeader(Qcow2Struct):
->           buf = buf[0:header_bytes-1]
->           fd.write(buf)
->   
-> -    def dump_extensions(self):
-> +    def dump_extensions(self, dump_json=None):
->           for ex in self.extensions:
->               print('Header extension:')
-> -            ex.dump()
-> +            ex.dump(dump_json)
->               print()
+> 
+> Thanks,
 > 
 
-
--- 
-Best regards,
-Vladimir
 
