@@ -4,66 +4,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD076C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 05:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E03C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 05:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 881AF2071B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 05:20:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C192E2071B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 05:38:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Xn/dBLps"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 881AF2071B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4gsdvPS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C192E2071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvwJu-0007Kc-R2
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 01:20:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40150)
+	id 1jvwb8-0002qF-1C
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 01:38:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jvwIw-0006P1-Ui; Thu, 16 Jul 2020 01:19:35 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:57947 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jvwIu-00037I-Iv; Thu, 16 Jul 2020 01:19:34 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B6jH2002jz9sR4; Thu, 16 Jul 2020 15:19:25 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1594876766;
- bh=GwkMTBL57EXeYKoBAZqO6JqQgDo0e47kQ5hYtukZJ1E=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Xn/dBLpsyFj4oSkM5TAlvM+mrwIZn7tjK4WWimAdlLCsZS5qzPTfF3MAB5eQyzUV/
- 1wnYuprbJVhpfb65Jo38KhgkFmioRE6eAUX/C8rqoO8rGo9yrxUHpgNoRz9mj1xRsK
- MORBRm1bHn/RhcvGsNrDGYI3PbDJBlE2YbWKgu1o=
-Date: Thu, 16 Jul 2020 15:04:59 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Reza Arbab <arbab@linux.ibm.com>
-Subject: Re: [PATCH v3] spapr: Add a new level of NUMA for GPUs
-Message-ID: <20200716050459.GM93134@umbus.fritz.box>
-References: <1590177213-4513-1-git-send-email-arbab@linux.ibm.com>
- <20200525050550.GA23110@umbus.fritz.box>
- <20200525174927.aky64nw7p7xztqzh@arbab-vm>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvwaI-00026t-W2
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 01:37:31 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47629
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jvwaG-0005ft-5a
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 01:37:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594877846;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2H7mI1XRse7iK1zvXaMtZjcTu9t4ovcty1wpRbv3Ib8=;
+ b=b4gsdvPSSk14O1DYCp7GTYv65tyxnqub8Lb18jxqNdj5SleIaDPNExLwosjYOzr8ASLnkc
+ nDVdlWJaRgRhG3zyvaLzTanjQSiAcAXZeeVuIhzqg2NZBGIGHgdSwzjOPfkg3kVPAbGAKC
+ ci1mAIQsaR79YSRNIwBAVVaMvX+qnx4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-6lrqlHwINlCREqHrjQJOKA-1; Thu, 16 Jul 2020 01:37:21 -0400
+X-MC-Unique: 6lrqlHwINlCREqHrjQJOKA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6907B100CCC6;
+ Thu, 16 Jul 2020 05:37:19 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 01A2717DFE;
+ Thu, 16 Jul 2020 05:37:18 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 4522311385E0; Thu, 16 Jul 2020 07:37:17 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: David Gibson <dgibson@redhat.com>
+Subject: Re: Slow down with: 'Make "info qom-tree" show children sorted'
+References: <20200527084754.7531-1-armbru@redhat.com>
+ <20200527084754.7531-3-armbru@redhat.com>
+ <49bea110-0a3d-5a40-6647-67b116fb41b5@redhat.com>
+ <5e967e5f-8ae5-01cc-0dfe-f22e0f03b6b3@redhat.com>
+ <87y2nvanya.fsf@dusky.pond.sub.org>
+ <794f6901-5fe3-f7a1-45e7-f277f687cb6b@redhat.com>
+ <87v9iz7cxl.fsf@dusky.pond.sub.org>
+ <20200713111344.23c1b313@umbus.fritz.box>
+ <874kqbbdft.fsf@dusky.pond.sub.org>
+ <20200716095926.74caee16@umbus.fritz.box>
+Date: Thu, 16 Jul 2020 07:37:17 +0200
+In-Reply-To: <20200716095926.74caee16@umbus.fritz.box> (David Gibson's message
+ of "Thu, 16 Jul 2020 09:59:26 +1000")
+Message-ID: <87a700rpf6.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="mkHYMT4O8DyWoHkb"
-Content-Disposition: inline
-In-Reply-To: <20200525174927.aky64nw7p7xztqzh@arbab-vm>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 01:19:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 01:37:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,86 +103,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>,
- Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ berrange@redhat.com, ehabkost@redhat.com,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>,
+ =?utf-8?Q?C=C3=A9dr?= =?utf-8?Q?ic?= Le Goater <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-D?= =?utf-8?Q?aud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+David Gibson <dgibson@redhat.com> writes:
 
---mkHYMT4O8DyWoHkb
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Mon, 13 Jul 2020 18:13:42 +0200
+> Markus Armbruster <armbru@redhat.com> wrote:
+>
+>> David Gibson <dgibson@redhat.com> writes:
+>> 
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>>  [...]  
+>> >> 
+>> >> The surprising part is that n turns out to be large enough for n^2 to
+>> >> matter *that* much.  
+>> >
+>> > Is this another consequence of the ludicrous number of QOM objects we
+>> > create for LMB DRCs (one for every 256MiB of guest RAM)?  Avoiding that
+>> > is on my list.  
+>> 
+>> You're talking about machine pseries, I presume.
+>
+> Yes.
+>
+>>  With
+>> print_qom_composition() patched to print the number of children, I get
+>> 
+>>     $ echo -e 'info qom-tree\nq' | ../qemu/bld/ppc64-softmmu/qemu-system-ppc64 -S -display none -M pseries -accel qtest -monitor stdio | grep '###' | sort | uniq -c | sort -k 3n
+>>         360 ### 0 children
+>>           5 ### 1 children
+>>           5 ### 2 children
+>>           2 ### 3 children
+>>           1 ### 4 children
+>>           1 ### 15 children
+>>           1 ### 16 children
+>>           1 ### 18 children
+>>           1 ### 37 children
+>>           1 ### 266 children
+>> 
+>> The outlier is
+>> 
+>>         /device[5] (spapr-pci-host-bridge)
+>> 
+>> due to its 256 spapr-drc-pci children.
+>
+> Right, that's one for each possible PCI slot on the bus.  That will be
+> reduced by the idea I have in mind for this, but...
+>
+>> I found quite a few machines with similar outliers.  ARM machines nuri
+>> and smdkc210 together take the cake: they each have a node with 513
+>> children.
+>> 
+>> My stupid n^2 sort is unnoticable in normal, human usage even for n=513.
+>
+> ... as you say, 256 shouldn't really be a problem.  I was concerned
+> about LMB DRCs rather than PCI DRCs.  To have that show up, you might
+> need to create a machine with a large difference between initial memory
+> and maxmem - I think you'll get a DRC object for every 256MiB in there,
+> which can easily get into the thousands for large (potential) memory
+> VMs.
 
-On Mon, May 25, 2020 at 12:49:27PM -0500, Reza Arbab wrote:
-> On Mon, May 25, 2020 at 03:05:50PM +1000, David Gibson wrote:
-> > On Fri, May 22, 2020 at 02:53:33PM -0500, Reza Arbab wrote:
-> > > --- a/hw/ppc/spapr_pci_nvlink2.c
-> > > +++ b/hw/ppc/spapr_pci_nvlink2.c
-> > > @@ -362,7 +362,7 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbStat=
-e *sphb, void *fdt)
-> > >          uint32_t associativity[] =3D {
-> > >              cpu_to_be32(0x4),
-> > >              SPAPR_GPU_NUMA_ID,
-> > > -            SPAPR_GPU_NUMA_ID,
-> > > +            cpu_to_be32(nvslot->numa_id),
-> > >              SPAPR_GPU_NUMA_ID,
-> > >              cpu_to_be32(nvslot->numa_id)
-> >=20
-> >=20
-> > This doesn't look quite right.  In the new case we'll get {
-> > GPU_NUMA_ID, nvslot->numa_id, GPU_NUMA_ID, nvslot->numa_id }.
->=20
-> The associativity reference points are 4 (and now 2), so this is what we
-> want. I think what you've noticed is that reference points are 1-based
-> ordinals:
->=20
-> 	"...the =E2=80=9Cibm,associativity-reference-points=E2=80=9D property in=
-dicates
-> boundaries between associativity domains presented by the
-> =E2=80=9Cibm,associativity=E2=80=9D property containing =E2=80=9Cnear=E2=
-=80=9D and =E2=80=9Cfar=E2=80=9D resources. The
-> first such boundary in the list represents the 1 based ordinal in the
-> associativity lists of the most significant boundary, with subsequent
-> entries indicating progressively less significant boundaries."
+Okay, I can reproduce: with -m 256,128G, /machine has 549 children, of
+which 511 are spapr-drc-lmb.
 
-Right.. AIUI, associativity-reference-points indicates which leves are
-"important" from a NUMA distance point of view (though the spec is
-very confusing).  But, I'm pretty sure, that ignoring
-reference-points, the individual ibm,associativity lists are supposed
-to describe a correct hierarchy, even if some levels will get ignored
-for distance purposes.  So once you've split up into "numa_id" nodes
-at the second level, you can't then go back to just 2 nodes (main
-vs. gpu) at the third.
+> I don't know what the config was that showed up this problem in the
+> first place, and whether that could be the case there.
 
+Thomas reported device-introspect-test -m slow has become much slower
+for ppc64.  Bisection traced it to my commit e8c9e65816 "qom: Make "info
+qom-tree" show children sorted".  Uses default memory size, no
+spapr-drc-lmb as far as I remember.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+>> >                 Though avoiding a n^2 behaviour here is probably a good
+>> > idea anyway.  
+>> 
+>> Agreed.
 
---mkHYMT4O8DyWoHkb
-Content-Type: application/pgp-signature; name="signature.asc"
+Patch posted:
 
------BEGIN PGP SIGNATURE-----
+    Subject: [PATCH for-5.1 5/5] qom: Make info qom-tree sort children more efficiently
+    Message-Id: <20200714160202.3121879-6-armbru@redhat.com>
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8P3/cACgkQbDjKyiDZ
-s5KAqBAAoX4G9FhUQ+4Amh/f7yHWWhoN1Sd3DT36h0HvDFG3qPz0Schls2kSSwQ5
-uQWvKDKOTdeyrPG0/bCKX3QkJo0FaEyRWHlulgg3CqL6XYPhRD+KlAiy70C6ajeB
-f+ajKMNNQyuoewaJnA68n0XrvpbeKaTfU3FE20wg6B5ddn048LYAtE9TB9RSbxuJ
-M/eEs+JysM0zcG9n+lTQymnd3iffrqBJtenKtjSOYeMddaQizG/ONjkvBZhhLaUA
-2+D3nZT7zH5wXFkMnpFH3h5f2msmeUswCTgI7hkO9nQ1l0afAQMCXTyMxOzlxZYS
-P9s5d9OLvz56CDkmh9/BKU03Vz1eAQsLRjxta/UTBC/wg6QTS4/6ivEZ8r1kzMq7
-1hssoeO/F9+/HVOaRu64lTDysPv2/QOPTtNE26M/KiaGDC2R+q7/hMwpddbevs09
-lzc2kA25n/htdVZh1izx28xNEiXs5nTYFBSbJMaN29UKDJuMBlfYfXekOFS+BQ41
-9Q5YPpVZ/tlNSrFaM4Limdjj1R2UaGCXCdwJsnHVy0lKjwkk2EsPdkzBr2C+Kkj6
-W3a3WywA48vwxDYXAF98pkZwkWuuC2gnxUMwUpuIlH3/XKHN81nzSlKMFknu9O5Q
-JmmgNRi1voiN9oSw/dZ4aXozRkDIzKuvPwXfRZSN+xnVynvtzdg=
-=PoO5
------END PGP SIGNATURE-----
-
---mkHYMT4O8DyWoHkb--
 
