@@ -2,74 +2,76 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7BCC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9318AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:11:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 105F1207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:08:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105F1207BC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 657C3207DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:11:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657C3207DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw4Yq-000057-6O
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:08:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38652)
+	id 1jw4bY-0001jW-L5
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:11:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jw4Y6-0007bR-MK
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:07:46 -0400
-Resent-Date: Thu, 16 Jul 2020 10:07:46 -0400
-Resent-Message-Id: <E1jw4Y6-0007bR-MK@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21320)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jw4Y4-0002GA-EN
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:07:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594908450; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=HuvHYF81wGh84s5bYplh4bSMYmIQ4nTCnVtxgSqxPYl5i8jd82h9mTNFgfVo7cHjWPf4sJdtjHKnihWMipdXOZDQP4a2Ul5pJtsizG7UdPK7WeE93vp3KXI9DeJ16sAYCpn+jBd6+I8DLR6SE3dWr79YfUuVBUOlfOeiwW7mP98=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594908450;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=J4t9zN5sVyuohZpPUxx86ihuz/2xeUaFrUMdfgSYFtM=; 
- b=VZI0VJwC2nb9jvfFsSpF+YOFCgTaBFIS9UV06xYhlEW0fA+92bQfcpbOt30uS1W7woVq0PjUxL+xuXi9nYivpnjX8X+Fy1F1HvJz0jBTxisJIjAzqEdEWxi7yPAXX4rz6F3mVWevRvPZCQElyxWz99cG0pKsn54izAAN4FifDuw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1594908446020202.84352513872295;
- Thu, 16 Jul 2020 07:07:26 -0700 (PDT)
-Subject: Re: [RFC PATCH] configure: Fix atomic64 test for --enable-werror on
- macOS
-Message-ID: <159490844491.8202.7276619870730599286@07a7f0d89f7d>
-In-Reply-To: <20200716131101.18462-1-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1jw4am-0001BU-BX; Thu, 16 Jul 2020 10:10:32 -0400
+Received: from mail-oo1-f68.google.com ([209.85.161.68]:42119)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1jw4ak-0002ec-DB; Thu, 16 Jul 2020 10:10:32 -0400
+Received: by mail-oo1-f68.google.com with SMTP id y9so1197850oot.9;
+ Thu, 16 Jul 2020 07:10:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=wWt5ahbOxhvdXh73SENCOrj8jOaH1VwJmV03whzLYgE=;
+ b=AKdND31/S6iqbAhsfr//eHoEZX2S+i3Ifx5gXIQwnoTnTVWchcEtmcXXRBSIN10dPn
+ iSGzLYp+JZI82OZrKSBwx5kkrlkYTISZzZVl1kKfe4keCQkZoMvEdB7/TRhniB3BOEaN
+ UR1LjogU1EqgdpU97jIoUQOaJQwGYkYIe8sLcg+UGOB/Uc3E8N+NAW3zaKGQNJJp5Rph
+ nf6+wBngKqpqam5mFNBQJfRtZ92Sbr/0uUjOmgWee6g+3jYJcuhtOoxyRMMZFmu2hkWT
+ HA4hnAQNPqxWy7ApFW2ygPXJ63TOlQbaEpVReFQ2dtWZ2ciXpv/X98jKiLcooy9e9gRl
+ +DDA==
+X-Gm-Message-State: AOAM532Jt+VPfEtWdCsC4PLKy0PavfkNz1vEk4gFrQBl2wigK5B8W6VU
+ unTAuIWDY6IThK4ZJYJQhEzPAFTuDIXfuRFEZ9o=
+X-Google-Smtp-Source: ABdhPJw8wK+W7tpnF6N131Op+T2pjdMUds/9+LliMx2aV95aWg/91xH1jsNMr0L7zwbdga4KDdhVG+97BQ8Vdx4dD+A=
+X-Received: by 2002:a4a:5209:: with SMTP id d9mr4371731oob.40.1594908627931;
+ Thu, 16 Jul 2020 07:10:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: thuth@redhat.com
-Date: Thu, 16 Jul 2020 07:07:26 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 09:36:25
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200423090118.11199-1-geert+renesas@glider.be>
+ <20200423090118.11199-5-geert+renesas@glider.be>
+ <520d1d07-7530-e133-af6e-a8b4615829b8@amsat.org>
+ <e279f622-3af6-5073-dac0-4c452a88c32b@amsat.org>
+In-Reply-To: <e279f622-3af6-5073-dac0-4c452a88c32b@amsat.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 16 Jul 2020 16:10:16 +0200
+Message-ID: <CAMuHMdU_d-Wd1G37=fUUmmoWgSwyu7M0Rjq1Kw-2H=pbo1CFNg@mail.gmail.com>
+Subject: Re: [PATCH QEMU v2 4/5] ARM: PL061: Add gpiodev support
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=209.85.161.68;
+ envelope-from=geert.uytterhoeven@gmail.com; helo=mail-oo1-f68.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 10:10:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: 1
+X-Spam_score: 0.1
+X-Spam_bar: /
+X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,48 +84,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, rth@twiddle.net, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Magnus Damm <magnus.damm@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Alexander Graf <graf@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Bartosz Golaszewski <bartekgola@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcxNjEzMTEwMS4xODQ2
-Mi0xLXRodXRoQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
-T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
-IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGlvdGVzdC1xY293
-MjogMDI3CiAgVEVTVCAgICBjaGVjay11bml0OiB0ZXN0cy90ZXN0LWNoYXIKKioKRVJST1I6L3Rt
-cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjEyMDQ6Y2hhcl9zZXJpYWxfdGVzdDog
-J2Nocicgc2hvdWxkIG5vdCBiZSBOVUxMCkVSUk9SIHRlc3QtY2hhciAtIEJhaWwgb3V0ISBFUlJP
-UjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1jaGFyLmM6MTIwNDpjaGFyX3NlcmlhbF90
-ZXN0OiAnY2hyJyBzaG91bGQgbm90IGJlIE5VTEwKbWFrZTogKioqIFtjaGVjay11bml0XSBFcnJv
-ciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBp
-b3Rlc3QtcWNvdzI6IDAyOQogIFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVz
-dC9oZC1nZW8tdGVzdAotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBj
-bWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4n
-LCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MGVl
-NjNhN2I5YThlNDIzZGE5ODk3ZmUwZDEzMmUzOTInLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5
-LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0n
-LCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQn
-LCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0v
-dmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2Vy
-LWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAteHNxbTE0YXMvc3JjL2RvY2tlci1zcmMuMjAyMC0wNy0xNi0wOS41MS4yNy43MjcyOi92
-YXIvdG1wL3FlbXU6eixybycsICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAn
-dGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1m
-aWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0wZWU2M2E3YjlhOGU0MjNkYTk4OTdm
-ZTBkMTMyZTM5MgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVh
-dmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC14c3FtMTRhcy9zcmMn
-Cm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwg
-ICAgMTVtNTguMDMzcwp1c2VyICAgIDBtOC41NDNzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDcxNjEzMTEwMS4xODQ2Mi0xLXRodXRo
-QHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
-aGF0LmNvbQ==
+Hi Philippe,
+
+On Thu, Apr 23, 2020 at 12:08 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> On 4/23/20 11:33 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 4/23/20 11:01 AM, Geert Uytterhoeven wrote:
+> >> Make the PL061 GPIO controller user-creatable, and allow the user to t=
+ie
+> >> a newly created instance to a gpiochip on the host.
+> >>
+> >> To create a new GPIO controller, the QEMU command line must be augment=
+ed
+> >> with:
+> >>
+> >>     -device pl061,host=3D<gpiochip>
+> >>
+> >> with <gpiochip> the name or label of the gpiochip on the host.
+> >>
+> >> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+
+> >> --- a/hw/gpio/pl061.c
+> >> +++ b/hw/gpio/pl061.c
+> >> @@ -12,11 +12,14 @@
+> >>  #include "hw/arm/fdt.h"
+> >>  #include "hw/gpio/pl061.h"
+> >>  #include "hw/irq.h"
+> >> +#include "hw/qdev-properties.h"
+> >>  #include "hw/sysbus.h"
+> >>  #include "migration/vmstate.h"
+> >> +#include "qapi/error.h"
+> >>  #include "qemu/log.h"
+> >>  #include "qemu/module.h"
+> >>  #include "sysemu/device_tree.h"
+> >> +#include "sysemu/gpiodev.h"
+> >>
+> >>  //#define DEBUG_PL061 1
+> >>
+> >> @@ -41,6 +44,9 @@ static const uint8_t pl061_id_luminary[12] =3D
+> >>  typedef struct PL061State {
+> >>      SysBusDevice parent_obj;
+> >>
+> >> +#ifdef CONFIG_GPIODEV
+> >> +    char *host;
+> >> +#endif
+> >>      MemoryRegion iomem;
+> >>      uint32_t locked;
+> >>      uint32_t data;
+> >> @@ -370,10 +376,39 @@ static void pl061_init(Object *obj)
+> >>      qdev_init_gpio_out(dev, s->out, 8);
+> >>
+> >> +#ifdef CONFIG_GPIODEV
+> >> +static Property pl061_properties[] =3D {
+> >> +    DEFINE_PROP_STRING("host", PL061State, host),
+> >> +    DEFINE_PROP_END_OF_LIST(),
+> >> +};
+> >> +
+> >> +static void pl061_realize(DeviceState *dev, Error **errp)
+> >> +{
+> >> +    PL061State *s =3D PL061(dev);
+> >> +
+> >> +    if (!dev->opts) {
+> >> +        /* Not created by user */
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (!s->host) {
+> >> +        error_setg(errp, "'host' property is required");
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    qemu_gpiodev_add(dev, s->host, 8, errp);
+> >> +}
+> >> +#endif /* CONFIG_GPIODEV */
+> >> +
+> >>  static void pl061_class_init(ObjectClass *klass, void *data)
+> >>  {
+> >>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> >>
+> >> +#ifdef CONFIG_GPIODEV
+> >> +    device_class_set_props(dc, pl061_properties);
+> >> +    dc->realize =3D pl061_realize;
+> >> +    dc->user_creatable =3D true;
+> >> +#endif
+> >>      dc->vmsd =3D &vmstate_pl061;
+> >>      dc->reset =3D &pl061_reset;
+> >>  }
+> >> diff --git a/qemu-options.hx b/qemu-options.hx
+> >> index 292d4e7c0cef6097..182de7fb63923b38 100644
+> >> --- a/qemu-options.hx
+> >> +++ b/qemu-options.hx
+> >> @@ -875,6 +875,15 @@ SRST
+> >>  ``-device isa-ipmi-bt,bmc=3Did[,ioport=3Dval][,irq=3Dval]``
+> >>      Like the KCS interface, but defines a BT interface. The default p=
+ort
+> >>      is 0xe4 and the default interrupt is 5.
+> >> +
+> >> +#ifdef CONFIG_GPIODEV
+> >> +``-device pl061,host=3Dgpiochip``
+> >> +    Add a PL061 GPIO controller, and map its virtual GPIO lines to a =
+GPIO
+> >> +    controller on the host.
+> >> +
+> >> +    ``host=3Dgpiochip``
+> >> +        The name or label of the GPIO controller on the host.
+> >> +#endif
+> >>  ERST
+> >>
+> >>  DEF("name", HAS_ARG, QEMU_OPTION_name,
+> >>
+> >
+> > Instead of restricting this to the pl061, it would be cleaner you add a
+> > GPIO_PLUGGABLE_INTERFACE (or GPIO_BINDABLE_INTERFACE or better name),
+> > and have TYPE_PL061 implement it.
+>
+> IOW your backend should consume devices implementing this generic interfa=
+ce.
+
+Thanks for the suggestion! I had a look into implementing this.
+
+Please pardon my QEMU illiteracy, but I fail to see how adding an
+interface, and letting frontends like pl061.c implement it, will help:
+  - The backend never has to call directly into the frontend: all
+    communication is done indirectly, using existing core qemu irq and
+    qdev gpio calls.
+  - The frontend has to call into the backend once, at initialization
+    time, to pass the host=3D parameter, and the number of GPIOs supported
+    by the frontend (through qemu_gpiodev_add()).
+  - Generalizing host=3D parsing in the backend would be nice, to avoid
+    duplicating this in each and every frontend, but AFAIU, an interface
+    cannot use device_class_set_props(), as InterfaceClass is not
+    derived from DeviceClass.
+
+Note that when adding more features later (input support, and e.g.
+pull-up/down support), the frontend will have to call into the backend
+to change GPIO line configuration at runtime, but this is from frontend
+to backend again, not the other way around.
+
+I do agree that if we ever want to support multiple backends,
+implementing that through an interface (for the backend, not for the
+frontend) would be needed.
+
+What am I missing?
+Thanks again!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
