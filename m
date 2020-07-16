@@ -2,91 +2,80 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A04C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 15:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D79C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 15:21:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 621DA2063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 15:17:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aloKnxdS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 621DA2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EBFCC2063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 15:21:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBFCC2063A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw5d7-0007wD-M5
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 11:17:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59262)
+	id 1jw5hk-0000r9-8i
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 11:21:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jw5c8-0007Lh-G3
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 11:16:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44128
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jw5c6-0000lZ-VY
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 11:16:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594912558;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=WjY7NOu99wbZfIistdwo/+2Oj1lqFS/sV+H/SnbV2jU=;
- b=aloKnxdSi4liCehqjhUjHWeZ6ieJMKAIsI4XaVWYRJ2agUzrhp+MT0Mn2qtv75MY3tNaBt
- V8PgPrf/2SHYYPSOba0Do5V1cZ1bF2V8pkI47bISvoub8gCiBnJlUYAxWlink8eHyJPcc+
- O8Vn22LxYG6An7VtSOEOimrwcuhyEqs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-GbA_8CwUPEu-PA8sP131DA-1; Thu, 16 Jul 2020 11:15:56 -0400
-X-MC-Unique: GbA_8CwUPEu-PA8sP131DA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 686F2100AA34;
- Thu, 16 Jul 2020 15:15:55 +0000 (UTC)
-Received: from localhost (ovpn-119-232.rdu2.redhat.com [10.10.119.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2769717D04;
- Thu, 16 Jul 2020 15:15:54 +0000 (UTC)
-Date: Thu, 16 Jul 2020 11:15:54 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [PATCH 1/2] i386/cpu: Clear FEAT_XSAVE_COMP_{LO,HI} when XSAVE
- is not available
-Message-ID: <20200716151554.GL1274972@habkost.net>
-References: <20200716082019.215316-1-xiaoyao.li@intel.com>
- <20200716082019.215316-2-xiaoyao.li@intel.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jw5gj-0000QG-3k
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 11:20:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38650)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jw5gh-0001g5-9N
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 11:20:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jw5gf-00039j-ED
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 15:20:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 604A42E80EE
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 15:20:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200716082019.215316-2-xiaoyao.li@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 09:29:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 16 Jul 2020 15:10:47 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1887820@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+Message-Id: <159491224773.12693.8652306455816073039.malonedeb@soybean.canonical.com>
+Subject: [Bug 1887820] [NEW] TCG test targets missing from 'make check-help'
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: aad1456c5b016f003a71a6f49a11eed981c0f6dd
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 11:20:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,43 +84,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1887820 <1887820@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 16, 2020 at 04:20:18PM +0800, Xiaoyao Li wrote:
-> Per Intel SDM vol 1, 13.2, if CPUID.1:ECX.XSAVE[bit 26] is 0, the
-> processor provides no further enumeration through CPUID function 0DH.
+Public bug reported:
 
-Can you explain what's the bug you are trying to fix?
-env->features[FEAT_XSAVE_COMP_*] is already initialized as zero.
+We can run the TCG tests using:
 
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  target/i386/cpu.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 1e5123251d74..f5f11603e805 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -6261,6 +6261,8 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
->      uint64_t mask;
->  
->      if (!(env->features[FEAT_1_ECX] & CPUID_EXT_XSAVE)) {
-> +        env->features[FEAT_XSAVE_COMP_LO] = 0;
-> +        env->features[FEAT_XSAVE_COMP_HI] = 0;
->          return;
->      }
->  
-> -- 
-> 2.18.4
-> 
+$ make run-tcg-tests-$TARGET-softmmu
 
--- 
-Eduardo
+This is not listed in 'make check-help'.
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1887820
+
+Title:
+  TCG test targets missing from 'make check-help'
+
+Status in QEMU:
+  New
+
+Bug description:
+  We can run the TCG tests using:
+
+  $ make run-tcg-tests-$TARGET-softmmu
+
+  This is not listed in 'make check-help'.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1887820/+subscriptions
 
