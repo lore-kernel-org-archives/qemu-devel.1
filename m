@@ -2,113 +2,70 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C8EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4BCC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C229C206F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:47:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iujwCyjF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C229C206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A7C21206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 14:43:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7C21206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw5Ab-0000NH-38
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:47:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49148)
+	id 1jw56H-0003vM-Uc
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 10:43:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jw59Y-0007Vo-DQ
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:46:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33171
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jw59W-0000aQ-RR
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:46:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594910786;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7DelS5N2dTTJuyl7q6v4yf6hEXAdzfevBgyZFcGL9W4=;
- b=iujwCyjF82/lCwIeCsIgGASjXzQ2+u1/1Z/urBiWF0YUiV9o1ok7EBf/qZlMwUZnnIoaHg
- Gw+l5rtSktVPZrS/dQLo8AA3AYYvTQKI46bplcXKdpeP8LBIhDcAl5My4h3q5PMgsqLaPu
- qJyltrwPOk3uE9ZorielK8T3Tq+bVEY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-8dleW9RyNCOVg4AxRO7-Hw-1; Thu, 16 Jul 2020 10:46:22 -0400
-X-MC-Unique: 8dleW9RyNCOVg4AxRO7-Hw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41443106B276;
- Thu, 16 Jul 2020 14:46:06 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-160.ams2.redhat.com
- [10.36.112.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0053710013D0;
- Thu, 16 Jul 2020 14:46:04 +0000 (UTC)
-Subject: Re: [PATCH v7 01/47] block: Add child access functions
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-2-mreitz@redhat.com>
- <12e568be-f931-fc16-0ca2-a7ec54e538ea@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6a40dbf6-5756-8483-680b-23916a6a962b@redhat.com>
-Date: Thu, 16 Jul 2020 16:46:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jw55e-0003Pd-T9
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:42:26 -0400
+Received: from 1.mo6.mail-out.ovh.net ([46.105.56.136]:43809)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jw55b-0008H9-6W
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 10:42:26 -0400
+Received: from player798.ha.ovh.net (unknown [10.110.171.173])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 7D1EA21FA6C
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 16:42:12 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player798.ha.ovh.net (Postfix) with ESMTPSA id B83481481743B;
+ Thu, 16 Jul 2020 14:42:01 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G002bf28cd65-9b19-4f5a-91ad-9c4e97feb9ee,82226C5D462F885DC4F8BFF1B5769E1A03475668)
+ smtp.auth=groug@kaod.org
+Date: Thu, 16 Jul 2020 16:42:00 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] spapr_pci: Robustify support of PCI bridges
+Message-ID: <20200716164200.2bea2977@bahia.lan>
+In-Reply-To: <87eepbmudt.fsf@dusky.pond.sub.org>
+References: <159431476748.407044.16711294833569014964.stgit@bahia.lan>
+ <20200716044540.GL93134@umbus.fritz.box>
+ <87eepbmudt.fsf@dusky.pond.sub.org>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <12e568be-f931-fc16-0ca2-a7ec54e538ea@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 19:36:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7441072487532697998
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfeeggdektdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=46.105.56.136; envelope-from=groug@kaod.org;
+ helo=1.mo6.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 10:42:13
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -122,129 +79,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww
-Content-Type: multipart/mixed; boundary="agDegy1On7lw5PhEzEALwnIQ4t4qjedoZ"
+On Thu, 16 Jul 2020 16:01:18 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
---agDegy1On7lw5PhEzEALwnIQ4t4qjedoZ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> David Gibson <david@gibson.dropbear.id.au> writes:
+> 
+> > On Thu, Jul 09, 2020 at 07:12:47PM +0200, Greg Kurz wrote:
+> >> Some recent error handling cleanups unveiled issues with our support of
+> >> PCI bridges:
+> >> 
+> >> 1) QEMU aborts when using non-standard PCI bridge types,
+> >>    unveiled by commit 7ef1553dac "spapr_pci: Drop some dead error handling"
+> >> 
+> >> $ qemu-system-ppc64 -M pseries -device pcie-pci-bridge
+> >> Unexpected error in object_property_find() at qom/object.c:1240:
+> >> qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not found
+> >> Aborted (core dumped)
+> >
+> > Oops, I thought we had a check that we actually had a "pci-bridge"
+> > device before continuing with the hotplug, but I guess not.
+> >
+> >> This happens because we assume all PCI bridge types to have a "chassis_nr"
+> >> property. This property only exists with the standard PCI bridge type
+> >> "pci-bridge" actually. We could possibly revert 7ef1553dac but it seems
+> >> much simpler to check the presence of "chassis_nr" earlier.
+> >
+> > Hrm, right, 7ef1553dac was not really correct since add_drcs() really
+> > can fail.
+> 
+> Right.  I failed to see that we can run into a bridge without a
+> "chassis_nr" here.
+> 
+> >> 2) QEMU abort if same "chassis_nr" value is used several times,
+> >>    unveiled by commit d2623129a7de "qom: Drop parameter @errp of
+> >>    object_property_add() & friends"
+> >> 
+> >> $ qemu-system-ppc64 -M pseries -device pci-bridge,chassis_nr=1 \
+> >>                         -device pci-bridge,chassis_nr=1
+> >> Unexpected error in object_property_try_add() at qom/object.c:1167:
+> >> qemu-system-ppc64: -device pci-bridge,chassis_nr=1: attempt to add duplicate property '40000100' to object (type 'container')
+> >> Aborted (core dumped)
+> 
+> Before d2623129a7de, the error got *ignored* in
+> spapr_dr_connector_new():
+> 
+>     SpaprDrc *spapr_dr_connector_new(Object *owner, const char *type,
+>                                              uint32_t id)
+>     {
+>         SpaprDrc *drc = SPAPR_DR_CONNECTOR(object_new(type));
+>         char *prop_name;
+> 
+>         drc->id = id;
+>         drc->owner = owner;
+>         prop_name = g_strdup_printf("dr-connector[%"PRIu32"]",
+>                                     spapr_drc_index(drc));
+>         object_property_add_child(owner, prop_name, OBJECT(drc), &error_abort);
+>         object_unref(OBJECT(drc));
+> --->    object_property_set_bool(OBJECT(drc), true, "realized", NULL);
+>         g_free(prop_name);
+> 
+>         return drc;
+>     }
+> 
+> I doubt that's healthy.
+> 
 
-On 13.07.20 11:06, Vladimir Sementsov-Ogievskiy wrote:
-> 25.06.2020 18:21, Max Reitz wrote:
->> There are BDS children that the general block layer code can access,
->> namely bs->file and bs->backing.=C2=A0 Since the introduction of filters=
- and
->> external data files, their meaning is not quite clear.=C2=A0 bs->backing=
- can
->> be a COW source, or it can be a filtered child; bs->file can be a
->> filtered child, it can be data and metadata storage, or it can be just
->> metadata storage.
->>
->> This overloading really is not helpful.=C2=A0 This patch adds functions =
-that
->> retrieve the correct child for each exact purpose.=C2=A0 Later patches i=
-n
->> this series will make use of them.=C2=A0 Doing so will allow us to handl=
-e
->> filter nodes in a meaningful way.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->=20
-> [..]
->=20
->> +/*
->> + * Return the primary child of this node: For filters, that is the
->> + * filtered child.=C2=A0 For other nodes, that is usually the child sto=
-ring
->> + * metadata.
->> + * (A generally more helpful description is that this is (usually) the
->> + * child that has the same filename as @bs.)
->> + *
->> + * Drivers do not necessarily have a primary child; for example quorum
->> + * does not.
->> + */
->> +BdrvChild *bdrv_primary_child(BlockDriverState *bs)
->> +{
->> +=C2=A0=C2=A0=C2=A0 BdrvChild *c;
->> +
->> +=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(c, &bs->children, next) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (c->role & BDRV_CHILD_PRI=
-MARY) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn c;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 return NULL;
->> +}
->>
->=20
-> Suggest squash-in to also assert that not more than one primary child:
-> --- a/block.c
-> +++ b/block.c
-> @@ -6998,13 +6998,14 @@ BdrvChild
-> *bdrv_filter_or_cow_child(BlockDriverState *bs)
-> =C2=A0 */
-> =C2=A0BdrvChild *bdrv_primary_child(BlockDriverState *bs)
-> =C2=A0{
-> -=C2=A0=C2=A0=C2=A0 BdrvChild *c;
-> +=C2=A0=C2=A0=C2=A0 BdrvChild *c, *found =3D NULL;
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(c, &bs->children, next) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (c->role & BDRV_CHILD=
-_PRIMARY) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retur=
-n c;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 asser=
-t(!found);
+This isn't. The object_property_set_bool() was later converted to
+qdev_realize() (thanks again for the cleanups!) but the problem
+remains. Realize can fail and I see now reason we don't do proper
+error handling when it comes to the DRCs.
 
-Hm, why not.
+I'll look into fixing that.
 
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 found=
- =3D c;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0 return NULL;
-> +=C2=A0=C2=A0=C2=A0 return c;
-> =C2=A0}
->=20
->=20
-> with or without:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >> This happens because we assume that "chassis_nr" values are unique, but
+> >> nobody enforces that and we end up generating duplicate DRC ids. The PCI
+> >> code doesn't really care for duplicate "chassis_nr" properties since it
+> >> is only used to initialize the "Chassis Number Register" of the bridge,
+> >> with no functional impact on QEMU. So, even if passing the same value
+> >> several times might look weird, it never broke anything before, so
+> >> I guess we don't necessarily want to enforce strict checking in the PCI
+> >> code now.
+> >
+> > Yeah, I guess.  I'm pretty sure that the chassis number of bridges is
+> > supposed to be system-unique (well, unique within the PCI domain at
+> > least, I guess) as part of the hardware spec.  So specifying multiple
+> > chassis ids the same is a user error, but we need a better failure
+> > mode.
+> >
+> >> Workaround both issues in the PAPR code: check that the bridge has a
+> >> unique and non null "chassis_nr" when plugging it into its parent bus.
+> >>
+> >> Fixes: 05929a6c5dfe ("spapr: Don't use bus number for building DRC ids")
+> >
+> > Arguably, it's really fixing 7ef1553dac.
+> 
+> I agree 7ef1553dac broke the "use a bridge that doesn't have property
+> 'chassis_nr' case.
+> 
+> I suspect the "duplicate chassis_nr" case has always been broken, and
+> d2623129a7de merely uncovered it.
+> 
 
-In any case, thanks for reviewing!
+Yes.
 
-Max
+> If we can trigger the abort with hot-plug, then d2623129a7de made things
+> materially worse (new way to accidentally kill your guest and maybe lose
+> data), and I'd add a Fixes: blaming it.
+> 
 
+Yes it does.
 
---agDegy1On7lw5PhEzEALwnIQ4t4qjedoZ--
+David,
 
---fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Maybe consider folding a third Fixes: tag into this patch ?
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8QaCsACgkQ9AfbAGHV
-z0BbQwf+Prf2dHfnnpHeHpvU9TxshsvIw4u89cyi8q+D208LAEYPFnpNxCPiBfQP
-zkkzWYRdb0yP21s8fZ874lX4yZ+z0dVU0wTYRJ2SRUOrGhrTbcLVqhmXAaTzX3Jr
-BBQTgZ2SB1jUZOVQBDWpepUsZbE+9FLbvlApowchT8Eee7Sf9VbdwuU0i1aGKI9L
-LX4wHnt4dxqKyNZMxmDKSeVwrSv/LOf3k0w7K9NKNPoa+Zi5wBiJe8YEkePUivOn
-Xw5ZPtlDPg4H2aLz03320t5eYRF00IFelSh5JTk9gCqKySU+OZb21p4j0qFsPobz
-ajM63uJDv1fUfZyDfW90WWQOVlHpeA==
-=MWap
------END PGP SIGNATURE-----
-
---fZr1TwGfLawxLkZabN9s0YGCnkQNZhFww--
+> >> Reported-by: Thomas Huth <thuth@redhat.com>
+> >> Signed-off-by: Greg Kurz <groug@kaod.org>
+> >
+> > I had a few misgivings about the details of this, but I think I've
+> > convinced myself they're fine.  There's a couple of things I'd like to
+> > polish, but I'll do that as a follow up.
+> 
 
 
