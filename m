@@ -8,77 +8,76 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB86C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E1EC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:42:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA09F2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0ACA420760
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:42:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+Yx74g8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA09F2074B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iVIxF69w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ACA420760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw1KL-0007dV-5r
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:41:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33632)
+	id 1jw1L0-0008NQ-Bk
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:42:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jw1JI-0006eo-H9
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:40:16 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:44512)
+ id 1jw1Jt-0007LC-64
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:40:53 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:34023)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1jw1JF-0003My-Tg
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:40:16 -0400
-Received: by mail-ed1-x541.google.com with SMTP id by13so4380711edb.11
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 03:40:13 -0700 (PDT)
+ id 1jw1Jp-0003iu-B7
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:40:52 -0400
+Received: by mail-ed1-x543.google.com with SMTP id a8so4423495edy.1
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 03:40:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=BLHxOCRJ+LZvJUFw52do8TbtBNrpQqvhUB8Ij75kU6M=;
- b=l+Yx74g87rpxCtZV10gqmG8A820LV1KGyYgMswvO8PAwUEjCd3aebxWmNQpdEh4oTS
- PUbeBtH8gcJrXUWxWpoWGXVf6zqONu8Up6agUzujJzf4uvJqVVslw3zO7m5rZyGvlTvN
- 1yKQ0NWKVOy9PRWWGVJqTZpyy2uwdjFgWU7axMOh4ec9bCjtTORBiIMrIwN1WJKkpKVM
- nRM7qD0tnsvhLO6ngrXPXuMoqhP0BMNVNitScozEn0p5G4gdSmq+OWQd23FjRJMz3GQ0
- koEaYNAakYflizmzEoUvSzZNQe2NUsAAgboKSWbxfaRXMD49Kvl3PJpsUbL7R8vbLxEN
- oNUQ==
+ bh=CkBQjPpokRRSOD3d3LoQgCJvGglsJwGJes84iBBLdZI=;
+ b=iVIxF69wwyaDb3mTXmEE9mxKCjNe2ATDQQxGGXFWeZXDdZMzGpC6LsH9PneEGcGbv4
+ 6jqQcqXXuY7PhY9nE5z4TbnXzvZxjucgdfEsE4001IVivKrzhigBDKjwoMUrRG0KIvSH
+ a0cO46KvvinfL8395nGmp0PNg4IT/km6SV3F0SoYhP2yFJqMxxVPFiTdxbFGs7PjZQpE
+ 84OcyKvzldXIvKpwHzunCXFS+WObM6XTl975xE9nfDb0YM+rKWe5lqls6U9tvJQjUgDS
+ VkC+d74iKQ++BwDQijUE6MrWJRoV0BRmryJyfMbyAj3ukkUrr1G1gx88gRfVUtnlSrhT
+ sYEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=BLHxOCRJ+LZvJUFw52do8TbtBNrpQqvhUB8Ij75kU6M=;
- b=DSpw1llO8qlRLKi0azvSs5bRg3A7je9a0Y4A7pfsa1MtbnWMHu3aE2y+rSLNvbViRR
- zUf7RivchQLkpAsz56jx+CcR9YHOFuaNbR6fpwNfUk13uGeebjWOZaHQEsDLZtcFY1n1
- o/ZQKHnDfeA7jjKFOrf/D6UKScOuxiJT9cigEegfSTXboRkn5YK4QQLmMakQj4Z8P0tX
- W61zwVLeAJMsW1smsP/xFR7TRSDm7XuWVJsjC7wQwwmxLHYL587EEZtO7NCiU5yEZHyy
- XxjRT0Gl6eEexbNcO3nxFRG+nHLbqQwlgIZ7JNWglvZw1C6fn4Rk1P8H58XxkdhG9E48
- Gp5w==
-X-Gm-Message-State: AOAM533pTGEUoEodnzmbjHX9Vv5HNolOTq6UeZFcqAQ1QUojCHjJjrIV
- Yqx/QLNG2P1MoBHCe7Z80E/t7spw
-X-Google-Smtp-Source: ABdhPJzK7DdqOa0ev61scA8mKGjBfil7gt8x5GmvU/Zb4kqtPCzSEW1m8DUg2aLN+gBwpAi1an+NvA==
-X-Received: by 2002:a05:6402:363:: with SMTP id
- s3mr3756560edw.238.1594896011630; 
- Thu, 16 Jul 2020 03:40:11 -0700 (PDT)
+ bh=CkBQjPpokRRSOD3d3LoQgCJvGglsJwGJes84iBBLdZI=;
+ b=lfeyooA7LVWfK5b1qpRSKiv0axVV5mSmHCvb+LiCcOXwqQaVQrs+UGR1iEQikV/Q4d
+ OJ7/r7NqswzgtdK7jwcRMjNl6SdXCKpmy062kSa1bQ0ikJri6szWOk3X9omtBh9NUqSM
+ C5tt09RBQOQCOrnP4ULUcauDvtluCtbTNTaesn5iNfNJhFx3aYwv5qrYFOKdVn9PzFAk
+ 0cEdxCaqe2OvSJqXoBbsleCdp8R1zqqv2Ag3/OYQM62W1HySuQMoYoBRcK56rg6ii5Px
+ jgQefuk6ewM713i9RMef2/sMK5K2DqlFCunu5T+oxSwonclCMlzBwvKplVcyYOj89ZVE
+ I9Ng==
+X-Gm-Message-State: AOAM531utR/QCtrm9PnRzO+OrO94TLJXs9T71Y+B/g2xyu1CvxuTrbCA
+ rLn98CNY/OxZUJkhy56hLuPH8qM7
+X-Google-Smtp-Source: ABdhPJw4GKx0xDZ1St+uhszMmzdarSVT4/s4CF7Zf52qSkOK87I5KVcoJwXRwaAMsuR70uKnGc4iwg==
+X-Received: by 2002:a50:e801:: with SMTP id e1mr3736751edn.251.1594896047535; 
+ Thu, 16 Jul 2020 03:40:47 -0700 (PDT)
 Received: from localhost.localdomain ([197.58.201.14])
- by smtp.gmail.com with ESMTPSA id w8sm4707892ejb.10.2020.07.16.03.39.40
+ by smtp.gmail.com with ESMTPSA id w8sm4707892ejb.10.2020.07.16.03.40.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jul 2020 03:40:11 -0700 (PDT)
+ Thu, 16 Jul 2020 03:40:47 -0700 (PDT)
 From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
 To: qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com, philmd@redhat.com,
  alex.bennee@linaro.org, eblake@redhat.com, ldoktor@redhat.com,
  rth@twiddle.net, ehabkost@redhat.com, crosa@redhat.com
-Subject: [PATCH v2 1/2] scripts/performance: Add list_fn_callees.py script
-Date: Thu, 16 Jul 2020 12:39:20 +0200
-Message-Id: <20200716103921.6605-2-ahmedkhaledkaraman@gmail.com>
+Subject: [PATCH v2 2/2] scripts/performance: Add list_helpers.py script
+Date: Thu, 16 Jul 2020 12:39:21 +0200
+Message-Id: <20200716103921.6605-3-ahmedkhaledkaraman@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200716103921.6605-1-ahmedkhaledkaraman@gmail.com>
 References: <20200716103921.6605-1-ahmedkhaledkaraman@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-ed1-x541.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,63 +104,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Python script that prints the callees of a given list of QEMU
-functions.
+Python script that prints executed helpers of a QEMU invocation.
 
 Syntax:
-list_fn_callees.py [-h] -f FUNCTION [FUNCTION ...] -- \
+list_helpers.py [-h] -- \
                <qemu executable> [<qemu executable options>] \
                <target executable> [<target executable options>]
 
 [-h] - Print the script arguments help message.
--f FUNCTION [FUNCTION ...] - List of function names
 
 Example of usage:
-list_fn_callees.py -f helper_float_sub_d helper_float_mul_d -- \
-                      qemu-mips coulomb_double-mips -n10
+list_helpers.py -- qemu-mips coulomb_double-mips -n10
 
 Example output:
- Total number of instructions: 108,952,851
+ Total number of instructions: 108,933,695
 
- Callees of helper_float_sub_d:
+ Executed QEMU Helpers:
 
- No. Instructions Percentage  Calls Ins/Call Function Name Source File
- --- ------------ ---------- ------ -------- ------------- ---------------
-   1      153,160     0.141%  1,305     117  float64_sub   <qemu>/fpu/softfloat.c
-
- Callees of helper_float_mul_d:
-
- No. Instructions Percentage  Calls Ins/Call Function Name Source File
- --- ------------ ---------- ------ -------- ------------- ---------------
-   1      131,137     0.120%  1,014      129 float64_mul   <qemu>/fpu/softfloat.c
+ No. Ins     Percent  Calls Ins/Call Helper Name             Source File
+ --- ------- ------- ------ -------- --------------------    ---------------
+   1 183,021  0.168%  1,305      140 helper_float_sub_d      <qemu>/target/mips/fpu_helper.c
+   2 177,111  0.163%    770      230 helper_float_madd_d     <qemu>/target/mips/fpu_helper.c
+   3 171,537  0.157%  1,014      169 helper_float_mul_d      <qemu>/target/mips/fpu_helper.c
+   4 157,298  0.144%  2,443       64 helper_lookup_tb_ptr    <qemu>/accel/tcg/tcg-runtime.c
+   5 138,123  0.127%    897      153 helper_float_add_d      <qemu>/target/mips/fpu_helper.c
+   6  47,083  0.043%    207      227 helper_float_msub_d     <qemu>/target/mips/fpu_helper.c
+   7  24,062  0.022%    487       49 helper_cmp_d_lt         <qemu>/target/mips/fpu_helper.c
+   8  22,910  0.021%    150      152 helper_float_div_d      <qemu>/target/mips/fpu_helper.c
+   9  15,497  0.014%    321       48 helper_cmp_d_eq         <qemu>/target/mips/fpu_helper.c
+  10   9,100  0.008%     52      175 helper_float_trunc_w_d  <qemu>/target/mips/fpu_helper.c
+  11   7,059  0.006%     10      705 helper_float_sqrt_d     <qemu>/target/mips/fpu_helper.c
+  12   3,000  0.003%     40       75 helper_cmp_d_ule        <qemu>/target/mips/fpu_helper.c
+  13   2,720  0.002%     20      136 helper_float_cvtd_w     <qemu>/target/mips/fpu_helper.c
+  14   2,477  0.002%     27       91 helper_swl              <qemu>/target/mips/op_helper.c
+  15   2,000  0.002%     40       50 helper_cmp_d_le         <qemu>/target/mips/fpu_helper.c
+  16   1,800  0.002%     40       45 helper_cmp_d_un         <qemu>/target/mips/fpu_helper.c
+  17   1,164  0.001%     12       97 helper_raise_exception_ <qemu>/target/mips/op_helper.c
+  18     720  0.001%     10       72 helper_cmp_d_ult        <qemu>/target/mips/fpu_helper.c
+  19     560  0.001%    140        4 helper_cfc1             <qemu>/target/mips/fpu_helper.c
 
 Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
 ---
- scripts/performance/list_fn_callees.py | 228 +++++++++++++++++++++++++
- 1 file changed, 228 insertions(+)
- create mode 100755 scripts/performance/list_fn_callees.py
+ scripts/performance/list_helpers.py | 207 ++++++++++++++++++++++++++++
+ 1 file changed, 207 insertions(+)
+ create mode 100755 scripts/performance/list_helpers.py
 
-diff --git a/scripts/performance/list_fn_callees.py b/scripts/performance/list_fn_callees.py
+diff --git a/scripts/performance/list_helpers.py b/scripts/performance/list_helpers.py
 new file mode 100755
-index 0000000000..f0ec5c8e81
+index 0000000000..a97c7ed4fe
 --- /dev/null
-+++ b/scripts/performance/list_fn_callees.py
-@@ -0,0 +1,228 @@
++++ b/scripts/performance/list_helpers.py
+@@ -0,0 +1,207 @@
 +#!/usr/bin/env python3
 +
-+#  Print the callees of a given list of QEMU functions.
++#  Print the executed helpers of a QEMU invocation.
 +#
 +#  Syntax:
-+#  list_fn_callees.py [-h] -f FUNCTION [FUNCTION ...] -- \
++#  list_helpers.py [-h] -- \
 +#                 <qemu executable> [<qemu executable options>] \
 +#                 <target executable> [<target executable options>]
 +#
 +#  [-h] - Print the script arguments help message.
-+#  -f FUNCTION [FUNCTION ...] - List of function names
 +#
 +#  Example of usage:
-+#  list_fn_callees.py -f helper_float_sub_d helper_float_mul_d -- \
-+#                        qemu-mips coulomb_double-mips
++#  list_helpers.py -- qemu-mips coulomb_double-mips
 +#
 +#  This file is a part of the project "TCG Continuous Benchmarking".
 +#
@@ -188,72 +194,61 @@ index 0000000000..f0ec5c8e81
 +import tempfile
 +
 +
-+def find_function_lines(function_name, callgrind_data):
++def find_JIT_line(callgrind_data):
 +    """
-+    Search for the line with the function name in the
-+    callgrind_annotate output when ran using --tre=calling.
-+    All the function callees should be listed after that line.
++    Search for the line with the JIT call in the callgrind_annotate
++    output when ran using --tre=calling.
++    All the helpers should be listed after that line.
 +
 +    Parameters:
-+    function_name (string): The desired function name to print its callees
 +    callgrind_data (list): callgrind_annotate output
 +
 +    Returns:
-+    (list): List of function line numbers
++    (int): Line number of JIT call
 +    """
-+    lines = []
++    line = -1
 +    for i in range(len(callgrind_data)):
 +        split_line = callgrind_data[i].split()
 +        if len(split_line) > 2 and \
 +                split_line[1] == "*" and \
-+                split_line[2].split(":")[-1] == function_name:
-+            # Function might be in the callgrind_annotate output more than
-+            # once, so don't break after finding an instance
-+            if callgrind_data[i + 1] != "\n":
-+                # Only append the line number if the found instance has
-+                # callees
-+                lines.append(i)
-+    return lines
++                split_line[-1] == "[???]":
++            line = i
++            break
++    return line
 +
 +
-+def get_function_calles(function_lines, callgrind_data):
++def get_helpers(JIT_line, callgrind_data):
 +    """
-+    Get all callees data for a function given its list of line numbers in
-+    callgrind_annotate output.
++    Get all helpers data given the line number of the JIT call.
 +
 +    Parameters:
-+    function_lines (list): Line numbers of the function to get its callees
++    JIT_line (int): Line number of the JIT call
 +    callgrind_data (list): callgrind_annotate output
 +
 +    Returns:
-+    (list):[[number_of_instructions(int), callee_name(str),
++    (list):[[number_of_instructions(int), helper_name(str),
 +             number_of_calls(int), source_file(str)]]
 +    """
-+    callees = []
-+    for function_line in function_lines:
-+        next_callee = function_line + 1
-+        while (callgrind_data[next_callee] != "\n"):
-+            split_line = callgrind_data[next_callee].split()
-+            number_of_instructions = int(split_line[0].replace(",", ""))
-+            source_file = split_line[2].split(":")[0]
-+            callee_name = split_line[2].split(":")[1]
-+            number_of_calls = int(split_line[3][1:-2])
-+            callees.append([number_of_instructions, callee_name,
-+                            number_of_calls, source_file])
-+            next_callee += 1
-+    return sorted(callees, reverse=True)
++    helpers = []
++    next_helper = JIT_line + 1
++    while (callgrind_data[next_helper] != "\n"):
++        split_line = callgrind_data[next_helper].split()
++        number_of_instructions = int(split_line[0].replace(",", ""))
++        source_file = split_line[2].split(":")[0]
++        callee_name = split_line[2].split(":")[1]
++        number_of_calls = int(split_line[3][1:-2])
++        helpers.append([number_of_instructions, callee_name,
++                        number_of_calls, source_file])
++        next_helper += 1
++    return sorted(helpers, reverse=True)
 +
 +
 +def main():
 +    # Parse the command line arguments
 +    parser = argparse.ArgumentParser(
-+        usage="list_fn_callees.py [-h] -f FUNCTION [FUNCTION ...] -- "
++        usage="list_helpers.py [-h] -- "
 +        "<qemu executable> [<qemu executable options>] "
 +        "<target executable> [<target executable options>]")
-+
-+    parser.add_argument("-f", dest="function", type=str,
-+                        nargs="+", required=True,
-+                        help="list of function names to print their callees")
 +
 +    parser.add_argument("command", type=str, nargs="+", help=argparse.SUPPRESS)
 +
@@ -261,7 +256,6 @@ index 0000000000..f0ec5c8e81
 +
 +    # Extract the needed variables from the args
 +    command = args.command
-+    function_names = args.function
 +
 +    # Insure that valgrind is installed
 +    check_valgrind = subprocess.run(
@@ -313,64 +307,57 @@ index 0000000000..f0ec5c8e81
 +        # Remove commas and convert to int
 +        total_instructions = int(total_instructions.replace(",", ""))
 +
-+        for function_name in function_names:
-+            # Line numbers with the desired function
-+            function_lines = find_function_lines(function_name, callgrind_data)
++        # Line number with the JIT call
++        JIT_line = find_JIT_line(callgrind_data)
++        if JIT_line == -1:
++            sys.exit("Couldn't locate the JIT call ... Exiting")
 +
-+            if len(function_lines) == 0:
-+                print("Couldn't locate function: {}.\n".format(
-+                    function_name))
-+                continue
++        # Get helpers
++        helpers = get_helpers(JIT_line, callgrind_data)
 +
-+            # Get function callees
-+            function_callees = get_function_calles(
-+                function_lines, callgrind_data)
++        print("Executed QEMU Helpers:\n")
 +
-+            print("Callees of {}:\n".format(function_name))
++        # Print table header
++        print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
++              format(
++                  "No.",
++                  "Instructions",
++                  "Percentage",
++                  "Calls",
++                  "Ins/Call",
++                  "Helper Name",
++                  "Source File")
++              )
 +
-+            # Print table header
-+            print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
++        print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
++              format(
++                  "-" * 4,
++                  "-" * 15,
++                  "-" * 10,
++                  "-" * 15,
++                  "-" * 10,
++                  "-" * 25,
++                  "-" * 30)
++              )
++
++        for (index, callee) in enumerate(helpers, start=1):
++            instructions = callee[0]
++            percentage = (callee[0] / total_instructions) * 100
++            calls = callee[2]
++            instruction_per_call = int(callee[0] / callee[2])
++            helper_name = callee[1]
++            source_file = callee[3]
++            # Print extracted data
++            print("{:>4}  {:>15}  {:>9.3f}%  {:>15}  {:>10}  {:<25}  {}".
 +                  format(
-+                      "No.",
-+                      "Instructions",
-+                      "Percentage",
-+                      "Calls",
-+                      "Ins/Call",
-+                      "Function Name",
-+                      "Source File")
++                      index,
++                      format(instructions, ","),
++                      round(percentage, 3),
++                      format(calls, ","),
++                      format(instruction_per_call, ","),
++                      helper_name,
++                      source_file)
 +                  )
-+
-+            print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
-+                  format(
-+                      "-" * 4,
-+                      "-" * 15,
-+                      "-" * 10,
-+                      "-" * 15,
-+                      "-" * 10,
-+                      "-" * 25,
-+                      "-" * 30)
-+                  )
-+
-+            for (index, callee) in enumerate(function_callees, start=1):
-+                instructions = callee[0]
-+                percentage = (callee[0] / total_instructions) * 100
-+                calls = callee[2]
-+                instruction_per_call = int(callee[0] / callee[2])
-+                function_name = callee[1]
-+                source_file = callee[3]
-+                # Print extracted data
-+                print("{:>4}  {:>15}  {:>9.3f}%  {:>15}  {:>10}  {:<25}  {}".
-+                      format(
-+                          index,
-+                          format(instructions, ","),
-+                          round(percentage, 3),
-+                          format(calls, ","),
-+                          format(instruction_per_call, ","),
-+                          function_name,
-+                          source_file)
-+                      )
-+
-+            print("\n")
 +
 +
 +if __name__ == "__main__":
