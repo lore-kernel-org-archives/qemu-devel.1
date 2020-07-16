@@ -2,83 +2,69 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54704C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 19:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA55C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 19:42:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B5E92074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 19:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DEAD52074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 19:42:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DZKUo+Ae"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5E92074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Nn08U9gs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEAD52074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw9Wj-0002v4-E3
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 15:26:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44924)
+	id 1jw9mE-0005r6-MC
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 15:42:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jw9Vv-0002GZ-7Z
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 15:25:51 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29417
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jw9Vs-0008B3-8f
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 15:25:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594927546;
+ (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
+ id 1jw9je-0005FF-LF
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 15:40:02 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:36864)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
+ id 1jw9jc-0002j8-IQ
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 15:40:02 -0400
+Received: from michell-laptop.bar.greensocs.com (unknown [172.17.10.6])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 368B0219CA;
+ Thu, 16 Jul 2020 19:39:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1594928397;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding;
- bh=ILiSAWPYTAj500OLNEREcWbB1f5alUvLXGyo4Skrp8k=;
- b=DZKUo+AeCrzJiXS6lWAfmuYOOgbmwVBIxfKegh7AIMP8gejXyFiN8hE0ye0jkJd0kRZYQ+
- OcVVOn38M0Xxln+JObv4jrSTDidzZGSoikgo2o59dljtZ0U+ebjbAN1qqO/Irzz/erBtC/
- iEGIV15gTACmCEJcUR37kN/7H1Q0N+I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-fRJXseWGM0ecwVTwxHIwzw-1; Thu, 16 Jul 2020 15:25:44 -0400
-X-MC-Unique: fRJXseWGM0ecwVTwxHIwzw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 865BA803059;
- Thu, 16 Jul 2020 19:25:42 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.192.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D5BB378479;
- Thu, 16 Jul 2020 19:25:39 +0000 (UTC)
-From: P J P <ppandit@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: [PATCH] net: check payload length limit for all frames
-Date: Fri, 17 Jul 2020 00:53:35 +0530
-Message-Id: <20200716192335.1212638-1-ppandit@redhat.com>
+ bh=8yKJ3PFfRI1+4hdxMcLpTHdA+dqcY8u/Hk+IgJron20=;
+ b=Nn08U9gskGvg6smP/O8ft5DnS3ptuncHzyICAaPYg7i4TUiaNGGUg3egxQckIv3moBk/bV
+ r+7APE2D3gcXyRmCzq7j4ZGDcvB+7TowZRuxQ0oapsFBLvREiOCPvcMEW9VEHb+xa2+X0i
+ h0h75GljY9fz6oSF5gOk4fExOOvQrw8=
+From: Luc Michel <luc.michel@greensocs.com>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
+Subject: [PATCH v2] tcg/cpu-exec: precise single-stepping after an exception
+Date: Thu, 16 Jul 2020 21:39:47 +0200
+Message-Id: <20200716193947.3058389-1-luc.michel@greensocs.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 13:59:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=5.135.226.135;
+ envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 15:39:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,50 +77,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+When single-stepping with a debugger attached to QEMU, and when an
+exception is raised, the debugger misses the first instruction after the
+exception:
 
-While sending packets, the check that packet 'payload_len'
-is within 64kB limit, seems to happen only for GSO frames.
-It may lead to use-after-free or out-of-bounds access like
-issues when sending non-GSO frames. Check the 'payload_len'
-limit for all packets, irrespective of the gso type.
+$ qemu-system-aarch64 -M virt -display none -cpu cortex-a53 -s -S
 
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+$ aarch64-linux-gnu-gdb
+GNU gdb (GDB) 9.2
+[...]
+(gdb) tar rem :1234
+Remote debugging using :1234
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x0000000000000000 in ?? ()
+(gdb) # writing nop insns to 0x200 and 0x204
+(gdb) set *0x200 = 0xd503201f
+(gdb) set *0x204 = 0xd503201f
+(gdb) # 0x0 address contains 0 which is an invalid opcode.
+(gdb) # The CPU should raise an exception and jump to 0x200
+(gdb) si
+0x0000000000000204 in ?? ()
+
+With this commit, the same run steps correctly on the first instruction
+of the exception vector:
+
+(gdb) si
+0x0000000000000200 in ?? ()
+
+Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- hw/net/net_tx_pkt.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+v2:
+  - remove RFC tag
+  - inline the recursive call to cpu_handle_exception [Richard]
+---
+ accel/tcg/cpu-exec.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
-index 162f802dd7..e66998a8f9 100644
---- a/hw/net/net_tx_pkt.c
-+++ b/hw/net/net_tx_pkt.c
-@@ -607,12 +607,10 @@ bool net_tx_pkt_send(struct NetTxPkt *pkt, NetClientState *nc)
-      * Since underlying infrastructure does not support IP datagrams longer
-      * than 64K we should drop such packets and don't even try to send
-      */
--    if (VIRTIO_NET_HDR_GSO_NONE != pkt->virt_hdr.gso_type) {
--        if (pkt->payload_len >
--            ETH_MAX_IP_DGRAM_LEN -
--            pkt->vec[NET_TX_PKT_L3HDR_FRAG].iov_len) {
--            return false;
--        }
-+    if (pkt->payload_len >
-+        ETH_MAX_IP_DGRAM_LEN -
-+        pkt->vec[NET_TX_PKT_L3HDR_FRAG].iov_len) {
-+        return false;
-     }
- 
-     if (pkt->has_virt_hdr ||
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index d95c4848a4..59b1b5fe76 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -502,10 +502,22 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+             CPUClass *cc = CPU_GET_CLASS(cpu);
+             qemu_mutex_lock_iothread();
+             cc->do_interrupt(cpu);
+             qemu_mutex_unlock_iothread();
+             cpu->exception_index = -1;
++
++            if (unlikely(cpu->singlestep_enabled)) {
++                /*
++                 * After processing the exception, ensure an EXCP_DEBUG is
++                 * raised when single-stepping so that GDB doesn't miss the
++                 * next instruction.
++                 */
++                *ret = EXCP_DEBUG;
++                cpu_handle_debug_exception(cpu);
++                return true;
++            }
++
+         } else if (!replay_has_interrupt()) {
+             /* give a chance to iothread in replay mode */
+             *ret = EXCP_INTERRUPT;
+             return true;
+         }
 -- 
-2.26.2
+2.27.0
 
 
