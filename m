@@ -2,114 +2,88 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B47C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 07:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6D8C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F18720760
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 07:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36CA120657
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 08:05:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DHX6X00X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F18720760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i70F1Pnu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36CA120657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jvymU-0003yM-D0
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 03:58:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46140)
+	id 1jvytn-0005YH-Dk
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 04:05:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jvylv-0003X2-ET
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 03:57:39 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39563)
+ id 1jvysx-0004wX-94; Thu, 16 Jul 2020 04:04:55 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38477)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jvylt-0004D3-Uz
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 03:57:39 -0400
-Received: by mail-wm1-x341.google.com with SMTP id w3so10382907wmi.4
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 00:57:37 -0700 (PDT)
+ id 1jvysv-0005TS-3v; Thu, 16 Jul 2020 04:04:54 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z13so6030780wrw.5;
+ Thu, 16 Jul 2020 01:04:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ITbZ0mkoHcwNQuKLh6St8K/j5GbXM90gmcivA31R1pQ=;
- b=DHX6X00XsdVEooZ2qGB6GDRvDPHRImIpOs7z0mTwVs46C4xBtJKxuMnBNVyCOOIzco
- 957G7MQEvGV7MjH5kjB7GCJwcFB1eberEG8+hu4+GJCQeyVRLPs2UXgmRg4TzxX4ul9d
- dzw+8PtgsDaW8qE+7FYQQRjO8QS0OYJR6ZnCN6Ne4UdDj8ay1cY3IIRkf3ZohXS+8o4g
- R5rwkvqYvFGkbx+CyxuURT2JQkJ4U9qZ3mUGZrRj80o9Ef8hCgO29DLXU2AxKgcEiErY
- qcwDxJE/Sxf4OrZEW29qgwgtA5CUI0Wlh9UuioNH7aatEAO9dhda+CnV0hcScyJGVn/x
- cBcA==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Jz3q79SkunqqGZxYd/dPTGUsZUxs7qJxL2TDp8Sun9Q=;
+ b=i70F1PnuM70HKW6kSEU5gwv9wyjchZP7bggHGXITp3NSHveee0zFqQbCWjTO8sN9cn
+ VsAz1DPSM/JZYrcH3s6C5hebZIsD+/GrvmOrg5S8BEJfl/uswBDDgrTJEq24aXX+Xhzm
+ GKXPcLUdUFDrrmtDQuBXtNzI+lK0P8aymZ7swp8dxXbx0My4jnfNCpwwUEB60SsKWn11
+ DV3O282JJ6bqRzmPDWeAdINILsJ4yiR0BKJ8riBK1yDeFkM2R6EdaOsmaHzO8X9JLVlF
+ bNZI14ewe3AvEvNrsVNE6C0JWeN2XIQhQ/sdxL5WJS3xb/kXZ9/UiQ5YT7qGSik2A2GB
+ M1/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=ITbZ0mkoHcwNQuKLh6St8K/j5GbXM90gmcivA31R1pQ=;
- b=BQHIR8Njqnf1On93wXh4UwUqy2OtNUeDpVz3w3crYEU5WZElmusI3yFnZ+wVV79TFh
- I4JPYidC3K4f5Zj6TbQEgl+jhHCmldSe4lc1OslnwMxhp3Cm/GkNQk80n6KmyuAlc30A
- DRkD5PTK6dNd15hiMwI0fJ5OIhFkYNdREBlzhdNHCfIMVjB6AORG81Rfwhbv5sUxaKZy
- BVoc01GjXnvPtVo/tS/SqQUFfD/VsJ6FRGq2aQxCer9YDg8OqkhNNjD8LOR6+h3QS8UG
- m0Om+vpdfA4V+uVsqRamz4/dVlNN/QAQRoRX0wmtG4nvCxLzWNHv8cyHRroJ8lcR6pzD
- qYpQ==
-X-Gm-Message-State: AOAM5326jiXbDN3tqYCbGwyep4c8/B1DV4Lol5RVwKrEJaBUlutN0pPH
- cbE67L59jM3vMz3Hbddd22o=
-X-Google-Smtp-Source: ABdhPJy5XVcq4oXaDsSqFzxObgkbQvyhosyy4RRFQKnNh/r5bMqCjxNXOrcZOHgx11sFW0vh0d9iog==
-X-Received: by 2002:a1c:dd86:: with SMTP id u128mr3139524wmg.123.1594886256391; 
- Thu, 16 Jul 2020 00:57:36 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Jz3q79SkunqqGZxYd/dPTGUsZUxs7qJxL2TDp8Sun9Q=;
+ b=RuI+IE5k0kqyjOLekil25wNY7XwU7KOjoU0c5Ko74Bqoq6aiYrXUgC4uYA9QGXiGVW
+ LncL67U30SoB4qJHMmT3fwExH8gksqrDOojibYGSXqwLjD0j6g4NiAM/4YqhX4iwQ85L
+ uoDtvc3Qaccv1VX1NTpF0q07iEPMKs/xBDZ5uEHYqwYHGIIT1Eg7ornzQ7azU3aD/HB6
+ q6tDNtH/DHciLpTx+Thd0hmCIZAFdCL3b5+VQj5iYB361o62Ng5iHJvjy2gT9sYeouNr
+ a9IfTIUlk44bsdIGCQx7n8ZMy9820cu/Kw8wwdAiY2VI/oPXdS0oDfS8EubGmVvlzj+8
+ LN9w==
+X-Gm-Message-State: AOAM532KVYySSyFdG0GgTKJgcna71OAvt9oh7XsGCmdwADllbL/O5hqG
+ q3AE4Dlqt8SKAm5b+8dmohw=
+X-Google-Smtp-Source: ABdhPJzgnRICouKUMaxulrn8+BYn+YTrVhDPaziG/1hTMQpZ53SEVNs4RvMUrxhIOwDgQO3LT3MoXw==
+X-Received: by 2002:a5d:4707:: with SMTP id y7mr3700319wrq.261.1594886690854; 
+ Thu, 16 Jul 2020 01:04:50 -0700 (PDT)
 Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id b184sm7609185wmc.20.2020.07.16.00.57.35
+ by smtp.gmail.com with ESMTPSA id q188sm7374545wma.46.2020.07.16.01.04.49
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Jul 2020 00:57:35 -0700 (PDT)
-Subject: Re: Implement standard file operation with QEMU
-To: casmac <climber.cui@qq.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-References: <tencent_BF749AEC7484FAFD4D5356B065C6679BF705@qq.com>
+ Thu, 16 Jul 2020 01:04:49 -0700 (PDT)
+Subject: Re: [PATCH v5 03/11] hw/timer: Add NPCM7xx Timer device model
+To: Havard Skinnemoen <hskinnemoen@google.com>
+References: <20200709003608.3834629-1-hskinnemoen@google.com>
+ <20200709003608.3834629-4-hskinnemoen@google.com>
+ <43d97595-ef79-0ecd-a13f-25c7a986b869@amsat.org>
+ <CAFQmdRZPMdvXYLQqXMhnv3DT8SHYjvPSBHg-v2YaDb7Zi3xc3Q@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <e9940859-3fd3-8710-a7d8-84ed94a96715@amsat.org>
-Date: Thu, 16 Jul 2020 09:57:34 +0200
+Message-ID: <58b9c434-a8f0-718b-0acf-1c7e0cc58b7c@amsat.org>
+Date: Thu, 16 Jul 2020 10:04:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <tencent_BF749AEC7484FAFD4D5356B065C6679BF705@qq.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAFQmdRZPMdvXYLQqXMhnv3DT8SHYjvPSBHg-v2YaDb7Zi3xc3Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -131,88 +105,442 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, CS20 KFTing <kfting@nuvoton.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Xiaolei,
-
-+Laurent (user-mode)
-+Alex (semihosting)
-+Marc-AndrÈ (chardev)
-
-On 7/16/20 2:51 AM, casmac wrote:
-> Hi all,
-> † I am trying to implment standard file operation (stdio) with QEMU for
-> DSP architecture. The manufacture (TI) provides a runtime library that
-> support posix standard IO, but it left the device level implmentation as
-> hook function calls, like in the library source , it contains†
-> add_device() function, and write(),read(),open() are not implemented:
+On 7/16/20 1:04 AM, Havard Skinnemoen wrote:
+> On Wed, Jul 15, 2020 at 12:25 AM Philippe Mathieu-Daud√© <f4bug@amsat.org> wrote:
+>> On 7/9/20 2:36 AM, Havard Skinnemoen wrote:
+>>> The NPCM730 and NPCM750 SoCs have three timer modules each holding five
+>>> timers and some shared registers (e.g. interrupt status).
+>>>
+>>> Each timer runs at 25 MHz divided by a prescaler, and counts down from a
+>>> configurable initial value to zero. When zero is reached, the interrupt
+>>> flag for the timer is set, and the timer is disabled (one-shot mode) or
+>>> reloaded from its initial value (periodic mode).
+>>>
+>>> This implementation is sufficient to boot a Linux kernel configured for
+>>> NPCM750. Note that the kernel does not seem to actually turn on the
+>>> interrupts.
+>>>
+>>> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+>>> Reviewed-by: Joel Stanley <joel@jms.id.au>
+>>> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+>>> ---
+>>>  include/hw/timer/npcm7xx_timer.h |  96 +++++++
+>>>  hw/timer/npcm7xx_timer.c         | 468 +++++++++++++++++++++++++++++++
+>>>  hw/timer/Makefile.objs           |   1 +
+>>>  hw/timer/trace-events            |   5 +
+>>>  4 files changed, 570 insertions(+)
+>>>  create mode 100644 include/hw/timer/npcm7xx_timer.h
+>>>  create mode 100644 hw/timer/npcm7xx_timer.c
+>>>
+>> ...
+>>
+>>> +/* The reference clock frequency is always 25 MHz. */
+>>> +#define NPCM7XX_TIMER_REF_HZ            (25000000)
+>>> +
+>>> +/* Return the value by which to divide the reference clock rate. */
+>>> +static uint32_t npcm7xx_timer_prescaler(const NPCM7xxTimer *t)
+>>> +{
+>>> +    return extract32(t->tcsr, NPCM7XX_TCSR_PRESCALE_START,
+>>> +                     NPCM7XX_TCSR_PRESCALE_LEN) + 1;
+>>> +}
+>>> +
+>>> +/* Convert a timer cycle count to a time interval in nanoseconds. */
+>>> +static int64_t npcm7xx_timer_count_to_ns(NPCM7xxTimer *t, uint32_t count)
+>>> +{
+>>> +    int64_t ns = count;
+>>> +
+>>> +    ns *= NANOSECONDS_PER_SECOND / NPCM7XX_TIMER_REF_HZ;
+>>> +    ns *= npcm7xx_timer_prescaler(t);
+>>> +
+>>> +    return ns;
+>>> +}
+>>> +
+>>> +/* Convert a time interval in nanoseconds to a timer cycle count. */
+>>> +static uint32_t npcm7xx_timer_ns_to_count(NPCM7xxTimer *t, int64_t ns)
+>>> +{
+>>> +    int64_t count;
+>>> +
+>>> +    count = ns / (NANOSECONDS_PER_SECOND / NPCM7XX_TIMER_REF_HZ);
+>>> +    count /= npcm7xx_timer_prescaler(t);
+>>> +
+>>> +    return count;
+>>> +}
+>>> +
+>>> +/*
+>>> + * Raise the interrupt line if there's a pending interrupt and interrupts are
+>>> + * enabled for this timer. If not, lower it.
+>>> + */
+>>> +static void npcm7xx_timer_check_interrupt(NPCM7xxTimer *t)
+>>> +{
+>>> +    NPCM7xxTimerCtrlState *tc = t->ctrl;
+>>> +    /* Find the array index of this timer. */
+>>> +    int index = t - tc->timer;
+>>
+>> As you suggested in another device in this series, using a getter
+>> here is clearer.
 > 
-> int add_device(char††† † *name,
-> †††††††††††† † unsigned † flags,
-> †††††††††††† † int††† † (*dopen)† (const char *path, unsigned flags, int
-> foo),
-> †††††††††††† † int††† † (*dclose) (int fno),
-> †††††††††††† † int††† † (*dread)† (int fno, char *buf, unsigned count),
-> †††††††††††† † int††† † (*dwrite) (int fno, const char *buf, unsigned
-> count),
-> †††††††††††† † fpos_t†† † (*dlseek) (int fno, fpos_t offset, int origin),
-> †††††††††††† † int††† † (*dunlink)(const char *path),
-> †††††††††††† † int††† † (*drename)(const char *old_name, const char
-> *new_name))
-> {
-> †† _DEVICE *dt;
+> Definitely.
 > 
-> †† strncpy(dt->name,name,8);
-> †† dt->name[8] = '\0';
-> †† dt->flags † = flags;
-> †† dt->OPEN† † = dopen;
-> †† dt->CLOSE † = dclose;
-> †† dt->READ† † = dread;
-> †† dt->WRITE † = dwrite;
-> †† dt->LSEEK † = dlseek;
-> †† dt->UNLINK† = dunlink;
-> †† dt->RENAME† = drename;
-> }
+>>> +
+>>> +    g_assert(index >= 0 && index < NPCM7XX_TIMERS_PER_CTRL);
+>>> +
+>>> +    if ((t->tcsr & NPCM7XX_TCSR_IE) && (tc->tisr & BIT(index))) {
+>>> +        qemu_irq_raise(t->irq);
+>>> +        trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, 1);
+>>> +    } else {
+>>> +        qemu_irq_lower(t->irq);
+>>> +        trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, 0);
+>>> +    }
+>>> +}
+>>> +
+>>> +/* Start or resume the timer. */
+>>> +static void npcm7xx_timer_start(NPCM7xxTimer *t)
+>>> +{
+>>> +    int64_t now;
+>>> +
+>>> +    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>>> +    t->expires_ns = now + t->remaining_ns;
+>>> +    timer_mod(&t->qtimer, t->expires_ns);
+>>> +}
+>>> +
+>>> +/*
+>>> + * Called when the counter reaches zero. Sets the interrupt flag, and either
+>>> + * restarts or disables the timer.
+>>> + */
+>>> +static void npcm7xx_timer_reached_zero(NPCM7xxTimer *t)
+>>> +{
+>>> +    NPCM7xxTimerCtrlState *tc = t->ctrl;
+>>> +    int index = t - tc->timer;
+>>> +
+>>> +    g_assert(index >= 0 && index < NPCM7XX_TIMERS_PER_CTRL);
+>>> +
+>>> +    tc->tisr |= BIT(index);
+>>> +
+>>> +    if (t->tcsr & NPCM7XX_TCSR_PERIODIC) {
+>>> +        t->remaining_ns = npcm7xx_timer_count_to_ns(t, t->ticr);
+>>> +        if (t->tcsr & NPCM7XX_TCSR_CEN) {
+>>> +            npcm7xx_timer_start(t);
+>>> +        }
+>>> +    } else {
+>>> +        t->tcsr &= ~(NPCM7XX_TCSR_CEN | NPCM7XX_TCSR_CACT);
+>>> +    }
+>>> +
+>>> +    npcm7xx_timer_check_interrupt(t);
+>>> +}
+>>> +
+>>> +/* Stop counting. Record the time remaining so we can continue later. */
+>>> +static void npcm7xx_timer_pause(NPCM7xxTimer *t)
+>>> +{
+>>> +    int64_t now;
+>>> +
+>>> +    timer_del(&t->qtimer);
+>>> +    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>>> +    t->remaining_ns = t->expires_ns - now;
+>>> +    if (t->remaining_ns <= 0) {
+>>
+>> Can this happen? Shouldn't we get npcm7xx_timer_expired() before?
 > 
-> int write(int†††††††† † fildes,
-> ††††††† † const char † *bufptr,
-> ††††††† † unsigned††† † cnt)
-> {
-> ††
-> /*------------------------------------------------------------------------*/
-> †† /* CALL FUNCTION FROM DEVICE TABLE TO PERFORM WRITE FOR THIS
-> DEVICE/FILE† */
-> ††
-> /*------------------------------------------------------------------------*/
-> †† return (*(_stream[fildes]->WRITE)) (fildes,bufptr,cnt);
-> }
+> I was thinking the timer might expire right after calling timer_del(),
+> and handling it before we expire the timer makes bookkeeping easier.
+> But if QEMU_CLOCK_VIRTUAL is stopped while this code is running (even
+> on multi-cpu systems?), then I agree it can't happen.
 > 
-> †† Then, how can we use this runtime library together with QEMu to
-> implement full-stack file oerations?† I really appreaciate any advice.
+> If it can't possibly happen, then it should be appropriate to add
+> 
+>     g_assert(t->remaining_ns > 0);
+> 
+> right?
 
-Trying to understand...
+This is my understanding, but I'd rather see someone more familiar
+with timers confirm.
 
-Are you trying to ask "how to implement semihosting for my
-qemu-user-tidsp fork"?
+> 
+>>> +        npcm7xx_timer_reached_zero(t);
+>>> +    }
+>>> +}
+>>> +
+>>> +/*
+>>> + * Restart the timer from its initial value. If the timer was enabled and stays
+>>> + * enabled, adjust the QEMU timer according to the new count. If the timer is
+>>> + * transitioning from disabled to enabled, the caller is expected to start the
+>>> + * timer later.
+>>> + */
+>>> +static void npcm7xx_timer_restart(NPCM7xxTimer *t, uint32_t old_tcsr)
+>>> +{
+>>> +    t->remaining_ns = npcm7xx_timer_count_to_ns(t, t->ticr);
+>>> +
+>>> +    if (old_tcsr & t->tcsr & NPCM7XX_TCSR_CEN) {
+>>> +        npcm7xx_timer_start(t);
+>>> +    }
+>>> +}
+>>> +
+>>> +/* Register read and write handlers */
+>>> +
+>>> +static void npcm7xx_timer_write_tcsr(NPCM7xxTimer *t, uint32_t new_tcsr)
+>>> +{
+>>> +    uint32_t old_tcsr = t->tcsr;
+>>> +
+>>> +    if (new_tcsr & NPCM7XX_TCSR_RSVD) {
+>>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: reserved bits in 0x%08x ignored\n",
+>>> +                      __func__, new_tcsr);
+>>> +        new_tcsr &= ~NPCM7XX_TCSR_RSVD;
+>>> +    }
+>>> +    if (new_tcsr & NPCM7XX_TCSR_CACT) {
+>>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: read-only bits in 0x%08x ignored\n",
+>>> +                      __func__, new_tcsr);
+>>> +        new_tcsr &= ~NPCM7XX_TCSR_CACT;
+>>> +    }
+>>> +
+>>> +    t->tcsr = (t->tcsr & NPCM7XX_TCSR_CACT) | new_tcsr;
+>>> +
+>>> +    if ((old_tcsr ^ new_tcsr) & NPCM7XX_TCSR_IE) {
+>>> +        npcm7xx_timer_check_interrupt(t);
+>>> +    }
+>>> +    if (new_tcsr & NPCM7XX_TCSR_CRST) {
+>>> +        npcm7xx_timer_restart(t, old_tcsr);
+>>> +        t->tcsr &= ~NPCM7XX_TCSR_CRST;
+>>> +    }
+>>> +    if ((old_tcsr ^ new_tcsr) & NPCM7XX_TCSR_CEN) {
+>>> +        if (new_tcsr & NPCM7XX_TCSR_CEN) {
+>>> +            npcm7xx_timer_start(t);
+>>> +        } else {
+>>> +            npcm7xx_timer_pause(t);
+>>> +        }
+>>> +    }
+>>> +}
+>>> +
+>>> +static void npcm7xx_timer_write_ticr(NPCM7xxTimer *t, uint32_t new_ticr)
+>>> +{
+>>> +    t->ticr = new_ticr;
+>>> +
+>>> +    npcm7xx_timer_restart(t, t->tcsr);
+>>> +}
+>>> +
+>>> +static uint32_t npcm7xx_timer_read_tdr(NPCM7xxTimer *t)
+>>> +{
+>>> +    if (t->tcsr & NPCM7XX_TCSR_CEN) {
+>>> +        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>>> +
+>>> +        return npcm7xx_timer_ns_to_count(t, t->expires_ns - now);
+>>> +    }
+>>> +
+>>> +    return npcm7xx_timer_ns_to_count(t, t->remaining_ns);
+>>> +}
+>>> +
+>>> +static uint64_t npcm7xx_timer_read(void *opaque, hwaddr offset, unsigned size)
+>>> +{
+>>> +    NPCM7xxTimerCtrlState *s = opaque;
+>>> +    uint64_t value = 0;
+>>> +    hwaddr reg;
+>>> +
+>>> +    reg = offset / sizeof(uint32_t);
+>>> +    switch (reg) {
+>>> +    case NPCM7XX_TIMER_TCSR0:
+>>> +        value = s->timer[0].tcsr;
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TCSR1:
+>>> +        value = s->timer[1].tcsr;
+>>
+>> Maybe add:
+>>
+>> static hwaddr timer_index(hwaddr reg)
+>> {
+>>     return reg - NPCM7XX_TIMER_TCSR0;
+>> }
+>>
+>> And use shorter:
+>>
+>>     case NPCM7XX_TIMER_TCSR0:
+>>     case NPCM7XX_TIMER_TCSR1:
+>>     case NPCM7XX_TIMER_TCSR2:
+>>     case NPCM7XX_TIMER_TCSR3:
+>>     case NPCM7XX_TIMER_TCSR4:
+>>         value = s->timer[timer_index(reg)].tcsr;
+>>         break;
+>>
+>> Similarly with NPCM7XX_TIMER_TDRx and in npcm7xx_timer_write().
+> 
+> Sorry, that won't work because the registers for the various modules
+> are not grouped together.
 
-Have a look at "hw/semihosting/console.h" and the implementation
-(so far only ARM) of qemu_semihosting_console_[in/out].
-This might help to plug read/write. Using other stream than
-stdin/stdout is not supported (but you can add support) so
-open/lseek/close/rename/unlink are not considered.
+So what about:
 
-(for QEMU 'console' is the stdin/stdout subset of stdio).
+static hwaddr timer_index(hwaddr reg)
+{
+    switch (reg) {
+    case NPCM7XX_TIMER_TCSR0:
+        return 0;
+    case NPCM7XX_TIMER_TCSR1:
+        return 1;
+    case NPCM7XX_TIMER_TCSR2:
+        return 2;
+    case NPCM7XX_TIMER_TCSR3:
+        return 3;
+    case NPCM7XX_TIMER_TCSR4:
+        return 4;
+    default:
+        g_assert_not_reached();
+    }
+}
 
-You can redirect semihosted files with any host chardev,
-this is done in qemu_semihosting_connect_chardevs().
+This simplifies the read/write handlers.
 
-You might also have a look at the functions declared in
-"hw/semihosting/semihost.h" and how the different TCG helpers
-use them.
-
-Regards,
-
-Phil.
+> 
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TCSR2:
+>>> +        value = s->timer[2].tcsr;
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TCSR3:
+>>> +        value = s->timer[3].tcsr;
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TCSR4:
+>>> +        value = s->timer[4].tcsr;
+>>> +        break;
+>>> +
+>>> +    case NPCM7XX_TIMER_TICR0:
+>>> +        value = s->timer[0].ticr;
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TICR1:
+>>> +        value = s->timer[1].ticr;
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TICR2:
+>>> +        value = s->timer[2].ticr;
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TICR3:
+>>> +        value = s->timer[3].ticr;
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TICR4:
+>>> +        value = s->timer[4].ticr;
+>>> +        break;
+>>> +
+>>> +    case NPCM7XX_TIMER_TDR0:
+>>> +        value = npcm7xx_timer_read_tdr(&s->timer[0]);
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TDR1:
+>>> +        value = npcm7xx_timer_read_tdr(&s->timer[1]);
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TDR2:
+>>> +        value = npcm7xx_timer_read_tdr(&s->timer[2]);
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TDR3:
+>>> +        value = npcm7xx_timer_read_tdr(&s->timer[3]);
+>>> +        break;
+>>> +    case NPCM7XX_TIMER_TDR4:
+>>> +        value = npcm7xx_timer_read_tdr(&s->timer[4]);
+>>> +        break;
+>>> +
+>>> +    case NPCM7XX_TIMER_TISR:
+>>> +        value = s->tisr;
+>>> +        break;
+>>> +
+>>> +    case NPCM7XX_TIMER_WTCR:
+>>> +        value = s->wtcr;
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid offset 0x%04x\n",
+>>> +                      __func__, (unsigned int)offset);
+>>> +        break;
+>>> +    }
+>>> +
+>>> +    trace_npcm7xx_timer_read(DEVICE(s)->canonical_path, offset, value);
+>>> +
+>>> +    return value;
+>>> +}
+>>> +
+>>> +static void npcm7xx_timer_write(void *opaque, hwaddr offset,
+>>> +                                uint64_t v, unsigned size)
+>>> +{
+>>> +    uint32_t reg = offset / sizeof(uint32_t);
+>>> +    NPCM7xxTimerCtrlState *s = opaque;
+>>> +    uint32_t value = v;
+>>> +
+>>> +    trace_npcm7xx_timer_write(DEVICE(s)->canonical_path, offset, value);
+>>> +
+>>> +    switch (reg) {
+>>> +    case NPCM7XX_TIMER_TCSR0:
+>>> +        npcm7xx_timer_write_tcsr(&s->timer[0], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TCSR1:
+>>> +        npcm7xx_timer_write_tcsr(&s->timer[1], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TCSR2:
+>>> +        npcm7xx_timer_write_tcsr(&s->timer[2], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TCSR3:
+>>> +        npcm7xx_timer_write_tcsr(&s->timer[3], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TCSR4:
+>>> +        npcm7xx_timer_write_tcsr(&s->timer[4], value);
+>>> +        return;
+>>> +
+>>> +    case NPCM7XX_TIMER_TICR0:
+>>> +        npcm7xx_timer_write_ticr(&s->timer[0], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TICR1:
+>>> +        npcm7xx_timer_write_ticr(&s->timer[1], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TICR2:
+>>> +        npcm7xx_timer_write_ticr(&s->timer[2], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TICR3:
+>>> +        npcm7xx_timer_write_ticr(&s->timer[3], value);
+>>> +        return;
+>>> +    case NPCM7XX_TIMER_TICR4:
+>>> +        npcm7xx_timer_write_ticr(&s->timer[4], value);
+>>> +        return;
+>>> +
+>>> +    case NPCM7XX_TIMER_TDR0:
+>>> +    case NPCM7XX_TIMER_TDR1:
+>>> +    case NPCM7XX_TIMER_TDR2:
+>>> +    case NPCM7XX_TIMER_TDR3:
+>>> +    case NPCM7XX_TIMER_TDR4:
+>>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: register @ 0x%04x is read-only\n",
+>>> +                      __func__, (unsigned int)offset);
+>>> +        return;
+>>> +
+>>> +    case NPCM7XX_TIMER_TISR:
+>>> +        s->tisr &= ~value;
+>>> +        return;
+>>> +
+>>> +    case NPCM7XX_TIMER_WTCR:
+>>> +        qemu_log_mask(LOG_UNIMP, "%s: WTCR write not implemented: 0x%08x\n",
+>>> +                      __func__, value);
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid offset 0x%04x\n",
+>>> +                  __func__, (unsigned int)offset);
+>>> +}
+>>> +
+>>> +static const struct MemoryRegionOps npcm7xx_timer_ops = {
+>>> +    .read       = npcm7xx_timer_read,
+>>> +    .write      = npcm7xx_timer_write,
+>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>> +    .valid      = {
+>>> +        .min_access_size        = 4,
+>>> +        .max_access_size        = 4,
+>>> +        .unaligned              = false,
+>>> +    },
+>>> +};
+>>> +
+>>> +/* Called when the QEMU timer expires. */
+>>> +static void npcm7xx_timer_expired(void *opaque)
+>>> +{
+>>> +    NPCM7xxTimer *t = opaque;
+>>> +
+>>> +    if (t->tcsr & NPCM7XX_TCSR_CEN) {
+>>> +        npcm7xx_timer_reached_zero(t);
+>>> +    }
+>>> +}
+>> ...
+> 
 
