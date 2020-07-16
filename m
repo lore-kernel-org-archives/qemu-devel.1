@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0DE3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 18:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B990C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 18:20:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B3FF2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 18:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 275D62076A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 18:20:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DNYPsGwT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B3FF2074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FRPoLL1J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 275D62076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw8UW-0002or-AI
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 14:20:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54092)
+	id 1jw8Uk-0002y1-CH
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 14:20:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jw8TS-00019X-Tk
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 14:19:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43185
- helo=us-smtp-1.mimecast.com)
+ id 1jw8TW-0001FG-KL
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 14:19:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22624
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jw8TQ-0004ma-MT
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 14:19:14 -0400
+ id 1jw8TU-0004o7-TW
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 14:19:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594923551;
+ s=mimecast20190719; t=1594923555;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gz67eWvULgd0XWJXCmx2u72FxEioeNRL6S8wxfz1tu8=;
- b=DNYPsGwT1vJEfgQgrzLAwnRTBzgY7x32ilIFj6hfUmlP2UaBe7OZco6Bo1u5pXHc+bGK2U
- VX3RwYQYA5X8sVu5jPfPN3b8mfKomGnSaPHhOlfdCEKGmK/MzsLEvkc8SwP+wdPiM1ds0U
- QlZ4npoupx0uNV2puyKCZ4o1qeAaklc=
+ bh=tii/fgrzB6+WjICBzyM+djJojGRqQYefAblXiqUOm7A=;
+ b=FRPoLL1JP6DFN2lcUzEyyQE9Y5JsKWxyKQ62nZ/KtCEM7+P6goyrtMPX2qk+Lj3tjc0ej/
+ zSVGjF0glvAVGw1NccbCtxTgRBs2mHEv9oun7QF2mRSH7HPfKTF/t/VX0Ri5Tv+Mh8t1q6
+ iG2gCPEu9VWbVQVTEHJIwf48SdCQiWU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-uGj__g66NfeMkQ40WSeMiQ-1; Thu, 16 Jul 2020 14:19:08 -0400
-X-MC-Unique: uGj__g66NfeMkQ40WSeMiQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-116-F787yec8O3upS6BeOdfr2A-1; Thu, 16 Jul 2020 14:19:12 -0400
+X-MC-Unique: F787yec8O3upS6BeOdfr2A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F7D51B18BCC;
- Thu, 16 Jul 2020 18:19:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C14AA8015F4;
+ Thu, 16 Jul 2020 18:19:10 +0000 (UTC)
 Received: from localhost (ovpn-119-232.rdu2.redhat.com [10.10.119.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A29272AC8;
- Thu, 16 Jul 2020 18:19:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8C6D710013D7;
+ Thu, 16 Jul 2020 18:19:10 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 2/6] i386/cpu: Don't add unavailable_features to
- env->user_features
-Date: Thu, 16 Jul 2020 14:18:59 -0400
-Message-Id: <20200716181903.1895314-3-ehabkost@redhat.com>
+Subject: [PULL 5/6] target/i386: add the missing vmx features for
+ Skylake-Server and Cascadelake-Server CPU models
+Date: Thu, 16 Jul 2020 14:19:02 -0400
+Message-Id: <20200716181903.1895314-6-ehabkost@redhat.com>
 In-Reply-To: <20200716181903.1895314-1-ehabkost@redhat.com>
 References: <20200716181903.1895314-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 19:36:06
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 13:59:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -98,39 +98,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Cameron Esfahani <dirty@apple.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Chenyi Qiang <chenyi.qiang@intel.com>, Cameron Esfahani <dirty@apple.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xiaoyao Li <xiaoyao.li@intel.com>
+From: Chenyi Qiang <chenyi.qiang@intel.com>
 
-Features unavailable due to absent of their dependent features should
-not be added to env->user_features. env->user_features only contains the
-feature explicity specified with -feature/+feature by user.
+Add the missing vmx features in Skylake-Server and Cascadelake-Server
+CPU models based on the output of Paolo's script.
 
-Fixes: 99e24dbdaa68 ("target/i386: introduce generic feature dependency mechanism")
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Message-Id: <20200713174436.41070-3-xiaoyao.li@intel.com>
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+Message-Id: <20200714084148.26690-4-chenyi.qiang@intel.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 1 -
- 1 file changed, 1 deletion(-)
+ target/i386/cpu.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index caf0334f3a..93b62b2eca 100644
+index 132ef90421..588f32e136 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -6371,7 +6371,6 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-                                       unavailable_features & env->user_features[d->to.index],
-                                       "This feature depends on other features that were not requested");
- 
--            env->user_features[d->to.index] |= unavailable_features;
-             env->features[d->to.index] &= ~unavailable_features;
+@@ -3034,6 +3034,13 @@ static X86CPUDefinition builtin_x86_defs[] = {
+                     { /* end of list */ }
+                 }
+             },
++            {
++                .version = 4,
++                .props = (PropValue[]) {
++                    { "vmx-eptp-switching", "on" },
++                    { /* end of list */ }
++                }
++            },
+             { /* end of list */ }
          }
-     }
+     },
+@@ -3158,6 +3165,13 @@ static X86CPUDefinition builtin_x86_defs[] = {
+                   { /* end of list */ }
+               },
+             },
++            { .version = 4,
++              .note = "ARCH_CAPABILITIES, no TSX",
++              .props = (PropValue[]) {
++                  { "vmx-eptp-switching", "on" },
++                  { /* end of list */ }
++              },
++            },
+             { /* end of list */ }
+         }
+     },
 -- 
 2.26.2
 
