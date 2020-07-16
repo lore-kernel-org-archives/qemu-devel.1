@@ -2,121 +2,86 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17ED1C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:49:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 371A8C433E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D59F12070E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:49:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00C422074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="ZE/ooTqc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D59F12070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WEg/dTzp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00C422074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw753-0000hD-6X
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 12:49:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56476)
+	id 1jw7AY-0003EF-4z
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 12:55:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jw748-00087T-DG
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:49:00 -0400
-Received: from mail-bn8nam11on2123.outbound.protection.outlook.com
- ([40.107.236.123]:10337 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jw746-0002Vf-1m
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:48:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IX+FH6EdKYJ4AaM1vEkktZ0Hf2Y+JokBiErLxpjx7C96bkbpiHHXd9AKUO3DClYumxt/whdXKsEcwiYvmLW8J5C0MAsDzfrQfNkt8r4eEqsxxKpvvtslX+VR453gIEPgexl+/0d4O1zQz54tccAeYoP1w3u/+RslqxHAQ4yHLKNyZw0YTNg3TV456IkfKJEsu9uH2jupndgOHmt91ugxgy6ZEtm2C4bXQMJCWdXEegbzKRMSZGhusMjuHk5rw8e+mtQA3j74v1R7sF+ejDueXhr1fgPGoM3XDHHdSkQuaRlpiNbtyniwdi6sLBQ8r4EXo8pw8niOyv+B+Kqj+R4mPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/JgZKmvmNEff+wbwhwknP6IKH69FSqDXhfaDkjgLG7Q=;
- b=mVzt2O9eqAL61W5m/SaFqlQG6wGcxqZ+IfNxFBFbgyxfV43sECz/Dchu6PIsVYh5JZcRfifXwQ9+zVnmLPmvnaY5phrn77xkWz/KHgHp4pbC3aw3mWmUnj+wgbsBIUCJxhnPttsqXoJ2nt/wH6RD1NrR0dj0b34vkTZHo8GY10Plies9dqD6cKSY2tZ/GyrHNmSFt2szTDzf+76e8tuN0owl+E9oq7cxj3jCtKXTdb+vCR5o/z9YZ79CIZD246EB/vWwhxCCBr9EB/4QmhXQcc2XkuTb72kIIyvDKkGIeeNsVvs4eMco7oRshjJno3bSuJbbIaqDvsWnJxnSuhuSbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/JgZKmvmNEff+wbwhwknP6IKH69FSqDXhfaDkjgLG7Q=;
- b=ZE/ooTqcWymxwGcBeR/iEF0U3MvBPAzSMkLqE3M/o5PBzxpK8YLcKpxUZM8DpbZmVuwK8j9TtFX9Elt9lGbPKgicwelWlB99WiH/VqDeVk78Yc6UmBDFKQ1r3IYcUBqatJTe5syVbVJz1iLYWyVdlCxuyVA1t9qszaZT+BkroEk=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN2PR03MB2207.namprd03.prod.outlook.com (2603:10b6:804:e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18; Thu, 16 Jul
- 2020 16:33:52 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::8ce:29a6:77be:c35b]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::8ce:29a6:77be:c35b%7]) with mapi id 15.20.3195.018; Thu, 16 Jul 2020
- 16:33:52 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] gitlab-ci.yml: Add oss-fuzz build tests
-Date: Thu, 16 Jul 2020 12:33:30 -0400
-Message-Id: <20200716163330.29141-1-alxndr@bu.edu>
-X-Mailer: git-send-email 2.26.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR16CA0028.namprd16.prod.outlook.com
- (2603:10b6:208:134::41) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jw79m-0002OW-4U
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:54:50 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45091)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jw79k-0003nK-6e
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:54:49 -0400
+Received: by mail-oi1-x243.google.com with SMTP id j11so5601883oiw.12
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 09:54:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xrxbVp0+KfRQ5lEE8m1hgWS4brHe9TqmR01tWtTDzN0=;
+ b=WEg/dTzpYAtO3ZRgF7di3YcRR9Bafk1+DykITVCPE6YSnlz/cXOkqqigpV9IVAqKrv
+ Q4pNWgQMO7aT9m1qJIxTGZQqO2RP//mwYjjrp1WR4HnS1JTsneVDtbuleE8SmMvbLc+A
+ hMhuxccX/nU2tvokdGXE6PlFB02fuHWgDkpkhUXgZX53rjQCSxHRfzqpHyMd3vT30hh6
+ HAAKSbwFguAkRHiEzmnT6xUvGWuFMKVr0fl1i4AO+FW+ArS6anP4s+JfixlebH6bDG0R
+ Z5OBfyEUKBAKYreMdgJdGRWH7D+2WbfjehKPJoucDIhpJvQsfcGPEirua0vT18pRjfho
+ dhJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xrxbVp0+KfRQ5lEE8m1hgWS4brHe9TqmR01tWtTDzN0=;
+ b=eBeRjpfZ9GPiVx1hS1sKr3U/NqWZxgqLwRTWRS9yCcQVEAVKJfqar3RrAAl6Q6sg7h
+ XndgsYq4I4yJVaSj32F149wgNj7hGGAv9WMkmUY0eoscCKY2vk96i4NladAENLY6CMm4
+ f5bizbFY41waeYU/Sn7WOGfGokuo27Vx1ijui5XvVf9ihV53yOqzI5gF+stIN69yeqIV
+ pBdhZGZrRRYOudqZBc31XVc3Ilv8XNqiFyfvz6ZkNvr3Kel1K+XITVLGsjVPxiKG/Nyq
+ osVxbe3W5Rpcujf7T4nkpugMH0ksqvluhgcVe0bk4v5YDErXNLiSjH2zj3JP1cwkcUSi
+ eIrQ==
+X-Gm-Message-State: AOAM530Idh6moYkeYddyMCZn7BnKlNuQ2saQiDW6bVEWrVeccQfQ+WyI
+ rkIXl9zY63AkYV/ql89ytFgYQYVukvT3ijKoL5sv2Q==
+X-Google-Smtp-Source: ABdhPJw+ZRY0s4ItArEp8luG1n/hK+5ZJNHq5bFizzTj2JJNOGB/EJsE6p4tEBEh6iINe36h46pNJrDf4JQc3cECm+s=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr4257028oix.48.1594918486642;
+ Thu, 16 Jul 2020 09:54:46 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mozz.bu.edu (128.197.127.33) by
- MN2PR16CA0028.namprd16.prod.outlook.com (2603:10b6:208:134::41) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend
- Transport; Thu, 16 Jul 2020 16:33:51 +0000
-X-Mailer: git-send-email 2.26.2
-X-Originating-IP: [128.197.127.33]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d13df35c-0684-4c5a-cc23-08d829a60674
-X-MS-TrafficTypeDiagnostic: SN2PR03MB2207:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN2PR03MB22074C30684E9E39AB1D7781BA7F0@SN2PR03MB2207.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /7hQnLvFVUGgtFjpG6mO9ctumASyhK4gezEcTuUsgY7UK05Wzkk3QA8uzuHnoO6beV57+aYS+OiuILafJABlM8/42z901es5lL1ovzNspO6s71gOlZEQhrsJi5kuOJGYFY95QAd6A+IB8h8zMBGR1Lt25lc2++tvs7EJv6oe2bNbnnNPqUllzhp0yy5jZv4LnASwhP2B1asLSBpxkEK1UE2O8W7sncLXMX7mNOrQosjyordWHvqYY27KgiiX3IT8ycnz2A6+iFJIioSsNTcNYEOOyHGwIsetB5T7u1XA+3pRo5hfXfo2BGm/mdRL0JTsm7BOnT325L8v6tZnUZ0LRB7KKFS6PItas1S+lmmpY0d1CQDWuM87wmedAo5IxB9HtiLNkyNWdJQit4Xx3AQeEw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39860400002)(136003)(376002)(366004)(346002)(396003)(6666004)(83380400001)(26005)(36756003)(8936002)(52116002)(6486002)(75432002)(7696005)(86362001)(8676002)(5660300002)(2616005)(6916009)(1076003)(16526019)(956004)(4326008)(2906002)(786003)(186003)(478600001)(316002)(54906003)(66476007)(966005)(66556008)(66946007);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: y1NI00K5PUX8QXjFSmT1AmO79v8zkgw4g8zZbjSFhKiiQ6zdwg6oO78mlGlflgtGMM4TQeJLghLWp/MCKwMqAeDtYpkww5GUjoht54Yz1wSqOZqhosQwURPhov7N97gd6qyFoMZfuNrl1vTsxvKSkRquaUkGQXvfijdLNVXXPrQHym+RpbeZfbZcDpu5JHXfTY8l/SEdsF9NijUlZrCUtC5NmpbWYMeyjdHNPtlC97t34N9Vjet9mnq7XQdPzIG0KKHFpG5H1JhJgi0G4BEJV/3caKI1xghUsm4SKbUTKFcm90V4CBzi3TQB4tuVoGOkurraWdI0L70M14DcD6WydG56HyVVRB2qplsHavLiINSJvwcib4j9Mqvfli1j7UGXmlsN63+/0z9Es0FnwHcKULXJSAocxdQOHc5fp7XbGb3irK6OG9jF6hNzvkhp2AfcVs681u0Nx7UErb5LvfU10d+ZwmEBkO63+sc4AqNwm3Y=
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: d13df35c-0684-4c5a-cc23-08d829a60674
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 16:33:52.4781 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LhaIEDKS0tTBbg05ee7rHP970ZyjjhjwlrlBXZoTmIszG6U4VULAbjcZfZ3e2PJ6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR03MB2207
-Received-SPF: pass client-ip=40.107.236.123; envelope-from=alxndr@bu.edu;
- helo=NAM11-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 12:48:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+References: <20200630122710.1119158-1-ppandit@redhat.com>
+ <20200630122710.1119158-3-ppandit@redhat.com>
+In-Reply-To: <20200630122710.1119158-3-ppandit@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Jul 2020 17:54:35 +0100
+Message-ID: <CAFEAcA_ux5iTNhCuevNz6O7_umhkZcVm+o68owhbNKGOUHZnGg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/9] pci-host: add pcie-msi read method
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,101 +94,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, darren.kenny@oracle.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This tries to build and run the fuzzers with the same build-script used
-by oss-fuzz. This doesn't guarantee that the builds on oss-fuzz will
-also succeed, since oss-fuzz provides its own compiler and fuzzer vars,
-but it can catch changes that are not compatible with the the
-./scripts/oss-fuzz/build.sh script.
-The strange way of finding fuzzer binaries stems from the method used by
-oss-fuzz:
-https://github.com/google/oss-fuzz/blob/master/infra/base-images/base-runner/targets_list
+On Tue, 30 Jun 2020 at 13:30, P J P <ppandit@redhat.com> wrote:
+>
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> Add pcie-msi mmio read method to avoid NULL pointer dereference
+> issue.
 
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
----
+This change is specific to the designware pci host controller;
+it would be nice to have "designware" in the commit subject.
 
-Similar to Thomas' patch:
 
-> Note: This patch needs two other patches merged first to work correctly:
+> Reported-by: Lei Sun <slei.casper@gmail.com>
+> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/pci-host/designware.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> Update v3: Add Reviewed-by: ...
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09400.html
 
-> - 'fuzz: Expect the cmdline in a freeable GString' from Alexander
+> +static uint64_t designware_pcie_root_msi_read(void *opaque, hwaddr addr,
+> +                                              unsigned size)
+> +{
+> +    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
+> +    return 0;
 
-> - 'qom: Plug memory leak in "info qom-tree"' from Markus
+This is the right change, but is missing an explanation
+of why it's right:
 
-Otherwise the test will fail due to detected memory leaks.
+Looking at the data sheet, in the real hardware MSI interrupts
+are handled by looking at writes to see whether they match the
+configured address; if so then the write gets quashed and never
+gets put out onto the AXI bus (to the CPU, memory, etc). This only
+happens for writes, so reads from the magic address are just
+allowed to pass through and will read from the system address
+space like any other read from any other address. That's not trivial
+to implement, though, and well-behaved guests won't care, so
+we can just explain why we're not doing anything with a suitable
+comment:
 
-Fair warning: I haven't been able to trigger this new job yet. I tried
-to run the pipeline with these changes on my forked repo on gitlab, but
-did not reach the build-oss-fuzz. I think this is due to some failures
-in the Containers-layer-2 stage:
+    /*
+     * Attempts to read from the MSI address are undefined in
+     * the PCI specifications. For this hardware, the datasheet
+     * specifies that a read from the magic address is simply not
+     * intercepted by the MSI controller, and will go out to the
+     * AHB/AXI bus like any other PCI-device-initiated DMA read.
+     * This is not trivial to implement in QEMU, so since
+     * well-behaved guests won't ever ask a PCI device to DMA from
+     * this address we just log the missing functionality.
+     */
+    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
+    return 0;
 
-...
-Error response from daemon: manifest for
-registry.gitlab.com/a1xndr/qemu/qemu/debian-all-test-cross:latest not
-found: manifest unknown: manifest unknown
-#2 [internal] load .dockerignore
-#2 transferring context:
-#2 transferring context: 2B 0.1s done
-#2 DONE 0.1s
-#1 [internal] load build definition from tmpg8j4xoop.docker
-#1 transferring dockerfile: 2.21kB 0.1s done
-#1 DONE 0.2s
-#3 [internal] load metadata for docker.io/qemu/debian10:latest
-#3 ERROR: pull access denied, repository does not exist or may require
-authorization: server message: insufficient_scope: authorization failed
-#4 [1/3] FROM docker.io/qemu/debian10:latest
-#4 resolve docker.io/qemu/debian10:latest 0.1s done
-#4 ERROR: pull access denied, repository does not exist or may require
-authorization: server message: insufficient_scope: authorization failed
-------
- > [internal] load metadata for docker.io/qemu/debian10:latest:
-------
-------
- > [1/3] FROM docker.io/qemu/debian10:latest:
-------
-failed to solve with frontend dockerfile.v0: failed to build LLB: failed
-to load cache key: pull access denied, repository does not exist or may
-require authorization: server message: insufficient_scope: authorization
-failed
-...
+> +}
+> +
+>  static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
+>                                             uint64_t val, unsigned len)
+>  {
+> @@ -77,6 +85,7 @@ static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
+>  }
+>
+>  static const MemoryRegionOps designware_pci_host_msi_ops = {
+> +    .read = designware_pcie_root_msi_read,
+>      .write = designware_pcie_root_msi_write,
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>      .valid = {
 
- .gitlab-ci.yml | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+With that comment,
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index e96f8794b9..a50df420c9 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -182,6 +182,20 @@ build-fuzzer:
-             || exit 1 ;
-       done
- 
-+build-oss-fuzz:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: fedora
-+  script:
-+    - OUT_DIR="./build" CC=clang-9 CXX=clang++-9 CFLAGS="-fsanitize=address"
-+      LIB_FUZZING_ENGINE="-fsanitize=fuzzer" CFL
-+      ./scripts/oss-fuzz/build.sh
-+    - for fuzzer in $(find ./build-oss-fuzz/DEST_DIR/ -executable -type f); do
-+        grep "LLVMFuzzerTestOneInput" ${fuzzer} > /dev/null 2>&1 || continue ;
-+        echo Testing ${fuzzer} ... ;
-+        "${fuzzer}" -runs=1000 || exit 1 ;
-+      done
-+
- build-tci:
-   <<: *native_build_job_definition
-   variables:
--- 
-2.26.2
-
+thanks
+-- PMM
 
