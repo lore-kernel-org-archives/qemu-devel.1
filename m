@@ -2,85 +2,60 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C61DC433F8
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFDB6C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:48:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 197112065E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:39:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jd4assSL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197112065E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7F3B520849
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 16:48:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F3B520849
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw6vF-000491-B2
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 12:39:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53882)
+	id 1jw73C-0007Mm-QB
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 12:48:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jw6uh-0003iV-3r
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:39:15 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43588)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jw6ue-0007ZE-VZ
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:39:14 -0400
-Received: by mail-oi1-x241.google.com with SMTP id x83so5567474oif.10
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 09:39:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lPp6+IokqPgK4YUA5WlSoHeWA4HF9WmGYrBBco+QKOI=;
- b=jd4assSLnpqDTRmY8m4sMZV40gxxW7rCaELkOhrZgRpev0yLkSGJmH7QggHu16M88o
- 2w6PJaC9FB4JDV5l5zoV99W3GmR6qAScagnXCM/6lPyxTtZYq9U8gAyd5ULS9LjwB0XM
- PdRd2a7zjndmf8jBhcsBplJ7cJyPa2f7P/YldFUbDcq2CUlcnQqMnGKQ8KFDamwOZZPM
- kyoRH7HZ5HG5I85Gsg+u+/HDvaU+R/EhCI8QE3bhDeSdeYkmxaA/q3EDbmMDng+HTbbV
- uIzSjQuktPZzSYIDZX6XENbbQyLYqGEFRwheA+HLiX4+jq8DnyBiDKgVL89y42WjsvKi
- B74g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lPp6+IokqPgK4YUA5WlSoHeWA4HF9WmGYrBBco+QKOI=;
- b=LV2dKHlG3b1cT/EK/nUwTQjzy3PiL/k128IUtulovCPpu6OOBX9guV2SubzclX8AcD
- /0e41TzAxYW5tVhNqaEphCUXqcFcR6MHpp4fIctssX04Tj9kXCg1/l15QN5WmmxNHIh7
- T/ec8Ruvh5F4kOqda9elkPQfWboixefKWDGDiNSNIM3649A7L6Ap19t3E4EhSx5qm8ET
- iXxexo+N8PluHfH1P6FdrXJg+mUrvkYGYAlrbIzOZkB6riWaw3Z5OWbCqhyPY5DybtLg
- 2qVFs3QtQb5EWlquuhh7HClCXfVz96ZpxzUN2trV0cXKC0NvMoLfHXb/Uc265zcceSQD
- 3kIg==
-X-Gm-Message-State: AOAM533aoobg977LR4bGkVE1OM3U+Lw9PPpOSyLSBzupW7rTG7D7KKYN
- dUUCv0mINT/kEbOgDNmEQm3vgyucCDQNeHz8J15WVw==
-X-Google-Smtp-Source: ABdhPJz6Y189ecFPxH2OiBr2R0FL+VKw0s0hxJDn0w9dni3r//GmIQ8U980Sv1B0ldWuea0PN6+hcN047/0++0R4qd4=
-X-Received: by 2002:aca:54c9:: with SMTP id i192mr4468620oib.163.1594917550033; 
- Thu, 16 Jul 2020 09:39:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jw72a-0006uy-Oe
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:47:24 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:45612)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jw72Y-0002MF-Qk
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 12:47:24 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 06GGkEAH021904
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Thu, 16 Jul 2020 12:46:19 -0400
+Date: Thu, 16 Jul 2020 12:46:14 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] gitlab-ci.yml: Add fuzzer tests
+Message-ID: <20200716164557.gmt62pll4aszyknf@mozz.bu.edu>
+References: <20200716100950.27396-1-thuth@redhat.com>
 MIME-Version: 1.0
-References: <20200630122710.1119158-1-ppandit@redhat.com>
- <20200630122710.1119158-7-ppandit@redhat.com>
-In-Reply-To: <20200630122710.1119158-7-ppandit@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Jul 2020 17:38:59 +0100
-Message-ID: <CAFEAcA-wfDD1gxKymYppVCsaxOi=h0_0SrvR+=3aJ0-3_sWB7Q@mail.gmail.com>
-Subject: Re: [PATCH v3 6/9] spapr_pci: add spapr msi read method
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200716100950.27396-1-thuth@redhat.com>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 12:47:21
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,86 +69,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jun 2020 at 13:31, P J P <ppandit@redhat.com> wrote:
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> Add spapr msi mmio read method to avoid NULL pointer dereference
-> issue.
->
-> Reported-by: Lei Sun <slei.casper@gmail.com>
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Li Qiang <liq3ea@gmail.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+On 200716 1209, Thomas Huth wrote:
+> So far we neither compile-tested nor run any of the new fuzzers in our CI,
+> which led to some build failures of the fuzzer code in the past weeks.
+> To avoid this problem, add a job to compile the fuzzer code and run some
+> loops (which likely don't find any new bugs via fuzzing, but at least we
+> know that the code can still be run).
+> 
+> A nice side-effect of this test is that the leak tests are enabled here,
+> so we should now notice some of the memory leaks in our code base earlier.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Thank you for this, Thomas. I just sent a patch to add a job that runs
+similar tests with the build-script that we use on oss-fuzz
+Patch: <20200716163330.29141-1-alxndr@bu.edu>
+
+I know that these jobs have a lot of overlap, but there are enough
+quirks in the oss-fuzz build-script that I, personally, don't think
+they are redundant.
+
+A couple notes below, and I haven't been able to test on my own fork of
+qemu on gitlab, yet due to some pipeline errors, but otherwise
+
+Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
+
 > ---
->  hw/ppc/spapr_pci.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->
-> Update v3: Add Acked-by: ...
->   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg08054.html
->
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 329002ac04..7033352834 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -52,6 +52,7 @@
->  #include "sysemu/kvm.h"
->  #include "sysemu/hostmem.h"
->  #include "sysemu/numa.h"
-> +#include "qemu/log.h"
->
->  /* Copied from the kernel arch/powerpc/platforms/pseries/msi.c */
->  #define RTAS_QUERY_FN           0
-> @@ -738,6 +739,12 @@ static PCIINTxRoute spapr_route_intx_pin_to_irq(void *opaque, int pin)
->      return route;
->  }
->
-> +static uint64_t spapr_msi_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
-> +    return 0;
-> +}
+>  .gitlab-ci.yml | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
+> 
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index 5eeba2791b..e96f8794b9 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -161,9 +161,27 @@ build-clang:
+>      IMAGE: fedora
+>      CONFIGURE_ARGS: --cc=clang --cxx=clang++
+>      TARGETS: alpha-softmmu arm-softmmu m68k-softmmu mips64-softmmu
+> -      ppc-softmmu s390x-softmmu x86_64-softmmu arm-linux-user
+> +      ppc-softmmu s390x-softmmu arm-linux-user
+>      MAKE_CHECK_ARGS: check
+>  
+> +build-fuzzer:
+> +  <<: *native_build_job_definition
+> +  variables:
+> +    IMAGE: fedora
+> +  script:
+> +    - mkdir build
+> +    - cd build
+> +    - ../configure --cc=clang --cxx=clang++ --enable-fuzzing
+> +                   --target-list=x86_64-softmmu
+
+https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg02310.html
+When/if this gets merged, enable-fuzzing won't build with
+AddressSanitizer, by default, so I would add --enable-sanitizers, just
+to be safe. 
+
+> +    - make -j"$JOBS" all check-build x86_64-softmmu/fuzz
+> +    - make check
+> +    - for fuzzer in i440fx-qos-fork-fuzz i440fx-qos-noreset-fuzz
+> +        i440fx-qtest-reboot-fuzz virtio-scsi-flags-fuzz virtio-scsi-fuzz ; do
+
+Any reason for these particular fuzzers? I know the virtio-net ones find
+crashes pretty quickly, but I dont think that causes a non-zero exit.
+
+> +          echo Testing ${fuzzer} ... ;
+> +          x86_64-softmmu/qemu-fuzz-x86_64 --fuzz-target=${fuzzer} -runs=1000
+> +            || exit 1 ;
+> +      done
 > +
->  /*
->   * MSI/MSIX memory region implementation.
->   * The handler handles both MSI and MSIX.
-> @@ -755,8 +762,10 @@ static void spapr_msi_write(void *opaque, hwaddr addr,
->  }
->
->  static const MemoryRegionOps spapr_msi_ops = {
-> -    /* There is no .read as the read result is undefined by PCI spec */
-> -    .read = NULL,
-> +    /* .read result is undefined by PCI spec
-
-QEMU multiline comments should have the '/*' on a line of its own.
-
-> +     * define .read method to avoid assert failure in memory_region_init_io
-> +     */
-
-If this is undefined behaviour per the PCI spec then LOG_UNIMP
-is the wrong thing -- this should either be LOG_GUEST_ERROR
-(if the guest can do this or program the h/w to do this)
-or assert() (if the only way this could happen would be a bug
-in a QEMU model of a PCI device).
-
-> +    .read = spapr_msi_read,
->      .write = spapr_msi_write,
->      .endianness = DEVICE_LITTLE_ENDIAN
->  };
-> --
-> 2.26.2
-
-thanks
--- PMM
+>  build-tci:
+>    <<: *native_build_job_definition
+>    variables:
+> -- 
+> 2.18.1
+> 
 
