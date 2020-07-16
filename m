@@ -4,94 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A028AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 11:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E6AC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 11:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 646BB2065F
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 11:08:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13D9720760
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 11:12:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tQuv6PbZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 646BB2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJ+YISaJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13D9720760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw1ky-0000Sp-MZ
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 07:08:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41460)
+	id 1jw1oO-0001n4-BH
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 07:12:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jw1k1-0008Tu-QJ
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 07:07:53 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43588)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jw1jz-0002oA-UG
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 07:07:53 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j4so6587327wrp.10
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 04:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=C6E9vtOzgEj4Th0XxIOdPTDswZ88/ro+PVZBO7uaB/Q=;
- b=tQuv6PbZUV7LDx+qyUoUsOYA+0MYYMb+IZ2qCiYH0TrE3AKEhFREbRNAjs5Y4GhM+m
- WsCOjk9N+uonn1TyLrGEq//1iC6hmnSgI5vSGLQo1R+czsDOVhNNPDIHwJ+QIRpoihXc
- wUe3fLBecZi4qDRLF4yJE+qYdQjOkGr9LHoJ4YHqiKiVY+hVoSWnfyd0J4+xejZ8ME3j
- kR5f/lFPgeLthDH+PBpbzZnFCVtiprJbVzX8zRRCeWz95XrNhA6p/UMaZ5nbjxI9V0Gl
- DTOeYlNpdRkv361d3M90e6j9Uvh4Ak84PZn9uNl2zi3M9qCtxx10ub4RGFw3qWGrsEVh
- PuYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=C6E9vtOzgEj4Th0XxIOdPTDswZ88/ro+PVZBO7uaB/Q=;
- b=jay5y9QT7wxhU3YkuDHp0OAof4iIg66qwXbA5Ux/rFu2e910PHEkfJQkYEuYTD8Im4
- /HjXOENAJA8iNYKll81DplOy79oqCAM2ksOyuIhM2bwGoA1UFMJLz6cdBefoWWNWjjvt
- JA51dZr3RPYenzZdaRtxbeU8cqJex2b0h79+a/gAXV8Asoatfu3QNPvZhxxHiubcwgk9
- umoXcCNFQyZbeyhn8+YBc5c/hebTtt/3oTZyE/F0INT4n8psN3wnZFiBA65VXAhMRwQ3
- SmHzEV6cgn6x0jwf2Fg3McEUYISpCP4crxAbD2yv1q3+o+McUeX2alt8ZuIy+B0TZcHy
- el0A==
-X-Gm-Message-State: AOAM532ocfBICMqZk4bJy/lOWNzWxVk79cf/AjYEWscw7FTtqkOxXxUJ
- vbQkPPnAe3Yvuj3becw32DcUrA==
-X-Google-Smtp-Source: ABdhPJyPTtekJ/1teqMDY4w1GVUR0VnUCuI10c5RagIppvRcakphayU9KrC3j0RSR3pmWB6GKgBWUg==
-X-Received: by 2002:adf:fe4b:: with SMTP id m11mr4498375wrs.36.1594897670028; 
- Thu, 16 Jul 2020 04:07:50 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x185sm8061889wmg.41.2020.07.16.04.07.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Jul 2020 04:07:48 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 280021FF7E;
- Thu, 16 Jul 2020 12:07:48 +0100 (BST)
-References: <20200715204814.2630-1-robert.foley@linaro.org>
- <20200715204814.2630-2-robert.foley@linaro.org>
-User-agent: mu4e 1.5.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH 1/2] python/qemu: Cleanup changes to ConsoleSocket
-In-reply-to: <20200715204814.2630-2-robert.foley@linaro.org>
-Date: Thu, 16 Jul 2020 12:07:47 +0100
-Message-ID: <87blkfwwe4.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jw1np-0001LN-NI
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 07:11:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29505
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jw1nn-0003gd-Kd
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 07:11:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594897906;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xFiLuc5XR3wBs/vyxAIIrKUNG0idjdaeKKJacGoDj18=;
+ b=HJ+YISaJW/Lfuid3Ifr2wrDBVN0iQR0kSIVYqazGcxpOCGvs44C/jLYeqfR7IIk6Ph0pte
+ EebMYORFM8FxaBayz15Z9FLr1Rk8lOsdBjyCOA593NmQAfHl/FRgRHEa/FzR+wNVAnuAji
+ GKRn8I/GvtnJso8sJ6UZ1JQs3YeI8m4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-UZLHo_YvOtKSs2Ig2wXwgw-1; Thu, 16 Jul 2020 07:11:45 -0400
+X-MC-Unique: UZLHo_YvOtKSs2Ig2wXwgw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D670C1800D42;
+ Thu, 16 Jul 2020 11:11:43 +0000 (UTC)
+Received: from gondolin (ovpn-113-57.ams2.redhat.com [10.36.113.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 765842B6DC;
+ Thu, 16 Jul 2020 11:11:42 +0000 (UTC)
+Date: Thu, 16 Jul 2020 13:11:27 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.2] hw/s390x: Move S390_ADAPTER_SUPPRESSIBLE from
+ 'css.h' to 's390_flic.h'
+Message-ID: <20200716131127.6eec15c2.cohuck@redhat.com>
+In-Reply-To: <20200715131845.30469-1-philmd@redhat.com>
+References: <20200715131845.30469-1-philmd@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/15 19:36:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,44 +96,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, Cleber Rosa <crosa@redhat.com>, jsnow@redhat.com,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 15 Jul 2020 15:18:45 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Robert Foley <robert.foley@linaro.org> writes:
+> Not all s390x devices require to have access to the CPU internals.
+>=20
+> To reduce the include dependencies on "s390x/css.h", move the
+> S390_ADAPTER_SUPPRESSIBLE definition to "s390x/s390_flic.h".
 
-> The changes to console_socket.py and machine.py are to
-> cleanup for pylint and flake8.
->
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+But css.h is not 'CPU internals', it is the main I/O subsystem?
+
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  python/qemu/console_socket.py | 58 +++++++++++++++++------------------
->  python/qemu/machine.py        |  7 +++--
->  python/qemu/pylintrc          |  2 +-
->  3 files changed, 34 insertions(+), 33 deletions(-)
->
-> diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
-> index 830cb7c628..6a746c1dbf 100644
-> --- a/python/qemu/console_socket.py
-> +++ b/python/qemu/console_socket.py
-> @@ -1,12 +1,9 @@
-<snip>
-> @@ -103,7 +104,6 @@ class ConsoleSocket(asyncore.dispatcher):
->=20=20
->      def set_blocking(self):
->          """Maintain compatibility with socket API"""
-> -        pass
+>  include/hw/s390x/css.h       | 7 -------
+>  include/hw/s390x/s390_flic.h | 7 +++++++
+>  2 files changed, 7 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index 08c869ab0a..7858666307 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -12,7 +12,6 @@
+>  #ifndef CSS_H
+>  #define CSS_H
+> =20
+> -#include "cpu.h"
 
-Hmm shouldn't this be with the change in 2/2 because I thought you
-needed a "pass" for an empty function in python?
+FWIW, we should just be able to remove this #include...
 
-Otherwise:
+>  #include "hw/s390x/adapter.h"
+>  #include "hw/s390x/s390_flic.h"
+>  #include "hw/s390x/ioinst.h"
+> @@ -233,12 +232,6 @@ uint32_t css_get_adapter_id(CssIoAdapterType type, u=
+int8_t isc);
+>  void css_register_io_adapters(CssIoAdapterType type, bool swap, bool mas=
+kable,
+>                                uint8_t flags, Error **errp);
+> =20
+> -#ifndef CONFIG_KVM
+> -#define S390_ADAPTER_SUPPRESSIBLE 0x01
+> -#else
+> -#define S390_ADAPTER_SUPPRESSIBLE KVM_S390_ADAPTER_SUPPRESSIBLE
+> -#endif
+> -
+>  #ifndef CONFIG_USER_ONLY
+>  SubchDev *css_find_subch(uint8_t m, uint8_t cssid, uint8_t ssid,
+>                           uint16_t schid);
+> diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+> index 4687ecfe83..6bf9d73728 100644
+> --- a/include/hw/s390x/s390_flic.h
+> +++ b/include/hw/s390x/s390_flic.h
+> @@ -17,6 +17,13 @@
+>  #include "hw/s390x/adapter.h"
+>  #include "hw/virtio/virtio.h"
+>  #include "qemu/queue.h"
+> +#include "cpu.h"
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+...and we do not need it here AFAICS.
 
---=20
-Alex Benn=C3=A9e
+> +
+> +#ifndef CONFIG_KVM
+> +#define S390_ADAPTER_SUPPRESSIBLE 0x01
+> +#else
+> +#define S390_ADAPTER_SUPPRESSIBLE KVM_S390_ADAPTER_SUPPRESSIBLE
+> +#endif
+> =20
+>  /*
+>   * Reserve enough gsis to accommodate all virtio devices.
+
+Whether the definition of S390_ADAPTER_SUPPRESSIBLE belongs into css.h
+or s390_flic.h is probably a matter of taste: the definition of an I/O
+adapter is in css.h, and registration of an adapter is done via the
+FLIC.
+
+I think removing the cpu.h include might already do what you wanted to
+do?
+
 
