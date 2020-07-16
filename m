@@ -2,88 +2,69 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A934C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C08CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:35:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 343DE2065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:34:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7ZZoLzQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 343DE2065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 112872074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 10:35:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 112872074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw1E1-0002l3-GZ
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:34:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60358)
+	id 1jw1Ee-0003dF-CJ
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 06:35:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jw1DL-0002LT-4V
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:34:07 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44646)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jw1DJ-0001el-Dk
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:34:06 -0400
-Received: by mail-ot1-x341.google.com with SMTP id 5so3763428oty.11
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 03:34:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=BD4pP2OL6n8sUBEwRwBcHJymW4TzC0cy2bIoy4Dc2JU=;
- b=j7ZZoLzQfuGxPfKsq6nX7UndIygFOElwI5Cji7ee2oWnFEEAv33ynceWtPclO9k0Jx
- S38jGelfOlzk/YVwOhAb/rUPT26xisPc2vjz+bqb1Dc7X67QntwyZsGzFT3lKzg3DjTh
- bYgD+uDwJxyPxNu6fV0pQKjsLEa1m7ueS4ELtA3qKO2jnxD87SzV+hJkvEm5uoHqaW4F
- wtH5dcR0MKk5p3gRJ65tt8vNnYRp+nLvOWufpy6tJ53sGW8nVvuCn/wguW3ZrVhk38fX
- cf9+taLx0hOXelvg9fTMUW3rE/1RaLc8sK7BF04XiGsUKsu0Ijnnh/NXot7+xRZFdfY3
- 5bfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=BD4pP2OL6n8sUBEwRwBcHJymW4TzC0cy2bIoy4Dc2JU=;
- b=L7wTyNQq0yPZYNu/uauBBrCFxzoySmBvLe9zBOIfLDpmHYkZY5yRmBu1YkHmdBf7fu
- pk27q7KWiMyQbOGfoh6WB1qyXejFy5Svdqu1zsrvvYkeRq+P6PwLFUu963zalGAXV4T7
- MilHxj7CHmLf6StpbedshoCK/1vDu5Et3R6Md9YmXxM2l6sq/XVMQzAkN5mmj9KQ612z
- IOPJVNgPkjNgUTGDgGoL5QpheLqJ9vz29nPeovJAScLZN6by2E8oAF/8bauYZCHWgyjv
- NAST6oxQLYyQXhjpibN/Hq3fwpCWsK7Irs5P0LRo/Ypvlrkt0vFHmaCvfokOIOzXxR5U
- KDCA==
-X-Gm-Message-State: AOAM5327qkCnQLMmesnKI4utxWJmZ4HKsNxui13UMC1TlBg0hvqW0qKt
- CtqZIV6PhcFrZ3GOW5sxSXnt4y/KJviOlB2bJLY=
-X-Google-Smtp-Source: ABdhPJwqkXpsD+8ctXssipv8gAwCcTjk6m5PYmKjuQKEIa4y6nCFnUaAZclUdI8e9fyS96Hp3Ymxtt5GgumxxF763yA=
-X-Received: by 2002:a05:6830:15c3:: with SMTP id
- j3mr3506334otr.353.1594895644192; 
- Thu, 16 Jul 2020 03:34:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jw1Dv-0002os-Qs
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:34:43 -0400
+Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:57865)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jw1Dt-0001lK-8S
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 06:34:43 -0400
+Received: from player756.ha.ovh.net (unknown [10.110.208.220])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id D7B8B172E9C
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 12:34:38 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player756.ha.ovh.net (Postfix) with ESMTPSA id 09999138F9FD0;
+ Thu, 16 Jul 2020 10:34:33 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R006c0787347-977c-43f8-bb79-59c6d966bdb4,82226C5D462F885DC4F8BFF1B5769E1A03475668)
+ smtp.auth=groug@kaod.org
+Date: Thu, 16 Jul 2020 12:34:30 +0200
+From: Greg Kurz <groug@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] spapr_pci: Robustify support of PCI bridges
+Message-ID: <20200716123430.12918da6@bahia.lan>
+In-Reply-To: <20200716025009-mutt-send-email-mst@kernel.org>
+References: <159431476748.407044.16711294833569014964.stgit@bahia.lan>
+ <20200716025009-mutt-send-email-mst@kernel.org>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200715154117.15456-1-liq3ea@163.com>
- <874kq8roev.fsf@dusky.pond.sub.org>
- <CAKXe6S+CvQ1rmnWXi2_=kiCF4yG-2T3iPut=51G25qwL+oO2Pw@mail.gmail.com>
- <87blkfpz20.fsf@dusky.pond.sub.org>
-In-Reply-To: <87blkfpz20.fsf@dusky.pond.sub.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 16 Jul 2020 18:33:28 +0800
-Message-ID: <CAKXe6SJ5ckb=VnhQx=uO7Y6pSm6mKL87F0OX2f2+499nmiSfPQ@mail.gmail.com>
-Subject: Re: [PATCH v2] tests: qmp-cmd-test: fix memory leak
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3260043182197152217
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfeeggddvlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=178.33.251.175; envelope-from=groug@kaod.org;
+ helo=3.mo179.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 06:34:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,111 +78,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
- Auger Eric <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8816=E6=
-=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:52=E5=86=99=E9=81=93=EF=BC=9A
->
-> Li Qiang <liq3ea@gmail.com> writes:
->
-> > Markus Armbruster <armbru@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=881=
-6=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=881:59=E5=86=99=E9=81=93=EF=BC=
-=9A
-> >>
-> >> Li Qiang <liq3ea@163.com> writes:
-> >>
-> >> > Properly free each test response to avoid memory leak and separate
-> >> > qtest_qmp() calls with spare lines, in a consistent manner.
-> >> >
-> >> > Fixes: 5b88849e7b9("tests/qmp-cmd-test: Add
-> >> > qmp/object-add-failure-modes"
-> >>
-> >> The patch also fixes leaks introduced in 442b09b83d and 9fc719b869,
-> >> actually.  At least it should, but the patch appears to be incomplete.
->
-> 442b09b83d was fine, actually.
->
-> 9fc719b869 wasn't, and your second patch hunk fixes it.  Please add a
-> "Fixes: 9fc719b869' line to the commit message.
+On Thu, 16 Jul 2020 02:53:07 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Hi Thomas,
+> On Thu, Jul 09, 2020 at 07:12:47PM +0200, Greg Kurz wrote:
+> > Some recent error handling cleanups unveiled issues with our support of
+> > PCI bridges:
+> > 
+> > 1) QEMU aborts when using non-standard PCI bridge types,
+> >    unveiled by commit 7ef1553dac "spapr_pci: Drop some dead error handling"
+> > 
+> > $ qemu-system-ppc64 -M pseries -device pcie-pci-bridge
+> > Unexpected error in object_property_find() at qom/object.c:1240:
+> > qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not found
+> > Aborted (core dumped)
+> > 
+> > This happens because we assume all PCI bridge types to have a "chassis_nr"
+> > property. This property only exists with the standard PCI bridge type
+> > "pci-bridge" actually. We could possibly revert 7ef1553dac but it seems
+> > much simpler to check the presence of "chassis_nr" earlier.
+> > 
+> > 2) QEMU abort if same "chassis_nr" value is used several times,
+> >    unveiled by commit d2623129a7de "qom: Drop parameter @errp of
+> >    object_property_add() & friends"
+> > 
+> > $ qemu-system-ppc64 -M pseries -device pci-bridge,chassis_nr=1 \
+> >                         -device pci-bridge,chassis_nr=1
+> > Unexpected error in object_property_try_add() at qom/object.c:1167:
+> > qemu-system-ppc64: -device pci-bridge,chassis_nr=1: attempt to add duplicate property '40000100' to object (type 'container')
+> > Aborted (core dumped)
+> > 
+> > This happens because we assume that "chassis_nr" values are unique, but
+> > nobody enforces that and we end up generating duplicate DRC ids. The PCI
+> > code doesn't really care for duplicate "chassis_nr" properties since it
+> > is only used to initialize the "Chassis Number Register" of the bridge,
+> > with no functional impact on QEMU. So, even if passing the same value
+> > several times might look weird, it never broke anything before, so
+> > I guess we don't necessarily want to enforce strict checking in the PCI
+> > code now.
+> > 
+> > Workaround both issues in the PAPR code: check that the bridge has a
+> > unique and non null "chassis_nr" when plugging it into its parent bus.
+> > 
+> > Fixes: 05929a6c5dfe ("spapr: Don't use bus number for building DRC ids")
+> > Reported-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> 
+> 
+> 
+> > ---
+> >  hw/ppc/spapr_pci.c |   57 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 57 insertions(+)
+> > 
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 329002ac040e..09d52ef7954d 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1480,6 +1480,57 @@ static void spapr_pci_bridge_plug(SpaprPhbState *phb,
+> >      add_drcs(phb, bus);
+> >  }
+> >  
+> > +/* Returns non-zero if the value of "chassis_nr" is already in use */
+> > +static int check_chassis_nr(Object *obj, void *opaque)
+> > +{
+> > +    int new_chassis_nr =
+> > +        object_property_get_uint(opaque, "chassis_nr", &error_abort);
+> > +    int chassis_nr =
+> > +        object_property_get_uint(obj, "chassis_nr", NULL);
+> > +
+> > +    if (!object_dynamic_cast(obj, TYPE_PCI_BRIDGE)) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    /* Skip unsupported bridge types */
+> > +    if (!chassis_nr) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    /* Skip self */
+> > +    if (obj == opaque) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    return chassis_nr == new_chassis_nr;
+> > +}
+> > +
+> > +static bool bridge_has_valid_chassis_nr(Object *bridge, Error **errp)
+> 
+> I would rename this "bridge_has_unique_chassis_nr".
+> 
 
-Could you do this minor adjustment?
-Add also add Markus's r-b tag.
+Right.
 
+> > +{
+> > +    int chassis_nr =
+> > +        object_property_get_uint(bridge, "chassis_nr", NULL);
+> > +
+> > +    /*
+> > +     * slotid_cap_init() already ensures that "chassis_nr" isn't null for
+> > +     * standard PCI bridges, so this really tells if "chassis_nr" is present
+> > +     * or not.
+> > +     */
+> > +    if (!chassis_nr) {
+> > +        error_setg(errp, "PCI Bridge lacks a \"chassis_nr\" property");
+> > +        error_append_hint(errp, "Try -device pci-bridge instead.\n");
+> > +        return false;
+> > +    }
+> > +
+> > +    /* We want unique values for "chassis_nr" */
+> > +    if (object_child_foreach_recursive(object_get_root(), check_chassis_nr,
+> > +                                       bridge)) {
+> > +        error_setg(errp, "Bridge chassis %d already in use", chassis_nr);
+> > +        return false;
+> > +    }
+> > +
+> > +    return true;
+> > +}
+> > +
+> >  static void spapr_pci_plug(HotplugHandler *plug_handler,
+> >                             DeviceState *plugged_dev, Error **errp)
+> >  {
+> > @@ -1491,6 +1542,12 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+> >      PCIBus *bus = PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
+> >      uint32_t slotnr = PCI_SLOT(pdev->devfn);
+> >  
+> > +    if (pc->is_bridge) {
+> > +        if (!bridge_has_valid_chassis_nr(OBJECT(plugged_dev), errp)) {
+> > +            return;
+> > +        }
+> > +    }
+> > +
+> 
+> 
+> Add a comment here explaning DRC ids are generated from chassis_nr and
+> these need to be unique?
+> 
 
->
-> >> >
-> >> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> >> > Signed-off-by: Li Qiang <liq3ea@163.com>
-> >> > ---
-> >> > Change sincve v1: add detailed commit message
-> >> >
-> >> > tests/qtest/qmp-cmd-test.c | 13 +++++++++++++
-> >> >  1 file changed, 13 insertions(+)
-> >> >
-> >> > diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-> >> > index c68f99f659..f7b1aa7fdc 100644
-> >> > --- a/tests/qtest/qmp-cmd-test.c
-> >> > +++ b/tests/qtest/qmp-cmd-test.c
-> >> > @@ -230,6 +230,8 @@ static void test_object_add_failure_modes(void)
-> >>    static void test_object_add_failure_modes(void)
-> >>    {
-> >>        QTestState *qts;
-> >>        QDict *resp;
-> >>
-> >>        /* attempt to create an object without props */
-> >>        qts =3D qtest_init(common_args);
-> >>        resp =3D qtest_qmp(qts, "{'execute': 'object-add', 'arguments':=
-"
-> >>                         " {'qom-type': 'memory-backend-ram', 'id': 'ra=
-m1' } }");
-> >>        g_assert_nonnull(resp);
-> >>        qmp_assert_error_class(resp, "GenericError");
-> >>
-> >> Doesn't @resp leak here, too?
+Makes sense.
+
+> 
+> >      /* if DR is disabled we don't need to do anything in the case of
+> >       * hotplug or coldplug callbacks
+> >       */
 > >
-> > No, qmp_assert_error_class will call qobject_unref(rsp) will so will no=
-t leak.
->
-> You're right.
->
-> With the additional Fixes:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
-> > In fact, I think this is a inconsistent for 'qtest_qmp'.
-> > I think we can apply this patch first and then change the
-> > 'qmp_assert_error_class' or/and others
-> > to free resp. And just let the caller of 'qtest_qmp' frees unref the rs=
-p.
->
-> Do you mean "not to free @resp"?
+> 
+> With above fixed:
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>  
+> Feel free to merge.
+> 
 
-Yes, the 'qmp_assert_error_class' not free @resp.
-
-
->
-> > What's your idea?
->
-> Rename it to qmp_expect_error_and_unref()?
-
-In fact I prefer qmp_assert_error_class has no reason unref @resp.
-So the user of ''qtest_qmp' will has a unify processing of the @resp.
-    resp =3D qtest_qmp()
-    use resp
-    free resp.
-
-If we just rename to 'qmp_expect_error_and_unref'.
-The user still should remember this. If not they will have UAF or mem
-leak issue.
-
-Thanks,
-Li Qiang
-
->
+Thanks !
 
