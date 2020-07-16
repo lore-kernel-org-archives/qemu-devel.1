@@ -2,77 +2,119 @@ Return-Path: <SRS0=z35Y=A3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D97C433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 12:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92AADC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 12:12:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73C8E20760
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 12:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AA8920739
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Jul 2020 12:12:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIn9bshe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73C8E20760
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F7U3kLoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA8920739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jw2c1-0001ro-MF
-	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 08:03:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57258)
+	id 1jw2kj-0003yw-JY
+	for qemu-devel@archiver.kernel.org; Thu, 16 Jul 2020 08:12:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60474)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jw2bQ-0001SF-3W
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 08:03:04 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57376
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jw2jy-0003TH-L7
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 08:11:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22519
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jw2bN-0004Ps-WE
- for qemu-devel@nongnu.org; Thu, 16 Jul 2020 08:03:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jw2ju-0005zN-Em
+ for qemu-devel@nongnu.org; Thu, 16 Jul 2020 08:11:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594900981;
+ s=mimecast20190719; t=1594901508;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6p12cVFWhQjghokDVt/0nFHm0oacy9mwe1UtoYlgeac=;
- b=WIn9bshe0YXFZMBtWFFhSTX3nYWKoa14ImHgipsqzW+nKQIbMsFJF0piw8NxnZ93SJcEHS
- XFP6TLWnJiVN8K/ghRWyKlxwt29kNz3hQXlciHx2ihbkzDZfNn6PFTdD6zI4VRpmOIzOP3
- nd/zJdUx4SD7ep0rQ0HcjWFIr1u7Mqg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-evyd2DwJP_CIhmv7xQgKJA-1; Thu, 16 Jul 2020 08:02:54 -0400
-X-MC-Unique: evyd2DwJP_CIhmv7xQgKJA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31AFF8C3E04;
- Thu, 16 Jul 2020 12:02:52 +0000 (UTC)
-Received: from gondolin (ovpn-113-57.ams2.redhat.com [10.36.113.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 304DE72AF9;
- Thu, 16 Jul 2020 12:02:17 +0000 (UTC)
-Date: Thu, 16 Jul 2020 14:02:14 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Collin Walling <walling@linux.ibm.com>
-Subject: Re: [PATCH v4 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
-Message-ID: <20200716140214.3fdc7590.cohuck@redhat.com>
-In-Reply-To: <d59bd0a5-0660-0c22-09dd-018be6dfe74f@linux.ibm.com>
-References: <20200624202312.28349-1-walling@linux.ibm.com>
- <b1d68acf-881f-be0f-c1ac-d32b8bfc859d@linux.ibm.com>
- <20200715180409.451d217e.cohuck@redhat.com>
- <d59bd0a5-0660-0c22-09dd-018be6dfe74f@linux.ibm.com>
-Organization: Red Hat GmbH
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=npHidU2crb4EQ+ll44BnSlywKEDjfc9ilKdB1rD9HnY=;
+ b=F7U3kLoBn8o2ufZVjDjCXjHwL2FUW/pJvs+PeC2t5upJz9kZPDxbAbTPl0YfuTl3Z0hSJw
+ 1QfjLuDRJpkAzGjyDRw6dmlyp9+rAIXdL9KVnjOk63zfFI32XsRgncNGCkhBCB9ggzWL/O
+ +w93ilT+kv87pYBPsbf1Aczo4+jZmDY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-__mbBbX4NZSF3w-0NBUdTw-1; Thu, 16 Jul 2020 08:11:43 -0400
+X-MC-Unique: __mbBbX4NZSF3w-0NBUdTw-1
+Received: by mail-wm1-f72.google.com with SMTP id u68so4944998wmu.3
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 05:11:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=npHidU2crb4EQ+ll44BnSlywKEDjfc9ilKdB1rD9HnY=;
+ b=L96Fm05wKeDS7IlQEFBbtxqCFNLE6ltnfngA8SX1ROcQpFNfdezVQayHVKbRkaFuUT
+ vYX+oQxGn+cZWbTgHFtZj1njWeHb+vjRKZRv4WHDm9CmOyJVeC5aE+m7JCdbbxG/RFYU
+ rMpfCbtt/QciZpvj41IALT7buUAV4lGdXCSq5U0l8REz6UOIPTvhbHJ7fgSo4Gi7BRAG
+ 7xDZLeOqMuWe6of0s/9rs6qf7Y8D8WdigtLrdIiJnXC8zU0RBAEYWtZe7wP1aURqlEuU
+ VsjoQ0SKvy3U3Chy5jqe1nZyZV8/iZUstgLfweL+wGBgGbYCXgRxpoO5BNGKlWk5ARO5
+ wT7w==
+X-Gm-Message-State: AOAM531rR7xmRXmEAG8pbWhlTpDKK6OWrS3v1gG9fHXZu6vYYneySFiR
+ xaYmeEJJrs7sXXSSCqzp+AcwFDFwtl99IJEghO7St9ZaNlGF+zytGMoQCcBEpueaeDFy3FwhBjz
+ 865MRQAkDqI0JnsI=
+X-Received: by 2002:adf:ecc8:: with SMTP id s8mr4893236wro.317.1594901502822; 
+ Thu, 16 Jul 2020 05:11:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy42waCOCF6p/bxrb4PMkgFRE7uIdL2UCMLdFQIg+29Pf5mNWTO/z+7pKKbJADzQ9IzDdTwkQ==
+X-Received: by 2002:adf:ecc8:: with SMTP id s8mr4893223wro.317.1594901502540; 
+ Thu, 16 Jul 2020 05:11:42 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id 133sm8738663wme.5.2020.07.16.05.11.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 16 Jul 2020 05:11:41 -0700 (PDT)
+Subject: Re: qemu test-qga failure on mergebuild after VERSION file change:
+ dependency issues??
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <CAFEAcA-reu8gKpBMgEffStTRA+M02OWj75riXqBYXjgtOh5Z_A@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <6e12e924-aefc-cd19-7fcb-4a919a4322ca@redhat.com>
+Date: Thu, 16 Jul 2020 14:11:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CAFEAcA-reu8gKpBMgEffStTRA+M02OWj75riXqBYXjgtOh5Z_A@mail.gmail.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 04:55:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,52 +138,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, svens@linux.ibm.com, pbonzini@redhat.com,
- mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 15 Jul 2020 12:26:20 -0400
-Collin Walling <walling@linux.ibm.com> wrote:
+On 7/16/20 12:53 PM, Peter Maydell wrote:
+> The first merge I tried to process after bumping VERSION for rc0
+> failed on test-qga like this:
+> 
+> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+> tests/test-qga -m=quick -k --tap < /dev/null | ./scripts/tap-driv
+> er.pl --test-name="test-qga"
+> PASS 1 test-qga /qga/sync-delimited
+> PASS 2 test-qga /qga/sync
+> PASS 3 test-qga /qga/ping
+> **
+> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-qga.c:303:test_qga_info:
+> assertion failed (version == QEMU_VERSION): ("5.0.9
+> 0" == "5.0.50")
+> ERROR test-qga - Bail out!
+> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-qga.c:303:test_qga_info:
+> assertion failed (versio
+> n == QEMU_VERSION): ("5.0.90" == "5.0.50")
+> Aborted (core dumped)
+> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:659:
+> recipe for target 'check-unit' failed
+> 
+> Looking at timestamps on files, tests/test-qga.o never got rebuilt,
+> even though config-host.h has been updated (and so has the new
+> QEMU_VERSION). Any idea what's gone wrong here?
+> 
+> Also weird: this build tree has no .d files in it.
 
-> On 7/15/20 12:04 PM, Cornelia Huck wrote:
-> > On Wed, 15 Jul 2020 11:36:35 -0400
-> > Collin Walling <walling@linux.ibm.com> wrote:
-> >   
-> >> Polite ping. Patches have been sitting on the list for a few weeks now,
-> >> and it doesn't look like any further changes are requested (hopefully I
-> >> didn't miss something).  
-> > 
-> > The only thing I had was (I think) the logging of the length you just
-> > replied to. We can still tweak things like that later, of course.
-> > 
-> > As these patches depend on a headers sync, I could not yet queue them.
-> > I can keep a preliminary version on a branch. I assume that the header
-> > changes will go in during the next kernel merge window? (If I missed
-> > something, apologies for that.)
-> >   
-> 
-> Gotcha. Thanks for the update :)
-> 
-> There was an email on the KVM list a couple of days that made one change
-> to the Linux header. Just changed the integer used for the DIAG cap,
-> which should be reflected in QEMU as well.
-> 
-> https://www.spinics.net/lists/kvm/msg220548.html
-> 
-> Should I respin this patch series to include the new ack's and account
-> for the header sync?
+Yes. We chatted about that yesterday on IRC, I ran this test:
 
-No need for that, my tooling picks up acks and the headers update needs
-to be replaced with a sync against a proper Linux version anyway.
+- checkout master
+- build after distclean
+- checkout mytest
+- change a function prototype in qdev-properties.c
+  (simply because I had it opened in my editor)
+- build
 
-I've queued the patches on a local branch, and the only patch that did
-not apply cleanly was the headers patch, which will get replaced later
-anyway :) Just ping me when the kernel patches hit upstream, then I'll
-do a header sync against the next -rc and queue the patches on
-s390-next.
+make: *** [rules.mak:69: hw/core/qdev-properties.o] Error 1
+
+But the file is still here from the previous 'master' build:
+
+$ ls -ln hw/core/qdev-properties.o
+-rw-rw-r--. 1 1000 1000 140624 Jul 15 16:27 hw/core/qdev-properties.o
+
+$ touch hw/core/qdev-properties.o
+
+$ make -> link success... but prototype doesn't match...
+
+> 
+> thanks
+> -- PMM
+> 
 
 
