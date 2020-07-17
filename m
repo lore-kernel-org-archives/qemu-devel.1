@@ -2,120 +2,83 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B46C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E749C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 319E12070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:21:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="E1UZp7Pb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 319E12070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 53B202070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:24:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53B202070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwRF9-0004rp-GI
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:21:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50504)
+	id 1jwRHZ-0007Nr-If
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:24:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jwREO-0003wD-7G
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:20:56 -0400
-Received: from mail-eopbgr40090.outbound.protection.outlook.com
- ([40.107.4.90]:41631 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jwREL-0008Hm-VT
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:20:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TVCKLeg0VUdp1nBOX+i981ujfzRLJy3n15BPjzX3cC7xEH64W5JlXgpR1x9fhexNd03Tt8Uk9yM1Eiy5uUc+YZf1Uo/ZUsJRr6Hq0nuaVMc08YOp+nuWQjf5Ssq2Bq0/+DNM7uvEZ4DM4SX3ziEoLw9gfeqzpbrG5gY05Xc65vqoti7H8I2vfmqHE+bplE7JT2ocunb5ae7IvzTXXXSw9fBAHpYyOE7iwCSLpaqProwtLT9h9vJ9MJXGzZL407bOYAjHy6EmbphHzOmTVmcLvvD/o+uWD0GA0hrOUSAMmNQRWtFPBcFhQ0tq745b4d2SBcJFldR9CUCq5Way5j8T9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ew/JAG6JXLqGZxY9fFsCIEOaB7BPDHNPEj4WMQkiAac=;
- b=kMknVaR0dIwzKGUCwsrpDovcPG6kTbZL0akUgACMrBDeP691nQszitg5a/Sgb3loZyODQVlfENSVToXUyel7tcwowZXvwH8nu1vuMdwvaNyPcoAnh2B4qySQf+fXsBvO6zhyYDwlfVz4TVoAZF67T2N6Pv8mYMk0wNYhv5JnEMnunq9Zg2liaeMc+2ud7z/dXtV3SoaMFXeVul7J4ZKA09HJcNqHZxxXfKGJk4N/WES2p8fI2wOiBUwzkR0RHimSXmoIObezVqKQQKfaFRz6PWAGQ5bXgS3WjVOtzPwyCroT84HD7+AuN9fWYTqEeJLTmBkxe9ZHFgpgaxkSGyib+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ew/JAG6JXLqGZxY9fFsCIEOaB7BPDHNPEj4WMQkiAac=;
- b=E1UZp7PbI+EEB2/fggz9RYPPdtKKRSUTy8lmM7mTfqE8dVfWn17Olcr3BLtjombZKuM/zT0739LNA2i8U818Kyl6ZQLDGI7bjBs1kOWryqEsZCPXou2QBzI8FcHSl/YxjgrMLmvb8pWn8O6bTvX/cqjEiBdgg8XqEv5tAbioXd8=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
- by VE1PR03MB5967.eurprd03.prod.outlook.com (2603:10a6:803:108::33)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Fri, 17 Jul
- 2020 14:05:49 +0000
-Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
- ([fe80::ad93:b959:82ec:107f]) by VE1PR03MB5246.eurprd03.prod.outlook.com
- ([fe80::ad93:b959:82ec:107f%3]) with mapi id 15.20.3174.027; Fri, 17 Jul 2020
- 14:05:49 +0000
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] Add support for a group of btrfs ioctls - 2
-Date: Fri, 17 Jul 2020 16:04:29 +0200
-Message-Id: <20200717140433.265599-1-Filip.Bozuta@syrmia.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: GV0P278CA0026.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:710:28::13) To VE1PR03MB5246.eurprd03.prod.outlook.com
- (2603:10a6:802:a1::22)
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jwRGw-0006nn-Gp
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:23:34 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:51043)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jwRGu-0000Sn-Nc
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:23:34 -0400
+Received: from mail-vs1-f69.google.com ([209.85.217.69])
+ by youngberry.canonical.com with esmtps
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
+ (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jwRGs-00037p-Jh
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 14:23:30 +0000
+Received: by mail-vs1-f69.google.com with SMTP id l26so1790599vsb.23
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 07:23:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gRTJnjj9AxDPUWZQL7OWihkmKTHSnl+aXdyW5qkviXU=;
+ b=YZVAv8uyDwnydDshfac5tuMgX2y/YwH/tsLBDDILhiu0Cs0EJN7uw3W5/3ceWmDd4R
+ qlcg3fJ2WzkKT8pKFKEC7uDAjZqrmit9KMeZcGSLNbBkbrYJVQbxX1JgMgW9jwlpKUgt
+ ail8Yl/jj79Tzk5n3oeiphTdEgeJ9w/s6ONFpYV3cHOEL0Qjupq1sVVR8pFMhYMwuWjg
+ MiK/MINaRhatbESV0vgmGRDT5cOO4hvoOreoQYbGTB9idKLPz4xvLXy+mAt71ZdLF/Ae
+ bRYEXlceXW+4l1AJE5eNF+lHhk9UwTuN4F1FPN6zjIW6b+aXSqi9A+nk8vjpM/xzlnek
+ XzrQ==
+X-Gm-Message-State: AOAM530EQXIuTRoyUamyPNhXu1hUT9os85Ie4EPyha1ICVr2Q/KQWdZY
+ HIQsD7WM86OqAi/sTcWMsuwhBWNnZ7a7splqZUtqmwmWKiReiS5W2RLGM/UvbtWRQXGGWemz0El
+ J7gb4Muj7jlJj8qEsFJqUafi657kJW3o9el5IVQ4/ghPp+wL3
+X-Received: by 2002:ab0:44e5:: with SMTP id n92mr7607198uan.9.1594995809361;
+ Fri, 17 Jul 2020 07:23:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbpJPTDBGKjPgpidvaI9QcFpM9yNOcwhKLvAoL6+7rt4i8YKYTPUcKqza82UfC5dsGfeSkdZ2HP6t5PBqQ7uw=
+X-Received: by 2002:ab0:44e5:: with SMTP id n92mr7607169uan.9.1594995809024;
+ Fri, 17 Jul 2020 07:23:29 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (147.91.217.239) by
- GV0P278CA0026.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:28::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3195.18 via Frontend Transport; Fri, 17 Jul 2020 14:05:48 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [147.91.217.239]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8e4d68d9-ecdb-4bb2-5097-08d82a5a820e
-X-MS-TrafficTypeDiagnostic: VE1PR03MB5967:
-X-Microsoft-Antispam-PRVS: <VE1PR03MB5967E55DF0E8D9E1BCFF07DFEB7C0@VE1PR03MB5967.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: v/5/a7mMFXSNbflS8iMUW+5vkoYuBYw5/T2Ixwrimk/fX3gfJZnPbPS3nUTgag3d8+YkOWyHPujbXu5RrJeKjcCS75TyiZOp2Vt4iSGxfDHaztsW3b/kmIrLdmNE+lHwmIJ0jlOc5+n3RQS86V4gAqt5jbHtYOFUn1etxXejGBZomcTAdIA9lyXzKeieRVp2ouLZjbv0rAMHuv3XgHHjQ3eayLzxt9IXhQz51xzQ3Xz7BkKXnAisKraWwKpm5GUDrJQH+eGgOu65o25QnA6ut8f1GBfSDWRRN/Jdp9hK/zAVdu8G52KLrpl3+ETb32PlRt18uySvAbDxqk/U0kyY/81GN+UYGnCLgLWMdEsWvqQJ8bG03Jjvq9Q65mDbWMCjJPSqZYxkCWC5qobJBVbgrfslfNw0kQrXrZDbDeRd0NMVXbw7HMEQuHEVjrD85FpMflK1yi01fwS17wz/PPxmHQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(39830400003)(136003)(366004)(346002)(396003)(376002)(2906002)(1076003)(83380400001)(52116002)(8936002)(66946007)(956004)(316002)(66476007)(36756003)(66556008)(508600001)(6512007)(966005)(6916009)(6666004)(2616005)(69590400007)(26005)(8676002)(6486002)(6506007)(16526019)(5660300002)(4326008)(186003)(86362001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: ScKBD+5Vi3kLxNBObGbMLSYrADvVKR/6QMIm/4XU3ZeiQp1+aH/29SrCvQWtyQS377hY7PrCHx/6WooT8xcqYBUdVgx5wYW+l/I95PNeyrS6NfOtn432YWqSQE9PyIl4jka7mi9DukrPkuBIzLeJr+ZUpW3l+0p/Frxb84d7CoFjisCWrcOM0q59l5PxAY9no4goAHb6xytlpSdNco+zmYkGc4o9TPYItzJtDAl7BdW+EK6wwHaGn6Y2uOLcU29GaArMPu4viVPAkbPLjbEMKbZl5lPPAtIQMveJK7LKGeN4xp0Isxje1whk5xlGbcqigyVwP4o/Je7hI+NKL/mEKMY2hKaF/uiioIMeWZhlKqFg6mkRoWB8fnMBrcLgVxR6WXWeuFE55Mhvr3Gt+Alx2ky4Mrn47ICC5Jgf/1RO05wcdV5fbwGkpjeYU4bA0gF5QxbR2HYjodKOUlGpaFg0NPDAuQDjGaWTmYf4ll5WJ4g=
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e4d68d9-ecdb-4bb2-5097-08d82a5a820e
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 14:05:49.2813 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V4fVy6ciVL28rWWukbPWUaCPJLiLdcC7M2YcnclZg5sexHw2L3Uio2jl/a+b0VHyRWkc3Abj6wMz/zpt0PR2Hg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR03MB5967
-Received-SPF: pass client-ip=40.107.4.90; envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 10:20:51
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200717105139.25293-1-alex.bennee@linaro.org>
+ <20200717105139.25293-6-alex.bennee@linaro.org>
+In-Reply-To: <20200717105139.25293-6-alex.bennee@linaro.org>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Fri, 17 Jul 2020 16:23:03 +0200
+Message-ID: <CAATJJ0+XL6-49cK0duxtYO1smywsoi3bL+03DxJG=OrpyZkdjQ@mail.gmail.com>
+Subject: Re: [PATCH v1 5/5] accel/tcg: better handle memory constrained systems
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000009d98d105aaa3e603"
+Received-SPF: none client-ip=91.189.89.112;
+ envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 09:40:52
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,63 +91,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@viver.eu
+Cc: fam@euphon.net, "Daniel P. Berrange" <berrange@redhat.com>,
+ richard.henderson@linaro.org, qemu-devel <qemu-devel@nongnu.org>,
+ f4bug@amsat.org, cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>,
+ aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series covers support for following btrfs ioctls
+--0000000000009d98d105aaa3e603
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-    *BTRFS_IOC_DEFAULT_SUBVOL        *BTRFS_IOC_QUOTA_RESCAN
-    *BTRFS_IOC_GET_SUBVOL_ROOTREF    *BTRFS_IOC_QUOTA_RESCAN_WAIT
-    *BTRFS_IOC_QUOTA_CTL             *BTRFS_IOC_SCRUB
-    *BTRFS_IOC_QGROUP_CREATE         *BTRFS_IOC_SCRUB_CANCEL
-    *BTRFS_IOC_QGROUP_ASSIGN         *BTRFS_IOC_SCRUB_PROGRESS
-    *BTRFS_IOC_INO_PATHS             *BTRFS_IOC_QGROUP_LIMIT
-    *BTRFS_IOC_LOGICAL_INO           *BTRFS_IOC_QUOTA_RESCAN_STATUS
-    *BTRFS_IOC_LOGICAL_INO_V2
-    *BTRFS_IOC_INO_LOOKUP_USER
-    *BTRFS_IOC_INO_LOOKUP
+On Fri, Jul 17, 2020 at 12:51 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
 
-The functionalities of individual ioctls were described in this series
-patch commit messages. Since all of these ioctls are added in kernel
-version 3.9, their definitions in file 'linux-user/ioctls.h' are
-enwrapped in an #ifdef directive.
+> It turns out there are some 64 bit systems that have relatively low
+> amounts of physical memory available to them (typically CI system).
+> Even with swapping available a 1GB translation buffer that fills up
+> can put the machine under increased memory pressure. Detect these low
+> memory situations and reduce tb_size appropriately.
+>
+> Fixes: 600e17b261
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+> ---
+>  accel/tcg/translate-all.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 2afa46bd2b1..2ff0ba6d19b 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t
+> tb_size)
+>  {
+>      /* Size the buffer.  */
+>      if (tb_size =3D=3D 0) {
+> -        tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
+> +        size_t phys_mem =3D qemu_get_host_physmem();
+> +        if (phys_mem > 0 && phys_mem < (2 *
+> DEFAULT_CODE_GEN_BUFFER_SIZE)) {
+> +            tb_size =3D phys_mem / 4;
+>
 
-Testing method:
+In my experiments I've found that /8 more closely matches the former
+behavior
+on small hosts while at the same time not affecting common large hosts.
 
-    Mini test programs were written for these ioctls. These test programs
-    can be found on a repository which is located on the link:
-    https://github.com/bozutaf/btrfs-tests
 
-    These test programs were compiled (sometimes using cross compilers) for
-    following architectures:
+> +        } else {
+> +            tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
+> +        }
+>      }
+>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
+>          tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;
+> --
+> 2.20.1
+>
+>
 
-         * Intel 64-bit (little endian)
-         * Power pc 32-bit (big endian)
-         * Power pc 64-bit (big endian)
+--=20
+Christian Ehrhardt
+Staff Engineer, Ubuntu Server
+Canonical Ltd
 
-    The corresponding native programs were executed without using QEMU on
-    an intel x86_64 host.
+--0000000000009d98d105aaa3e603
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-    All applicable compiled programs were in turn executed through QEMU
-    and the results obtained were the same ones gotten for native
-    execution.
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Jul 17, 2020 at 12:51 PM Alex=
+ Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@lina=
+ro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">It turns out there are some 64 bit systems that have relatively low<b=
+r>
+amounts of physical memory available to them (typically CI system).<br>
+Even with swapping available a 1GB translation buffer that fills up<br>
+can put the machine under increased memory pressure. Detect these low<br>
+memory situations and reduce tb_size appropriately.<br>
+<br>
+Fixes: 600e17b261<br>
+Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.or=
+g" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
+Cc: BALATON Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu" target=3D"_bla=
+nk">balaton@eik.bme.hu</a>&gt;<br>
+Cc: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canonical.c=
+om" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;<br>
+---<br>
+=C2=A0accel/tcg/translate-all.c | 7 ++++++-<br>
+=C2=A01 file changed, 6 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c<br>
+index 2afa46bd2b1..2ff0ba6d19b 100644<br>
+--- a/accel/tcg/translate-all.c<br>
++++ b/accel/tcg/translate-all.c<br>
+@@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t tb_si=
+ze)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0/* Size the buffer.=C2=A0 */<br>
+=C2=A0 =C2=A0 =C2=A0if (tb_size =3D=3D 0) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t phys_mem =3D qemu_get_host_physmem();<b=
+r>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (phys_mem &gt; 0 &amp;&amp; phys_mem &lt; (=
+2 * DEFAULT_CODE_GEN_BUFFER_SIZE)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D phys_mem / 4;<br></b=
+lockquote><div><br></div><div>In my experiments I&#39;ve found that /8 more=
+ closely matches the former behavior</div><div>on small hosts while at the =
+same time not affecting common large hosts.</div><div>=C2=A0</div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);padding-left:1ex">
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D DEFAULT_CODE_GEN_BUF=
+FER_SIZE;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0if (tb_size &lt; MIN_CODE_GEN_BUFFER_SIZE) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;<br>
+-- <br>
+2.20.1<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">Christian Ehrhardt<br>Staff Engineer, Ubuntu Ser=
+ver<br>Canonical Ltd</div></div>
 
-Based-on: <20200709155203.21106-1-Filip.Bozuta@syrmia.com>
-
-Filip Bozuta (4):
-  linux-user: Add support for a group of btrfs inode ioctls
-  linux-user: Add support for two btrfs ioctls used for subvolume
-  linux-user: Add support for btrfs ioctls used to manage quota
-  linux-user: Add support for btrfs ioctls used to scrub a filesystem
-
- linux-user/ioctls.h        | 65 +++++++++++++++++++++++++++
- linux-user/syscall_defs.h  | 34 ++++++++++++++
- linux-user/syscall_types.h | 90 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 189 insertions(+)
-
--- 
-2.25.1
-
+--0000000000009d98d105aaa3e603--
 
