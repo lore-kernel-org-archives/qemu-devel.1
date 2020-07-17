@@ -2,92 +2,96 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A03C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:48:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC56C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EB1B20717
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:48:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1ABFE20717
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Np8uf44T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EB1B20717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FS0x9zFO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABFE20717
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwTWt-0007uS-F7
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 12:48:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40836)
+	id 1jwTXk-0000uk-AL
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 12:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jwTVt-0007S4-R9
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:47:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45287
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jwTVr-00076j-80
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:47:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595004425;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ye9FfXJ977NoZop94/SG2flF/07Ba4HvcDoP573JxYQ=;
- b=Np8uf44TIirJAPW0oDjQfyao4x7hWBAquE2a5bpNn10fjDp1UaoPQVMwzx5QeZ4KauqUoN
- /K75YDmea9X19OkoTR6se8gXUnRkKXh5wZUsfXPrwEfnGV8oLzzFo7GyhTS8cm7DHO/8fJ
- uPoTy0ksyDocRMo50KQjZDnG+7CAPW0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-bzYp5qFlN--9y_EaXSsPcQ-1; Fri, 17 Jul 2020 12:47:01 -0400
-X-MC-Unique: bzYp5qFlN--9y_EaXSsPcQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 367048015F4;
- Fri, 17 Jul 2020 16:46:59 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-68.ams2.redhat.com
- [10.36.112.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 756A36FEC2;
- Fri, 17 Jul 2020 16:46:55 +0000 (UTC)
-Subject: Re: [PATCH] target/i386: floatx80: avoid compound literals in static
- initializers
-From: Laszlo Ersek <lersek@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200716144251.23004-1-lersek@redhat.com>
- <a38a3da3-7406-0ba3-ca32-e96a99915c97@redhat.com>
- <af008780-5207-c156-56f3-dcda95367a5a@redhat.com>
-Message-ID: <cc685d76-db4c-74bf-34dc-744fdd28add3@redhat.com>
-Date: Fri, 17 Jul 2020 18:46:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
+ id 1jwTWu-00084h-JB
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:48:12 -0400
+Received: from mail-oo1-xc31.google.com ([2607:f8b0:4864:20::c31]:46172)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
+ id 1jwTWs-0007Dd-D2
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:48:12 -0400
+Received: by mail-oo1-xc31.google.com with SMTP id s190so1958162ooa.13
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 09:48:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:reply-to:mime-version
+ :content-disposition:content-transfer-encoding:user-agent;
+ bh=SUOl+hV+T1L7z95z1yhwj+ZR/UUqnnwnoYcJTskgr24=;
+ b=FS0x9zFOBpZ4kSRA8pFiwzGtt5bAxSNVR2pp5nUTw33RkNs0FtlTYiRga9bvUL0K6t
+ LIuXVKRO9HbnJlttaE6rI9Gg3oNwySuI04GFrW0g30snRz2vhoD8j+HDhJAUyxJdsIxR
+ hbGug1eSPyaSg/8d7LOwPHUosZX4jPFjrfc0BAeHN4ZTV7lb5zjvwFQZqU8yk3SrmOlM
+ gtWU+Yn/QFQs9N9+WYXFQ1tB7JgZRUNcBEg4ip5YdBkHEJeJFKn9aurSxweSRBLmC1Mq
+ MsMbBHUYWN+wsIm3eh0FnRsZEnepxN+NLpWuDMCRnRuPxTXPDF+7V1InORHnAJj+wPzO
+ exOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :reply-to:mime-version:content-disposition:content-transfer-encoding
+ :user-agent;
+ bh=SUOl+hV+T1L7z95z1yhwj+ZR/UUqnnwnoYcJTskgr24=;
+ b=tfQqOf4iYXuyzGOfg0+LTCFLwIIxkCPtuuCIZ3FBjgbt0UCQFucZKB4osOlsHHfcaF
+ iz4X6vkFvaz/E1nGbTnuRHk7KbfmjgsC/CrZkXcfwGfsX+7+l4QPwcdAjeuiOnIe1bux
+ KvjdaMWzyLSVsMyv53OEwh+UZ3T44+i8d6xMY8ff8T2QH3UeWpIlBmx8dKASrroHtyfO
+ nHRklfo69/BdBVu407wgq+enVU7r7v2/h5ft3OjyzT93aB3Ef7Bg4dcl5qo4daEw2z7O
+ lqHGrpX6STPU4ItqJPwW/1fh/LVkZKKsT55adJ90Dwuq2Qy063LK5FTwOJlz7tI1uEZ7
+ zHyg==
+X-Gm-Message-State: AOAM532zagBoxn70ynO5bJtUCEVsk6X5J13wfII0fSIHm2tIUbRKmofx
+ 3wXNOvt/lgiZP3lR2sOWAA==
+X-Google-Smtp-Source: ABdhPJxg3tJ8s4LiNgG/5UuVPjTRzoBzmBtjwCbpYy6PsREQChR1sEuaMF+HtNXq33MCxtEZNoRodQ==
+X-Received: by 2002:a4a:57c1:: with SMTP id u184mr5567053ooa.41.1595004488171; 
+ Fri, 17 Jul 2020 09:48:08 -0700 (PDT)
+Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
+ by smtp.gmail.com with ESMTPSA id k16sm2021032otl.63.2020.07.17.09.48.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Jul 2020 09:48:07 -0700 (PDT)
+Received: from minyard.net (unknown
+ [IPv6:2001:470:b8f6:1b:899b:e727:2fc3:fa54])
+ by serve.minyard.net (Postfix) with ESMTPSA id 11CA918055F;
+ Fri, 17 Jul 2020 16:48:06 +0000 (UTC)
+Date: Fri, 17 Jul 2020 11:48:03 -0500
+From: Corey Minyard <minyard@acm.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [GIT PULL] IPMI updates
+Message-ID: <20200717164803.GJ29192@minyard.net>
 MIME-Version: 1.0
-In-Reply-To: <af008780-5207-c156-56f3-dcda95367a5a@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c31;
+ envelope-from=tcminyard@gmail.com; helo=mail-oo1-xc31.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,96 +104,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Joseph Myers <joseph@codesourcery.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: minyard@acm.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/17/20 11:26, Laszlo Ersek wrote:
-> On 07/16/20 17:09, Philippe Mathieu-Daudé wrote:
->> On 7/16/20 4:42 PM, Laszlo Ersek wrote:
->>> Quoting ISO C99 6.7.8p4, "All the expressions in an initializer for an
->>> object that has static storage duration shall be constant expressions or
->>> string literals".
->>>
->>> The compound literal produced by the make_floatx80() macro is not such a
->>> constant expression, per 6.6p7-9. (An implementation may accept it,
->>> according to 6.6p10, but is not required to.)
->>>
->>> Therefore using "floatx80_zero" and make_floatx80() for initializing
->>> "f2xm1_table" and "fpatan_table" is not portable. And gcc-4.8 in RHEL-7.6
->>> actually chokes on them:
->>>
->>>> target/i386/fpu_helper.c:871:5: error: initializer element is not constant
->>>>      { make_floatx80(0xbfff, 0x8000000000000000ULL),
->>>>      ^
->>
->> This reminds me of:
->>
->> commit 6fa9ba09dbf4eb8b52bcb47d6820957f1b77ee0b
->> Author: Kamil Rytarowski <n54@gmx.com>
->> Date:   Mon Sep 4 23:23:06 2017 +0200
->>
->>     target/m68k: Switch fpu_rom from make_floatx80() to make_floatx80_init()
->>
->>     GCC 4.7.2 on SunOS reports that the values assigned to array members
->> are not
->>     real constants:
->>
->>     target/m68k/fpu_helper.c:32:5: error: initializer element is not
->> constant
->>     target/m68k/fpu_helper.c:32:5: error: (near initialization for
->> 'fpu_rom[0]')
->>     rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
->>
->>     Convert the array to make_floatx80_init() to fix it.
->>     Replace floatx80_pi-like constants with make_floatx80_init() as they are
->>     defined as make_floatx80().
->>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
->>>
->>> We've had the make_floatx80_init() macro for this purpose since commit
->>> 3bf7e40ab914 ("softfloat: fix for C99", 2012-03-17), so let's use that
->>> macro again.
->>>
->>> Fixes: eca30647fc07
->>> Fixes: ff57bb7b6326
->>> Link: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06566.html
->>> Link: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04714.html
->>> Cc: Alex Bennée <alex.bennee@linaro.org>
->>> Cc: Aurelien Jarno <aurelien@aurel32.net>
->>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->>> Cc: Joseph Myers <joseph@codesourcery.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>> Cc: Richard Henderson <rth@twiddle.net>
->>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->>> ---
->>>
->>> Notes:
->>>     I can see that there are test cases under "tests/tcg/i386", but I don't
->>>     know how to run them.
->>
->> Yeah it is not easy to figure...
->>
->> Try 'make run-tcg-tests-i386-softmmu'
->> but you need docker :^)
-> 
-> That worked, thanks! Even without Docker: I just had to add
-> 
->   --cross-cc-i386=gcc
-> 
-> to my ./configure flags.
-> 
+The following changes since commit 95d1fbabae0cd44156ac4b96d512d143ca7dfd5e:
 
-Also -- I meant to, but I forgot to put "for-5.1" in the subject prefix;
-sorry about that.
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20200716-pull-request' into staging (2020-07-16 18:50:51 +0100)
 
-Laszlo
+are available in the Git repository at:
+
+  https://github.com/cminyard/qemu.git tags/for-qemu-ipmi-5
+
+for you to fetch changes up to e3f7320caa1cc08a9b752e555b79abd6218c7c7a:
+
+  ipmi: add SET_SENSOR_READING command (2020-07-17 11:39:46 -0500)
+
+----------------------------------------------------------------
+Man page update and new set sensor command
+
+Some minor man page updates for fairly obvious things.
+
+The set sensor command addition has been in the Power group's tree for a
+long time and I have neglected to submit it.
+
+-corey
+
+----------------------------------------------------------------
+Corey Minyard (2):
+      ipmi: Add man page pieces for the IPMI PCI devices
+      ipmi: Fix a man page entry
+
+Cédric Le Goater (1):
+      ipmi: add SET_SENSOR_READING command
+
+ hw/ipmi/ipmi_bmc_sim.c | 223 +++++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx        |  11 ++-
+ 2 files changed, 233 insertions(+), 1 deletion(-)
 
 
