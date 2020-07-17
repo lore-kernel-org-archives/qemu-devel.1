@@ -2,119 +2,79 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9728DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 882BCC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:02:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FEB52065D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:56:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaH3RBsf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FEB52065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 596C92065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:02:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 596C92065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwOyb-0006cX-Mo
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:56:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33056)
+	id 1jwP43-00009f-K3
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:02:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOxy-00060p-UV
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:55:50 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57075
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOxx-0005Re-73
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:55:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594986948;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=TR/t1i7Un1JH98iEFzfWCPgMAjk3+dlkdT53FIROPXk=;
- b=CaH3RBsfEUjwnRUKqiOunaOGqlcQh5cSdqB9IBIM2G+ldF9ar3/RqIBAmhJtXYnsGsz8fe
- nIrbXw1ns0qJ/w7AsmPV1Tr389A2LFQXbU4ZoBDtwdDH6cyl2RzBY5rXMpUafmkmukE+zO
- ON7I4JeDZtoWZl+pf/jogE6xl+scPY8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-C8hTF3ZlOmKcKZDjg5xiag-1; Fri, 17 Jul 2020 07:55:44 -0400
-X-MC-Unique: C8hTF3ZlOmKcKZDjg5xiag-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8251E108A;
- Fri, 17 Jul 2020 11:55:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-123.ams2.redhat.com
- [10.36.113.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BFAD5D9E7;
- Fri, 17 Jul 2020 11:55:41 +0000 (UTC)
-Subject: Re: [PATCH for-5.1 3/3] file-posix: Fix leaked fd in
- raw_open_common() error path
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200717105426.51134-1-kwolf@redhat.com>
- <20200717105426.51134-4-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <20e43386-a017-3407-1957-8fd00c6748e7@redhat.com>
-Date: Fri, 17 Jul 2020 13:55:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwP32-0007vO-D8
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:01:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49080)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwP2x-0008QM-Qs
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:01:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jwP2v-0001Gf-Nt
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 12:00:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8FB442E80F0
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 12:00:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200717105426.51134-4-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Jul 2020 11:50:58 -0000
+From: K <1887854@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: opticron pmaydell
+X-Launchpad-Bug-Reporter: K (opticron)
+X-Launchpad-Bug-Modifier: K (opticron)
+References: <159492817809.19148.14056725236873205625.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159498665895.19930.15668446293272583341.malone@chaenomeles.canonical.com>
+Subject: [Bug 1887854] Re: Spurious Data Abort on qemu-system-aarch64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ae0e7716a5a4c2ee8526b802ca0953b745e46b59
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 08:00:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -123,48 +83,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1887854 <1887854@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ
-Content-Type: multipart/mixed; boundary="qwElnrCLo2NeNdcyN7e1XpzlbUIUsmHAz"
+I would have thought that TLB considerations would not apply when the
+MMU is disabled (RTEMS runs in a completely flat memory space). I'll try
+to reproduce on more modern QEMU today. Thanks for taking a look at
+this.
 
---qwElnrCLo2NeNdcyN7e1XpzlbUIUsmHAz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On 17.07.20 12:54, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/file-posix.c | 3 +++
->  1 file changed, 3 insertions(+)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1887854
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Title:
+  Spurious Data Abort on qemu-system-aarch64
 
+Status in QEMU:
+  New
 
---qwElnrCLo2NeNdcyN7e1XpzlbUIUsmHAz--
+Bug description:
+  When running RTEMS test psxndbm01.exe built for AArch64-ilp32 (this code =
+is not yet publically available), the test generates a spurious data abort =
+(the MMU and alignment checks should be disabled according to bits 1, 0 of =
+SCTLR_EL1). The abort information is as follows:
+  Taking exception 4 [Data Abort]
+  ...from EL1 to EL1
+  ...with ESR 0x25/0x96000010
+  ...with FAR 0x104010ca28
+  ...with ELR 0x400195d8
+  ...to EL1 PC 0x40018200 PSTATE 0x3c5
 
---OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  The ESR indicates that a synchronous external abort has occurred.
+  ESR EC field: 0b100101
 
------BEGIN PGP SIGNATURE-----
+  From the ARMv8 technical manual: Data Abort taken without a change in
+  Exception level. Used for MMU faults generated by data accesses,
+  alignment faults other than those caused by Stack Pointer
+  misalignment, and synchronous External aborts, including synchronous
+  parity or ECC errors. Not used for debug related exceptions.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8RkbsACgkQ9AfbAGHV
-z0AyDwgAkpuMr+Jy7PR5qPpjxRNOV6/jYhjpAvla2XPWvL4cVLLC2HbM2tx9I+c4
-4ZzW4EZKTB7K3bm753/7ybyRt7ygPhOugNKRypKbGUm/XpY4gkIMZJI8NQo55x3d
-9LWwqDjeOfhLlNGjaj/u2wJ6Js3CV+aiDbvMDtCjUmRVG018M6FBPyaFvIXcX36Y
-hRfPsh/TPGl8AgEfEvPGmjKyE/I1FVLedez9AVUuGYebOPNeIQUuvq6l3fDAkZYk
-qHLPSg7k0QGZ8fABAAOplG/9vMl4il3r0Sxo71V/o8ROHHMyc7uygzd38bGthn8L
-kBlSJ556EGrkx/JX2yf216PluL0vmg==
-=03mi
------END PGP SIGNATURE-----
+  ESR ISS field: 0b10000
 
---OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ--
+  From the ARMv8 technical manual: Synchronous External abort, not on
+  translation table walk or hardware update of translation table.
 
+  The following command line is used to invoke qemu:
+  qemu-system-aarch64 -machine virt -cpu cortex-a53 -m 256M -no-reboot -nog=
+raphic -serial mon:stdio -kernel build/aarch64/a53_ilp32_qemu/testsuites/ps=
+xtests/psxndbm01.exe -D qemu.log -d in_asm,int,cpu_reset,unimp,guest_errors
+
+  This occurs on Qemu 3.1.0 as distributed via Debian and on Qemu 4.1 as
+  built by the RTEMS source builder (4.1+minor patches).
+
+  Edit: This bug can be worked around by getting and setting SCTLR
+  without changing its value before each data abort would occur. This
+  test needs 6 of these workarounds to operate successfully.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1887854/+subscriptions
 
