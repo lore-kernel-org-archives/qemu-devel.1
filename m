@@ -2,91 +2,95 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E94C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A00C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:32:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90E202070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:31:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 242F2206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 16:32:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KE5qWmqp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90E202070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UwmCkwn4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 242F2206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwTGn-0003dY-PX
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 12:31:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35946)
+	id 1jwTHn-0004Z7-9P
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 12:32:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jwTFq-00033y-Tl
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:30:35 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42425)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jwTFp-0003mC-6v
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:30:34 -0400
-Received: by mail-pl1-x642.google.com with SMTP id q17so5642470pls.9
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 09:30:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=i02/q3AgrH9RgvbsQSvTZ7VqTpExkdZLxVeb6Qgb8Ok=;
- b=KE5qWmqpqyDA1UWBZVerBqwdeqwN2X+UkmefhSSKwcIMwm2yrTEgGsEGlWLqnsxgZa
- tlcRrPLal8E3LUzF7P0Czbzsv+S761p3RDcevLS7tz7Qz0FO35qrX/pQlCMqFJFYJzGz
- 1RtOP0RvTYpOV5gwt9Q6PEkMYrl2MBLgnS5qI7PChADuWw6YuNj4LYlcQFEPtpuUhVxn
- WHol9G3CWYb6RPFaLZipbKHDrPgPF6WOEoZ4ZvVDqoFMMyq8XhhsblfCtW2WUc0mF4er
- dP2BeoCF/lQmCraLwfGPErB+JMJ3z7Nn/g1x5BZmIrh3GnZiINrGt515B803O4d0yVnS
- DlNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=i02/q3AgrH9RgvbsQSvTZ7VqTpExkdZLxVeb6Qgb8Ok=;
- b=FlJTY2+M3saffT1WdeNOZAU3xhNmgRq+yMcWZKZ2T+0WaIQDyvYMcE1c57MmJjE8F+
- z50pSU8jj/mZmmPtM3TqznulMf/u2i1fYfmcYpyl2K9ajZSp7TBYX1BR35JLtePs8My1
- /ZLy/ZPklNSJ5lzQCRv5WWOEdfewPA31lh30yH2gaZ9agxQnmIMISIk9UE1lRws9hPXL
- vY4zX+0TbUPoy3VzaItKV5RLUfnDYZXr+d1hC7/Oprt9acKoHErQ0hE4eJ0dnM3bfZ2Y
- RGm/IAJr5367ZDqnOq0B693J86SccrRVc0LnCAQ5hhxYnLk1uJJMHBb6ROY7P/N/Sqno
- L4iw==
-X-Gm-Message-State: AOAM5308/f9iF9zvzZvBMG5i6Ngma2J0hEacNWe1udGQV2CkMptL8WkK
- 08S618Z1GRJi1pTs+uL97N8U8pvMBxc=
-X-Google-Smtp-Source: ABdhPJwvY3k1tgO1GgJ+PzoJA5M4dy2UJtIdgxyi2ZkHeMnG0t7xI0dHmw+W8fR/80I2Aq7OJxePRw==
-X-Received: by 2002:a17:90a:784b:: with SMTP id
- y11mr11015941pjl.51.1595003430954; 
- Fri, 17 Jul 2020 09:30:30 -0700 (PDT)
-Received: from localhost.localdomain (216-160-65-90.tukw.qwest.net.
- [216.160.65.90])
- by smtp.gmail.com with ESMTPSA id f18sm7652846pgv.84.2020.07.17.09.30.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jul 2020 09:30:30 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tcg/cpu-exec: precise single-stepping after an interrupt
-Date: Fri, 17 Jul 2020 09:30:29 -0700
-Message-Id: <20200717163029.2737546-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jwTG7-0003Nc-0a
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:30:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29870
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jwTG4-0003sQ-4Z
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 12:30:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595003446;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=YMMTDylHfts8r1On+wbI9MPNF5XGAbttt4ct4kdO46s=;
+ b=UwmCkwn4AxooEInJi7RGgSqiSZwMT0G8GU/pTN9df9cfl24xMLq0tUNfpCTmsr36j3L0bM
+ GI+M+HMCQ23XkK8gQUxrXpY2H7kKF8ajpYivYU60/AjHMaaLZzberhvJOb1X50C+uF+jLT
+ rrSzc4TNqKOhdhn/B1qf2gX9kEiKQ4w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-JyjhlAOHPUqf5zxnslvUoA-1; Fri, 17 Jul 2020 12:30:44 -0400
+X-MC-Unique: JyjhlAOHPUqf5zxnslvUoA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F62F80183C;
+ Fri, 17 Jul 2020 16:30:43 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C6D8A5D9E7;
+ Fri, 17 Jul 2020 16:30:41 +0000 (UTC)
+Date: Fri, 17 Jul 2020 17:30:38 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: sysbus_create_simple Vs qdev_create
+Message-ID: <20200717163038.GQ244185@redhat.com>
+References: <CA+aXn+EkkyiXmKpNhbggy0pjKVpiHxa+TUqEnZLB4v_D=T+7tA@mail.gmail.com>
+ <CA+aXn+HHXAmT6Ljj2tpovGAYSurHKSdtUL3y-89t31B0e7jpsA@mail.gmail.com>
+ <adb25c78-2edc-115a-5264-ca9f97864ec7@redhat.com>
+ <87365t18mp.fsf@dusky.pond.sub.org>
+ <CA+aXn+Guvt34PDD=N3FsD5w1C-aDXZ7gS8H_AZN-JEM8j8wBiQ@mail.gmail.com>
+ <87lfjkvo81.fsf@dusky.pond.sub.org>
+ <20200716222130.GO1274972@habkost.net>
+ <87tuy6k9pa.fsf@dusky.pond.sub.org>
+ <20200717162312.GR1274972@habkost.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200717162312.GR1274972@habkost.net>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,41 +103,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, luc.michel@greensocs.com, peter.maydell@linaro.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Pratik Parvati <pratikp@vayavyalabs.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When single-stepping with a debugger attached to QEMU, and when an
-interrupt is raised, the debugger misses the first instruction after
-the interrupt.
+On Fri, Jul 17, 2020 at 12:23:12PM -0400, Eduardo Habkost wrote:
+> On Fri, Jul 17, 2020 at 07:10:57AM +0200, Markus Armbruster wrote:
+> > Eduardo Habkost <ehabkost@redhat.com> writes:
+> > 
+> > > I'd also note that the use of "parent" in the code is also
+> > > ambiguous.  It can mean:
+> > >
+> > > * QOM parent type, i.e. TypeInfo.parent.  Related fields:
+> > >   * parent_class members of class structs
+> > >   * parent_obj members of object structs
+> > 
+> > I hate the use of "parent" and "child" for a super- / subtype relation.
+> > 
+> > Correcting the terminology there would be short term pain for long term
+> > gain.  Worthwhile?
+> 
+> I don't know.  It looks like the terminology came from GObject.
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/757702
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/cpu-exec.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+One day I would love it if we got QOM to actually use GObject, so
+from that POV I'd be inclined to stick with the "parent" term.
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 6a3d3a3cfc..66d38f9d85 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -588,7 +588,13 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-         else {
-             if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
-                 replay_interrupt();
--                cpu->exception_index = -1;
-+                /*
-+                 * After processing the interrupt, ensure an EXCP_DEBUG is
-+                 * raised when single-stepping so that GDB doesn't miss the
-+                 * next instruction.
-+                 */
-+                cpu->exception_index =
-+                    (cpu->singlestep_enabled ? EXCP_DEBUG : -1);
-                 *last_tb = NULL;
-             }
-             /* The target hook may have updated the 'cpu->interrupt_request';
+Personally I've not seen a problem with the term "parent" in
+this scenario. The class inheritance metaphor maps reasonably
+clearly to a parent/child metaphor. 
+
+Regards,
+Daniel
 -- 
-2.25.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
