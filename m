@@ -2,98 +2,91 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7F1C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD63C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A6C720739
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:10:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B6532071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:11:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U5E5x+EO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6C720739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LFJmNxgC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B6532071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwJa7-00072c-I8
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 02:10:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60246)
+	id 1jwJb0-0000Rw-Sy
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 02:11:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3Nj8RXwsKCvcgrjhmmdlndmfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--hskinnemoen.bounces.google.com>)
- id 1jwJT7-0003s6-PR
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:03:37 -0400
-Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:46291)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3Nj8RXwsKCvcgrjhmmdlndmfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--hskinnemoen.bounces.google.com>)
- id 1jwJT5-0005JB-EJ
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:03:37 -0400
-Received: by mail-yb1-xb4a.google.com with SMTP id u64so10003664ybf.13
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 23:03:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc:content-transfer-encoding;
- bh=PjXLdj2cihq5uXhjGbzoxvHE0ecuRwdA46uT+Gv/ofM=;
- b=U5E5x+EOSE/8ywjo1Ovd65pvoosOvCUIsqsf8issRPni+uTW1XoDut4cjqkto/hCX1
- 2oKXZlL3HXa6ipC3etHj9xuCb2Yxd9HXR/EnJ2xiM1pcAZtR9r6OMfMYeeyZcY4bhA6m
- fugH59VDatn+rzoFzRXEzjOpKggBjyqNQihK5C78wgfSVJ1VqNBWNDZNK59iff0xSYrV
- mot3MIs8YFf3OIN+74LCM+dsSdadgjYxuuPt/EU5ydaQQocZsat2hiY7DOSVpOlhFQcy
- LQ2eEZQ7XuCEh0djEhbQR/BdBkNK5IZM7E+IrT3+Plk603jarFT2SI8j3YMEKHySdHfS
- rNYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc:content-transfer-encoding;
- bh=PjXLdj2cihq5uXhjGbzoxvHE0ecuRwdA46uT+Gv/ofM=;
- b=FppInfN30MCYqQ9c/Ou4slmqsEsuMNirH2DDZQnWXbZtmTvp9yUkoBAYIz8alTZ6Hl
- i5HaFSW5F7vl5YjDIpZkW9DQrnmy7NcdughPqtyfL0U13NHcQMNFnliZQu01zSXVu/3a
- W0KmUMGUrM74diO1JkOVhW9+qtyUduoeHFf/E8MN9nbq3qQwMCCSBXm6fLzoz+9o4kdg
- 4Odu6Mb/57SvsIBief9H/UqyknYS67JLsnVxqTZx4iByu0qRBqtS+ARkAX0DUQLwCOrs
- aJX0E+tpdWvWNvCGyhJ8EfQmYnO9VeqDT8qDBIMZYedn7I333gY7YShdVHn0Fs5ep1Q6
- Yi5A==
-X-Gm-Message-State: AOAM533tyoHd50xeW/kakCqbFDg2nic5PpBo6RhF/3k8u1pLVoySgp7h
- LX3peMm6htd3jnUQpc2NY7LkHfpC46GZYMPgan2A0LXnDPxdh2IvmhsbKZRioGjD4GarIGBJSOV
- 7UoHDE+XSgjTNrAqdPUHSaDoX3nrPIipzWvth9zvGlKlyuQMElzk07mtKBUQnWWAVZj9jrFOnzg
- ==
-X-Google-Smtp-Source: ABdhPJxanI8jzYLHes88d4C/JneKvjZOOotpEs+1yzg3Ud1x/iYIz3PHCcaHJFFtI80ve6YN+iYNKVAu3NV+RoalEQ==
-X-Received: by 2002:a25:aba9:: with SMTP id v38mr12183884ybi.54.1594965814164; 
- Thu, 16 Jul 2020 23:03:34 -0700 (PDT)
-Date: Thu, 16 Jul 2020 23:02:56 -0700
-In-Reply-To: <20200717060258.1602319-1-hskinnemoen@google.com>
-Message-Id: <20200717060258.1602319-12-hskinnemoen@google.com>
-Mime-Version: 1.0
-References: <20200717060258.1602319-1-hskinnemoen@google.com>
-X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
-Subject: [PATCH v6 11/13] hw/arm: Wire up BMC boot flash for npcm750-evb and
- quanta-gsj
-From: Havard Skinnemoen <hskinnemoen@google.com>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: Avi.Fishman@nuvoton.com, kfting@nuvoton.com, 
- Havard Skinnemoen <hskinnemoen@google.com>, 
- "=?UTF-8?q?C=C3=A9dric=20Le=20Goater?=" <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
- envelope-from=3Nj8RXwsKCvcgrjhmmdlndmfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--hskinnemoen.bounces.google.com;
- helo=mail-yb1-xb4a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jwJVA-0007I6-MD
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:05:44 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34393
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jwJV8-0005uD-NE
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:05:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594965942;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u13KSSj8DMN1VZuU1tnx2IE6TiDfbcI5cNTd5BwL1mA=;
+ b=LFJmNxgCaHt2XBiDW8JcdlDm3gCxrco3Ds3ISbQf3roF3SrvrBYtIL65j73wqfItClKQX5
+ 9lnjG2mWPPRcnpwMncMulu7Iu+GRpWBLLirv8gWgbFcD3vmnEOsIEkYkTxsSEAQJh4XhSR
+ ktFfKSdFhI7tY+HKADdkh+IwSkLIZOs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-m2M7x2ifNT6l2LhysyCFKw-1; Fri, 17 Jul 2020 02:05:39 -0400
+X-MC-Unique: m2M7x2ifNT6l2LhysyCFKw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21E7A8015F7;
+ Fri, 17 Jul 2020 06:05:38 +0000 (UTC)
+Received: from [10.72.12.157] (ovpn-12-157.pek2.redhat.com [10.72.12.157])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9589E72AE8;
+ Fri, 17 Jul 2020 06:05:15 +0000 (UTC)
+Subject: Re: [PATCH v3 2/2] hw/net: Added basic IPv6 software fragmentation
+To: andrew@daynix.com, qemu-devel@nongnu.org
+References: <20200716035325.1406919-1-andrew@daynix.com>
+ <20200716035325.1406919-2-andrew@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a7764ed2-0fdb-39bd-55ba-eb308ea4b36e@redhat.com>
+Date: Fri, 17 Jul 2020 14:05:09 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200716035325.1406919-2-andrew@daynix.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,82 +99,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows these NPCM7xx-based boards to boot from a flash image, e.g.
-one built with OpenBMC. For example like this:
 
-IMAGE=3D${OPENBMC}/build/tmp/deploy/images/gsj/image-bmc
-qemu-system-arm -machine quanta-gsj -nographic \
-	-drive file=3D${IMAGE},if=3Dmtd,bus=3D0,unit=3D0,format=3Draw,snapshot=3Do=
-n
+On 2020/7/16 上午11:53, andrew@daynix.com wrote:
+> From: Andrew <andrew@daynix.com>
+>
+> The basic IPv6 fragmentation - adding 'frag' extension to
+> the packet, overall shares some logic with IPv4. It works,
+> but there are still issues with a combination of
+> extensions - in the future, it would require refactoring
+> work to implement workflow with IPv6 and extension.
+> "Jumbo option" isn't added yet, until
+> qemu supports packets greater than 64K.
+>
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
----
- hw/arm/npcm7xx_boards.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
 
-diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
-index f32557e0e1..565ee6f671 100644
---- a/hw/arm/npcm7xx_boards.c
-+++ b/hw/arm/npcm7xx_boards.c
-@@ -19,6 +19,7 @@
- #include "hw/arm/npcm7xx.h"
- #include "hw/core/cpu.h"
- #include "hw/loader.h"
-+#include "hw/qdev-properties.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/units.h"
-@@ -53,6 +54,22 @@ static void npcm7xx_load_bootrom(NPCM7xxState *soc)
-     }
- }
-=20
-+static void npcm7xx_connect_flash(NPCM7xxFIUState *fiu, int cs_no,
-+                                  const char *flash_type, DriveInfo *dinfo=
-)
-+{
-+    DeviceState *flash;
-+    qemu_irq flash_cs;
-+
-+    flash =3D qdev_new(flash_type);
-+    if (dinfo) {
-+        qdev_prop_set_drive(flash, "drive", blk_by_legacy_dinfo(dinfo));
-+    }
-+    qdev_realize_and_unref(flash, BUS(fiu->spi), &error_fatal);
-+
-+    flash_cs =3D qdev_get_gpio_in_named(flash, SSI_GPIO_CS, 0);
-+    qdev_connect_gpio_out_named(DEVICE(fiu), "cs", cs_no, flash_cs);
-+}
-+
- static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
- {
-     memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram=
-);
-@@ -90,6 +107,7 @@ static void npcm750_evb_init(MachineState *machine)
-     qdev_realize(DEVICE(soc), NULL, &error_fatal);
-=20
-     npcm7xx_load_bootrom(soc);
-+    npcm7xx_connect_flash(&soc->fiu[0], 0, "w25q256", drive_get(IF_MTD, 0,=
- 0));
-     npcm7xx_load_kernel(machine, soc);
- }
-=20
-@@ -102,6 +120,8 @@ static void quanta_gsj_init(MachineState *machine)
-     qdev_realize(DEVICE(soc), NULL, &error_fatal);
-=20
-     npcm7xx_load_bootrom(soc);
-+    npcm7xx_connect_flash(&soc->fiu[0], 0, "mx25l25635e",
-+                          drive_get(IF_MTD, 0, 0));
-     npcm7xx_load_kernel(machine, soc);
- }
-=20
---=20
-2.28.0.rc0.105.gf9edc3c819-goog
+Queued for 5.2
+
+Thanks
+
+
+> ---
+>   hw/net/net_tx_pkt.c |  7 ++--
+>   include/net/eth.h   | 14 +++++--
+>   net/eth.c           | 99 ++++++++++++++++++++++++++++++++++++++++++---
+>   3 files changed, 109 insertions(+), 11 deletions(-)
+>
+> diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+> index 9560e4a49e..74044c6618 100644
+> --- a/hw/net/net_tx_pkt.c
+> +++ b/hw/net/net_tx_pkt.c
+> @@ -589,10 +589,11 @@ static bool net_tx_pkt_do_sw_fragmentation(struct NetTxPkt *pkt,
+>   
+>           more_frags = (fragment_offset + fragment_len < pkt->payload_len);
+>   
+> -        eth_setup_ip4_fragmentation(l2_iov_base, l2_iov_len, l3_iov_base,
+> -            l3_iov_len, fragment_len, fragment_offset, more_frags);
+> +        eth_setup_ip_fragmentation(l2_iov_base, l2_iov_len, l3_iov_base,
+> +            &l3_iov_len, ETH_MAX_IP_DGRAM_LEN,
+> +            fragment_len, fragment_offset, more_frags);
+>   
+> -        eth_fix_ip4_checksum(l3_iov_base, l3_iov_len);
+> +        fragment[NET_TX_PKT_FRAGMENT_L3_HDR_POS].iov_len = l3_iov_len;
+>   
+>           net_tx_pkt_sendv(pkt, nc, fragment, dst_idx);
+>   
+> diff --git a/include/net/eth.h b/include/net/eth.h
+> index 0671be6916..05c75ac9fc 100644
+> --- a/include/net/eth.h
+> +++ b/include/net/eth.h
+> @@ -139,6 +139,14 @@ struct ip6_ext_hdr_routing {
+>       uint8_t     rsvd[4];
+>   };
+>   
+> +struct ip6_ext_hdr_fragment {
+> +    uint8_t     nxt;
+> +    uint8_t     res0;
+> +    uint16_t    off;
+> +    uint32_t    id;
+> +};
+> +
+> +
+>   struct ip6_option_hdr {
+>   #define IP6_OPT_PAD1   (0x00)
+>   #define IP6_OPT_HOME   (0xC9)
+> @@ -399,9 +407,9 @@ void eth_get_protocols(const struct iovec *iov, int iovcnt,
+>                          eth_ip4_hdr_info *ip4hdr_info,
+>                          eth_l4_hdr_info  *l4hdr_info);
+>   
+> -void eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+> -                                 void *l3hdr, size_t l3hdr_len,
+> -                                 size_t l3payload_len,
+> +void eth_setup_ip_fragmentation(const void *l2hdr, size_t l2hdr_len,
+> +                                 void *l3hdr, size_t *l3hdr_len,
+> +                                 size_t l3hdr_max_len, size_t l3payload_len,
+>                                    size_t frag_offset, bool more_frags);
+>   
+>   void
+> diff --git a/net/eth.c b/net/eth.c
+> index 0c1d413ee2..067111526d 100644
+> --- a/net/eth.c
+> +++ b/net/eth.c
+> @@ -314,10 +314,65 @@ eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
+>       return 0;
+>   }
+>   
+> +static bool eth_is_ip6_extension_header_type(uint8_t hdr_type);
+> +
+> +static void *eth_ip6_find_ext(struct ip6_header *ip6, uint8_t ext_type)
+> +{
+> +    uint8_t curr_ext_hdr_type = ip6->ip6_nxt;
+> +    struct ip6_ext_hdr *ext_hdr = (struct ip6_ext_hdr *)(ip6 + 1);
+> +    for (; eth_is_ip6_extension_header_type(curr_ext_hdr_type);) {
+> +        if (curr_ext_hdr_type == ext_type) {
+> +            return ext_hdr;
+> +        }
+> +        curr_ext_hdr_type = ext_hdr->ip6r_nxt;
+> +        ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
+> +                + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +/*
+> + * To add an extension - there is should be
+> + * enough memory 'behind' the ip6 header.
+> + */
+> +static void *eth_ip6_add_ext_nonsafe(struct ip6_header *ip6, uint8_t ext_type)
+> +{
+> +    uint8_t curr_ext_hdr_type = ip6->ip6_nxt;
+> +    struct ip6_ext_hdr *ext_hdr = (struct ip6_ext_hdr *)(ip6 + 1);
+> +    struct ip6_ext_hdr *ext_hdr_prev = NULL;
+> +
+> +    if (!eth_is_ip6_extension_header_type(curr_ext_hdr_type)) {
+> +        ext_hdr->ip6r_nxt = ip6->ip6_nxt;
+> +        ip6->ip6_nxt = ext_type;
+> +        return ext_hdr;
+> +    }
+> +
+> +    ext_hdr_prev = ext_hdr;
+> +    curr_ext_hdr_type = ext_hdr->ip6r_nxt;
+> +    ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
+> +            + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
+> +
+> +    for (; eth_is_ip6_extension_header_type(curr_ext_hdr_type);) {
+> +        ext_hdr_prev = ext_hdr;
+> +        curr_ext_hdr_type = ext_hdr->ip6r_nxt;
+> +        ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
+> +                + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
+> +    }
+> +
+> +    ext_hdr->ip6r_nxt = ext_hdr_prev->ip6r_nxt;
+> +    ext_hdr_prev->ip6r_nxt = ext_type;
+> +
+> +    return ext_hdr;
+> +}
+> +
+> +/* When IP6_FRAGMENT added, first 'id' would be 0x71656d75 */
+> +static const uint32_t s_first_fragment_identificator = 0x71656d75; /* 'qemu' */
+> +
+>   void
+> -eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+> -                            void *l3hdr, size_t l3hdr_len,
+> -                            size_t l3payload_len,
+> +eth_setup_ip_fragmentation(const void *l2hdr, size_t l2hdr_len,
+> +                            void *l3hdr, size_t *l3hdr_len,
+> +                            size_t l3hdr_max_len, size_t l3payload_len,
+>                               size_t frag_offset, bool more_frags)
+>   {
+>       const struct iovec l2vec = {
+> @@ -325,7 +380,9 @@ eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+>           .iov_len = l2hdr_len
+>       };
+>   
+> -    if (eth_get_l3_proto(&l2vec, 1, l2hdr_len) == ETH_P_IP) {
+> +    uint16_t l3_proto = eth_get_l3_proto(&l2vec, 1, l2hdr_len);
+> +
+> +    if (l3_proto == ETH_P_IP) {
+>           uint16_t orig_flags;
+>           struct ip_header *iphdr = (struct ip_header *) l3hdr;
+>           uint16_t frag_off_units = frag_offset / IP_FRAG_UNIT_SIZE;
+> @@ -337,7 +394,39 @@ eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+>           orig_flags = be16_to_cpu(iphdr->ip_off) & ~(IP_OFFMASK|IP_MF);
+>           new_ip_off = frag_off_units | orig_flags  | (more_frags ? IP_MF : 0);
+>           iphdr->ip_off = cpu_to_be16(new_ip_off);
+> -        iphdr->ip_len = cpu_to_be16(l3payload_len + l3hdr_len);
+> +        iphdr->ip_len = cpu_to_be16(l3payload_len + *l3hdr_len);
+> +
+> +        eth_fix_ip4_checksum(l3hdr, *l3hdr_len);
+> +    } else if (l3_proto == ETH_P_IPV6) {
+> +        struct ip6_header *ip6 = (struct ip6_header *) l3hdr;
+> +
+> +        struct ip6_ext_hdr_fragment *frag_ext = NULL;
+> +
+> +        /* Find frag extension */
+> +        frag_ext = eth_ip6_find_ext(ip6, IP6_FRAGMENT);
+> +        if (frag_ext == NULL) {
+> +            /* No frag extension? Add one */
+> +            if (*l3hdr_len + sizeof(*frag_ext) > l3hdr_max_len) {
+> +                /*
+> +                 * TODO:
+> +                 * For now, qemu's L3 buffer allocated with NetTxPkt
+> +                 * and have enough memory(buffer allocated with 65K bytes
+> +                 * ETH_MAX_IP_DGRAM_LEN = 0xFFFF)
+> +                 * for additional extensions.
+> +                 */
+> +                return; /* TODO: request to reallocate l3hdr */
+> +            }
+> +            frag_ext = eth_ip6_add_ext_nonsafe(ip6, IP6_FRAGMENT);
+> +            *l3hdr_len += sizeof(*frag_ext);
+> +            static uint32_t s_id = s_first_fragment_identificator;
+> +            frag_ext->id = cpu_to_be32(s_id);
+> +            ++s_id;
+> +        }
+> +
+> +        frag_ext->off = cpu_to_be16((frag_offset / IP_FRAG_UNIT_SIZE) << 3
+> +                | (uint16_t)!!more_frags);
+> +
+> +        ip6->ip6_plen = cpu_to_be16(l3payload_len + *l3hdr_len - sizeof(*ip6));
+>       }
+>   }
+>   
 
 
