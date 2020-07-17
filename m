@@ -2,80 +2,92 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38162C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 21:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 503F8C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 22:00:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C6332064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 21:36:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C6332064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 171642070A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 22:00:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HQ12boiI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 171642070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwY1o-0000Vr-0Y
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 17:36:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54602)
+	id 1jwYOd-0004Km-Bi
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 17:59:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwY14-0008Vg-B4
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 17:35:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36894)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwY12-0003V5-D6
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 17:35:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jwY0z-0004E1-IV
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 21:35:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 89EE32E80F0
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 21:35:33 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jwYNy-0003Uq-6P
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 17:59:18 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36498
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jwYNv-0007Rd-GT
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 17:59:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595023153;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=O9yv5JHNdz/5xPo0tJaeR3nhouG+c33TFFAKleHI8y4=;
+ b=HQ12boiIFdDG/5RU7dzqar3enprrSHekvApNCF1HV9spRXPZmkLfvRZ3PuHm2Zn0Dyo0q3
+ ewK46fhr+F1tZkv0KL11VULiGpoDQG04G2Kc/VM89w38TU45VjQwV+YZSgvRdUtAFeEgE/
+ t8lHDCE/2CNI1PyHPGQYR/w7PBDlJ50=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-h_mXtBpzNxC-4L7L4nCMEQ-1; Fri, 17 Jul 2020 17:59:11 -0400
+X-MC-Unique: h_mXtBpzNxC-4L7L4nCMEQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7210E8014D7
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 21:59:10 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 01E2519D61;
+ Fri, 17 Jul 2020 21:59:09 +0000 (UTC)
+Date: Fri, 17 Jul 2020 15:59:07 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.2] hw/vfio: Move some target-independent devices
+ to common-objs
+Message-ID: <20200717155907.159a302c@x1.home>
+In-Reply-To: <20200715131322.28767-1-philmd@redhat.com>
+References: <20200715131322.28767-1-philmd@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jul 2020 21:26:50 -0000
-From: Helge Deller <1880287@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 8-deller
-X-Launchpad-Bug-Reporter: Helge Deller (8-deller)
-X-Launchpad-Bug-Modifier: Helge Deller (8-deller)
-References: <159022297856.20775.958724179871171148.malonedeb@soybean.canonical.com>
-Message-Id: <159502121068.13621.18184835876951101397.malone@gac.canonical.com>
-Subject: [Bug 1880287] Re: gcc crashes in hppa emulation
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e5cf6fd6820b497e67789e7b5a80457ef1c62925
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 11:25:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=207.211.31.81;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 17:59:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,41 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880287 <1880287@bugs.launchpad.net>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test still crashes the VM and chroot with up-to-date debian chroot,
-including updated gcc-9.3.0-14.
+On Wed, 15 Jul 2020 15:13:22 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
--- =
+> These devices do not depend on the target CPU configuration
+> (32 or 64-bit, big / little endian). Move them to common-obj
+> to compile them once for all the targets.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/vfio/Makefile.objs | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+> index 9bb1c09e84..f663a800b1 100644
+> --- a/hw/vfio/Makefile.objs
+> +++ b/hw/vfio/Makefile.objs
+> @@ -1,8 +1,9 @@
+>  obj-y +=3D common.o spapr.o
+> -obj-$(CONFIG_VFIO_PCI) +=3D pci.o pci-quirks.o display.o
+> +obj-$(CONFIG_VFIO_PCI) +=3D pci.o pci-quirks.o
+>  obj-$(CONFIG_VFIO_CCW) +=3D ccw.o
+>  obj-$(CONFIG_VFIO_PLATFORM) +=3D platform.o
+> -obj-$(CONFIG_VFIO_XGMAC) +=3D calxeda-xgmac.o
+> -obj-$(CONFIG_VFIO_AMD_XGBE) +=3D amd-xgbe.o
+>  obj-$(CONFIG_VFIO_AP) +=3D ap.o
+> -obj-$(CONFIG_VFIO_IGD) +=3D igd.o
+> +common-obj-$(CONFIG_VFIO_PCI) +=3D display.o
+> +common-obj-$(CONFIG_VFIO_XGMAC) +=3D calxeda-xgmac.o
+> +common-obj-$(CONFIG_VFIO_AMD_XGBE) +=3D amd-xgbe.o
+> +common-obj-$(CONFIG_VFIO_IGD) +=3D igd.o
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880287
+What thing, or lack of thing, are you looking for in these files that
+aren't in the others?  For instance if igd.o is common, but pci-quirks.o
+is not, where igd.o is just a quirk that got split out of pci-quirks.o
+so that we could more easily compile it out, it feels like we might be
+stumbling into cases where adding or removing code that would shift
+objects into or out of the common-obj target.  I don't know how to
+maintain that.  Thanks,
 
-Title:
-  gcc crashes in hppa emulation
+Alex
 
-Status in QEMU:
-  New
-
-Bug description:
-  There seems to be a translation bug in the qemu-hppa (qemu v5.0.0) emulat=
-ion:
-  A stripped down testcase (taken from Linux kernel build) is attached.
-
-  In there is "a.sh", a shell script which calls gcc-9 (fails with both
-  debian gcc-9.3.0-11 or gcc-9.3.0-12). and "a.iii", the preprocessed
-  source.
-
-  When starting a.sh, in the emulation gcc crashes with segfault.
-  On real hardware gcc succeeds to compile the source.
-
-  In a hppa-user chroot running "apt update && apt install gcc-9" should
-  be sufficient to get the needed reproducer environment.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880287/+subscriptions
 
