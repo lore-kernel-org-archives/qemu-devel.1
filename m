@@ -2,85 +2,112 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900B2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BB8C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57996204EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:40:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F273B20768
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:46:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aPFkrh4N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57996204EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWOXeyJH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F273B20768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwOjA-0008W8-GE
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:40:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57104)
+	id 1jwOoq-0001bV-6m
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:46:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1jwOiU-00082j-RG
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:39:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31129
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOnt-0000zc-7T
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:45:25 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56699
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1jwOiT-000650-82
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:39:50 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOnq-0007su-OE
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:45:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594985987;
+ s=mimecast20190719; t=1594986321;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=2kwjHNkBDl6dYE4D/mrtrHnD3NR2uPV3G9K2mrWMLZo=;
- b=aPFkrh4NqWsAFa7bgJtAFiPNKOJlc5by0ZfgIaDkZvqCjObXbrIlCzJlNqI3BwKehyBvVk
- f5EIZ8rC+QRihL1x6xdWszcwb0lQ1/ocRp+dvXDQF1j2N4jRDdJ1D/kkttA7WInhnn5CqF
- TnzX7QDEKgzDfPWTWb5PPBP5eyhNhdY=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=GQYpAWcrn8aiV0DMIql7V0LWYi0XHaed73U9lOk4F5A=;
+ b=LWOXeyJH3WDoQ2wI8wMS2iOUOGEwti9DdrozfMQrZLZ5RJD3XJWIivurvqtdXtyyyuM4pA
+ H+0pEFIZgvm/b8W5XTLDu2Ar1gvx9unuFvTxKbY4wuHnR2qH4poMyZEh9ljUZ2k0idZT8z
+ SEuvxfYz39EHFKNnhyx+idxn4dDLtco=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-6QvxQCFqNTiEYQZED4TKiw-1; Fri, 17 Jul 2020 07:39:45 -0400
-X-MC-Unique: 6QvxQCFqNTiEYQZED4TKiw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-399-3-766qP0PlewU7rEMO09wg-1; Fri, 17 Jul 2020 07:45:19 -0400
+X-MC-Unique: 3-766qP0PlewU7rEMO09wg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4454218A1DE7
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 11:39:44 +0000 (UTC)
-Received: from localhost (ovpn-112-29.rdu2.redhat.com [10.10.112.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E0DE5C1D3;
- Fri, 17 Jul 2020 11:39:41 +0000 (UTC)
-Date: Fri, 17 Jul 2020 13:39:40 +0200
-From: Sergio Lopez <slp@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [PATCH] virtiofsd: Remove "norace" from cmdline help
-Message-ID: <20200717113940.b77kjptryyjszll7@mhamilton>
-References: <20200716101442.48057-1-slp@redhat.com>
- <20200717091414.lhi4ho6xqol2tixi@steredhat.lan>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27870107ACCA;
+ Fri, 17 Jul 2020 11:45:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-123.ams2.redhat.com
+ [10.36.113.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44B8D5D9E7;
+ Fri, 17 Jul 2020 11:45:17 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 1/3] file-posix: Move check_hdev_writable() up
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200717105426.51134-1-kwolf@redhat.com>
+ <20200717105426.51134-2-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a007774f-233b-02e2-f475-6385791eedfb@redhat.com>
+Date: Fri, 17 Jul 2020 13:45:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200717091414.lhi4ho6xqol2tixi@steredhat.lan>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200717105426.51134-2-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="pociqooz4nsrhin4"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=slp@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 23:13:19
+ protocol="application/pgp-signature";
+ boundary="McPxUlzhypoZDfHkqtkYeKHZQlnXctIRF"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,100 +120,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Miklos Szeredi <mszeredi@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---pociqooz4nsrhin4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--McPxUlzhypoZDfHkqtkYeKHZQlnXctIRF
+Content-Type: multipart/mixed; boundary="Inf60RSzVmo1Lzp5Fl8XF1XzYIfzIRYi6"
+
+--Inf60RSzVmo1Lzp5Fl8XF1XzYIfzIRYi6
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 17, 2020 at 11:14:14AM +0200, Stefano Garzarella wrote:
-> On Thu, Jul 16, 2020 at 12:14:42PM +0200, Sergio Lopez wrote:
-> > Commit 93bb3d8d4cda ("virtiofsd: remove symlink fallbacks") removed
-> > the implementation of the "norace" option, so remove it from the
-> > cmdline help too.
-> >=20
-> > Signed-off-by: Sergio Lopez <slp@redhat.com>
-> > ---
-> >  tools/virtiofsd/helper.c | 2 --
-> >  1 file changed, 2 deletions(-)
-> >=20
-> > diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-> > index 3105b6c23a..7bc5d7dc5a 100644
-> > --- a/tools/virtiofsd/helper.c
-> > +++ b/tools/virtiofsd/helper.c
-> > @@ -159,8 +159,6 @@ void fuse_cmdline_help(void)
-> >             "    -o max_idle_threads        the maximum number of idle =
-worker "
-> >             "threads\n"
-> >             "                               allowed (default: 10)\n"
-> > -           "    -o norace                  disable racy fallback\n"
-> > -           "                               default: false\n"
-> >             "    -o posix_lock|no_posix_lock\n"
-> >             "                               enable/disable remote posix=
- lock\n"
-> >             "                               default: posix_lock\n"
-> > --=20
-> > 2.26.2
-> >=20
-> >=20
+On 17.07.20 12:54, Kevin Wolf wrote:
+> We'll need to call it in raw_open_common(), so move the function to
+> avoid a forward declaration.
 >=20
-> I noticed that 'norace' is also described in docs/tools/virtiofsd.rst,
-> so I think we need to remove it there too:
->=20
->     diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
->     index 824e713491..58666a4495 100644
->     --- a/docs/tools/virtiofsd.rst
->     +++ b/docs/tools/virtiofsd.rst
->     @@ -63,9 +63,6 @@ Options
->          Print only log messages matching LEVEL or more severe.  LEVEL is=
- one of
->          ``err``, ``warn``, ``info``, or ``debug``.  The default is ``inf=
-o``.
->=20
->     -  * norace -
->     -    Disable racy fallback.  The default is false.
->     -
->        * posix_lock|no_posix_lock -
->          Enable/disable remote POSIX locks.  The default is ``posix_lock`=
-`.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/file-posix.c | 66 +++++++++++++++++++++++-----------------------
+>  1 file changed, 33 insertions(+), 33 deletions(-)
 
-Good catch, thanks. I'll send a v2.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Sergio.
 
-> With that fixed:
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->=20
-> Thanks,
-> Stefano
->=20
+--Inf60RSzVmo1Lzp5Fl8XF1XzYIfzIRYi6--
 
---pociqooz4nsrhin4
+--McPxUlzhypoZDfHkqtkYeKHZQlnXctIRF
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl8RjfsACgkQ9GknjS8M
-AjW3Tw//TERZvnR0A8Yu2XOMICgAPXX3ynneVgpGbJUI2unAAGUOgjwxjP6IveF4
-qnoOWvNaz6ck4/4PMuqe3vdVFRiRoXtd2JYABrgShZYdZc/fsSaKWNAMMhCAEkZy
-BPjtiKWAe08VCTONkfHlqdwYZuO+OKtl9FgEZaC0DNXlAYUM1s06vyeaTmwngko6
-Z38qZKjOiQKvrt1b/62RPXKTBtDLJHrL/+fuSV0U6Xu5DxI1CaiIMOhwgwqx0Gj/
-7+7RpSEZxnbO4DYflL6qLbA9utGL84kvzd5LQDDjzKuBc+4BN9GZqV5uI84l5ioe
-QXWppNr4vu0a8DATRma4BI08tCl2+h2OzbDh7a8MFely8K48uyE0VuXwwLjXbmDx
-mg9zVfd4wMus6l77+vQ3zMxXvo9WKMLaxkeirRiqh5vr99ZzI/Q3gfcLb8AsDLOZ
-3WGFqhbAae/GKZU/6tGP7eQet2h5EsKHpuGlxlVc4iIxZuOJueZObvf+h5Ra+3Js
-xrDfKbRVh0blUJ542+Ux7+GFvOvyMkJBWjDDDOaDAGUwo9dFXtsDDQTjFnEMK/Mh
-BRdNnjXAeKp4VqdwYS62Io+tWRm6vMBWfKuvFiEXABSm7WsEvufLJgsc2EUJvTAE
-VJb120CKNki0kC13lJtHndeOHIAI9VTVtZbxPFAdk7RzAfj5ji4=
-=yMWs
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8Rj0sACgkQ9AfbAGHV
+z0Aefwf/eeypPBuwJw8Wd7/82rBS4nvsOqGUqcn5Tw0Gu93Prne00ZPvlTkDGVAd
+WsKtfR8gKHmo3Y8WIk7R5c9HkI1uZ0r7OViEaYhUXRvjnC85ZbxPyaEUdwzz6Yfk
+kLYffUN+oQJyHCOAEx8GCKk55trOM5dw5SsjxrWfceZwmAukkLKXF6FExwD0Cc1H
+vNpl08a1QPsnRNFDflXlPy/a3i6OCdacRBawhIJ41HIjTz4hxYiLjJG3bUPQPla+
+Qrs5j8ko7q2ISW/EQX28iR2xp3AOB2ucFFnSEeyP0NIfKDFHaH5cHAlM5qzyndVG
+eUVT9qX0kJ0+q83Fl5YiHLaJez1rmA==
+=K/83
 -----END PGP SIGNATURE-----
 
---pociqooz4nsrhin4--
+--McPxUlzhypoZDfHkqtkYeKHZQlnXctIRF--
 
 
