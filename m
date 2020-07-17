@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F26C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B36B2C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A6A52067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:26:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A6A52067D
+	by mail.kernel.org (Postfix) with ESMTPS id 8792C2067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:27:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8792C2067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwSG9-0002HS-Dm
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:26:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39322)
+	id 1jwSGw-0003Y9-NF
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:27:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwSF5-0000r9-RH
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:25:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37350)
+ id 1jwSF7-0000re-NG
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:25:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37584)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwSF1-000639-Cu
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:25:43 -0400
+ id 1jwSF5-00064B-FR
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:25:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jwSEz-0005iF-9B
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 15:25:37 +0000
+ id 1jwSF3-0005nU-FP
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 15:25:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3B50B2E80E7
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 15:25:37 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6BBA12E80ED
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 15:25:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jul 2020 15:18:50 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1887309@bugs.launchpad.net>
+Date: Fri, 17 Jul 2020 15:18:15 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878642@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
@@ -54,16 +54,16 @@ X-Launchpad-Bug-Commenters: a1xndr philmd
 X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
-References: <159458555115.12636.15753095068884071065.malonedeb@gac.canonical.com>
-Message-Id: <159499913100.13251.14179363373459913859.malone@gac.canonical.com>
-Subject: [Bug 1887309] Re: Floating-point exception in ide_set_sector
+References: <158947186100.17636.13410831714995033672.malonedeb@soybean.canonical.com>
+Message-Id: <159499909591.7592.10146810433082370825.malone@wampee.canonical.com>
+Subject: [Bug 1878642] Re: Assertion failure in pci_bus_get_irq_level
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5435d9eda95a49263471ded8d4325bd2d74b2c50
+X-Launchpad-Hash: 6f07ef624d2addc88a1ba06a9f30ff004bf7d9c1
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 11:25:37
@@ -85,13 +85,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1887309 <1887309@bugs.launchpad.net>
+Reply-To: Bug 1878642 <1878642@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Proposed fix:
-https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05528.html
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05564.html
 
 ** Changed in: qemu
        Status: New =3D> Confirmed
@@ -100,131 +100,125 @@ https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05528.html
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1887309
+https://bugs.launchpad.net/bugs/1878642
 
 Title:
-  Floating-point exception in ide_set_sector
+  Assertion failure in pci_bus_get_irq_level
 
 Status in QEMU:
   Confirmed
 
 Bug description:
   Hello,
-  Here is a reproducer:
-  cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
-   -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
-   -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,for=
-mat=3Draw\
-   -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,for=
-mat=3Draw\
-   -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
-  outw 0x176 0x3538
-  outl 0xcf8 0x80000903
-  outl 0xcfc 0x184275c
-  outb 0x376 0x2f
-  outb 0x376 0x0
-  outw 0x176 0xa1a4
-  outl 0xcf8 0x80000920
-  outb 0xcfc 0xff
-  outb 0xf8 0x9
+  I found an input which triggers an assertion failure in pci_bus_get_irq_l=
+evel:
+
+  qemu-system-i386: /home/alxndr/Development/qemu/hw/pci/pci.c:268: int pci=
+_bus_get_irq_level(PCIBus *, int): Assertion `irq_num < bus->nirq' failed.
+  Aborted
+  #0  0x00007ffff686d761 in __GI_raise (sig=3Dsig@entry=3D0x6) at ../sysdep=
+s/unix/sysv/linux/raise.c:50
+  #1  0x00007ffff685755b in __GI_abort () at abort.c:79
+  #2  0x00007ffff685742f in __assert_fail_base (fmt=3D0x7ffff69bdb48 "%s%s%=
+s:%u: %s%sAssertion `%s' failed.\n%n", assertion=3D0x555557f9bca0 <str> "ir=
+q_num < bus->nirq", file=3D0x555557f9bbe0 <str> "/home/alxndr/Development/q=
+emu/hw/pci/pci.c", line=3D0x10c, function=3D<optimized out>) at assert.c:92
+  #3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555557f9bca0 =
+<str> "irq_num < bus->nirq", file=3D0x555557f9bbe0 <str> "/home/alxndr/Deve=
+lopment/qemu/hw/pci/pci.c", line=3D0x10c, function=3D0x555557f9bc40 <__PRET=
+TY_FUNCTION__.pci_bus_get_irq_level> "int pci_bus_get_irq_level(PCIBus *, i=
+nt)") at assert.c:101
+  #4  0x0000555557060c34 in pci_bus_get_irq_level (bus=3D0x61d000096080, ir=
+q_num=3D0xef) at /home/alxndr/Development/qemu/hw/pci/pci.c:268
+  #5  0x0000555556657391 in ich9_lpc_update_apic (lpc=3D0x62a000006200, gsi=
+=3D0xff) at /home/alxndr/Development/qemu/hw/isa/lpc_ich9.c:249
+  #6  0x0000555556658ea7 in ich9_set_sci (opaque=3D0x62a000006200, irq_num=
+=3D0x0, level=3D0x1) at /home/alxndr/Development/qemu/hw/isa/lpc_ich9.c:354
+  #7  0x0000555556ccefc6 in qemu_set_irq (irq=3D0x60600002af80, level=3D0x1=
+) at /home/alxndr/Development/qemu/hw/core/irq.c:44
+  #8  0x0000555556bc06fd in acpi_update_sci (regs=3D0x62a000006c80, irq=3D0=
+x60600002af80) at /home/alxndr/Development/qemu/hw/acpi/core.c:723
+  #9  0x0000555556bccb08 in ich9_pm_update_sci_fn (regs=3D0x62a000006c80) a=
+t /home/alxndr/Development/qemu/hw/acpi/ich9.c:56
+  #10 0x0000555556bc10ee in acpi_pm_evt_write (opaque=3D0x62a000006c80, add=
+r=3D0x2, val=3D0x2049, width=3D0x2) at /home/alxndr/Development/qemu/hw/acp=
+i/core.c:456
+  #11 0x00005555564938b5 in memory_region_write_accessor (mr=3D0x62a000006d=
+b0, addr=3D0x2, value=3D0x7fffffff9c70, size=3D0x2, shift=3D0x0, mask=3D0xf=
+fff, attrs=3D...) at /home/alxndr/Development/qemu/memory.c:483
+  #12 0x000055555649328a in access_with_adjusted_size (addr=3D0x2, value=3D=
+0x7fffffff9c70, size=3D0x2, access_size_min=3D0x1, access_size_max=3D0x4, a=
+ccess_fn=3D0x555556493360 <memory_region_write_accessor>, mr=3D0x62a000006d=
+b0, attrs=3D...) at /home/alxndr/Development/qemu/memory.c:544
+  #13 0x0000555556491df6 in memory_region_dispatch_write (mr=3D0x62a000006d=
+b0, addr=3D0x2, data=3D0x2049, op=3DMO_16, attrs=3D...) at /home/alxndr/Dev=
+elopment/qemu/memory.c:1476
+  #14 0x00005555562cbbf4 in flatview_write_continue (fv=3D0x606000033fe0, a=
+ddr=3D0x5d02, attrs=3D..., ptr=3D0x7fffffffa4e0, len=3D0x4, addr1=3D0x2, l=
+=3D0x2, mr=3D0x62a000006db0) at /home/alxndr/Development/qemu/exec.c:3137
+  #15 0x00005555562bbad9 in flatview_write (fv=3D0x606000033fe0, addr=3D0x5=
+d02, attrs=3D..., buf=3D0x7fffffffa4e0, len=3D0x4) at /home/alxndr/Developm=
+ent/qemu/exec.c:3177
+  #16 0x00005555562bb609 in address_space_write (as=3D0x55555968f940 <addre=
+ss_space_io>, addr=3D0x5d02, attrs=3D..., buf=3D0x7fffffffa4e0, len=3D0x4) =
+at /home/alxndr/Development/qemu/exec.c:3268
+  #17 0x0000555556478c0a in cpu_outl (addr=3D0x5d02, val=3D0xedf82049) at /=
+home/alxndr/Development/qemu/ioport.c:80
+  #18 0x000055555648166f in qtest_process_command (chr=3D0x555559691d00 <qt=
+est_chr>, words=3D0x60300009ef20) at /home/alxndr/Development/qemu/qtest.c:=
+396
+  #19 0x000055555647f187 in qtest_process_inbuf (chr=3D0x555559691d00 <qtes=
+t_chr>, inbuf=3D0x61900000f680) at /home/alxndr/Development/qemu/qtest.c:710
+  #20 0x000055555647e8b4 in qtest_read (opaque=3D0x555559691d00 <qtest_chr>=
+, buf=3D0x7fffffffca40 "outl 0xcf8 0x8400f841\noutl 0xcfc 0xebed205d\noutl =
+0x5d02 0xedf82049\n-M pc-q35-5.0 -device intel-hda,id=3Dhda0 -device hda-ou=
+tput,bus=3Dhda0.0 -device hda-micro,bus=3Dhda0.0 -device hda-duplex,bus=3Dh=
+da0.0 -display none -nodefaults -nographic\n", size=3D0xe9) at /home/alxndr=
+/Development/qemu/qtest.c:722
+  #21 0x00005555579c260c in qemu_chr_be_write_impl (s=3D0x60f000001f30, buf=
+=3D0x7fffffffca40 "outl 0xcf8 0x8400f841\noutl 0xcfc 0xebed205d\noutl 0x5d0=
+2 0xedf82049\n-M pc-q35-5.0 -device intel-hda,id=3Dhda0 -device hda-output,=
+bus=3Dhda0.0 -device hda-micro,bus=3Dhda0.0 -device hda-duplex,bus=3Dhda0.0=
+ -display none -nodefaults -nographic\n", len=3D0xe9) at /home/alxndr/Devel=
+opment/qemu/chardev/char.c:183
+  #22 0x00005555579c275b in qemu_chr_be_write (s=3D0x60f000001f30, buf=3D0x=
+7fffffffca40 "outl 0xcf8 0x8400f841\noutl 0xcfc 0xebed205d\noutl 0x5d02 0xe=
+df82049\n-M pc-q35-5.0 -device intel-hda,id=3Dhda0 -device hda-output,bus=
+=3Dhda0.0 -device hda-micro,bus=3Dhda0.0 -device hda-duplex,bus=3Dhda0.0 -d=
+isplay none -nodefaults -nographic\n", len=3D0xe9) at /home/alxndr/Developm=
+ent/qemu/chardev/char.c:195
+  #23 0x00005555579cb97a in fd_chr_read (chan=3D0x6080000026a0, cond=3DG_IO=
+_IN, opaque=3D0x60f000001f30) at /home/alxndr/Development/qemu/chardev/char=
+-fd.c:68
+  #24 0x0000555557a530ea in qio_channel_fd_source_dispatch (source=3D0x60c0=
+0002ef00, callback=3D0x5555579cb540 <fd_chr_read>, user_data=3D0x60f000001f=
+30) at /home/alxndr/Development/qemu/io/channel-watch.c:84
+  #25 0x00007ffff7ca8898 in g_main_context_dispatch () at /usr/lib/x86_64-l=
+inux-gnu/libglib-2.0.so.0
+  #26 0x0000555557c10b85 in glib_pollfds_poll () at /home/alxndr/Developmen=
+t/qemu/util/main-loop.c:219
+  #27 0x0000555557c0f57e in os_host_main_loop_wait (timeout=3D0x0) at /home=
+/alxndr/Development/qemu/util/main-loop.c:242
+  #28 0x0000555557c0f177 in main_loop_wait (nonblocking=3D0x0) at /home/alx=
+ndr/Development/qemu/util/main-loop.c:518
+  #29 0x000055555689fd1e in qemu_main_loop () at /home/alxndr/Development/q=
+emu/softmmu/vl.c:1664
+  #30 0x0000555557a6a29d in main (argc=3D0x17, argv=3D0x7fffffffe148, envp=
+=3D0x7fffffffe208) at /home/alxndr/Development/qemu/softmmu/main.c:49
+
+  I can reproduce this in qemu 5.0 using these qtest commands:
+
+  cat << EOF | ./qemu-system-i386 \
+  -qtest stdio -nographic -monitor none -serial none \
+  -M pc-q35-5.0
+  outl 0xcf8 0x8400f841
+  outl 0xcfc 0xebed205d
+  outl 0x5d02 0xedf82049
   EOF
 
-  The stack-trace:
-  =3D=3D16513=3D=3DERROR: UndefinedBehaviorSanitizer: FPE on unknown addres=
-s 0x556783603fdc (pc 0x556783603fdc bp 0x7fff82143b10 sp 0x7fff82143ab0 T16=
-513)
-      #0 0x556783603fdc in ide_set_sector /home/alxndr/Development/qemu/hw/=
-ide/core.c:626:26
-      #1 0x556783603fdc in ide_dma_cb /home/alxndr/Development/qemu/hw/ide/=
-core.c:883:9
-      #2 0x55678349d74d in dma_complete /home/alxndr/Development/qemu/dma-h=
-elpers.c:120:9
-      #3 0x55678349d74d in dma_blk_cb /home/alxndr/Development/qemu/dma-hel=
-pers.c:138:9
-      #4 0x556783962f25 in blk_aio_complete /home/alxndr/Development/qemu/b=
-lock/block-backend.c:1402:9
-      #5 0x556783962f25 in blk_aio_complete_bh /home/alxndr/Development/qem=
-u/block/block-backend.c:1412:5
-      #6 0x556783ac030f in aio_bh_call /home/alxndr/Development/qemu/util/a=
-sync.c:136:5
-      #7 0x556783ac030f in aio_bh_poll /home/alxndr/Development/qemu/util/a=
-sync.c:164:13
-      #8 0x556783a9a863 in aio_dispatch /home/alxndr/Development/qemu/util/=
-aio-posix.c:380:5
-      #9 0x556783ac1b4c in aio_ctx_dispatch /home/alxndr/Development/qemu/u=
-til/async.c:306:5
-      #10 0x7f4f1c0fe9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e9ed)
-      #11 0x556783acdccb in glib_pollfds_poll /home/alxndr/Development/qemu=
-/util/main-loop.c:219:9
-      #12 0x556783acdccb in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/util/main-loop.c:242:5
-      #13 0x556783acdccb in main_loop_wait /home/alxndr/Development/qemu/ut=
-il/main-loop.c:518:11
-      #14 0x5567833613e5 in qemu_main_loop /home/alxndr/Development/qemu/so=
-ftmmu/vl.c:1664:9
-      #15 0x556783a07a4d in main /home/alxndr/Development/qemu/softmmu/main=
-.c:49:5
-      #16 0x7f4f1ac84e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #17 0x5567830a9089 in _start (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0x7d2089)
-
-  With -trace ide*
-
-  12163@1594585516.671265:ide_reset IDEstate 0x56162a269058
-  [R +0.024963] outw 0x176 0x3538
-  12163@1594585516.673676:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
-; val 0x38; bus 0x56162a268c00 IDEState 0x56162a268c88
-  12163@1594585516.673683:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
-l 0x35; bus 0x56162a268c00 IDEState 0x56162a269058
-  12163@1594585516.673686:ide_exec_cmd IDE exec cmd: bus 0x56162a268c00; st=
-ate 0x56162a269058; cmd 0x35
-  OK
-  [S +0.025002] OK
-  [R +0.025012] outl 0xcf8 0x80000903
-  OK
-  [S +0.025018] OK
-  [R +0.025026] outl 0xcfc 0x184275c
-  OK
-  [S +0.025210] OK
-  [R +0.025219] outb 0x376 0x2f
-  12163@1594585516.673916:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
-; val 0x2f; bus 0x56162a268c00
-  OK
-  [S +0.025229] OK
-  [R +0.025234] outb 0x376 0x0
-  12163@1594585516.673928:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
-; val 0x00; bus 0x56162a268c00
-  OK
-  [S +0.025240] OK
-  [R +0.025246] outw 0x176 0xa1a4
-  12163@1594585516.673940:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
-; val 0xa4; bus 0x56162a268c00 IDEState 0x56162a269058
-  12163@1594585516.673943:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
-l 0xa1; bus 0x56162a268c00 IDEState 0x56162a268c88
-  12163@1594585516.673946:ide_exec_cmd IDE exec cmd: bus 0x56162a268c00; st=
-ate 0x56162a268c88; cmd 0xa1
-  OK
-  [S +0.025265] OK
-  [R +0.025270] outl 0xcf8 0x80000920
-  OK
-  [S +0.025274] OK
-  [R +0.025279] outb 0xcfc 0xff
-  OK
-  [S +0.025443] OK
-  [R +0.025451] outb 0xf8 0x9
-  12163@1594585516.674221:ide_dma_cb IDEState 0x56162a268c88; sector_num=3D=
-0 n=3D1 cmd=3DDMA READ
-  OK
-  [S +0.025724] OK
-  UndefinedBehaviorSanitizer:DEADLYSIGNAL
-  =3D=3D12163=3D=3DERROR: UndefinedBehaviorSanitizer: FPE on unknown addres=
-s 0x5616279cffdc (pc 0x5616279cffdc bp 0x7ffcdaabae90 sp 0x7ffcdaabae30 T12=
-163)
-
+  Please let me know if I can provide any further info.
   -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1887309/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1878642/+subscriptions
 
