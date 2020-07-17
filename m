@@ -2,91 +2,126 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAEBC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D430C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:19:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB12E206F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:18:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAF10204EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:19:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1W3HXEC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB12E206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="P/VPp0Qe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF10204EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwS7k-000386-7q
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:18:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36824)
+	id 1jwS99-0004gP-0f
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:19:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jwS6p-0002UD-Da; Fri, 17 Jul 2020 11:17:11 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:36771)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jwS6n-0004ct-OJ; Fri, 17 Jul 2020 11:17:11 -0400
-Received: by mail-ej1-x642.google.com with SMTP id n22so8310477ejy.3;
- Fri, 17 Jul 2020 08:17:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=V0SBtegwoepW2Ol9ZHfRH+KRDlOa0UwLbC81CuHQzwQ=;
- b=R1W3HXECambyd8+peLQKOgcqE89oMKN2qjL+H1VEIdKwPqeq9ROjRkSDFOykMJfdeR
- Jr+5GNRbTgDzy59/tYtyzdGUJCb3xR0+7CzBrQz3EYkh1H+zSE+MjZ01oRuq2h/e4hRD
- kTfaWf2GGBzjwtIEUb8i55CjaIWk2Z3XpsSt/U6aFk9TznGpy8Ck4/rljqBSW5WMccSd
- ZQyI7j+HL5VqtOYDjVpKE/xZTzgqLS/W9B8lvZv9AFYL2D8F+Kc8mi8PfVXQKlON3Fh9
- BByxXEcMnP/NOD6/OevzEB66rK5JUVDNzCz6yl38at0cQLlof0RYXfnRe/weeGNfDnGD
- rNhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=V0SBtegwoepW2Ol9ZHfRH+KRDlOa0UwLbC81CuHQzwQ=;
- b=HW6oYGC7lWFagCh5iuHMZcCCtGyNQGnt+Rn95PUaSbGpWmwATIXGLGPEaSKQ7/s/5b
- AI2JMvG+WdXFYX8DeQDq/s4Ga72okCqxBG6XlWuBqffLa4QUNbSZdBSEVHABRkbVAg67
- gl8zNF7kXrW7A5tX6h+APYPeJvQKX8mExLAiX6GyiQUeKX0VyQqqCGnSGRnh3MiUE0E5
- ezK5wCny10RE3yjSoWxjPwfB25+HqlgcKwwnI9oOqAhHRyo1Le6Hq3b5f/5/0+eaoNRQ
- Yi9Xn/Tcq+vIdlLsuVzLh9GQ1jB1qxeGqpTvGwfCeaHFa9wVe1O26L/4rRj3ZquvvZ8y
- LvNA==
-X-Gm-Message-State: AOAM531rd297XynrKeeILAxDohICV+c833LZt5nYkzmh3ASI0lwmAyIP
- 5h3tGvKx/rRE5rpkG67pj6MIYCaFbno=
-X-Google-Smtp-Source: ABdhPJxxaIYUqzMJ4H00+8mywMnRRl2/JdwkR1X0IXS2GDh/5slM5UpeGXcgMbbY3MO3i1gn/SvmqA==
-X-Received: by 2002:a17:906:4a94:: with SMTP id
- x20mr9453046eju.539.1594999027523; 
- Fri, 17 Jul 2020 08:17:07 -0700 (PDT)
-Received: from x1w.redhat.com (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id o21sm8165318eja.37.2020.07.17.08.17.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jul 2020 08:17:06 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH-for-5.1] hw/isa/lpc_ich9: Ignore reserved/invalid SCI IRQ
-Date: Fri, 17 Jul 2020 17:17:05 +0200
-Message-Id: <20200717151705.18611-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jwS85-0003Yr-HC; Fri, 17 Jul 2020 11:18:29 -0400
+Received: from mail-db8eur05on2092.outbound.protection.outlook.com
+ ([40.107.20.92]:5819 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jwS81-0004gm-Ur; Fri, 17 Jul 2020 11:18:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NkXz+OEgLV8ASOfE/beDkBFGGb8Qt1l4iYrfos8e/dhvb075KY8krgmdnek5MLBztjezoTeN7Pj3rpKr1XWyy2GM9hX2giaRFSpdPtDcQ5zM474HdIGOnWd4LzkwivAWTZkAECPKw9Rs98UMEuwJcYdarxnpfJ/q5q56dJ9N0D0gfw/u6+vFOsbeWiBm7xITMXXT19X7lvwicx2xuvaJxI/XYrHysFRZEHhjnie/r9TxaqCODPWA/EHSxCJevoGEHC4slYeLAsYUG1lO3zctHK/OAYcZZAnwQ+7pVGHwxucQrlNpTBhO+12wDMRj01pnhb4zbHHCaefwWB6m4zhnhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G6RNB4AlNJKhvWNs2lsdlc7OaJ6+cgY3g0awKU/kQvo=;
+ b=Fj+bDfu2Or8nkQtl8OI/mdJ2qdDIK4JiUxZ44ug5K0XEmmMNqVPfWtgSC1xHWu/omCxaniex/QMQOMrsamVu7euKtF87EN50r6g6d3ZH4BPqMZUrQ6Em46x66E1boOSptO0+pKLEO4bRuE7+EGgLRhe8gYou3Ro8u2MPyI7ogOydHFSF+ykEP9bAwUcpfPjPBVBXYwSZGsazp4xmcRFxZZMuhWCuOQk03uBPsNCOCoavbr/tMRI2KDcvTYj/OTPZci21yBBRpEXiD6WQcK6yOKJQU4BVaVbcxH5/X6EHdovAlilqbHlfCfSCgu9cHZYsvj3viNGTt5jA/hZ2H8YAcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G6RNB4AlNJKhvWNs2lsdlc7OaJ6+cgY3g0awKU/kQvo=;
+ b=P/VPp0QesAw5TPk2SvvLomdzPXEIgcSmxu2q9OUZpA0jn2d7C+p483CKqzlipuyzlcfoHQQApYByslHcuQIGy7gEnd3RJVKWPg3Wpliv1tBLhs7EaQaDVQTQ44ILelBTCkcrbls3TqELFQZLmcfZWyg7kNHIWkSc8doHm/FNCIA=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3894.eurprd08.prod.outlook.com (2603:10a6:20b:90::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Fri, 17 Jul
+ 2020 15:18:22 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3195.022; Fri, 17 Jul 2020
+ 15:18:22 +0000
+Subject: Re: [PATCH v2 03/20] qapi: backup: add x-use-copy-range parameter
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200601181118.579-1-vsementsov@virtuozzo.com>
+ <20200601181118.579-4-vsementsov@virtuozzo.com>
+ <a18ed0cf-cd8a-1600-e821-82a94dd8a7be@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <086babe5-ebb6-495a-6dc7-343f4841b808@virtuozzo.com>
+Date: Fri, 17 Jul 2020 18:18:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <a18ed0cf-cd8a-1600-e821-82a94dd8a7be@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-ClientProxiedBy: AM0PR10CA0023.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:17c::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.164) by
+ AM0PR10CA0023.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.19 via Frontend
+ Transport; Fri, 17 Jul 2020 15:18:21 +0000
+X-Originating-IP: [185.215.60.164]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6f7a5254-39b7-4533-b836-08d82a64a47e
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3894:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3894E4E8834A0229CC6F71A3C17C0@AM6PR08MB3894.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EYLqtH2pfc+fuV+6bnrczc7BQV3Q627PU2rqt7UiTetxQWk/3nLhgQThEJ3+Q+pX4GR6DkT5Zq7fw+dPlwYRai9vMiuj2wN2lQnfhMLpUXXoJJgcxtULtILwNf45zXeWlHaG9V49cQvow58E/xyZyo6Bam8RBX7aBf+9HwqXwxfqiZtvOc1UiuIH6UmMSWQmmb1NPO7rSMqYlVlvkZrWJZzeeCUa0LF3+yHGSwCzMcVYqJO7KDyQudWykZsPzdB4VGdm3PwA/q/WoQp2tDwCjvLTn0rY0APb7Mye+G7fAF6qghamkCntt4NIBKYMz/NHZjCH3htsMlvPLuNKiz/akPWVJCePP805dKA+6L74nqaO4e2W5PiJWKQrh4bJLF27
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39840400004)(136003)(366004)(396003)(376002)(346002)(956004)(31696002)(86362001)(36756003)(5660300002)(31686004)(2906002)(4326008)(66476007)(16576012)(66556008)(316002)(66946007)(107886003)(478600001)(52116002)(53546011)(186003)(26005)(2616005)(16526019)(8676002)(6486002)(8936002)(83380400001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: +CYHxZXw5UCdg1Hm1mJg54rn/re/PVruZhIUo/1ur6tPnryDAyRNhby9rjhtP3EWSVd2InJpIfQCYYwQMBqUfS+B3vbY8XX2jiLpXCXlRH+X+NmBbFUVwJ2m5kAAJFjqnc1fNMto8wK4tXcK59lEtTW86AwdpKU2wR7tM0x1NZEFo5vlkZx7bLk0xGxUQcQuY+6jQZhgo15J+dzNNFJd1eMfkD3WXlQX67NpC7rJ5rofN3nr60hFQNpG0RM2zOVpAJaykf0jN/zE7J/TELr0toPquON2G9Kut8tcMqMkF3VP2JrF5eGhmxs1crh8MqvA58yrmhw9ruaVZrPOiWRMkBpJTCRveJ6RIJD/zwWvEjikQycC/Yro+wtjmlOglh8Ux16+/pqhz0qCUcODzpcDzCueDw4ljvJNCk8sbTDIZibDVGFLfJB6hu+peWW0UDY0cO6JHKZOTiQysKDR//yJhsGHn8AWdnLmAyAZLw2wBfagTT2EzRrSjORxclsDpmOt
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f7a5254-39b7-4533-b836-08d82a64a47e
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 15:18:21.9462 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eXAl7qBrKxm+l+KaTyVItwNfRBjNUAxxISsw3C2aVhAytTcqZ3TU7lo0PDt2p09Rcau52Vhz5XIBURXQ4dldwWqKJeKkyWejyHuTEveSEig=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3894
+Received-SPF: pass client-ip=40.107.20.92;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 11:18:23
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,122 +134,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Alexander Bulekov <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-libFuzzer triggered the following assertion:
+17.07.2020 16:15, Max Reitz wrote:
+> On 01.06.20 20:11, Vladimir Sementsov-Ogievskiy wrote:
+>> Add parameter to enable/disable copy_range. Keep current default for
+>> now (enabled).
+> 
+> Why x-, though?  I can’t think of a reason why we would have to remove this.
 
-  cat << EOF | qemu-system-i386 -M pc-q35-5.0 \
-    -nographic -monitor none -serial none \
-    -qtest stdio -d guest_errors -trace pci\*
-  outl 0xcf8 0x8400f841
-  outl 0xcfc 0xebed205d
-  outl 0x5d02 0xedf82049
-  EOF
-  pci_cfg_write ICH9-LPC 31:0 @0x41 <- 0xebed205d
-  hw/pci/pci.c:268: int pci_bus_get_irq_level(PCIBus *, int): Assertion `irq_num < bus->nirq' failed.
+I add some x- arguments in these series:
 
-This is because ich9_lpc_sci_irq() returns -1 for reserved
-(illegal) values, but ich9_lpc_pmbase_sci_update() considers
-it valid and store it in a 8-bit unsigned type. Then the 255
-value is used as GSI IRQ, resulting in a PIRQ value of 247,
-more than ICH9_LPC_NB_PIRQS (8).
+  1. I'm unsure about default values (still, it can be changed even without x- prefixes as I understand)
+  2. Probably all this should be wrapped into common "block-copy" options, to not add same arguments to different block-jobs, when they all (I believe in bright future :) move on block-copy.
 
-Fix by simply ignoring the invalid access (and reporting it):
+So, this series is not about API, but for new backup architecture, and experimental APIs are needed only to experiment with performance and adjust some iotests.
 
-  pci_cfg_write ICH9-LPC 31:0 @0x41 <- 0xebed205d
-  ICH9 LPC: SCI IRQ SEL #3 is reserved
-  pci_cfg_read mch 00:0 @0x0 -> 0x8086
-  pci_cfg_read mch 00:0 @0x0 -> 0x29c08086
-  ...
+> 
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   qapi/block-core.json       | 4 +++-
+>>   block/backup-top.h         | 1 +
+>>   include/block/block-copy.h | 2 +-
+>>   include/block/block_int.h  | 1 +
+>>   block/backup-top.c         | 4 +++-
+>>   block/backup.c             | 4 +++-
+>>   block/block-copy.c         | 4 ++--
+>>   block/replication.c        | 1 +
+>>   blockdev.c                 | 5 +++++
+>>   9 files changed, 20 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 6fbacddab2..0c7600e4ec 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1405,6 +1405,8 @@
+>>   #                    above node specified by @drive. If this option is not given,
+>>   #                    a node name is autogenerated. (Since: 4.2)
+>>   #
+>> +# @x-use-copy-range: use copy offloading if possible. Default true. (Since 5.1)
+> 
+> Would it make more sense to invert it to disable-copy-range?  First,
+> this would make for a cleaner meaning, because it would allow dropping
+> the “if possible” part.  Setting use-copy-range=true would intuitively
+> imply to me that I get an error if copy-range cannot be used.  Sure,
+> there’s this little “if possible” in the documentation, but it goes
+> against my intuition.  disable-copy-range=true is intuitively clear.
+> Second, this would give us a default of false, which is marginally nicer.
+> 
 
-Cc: qemu-stable@nongnu.org
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Fixes: 8f242cb724 ("ich9: implement SCI_IRQ_SEL register")
-BugLink: https://bugs.launchpad.net/qemu/+bug/1878642
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-RFC because I have no idea how to report the error. The LPC is on
-Device 31 Function 0. Should it trigger some error to the PCI bridge?
-I can't find that info in the ICH9 datasheet.
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/i386/ich9.h |  1 +
- hw/isa/lpc_ich9.c      | 14 +++++++++++---
- 2 files changed, 12 insertions(+), 3 deletions(-)
+Reasonable. But we also should consider disabling copy_range by default as I propose.. But yes, if we keep x- for now, and don't change default for copy_range in this series, I can invert it just for readability.
 
-diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-index a98d10b252..60483b16cd 100644
---- a/include/hw/i386/ich9.h
-+++ b/include/hw/i386/ich9.h
-@@ -144,6 +144,7 @@ typedef struct ICH9LPCState {
- #define ICH9_LPC_PMBASE_BASE_ADDRESS_MASK       Q35_MASK(32, 15, 7)
- #define ICH9_LPC_PMBASE_RTE                     0x1
- #define ICH9_LPC_PMBASE_DEFAULT                 0x1
-+
- #define ICH9_LPC_ACPI_CTRL                      0x44
- #define ICH9_LPC_ACPI_CTRL_ACPI_EN              0x80
- #define ICH9_LPC_ACPI_CTRL_SCI_IRQ_SEL_MASK     Q35_MASK(8, 2, 0)
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index cd6e169d47..5ed28a726c 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -29,6 +29,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "cpu.h"
- #include "qapi/visitor.h"
- #include "qemu/range.h"
-@@ -312,10 +313,12 @@ void ich9_generate_smi(void)
-     cpu_interrupt(first_cpu, CPU_INTERRUPT_SMI);
- }
- 
-+/* Returns -1 on error, IRQ number on success */
- static int ich9_lpc_sci_irq(ICH9LPCState *lpc)
- {
--    switch (lpc->d.config[ICH9_LPC_ACPI_CTRL] &
--            ICH9_LPC_ACPI_CTRL_SCI_IRQ_SEL_MASK) {
-+    uint8_t sel = lpc->d.config[ICH9_LPC_ACPI_CTRL] &
-+                  ICH9_LPC_ACPI_CTRL_SCI_IRQ_SEL_MASK;
-+    switch (sel) {
-     case ICH9_LPC_ACPI_CTRL_9:
-         return 9;
-     case ICH9_LPC_ACPI_CTRL_10:
-@@ -328,6 +331,8 @@ static int ich9_lpc_sci_irq(ICH9LPCState *lpc)
-         return 21;
-     default:
-         /* reserved */
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "ICH9 LPC: SCI IRQ SEL #%u is reserved\n", sel);
-         break;
-     }
-     return -1;
-@@ -450,7 +455,7 @@ ich9_lpc_pmbase_sci_update(ICH9LPCState *lpc)
- {
-     uint32_t pm_io_base = pci_get_long(lpc->d.config + ICH9_LPC_PMBASE);
-     uint8_t acpi_cntl = pci_get_long(lpc->d.config + ICH9_LPC_ACPI_CTRL);
--    uint8_t new_gsi;
-+    int new_gsi;
- 
-     if (acpi_cntl & ICH9_LPC_ACPI_CTRL_ACPI_EN) {
-         pm_io_base &= ICH9_LPC_PMBASE_BASE_ADDRESS_MASK;
-@@ -461,6 +466,9 @@ ich9_lpc_pmbase_sci_update(ICH9LPCState *lpc)
-     ich9_pm_iospace_update(&lpc->pm, pm_io_base);
- 
-     new_gsi = ich9_lpc_sci_irq(lpc);
-+    if (new_gsi == -1) {
-+        return;
-+    }
-     if (lpc->sci_level && new_gsi != lpc->sci_gsi) {
-         qemu_set_irq(lpc->pm.irq, 0);
-         lpc->sci_gsi = new_gsi;
+Thanks a lot for reviewing this!
+
 -- 
-2.21.3
-
+Best regards,
+Vladimir
 
