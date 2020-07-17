@@ -2,78 +2,86 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D0BC433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 765F4C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:53:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 399E2206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:52:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EC0520768
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:53:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TJGgDigW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 399E2206BE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NIXZ17l6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EC0520768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwNyk-0005B3-DT
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:52:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43552)
+	id 1jwNzB-0005tn-GU
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:53:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwNxE-00046M-1k
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:00 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33603)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jwNy5-0004c2-Lq
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:53 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45508)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwNxC-0003im-Cc
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:50:59 -0400
-Received: by mail-ot1-x344.google.com with SMTP id h13so6565234otr.0
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 03:50:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jwNxy-0003qo-NK
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:52 -0400
+Received: by mail-wr1-x444.google.com with SMTP id s10so10444634wrw.12
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 03:51:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NWY3zkF1M6hKTA2sE5Tnn3/05iw5/fl9oYymANXDgco=;
- b=TJGgDigWI1dBUW3Qd23z7wFPiiF21C7edt9/Ivm0j0zoW5PHOj1X8doDC89APvDcCC
- n7oXQ4kPJkWlN4sybKkDXQtDo5LS95Ebcibr+WUiWFLF9rIa81rb7RBWZ45yfWnBbHRu
- aK+Geosq79PDOaLDJLLJaiCPc7yh012g4WNmHF/N/tkvzChDPZfnKx1YBgf/YUCV19SC
- LNPGG8y0gnMfkaM8SACDLLWZYV7z9x8gcvJuZhJ9MEe55GIFHc0AbXgXqhxeq5Z/NTWy
- BgPIUvDGstKxEIFFniPCCqnyZkUi6ky48GOVPWSx7w/Oj/XQ450vB1kEybvs7bh5ZjV0
- BPVA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=UTNNPLj2+kMWz6js2JQCoZUUX1PoT8XdOIXnTvMqmsw=;
+ b=NIXZ17l6w7bFZH1D8zBLzMJzrl7b3jZYQqstvAHrqyCxRJ2cYeBXYAc30Kc2j+P7Ky
+ I0azmjLxTv6ZfNUTmCKEahVToM1J1IsxKMC+QWODp2iaeHFg80l9esf2iwg9gvPNM81X
+ lrZRRK9sWmtZ3n3tdC2UchMjzwEox+ACAUNmrWQtKB11dGDtvCmi7Uy0nG6lFUFtcTrT
+ 56Tr3Ho4lQwEsmMqh3Y0m7AirWYrPXIaap8rWGJ4IiR8Svd3qz5uts24Ycfagdofncda
+ jZI01uFq1aLEXu7VIzQf2ubHwmbY3bf3YEMz8oksbKzup6pAQic8IcNRRAjqTsxO3RlK
+ TwkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NWY3zkF1M6hKTA2sE5Tnn3/05iw5/fl9oYymANXDgco=;
- b=YNeaXIPVPGReLW8FmbSa0bLlasgkhwKXiLunEpMma19e0IR0cS3osYuNFs6uIIQVXe
- 70Gy4SBJX849S3rhV0xOoWOgARk4/YCz+t4UDNAW1VNmO1JuSn1JdIoFWPPKNI+MQyv4
- LqcWdYSOPPZCKirYdchvn54hBTax5OKxt9uXc+uKzuBaYr7gZoX0hoRDzgUazrib1UMI
- +N4q34ni/k23iBR4L7bGBJjWkhCyjbCFzlLt2tooWelJ5VJ0pjgPNVstrXZSGsLU/bsB
- Z6akKT/B8vfLJ5v1V35EwvL80WzjgPTeKXYLIXsM0HHpfV4sqccuXqLThy4RD1v1Xvos
- Cqmw==
-X-Gm-Message-State: AOAM532WnDvz7UtkNiXRRAdJO6XzfFTQSa/1Yx1BxFIf93ZT1D+6OV/T
- pGAdBZxKhSOej3rNGlMA4l8HbCoCwRzTS287qym/rw==
-X-Google-Smtp-Source: ABdhPJyR82d6VkNt6ZjOtam892mE1DEx4YKXdEjaeFVn+1KkQ6vGDXAg8WXNuERxSIR/wcKEgQajiko+bcbLklCVr44=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr8160438ota.91.1594983055825; 
- Fri, 17 Jul 2020 03:50:55 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=UTNNPLj2+kMWz6js2JQCoZUUX1PoT8XdOIXnTvMqmsw=;
+ b=k4Q1NVGtU61nkFR37+jR3lKwiDR+Wh+PkWWTd+v+lTW5fzkfWbhyjbJPQ/ESwtVEwM
+ EmK41oHOssr9PWtF4NbZrhWcUIwY+Xj5xQ7R+HpKzDO4AEQ2PxALGo6f0IpI48OjCJ+X
+ MhC/VulT5SsB7eQvDj5djV4+lASx5XJTeuv6BneNI55V2Y/fhDEWdBTZf3SNjU7zJNOF
+ hvvEGHXe8HJ3hN29Ato2c+uHOzjLx6BU4xHT92HQDqIGj3uyurVodagROoufuCEtngDc
+ z9CA08cSdWddFElqnyFWrO8B5ru+0mn9pYpQVPSdVWVoVJpE7YEVPaFpQ9Kny73jBcC4
+ my9Q==
+X-Gm-Message-State: AOAM530L+3F7y1/lC2UlP2OKigVD2EP08PxaVP98/+obKrlRc1bbWOmR
+ e+PSCHmi92/8BS4oytr3akEB4w==
+X-Google-Smtp-Source: ABdhPJzJekrXgd8UkGDZidqSD+I/3umaYrZkM0HxRuVVJ/2Qf7kkrLfeTDsRVb7D+OnI2zOwsVOZhA==
+X-Received: by 2002:adf:e684:: with SMTP id r4mr9657478wrm.68.1594983102355;
+ Fri, 17 Jul 2020 03:51:42 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f14sm14343778wro.90.2020.07.17.03.51.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Jul 2020 03:51:40 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A77241FF87;
+ Fri, 17 Jul 2020 11:51:39 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 1/5] shippable: add one more qemu to registry url
+Date: Fri, 17 Jul 2020 11:51:35 +0100
+Message-Id: <20200717105139.25293-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200717105139.25293-1-alex.bennee@linaro.org>
+References: <20200717105139.25293-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-References: <20200716174900.GL3235@minyard.net>
- <CAFEAcA-UWJBpM_-G2RAe9B-WcPzBaKGZTas1njehQ7gcjsMpew@mail.gmail.com>
- <20200716222601.GM3235@minyard.net>
-In-Reply-To: <20200716222601.GM3235@minyard.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Jul 2020 11:50:44 +0100
-Message-ID: <CAFEAcA_5M8MD+2s_r1jjcgDY0LX69iZRkUP1kbUQTQYEuSN1Nw@mail.gmail.com>
-Subject: Re: [GIT PULL] I2C updates
-To: Corey Minyard <minyard@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,33 +103,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, berrange@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Jul 2020 at 23:26, Corey Minyard <minyard@acm.org> wrote:
->
-> On Thu, Jul 16, 2020 at 09:45:41PM +0100, Peter Maydell wrote:
-> > Hi; this failed to build on x86-64 Linux (incremental build):
->
-> Hmm, I did test this, and I just rebuilt, then rebased on the end of
-> master and rebuilt, without issue.
->
-> It looks like the smbus code is not being included, but I don't see how
-> that can be.
+The registry url is <project>/<repo>/qemu/<image>
 
-I was wrong about which config failed, sorry. Incremental builds
-are fine, but the build that does "make -C builddir clean" first
-fails.
+Perhaps we should rationalise that some day but for now.
 
-It looks like the problem is that in the created config-devices.mak
-files, CONFIG_SMBUS_EEPROM is set, but CONFIG_SMBUS is not.
-So presumably the problem is in the change
-"hw/i2c/Kconfig: Add an entry for the SMBus", or it is a more
-general issue with changes to Kconfig files not correctly
-resulting in rebuilds of config-devices.mak.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .shippable.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks
--- PMM
+diff --git a/.shippable.yml b/.shippable.yml
+index f6b742432e5..89d8be4291b 100644
+--- a/.shippable.yml
++++ b/.shippable.yml
+@@ -27,7 +27,7 @@ env:
+       TARGET_LIST=ppc64-softmmu,ppc64-linux-user,ppc64abi32-linux-user
+ build:
+   pre_ci_boot:
+-    image_name: registry.gitlab.com/qemu-project/qemu/${IMAGE}
++    image_name: registry.gitlab.com/qemu-project/qemu/qemu/${IMAGE}
+     image_tag: latest
+     pull: true
+     options: "-e HOME=/root"
+-- 
+2.20.1
+
 
