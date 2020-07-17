@@ -2,75 +2,76 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EF0C433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5F4C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:14:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CE3D20657
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:06:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A4D420657
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:14:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bje50UPM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE3D20657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W99skCgV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A4D420657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwRwl-0006jz-Cp
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:06:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34008)
+	id 1jwS4T-0008W9-FW
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:14:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwRvU-0005j4-Cr
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:05:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52063
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwS3o-00086f-Iq
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:14:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23344
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwRvS-0001yr-4p
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:05:27 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwS3m-00046a-0K
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:14:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594998324;
+ s=mimecast20190719; t=1594998840;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=mdz+jUB7SnXAP+eWcJtlouYtT06oxyQSctdVN3iRmU0=;
- b=bje50UPMSou+C4LafKFMnKiOJ0vfPrB1lyhP41GLwyE2rkY2ru0QvbEfiaDT9u8+Gi6GMp
- a8Wr/w2Bgx2T/L2F4D494M7ZD/t0PdsC8O9o4qq5hGAy/SY2MtMaokwEds0bhD/rZEwtVw
- 2YG9iOsHQuSbXbxPgLOlr3n3+w698l8=
+ bh=8bbtw3SHHdTzyRaRoi0KfTGe86uglV4wb6ggEE3Qrb0=;
+ b=W99skCgVhPQ3bNZl3E3aytl9ul9bTyfYY47FEhO6SHMHRje1lRCdoJhH9qt3LLqajGIp2Q
+ 8tjy644rZxfHYOYxxgCuRgrXirKqCx++wysatczQlMYx00uRgKoGfaWWtEr7igZME2uTt6
+ l5tu11XUB8SmsgV+U4i3GNR60lwQ3xg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-68qNFskePcqrY_-6LPlHaw-1; Fri, 17 Jul 2020 11:05:20 -0400
-X-MC-Unique: 68qNFskePcqrY_-6LPlHaw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-108-kf9s7LtaMsu-HCHsm1fKsA-1; Fri, 17 Jul 2020 11:13:58 -0400
+X-MC-Unique: kf9s7LtaMsu-HCHsm1fKsA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78FB81800D42;
- Fri, 17 Jul 2020 15:05:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B0398015CE;
+ Fri, 17 Jul 2020 15:13:57 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-113-141.ams2.redhat.com [10.36.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7358372AF8;
- Fri, 17 Jul 2020 15:05:15 +0000 (UTC)
-Subject: Re: [PATCH 1/7] pc-bios: s390x: Fix bootmap.c zipl component entry
- data handling
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B04272E48;
+ Fri, 17 Jul 2020 15:13:52 +0000 (UTC)
+Subject: Re: [PATCH 2/7] pc-bios: s390x: Cleanup jump to ipl code
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200715094045.381984-1-frankja@linux.ibm.com>
- <20200715094045.381984-2-frankja@linux.ibm.com>
+ <20200715094045.381984-3-frankja@linux.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <75c4f09d-8354-9ebc-b0ac-baacd8ee282f@redhat.com>
-Date: Fri, 17 Jul 2020 17:05:13 +0200
+Message-ID: <cd3b6812-b3d4-2a10-382d-2587b661ab2c@redhat.com>
+Date: Fri, 17 Jul 2020 17:13:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200715094045.381984-2-frankja@linux.ibm.com>
+In-Reply-To: <20200715094045.381984-3-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -104,23 +105,43 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 15/07/2020 11.40, Janosch Frank wrote:
-> The two main types of zipl component entries are execute and
-> load/data. The last member of the component entry struct therefore
-> denotes either a PSW or an address. Let's make this a bit more clear
-> by introducing a union and cleaning up the code that uses that struct
-> member.
+> jump_to_IPL_code takes a 64 bit address, masks it with the short psw
+> address mask and later branches to it using a full 64 bit register.
 > 
-> The execute type component entries written by zipl contain short PSWs,
-> not addresses. Let's mask them and only pass the address part to
-> jump_to_IPL_code(uint64_t address) because it expects an address as
-> visible by the name of the argument.
+> * As the masking is not necessary, let's remove it
+> * Without the mask we can save the ipl address to a static 64 bit
+>   function ptr as we later branch to it
+> * Let's also clean up the variable names and remove the now unneeded
+>   ResetInfo
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  pc-bios/s390-ccw/bootmap.c | 5 +++--
->  pc-bios/s390-ccw/bootmap.h | 7 ++++++-
->  2 files changed, 9 insertions(+), 3 deletions(-)
+>  pc-bios/s390-ccw/jump2ipl.c | 27 +++++++++++----------------
+>  1 file changed, 11 insertions(+), 16 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+> index 767012bf0c..aef37cea76 100644
+> --- a/pc-bios/s390-ccw/jump2ipl.c
+> +++ b/pc-bios/s390-ccw/jump2ipl.c
+> @@ -13,20 +13,15 @@
+>  #define KERN_IMAGE_START 0x010000UL
+>  #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
+>  
+> -typedef struct ResetInfo {
+> -    uint64_t ipl_psw;
+> -    uint32_t ipl_continue;
+> -} ResetInfo;
+> -
+> -static ResetInfo save;
+> +static void (*ipl_continue)(void);
+> +static uint64_t psw_save;
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Christian, do you remember whether there was a reason that we saved the
+"ipl_continue" in the low-core in the past?
+
+The changes here look ok to me, but I still wonder why it has been more
+"complicated" before...?
+
+Acked-by: Thomas Huth <thuth@redhat.com>
 
 
