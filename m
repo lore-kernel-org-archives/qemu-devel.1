@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F66EC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E35CC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:19:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C4552074B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:18:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C4552074B
+	by mail.kernel.org (Postfix) with ESMTPS id 49BE92074B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:19:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49BE92074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwLa3-0008SQ-AX
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:18:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60480)
+	id 1jwLap-0001xs-K5
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:19:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jwLWT-0001tU-Eo; Fri, 17 Jul 2020 04:15:14 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49982 helo=relay3.sw.ru)
+ id 1jwLWQ-0001rn-Mm; Fri, 17 Jul 2020 04:15:11 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49990 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jwLWK-0007JJ-HJ; Fri, 17 Jul 2020 04:15:13 -0400
+ id 1jwLWK-0007JS-G1; Fri, 17 Jul 2020 04:15:10 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jwLWC-0003cP-Gn; Fri, 17 Jul 2020 11:14:56 +0300
+ id 1jwLWC-0003cP-Nr; Fri, 17 Jul 2020 11:14:56 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v11 01/11] qcow2: Fix capitalization of header extension
- constant.
-Date: Fri, 17 Jul 2020 11:14:49 +0300
-Message-Id: <1594973699-781898-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v11 07/11] qcow2_format.py: Dump bitmap table serialized
+ entries
+Date: Fri, 17 Jul 2020 11:14:55 +0300
+Message-Id: <1594973699-781898-8-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -51,7 +51,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,43 +70,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the capitalization of the hexadecimal numbers consistent for the
-QCOW2 header extension constants in docs/interop/qcow2.txt.
+Add bitmap table information to the QCOW2 metadata dump.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
+Bitmap name               bitmap-1
+...
+Bitmap table   type            offset                   size
+0              serialized      4718592                  65536
+1              serialized      4294967296               65536
+2              serialized      5348033147437056         65536
+3              serialized      13792273858822144        65536
+4              serialized      4718592                  65536
+5              serialized      4294967296               65536
+6              serialized      4503608217305088         65536
+7              serialized      14073748835532800        65536
+
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2.c          | 2 +-
- docs/interop/qcow2.txt | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/qcow2_format.py | 41 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index fadf342..6ad6bdc 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -66,7 +66,7 @@ typedef struct {
- } QEMU_PACKED QCowExtension;
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index ca0d350..ad1918c 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -175,6 +175,10 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+         entry_raw_size = self.bitmap_dir_entry_raw_size()
+         padding = ((entry_raw_size + 7) & ~7) - entry_raw_size
+         fd.seek(padding, 1)
++        self.bitmap_table = Qcow2BitmapTable(fd=fd,
++                                             offset=self.bitmap_table_offset,
++                                             size=self.bitmap_table_size,
++                                             cluster_size=self.cluster_size)
  
- #define  QCOW2_EXT_MAGIC_END 0
--#define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
-+#define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xe2792aca
- #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
- #define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
- #define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index cb72346..f072e27 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -231,7 +231,7 @@ be stored. Each extension has a structure like the following:
+     def bitmap_dir_entry_raw_size(self):
+         return struct.calcsize(self.fmt) + self.name_size + \
+@@ -183,6 +187,43 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+     def dump(self):
+         print(f'{"Bitmap name":<25} {self.name}')
+         super(Qcow2BitmapDirEntry, self).dump()
++        self.bitmap_table.dump()
++
++
++class Qcow2BitmapTableEntry:
++
++    BME_TABLE_ENTRY_OFFSET_MASK = 0x00fffffffffffe00
++    BME_TABLE_ENTRY_FLAG_ALL_ONES = 1
++
++    def __init__(self, entry):
++        self.offset = entry & self.BME_TABLE_ENTRY_OFFSET_MASK
++        if self.offset:
++            self.type = 'serialized'
++        elif entry & self.BME_TABLE_ENTRY_FLAG_ALL_ONES:
++            self.type = 'all-ones'
++        else:
++            self.type = 'all-zeroes'
++
++
++class Qcow2BitmapTable:
++
++    def __init__(self, fd, offset, size, cluster_size):
++        self.entries = []
++        self.cluster_size = cluster_size
++        table_size = size * 8
++        position = fd.tell()
++        fd.seek(offset)
++        table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
++        fd.seek(position)
++        for entry in table:
++            self.entries.append(Qcow2BitmapTableEntry(entry))
++
++    def dump(self):
++        size = self.cluster_size
++        bitmap_table = enumerate(self.entries)
++        print(f'{"Bitmap table":<14} {"type":<15} {"offset":<24} {"size"}')
++        for i, entry in bitmap_table:
++            print(f'{i:<14} {entry.type:<15} {entry.offset:<24} {size}')
  
-     Byte  0 -  3:   Header extension type:
-                         0x00000000 - End of the header extension area
--                        0xE2792ACA - Backing file format name string
-+                        0xe2792aca - Backing file format name string
-                         0x6803f857 - Feature name table
-                         0x23852875 - Bitmaps extension
-                         0x0537be77 - Full disk encryption header pointer
+ 
+ QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
 -- 
 1.8.3.1
 
