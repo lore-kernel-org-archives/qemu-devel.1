@@ -7,71 +7,74 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9042C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE03C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:01:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80D2921741
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67F5E21744
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:01:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPRG16y2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80D2921741
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PW9gbHo8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67F5E21744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwPxN-0001rj-N1
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:59:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52306)
+	id 1jwPzg-0005FO-MK
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 09:01:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwPtw-0005AQ-Q9
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:55:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23222
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwPtt-00050V-6h
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:55:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29272
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwPtv-0008Qc-8B
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:55:44 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwPtp-0008O8-G2
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:55:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594990542;
+ s=mimecast20190719; t=1594990536;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=l5LtfD+inHy3GTRqmhWnchn/ZoZZ/m+lo0JW9SbCS6I=;
- b=NPRG16y2ogSb2gcyUS4IBw7vnLzFDkT3PBTVrEUrY7sQsI2PMIgnJ7Nonn6/lXS+wiWYIA
- XoTej5DSFaG17ub5oBZOQ8T0kVJqbs0P8ccxHkVvmZgeqWPFTR8Mw+mmqgDXvbhSPf/qG/
- sIVNAJpOvF1lSgnRjoTXsLpv64vD4wQ=
+ bh=ssUMs41lZlXK8WWkgZsHeKKzHbcvcpeTuYKdsOrFt4k=;
+ b=PW9gbHo8IX+2lTcNZPnlQu/XIi1yEgQ4yt+1MCWvpQB+45QO2eqf6jHZTAxqoOQnPnZ6HR
+ dKllKLdLqzeUayCIpFDnGEjeyN3FsYg0BnFmBLkyE4lqDVA1VjCJYQZ+DBQh+GVwjlucK1
+ TSeqfJhcKLG+7nlWzfloBAL4B+e0KmE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-3HalbDrzPOiY9kufjK50zA-1; Fri, 17 Jul 2020 08:55:38 -0400
-X-MC-Unique: 3HalbDrzPOiY9kufjK50zA-1
+ us-mta-102-KZiDee97MSK164cp6rMRzQ-1; Fri, 17 Jul 2020 08:55:35 -0400
+X-MC-Unique: KZiDee97MSK164cp6rMRzQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7345803129;
- Fri, 17 Jul 2020 12:55:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66E81802B62;
+ Fri, 17 Jul 2020 12:55:27 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-80.ams2.redhat.com [10.36.113.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E53EE710B1;
- Fri, 17 Jul 2020 12:55:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 76B8B72AE8;
+ Fri, 17 Jul 2020 12:55:26 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 10/12] file-posix: Move check_hdev_writable() up
-Date: Fri, 17 Jul 2020 14:55:08 +0200
-Message-Id: <20200717125510.238374-11-kwolf@redhat.com>
+Subject: [PULL 08/12] block: Require aligned image size to avoid assertion
+ failure
+Date: Fri, 17 Jul 2020 14:55:06 +0200
+Message-Id: <20200717125510.238374-9-kwolf@redhat.com>
 In-Reply-To: <20200717125510.238374-1-kwolf@redhat.com>
 References: <20200717125510.238374-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 03:33:51
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -97,101 +100,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We'll need to call it in raw_open_common(), so move the function to
-avoid a forward declaration.
+Unaligned requests will automatically be aligned to bl.request_alignment
+and we can't extend write requests to access space beyond the end of the
+image without resizing the image, so if we have the WRITE permission,
+but not the RESIZE one, it's required that the image size is aligned.
+
+Failing to meet this requirement could cause assertion failures like
+this if RESIZE permissions weren't requested:
+
+qemu-img: block/io.c:1910: bdrv_co_write_req_prepare: Assertion `end_sector <= bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
+
+This was e.g. triggered by qemu-img converting to a target image with 4k
+request alignment when the image was only aligned to 512 bytes, but not
+to 4k.
+
+Turn this into a graceful error in bdrv_check_perm() so that WRITE
+without RESIZE can only be taken if the image size is aligned. If a user
+holds both permissions and drops only RESIZE, the function will return
+an error, but bdrv_child_try_set_perm() will ignore the failure silently
+if permissions are only requested to be relaxed and just keep both
+permissions while returning success.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200717105426.51134-2-kwolf@redhat.com>
+Message-Id: <20200716142601.111237-2-kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 66 +++++++++++++++++++++++-----------------------
- 1 file changed, 33 insertions(+), 33 deletions(-)
+ block.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ae8190edab..dd7dab07d6 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -425,6 +425,39 @@ static void raw_probe_alignment(BlockDriverState *bs, int fd, Error **errp)
+diff --git a/block.c b/block.c
+index 35a372df57..d9ac0e07eb 100644
+--- a/block.c
++++ b/block.c
+@@ -2025,6 +2025,22 @@ static int bdrv_check_perm(BlockDriverState *bs, BlockReopenQueue *q,
+         return -EPERM;
      }
- }
  
-+static int check_hdev_writable(BDRVRawState *s)
-+{
-+#if defined(BLKROGET)
-+    /* Linux block devices can be configured "read-only" using blockdev(8).
-+     * This is independent of device node permissions and therefore open(2)
-+     * with O_RDWR succeeds.  Actual writes fail with EPERM.
-+     *
-+     * bdrv_open() is supposed to fail if the disk is read-only.  Explicitly
-+     * check for read-only block devices so that Linux block devices behave
-+     * properly.
++    /*
++     * Unaligned requests will automatically be aligned to bl.request_alignment
++     * and without RESIZE we can't extend requests to write to space beyond the
++     * end of the image, so it's required that the image size is aligned.
 +     */
-+    struct stat st;
-+    int readonly = 0;
-+
-+    if (fstat(s->fd, &st)) {
-+        return -errno;
++    if ((cumulative_perms & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) &&
++        !(cumulative_perms & BLK_PERM_RESIZE))
++    {
++        if ((bs->total_sectors * BDRV_SECTOR_SIZE) % bs->bl.request_alignment) {
++            error_setg(errp, "Cannot get 'write' permission without 'resize': "
++                             "Image size is not a multiple of request "
++                             "alignment");
++            return -EPERM;
++        }
 +    }
 +
-+    if (!S_ISBLK(st.st_mode)) {
-+        return 0;
-+    }
-+
-+    if (ioctl(s->fd, BLKROGET, &readonly) < 0) {
-+        return -errno;
-+    }
-+
-+    if (readonly) {
-+        return -EACCES;
-+    }
-+#endif /* defined(BLKROGET) */
-+    return 0;
-+}
-+
- static void raw_parse_flags(int bdrv_flags, int *open_flags, bool has_writers)
- {
-     bool read_write = false;
-@@ -3323,39 +3356,6 @@ static int hdev_probe_device(const char *filename)
-     return 0;
- }
- 
--static int check_hdev_writable(BDRVRawState *s)
--{
--#if defined(BLKROGET)
--    /* Linux block devices can be configured "read-only" using blockdev(8).
--     * This is independent of device node permissions and therefore open(2)
--     * with O_RDWR succeeds.  Actual writes fail with EPERM.
--     *
--     * bdrv_open() is supposed to fail if the disk is read-only.  Explicitly
--     * check for read-only block devices so that Linux block devices behave
--     * properly.
--     */
--    struct stat st;
--    int readonly = 0;
--
--    if (fstat(s->fd, &st)) {
--        return -errno;
--    }
--
--    if (!S_ISBLK(st.st_mode)) {
--        return 0;
--    }
--
--    if (ioctl(s->fd, BLKROGET, &readonly) < 0) {
--        return -errno;
--    }
--
--    if (readonly) {
--        return -EACCES;
--    }
--#endif /* defined(BLKROGET) */
--    return 0;
--}
--
- static void hdev_parse_filename(const char *filename, QDict *options,
-                                 Error **errp)
- {
+     /* Check this node */
+     if (!drv) {
+         return 0;
 -- 
 2.25.4
 
