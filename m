@@ -2,83 +2,110 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30708C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6BBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08A18206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:16:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08A18206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id B02BE206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:19:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBqeIPJk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B02BE206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwRAC-0002A1-4m
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:16:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49178)
+	id 1jwRCa-0003FG-Vt
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:19:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jwR9P-0001i6-6b
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:15:47 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:50855)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jwR9N-0006yA-1s
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:15:46 -0400
-Received: from mail-vs1-f72.google.com ([209.85.217.72])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jwR9L-0002Po-1l
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 14:15:43 +0000
-Received: by mail-vs1-f72.google.com with SMTP id s67so1795265vss.7
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 07:15:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jwRBp-0002nR-Ml
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:18:18 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45835
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jwRBl-0007Q1-PW
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:18:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594995492;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6nG6J4YezlYfGUG0e0ERTOm/9YYwGefzHEeAhTeysKE=;
+ b=UBqeIPJk6y0nQEIUYgyEeP49QRyx7IXl0zohE/Twj2Una5pRjbYE7lCYXZHdV/xbkd8E/m
+ 7ZD9oCBmAUVSWzTaDxUMnC8Wzki3PPM7IxOFoqMzIMnBvaQZqYGd2mYI6ej9ekQMPY9wje
+ jStpnroB/mE2fnggirwpe1hG5Lkx6PQ=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-wMQg4hQ0Ppap9C8w61v_5A-1; Fri, 17 Jul 2020 10:18:10 -0400
+X-MC-Unique: wMQg4hQ0Ppap9C8w61v_5A-1
+Received: by mail-qv1-f69.google.com with SMTP id j4so5591160qvt.20
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 07:18:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YkdMRo5Hr6aNaRk/vfmPDStRhR1kwLqb24YcxDZaZsA=;
- b=p3Rbr++E/DbjoFJ5Z/60wqP8zwZD8ka47sP7UPTQUoK0vDyWC48UwbO3dENYA1FSDA
- EGZ7hRqHctqYtr8/sdF+1Bkp1TwyyzSw0kXW3dx7bfGfoUX7qYjBaeN5iZvuqv6/TDU+
- JnpDrp7d0qb6KVS3zdfTYFFUuKxks/OfeceBZi0HR7XnS46dMcQGRdNf8Q08zZMhu3ll
- mKZOQ05eWgjrn2ACmtmeMg3zIuVfcxNaQMbDge2ZtYKAUFQRkryRQ0Le9+RIuRIFgwk6
- 4ab1w3fiaurOo7LmUMY46oVGz4BjbGLLptgvHc0Rev5HP6Y6prnja/Zyl8UFzKOh6Ho5
- 43pw==
-X-Gm-Message-State: AOAM532RUJsT0E0Cn4m4f4SMzQAyshjBgDhK6wF4STILOwHdPhwEQE4u
- FJpB+rQ+NlIHHecW79KkJ10+98dP1UCbsK4STl4jyqQaculSrWvJ8NVhbD3KmyZkfI+7gvLJ8Pw
- tjsKLNz/mo2g7yCf62gBg9ehB77HWnWoJckCWGSpS5YAAoBu1
-X-Received: by 2002:a1f:255:: with SMTP id 82mr7594668vkc.39.1594995342196;
- Fri, 17 Jul 2020 07:15:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyUC+3K/8AmLSUoGw3KGFDVVy4UTXJU7xiIcqdgNU7YeX7+GksZalY3lH5PBJ/0y4licf5hodVtC5OAF2qDyF4=
-X-Received: by 2002:a1f:255:: with SMTP id 82mr7594643vkc.39.1594995341905;
- Fri, 17 Jul 2020 07:15:41 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=6nG6J4YezlYfGUG0e0ERTOm/9YYwGefzHEeAhTeysKE=;
+ b=fK4VthFcXdr+Sl1AvRXF039nrSk4AwJS4tK2PIavL70iZJviGYXjBxa18ses4ZwMwh
+ YdDW4uGDQtdybb88eM0Krbb0vc62GntejGI1o+xCdO9z1Uljb2sqHF3WbPTf2VhrjLIg
+ g+awT303syURSBeTIcwPKS2SUWOoTRBiWI9QC1PgSD1JAn5uWATh6ZF+sWO6FNbAZsZc
+ st8V2U5/11NVg5EbFYOnIgRW6XNlPuSktso0geb/Qhm5JJ9hz9fibrCj0FhT1LNH5Riq
+ ys16aPoCKogT1xk/SgAPFqGSHivNN23EmA6QvXj5ggBjtpfmZzbFfRyCRvtV49nw5xR7
+ LPgw==
+X-Gm-Message-State: AOAM531G14Xj9jH4YjPDOmp7AEG8OcS7G299asWgR90dOy2krQKK32ef
+ 7OqeacZIWI+1QsFftceJySW5m+ecN82/9irhnl18sQyZn/iAStPloRORGdVezvszWe2DNDi8c2E
+ 1tYd+Lxbdab+Ci1k=
+X-Received: by 2002:ac8:72c4:: with SMTP id o4mr10294294qtp.270.1594995489754; 
+ Fri, 17 Jul 2020 07:18:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw8O0kgglXi1Hac3yJ7GAI71LBCwvxh/hZUdtzeV4+GzOHgW5MefO32di9LUb7wcBpDjhTHEQ==
+X-Received: by 2002:ac8:72c4:: with SMTP id o4mr10294262qtp.270.1594995489398; 
+ Fri, 17 Jul 2020 07:18:09 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
+ by smtp.gmail.com with ESMTPSA id v184sm10488214qki.12.2020.07.17.07.18.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Jul 2020 07:18:08 -0700 (PDT)
+Date: Fri, 17 Jul 2020 10:18:06 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+Message-ID: <20200717141806.GE535743@xz-x1>
+References: <20200707195429.GF88106@xz-x1>
+ <5004a059-6eb0-4ef3-40b7-94dfbf9ec08f@redhat.com>
+ <20200708141657.GA199122@xz-x1>
+ <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
+ <20200709141037.GF199122@xz-x1>
+ <fb2f8d35-3f04-55ac-e0c0-7eeedbaf2429@redhat.com>
+ <20200710133005.GL199122@xz-x1>
+ <05bb512c-ca0a-e80e-1eed-446e918ad729@redhat.com>
+ <20200716010005.GA535743@xz-x1>
+ <b0319440-6e53-f274-59ba-6dbc67de69be@redhat.com>
 MIME-Version: 1.0
-References: <20200717140714.124263-1-christian.ehrhardt@canonical.com>
-In-Reply-To: <20200717140714.124263-1-christian.ehrhardt@canonical.com>
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Fri, 17 Jul 2020 16:15:15 +0200
-Message-ID: <CAATJJ0+ONgyxZztZJi_03-++aXa1pM-r5dKf7An2KiYhvYNgvw@mail.gmail.com>
-Subject: Re: [PATCH] accel/tcg: reduce default code gen buffer on small hosts
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
- Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="000000000000c5e9d605aaa3caac"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 09:40:52
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <b0319440-6e53-f274-59ba-6dbc67de69be@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,195 +118,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c5e9d605aaa3caac
-Content-Type: text/plain; charset="UTF-8"
+On Thu, Jul 16, 2020 at 10:54:31AM +0800, Jason Wang wrote:
+> 
+> On 2020/7/16 上午9:00, Peter Xu wrote:
+> > On Mon, Jul 13, 2020 at 12:04:16PM +0800, Jason Wang wrote:
+> > > On 2020/7/10 下午9:30, Peter Xu wrote:
+> > > > On Fri, Jul 10, 2020 at 02:34:11PM +0800, Jason Wang wrote:
+> > > > > On 2020/7/9 下午10:10, Peter Xu wrote:
+> > > > > > On Thu, Jul 09, 2020 at 01:58:33PM +0800, Jason Wang wrote:
+> > > > > > > > > - If we care the performance, it's better to implement the MAP event for
+> > > > > > > > > vhost, otherwise it could be a lot of IOTLB miss
+> > > > > > > > I feel like these are two things.
+> > > > > > > > 
+> > > > > > > > So far what we are talking about is whether vt-d should have knowledge about
+> > > > > > > > what kind of events one iommu notifier is interested in.  I still think we
+> > > > > > > > should keep this as answered in question 1.
+> > > > > > > > 
+> > > > > > > > The other question is whether we want to switch vhost from UNMAP to MAP/UNMAP
+> > > > > > > > events even without vDMA, so that vhost can establish the mapping even before
+> > > > > > > > IO starts.  IMHO it's doable, but only if the guest runs DPDK workloads.  When
+> > > > > > > > the guest is using dynamic iommu page mappings, I feel like that can be even
+> > > > > > > > slower, because then the worst case is for each IO we'll need to vmexit twice:
+> > > > > > > > 
+> > > > > > > >       - The first vmexit caused by an invalidation to MAP the page tables, so vhost
+> > > > > > > >         will setup the page table before IO starts
+> > > > > > > > 
+> > > > > > > >       - IO/DMA triggers and completes
+> > > > > > > > 
+> > > > > > > >       - The second vmexit caused by another invalidation to UNMAP the page tables
+> > > > > > > > 
+> > > > > > > > So it seems to be worse than when vhost only uses UNMAP like right now.  At
+> > > > > > > > least we only have one vmexit (when UNMAP).  We'll have a vhost translate()
+> > > > > > > > request from kernel to userspace, but IMHO that's cheaper than the vmexit.
+> > > > > > > Right but then I would still prefer to have another notifier.
+> > > > > > > 
+> > > > > > > Since vtd_page_walk has nothing to do with device IOTLB. IOMMU have a
+> > > > > > > dedicated command for flushing device IOTLB. But the check for
+> > > > > > > vtd_as_has_map_notifier is used to skip the device which can do demand
+> > > > > > > paging via ATS or device specific way. If we have two different notifiers,
+> > > > > > > vhost will be on the device iotlb notifier so we don't need it at all?
+> > > > > > But we can still have iommu notifier that only registers to UNMAP even after we
+> > > > > > introduce dev-iotlb notifier?  We don't want to do page walk for them as well.
+> > > > > > TCG should be the only one so far, but I don't know.. maybe there can still be
+> > > > > > new ones?
+> > > > > I think you're right. But looking at the codes, it looks like the check of
+> > > > > vtd_as_has_map_notifier() was only used in:
+> > > > > 
+> > > > > 1) vtd_iommu_replay()
+> > > > > 2) vtd_iotlb_page_invalidate_notify() (PSI)
+> > > > > 
+> > > > > For the replay, it's expensive anyhow. For PSI, I think it's just about one
+> > > > > or few mappings, not sure it will have obvious performance impact.
+> > > > > 
+> > > > > And I had two questions:
+> > > > > 
+> > > > > 1) The codes doesn't check map for DSI or GI, does this match what spec
+> > > > > said? (It looks to me the spec is unclear in this part)
+> > > > Both DSI/GI should cover maps too?  E.g. vtd_sync_shadow_page_table() in
+> > > > vtd_iotlb_domain_invalidate().
+> > > 
+> > > I meant the code doesn't check whether there's an MAP notifier :)
+> > It's actually checked, because it loops over vtd_as_with_notifiers, and only
+> > MAP notifiers register to that. :)
+> 
+> 
+> I may miss something but I don't find the code to block UNMAP notifiers?
+> 
+> vhost_iommu_region_add()
+>     memory_region_register_iommu_notifier()
+>         memory_region_update_iommu_notify_flags()
+>             imrc->notify_flag_changed()
+>                 vtd_iommu_notify_flag_changed()
+> 
+> ?
 
-On Fri, Jul 17, 2020 at 4:07 PM Christian Ehrhardt <
-christian.ehrhardt@canonical.com> wrote:
+Yeah I think you're right.  I might have confused with some previous
+implementations.  Maybe we should also do similar thing for DSI/GI just like
+what we do in PSI.
 
-> Since v5.0.0 and 600e17b2 "accel/tcg: increase default code gen buffer
-> size for 64 bit" in particular qemu with TCG regularly gets OOM Killed
-> on small hosts.
->
-> The former 47a2def4 "accel/tcg: remove link between guest ram and TCG
-> cache size" removed the link to guest size which is right, but at least
-> some connection to the host size needs to be retained to avoid growing
-> out of control on common CI setups which run at 1-2G host sizes.
->
-> The lower value of 1/8th of the host memory size and the default (of
-> currently 1G) will be taken to initialize the TB. There already is a
-> Min/Max check in place to not reach ridiculously small values.
->
-> Fixes: 600e17b2
->
+> > > > > 2) for the replay() I don't see other implementations (either spapr or
+> > > > > generic one) that did unmap (actually they skip unmap explicitly), any
+> > > > > reason for doing this in intel IOMMU?
+> > > > I could be wrong, but I'd guess it's because vt-d implemented the caching mode
+> > > > by leveraging the same invalidation strucuture, so it's harder to make all
+> > > > things right (IOW, we can't clearly identify MAP with UNMAP when we receive an
+> > > > invalidation request, because MAP/UNMAP requests look the same).
+> > > > 
+> > > > I didn't check others, but I believe spapr is doing it differently by using
+> > > > some hypercalls to deliver IOMMU map/unmap requests, which seems a bit close to
+> > > > what virtio-iommu is doing.  Anyway, the point is if we have explicit MAP/UNMAP
+> > > > from the guest, logically the replay indeed does not need to do any unmap
+> > > > because we don't need to call replay() on an already existing device but only
+> > > > for e.g. hot plug.
+> > > 
+> > > But this looks conflict with what memory_region_iommu_replay( ) did, for
+> > > IOMMU that doesn't have a replay method, it skips UNMAP request:
+> > > 
+> > >      for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
+> > >          iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iommu_idx);
+> > >          if (iotlb.perm != IOMMU_NONE) {
+> > >              n->notify(n, &iotlb);
+> > >          }
+> > > 
+> > > I guess there's no knowledge of whether guest have an explicit MAP/UMAP for
+> > > this generic code. Or replay implies that guest doesn't have explicit
+> > > MAP/UNMAP?
+> > I think it matches exactly with a hot plug case?  Note that when IOMMU_NONE
+> > could also mean the translation does not exist.  So it's actually trying to map
+> > everything that can be translated and then notify().
+> 
+> 
+> Yes, so the question is what's the assumption before calling
+> memory_region_iommu_replay(). If it assumes an empty mapping, there's
+> probably no need for unamp.
 
-Just found "[PATCH v1 0/5] candidate fixes for 5.1-rc1 (shippable,
-semihosting, OOM tcg)"
-which was submitted while I was prepping this one (this is a busy day since
-I'll be off for a week).
+The only caller of memory_region_iommu_replay() is vfio_listener_region_add(),
+when there's a new vIOMMU memory region detected.  So IIUC that guarantees the
+previous state should be all empty.
 
-Please ignore this patch here and give the series of Alex a look as it is
-the more advanced version :-).
-
-
-> Signed-off-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-> ---
->  accel/tcg/translate-all.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
->
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 2afa46bd2b..ffcd67060e 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -977,6 +977,29 @@ static inline size_t size_code_gen_buffer(size_t
-> tb_size)
->      /* Size the buffer.  */
->      if (tb_size == 0) {
->          tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
-> +        /*
-> +         * A static default of 1G turned out to break (OOM Kill) many
-> common
-> +         * CI setups that run at 1-2G Host memory size.
-> +         * At the same time the former default of ram_size/4 wasted
-> performance
-> +         * on large host systems when running small guests.
-> +         * Common CI guest sizes are 0.5-1G which meant ~128M-256M TB
-> size.
-> +         * A Default of 1/8th of the host size will get small hosts a
-> +         * similar TB size than they had prior to v5.0 and common bare
-> metal
-> +         * systems (>=8G) the new 1G default that was set in v5.0
-> +         */
-> +#if defined _SC_PHYS_PAGES && defined _SC_PAGESIZE
-> +        {
-> +            unsigned long max = DEFAULT_CODE_GEN_BUFFER_SIZE;
-> +            double pages = (double)sysconf(_SC_PHYS_PAGES);
-> +
-> +            if (pages > 0 && pagesize > 0) {
-> +                max = (unsigned long)((pages * qemu_real_host_page_size)
-> / 8);
-> +            }
-> +            if (max < DEFAULT_CODE_GEN_BUFFER_SIZE) {
-> +                tb_size = max;
-> +            }
-> +        }
-> +#endif
->      }
->      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
->          tb_size = MIN_CODE_GEN_BUFFER_SIZE;
-> --
-> 2.27.0
->
->
+Thanks,
 
 -- 
-Christian Ehrhardt
-Staff Engineer, Ubuntu Server
-Canonical Ltd
+Peter Xu
 
---000000000000c5e9d605aaa3caac
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Jul 17, 2020 at 4:07 PM Chris=
-tian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canonical.com" targe=
-t=3D"_blank">christian.ehrhardt@canonical.com</a>&gt; wrote:<br></div><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:=
-1px solid rgb(204,204,204);padding-left:1ex">Since v5.0.0 and 600e17b2 &quo=
-t;accel/tcg: increase default code gen buffer<br>
-size for 64 bit&quot; in particular qemu with TCG regularly gets OOM Killed=
-<br>
-on small hosts.<br>
-<br>
-The former 47a2def4 &quot;accel/tcg: remove link between guest ram and TCG<=
-br>
-cache size&quot; removed the link to guest size which is right, but at leas=
-t<br>
-some connection to the host size needs to be retained to avoid growing<br>
-out of control on common CI setups which run at 1-2G host sizes.<br>
-<br>
-The lower value of 1/8th of the host memory size and the default (of<br>
-currently 1G) will be taken to initialize the TB. There already is a<br>
-Min/Max check in place to not reach ridiculously small values.<br>
-<br>
-Fixes: 600e17b2<br></blockquote><div><br></div><div>Just found &quot;[PATCH=
- v1 0/5] candidate fixes for 5.1-rc1 (shippable, semihosting, OOM tcg)&quot=
-;</div><div>which was submitted while I was prepping this one (this is a bu=
-sy day since I&#39;ll be off for a week).</div><div><br></div><div>Please i=
-gnore this patch here and give the series of Alex a look as it is the more =
-advanced version :-).</div><div><br></div><blockquote class=3D"gmail_quote"=
- style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
-adding-left:1ex">
-<br>
-Signed-off-by: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@=
-canonical.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;<b=
-r>
----<br>
-=C2=A0accel/tcg/translate-all.c | 23 +++++++++++++++++++++++<br>
-=C2=A01 file changed, 23 insertions(+)<br>
-<br>
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c<br>
-index 2afa46bd2b..ffcd67060e 100644<br>
---- a/accel/tcg/translate-all.c<br>
-+++ b/accel/tcg/translate-all.c<br>
-@@ -977,6 +977,29 @@ static inline size_t size_code_gen_buffer(size_t tb_si=
-ze)<br>
-=C2=A0 =C2=A0 =C2=A0/* Size the buffer.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0if (tb_size =3D=3D 0) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* A static default of 1G turned out to b=
-reak (OOM Kill) many common<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* CI setups that run at 1-2G Host memory=
- size.<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* At the same time the former default of=
- ram_size/4 wasted performance<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* on large host systems when running sma=
-ll guests.<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Common CI guest sizes are 0.5-1G which=
- meant ~128M-256M TB size.<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* A Default of 1/8th of the host size wi=
-ll get small hosts a<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* similar TB size than they had prior to=
- v5.0 and common bare metal<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* systems (&gt;=3D8G) the new 1G default=
- that was set in v5.0<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-+#if defined _SC_PHYS_PAGES &amp;&amp; defined _SC_PAGESIZE<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned long max =3D DEFAULT_CO=
-DE_GEN_BUFFER_SIZE;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 double pages =3D (double)sysconf=
-(_SC_PHYS_PAGES);<br>
-+<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (pages &gt; 0 &amp;&amp; page=
-size &gt; 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 max =3D (unsigned =
-long)((pages * qemu_real_host_page_size) / 8);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (max &lt; DEFAULT_CODE_GEN_BU=
-FFER_SIZE) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D max;<b=
-r>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+#endif<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0if (tb_size &lt; MIN_CODE_GEN_BUFFER_SIZE) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;<br>
--- <br>
-2.27.0<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Christian Ehrhardt<br>Staff Engineer, Ubuntu Server<br>Canonical Ltd</div>=
-</div>
-
---000000000000c5e9d605aaa3caac--
 
