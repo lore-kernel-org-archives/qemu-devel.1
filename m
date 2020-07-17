@@ -2,73 +2,98 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B850FC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 07:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92475C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:00:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D0DD2071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 07:56:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D0DD2071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5C50820704
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:00:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lHNg8TBd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C50820704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwLE2-0002c8-TN
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 03:56:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55980)
+	id 1jwLHw-0004GL-L3
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:00:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jwLDR-0002BD-04
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 03:55:33 -0400
-Resent-Date: Fri, 17 Jul 2020 03:55:33 -0400
-Resent-Message-Id: <E1jwLDR-0002BD-04@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21758)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jwLDO-0003uc-K4
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 03:55:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594972520; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=UNxelbwhWlWVIopwsoHGe9ZoRhU8u5jsuQ3NqtFbOgjrtOQ9I+IRd2wGWTMJU9ahJbPW0dbnOfYozoEYzN29zhr9teGjJwnP+qE/3ixF42qHd1mlMsucZSv1QKfZixkO5zt70CwEHQ3htoBvzuRHs0WfvAZjP1surcYLA8QHN1Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594972520;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=6dIlo1Rv413VW3CYh7qAC7SiDIRAisUZmkICWR52swA=; 
- b=bTEUTKjFyp6L7e/BJOCXoaX7VCmlPbxVDYtR0yIaNsX5C5LUhdkjQ0/EEi6AersyrRvWH+B/fUwq1bESmbnu8QeDir4F9zL+2F9UOKwkN533OFuXW4dpi64fBrsP7mul+i9VmEVXqt2w+jOvN2SqQbkenABvZQ8kq0LWtIvN6tM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159497251602754.10607426509159;
- Fri, 17 Jul 2020 00:55:16 -0700 (PDT)
-Subject: Re: [PATCH] scripts/oss-fuzz: Limit target list to i386-softmmu
-Message-ID: <159497251473.12943.13332971386138727693@07a7f0d89f7d>
-In-Reply-To: <20200717073335.25534-1-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jwLHC-0003P8-NI; Fri, 17 Jul 2020 03:59:26 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:36257)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jwLHB-0004UB-3h; Fri, 17 Jul 2020 03:59:26 -0400
+Received: by mail-ej1-x642.google.com with SMTP id n22so6877232ejy.3;
+ Fri, 17 Jul 2020 00:59:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=1xHSoXtLBxF7ROb27OCLzG5gXoJlGpOkqfizxTYTmPE=;
+ b=lHNg8TBdjE5w5fvkEFpZ3tbLE5maL1EVY+WCZLuam+aphnuw+4lvELi5HmEiCWCqMR
+ YmUPBIaGssVNvFM8exmNxXrch1+Mbp2l0O+T36KlEKbuTYvMaulaQKXhgQO6E1ZL2DpW
+ qE4NSzVCmZkM0RugbAKUo96+8Vt8TQ1mp87JS21Sv8UVp83FaAvhm1NpXB4rAU8FkrSZ
+ P5RIb/5lfqfSRf/4k9+3SIw0/0hB2lvmBRxBjxsANkN+oy07TihK1GNcHsJiHnXfIP8r
+ yfoWILBpixeVKpDhWq1LbwrXJz8vDKC1bkcj4eVDSTaP2ItyITwfUTTTA3qB6Pl3KACs
+ Llig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1xHSoXtLBxF7ROb27OCLzG5gXoJlGpOkqfizxTYTmPE=;
+ b=JVnputJyvue8736SKYllGRYiuPmR7i8TBNnYMFrpaNths/ovtzy8Zze78nnXfiOjiB
+ XNXMh8bkIScU4iAHznXkG5twW0iHAd365p0yZRpwtnMdKtgGcax0Fn3NSUHmQ0KeSA8b
+ aO0HVSCk5+Wmc+ZwOcSKMhrklw060TSygDkvpmxSSP8k77l8Yk8DE6j2X/I4ZjcfWPu3
+ eE+o0mI5O9dNybIrbnhE8o6fzpqRlfhblKVSta4Flc1pN3UtUrM6viUmiWSwHccS7AFT
+ 1AwNj9dsBwtF/LVnSYQfVBk7KNiZguvE8eVk9k15fhtMpWJV+0Ug82ZFAidUeOuokMNx
+ K7dA==
+X-Gm-Message-State: AOAM530knCcJkymfLPFB1TJx4aSrTTNcsjtkz72b4kdZtB/CpAXt4UvV
+ HvQj4iEIyOg4//e7ymF84EM=
+X-Google-Smtp-Source: ABdhPJyrzdT46B3pJnT4cePdjuJH6jgiRoioyI727golyBmn6esqleJjxrEzvoCLjL+jZRsW2AAlQw==
+X-Received: by 2002:a17:906:1102:: with SMTP id
+ h2mr7269748eja.356.1594972763113; 
+ Fri, 17 Jul 2020 00:59:23 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id di20sm7630018edb.26.2020.07.17.00.59.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 17 Jul 2020 00:59:22 -0700 (PDT)
+Subject: Re: [PATCH v6 01/13] hw/misc: Add NPCM7xx System Global Control
+ Registers device model
+To: Havard Skinnemoen <hskinnemoen@google.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <20200717060258.1602319-1-hskinnemoen@google.com>
+ <20200717060258.1602319-2-hskinnemoen@google.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b0cd1c93-30ed-93c9-b768-01fb87d3100e@amsat.org>
+Date: Fri, 17 Jul 2020 09:59:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: thuth@redhat.com
-Date: Fri, 17 Jul 2020 00:55:16 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 03:55:26
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200717060258.1602319-2-hskinnemoen@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,48 +106,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, alxndr@bu.edu, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com
+Cc: kfting@nuvoton.com, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Avi.Fishman@nuvoton.com, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcxNzA3MzMzNS4yNTUz
-NC0xLXRodXRoQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
-T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
-IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGNoZWNrLXVuaXQ6
-IHRlc3RzL3Rlc3QtY3J5cHRvLXNlY3JldAogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvdGVz
-dC1jaGFyCioqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWNoYXIuYzoxMjA0
-OmNoYXJfc2VyaWFsX3Rlc3Q6ICdjaHInIHNob3VsZCBub3QgYmUgTlVMTApFUlJPUiB0ZXN0LWNo
-YXIgLSBCYWlsIG91dCEgRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5j
-OjEyMDQ6Y2hhcl9zZXJpYWxfdGVzdDogJ2Nocicgc2hvdWxkIG5vdCBiZSBOVUxMCm1ha2U6ICoq
-KiBbY2hlY2stdW5pdF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
-b2JzLi4uLgogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMjIKICBURVNUICAgIGlvdGVzdC1xY293
-MjogMDI0Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3Vi
-cHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2Nr
-ZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1mMGYzYjFmNmQ4
-Zjg0Y2UwYWJmMWNjZWM1MDA0NTIwNScsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0Jywg
-J3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScs
-ICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScs
-ICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1w
-L2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hl
-Oi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1y
-YXZ6eGEwYS9zcmMvZG9ja2VyLXNyYy4yMDIwLTA3LTE3LTAzLjM5LjM1LjIxOTI2Oi92YXIvdG1w
-L3FlbXU6eixybycsICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1x
-dWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9
-bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1mMGYzYjFmNmQ4Zjg0Y2UwYWJmMWNjZWM1MDA0
-NTIwNQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBk
-aXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1yYXZ6eGEwYS9zcmMnCm1ha2U6
-ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTVt
-NDAuMzIzcwp1c2VyICAgIDBtOC45MTlzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDcxNzA3MzMzNS4yNTUzNC0xLXRodXRoQHJlZGhh
-dC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
-bQ==
+On 7/17/20 8:02 AM, Havard Skinnemoen wrote:
+> Implement a device model for the System Global Control Registers in the
+> NPCM730 and NPCM750 BMC SoCs.
+> 
+> This is primarily used to enable SMP boot (the boot ROM spins reading
+> the SCRPAD register) and DDR memory initialization; other registers are
+> best effort for now.
+> 
+> The reset values of the MDLR and PWRON registers are determined by the
+> SoC variant (730 vs 750) and board straps respectively.
+> 
+> Reviewed-by: Joel Stanley <joel@jms.id.au>
+> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> ---
+>  include/hw/misc/npcm7xx_gcr.h |  76 ++++++++++++
+>  hw/misc/npcm7xx_gcr.c         | 227 ++++++++++++++++++++++++++++++++++
+>  MAINTAINERS                   |   8 ++
+>  hw/arm/Kconfig                |   3 +
+>  hw/misc/Makefile.objs         |   1 +
+>  hw/misc/trace-events          |   4 +
+>  6 files changed, 319 insertions(+)
+>  create mode 100644 include/hw/misc/npcm7xx_gcr.h
+>  create mode 100644 hw/misc/npcm7xx_gcr.c
+...
+
+> +static void npcm7xx_gcr_realize(DeviceState *dev, Error **errp)
+> +{
+> +    ERRP_GUARD();
+> +    NPCM7xxGCRState *s = NPCM7XX_GCR(dev);
+> +    uint64_t dram_size;
+> +    Object *obj;
+> +
+> +    obj = object_property_get_link(OBJECT(dev), "dram-mr", errp);
+> +    if (!obj) {
+> +        error_prepend(errp, "%s: required dram-mr link not found: ", __func__);
+> +        return;
+> +    }
+> +    dram_size = memory_region_size(MEMORY_REGION(obj));
+> +    if (!is_power_of_2(dram_size) ||
+> +        dram_size < NPCM7XX_GCR_MIN_DRAM_SIZE ||
+> +        dram_size > NPCM7XX_GCR_MAX_DRAM_SIZE) {
+> +        error_setg(errp, "%s: unsupported DRAM size %" PRIu64,
+> +                   __func__, dram_size);
+
+Nitpicking if you ever have to respin, please use size_to_str() here,
+
+> +        error_append_hint(errp,
+> +                          "DRAM size must be a power of two between %" PRIu64
+> +                          " and %" PRIu64 " MiB, inclusive.\n",
+> +                          NPCM7XX_GCR_MIN_DRAM_SIZE / MiB,
+> +                          NPCM7XX_GCR_MAX_DRAM_SIZE / MiB);
+
+and here.
+
+> +        return;
+> +    }
+> +
+> +    /* Power-on reset value */
+> +    s->reset_intcr3 = 0x00001002;
+> +
+> +    /*
+> +     * The GMMAP (Graphics Memory Map) field is used by u-boot to detect the
+> +     * DRAM size, and is normally initialized by the boot block as part of DRAM
+> +     * training. However, since we don't have a complete emulation of the
+> +     * memory controller and try to make it look like it has already been
+> +     * initialized, the boot block will skip this initialization, and we need
+> +     * to make sure this field is set correctly up front.
+> +     *
+> +     * WARNING: some versions of u-boot only looks at bits 8 and 9, so 2 GiB of
+> +     * DRAM will be interpreted as 128 MiB.
+> +     *
+> +     * https://github.com/Nuvoton-Israel/u-boot/blob/2aef993bd2aafeb5408dbaad0f3ce099ee40c4aa/board/nuvoton/poleg/poleg.c#L244
+> +     */
+> +    s->reset_intcr3 |= ctz64(dram_size / NPCM7XX_GCR_MIN_DRAM_SIZE) << 8;
+
+Nice :)
+
+> +}
+[...]
 
