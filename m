@@ -2,72 +2,69 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA87C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87619C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:41:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7115B2074B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:28:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7115B2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 601552076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:41:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 601552076A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwUA3-0000A1-Ox
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 13:28:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52646)
+	id 1jwUMa-0003Ga-JQ
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 13:41:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jwU9T-00087s-2k; Fri, 17 Jul 2020 13:28:03 -0400
-Resent-Date: Fri, 17 Jul 2020 13:28:03 -0400
-Resent-Message-Id: <E1jwU9T-00087s-2k@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21777)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jwULP-0002dx-14
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 13:40:23 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48919
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jwU9P-0007c0-6A; Fri, 17 Jul 2020 13:28:02 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1595006869; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=JnHWys5/wV3C+CSkJqCRwri+odg8QUCDSjR4u1bPSLR1eWS1Og2Iibh4EzADAb6ecJJ5BDW46pVo/zUjZvsYv3xq25LePVxr9KrOxdQAdAIkywRzIUYDSInUgmPUqrrji4xQT1DJbkLfAfn1usTCYEuV1kiHcFx0Hm/VYmnaZdU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1595006869;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=pd65us6ov1HVCXioshLykaX8cKBCH1bphEVmoikYoDg=; 
- b=Q9mQB/ndbcUsMZxqJDHtPdx5SxdAyvLJi7rSV91QPFxil27sUfUd5Bst8pmb4vcS+v74YDRelT0hRn8HNUaTpVaCcE/KOgfdESZIFL6qdNSX7vtFEiSCzLztaqL7fS8kLAf/7HmQW2ZSfLHCIKQmzhXp2Ut0cKOmd+CF6dSdZjQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1595006864020647.5563538240331;
- Fri, 17 Jul 2020 10:27:44 -0700 (PDT)
-Subject: Re: [RFC PATCH-for-5.1] hw/ide: Do not block for AIO while resetting
- a drive
-Message-ID: <159500686338.18948.8664131390784651183@07a7f0d89f7d>
-In-Reply-To: <20200717171938.1249-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jwULN-0001sz-Ic
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 13:40:22 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-sq4Ls5n3MhS_HQk96JGEcg-1; Fri, 17 Jul 2020 13:40:08 -0400
+X-MC-Unique: sq4Ls5n3MhS_HQk96JGEcg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F1B1108E;
+ Fri, 17 Jul 2020 17:40:07 +0000 (UTC)
+Received: from bahia.lan (ovpn-113-187.ams2.redhat.com [10.36.113.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9D8FB619C4;
+ Fri, 17 Jul 2020 17:40:06 +0000 (UTC)
+Subject: [PATCH for-5.2] spapr: Simplify error handling in spapr_phb_realize()
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 17 Jul 2020 19:40:05 +0200
+Message-ID: <159500760539.383731.10928308889360009122.stgit@bahia.lan>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: f4bug@amsat.org
-Date: Fri, 17 Jul 2020 10:27:44 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 12:58:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=207.211.31.81; envelope-from=groug@kaod.org;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -12
+X-Spam_score: -1.3
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,50 +77,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, f4bug@amsat.org,
- alxndr@bu.edu, stefanha@redhat.com, jsnow@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcxNzE3MTkzOC4xMjQ5
-LTEtZjRidWdAYW1zYXQub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
-LXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFu
-ZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwg
-eW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVUV09S
-Sz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0xNCBO
-RVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
-bXUvdGFyZ2V0L2FybS90cmFuc2xhdGUtc3ZlLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90
-cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5vCiAgTElOSyAgICBhYXJjaDY0LXNvZnRtbXUvcWVtdS1z
-eXN0ZW0tYWFyY2g2NApjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVybmVkIDEgZXhpdCBzdGF0dXMK
-Y29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBb
-cWVtdS1zeXN0ZW0tYWFyY2g2NF0gRXJyb3IgMQptYWtlWzFdOiAqKiogW3FlbXUtc3lzdGVtLXg4
-Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogW2FhcmNoNjQtc29mdG1tdS9hbGxdIEVycm9yIDIKbWFr
-ZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFt4ODZfNjQt
-c29mdG1tdS9hbGxdIEVycm9yIDIKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgog
-IEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNzA4LCBpbiA8bW9kdWxlPgog
-ICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRj
-b2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8n
-LCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1
-aWQ9M2JiMWE5MGJhMDdkNDRmOGE2ODQyOGJhOGNjMWFhYzgnLCAnLXUnLCAnMTAwMycsICctLXNl
-Y3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRf
-TElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywg
-J0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hF
-X0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUt
-ZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAtczdvOW11dnQvc3JjL2RvY2tlci1zcmMuMjAyMC0wNy0xNy0xMy4yNC4zMS4z
-NzQwOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9y
-dW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0
-ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0zYmIxYTkwYmEwN2Q0NGY4
-YTY4NDI4YmE4Y2MxYWFjOAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsx
-XTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1zN285bXV2
-dC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIK
-CnJlYWwgICAgMm00NC45NzdzCnVzZXIgICAgMG04Ljk4NHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
-aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNzE3MTcxOTM4LjEyNDktMS1m
-NGJ1Z0BhbXNhdC5vcmcvdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdl
-LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-cmVkaGF0LmNvbQ==
+The spapr_phb_realize() function has a local_err variable which
+is used to:
+
+1) check failures of spapr_irq_findone() and spapr_irq_claim()
+
+2) prepend extra information to the error message
+
+Recent work from Markus Armbruster highlighted we get better
+code when testing the return value of a function, rather than
+setting up all the local_err boiler plate. For similar reasons,
+it is now preferred to use ERRP_GUARD() and error_prepend()
+rather than error_propagate_prepend().
+
+Since spapr_irq_findone() and spapr_irq_claim() return negative
+values in case of failure, do both changes.
+
+This is just cleanup, no functional impact.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+
+Since we add ERRP_GUARD(), we could theoretically check *errp
+rather than the return value, and thus avoid the uint32_t to
+int32_t change but I personally find it clearer the other way.
+---
+ hw/ppc/spapr_pci.c |   16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 21681215d405..b1ce51327db4 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1796,6 +1796,7 @@ static void spapr_phb_destroy_msi(gpointer opaque)
+=20
+ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_GUARD();
+     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the use=
+r
+      * tries to add a sPAPR PHB to a non-pseries machine.
+      */
+@@ -1813,7 +1814,6 @@ static void spapr_phb_realize(DeviceState *dev, Error=
+ **errp)
+     uint64_t msi_window_size =3D 4096;
+     SpaprTceTable *tcet;
+     const unsigned windows_supported =3D spapr_phb_windows_supported(sphb)=
+;
+-    Error *local_err =3D NULL;
+=20
+     if (!spapr) {
+         error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries mach=
+ine");
+@@ -1964,13 +1964,12 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+=20
+     /* Initialize the LSI table */
+     for (i =3D 0; i < PCI_NUM_PINS; i++) {
+-        uint32_t irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + =
+i;
++        int32_t irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + i=
+;
+=20
+         if (smc->legacy_irq_allocation) {
+-            irq =3D spapr_irq_findone(spapr, &local_err);
+-            if (local_err) {
+-                error_propagate_prepend(errp, local_err,
+-                                        "can't allocate LSIs: ");
++            irq =3D spapr_irq_findone(spapr, errp);
++            if (irq < 0) {
++                error_prepend(errp, "can't allocate LSIs: ");
+                 /*
+                  * Older machines will never support PHB hotplug, ie, this=
+ is an
+                  * init only path and QEMU will terminate. No need to roll=
+back.
+@@ -1979,9 +1978,8 @@ static void spapr_phb_realize(DeviceState *dev, Error=
+ **errp)
+             }
+         }
+=20
+-        spapr_irq_claim(spapr, irq, true, &local_err);
+-        if (local_err) {
+-            error_propagate_prepend(errp, local_err, "can't allocate LSIs:=
+ ");
++        if (spapr_irq_claim(spapr, irq, true, errp) < 0) {
++            error_prepend(errp, "can't allocate LSIs: ");
+             goto unrealize;
+         }
+=20
+
+
 
