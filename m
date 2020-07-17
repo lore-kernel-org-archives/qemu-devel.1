@@ -2,84 +2,115 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 718DFC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A16C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:47:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34E5820734
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:41:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34E5820734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 696612076D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:47:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aa9h+m6c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 696612076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwQcK-0007qR-GS
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 09:41:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36948)
+	id 1jwQhY-00020m-N4
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 09:47:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jwQbh-0007Op-NU
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:40:57 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:49756)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jwQbe-000084-TL
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:40:57 -0400
-Received: from mail-ua1-f69.google.com ([209.85.222.69])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jwQbc-0006hy-5C
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 13:40:52 +0000
-Received: by mail-ua1-f69.google.com with SMTP id o9so1712510uar.22
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 06:40:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Gj50aoMUWKRCBVL8C6Ws3t48A0VcXMkp+0AdQ7VGEhI=;
- b=fns2DHaMZL47fI212hBKYWPhw9pdxI8OmbfbDHvD4RyA2uUkOCFMnFKYbbu8E57/EN
- Myqf6cJ8tqvr51kfN1GxPYvkxJ2EzOS6uM03prIq1mJx+9AM6fB22w8yHCVGJ0YQJ8L/
- HOYMRW/gXuGuK70e05f9VqND5xM3ocjkHx9DJ5SapGZIrXxoreFNJxrbiDQxA8GSidUM
- 4OF/QBZ4JHkDkPkXfd/0bFebx1+7uyVXxKjI7Qo77MCTq4LudlWsJiu15HU8FN1TEyNc
- l3Fq1uzdyjutq2q20O84p2sZ5ubiGSfHYOon4TP5zPSko1jvnsjrhCoxw3Vy4wD4249l
- pV8Q==
-X-Gm-Message-State: AOAM532t3Cn+R/kBqEu7yKIC3SfP8p4VsYigKwUHMVP12rDmpnSPZ4lN
- 6BXoDzniPJ+C/oGvnB1xAhpV2/FNeJ0HKrX1ygUYfgxfvM4QawDwpqWSIZckvavOg478GupjkGA
- xWZqg/Fcp2oXxm5XNRgrPra0p1BG6D4+KZlz4c9sdWgeHiCYA
-X-Received: by 2002:a1f:255:: with SMTP id 82mr7428510vkc.39.1594993250637;
- Fri, 17 Jul 2020 06:40:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwygioAni5WAZskhaVyPLaH0owgey+lDoIg2s41Tn2t1FeOxEVrrJSjTxNG7TdgiSgySOnfTytIX+KON7c4YYY=
-X-Received: by 2002:a1f:255:: with SMTP id 82mr7428479vkc.39.1594993250251;
- Fri, 17 Jul 2020 06:40:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwQgd-0001Im-QN
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:46:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60892
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwQgc-00014Z-3N
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:46:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594993561;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=MScvuX8/XxG4xemulmgmgqaL0b/rE1PsIiFJ4qsQVS0=;
+ b=aa9h+m6cmVc70HmgTW8jBpEIZxoCEmYeOEOR3ne0Re3Qu/dscs4m3kJHbN/+/nvrJ2D/Bq
+ V+n8cO+suAvIWf5VaUrjxBq9+vXPkYzBy6us9mPmi8E2e/kJFn+pHyilsAd5bi+bS8vVlR
+ 15z/zVZOhJXXeeyxqP5rb7sXpQeTtjo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-D4VE-tcsP5GO2ZXef8M_0w-1; Fri, 17 Jul 2020 09:45:57 -0400
+X-MC-Unique: D4VE-tcsP5GO2ZXef8M_0w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2458A801E6A;
+ Fri, 17 Jul 2020 13:45:56 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-123.ams2.redhat.com
+ [10.36.113.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BDE0010013C0;
+ Fri, 17 Jul 2020 13:45:53 +0000 (UTC)
+Subject: Re: [PATCH v2 04/20] block/block-copy: More explicit call_state
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200601181118.579-1-vsementsov@virtuozzo.com>
+ <20200601181118.579-5-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e0e8a810-814d-eb1c-21a7-4469451311e2@redhat.com>
+Date: Fri, 17 Jul 2020 15:45:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <CAATJJ0JDs78irZYRA7-wBefZhmTFK7SpCecuq79Ub-8n1jfy3A@mail.gmail.com>
- <alpine.LMD.2.03.2007151755360.31652@eik.bme.hu>
- <CAATJJ0L2V5QgPHoJW25HrT1_4_YhZJOLS=jFdCU6+JkHFG_MbA@mail.gmail.com>
- <871rlbwhlp.fsf@linaro.org>
-In-Reply-To: <871rlbwhlp.fsf@linaro.org>
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Fri, 17 Jul 2020 15:40:24 +0200
-Message-ID: <CAATJJ0+v5jPD+Qed8oq4i=pfKt5xXVhUq5kPw8P-KGEUOnb_3g@mail.gmail.com>
-Subject: Re: TB Cache size grows out of control with qemu 5.0
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000019cd5405aaa34ed0"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 09:40:52
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200601181118.579-5-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="BWcBR5tAtlqJh3E0agxh3OnF6MPdoeZCt"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,447 +123,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000019cd5405aaa34ed0
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BWcBR5tAtlqJh3E0agxh3OnF6MPdoeZCt
+Content-Type: multipart/mixed; boundary="LW9HEINQEuVMyiSCWuoOZmhSDSv80ZoxK"
+
+--LW9HEINQEuVMyiSCWuoOZmhSDSv80ZoxK
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 16, 2020 at 6:27 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
+On 01.06.20 20:11, Vladimir Sementsov-Ogievskiy wrote:
+> Refactor common path to use BlockCopyCallState pointer as parameter, to
+> prepare it for use in asynchronous block-copy (at least, we'll need to
+> run block-copy in a coroutine, passing the whole parameters as one
+> pointer).
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/block-copy.c | 51 ++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 38 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/block/block-copy.c b/block/block-copy.c
+> index 43a018d190..75882a094c 100644
+> --- a/block/block-copy.c
+> +++ b/block/block-copy.c
 
->
-> Christian Ehrhardt <christian.ehrhardt@canonical.com> writes:
->
-> > On Wed, Jul 15, 2020 at 5:58 PM BALATON Zoltan <balaton@eik.bme.hu>
-> wrote:
-> >
-> >> See commit 47a2def4533a2807e48954abd50b32ecb1aaf29a and the next two
-> >> following it.
-> >>
-> >
-> > Thank you Zoltan for pointing out this commit, I agree that this seems
-> to be
-> > the trigger for the issues I'm seeing. Unfortunately the common CI host
-> size
-> > is 1-2G. For example on Ubuntu Autopkgtests 1.5G.
-> > Those of them running guests do so in 0.5-1G size in TCG mode
-> > (as they often can't rely on having KVM available).
-> >
-> > The 1G TB buffer + 0.5G actual guest size + lack of dynamic downsizing
-> > on memory pressure (never existed) makes these systems go OOM-Killing
-> > the qemu process.
->
-> Ooops. I admit the assumption was that most people running system
-> emulation would be doing it on beefier machines.
->
-> > The patches indicated that the TB flushes on a full guest boot are a
-> > good indicator of the TB size efficiency. From my old checks I had:
-> >
-> > - Qemu 4.2 512M guest with 32M default overwritten by ram-size/4
-> > TB flush count      14, 14, 16
-> > - Qemu 5.0 512M guest with 1G default
-> > TB flush count      1, 1, 1
-> >
-> > I agree that ram/4 seems odd, especially on huge guests that is a lot
-> > potentially wasted. And most environments have a bit of breathing
-> > room 1G is too big in small host systems and the common CI system falls
-> > into this category. So I tuned it down to 256M for a test.
-> >
-> > - Qemu 4.2 512M guest with tb-size 256M
-> > TB flush count      5, 5, 5
-> > - Qemu 5.0 512M guest with tb-size 256M
-> > TB flush count      5, 5, 5
-> > - Qemu 5.0 512M guest with 256M default in code
-> > TB flush count      5, 5, 5
-> >
-> > So performance wise the results are as much in-between as you'd think
-> from a
-> > TB size in between. And the memory consumption which (for me) is the
-> actual
-> > current issue to fix would be back in line again as expected.
->
-> So I'm glad you have the workaround.
->
-> >
-> > So on one hand I'm suggesting something like:
-> > --- a/accel/tcg/translate-all.c
-> > +++ b/accel/tcg/translate-all.c
-> > @@ -944,7 +944,7 @@ static void page_lock_pair(PageDesc **re
-> >   * Users running large scale system emulation may want to tweak their
-> >   * runtime setup via the tb-size control on the command line.
-> >   */
-> > -#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (1 * GiB)
-> > +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (256 * MiB)
->
-> The problem we have is any number we pick here is arbitrary. And while
-> it did regress your use-case changing it again just pushes a performance
-> regression onto someone else.
+[...]
+
+> @@ -646,16 +653,16 @@ out:
+>   * it means that some I/O operation failed in context of _this_ block_co=
+py call,
+>   * not some parallel operation.
+>   */
+> -int coroutine_fn block_copy(BlockCopyState *s, int64_t offset, int64_t b=
+ytes,
+> -                            bool *error_is_read)
+> +static int coroutine_fn block_copy_common(BlockCopyCallState *call_state=
+)
+>  {
+>      int ret;
+> =20
+>      do {
+> -        ret =3D block_copy_dirty_clusters(s, offset, bytes, error_is_rea=
+d);
+> +        ret =3D block_copy_dirty_clusters(call_state);
+
+It=E2=80=99s possible that much of this code will change in a future patch =
+of
+this series, but as it is, it might be nice to make
+block_copy_dirty_clusters=E2=80=99s argument a const pointer so it=E2=80=99=
+s clear that
+the call to block_copy_wait_one() below will use the original @offset
+and @bytes values.
+
+*shrug*
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> =20
+>          if (ret =3D=3D 0) {
+> -            ret =3D block_copy_wait_one(s, offset, bytes);
+> +            ret =3D block_copy_wait_one(call_state->s, call_state->offse=
+t,
+> +                                      call_state->bytes);
+>          }
+> =20
+>          /*
 
 
-Thanks for your feedback Alex!
+--LW9HEINQEuVMyiSCWuoOZmhSDSv80ZoxK--
 
-That is true "for you" since 5.0 is released from upstreams POV.
-But from the downstreams POV no 5.0 exists for Ubuntu yet and I'd break
-many places releasing it like that.
-Sadly the performance gain to the other cases will most likely go unnoticed=
-.
+--BWcBR5tAtlqJh3E0agxh3OnF6MPdoeZCt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-> The most (*) 64 bit desktop PCs have 16Gb
-> of RAM, almost all have more than 8gb. And there is a workaround.
->
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8Rq5AACgkQ9AfbAGHV
+z0Cl6AgAwFLpvvib1DY4MCXfJw6SN1dyJvJXrMImkWlPT4+6Goi67m+RbbKXtivb
+z3cK6LJgxyZ8KPRw5a/H6Kx6BT9CFS3EC4+JWFKGRQ6BbOHlE2UkYwJkOGIDNQHT
+LbLqNYtO6Ag7L8ipk6o8c2yUn5q+MPL1No68qsNRokwMwj5Hq6hqAEGHioi8QF36
+CFCvYyF3JOkSCxDJArbcA4NC8lnplGyLJNM0m4K+GWiI8jwycBoeomD4O5IPZoqJ
+KpYQvuUEvxj6oUiyUi9nlGBykaUWT9HcdHwR/CERzQbLvLdP7mSOmQoRBA0wpTL4
+rjMQzRBC3mq7IbpF1KIL6i2MXlrc0A==
+=Sg00
+-----END PGP SIGNATURE-----
 
-Due to our work around virtualization the values representing
-"most 64 bit desktop PCs" aren't the only thing that matters :-)
+--BWcBR5tAtlqJh3E0agxh3OnF6MPdoeZCt--
 
-...
-
-
-> > This is a bit more tricky than it seems as ram_sizes is no more
-> > present in that context but it is enough to discuss it.
-> > That should serve all cases - small and large - better as a pure
-> > static default of 1G or always ram/4?
->
-> I'm definitely against re-introducing ram_size into the mix. The
-> original commit (a1b18df9a4) that broke this introduced an ordering
-> dependency which we don't want to bring back.
->
-
-I agree with that reasoning, but currently without any size dependency
-the "arbitrary value" we picked to be 1G is even more fixed than it was
-before.
-Compared to pre v5.0 for now I can only decide to
-a) tune it down -> performance impact for huge guests
-b) keep it at 1G -> functional breakage with small hosts
-
-I'd be more amenable to something that took into account host memory and
-> limited the default if it was smaller than a threshold. Is there a way
-> to probe that that doesn't involve slurping /proc/meminfo?
->
-
-I agree that a host-size dependency might be the better way to go,
-yet I have no great cross-platform resilient way to get that.
-Maybe we can make it like "if I can get some value consider it,
-otherwise use the current default".
-That would improve many places already, while keeping the rest at the
-current behavior.
-
-
-> >
-> > P.S. I added Alex being the Author of the offending patch and
-> Richard/Paolo
-> > for being listed in the Maintainers file for TCG.
->
->
->
-From Zoltan (unifying the thread a bit):
-
-> I agree that this should be dependent on host memory size not guest
-> ram_size but it might be tricky to get that value because different host
-> OSes would need different ways.
-
-Well - where it isn't available we will continue to take the default
-qemu 5.0 already had. If required on other platforms as well they can add
-their way of host memory detection into this as needed.
-
-> Maybe a new qemu_host_mem_size portability
-> function will be needed that implements this for different host OSes.
-> POSIX may or may not have sysconf _SC_PHYS_PAGES and _SC_AVPHYS_PAGES
-
-We should not try to get into the business of _SC_AVPHYS_PAGES and
-try to understand/assume what might be cache or otherwise (re)usable.
-Since we only look for some alignment to hosts size _SC_PHYS_PAGES should
-be good enough and available in more places than the other options.
-
-> and linux has sysinfo but don't know how reliable these are.
-
-sysconf is slightly more widely available than sysinfo and has enough for
-what we need.
-
-
-I have combined the thoughts above into a patch and it works well in
-my tests.
-
-32G Host:
-pages 8187304.000000
-pagesize 4096.000000
-max_default 4191899648
-final tb_size 1073741824
-
-(qemu) info jit
-Translation buffer state:
-gen code size       210425059/1073736659
-TB count            368273
-TB avg target size  20 max=3D1992 bytes
-TB avg host size    330 bytes (expansion ratio: 16.1)
-cross page TB count 1656 (0%)
-direct jump count   249813 (67%) (2 jumps=3D182112 49%)
-TB hash buckets     197613/262144 (75.38% head buckets used)
-TB hash occupancy   34.15% avg chain occ. Histogram: [0,10)%|=E2=96=86 =E2=
-=96=88
- =E2=96=85=E2=96=81=E2=96=83=E2=96=81=E2=96=81|[90,100]%
-TB hash avg chain   1.020 buckets. Histogram: 1|=E2=96=88=E2=96=81=E2=96=81=
-|3
-
-Statistics:
-TB flush count      1
-TB invalidate count 451673
-TLB full flushes    0
-TLB partial flushes 154819
-TLB elided flushes  191627
-[TCG profiler not compiled]
-
-=3D> 1G TB size not changed compared to v5.0 - as intended
-
-
-But on a small 1.5G Host it now works without OOM:
-
-pages 379667.000000
-pagesize 4096.000000
-max_default 194389504
-final tb_size 194389504
-
-(qemu) info jit
-Translation buffer state:
-gen code size       86179731/194382803
-TB count            149995
-TB avg target size  20 max=3D1992 bytes
-TB avg host size    333 bytes (expansion ratio: 16.5)
-cross page TB count 716 (0%)
-direct jump count   98854 (65%) (2 jumps=3D74962 49%)
-TB hash buckets     58842/65536 (89.79% head buckets used)
-TB hash occupancy   51.46% avg chain occ. Histogram: [0,10)%|=E2=96=83 =E2=
-=96=87
- =E2=96=88=E2=96=82=E2=96=86=E2=96=81=E2=96=84|[90,100]%
-TB hash avg chain   1.091 buckets. Histogram: 1|=E2=96=88=E2=96=81=E2=96=81=
-|3
-
-Statistics:
-TB flush count      10
-TB invalidate count 31733
-TLB full flushes    0
-TLB partial flushes 180891
-TLB elided flushes  244107
-[TCG profiler not compiled]
-
-=3D> ~185M which is way more reasonable given the host size
-
-The patch will have a rather large comment in it, I'm not sure if the full
-comment is needed, but I wanted to leave a trace what&why is going
-on in the code for the next one who comes by.
-
-Submitting as a proper patch to the list in a bit ...
-
---=20
-> Alex Benn=C3=A9e
->
-
-
---=20
-Christian Ehrhardt
-Staff Engineer, Ubuntu Server
-Canonical Ltd
-
---00000000000019cd5405aaa34ed0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jul 16, 2020 at 6:27 PM Alex =
-Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org" target=3D"_blank"=
->alex.bennee@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_=
-quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,=
-204);padding-left:1ex"><br>
-Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canonical.com" =
-target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt; writes:<br>
-<br>
-&gt; On Wed, Jul 15, 2020 at 5:58 PM BALATON Zoltan &lt;<a href=3D"mailto:b=
-alaton@eik.bme.hu" target=3D"_blank">balaton@eik.bme.hu</a>&gt; wrote:<br>
-&gt;<br>
-&gt;&gt; See commit 47a2def4533a2807e48954abd50b32ecb1aaf29a and the next t=
-wo<br>
-&gt;&gt; following it.<br>
-&gt;&gt;<br>
-&gt;<br>
-&gt; Thank you Zoltan for pointing out this commit, I agree that this seems=
- to be<br>
-&gt; the trigger for the issues I&#39;m seeing. Unfortunately the common CI=
- host size<br>
-&gt; is 1-2G. For example on Ubuntu Autopkgtests 1.5G.<br>
-&gt; Those of them running guests do so in 0.5-1G size in TCG mode<br>
-&gt; (as they often can&#39;t rely on having KVM available).<br>
-&gt;<br>
-&gt; The 1G TB buffer + 0.5G actual guest size + lack of dynamic downsizing=
-<br>
-&gt; on memory pressure (never existed) makes these systems go OOM-Killing<=
-br>
-&gt; the qemu process.<br>
-<br>
-Ooops. I admit the assumption was that most people running system<br>
-emulation would be doing it on beefier machines.<br>
-<br>
-&gt; The patches indicated that the TB flushes on a full guest boot are a<b=
-r>
-&gt; good indicator of the TB size efficiency. From my old checks I had:<br=
->
-&gt;<br>
-&gt; - Qemu 4.2 512M guest with 32M default overwritten by ram-size/4<br>
-&gt; TB flush count=C2=A0 =C2=A0 =C2=A0 14, 14, 16<br>
-&gt; - Qemu 5.0 512M guest with 1G default<br>
-&gt; TB flush count=C2=A0 =C2=A0 =C2=A0 1, 1, 1<br>
-&gt;<br>
-&gt; I agree that ram/4 seems odd, especially on huge guests that is a lot<=
-br>
-&gt; potentially wasted. And most environments have a bit of breathing<br>
-&gt; room 1G is too big in small host systems and the common CI system fall=
-s<br>
-&gt; into this category. So I tuned it down to 256M for a test.<br>
-&gt;<br>
-&gt; - Qemu 4.2 512M guest with tb-size 256M<br>
-&gt; TB flush count=C2=A0 =C2=A0 =C2=A0 5, 5, 5<br>
-&gt; - Qemu 5.0 512M guest with tb-size 256M<br>
-&gt; TB flush count=C2=A0 =C2=A0 =C2=A0 5, 5, 5<br>
-&gt; - Qemu 5.0 512M guest with 256M default in code<br>
-&gt; TB flush count=C2=A0 =C2=A0 =C2=A0 5, 5, 5<br>
-&gt;<br>
-&gt; So performance wise the results are as much in-between as you&#39;d th=
-ink from a<br>
-&gt; TB size in between. And the memory consumption which (for me) is the a=
-ctual<br>
-&gt; current issue to fix would be back in line again as expected.<br>
-<br>
-So I&#39;m glad you have the workaround. <br>
-<br>
-&gt;<br>
-&gt; So on one hand I&#39;m suggesting something like:<br>
-&gt; --- a/accel/tcg/translate-all.c<br>
-&gt; +++ b/accel/tcg/translate-all.c<br>
-&gt; @@ -944,7 +944,7 @@ static void page_lock_pair(PageDesc **re<br>
-&gt;=C2=A0 =C2=A0* Users running large scale system emulation may want to t=
-weak their<br>
-&gt;=C2=A0 =C2=A0* runtime setup via the tb-size control on the command lin=
-e.<br>
-&gt;=C2=A0 =C2=A0*/<br>
-&gt; -#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (1 * GiB)<br>
-&gt; +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (256 * MiB)<br>
-<br>
-The problem we have is any number we pick here is arbitrary. And while<br>
-it did regress your use-case changing it again just pushes a performance<br=
->
-regression onto someone else.</blockquote><div><br></div><div><div>Thanks f=
-or your feedback Alex!</div><div><br></div><div>That is true &quot;for you&=
-quot; since 5.0 is released from upstreams POV.</div><div>But from the down=
-streams POV no 5.0 exists for Ubuntu yet and I&#39;d break</div><div>many p=
-laces releasing it like that.</div><div>Sadly the performance gain to the o=
-ther cases will most likely go unnoticed.</div><div></div></div><div>=C2=A0=
-</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;b=
-order-left:1px solid rgb(204,204,204);padding-left:1ex">The most (*) 64 bit=
- desktop PCs have 16Gb<br>
-of RAM, almost all have more than 8gb. And there is a workaround.<br></bloc=
-kquote><div><br></div><div>Due to our work around virtualization the values=
- representing</div><div>&quot;most 64 bit desktop PCs&quot; aren&#39;t the =
-only thing that matters :-)</div><div><br></div><div>...</div><div>=C2=A0</=
-div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bor=
-der-left:1px solid rgb(204,204,204);padding-left:1ex">&gt; This is a bit mo=
-re tricky than it seems as ram_sizes is no more<br>
-&gt; present in that context but it is enough to discuss it.<br>
-&gt; That should serve all cases - small and large - better as a pure<br>
-&gt; static default of 1G or always ram/4?<br>
-<br>
-I&#39;m definitely against re-introducing ram_size into the mix. The<br>
-original commit (a1b18df9a4) that broke this introduced an ordering<br>
-dependency which we don&#39;t want to bring back.<br></blockquote><div>=C2=
-=A0</div><div>I agree with that reasoning, but currently without any size d=
-ependency</div><div>the &quot;arbitrary value&quot; we picked to be 1G is e=
-ven more fixed=C2=A0than it was before.</div><div>Compared to pre v5.0 for =
-now I can only decide to</div><div>a) tune it down -&gt; performance impact=
- for huge guests</div><div>b) keep it at 1G -&gt; functional breakage with =
-small hosts</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
-t:1ex">
-I&#39;d be more amenable to something that took into account host memory an=
-d<br>
-limited the default if it was smaller than a threshold. Is there a way<br>
-to probe that that doesn&#39;t involve slurping /proc/meminfo?<br></blockqu=
-ote><div><br></div><div>I agree that a host-size dependency might be the be=
-tter way to go,</div><div>yet I have no great cross-platform resilient way =
-to get that.</div><div>Maybe we can make it like &quot;if I can get some va=
-lue consider it,</div><div>otherwise use the current default&quot;.</div><d=
-iv>That would improve many places already, while keeping the rest at the cu=
-rrent behavior.</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" sty=
-le=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddi=
-ng-left:1ex">
-&gt;<br>
-&gt; P.S. I added Alex being the Author of the offending patch and Richard/=
-Paolo<br>
-&gt; for being listed in the Maintainers file for TCG.<br>
-<br>
-<br></blockquote><div><br></div><div>From Zoltan (unifying the thread a bit=
-):</div><div><br></div><div>&gt; I agree that this should be dependent on h=
-ost memory size not guest<br>&gt; ram_size but it might be tricky to get th=
-at value because different host<br>&gt; OSes would need different ways.</di=
-v><div><br></div><div>Well - where it isn&#39;t available we will continue =
-to take the default<br>qemu 5.0 already had. If required on other platforms=
- as well they can add<br>their way of host memory detection into this as ne=
-eded.<br></div><div><br></div><div>&gt; Maybe a new qemu_host_mem_size port=
-ability<br>&gt; function will be needed that implements this for different =
-host OSes.<br>&gt; POSIX may or may not have sysconf _SC_PHYS_PAGES and _SC=
-_AVPHYS_PAGES</div><div><br></div><div>We should not try to get into the bu=
-siness of _SC_AVPHYS_PAGES and<br>try to understand/assume what might be ca=
-che or otherwise (re)usable.<br>Since we only look for some alignment to ho=
-sts size _SC_PHYS_PAGES should<br>be good enough and available in more plac=
-es than the other options.<br></div><div><br></div><div>&gt; and=C2=A0linux=
- has sysinfo but don&#39;t know how reliable these are.<br></div><div><br><=
-/div><div>sysconf is slightly more widely available than sysinfo and has en=
-ough for what we need.</div><div><br></div><div><br></div><div>I have combi=
-ned the thoughts=C2=A0above into a patch and it works well in</div><div>my =
-tests.</div><div><br></div><div>32G Host:<br>pages 8187304.000000<br>pagesi=
-ze 4096.000000<br>max_default 4191899648<br>final tb_size 1073741824<br><br=
->(qemu) info jit<br>Translation buffer state:<br>gen code size =C2=A0 =C2=
-=A0 =C2=A0 210425059/1073736659<br>TB count =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0368273<br>TB avg target size =C2=A020 max=3D1992 bytes<br>TB avg =
-host size =C2=A0 =C2=A0330 bytes (expansion ratio: 16.1)<br>cross page TB c=
-ount 1656 (0%)<br>direct jump count =C2=A0 249813 (67%) (2 jumps=3D182112 4=
-9%)<br>TB hash buckets =C2=A0 =C2=A0 197613/262144 (75.38% head buckets use=
-d)<br>TB hash occupancy =C2=A0 34.15% avg chain occ. Histogram: [0,10)%|=E2=
-=96=86 =E2=96=88 =C2=A0=E2=96=85=E2=96=81=E2=96=83=E2=96=81=E2=96=81|[90,10=
-0]%<br>TB hash avg chain =C2=A0 1.020 buckets. Histogram: 1|=E2=96=88=E2=96=
-=81=E2=96=81|3<br><br>Statistics:<br>TB flush count =C2=A0 =C2=A0 =C2=A01<b=
-r>TB invalidate count 451673<br>TLB full flushes =C2=A0 =C2=A00<br>TLB part=
-ial flushes 154819<br>TLB elided flushes =C2=A0191627<br>[TCG profiler not =
-compiled]<br><br>=3D&gt; 1G TB size not changed compared to v5.0 - as inten=
-ded<br><br><br>But on a small 1.5G Host it now works without OOM:<br><br>pa=
-ges 379667.000000<br>pagesize 4096.000000<br>max_default 194389504<br>final=
- tb_size 194389504<br><br>(qemu) info jit<br>Translation buffer state:<br>g=
-en code size =C2=A0 =C2=A0 =C2=A0 86179731/194382803<br>TB count =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0149995<br>TB avg target size =C2=A020 max=3D=
-1992 bytes<br>TB avg host size =C2=A0 =C2=A0333 bytes (expansion ratio: 16.=
-5)<br>cross page TB count 716 (0%)<br>direct jump count =C2=A0 98854 (65%) =
-(2 jumps=3D74962 49%)<br>TB hash buckets =C2=A0 =C2=A0 58842/65536 (89.79% =
-head buckets used)<br>TB hash occupancy =C2=A0 51.46% avg chain occ. Histog=
-ram: [0,10)%|=E2=96=83 =E2=96=87 =C2=A0=E2=96=88=E2=96=82=E2=96=86=E2=96=81=
-=E2=96=84|[90,100]%<br>TB hash avg chain =C2=A0 1.091 buckets. Histogram: 1=
-|=E2=96=88=E2=96=81=E2=96=81|3<br><br>Statistics:<br>TB flush count =C2=A0 =
-=C2=A0 =C2=A010<br>TB invalidate count 31733<br>TLB full flushes =C2=A0 =C2=
-=A00<br>TLB partial flushes 180891<br>TLB elided flushes =C2=A0244107<br>[T=
-CG profiler not compiled]<br><br>=3D&gt; ~185M which is way more reasonable=
- given the host size<br></div><div><br></div><div>The patch will have a rat=
-her large comment in it, I&#39;m not sure if the full</div><div>comment is =
-needed, but I wanted to leave a trace what&amp;why is going</div><div>on in=
- the code for the next one who comes by.</div><div><br></div><div>Submittin=
-g as a proper patch to the list in a bit ...</div><div><br></div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px s=
-olid rgb(204,204,204);padding-left:1ex">
--- <br>
-Alex Benn=C3=A9e<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Christian Ehrhardt<br>Staff Engineer, Ubuntu Server<br>Canonical Ltd</div>=
-</div>
-
---00000000000019cd5405aaa34ed0--
 
