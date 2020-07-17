@@ -2,78 +2,115 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B080C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41333C433EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:06:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 565A6207F5
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:04:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A8A72070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:06:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="wgIE6GpD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 565A6207F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OfA9rqYu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A8A72070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwOA7-0000VM-FS
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:04:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47104)
+	id 1jwOC8-0001e7-Bn
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:06:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1jwO7K-0008GI-6e
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:01:26 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:41054)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1jwO7H-00066m-Lx
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:01:25 -0400
-Received: from [172.16.11.100] (tiramisu.bar.greensocs.com [172.16.11.100])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 4B643219CA;
- Fri, 17 Jul 2020 11:01:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1594983678;
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwO86-0008RG-2z
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:02:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45254
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwO83-0006DQ-3c
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:02:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594983729;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x1yZgltZX69nmLEMIes/f3jdrWq7hYN5FXevKxCyNac=;
- b=wgIE6GpDEcRoOBbyF4P9mLWobccJNi56U3ACihhbkS0fmuMd52aAiZLE47cpU3tLArWRJF
- 5gEeoSB9jjB+1SqRCGl6Wt3kvGNLKzc+xSIT/PBf62mXf/rxFCO1NK6za8CNAvgjK7NJ3O
- lMqir3h4koxODumpKmjQwDXjkxTmFXc=
-Subject: Re: [RFC PATCH] tcg/cpu-exec: precise single-stepping after an
- exception
-To: Richard Henderson <richard.henderson@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200716100445.3748740-1-luc.michel@greensocs.com>
- <CAFEAcA_fGQoPXGg_t0jsXk7R+aSbWp9S+mpVJbAVZRr9FyUSpw@mail.gmail.com>
- <8e78c1c1-dd3f-fe07-5bd2-a0d8b0bc48ac@linaro.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <5802fcc2-a6ca-2aee-55be-7e19126874e1@greensocs.com>
-Date: Fri, 17 Jul 2020 13:01:17 +0200
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=msIXDQmQBa7e+AO47OCzJjnKCCwte1EhI+lLS0Pt0ho=;
+ b=OfA9rqYuOACAYbzLlnEvb8tz5PY0l1xcQS0gl2TNqdMU513p2eu+5QD+BXTVus+e4EnrdA
+ Yp6qhf/+WD985A8mN5rJrDnuIHzEEF0x/eO47RWQF+AHlewMjRX8ccKic9G0jHUgj8A1KF
+ PDSkCbtGp0Y/G8w9Bx9dtZqcFeG6SKI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-skcIYPJbMlGl5dtVH9JQDg-1; Fri, 17 Jul 2020 07:02:07 -0400
+X-MC-Unique: skcIYPJbMlGl5dtVH9JQDg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E156100CCC2;
+ Fri, 17 Jul 2020 11:02:06 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-123.ams2.redhat.com
+ [10.36.113.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA05F75554;
+ Fri, 17 Jul 2020 11:02:04 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 v2 1/2] block: Require aligned image size to avoid
+ assertion failure
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200716142601.111237-1-kwolf@redhat.com>
+ <20200716142601.111237-2-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7567943c-85e0-5c5b-b67e-3b915d5fa9de@redhat.com>
+Date: Fri, 17 Jul 2020 13:02:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <8e78c1c1-dd3f-fe07-5bd2-a0d8b0bc48ac@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=5.135.226.135;
- envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 07:01:19
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200716142601.111237-2-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="PaMGyDdWu77a1ahFdcB7LzWxYWfd6YUJb"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 03:33:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -86,155 +123,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PaMGyDdWu77a1ahFdcB7LzWxYWfd6YUJb
+Content-Type: multipart/mixed; boundary="8KzwD2FHzqiDUQLAdajYP7RKjcLKtlhmk"
+
+--8KzwD2FHzqiDUQLAdajYP7RKjcLKtlhmk
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 16.07.20 16:26, Kevin Wolf wrote:
+> Unaligned requests will automatically be aligned to bl.request_alignment
+> and we can't extend write requests to access space beyond the end of the
+> image without resizing the image, so if we have the WRITE permission,
+> but not the RESIZE one, it's required that the image size is aligned.
+>=20
+> Failing to meet this requirement could cause assertion failures like
+> this if RESIZE permissions weren't requested:
+>=20
+> qemu-img: block/io.c:1910: bdrv_co_write_req_prepare: Assertion `end_sect=
+or <=3D bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
+>=20
+> This was e.g. triggered by qemu-img converting to a target image with 4k
+> request alignment when the image was only aligned to 512 bytes, but not
+> to 4k.
+>=20
+> Turn this into a graceful error in bdrv_check_perm() so that WRITE
+> without RESIZE can only be taken if the image size is aligned. If a user
+> holds both permissions and drops only RESIZE, the function will return
+> an error, but bdrv_child_try_set_perm() will ignore the failure silently
+> if permissions are only requested to be relaxed and just keep both
+> permissions while returning success.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>=20
+> diff --git a/block.c b/block.c
+> index 35a372df57..6371928edb 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2025,6 +2025,22 @@ static int bdrv_check_perm(BlockDriverState *bs, B=
+lockReopenQueue *q,
+>          return -EPERM;
+>      }
+> =20
+> +    /*
+> +     * Unaligned requests will automatically be aligned to bl.request_al=
+ignment
+> +     * and without RESIZE we can't extend requests to write to space bey=
+ond the
+> +     * end of the image, so it's required that the image size is aligned=
+.
+> +     */
+> +    if ((cumulative_perms & BLK_PERM_WRITE) &&
+
+What about WRITE_UNCHANGED?  I think this would only matter with nodes
+that can have backing files (i.e., qcow2 in practice) because
+WRITE_UNCHANGED is only used by COR and block jobs doing something with
+a backing chain, so it shouldn=E2=80=99t matter in practice, but, well.
+
+So, either way:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> +        !(cumulative_perms & BLK_PERM_RESIZE))
+> +    {
+> +        if ((bs->total_sectors * BDRV_SECTOR_SIZE) % bs->bl.request_alig=
+nment) {
+> +            error_setg(errp, "Cannot get 'write' permission without 'res=
+ize': "
+> +                             "Image size is not a multiple of request "
+> +                             "alignment");
+> +            return -EPERM;
+> +        }
+> +    }
+> +
+>      /* Check this node */
+>      if (!drv) {
+>          return 0;
+>=20
 
 
-On 7/16/20 11:08 PM, Richard Henderson wrote:
-> On 7/16/20 1:12 PM, Peter Maydell wrote:
->> On Thu, 16 Jul 2020 at 11:08, Luc Michel <luc.michel@greensocs.com> wrote:
->>>
->>> When single-stepping with a debugger attached to QEMU, and when an
->>> exception is raised, the debugger misses the first instruction after the
->>> exception:
->>
->> This is a long-standing bug; thanks for looking at it.
->> (https://bugs.launchpad.net/qemu/+bug/757702)
->>
->>
->>> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
->>> index d95c4848a4..e85fab5d40 100644
->>> --- a/accel/tcg/cpu-exec.c
->>> +++ b/accel/tcg/cpu-exec.c
->>> @@ -502,10 +502,21 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
->>>              CPUClass *cc = CPU_GET_CLASS(cpu);
->>>              qemu_mutex_lock_iothread();
->>>              cc->do_interrupt(cpu);
->>>              qemu_mutex_unlock_iothread();
->>>              cpu->exception_index = -1;
->>> +
->>> +            if (unlikely(cpu->singlestep_enabled)) {
->>> +                /*
->>> +                 * After processing the exception, ensure an EXCP_DEBUG is
->>> +                 * raised when single-stepping so that GDB doesn't miss the
->>> +                 * next instruction.
->>> +                 */
->>> +                cpu->exception_index = EXCP_DEBUG;
->>> +                return cpu_handle_exception(cpu, ret);
->>> +            }
->>
->> I like the idea of being able to do this generically in
->> the main loop.
->>
->> How about interrupts? If we are single-stepping and we
->> take an interrupt I guess we want to stop before the first
->> insn of the interrupt handler rather than after it, which
->> would imply a similar change to cpu_handle_interrupt().
-> 
-> Fair.  I think something like this:
-> 
->             if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
->                 replay_interrupt();
-> -               cpu->exception_index = -1;
-> +               cpu->exception_index =
-> +                   (cpu->singlestep_enabled ? EXCP_DEBUG : -1);
->                 *last_tb = NULL;
->             }
-> 
-> I'm not quite sure how to test this though...
-I wrote a small test case for the interrupt side that can be run on the
-virt board:
 
+--8KzwD2FHzqiDUQLAdajYP7RKjcLKtlhmk--
 
-8<-----------------------------------------------
-    .global _start
-    .text
+--PaMGyDdWu77a1ahFdcB7LzWxYWfd6YUJb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-#define GIC_DIST_BASE 0x08000000
-#define GIC_CPU_BASE  0x08010000
+-----BEGIN PGP SIGNATURE-----
 
-#define ARCH_TIMER_NS_EL1_IRQ (16 + 14)
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8RhSoACgkQ9AfbAGHV
+z0BEIwf+PggU6yozH+kvTuiow4vI5K/P1j2RDzfuxrsmXCQHGSBglMCip7d1st1x
+u8iAJUCLakKiqu8gi7eUBLlntj1kAy0gGda8vnlhgE697SCYnXK7wCxtbAJvxhLz
+4crEplasTQhBGXgSoVTjyRsVfJg3GAFzouUqmo+Pm6a2DbXTJCMVuEr1+/dp4cWt
+rC9cK6VL+mDnOMaMR3LtSowsUwkoRAW0rD6uwFy9mlKbZWkSUAuXfeL7OYpfOQ6e
+62hrPIR+YJafcudL1a/PEdwwbkmiNk1w+JHITrA4Away5HdUPs1OeFNMsuDP1kR6
+GxkYk4CQaq2zI3nBJJTef/OtJq/meQ==
+=eR4g
+-----END PGP SIGNATURE-----
 
-.org 0x280
-_irq_handler:
-    nop
-    nop
+--PaMGyDdWu77a1ahFdcB7LzWxYWfd6YUJb--
 
-
-.org 0x1000
-_start:
-    ldr x1, =GIC_DIST_BASE  /* GICD_CTLR */
-    mov w0, #1              /* enable */
-    str w0, [x1]
-
-    ldr x1, =GIC_DIST_BASE + 0x100 /* GICD_ISENABLER0 */
-    ldr w0, =(1 << ARCH_TIMER_NS_EL1_IRQ)
-    str w0, [x1]
-
-    ldr x1, =GIC_CPU_BASE   /* GICC_CTLR */
-    mov w0, #1              /* enable */
-    str w0, [x1]
-
-    ldr x1, =GIC_CPU_BASE + 0x4  /* GICC_PMR */
-    mov w0, #255              /* min priority */
-    str w0, [x1]
-
-    msr daifclr, 2          /* unmask IRQ line */
-
-    mov x0, 10              /* timer will trigger in 10 ticks */
-    msr cntp_tval_el0, x0
-
-    mov x0, 1               /* enable timer */
-enable_timer:
-    msr cntp_ctl_el0, x0
-
-1:
-    b 1b
-
-8<-----------------------------------------------------
-
-$ aarch64-linux-gnu-gcc -g -nostdinc -nostdlib -Wl,-Ttext=0x0 -o foo foo.S
-
-$ qemu-system-aarch64 -display none -M virt -cpu cortex-a53 -kernel foo
--s -S
-
-$ aarch64-linux-gnu-gdb foo
-(gdb) tar rem :1234
-(gdb) maintenance packet Qqemu.sstep=0x1
-(gdb) b enable_timer
-(gdb) disp /i $pc
-(gdb) c
-Continuing.
-
-Breakpoint 1, enable_timer () at foo.S:40
-1: x/i $pc
-=> 0x1040 <enable_timer>:	msr	cntp_ctl_el0, x0
-
-(gdb) si
-1: x/i $pc
-=> 0x1044 <enable_timer+4>:	b	0x1044 <enable_timer+4>
-
-(gdb)
-1: x/i $pc
-=> 0x280 <_irq_handler>:	nop
-
-This is with your fix. Without it, the second stepi stops on 0x284.
-
-> 
-> Probably best to keep this a separate patch anyway.
-Do you want me to send it? If yes, how should I give credit to you?
-Should I put your Signed-off-by: in it?
-
-thanks
-
-Luc
-
-> 
-> 
-> r~
-> 
 
