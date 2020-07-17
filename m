@@ -6,89 +6,86 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9566C433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B15C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:12:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A499D206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:16:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D630A20717
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 17:12:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qc2VpDqn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A499D206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAagfx82"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D630A20717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwTyR-0004Bl-UJ
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 13:16:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49088)
+	id 1jwTu8-0001zP-5P
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 13:12:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwTxS-0003VY-Ss
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 13:15:38 -0400
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:42580)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwTxR-0004zJ-8I
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 13:15:38 -0400
-Received: by mail-oi1-x233.google.com with SMTP id t4so8580925oij.9
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 10:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=HAGssdKmByeuvUTK1+H5YUaNV8wGyH+3ODKku0pmFDA=;
- b=qc2VpDqnKcYBkeVlQLMOFsGApl3vwlZmWPze0J1KXxoFum77fPsuziAk/eaI/j64Hs
- atjUuJEg4d25w2QlKzBMQD9+ATwgdE4sz97pVWTz0gV7sLMHvezbl27HC4qHoTinqGCg
- Z00Xi7qe1ymlj5AqDdBLtyqUZSsK9ercyB+WufHaGAztChhhm5Gr4B2hICkJfNccK0TX
- cyO+BRCbjtGB/xhrdS1d+muGYwhJDYZ3Mo9+0ZNPRK5E/fguY4A36Bj68OmjxKbHUWkI
- xA5q/abEiwC1ZOuaOUjf12l2SZZ3cDi3jxdL+1gEcpOkkuZz+SuMWopgxMvQgvA4Sncf
- zPTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=HAGssdKmByeuvUTK1+H5YUaNV8wGyH+3ODKku0pmFDA=;
- b=CNIyHuvk9YLpgM8RbPKeU3d98VosL13mI7U+KmesC+eFDZtcBRl5wzLC15aJCfxlLH
- TUq+ie/WT8on/9U+d+4oQOASZkOK6hRft/Ls8qfv1bIZkC4aIxM6hdn08ac1prpQTdM4
- JT9bE5wyUBMUr9xVxtD5Kixog1H87ZTJpgAeutcQPTw/NQm6AVpTNqHUl9LXev8HCUps
- hk58hXINB0tuE//MIUdgFhxzdXsDUbHT7CJEJF/shFZMW/6fRINSE3Ziw9jqdlf1AibX
- su4ctuQyGYTk2cLzvg6FQ6myTY1M3pskCm2PEaEls+6pS9KFCSxgfej7LoCcZpoEKWSv
- oAbA==
-X-Gm-Message-State: AOAM530K9paR8x/8dg6AEVddN3FRkSo9Amivk9y8n8XJ2PPIxednSVio
- 0wF3VzQEhOnE3ef4hCP1dreUFaG+JkXGhwGB8wJ3Cg==
-X-Google-Smtp-Source: ABdhPJyE/dsRphqdOwIM2uqSU6xBUyAPttrLUWqcA3gtQewdSm9NZWESsC500jAmaZC+ntKmQHZDamce9t2HYSSi4as=
-X-Received: by 2002:aca:54c9:: with SMTP id i192mr8415634oib.163.1595006135577; 
- Fri, 17 Jul 2020 10:15:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jwTtI-0001Xu-JO
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 13:11:20 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44395
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jwTtF-00049K-K2
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 13:11:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595005875;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2AMU7kXgsmroj3OkjSJnDrsJrfXNO1FrxQl3btc5KCM=;
+ b=jAagfx82P3owOd89JQKld/RIlk858i0U0To/QOggSodua/1eBw3sEwYhtjkokhSIO3pdb0
+ hRrdYRCJWcKEpS2ECS27AzroT43tBBDKo0JEi9XNnlWXg1OsAkoqSvzuLmmpDj6M58uDbb
+ W+YP5yLqK0ixrpdrtyjeOQ0lPX9N/vE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-XkE7hKg1OgSv7w8CgJlhmg-1; Fri, 17 Jul 2020 13:11:03 -0400
+X-MC-Unique: XkE7hKg1OgSv7w8CgJlhmg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B04D08014D7;
+ Fri, 17 Jul 2020 17:11:01 +0000 (UTC)
+Received: from localhost (ovpn-114-107.ams2.redhat.com [10.36.114.107])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 81E8375559;
+ Fri, 17 Jul 2020 17:10:55 +0000 (UTC)
+Date: Fri, 17 Jul 2020 18:10:54 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Nikos Dragazis <ndragazis@arrikto.com>
+Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
+Message-ID: <20200717171054.GA136776@stefanha-x1.localdomain>
+References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
+ <20200715112342.GD18817@stefanha-x1.localdomain>
+ <deb5788e-c828-6996-025d-333cf2bca7ab@siemens.com>
+ <20200715153855.GA47883@stefanha-x1.localdomain>
+ <87y2nkwwvy.fsf@linaro.org>
+ <b3efd773-c07e-8095-c1ca-5ffb894ac2ac@arrikto.com>
 MIME-Version: 1.0
-References: <CA+aXn+EkkyiXmKpNhbggy0pjKVpiHxa+TUqEnZLB4v_D=T+7tA@mail.gmail.com>
- <CA+aXn+HHXAmT6Ljj2tpovGAYSurHKSdtUL3y-89t31B0e7jpsA@mail.gmail.com>
- <adb25c78-2edc-115a-5264-ca9f97864ec7@redhat.com>
- <87365t18mp.fsf@dusky.pond.sub.org>
- <CA+aXn+Guvt34PDD=N3FsD5w1C-aDXZ7gS8H_AZN-JEM8j8wBiQ@mail.gmail.com>
- <87lfjkvo81.fsf@dusky.pond.sub.org> <20200716222130.GO1274972@habkost.net>
- <87tuy6k9pa.fsf@dusky.pond.sub.org> <20200717162312.GR1274972@habkost.net>
- <20200717163038.GQ244185@redhat.com>
-In-Reply-To: <20200717163038.GQ244185@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Jul 2020 18:15:24 +0100
-Message-ID: <CAFEAcA-ZrH6vtncD_REPOY8Nmg7HdKWwrSRO9EEPvnjOLnVXoQ@mail.gmail.com>
-Subject: Re: sysbus_create_simple Vs qdev_create
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::233;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x233.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <b3efd773-c07e-8095-c1ca-5ffb894ac2ac@arrikto.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="C7zPtVaVf+AK4Oqc"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,26 +98,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Pratik Parvati <pratikp@vayavyalabs.com>
+Cc: "John G. Johnson" <john.g.johnson@oracle.com>,
+ Andra-Irina Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>,
+ qemu-devel@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>,
+ Alexander Graf <graf@amazon.com>, Thanos Makatos <thanos.makatos@nutanix.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jul 2020 at 17:32, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
-> Personally I've not seen a problem with the term "parent" in
-> this scenario. The class inheritance metaphor maps reasonably
-> clearly to a parent/child metaphor.
+--C7zPtVaVf+AK4Oqc
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It's not bad in itself; it's just that it means almost all
-of our objects are in three different kinds of parent-child
-relationship simultaneously, which is confusing if you're
-not used to it...
+On Fri, Jul 17, 2020 at 11:58:40AM +0300, Nikos Dragazis wrote:
+> On 15/7/20 7:44 =CE=BC.=CE=BC., Alex Benn=C3=A9e wrote:
+>=20
+> > Stefan Hajnoczi <stefanha@redhat.com> writes:
+> >=20
+> > > On Wed, Jul 15, 2020 at 01:28:07PM +0200, Jan Kiszka wrote:
+> > > > On 15.07.20 13:23, Stefan Hajnoczi wrote:
+> > > > > Let's have a call to figure out:
+> > > > >=20
+> > > > > 1. What is unique about these approaches and how do they overlap?
+> > > > > 2. Can we focus development and code review efforts to get someth=
+ing
+> > > > >     merged sooner?
+> > > > >=20
+> > > > > Jan and Nikos: do you have time to join on Monday, 20th of July a=
+t 15:00
+> > > > > UTC?
+> > > > > https://www.timeanddate.com/worldclock/fixedtime.html?iso=3D20200=
+720T1500
+> > > > >=20
+> > > > Not at that slot, but one hour earlier or later would work for me (=
+so far).
+> > > Nikos: Please let us know which of Jan's timeslots works best for you=
+.
+> > I'm in - the earlier slot would be preferential for me to avoid clashin=
+g with
+> > family time.
+> >=20
+>=20
+> I'm OK with all timeslots.
 
-thanks
--- PMM
+Great, let's do 16:00 UTC.
+
+I have a meeting at 14:00 UTC so I can't make the earlier slot and it
+sounds like Andra-Irina and Alexander Graf do too. Sorry, Alex (Benn=C3=A9e=
+),
+not optimal but it's hard to find a slot that is perfect for everyone.
+
+Stefan
+
+--C7zPtVaVf+AK4Oqc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8R254ACgkQnKSrs4Gr
+c8grAAgAi2wVUmRLdx6YA+VLULX0iVZjWcEwN4qqjvrwXwEHSz5q3MRzkbZCcRI4
+xvlY9ZHk279PCt2CBx8317aupxADZFUAv3N4zz+9XZnOi1A8JfOTjq40D8/9ECZG
+5so8TZrZxjLo5+zXbRlwXPYTMYTbAgLy3EH/Qbj5v1oTavSVO8WcOtsGdWQo+oQm
+Re/KMrIrR+vjPjO9gBuQm9+qtfEIX4W5UfLw0fPVbQeExq2sBG5JkcUA6FGoni9w
+PT6hvOS50YwEbFuEgAY7zkQ0eEziBotU/5V+p6cOoBJq/JKOLXA6b9AxhnLkD+Ee
+gakArk5I1uxEpq/6laYT+DqMTB102A==
+=HI4C
+-----END PGP SIGNATURE-----
+
+--C7zPtVaVf+AK4Oqc--
+
 
