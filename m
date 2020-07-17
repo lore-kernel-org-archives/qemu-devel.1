@@ -2,113 +2,124 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C1AC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06312C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:07:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB63122CA0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:01:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8BDA22D2A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:07:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Noo+bZTD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB63122CA0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="GpwnuCui"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8BDA22D2A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwQvf-0002Sh-0U
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:01:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43678)
+	id 1jwR1T-0004tD-2U
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:07:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwQub-0001q2-96
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:00:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59608
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwQuZ-000433-NA
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:00:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594994426;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=8sj+n3v+dgJ0qiRHpdzmC25k5qn+hKhmyiopiT1jk8E=;
- b=Noo+bZTDNaGJSBrwFocISaZnOISLIc5mYSSbeokQHwQ4c8H4IJB3CfPIs8kV5eFOy+sC0C
- bx3smUBx6/IQ35a2BS71a2xcFz52V+kAcXc0Pfct1iDDS59bWG+IOYyCTZIbjf7E14oyRw
- g3HfwMEg42XCbx2lJ03/mCHDfMVj4po=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-b4etkOE_P6Kj5oBbbNYxdA-1; Fri, 17 Jul 2020 10:00:22 -0400
-X-MC-Unique: b4etkOE_P6Kj5oBbbNYxdA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED1F7100CCC0;
- Fri, 17 Jul 2020 14:00:20 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-123.ams2.redhat.com
- [10.36.113.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 645F970104;
- Fri, 17 Jul 2020 14:00:05 +0000 (UTC)
-Subject: Re: [PATCH v2 05/20] block/block-copy: implement block_copy_async
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200601181118.579-1-vsementsov@virtuozzo.com>
- <20200601181118.579-6-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <90825bab-19d1-466f-4fd4-adf76f1010b1@redhat.com>
-Date: Fri, 17 Jul 2020 16:00:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jwR0S-0003fP-8h
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:06:32 -0400
+Received: from mail-eopbgr30139.outbound.protection.outlook.com
+ ([40.107.3.139]:44942 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jwR0O-0005Go-Cm
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:06:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OvdUIsD+f2rZH29+Mp2l756xhnouu+8A17VtC9nRgQ6X9esDQi34ci3bB7i8X4NIv7kMJmX4wTOVI6ErP+x62Tiq8gSHccmjSpXGIO8JQUibNOOqZ7L03nfVj1ZONKglYWBYOOJWxE5cKIgl0qEwZ4X59x1iUN6XupLByx3hejmQR0iePKrDumAgNPn+4+PTI0mmiLMTpyzTBtpw9aE8CSKLmdcOGFFR/YN0BEZAbewk7C/YjrRGbpYTrGTeC+3b06j6iODrm8BA+VEMkj7guHFrDcf0UBVWBQTGTrfKmoVc5onWHqcEgjYWfNmL8hpWNFGRb8KyuUgHQDsG3bCoNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=inke6FYYZsdCMuToWXbMgGmtZA1DzE/VVxDRLLLLh2I=;
+ b=Q66MVt0aqJBxcsmrRo1tq0DFSQtObijVwEiYxoKsObsj14gMJqyRKS/LSJeQU1iQOTzeEf0LlpAJFfVOfRKKQ/yyvPdx5wfDWFYIZ36eDeJ9ADnFsYDC7Fbw+IDHWvTzKF4lxfeYvQ4Rfln+y7ZC3T0TgUPpLMvpFJ/3gy95bcSDsdAM3LAphuq8ISxbRckY6ux7bo0Db8fXMidx9W9Yl7VRlNxYqBA/wlpKhfEMMNRdi5DNAxOuh5Ub1HaibmtYOtQSelb2cnYOdOWso5XtDNayUtaK+q26Vqw1BbpQMTK492Hkcgc0lrmx/v6b80AJoBsxiYqFalDFibu2vJAbtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=inke6FYYZsdCMuToWXbMgGmtZA1DzE/VVxDRLLLLh2I=;
+ b=GpwnuCuirLNjEJfKE/DJyorEfVc6thC7qgH17quhKp9R7yfSYzLx4tleKelxt+ldtJo6otuXDaG0mxi1XgkqkRL1mV7UWQNEOg88uyZfc+H0AJcMF6wGxYQXeWInCshD7LODKBDEpjncP6u+A5Kckqe6DreuUz9BNyChS6cb2MM=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
+ by VE1PR03MB5967.eurprd03.prod.outlook.com (2603:10a6:803:108::33)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Fri, 17 Jul
+ 2020 14:05:51 +0000
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::ad93:b959:82ec:107f]) by VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::ad93:b959:82ec:107f%3]) with mapi id 15.20.3174.027; Fri, 17 Jul 2020
+ 14:05:51 +0000
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/4] linux-user: Add support for two btrfs ioctls used for
+ subvolume
+Date: Fri, 17 Jul 2020 16:04:31 +0200
+Message-Id: <20200717140433.265599-3-Filip.Bozuta@syrmia.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200717140433.265599-1-Filip.Bozuta@syrmia.com>
+References: <20200717140433.265599-1-Filip.Bozuta@syrmia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: GV0P278CA0026.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:710:28::13) To VE1PR03MB5246.eurprd03.prod.outlook.com
+ (2603:10a6:802:a1::22)
 MIME-Version: 1.0
-In-Reply-To: <20200601181118.579-6-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="rdT7P8Pb9hpmtcNNQ4AI1DdaxG0suCZey"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 23:13:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (147.91.217.239) by
+ GV0P278CA0026.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:28::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3195.18 via Frontend Transport; Fri, 17 Jul 2020 14:05:50 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [147.91.217.239]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0f6f1736-903e-45f3-9731-08d82a5a8365
+X-MS-TrafficTypeDiagnostic: VE1PR03MB5967:
+X-Microsoft-Antispam-PRVS: <VE1PR03MB5967355AD678C127D26F778FEB7C0@VE1PR03MB5967.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6CSQNS2qcHp/KnnWculakvAB0pRD2vd1gUKJKRpCfI3qT2LAX0+lUQ42ROxxQlEIBpZZ+MTpzMztACF0o/QV1rA5xXk4MYfaq0Nqkg3FP0b+I+bxlkSD1rb9ZLdd8GiNKjjtMKgDV2u0AzoUbVcgORNcTnwZWn2mpQY9IbZTrl1xl9NQnIo5hIWSognQcAZJ15AZiKHAsly0F82Bqh+Xu9RGucrzPhcDNtIMRj2HPm3gBXBstpmeAw+LJKDr18BLuPWlVAAriWQzeinn76mYCXpIf4+OQ/+EhBLXinLH/Mbq8GfdaouI6dZg+OLkVnp7ZrnLR3deanOAm3snpjXSW0llbzajgRy5ZzT1Sv5cyjENicg9V1AC7PDmouxBYUbI
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39830400003)(136003)(366004)(346002)(396003)(376002)(2906002)(1076003)(52116002)(8936002)(66946007)(956004)(316002)(66476007)(36756003)(66556008)(508600001)(6512007)(6916009)(6666004)(2616005)(69590400007)(26005)(8676002)(6486002)(6506007)(16526019)(5660300002)(4326008)(186003)(86362001);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: ZgXPcKKwv8Ncmzq8Ufn4GztpNp5/HL0o7pk916IXaiSdHotDS6NFdTAjSGb5Ndg6HhwlrfZjPuuSoAyvvM9RtXxX4zd0u4iecdxucHRtN6rxO1uNNUaQgDkV/8litnovkUZp7IUfICs045MlbtwjJ8+tKU3ZltIQ70A71l08MXMA2pag3sQALuCE/U+SXWNIGEXLD5I5EayJyrYFRHG59CXIgNrQQDFB+P9zavUzDLxa2z8eJxDRuzC+m4PfOu4QwDIgVFv0C8ujj2hPZU3VGzljs7/j/NM/BIL7Q/WQvwRwDY7bdPF/0l2Q39sQ018h3B5WiAG4tNUzrTEkjW6eIEQ9b6b2mI9arbKNsPkoblk0e0Qy+wUL91yC4pW+IF1r3ggslk1fHHJOQzMZTFdckBS9DtO8bXDs6tHxm5xHyfOsonckNr9bxNbo/5TRh1PDG9MaM8Lh3p8Sig9WvIGzHpxJICGZpuMn4yWPYUp9fNk=
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f6f1736-903e-45f3-9731-08d82a5a8365
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 14:05:51.5390 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SvtBlb9cNddEDt6/KJI2q1KGsBqehWrg1WZfbTJ8hG1MyHzIb+Q673Xmo7sSHZd/pTb6tF9Ld3rZm9dgv1soUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR03MB5967
+Received-SPF: pass client-ip=40.107.3.139;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 10:06:23
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,177 +132,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
- armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org, jsnow@redhat.com
+Cc: riku.voipio@iki.fi, laurent@viver.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rdT7P8Pb9hpmtcNNQ4AI1DdaxG0suCZey
-Content-Type: multipart/mixed; boundary="8C90YjtfxresFvYBoeNPQY6ws9RidQ1wK"
+This patch implements functionality for following ioctl:
 
---8C90YjtfxresFvYBoeNPQY6ws9RidQ1wK
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+BTRFS_IOC_DEFAULT_SUBVOL - Setting a default subvolume
 
-On 01.06.20 20:11, Vladimir Sementsov-Ogievskiy wrote:
-> We'll need async block-copy invocation to use in backup directly.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/block-copy.h | 13 +++++++++++++
->  block/block-copy.c         | 40 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 53 insertions(+)
->=20
-> diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-> index 6397505f30..ada0d99566 100644
-> --- a/include/block/block-copy.h
-> +++ b/include/block/block-copy.h
-> @@ -19,7 +19,10 @@
->  #include "qemu/co-shared-resource.h"
-> =20
->  typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
-> +typedef void (*BlockCopyAsyncCallbackFunc)(int ret, bool error_is_read,
-> +                                           void *opaque);
->  typedef struct BlockCopyState BlockCopyState;
-> +typedef struct BlockCopyCallState BlockCopyCallState;
-> =20
->  BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *targe=
-t,
->                                       int64_t cluster_size, bool use_copy=
-_range,
-> @@ -41,6 +44,16 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s=
-,
->  int coroutine_fn block_copy(BlockCopyState *s, int64_t offset, int64_t b=
-ytes,
->                              bool *error_is_read);
-> =20
-> +/*
-> + * Run block-copy in a coroutine, return state pointer. If finished earl=
-y
-> + * returns NULL (@cb is called anyway).
+    Set a default subvolume for a btrfs filesystem. The third
+    ioctl's argument is a '__u64' (unsigned long long) which
+    represents the id of a subvolume that is to be set as
+    the default.
 
-Any special reason for doing so?  Seems like the code would be a tad
-simpler if we just returned it either way.  (And off the top of my head
-I=E2=80=99d guess it=E2=80=99d be easier for the caller if the returned val=
-ue was always
-non-NULL, too.)
+BTRFS_IOC_GET_SUBVOL_ROOTREF - Getting tree and directory id of subvolumes
 
-> + */
-> +BlockCopyCallState *block_copy_async(BlockCopyState *s,
-> +                                     int64_t offset, int64_t bytes,
-> +                                     bool ratelimit, int max_workers,
-> +                                     int64_t max_chunk,
-> +                                     BlockCopyAsyncCallbackFunc cb);
-> +
->  BdrvDirtyBitmap *block_copy_dirty_bitmap(BlockCopyState *s);
->  void block_copy_set_skip_unallocated(BlockCopyState *s, bool skip);
-> =20
-> diff --git a/block/block-copy.c b/block/block-copy.c
-> index 75882a094c..a0477d90f3 100644
-> --- a/block/block-copy.c
-> +++ b/block/block-copy.c
-> @@ -34,9 +34,11 @@ typedef struct BlockCopyCallState {
->      BlockCopyState *s;
->      int64_t offset;
->      int64_t bytes;
-> +    BlockCopyAsyncCallbackFunc cb;
-> =20
->      /* State */
->      bool failed;
-> +    bool finished;
-> =20
->      /* OUT parameters */
->      bool error_is_read;
-> @@ -676,6 +678,13 @@ static int coroutine_fn block_copy_common(BlockCopyC=
-allState *call_state)
->           */
->      } while (ret > 0);
-> =20
-> +    if (call_state->cb) {
-> +        call_state->cb(ret, call_state->error_is_read,
-> +                       call_state->s->progress_opaque);
+    Read tree and directory id of subvolumes from a btrfs
+    filesystem. The tree and directory id's are returned in the
+    ioctl's third argument which represents a pointer to a
+    following type:
 
-I find it weird to pass progress_opaque here.  Shouldn=E2=80=99t we just ha=
-ve a
-dedicated opaque object for this CB?
+    struct btrfs_ioctl_get_subvol_rootref_args {
+		/* in/out, minimum id of rootref's treeid to be searched */
+		__u64 min_treeid;
 
-> +    }
-> +
-> +    call_state->finished =3D true;
-> +
->      return ret;
->  }
-> =20
-> @@ -697,6 +706,37 @@ int coroutine_fn block_copy(BlockCopyState *s, int64=
-_t start, int64_t bytes,
->      return ret;
->  }
-> =20
-> +static void coroutine_fn block_copy_async_co_entry(void *opaque)
-> +{
-> +    block_copy_common(opaque);
-> +}
-> +
-> +BlockCopyCallState *block_copy_async(BlockCopyState *s,
-> +                                     int64_t offset, int64_t bytes,
-> +                                     bool ratelimit, int max_workers,
-> +                                     int64_t max_chunk,
-> +                                     BlockCopyAsyncCallbackFunc cb)
-> +{
-> +    BlockCopyCallState *call_state =3D g_new(BlockCopyCallState, 1);
-> +    Coroutine *co =3D qemu_coroutine_create(block_copy_async_co_entry,
-> +                                          call_state);
-> +
-> +    *call_state =3D (BlockCopyCallState) {
-> +        .s =3D s,
-> +        .offset =3D offset,
-> +        .bytes =3D bytes,
-> +        .cb =3D cb,
-> +    };
-> +
-> +    qemu_coroutine_enter(co);
+		/* out */
+		struct {
+			__u64 treeid;
+			__u64 dirid;
+		} rootref[BTRFS_MAX_ROOTREF_BUFFER_NUM];
 
-Do we need/want any already-in-coroutine shenanigans here?
+		/* out, number of found items */
+		__u8 num_items;
+		__u8 align[7];
+     };
 
-Max
+     Before calling this ioctl, 'min_treeid' field should be filled
+     with value that represent the minimum value for the tree id.
 
-> +
-> +    if (call_state->finished) {
-> +        g_free(call_state);
-> +        return NULL;
-> +    }
-> +
-> +    return call_state;
-> +}
->  BdrvDirtyBitmap *block_copy_dirty_bitmap(BlockCopyState *s)
->  {
->      return s->copy_bitmap;
->=20
+Implementation notes:
 
+    Ioctl BTRFS_IOC_GET_SUBVOL_ROOTREF uses the above mentioned structure
+    type as third argument. That is the reason why a aproppriate thunk
+    structure definition is added in file 'syscall_types.h'.
+---
+ linux-user/ioctls.h        |  7 +++++++
+ linux-user/syscall_defs.h  |  4 ++++
+ linux-user/syscall_types.h | 11 +++++++++++
+ 3 files changed, 22 insertions(+)
 
-
---8C90YjtfxresFvYBoeNPQY6ws9RidQ1wK--
-
---rdT7P8Pb9hpmtcNNQ4AI1DdaxG0suCZey
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8RruMACgkQ9AfbAGHV
-z0DNdQf/WWPI82HTPnhmluCXwE52rpuD2HdN5Tk9/2gLWjDnMRjZ/EFKp99u+ClN
-Sbv5F8oWhCw4EPeFSyIIKfmZz5oaakPYKf7Gp1MGtgs3rXjO5Z6OnT7IIBloXJWf
-tTeyQwWjL3EMqgwFqCdT793yp/s4e5ZGMOqourYblYyCPNgXKnygou28kUK1Eybu
-J7kjBnE1CY0qMTmfpNpWw5v1CtU4bRmfrwBEjg1Rq4O5pqaKw5nyBSjs7s5asTDE
-iasyPwNDSzyB7umIsTbiZ+QG5drV6FEC8IUmVNi0xYUARR7I8mcVNqnhd/TvDXxf
-NVunG2sjXEhQi5rwf2wMpm/L12nDiA==
-=lYU0
------END PGP SIGNATURE-----
-
---rdT7P8Pb9hpmtcNNQ4AI1DdaxG0suCZey--
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index a7f5664487..2c553103e6 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -206,6 +206,9 @@
+      IOCTL(BTRFS_IOC_INO_LOOKUP, IOC_RW,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_args)))
+ #endif
++#ifdef BTRFS_IOC_DEFAULT_SUBVOL
++     IOCTL(BTRFS_IOC_DEFAULT_SUBVOL, IOC_W, MK_PTR(TYPE_ULONGLONG))
++#endif
+ #ifdef BTRFS_IOC_SUBVOL_GETFLAGS
+      IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
+ #endif
+@@ -248,6 +251,10 @@
+      IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
+ #endif
++#ifdef BTRFS_IOC_GET_SUBVOL_ROOTREF
++     IOCTL(BTRFS_IOC_GET_SUBVOL_ROOTREF, IOC_RW,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_rootref_args)))
++#endif
+ #ifdef BTRFS_IOC_INO_LOOKUP_USER
+      IOCTL(BTRFS_IOC_INO_LOOKUP_USER, IOC_RW,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_user_args)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 7bb105428b..f4b4fc4a20 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -984,6 +984,8 @@ struct target_rtc_pll_info {
+                                                15, struct btrfs_ioctl_vol_args)
+ #define TARGET_BTRFS_IOC_INO_LOOKUP             TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
+                                         18, struct btrfs_ioctl_ino_lookup_args)
++#define TARGET_BTRFS_IOC_DEFAULT_SUBVOL         TARGET_IOW(BTRFS_IOCTL_MAGIC, \
++                                                           19, abi_ullong)
+ #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, \
+                                                            25, abi_ullong)
+ #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, \
+@@ -1006,6 +1008,8 @@ struct target_rtc_pll_info {
+                                        59, struct btrfs_ioctl_logical_ino_args)
+ #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IOR(BTRFS_IOCTL_MAGIC, \
+                                    60, struct btrfs_ioctl_get_subvol_info_args)
++#define TARGET_BTRFS_IOC_GET_SUBVOL_ROOTREF     TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
++                                61, struct btrfs_ioctl_get_subvol_rootref_args)
+ #define TARGET_BTRFS_IOC_INO_LOOKUP_USER        TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
+                                    62, struct btrfs_ioctl_ino_lookup_user_args)
+ 
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 980c29000a..d2f1b30ff3 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -381,6 +381,17 @@ STRUCT(btrfs_ioctl_dev_info_args,
+        MK_ARRAY(TYPE_ULONGLONG, 379), /* unused */
+        MK_ARRAY(TYPE_CHAR, BTRFS_DEVICE_PATH_NAME_MAX)) /* path */
+ 
++STRUCT(rootref,
++       TYPE_ULONGLONG, /* treeid */
++       TYPE_ULONGLONG) /* dirid */
++
++STRUCT(btrfs_ioctl_get_subvol_rootref_args,
++    TYPE_ULONGLONG, /* min_treeid */
++    MK_ARRAY(MK_STRUCT(STRUCT_rootref),
++             BTRFS_MAX_ROOTREF_BUFFER_NUM), /* rootref */
++    TYPE_CHAR, /* num_items */
++    MK_ARRAY(TYPE_CHAR, 7)) /* align */
++
+ STRUCT(btrfs_ioctl_get_dev_stats,
+        TYPE_ULONGLONG, /* devid */
+        TYPE_ULONGLONG, /* nr_items */
+-- 
+2.25.1
 
 
