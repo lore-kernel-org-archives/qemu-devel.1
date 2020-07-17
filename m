@@ -2,86 +2,74 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08309C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7BDCC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:16:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4AF620717
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:13:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sdrj2fCG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4AF620717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C5FC2080D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:16:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5FC2080D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwPF2-0004Ih-4k
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:13:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37736)
+	id 1jwPHg-0005hh-Tg
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:16:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jwPEM-0003nS-NW
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:12:46 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40634)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jwPEK-0007hA-VD
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:12:46 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f139so16674697wmf.5
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 05:12:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=B2KWoE7LClMe8XEOEplE+B7mIaoJdmCgeAYlAUIg5TA=;
- b=sdrj2fCGYjIq1wRiF3AUHrpEmxAITCKGPgxiSyBUSopB4VpQKGrFtloPfE+sFMTW/J
- GhheaY6Q/rZsCbDZ9y2LON1V2QWMnej+MbBgA4SladthIp/efPuPLDFtPRMlP/yAGS9L
- zvUM4ZzuL3jBNBrXc04X7jzqReOYn3zDQ+hua46Fhuopo9eBdhqHGXz6PTCGNNa4zsuC
- Tja744DDcH0UPtGJtxiD8Y2BoT2OcAu2Qf4nSYODRJmOM1IO6/SvfpNHO2eF2P+JJVLl
- 4FM5Ho/ozTxc3PmIzOlcLdcV3D6vas1DTTRlIBBX/MGJrRqwl+TIjsGgAoCybEVLjJMp
- QhTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=B2KWoE7LClMe8XEOEplE+B7mIaoJdmCgeAYlAUIg5TA=;
- b=NNA6jmeq2J6mAEhF5oCrD0d5Mjmue9nuPn89e/9wXVEyXRixAU6yrfnfeZ6crk0UDY
- zhzHELy0UR30Ufeob3eEXO/FB9fqYe7oFGswrmWxY0A3XOddzjRLRNCBBM3zlSiLsHUa
- rTuRz8m/MNIzIR4YsDIbZpREAc/vBgoziZvBzztlxIbUvjpn3gt55hepRrZHSeR6vtbe
- tGuhF8HyapUtO0jd2lwiiQ1K0L5X4wPOlWWRbDm13foj8m89DCoYWTYQceXKZepo4VAf
- v0cT8QrpgbktAQZiRyqPDn04YdV3+jvjEPxIIQwb/BLWrIWpnWWb6jy0Nr0+05KaWUAg
- sRAQ==
-X-Gm-Message-State: AOAM533iSY9HXul95yKuKbxxKxEuW5Eeusog67HhQ9ZNgf4rihm991tI
- X8oo6xSZltRBmVcuGYNIHFL0BllN+bs0SuwEyr0YSxYt
-X-Google-Smtp-Source: ABdhPJy752oDiQUWz1tgqPH8njUTV80VyD+6HdAqjgY1YI3Vmp3EjWgmSwJ99vsTq2O3yUAk/K7QsKJpK5Lo/gmZEmc=
-X-Received: by 2002:a1c:b608:: with SMTP id g8mr8920989wmf.55.1594987960122;
- Fri, 17 Jul 2020 05:12:40 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jwPGl-00054D-IQ
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:15:15 -0400
+Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:53857)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jwPGj-00087U-7r
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:15:15 -0400
+Received: from player795.ha.ovh.net (unknown [10.110.208.168])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id BA35A1E23FA
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 14:15:01 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player795.ha.ovh.net (Postfix) with ESMTPSA id C3EC5144E1AAA;
+ Fri, 17 Jul 2020 12:14:55 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-100R00314731bc6-1c62-4562-8136-01b5a9a5a681,EDCDB8C856EF0F0B0CA5B21EBB7B009702C7510A)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v6 07/13] hw/arm: Load -bios image as a boot ROM for
+ npcm7xx
+To: Havard Skinnemoen <hskinnemoen@google.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <20200717060258.1602319-1-hskinnemoen@google.com>
+ <20200717060258.1602319-8-hskinnemoen@google.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b5cf9b0f-9ad9-31b8-12ee-c2f8520b8ffd@kaod.org>
+Date: Fri, 17 Jul 2020 14:14:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200713083250.2955536-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20200713083250.2955536-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 17 Jul 2020 16:12:27 +0400
-Message-ID: <CAJ+F1CLn9wT__zFxNv_WiGfzmdCmoA+im42=EY7uqHXB6MnzLg@mail.gmail.com>
-Subject: Re: [PATCH] slirp: update to v4.3.1
-To: QEMU <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="000000000000c8c32105aaa212ec"
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200717060258.1602319-8-hskinnemoen@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 10828060879354170281
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfeeigdegjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeffvddtudegieefudeugffhjefgieegieegleettdehgfeiieevueeihfegfefgnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=87.98.165.38; envelope-from=clg@kaod.org;
+ helo=6.mo2.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 08:15:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,171 +82,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: kfting@nuvoton.com, Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c8c32105aaa212ec
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi
-
-On Mon, Jul 13, 2020 at 12:33 PM Marc-Andr=C3=A9 Lureau <
-marcandre.lureau@redhat.com> wrote:
-
-> Switch from stable-4.2 branch back to master (which is actually
-> maintained, I think we tend to forget about stable...).
->
-> git shortlog 2faae0f7..a62d3673:
->
-> 5eraph (2):
->       disable_dns option
->       limit vnameserver_addr to port 53
->
-> Akihiro Suda (1):
->       libslirp.h: fix SlirpConfig v3 documentation
->
-> Jindrich Novy (4):
->       Fix possible infinite loops and use-after-free
->       Use secure string copy to avoid overflow
->       Be sure to initialize sockaddr structure
->       Check lseek() for failure
->
-> Marc-Andr=C3=A9 Lureau (12):
->       Merge branch 'master' into 'master'
->       Merge branch 'fix-slirpconfig-3-doc' into 'master'
->       Fix use-afte-free in ip_reass() (CVE-2020-1983)
->       Update CHANGELOG
->       Merge branch 'cve-2020-1983' into 'master'
->       Release v4.3.0
->       Merge branch 'release-v4.3.0' into 'master'
->       changelog: post-release
->       util: do not silently truncate
->       Merge branch 'slirp-fmt-truncate' into 'master'
->       Release v4.3.1
->       Merge branch 'release-v4.3.1' into 'master'
->
-> Philippe Mathieu-Daud=C3=A9 (3):
->       Fix win32 builds by using the SLIRP_PACKED definition
->       Fix constness warnings
->       Remove unnecessary break
->
-> Ralf Haferkamp (2):
->       Drop bogus IPv6 messages
->       Fix MTU check
->
-> Samuel Thibault (1):
->       Merge branch 'ip6_payload_len' into 'master'
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 7/17/20 8:02 AM, Havard Skinnemoen wrote:
+> If a -bios option is specified on the command line, load the image into
+> the internal ROM memory region, which contains the first instructions
+> run by the CPU after reset.
+> 
+> If -bios is not specified, the vbootrom included with qemu is loaded by
+> default.
+> 
+> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 > ---
->  slirp | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/slirp b/slirp
-> index 2faae0f778f..a62d36734ff 160000
-> --- a/slirp
-> +++ b/slirp
-> @@ -1 +1 @@
-> -Subproject commit 2faae0f778f818fadc873308f983289df697eb93
-> +Subproject commit a62d36734ffe9828d0f70df1b3898a3b4fbda755
-> --
-> 2.27.0.221.ga08a83db2b
->
->
->
-Anyone willing to ack this, or nack it and then someone (me?) will have to
-backport the fixes in the slirp stable-4.2 branch.
+>  hw/arm/npcm7xx_boards.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
+> index 0b9dce2b35..f32557e0e1 100644
+> --- a/hw/arm/npcm7xx_boards.c
+> +++ b/hw/arm/npcm7xx_boards.c
+> @@ -18,12 +18,41 @@
+>  
+>  #include "hw/arm/npcm7xx.h"
+>  #include "hw/core/cpu.h"
+> +#include "hw/loader.h"
+>  #include "qapi/error.h"
+> +#include "qemu-common.h"
+>  #include "qemu/units.h"
+> +#include "sysemu/sysemu.h"
+>  
+>  #define NPCM750_EVB_POWER_ON_STRAPS 0x00001ff7
+>  #define QUANTA_GSJ_POWER_ON_STRAPS 0x00001fff
+>  
+> +static const char npcm7xx_default_bootrom[] = "npcm7xx_bootrom.bin";
+> +
+> +static void npcm7xx_load_bootrom(NPCM7xxState *soc)
+> +{
+> +    g_autofree char *filename = NULL;
+> +    const char *bootrom;
+> +    int ret;
+> +
+> +    if (bios_name) {
+> +        bootrom = bios_name;
+> +    } else {
+> +        bootrom = npcm7xx_default_bootrom;
 
+you could simply assign bios_name. No need to resend for that.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
---000000000000c8c32105aaa212ec
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+C.
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jul 13, 2020 at 12:33 PM Ma=
-rc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">mar=
-candre.lureau@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail=
-_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204=
-,204);padding-left:1ex">Switch from stable-4.2 branch back to master (which=
- is actually<br>
-maintained, I think we tend to forget about stable...).<br>
-<br>
-git shortlog 2faae0f7..a62d3673:<br>
-<br>
-5eraph (2):<br>
-=C2=A0 =C2=A0 =C2=A0 disable_dns option<br>
-=C2=A0 =C2=A0 =C2=A0 limit vnameserver_addr to port 53<br>
-<br>
-Akihiro Suda (1):<br>
-=C2=A0 =C2=A0 =C2=A0 libslirp.h: fix SlirpConfig v3 documentation<br>
-<br>
-Jindrich Novy (4):<br>
-=C2=A0 =C2=A0 =C2=A0 Fix possible infinite loops and use-after-free<br>
-=C2=A0 =C2=A0 =C2=A0 Use secure string copy to avoid overflow<br>
-=C2=A0 =C2=A0 =C2=A0 Be sure to initialize sockaddr structure<br>
-=C2=A0 =C2=A0 =C2=A0 Check lseek() for failure<br>
-<br>
-Marc-Andr=C3=A9 Lureau (12):<br>
-=C2=A0 =C2=A0 =C2=A0 Merge branch &#39;master&#39; into &#39;master&#39;<br=
->
-=C2=A0 =C2=A0 =C2=A0 Merge branch &#39;fix-slirpconfig-3-doc&#39; into &#39=
-;master&#39;<br>
-=C2=A0 =C2=A0 =C2=A0 Fix use-afte-free in ip_reass() (CVE-2020-1983)<br>
-=C2=A0 =C2=A0 =C2=A0 Update CHANGELOG<br>
-=C2=A0 =C2=A0 =C2=A0 Merge branch &#39;cve-2020-1983&#39; into &#39;master&=
-#39;<br>
-=C2=A0 =C2=A0 =C2=A0 Release v4.3.0<br>
-=C2=A0 =C2=A0 =C2=A0 Merge branch &#39;release-v4.3.0&#39; into &#39;master=
-&#39;<br>
-=C2=A0 =C2=A0 =C2=A0 changelog: post-release<br>
-=C2=A0 =C2=A0 =C2=A0 util: do not silently truncate<br>
-=C2=A0 =C2=A0 =C2=A0 Merge branch &#39;slirp-fmt-truncate&#39; into &#39;ma=
-ster&#39;<br>
-=C2=A0 =C2=A0 =C2=A0 Release v4.3.1<br>
-=C2=A0 =C2=A0 =C2=A0 Merge branch &#39;release-v4.3.1&#39; into &#39;master=
-&#39;<br>
-<br>
-Philippe Mathieu-Daud=C3=A9 (3):<br>
-=C2=A0 =C2=A0 =C2=A0 Fix win32 builds by using the SLIRP_PACKED definition<=
-br>
-=C2=A0 =C2=A0 =C2=A0 Fix constness warnings<br>
-=C2=A0 =C2=A0 =C2=A0 Remove unnecessary break<br>
-<br>
-Ralf Haferkamp (2):<br>
-=C2=A0 =C2=A0 =C2=A0 Drop bogus IPv6 messages<br>
-=C2=A0 =C2=A0 =C2=A0 Fix MTU check<br>
-<br>
-Samuel Thibault (1):<br>
-=C2=A0 =C2=A0 =C2=A0 Merge branch &#39;ip6_payload_len&#39; into &#39;maste=
-r&#39;<br>
-<br>
-Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lurea=
-u@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br>
----<br>
-=C2=A0slirp | 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/slirp b/slirp<br>
-index 2faae0f778f..a62d36734ff 160000<br>
---- a/slirp<br>
-+++ b/slirp<br>
-@@ -1 +1 @@<br>
--Subproject commit 2faae0f778f818fadc873308f983289df697eb93<br>
-+Subproject commit a62d36734ffe9828d0f70df1b3898a3b4fbda755<br>
--- <br>
-2.27.0.221.ga08a83db2b<br>
-<br>
-<br>
-</blockquote></div><div><br></div><div>Anyone willing to ack this, or nack =
-it and then someone (me?) will have to backport the fixes in the slirp stab=
-le-4.2 branch.</div><div><br></div><br>-- <br><div dir=3D"ltr" class=3D"gma=
-il_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+> +    }
+> +
+> +    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bootrom);
+> +    if (!filename) {
+> +        error_report("Could not find ROM image '%s'", bootrom);
+> +        exit(1);
+> +    }
+> +    ret = load_image_mr(filename, &soc->irom);
+> +    if (ret < 0) {
+> +        error_report("Failed to load ROM image '%s'", filename);
+> +        exit(1);
+> +    }
+> +}
+> +
+>  static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
+>  {
+>      memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram);
+> @@ -60,6 +89,7 @@ static void npcm750_evb_init(MachineState *machine)
+>      npcm7xx_connect_dram(soc, machine->ram);
+>      qdev_realize(DEVICE(soc), NULL, &error_fatal);
+>  
+> +    npcm7xx_load_bootrom(soc);
+>      npcm7xx_load_kernel(machine, soc);
+>  }
+>  
+> @@ -71,6 +101,7 @@ static void quanta_gsj_init(MachineState *machine)
+>      npcm7xx_connect_dram(soc, machine->ram);
+>      qdev_realize(DEVICE(soc), NULL, &error_fatal);
+>  
+> +    npcm7xx_load_bootrom(soc);
+>      npcm7xx_load_kernel(machine, soc);
+>  }
+>  
+> 
 
---000000000000c8c32105aaa212ec--
 
