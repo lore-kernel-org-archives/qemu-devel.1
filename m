@@ -2,93 +2,83 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E879C433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E3CC433E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:56:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF5D6206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:54:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31D1320717
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:56:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ujkHhBGg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF5D6206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRAAqnD8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31D1320717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwO0k-0000iD-1d
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:54:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43958)
+	id 1jwO2G-0003xz-AO
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:56:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwNy2-0004bp-7F
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:53 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51859)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwNxv-0003qX-F6
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:48 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 22so14180088wmg.1
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 03:51:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=DqfpJSe2gTXPFMFK1RIpYZrvJwlQQx+0+8ewUbbarN8=;
- b=ujkHhBGg2yoLYpffAxO7ZMdLwdbACGWuWTdf5ehbigSJeJgaF0Dxq4fhpQJ6owMo/x
- jmPiVQ3iAs4LoKNSEiYpR8Tc5UqP8AYLVVN3wuS7pHkVdgX/6OA3zHjiSaOdmoFHtZhY
- 97lovYZFmmAxn/dNPWeH/iwN+UOeSDGZjA7aYsEg3/MJbTHmMx11V5sTNYECJ62E2Amc
- tQWTNucmGoJyEsWZdp5GKhbdgBGgIax3ICGorsxew027mZoRT3C4lLtiP4A4PmnMBt/A
- 1ln9864HmQNyXQDfll8+6ZWqA8OKygjTWD0DycqKbHFECrNEgQAsVQ1pohnWnx+6aVn7
- 17/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=DqfpJSe2gTXPFMFK1RIpYZrvJwlQQx+0+8ewUbbarN8=;
- b=dzrUO70XC+R+QalQ3Q9x/ZWXOFanIBfzZw0lYqhL864jvOAsZUmgSZf5tKp7pimZFx
- il7Uh6V5GEWr2ot89fMFZUSgCFmKSpGZJhSjprXBmGFMwDmoBquu8SFTpoXJ56tI9v9O
- OSP8dOsV1iyxzMAC7Nk0kUIgsr3i20qeZkGKSrGDQ2R1kcLJTj9k+00xEUolp2/jWDRd
- XmA7zkPIggmVW1fvqPhnT90vxznV1pTVG6czdKTEEs0ur9PYw5mu23WHaZ2bsH/uByIj
- OM5Bmyjzi5F3DNBbtOrqrknBFWsN7qZz+4yDbag0gLz9RLIVjph++07ojc9W+MKM/F22
- imCA==
-X-Gm-Message-State: AOAM532U8QeeP9aOukCF2qfi4ZPhjyDYzI5XbxoJ4D+fmAW2CJ59CFCE
- 0E7W6QD+NwplwSAzNU4hSATHJg==
-X-Google-Smtp-Source: ABdhPJz0NkUJVv0nBdxuQmN+sEtFGz4TRsw4y14w/Xv8s33haNB/YK1ENL5mkRQwrXIiBAYg01Lb9w==
-X-Received: by 2002:a05:600c:4114:: with SMTP id
- j20mr8522271wmi.74.1594983101418; 
- Fri, 17 Jul 2020 03:51:41 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j145sm13940777wmj.7.2020.07.17.03.51.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jul 2020 03:51:40 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 907D11FF7E;
- Fri, 17 Jul 2020 11:51:39 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 0/5] candidate fixes for 5.1-rc1 (shippable, semihosting,
- OOM tcg)
-Date: Fri, 17 Jul 2020 11:51:34 +0100
-Message-Id: <20200717105139.25293-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwO0j-0001DD-Qv
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:54:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39643
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwO0g-0004QB-HA
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:54:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594983273;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5q8KKnBbLZd3LytN1YBSNWa8Cu5XHVk6GiVEfo4dW5M=;
+ b=dRAAqnD8hR1GOc+PcawLxRik9WnyrmQgNrmSO5F+5HJOKRWqAIRK5QGHTHqq/BroQ6qGTe
+ twFX1Uqsu9rpfKJOA4PvemsR/+BGevowjIXFnWcGZxuJFYPKcwSH9Lwf+fgPlqZyaq5xyS
+ v5vUIK1BhY74A2oXQv6jSSvu3o0XJ9g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-NxG8R6hEOfaiM5XWk0SU5A-1; Fri, 17 Jul 2020 06:54:32 -0400
+X-MC-Unique: NxG8R6hEOfaiM5XWk0SU5A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 159F38015CE;
+ Fri, 17 Jul 2020 10:54:31 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-113-80.ams2.redhat.com [10.36.113.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EFF8075554;
+ Fri, 17 Jul 2020 10:54:29 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH for-5.1 1/3] file-posix: Move check_hdev_writable() up
+Date: Fri, 17 Jul 2020 12:54:24 +0200
+Message-Id: <20200717105426.51134-2-kwolf@redhat.com>
+In-Reply-To: <20200717105426.51134-1-kwolf@redhat.com>
+References: <20200717105426.51134-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 03:33:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,52 +92,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- aurelien@aurel32.net
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+We'll need to call it in raw_open_common(), so move the function to
+avoid a forward declaration.
 
-These are some candidate patches for rc1. 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/file-posix.c | 66 +++++++++++++++++++++++-----------------------
+ 1 file changed, 33 insertions(+), 33 deletions(-)
 
-The first is a quick fix that finally gets shippable up and running
-again. We may want to consider a grand renaming of our docker scheme
-but I don't think thats something worth dropping in while we are
-stabilising - especially if we change the project name on gitlab. 
-
-The semihosting fixes had just slipped off my radar but are pretty
-minor bug fixes.
-
-Finally I whipped up the last two because of a report of QEMU OOM'ing
-on some CI systems with low memory. It doesn't restore the link to
-guest ram size but instead introduces an advisory helper function to
-probe guest physical memory.
-
-Please review.
-
-Alex Bennée (3):
-  shippable: add one more qemu to registry url
-  util: add qemu_get_host_physmem utility function
-  accel/tcg: better handle memory constrained systems
-
-KONRAD Frederic (2):
-  semihosting: defer connect_chardevs a little more to use serialx
-  semihosting: don't send the trailing '\0'
-
- include/qemu/osdep.h      | 10 ++++++++++
- accel/tcg/translate-all.c |  7 ++++++-
- hw/semihosting/console.c  |  4 +++-
- softmmu/vl.c              |  5 +++--
- util/oslib-posix.c        | 11 +++++++++++
- util/oslib-win32.c        |  6 ++++++
- .shippable.yml            |  2 +-
- 7 files changed, 40 insertions(+), 5 deletions(-)
-
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 8067e238cb..e35e15185a 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -401,6 +401,39 @@ static void raw_probe_alignment(BlockDriverState *bs, int fd, Error **errp)
+     }
+ }
+ 
++static int check_hdev_writable(BDRVRawState *s)
++{
++#if defined(BLKROGET)
++    /* Linux block devices can be configured "read-only" using blockdev(8).
++     * This is independent of device node permissions and therefore open(2)
++     * with O_RDWR succeeds.  Actual writes fail with EPERM.
++     *
++     * bdrv_open() is supposed to fail if the disk is read-only.  Explicitly
++     * check for read-only block devices so that Linux block devices behave
++     * properly.
++     */
++    struct stat st;
++    int readonly = 0;
++
++    if (fstat(s->fd, &st)) {
++        return -errno;
++    }
++
++    if (!S_ISBLK(st.st_mode)) {
++        return 0;
++    }
++
++    if (ioctl(s->fd, BLKROGET, &readonly) < 0) {
++        return -errno;
++    }
++
++    if (readonly) {
++        return -EACCES;
++    }
++#endif /* defined(BLKROGET) */
++    return 0;
++}
++
+ static void raw_parse_flags(int bdrv_flags, int *open_flags, bool has_writers)
+ {
+     bool read_write = false;
+@@ -3299,39 +3332,6 @@ static int hdev_probe_device(const char *filename)
+     return 0;
+ }
+ 
+-static int check_hdev_writable(BDRVRawState *s)
+-{
+-#if defined(BLKROGET)
+-    /* Linux block devices can be configured "read-only" using blockdev(8).
+-     * This is independent of device node permissions and therefore open(2)
+-     * with O_RDWR succeeds.  Actual writes fail with EPERM.
+-     *
+-     * bdrv_open() is supposed to fail if the disk is read-only.  Explicitly
+-     * check for read-only block devices so that Linux block devices behave
+-     * properly.
+-     */
+-    struct stat st;
+-    int readonly = 0;
+-
+-    if (fstat(s->fd, &st)) {
+-        return -errno;
+-    }
+-
+-    if (!S_ISBLK(st.st_mode)) {
+-        return 0;
+-    }
+-
+-    if (ioctl(s->fd, BLKROGET, &readonly) < 0) {
+-        return -errno;
+-    }
+-
+-    if (readonly) {
+-        return -EACCES;
+-    }
+-#endif /* defined(BLKROGET) */
+-    return 0;
+-}
+-
+ static void hdev_parse_filename(const char *filename, QDict *options,
+                                 Error **errp)
+ {
 -- 
-2.20.1
+2.25.4
 
 
