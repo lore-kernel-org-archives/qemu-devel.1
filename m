@@ -2,78 +2,79 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6B6C433E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD45C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:41:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00E2D20775
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:36:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E2D20775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0EC26206F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:41:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EC26206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwPbV-0007il-UR
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:36:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44146)
+	id 1jwPgH-0001LY-BR
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:41:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jwPYq-0005dz-Fw
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:33:56 -0400
-Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:51493)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jwPYn-0003kv-9Y
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:33:56 -0400
-Received: from player158.ha.ovh.net (unknown [10.108.57.188])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id CD66BAA8AE
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 14:33:49 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player158.ha.ovh.net (Postfix) with ESMTPSA id 7DB2E146A94D4;
- Fri, 17 Jul 2020 12:33:37 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-99G003a2901222-9bce-455c-ac92-4ccef942abda,EDCDB8C856EF0F0B0CA5B21EBB7B009702C7510A)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v6 13/13] tests/acceptance: console boot tests for
- quanta-gsj
-To: Havard Skinnemoen <hskinnemoen@google.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-References: <20200717060258.1602319-1-hskinnemoen@google.com>
- <20200717060258.1602319-14-hskinnemoen@google.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f098aa02-28cd-f86b-1641-5e164ba5ca7f@kaod.org>
-Date: Fri, 17 Jul 2020 14:33:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwPff-0000tW-In
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:40:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55924)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwPfd-0005SB-BA
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:40:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jwPfb-0006Lr-8b
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 12:40:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3FCF12E80EC
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 12:40:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200717060258.1602319-14-hskinnemoen@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 11145564655394261777
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfeeigdehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepieehjeelfedugeelgeduudfhueeuveetfeevkeduuedvleeiuedvfeetledugedvnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhduheekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=46.105.76.150; envelope-from=clg@kaod.org;
- helo=10.mo178.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 08:33:50
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Jul 2020 12:32:50 -0000
+From: Peter Maydell <1887854@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: opticron pmaydell
+X-Launchpad-Bug-Reporter: K (opticron)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <159492817809.19148.14056725236873205625.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159498917051.12817.12882227203582589989.malone@gac.canonical.com>
+Subject: [Bug 1887854] Re: Spurious Data Abort on qemu-system-aarch64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5ba316ee755d8c8b0ea8a77ceb453379ea54138f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 08:00:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,122 +83,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- kfting@nuvoton.com, Avi.Fishman@nuvoton.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Joel Stanley <joel@jms.id.au>
+Reply-To: Bug 1887854 <1887854@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/20 8:02 AM, Havard Skinnemoen wrote:
-> This adds two acceptance tests for the quanta-gsj machine.
-> 
-> One test downloads a lightly patched openbmc flash image from github and
-> verifies that it boots all the way to the login prompt.
-> 
-> The other test downloads a kernel, initrd and dtb built from the same
-> openbmc source and verifies that the kernel detects all CPUs and boots
-> to the point where it can't find the root filesystem (because we have no
-> flash image in this case).
-> 
-> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+It does still crash on current QEMU. The proximate cause of the crash is
+that you are trying to read from an address which is way outside RAM:
 
-It looks good but I am not sure it's a good idea to have tests 
-point to URLs like : 
+Trace 0: 0x7f8d50054340 [0000000000000000/00000000400195d8/0x82104000] strc=
+mp
+ PC=3D00000000400195d8 X00=3D000000104010ca28 X01=3D000000004001ec28
+X02=3D0000000000000fe8 X03=3D00000000401098c8 X04=3D000000004010ba40
+X05=3D5641526f44654b00 X06=3D1f276f6c62717372 X07=3D0000000000000000
+X08=3D00000000ffffffda X09=3D00000000401097d0 X10=3D0101010101010101
+X11=3D0000000000000000 X12=3D0000000000000000 X13=3D0000000000000000
+X14=3D0000000000000000 X15=3D0000000000000000 X16=3D0000000040014610
+X17=3D0000000000000008 X18=3D0000000000000000 X19=3D000000004010b9f0
+X20=3D000000004001ec28 X21=3D000000084001ec20 X22=3D000000004001ec60
+X23=3D000000004001ec40 X24=3D000000004001f548 X25=3D000000104001ec28
+X26=3D000000104001ec40 X27=3D000000034001ec38 X28=3D0000000000000000
+X29=3D00000000401098d0 X30=3D0000000040008a38  SP=3D00000000401098d0
+PSTATE=3D40000005 -Z-- EL1h
+Taking exception 4 [Data Abort]
+...from EL1 to EL1
+...with ESR 0x25/0x96000010
+...with FAR 0x104010ca28
+...with ELR 0x400195d8
+...to EL1 PC 0x40018200 PSTATE 0x3c5
 
-https://github.com/hskinnemoen/openbmc/releases/download/20200711-gsj-qemu-0/obmc-phosphor-initramfs-gsj.cpio.xz
+where the insn at 0x400195d8 is (inside strcmp)
+0x400195d8:  f8408402  ldr      x2, [x0], #8
 
-Philippe, Peter, is that OK ? 
+You can see that x0 is is 000000104010ca28, so QEMU is correct to give
+the data abort here. Further diagnosis would require working back
+through the log to find out where that address came from, which will be
+easier for you to do since you have the source.
 
+NB: I recommend these options for producing the logfile:
+ /tmp/q.log -d in_asm,int,cpu_reset,exec,cpu,guest_errors,nochain -singlest=
+ep
+Execution will be slower, but the crash here is pretty quick so that's not =
+a problem, and these options mean that every insn executed will produce a "=
+Trace" line and a CPU register dump. That's easier to understand and read (=
+especially reading backwards) than logs produced when QEMU is doing its nor=
+mal optimisations of chaining TBs together and putting multiple guest insns=
+ in each TB.
 
-If so, Joel, Andrew, could we host FW images on the OpenBMC github ? 
-and do the same for Aspeed.
+-- =
 
-Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1887854
 
-C. 
+Title:
+  Spurious Data Abort on qemu-system-aarch64
 
-> ---
->  tests/acceptance/boot_linux_console.py | 65 ++++++++++++++++++++++++++
->  1 file changed, 65 insertions(+)
-> 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 73cc69c499..1d82fc7ff8 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -569,6 +569,71 @@ class BootLinuxConsole(LinuxKernelTest):
->                                                  'sda')
->          # cubieboard's reboot is not functioning; omit reboot test.
->  
-> +    def test_arm_quanta_gsj(self):
-> +        """
-> +        :avocado: tags=arch:arm
-> +        :avocado: tags=machine:quanta-gsj
-> +        """
-> +        # 25 MiB compressed, 32 MiB uncompressed.
-> +        image_url = (
-> +                'https://github.com/hskinnemoen/openbmc/releases/download/'
-> +                '20200711-gsj-qemu-0/obmc-phosphor-image-gsj.static.mtd.gz')
-> +        image_hash = '14895e634923345cb5c8776037ff7876df96f6b1'
-> +        image_path_gz = self.fetch_asset(image_url, asset_hash=image_hash)
-> +        image_name = os.path.splitext(os.path.basename(image_path_gz))[0]
-> +        image_path = os.path.join(self.workdir, image_name)
-> +        archive.gzip_uncompress(image_path_gz, image_path)
-> +
-> +        self.vm.set_console()
-> +        drive_args = 'file=' + image_path + ',if=mtd,bus=0,unit=0'
-> +        self.vm.add_args('-drive', drive_args)
-> +        self.vm.launch()
-> +
-> +        self.wait_for_console_pattern('> BootBlock by Nuvoton')
-> +        self.wait_for_console_pattern('>Device: Poleg BMC NPCM730')
-> +        self.wait_for_console_pattern('>Skip DDR init.')
-> +        self.wait_for_console_pattern('U-Boot ')
-> +        self.wait_for_console_pattern('Booting Linux on physical CPU 0x0')
-> +        self.wait_for_console_pattern('CPU1: thread -1, cpu 1, socket 0')
-> +        self.wait_for_console_pattern('OpenBMC Project Reference Distro')
-> +        self.wait_for_console_pattern('gsj login:')
-> +
-> +    def test_arm_quanta_gsj_initrd(self):
-> +        """
-> +        :avocado: tags=arch:arm
-> +        :avocado: tags=machine:quanta-gsj
-> +        """
-> +        initrd_url = (
-> +                'https://github.com/hskinnemoen/openbmc/releases/download/'
-> +                '20200711-gsj-qemu-0/obmc-phosphor-initramfs-gsj.cpio.xz')
-> +        initrd_hash = '98fefe5d7e56727b1eb17d5c00311b1b5c945300'
-> +        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-> +        kernel_url = (
-> +                'https://github.com/hskinnemoen/openbmc/releases/download/'
-> +                '20200711-gsj-qemu-0/uImage-gsj.bin')
-> +        kernel_hash = 'fa67b2f141d56d39b3c54305c0e8a899c99eb2c7'
-> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-> +        dtb_url = (
-> +                'https://github.com/hskinnemoen/openbmc/releases/download/'
-> +                '20200711-gsj-qemu-0/nuvoton-npcm730-gsj.dtb')
-> +        dtb_hash = '18315f7006d7b688d8312d5c727eecd819aa36a4'
-> +        dtb_path = self.fetch_asset(dtb_url, asset_hash=dtb_hash)
-> +
-> +        self.vm.set_console()
-> +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-> +                               'console=ttyS0,115200n8 '
-> +                               'earlycon=uart8250,mmio32,0xf0001000')
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-initrd', initrd_path,
-> +                         '-dtb', dtb_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +
-> +        self.wait_for_console_pattern('Booting Linux on physical CPU 0x0')
-> +        self.wait_for_console_pattern('CPU1: thread -1, cpu 1, socket 0')
-> +        self.wait_for_console_pattern(
-> +                'Give root password for system maintenance')
-> +
->      def test_arm_orangepi(self):
->          """
->          :avocado: tags=arch:arm
-> 
+Status in QEMU:
+  New
 
+Bug description:
+  When running RTEMS test psxndbm01.exe built for AArch64-ilp32 (this code =
+is not yet publically available), the test generates a spurious data abort =
+(the MMU and alignment checks should be disabled according to bits 1, 0 of =
+SCTLR_EL1). The abort information is as follows:
+  Taking exception 4 [Data Abort]
+  ...from EL1 to EL1
+  ...with ESR 0x25/0x96000010
+  ...with FAR 0x104010ca28
+  ...with ELR 0x400195d8
+  ...to EL1 PC 0x40018200 PSTATE 0x3c5
+
+  The ESR indicates that a synchronous external abort has occurred.
+  ESR EC field: 0b100101
+
+  From the ARMv8 technical manual: Data Abort taken without a change in
+  Exception level. Used for MMU faults generated by data accesses,
+  alignment faults other than those caused by Stack Pointer
+  misalignment, and synchronous External aborts, including synchronous
+  parity or ECC errors. Not used for debug related exceptions.
+
+  ESR ISS field: 0b10000
+
+  From the ARMv8 technical manual: Synchronous External abort, not on
+  translation table walk or hardware update of translation table.
+
+  The following command line is used to invoke qemu:
+  qemu-system-aarch64 -machine virt -cpu cortex-a53 -m 256M -no-reboot -nog=
+raphic -serial mon:stdio -kernel build/aarch64/a53_ilp32_qemu/testsuites/ps=
+xtests/psxndbm01.exe -D qemu.log -d in_asm,int,cpu_reset,unimp,guest_errors
+
+  This occurs on Qemu 3.1.0 as distributed via Debian and on Qemu 4.1 as
+  built by the RTEMS source builder (4.1+minor patches).
+
+  Edit: This bug can be worked around by getting and setting SCTLR
+  without changing its value before each data abort would occur. This
+  test needs 6 of these workarounds to operate successfully.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1887854/+subscriptions
 
