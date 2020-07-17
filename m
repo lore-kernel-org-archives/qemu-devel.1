@@ -2,81 +2,94 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A518AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C56C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:15:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E1182070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:09:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C7A720684
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:15:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fb3y3cL4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E1182070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PnXmyuR3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7A720684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwMNN-0000Cm-Mp
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 05:09:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46042)
+	id 1jwMSY-0001QL-Qh
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 05:15:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jwMMb-0007ux-Jd
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:09:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41613
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1jwMRl-000107-He
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:14:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48487
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jwMMZ-0000nW-KL
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:09:04 -0400
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1jwMRj-0001dk-63
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:14:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594976942;
+ s=mimecast20190719; t=1594977261;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=U+SQTO/LdPhXi+iiDRCXGRz7FKFGXHlRx4X4xRi30gs=;
- b=Fb3y3cL4L3EmYYbKHAzcE8m0KuaE+jn5kugLg8+0n8sDhYSeHAOiKvzZ4ZdvkKibs4i/do
- Mfy2+Z0WxzOWynrdq54zI7mkW4HRl65acITSYNEMBwmm5XbQzt+8STYn1IK37EnfH9ujKn
- C/Zwjpcc3O95P8Q5YIqvBQTWYsl3dGM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-cpn_FlHdMgu4GEBKeNDTOA-1; Fri, 17 Jul 2020 05:08:58 -0400
-X-MC-Unique: cpn_FlHdMgu4GEBKeNDTOA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CA591005274;
- Fri, 17 Jul 2020 09:08:57 +0000 (UTC)
-Received: from kaapi (ovpn-112-116.phx2.redhat.com [10.3.112.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B0797B439;
- Fri, 17 Jul 2020 09:08:54 +0000 (UTC)
-Date: Fri, 17 Jul 2020 14:38:52 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH] net: check payload length limit for all frames
-In-Reply-To: <3620abab-a464-8e3c-d5b9-0bd80b35e2f1@redhat.com>
-Message-ID: <nycvar.YSQ.7.78.906.2007171326100.4380@xnncv>
-References: <20200716192335.1212638-1-ppandit@redhat.com>
- <CAKXe6SKL3aNiOKKLEMof6GGNjYLcX9fvfSf-0PBSX48rh4--FQ@mail.gmail.com>
- <20200717012151.tlfmc6hsfia22f4e@mozz.bu.edu>
- <4e4909ae-db2f-4a32-ae5c-d52149e80a8c@redhat.com>
- <nycvar.YSQ.7.78.906.2007171016480.950384@xnncv>
- <3620abab-a464-8e3c-d5b9-0bd80b35e2f1@redhat.com>
+ bh=qipmyxsQwqLLfzEs4A1FGDlCk4TMXgdbhC4gAE7t/8s=;
+ b=PnXmyuR35tRsaOF6+gFbmEDBMaS0O783/fAFlWCpbuESal1yJTyC+F8FI2IPEC2KZWvNB8
+ Rb6U+73e1HwL5ltdISBgfwljOW438rJw3TD3nqFJ27SiAEQZ9ouOv8G86eZd+mcahSgGLp
+ Kv2J4HTMk+1BGO3y4nljambMDb9SGwQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-tysa6zo3MjuXjw8o8L5CBg-1; Fri, 17 Jul 2020 05:14:20 -0400
+X-MC-Unique: tysa6zo3MjuXjw8o8L5CBg-1
+Received: by mail-wr1-f71.google.com with SMTP id a18so8347955wrm.14
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 02:14:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=qipmyxsQwqLLfzEs4A1FGDlCk4TMXgdbhC4gAE7t/8s=;
+ b=LYI/IW0jtQjZ8xpqyh0SoJ6LioDRy96prHnEtOQWATtSJsp2q8avn9mirO8k4Q6BeH
+ Wq/lEi1C4wpHFo6X0l24G67+ZLEjNby6N2c5lpxGmYYf6aQMvcIDlwQlnp5Gaz1mgaSJ
+ GumRiG4HNw1FaDb832IJgOhF87/DgsyuOKIIOioEnj2mGdrZvTRfWHJRvZ5yU8PVRDU2
+ 4uEqystFVM2cnihiP6Mf0Afrzzq81Hp/PjRTJGLe6IK7NV+v1PIGUlGKJhehBl17n8Wa
+ n4N/8EQqBhzgDVvd3EWYyJUZxSuj3Tra11lk115dGYyGj7rSx2wB26pVp1bhi76KmGAb
+ gx0A==
+X-Gm-Message-State: AOAM533gJEuqLHYtmXTnAXjyJBHdaDDLdSHqMpzUJBLuRs1TtgXXPM5i
+ L5+ZyenXoPFbW/8tOjg6TQoUmbYtWDO9rXGFpVuRQ7vNkDviSnqChWVN/l0C4YU1w+o0uAIzQuk
+ rWMJ7CyYO2f7IbVM=
+X-Received: by 2002:a1c:27c1:: with SMTP id n184mr8631021wmn.6.1594977258908; 
+ Fri, 17 Jul 2020 02:14:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxIZ7bJYEz/2mcGAaJcrbvDidyPqvMJWs17qXduMQ6zfQCCKy8HYBMqZGcnHMzad+7oLsoxJg==
+X-Received: by 2002:a1c:27c1:: with SMTP id n184mr8630998wmn.6.1594977258650; 
+ Fri, 17 Jul 2020 02:14:18 -0700 (PDT)
+Received: from steredhat.lan ([5.171.231.144])
+ by smtp.gmail.com with ESMTPSA id n17sm13180382wrs.2.2020.07.17.02.14.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Jul 2020 02:14:18 -0700 (PDT)
+Date: Fri, 17 Jul 2020 11:14:14 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH] virtiofsd: Remove "norace" from cmdline help
+Message-ID: <20200717091414.lhi4ho6xqol2tixi@steredhat.lan>
+References: <20200716101442.48057-1-slp@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200716101442.48057-1-slp@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 03:33:51
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -97,28 +110,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>, Li Qiang <liq3ea@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Miklos Szeredi <mszeredi@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Fri, 17 Jul 2020, Jason Wang wrote --+
-| Thanks but I don't see a direct relation between 64K limit and this 
-| calltrace. Maybe you can elaborate more on this?
+On Thu, Jul 16, 2020 at 12:14:42PM +0200, Sergio Lopez wrote:
+> Commit 93bb3d8d4cda ("virtiofsd: remove symlink fallbacks") removed
+> the implementation of the "norace" option, so remove it from the
+> cmdline help too.
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  tools/virtiofsd/helper.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 3105b6c23a..7bc5d7dc5a 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -159,8 +159,6 @@ void fuse_cmdline_help(void)
+>             "    -o max_idle_threads        the maximum number of idle worker "
+>             "threads\n"
+>             "                               allowed (default: 10)\n"
+> -           "    -o norace                  disable racy fallback\n"
+> -           "                               default: false\n"
+>             "    -o posix_lock|no_posix_lock\n"
+>             "                               enable/disable remote posix lock\n"
+>             "                               default: posix_lock\n"
+> -- 
+> 2.26.2
+> 
+> 
 
-The use-after-free is not function of the size per say; The reproducer given 
-sends large(>64k) packets via loopback interface with gso_type=none(0). The 
-proposed patch helps to fix it. The large size & payload_len may result in 
-other oob kind of access issues too I think.
+I noticed that 'norace' is also described in docs/tools/virtiofsd.rst,
+so I think we need to remove it there too:
 
-@Alex, would it be possible to share the reproduces on the upstream bug 
-LP#1886362?
+    diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+    index 824e713491..58666a4495 100644
+    --- a/docs/tools/virtiofsd.rst
+    +++ b/docs/tools/virtiofsd.rst
+    @@ -63,9 +63,6 @@ Options
+         Print only log messages matching LEVEL or more severe.  LEVEL is one of
+         ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+    -  * norace -
+    -    Disable racy fallback.  The default is false.
+    -
+       * posix_lock|no_posix_lock -
+         Enable/disable remote POSIX locks.  The default is ``posix_lock``.
+
+
+With that fixed:
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Thanks,
+Stefano
 
 
