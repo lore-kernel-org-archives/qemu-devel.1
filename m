@@ -2,92 +2,103 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D3B5C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD103C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:30:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB0C52063A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:28:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O63hrumJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB0C52063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3346D2063A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:30:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3346D2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwMfV-0005PO-2y
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 05:28:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50188)
+	id 1jwMhZ-0007J1-DT
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 05:30:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jwMej-0004yM-PG
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:27:49 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43060
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jwMei-000437-7C
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:27:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594978067;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/qdTsqJP8cP1G8j6LPsFfq3aNNkK+XdqDMGDFiOrXBc=;
- b=O63hrumJCBndPQn5v7p7SPbmxcRugh/pqYMzP8u5GzoYQ/phsz1VtLuoiAFGArlYlQalYb
- j9UyAHn9GbZpRpVjeNF61Evn2mo0xmBvru4LEtPSS1V9wg4RUx5RzMl7ilq2XiOyhLbMiF
- OAI5bgJXViXkeAVS/PBeGzjX88b0rjk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-htE_w1MZO2SG_H7hYw_LKA-1; Fri, 17 Jul 2020 05:27:44 -0400
-X-MC-Unique: htE_w1MZO2SG_H7hYw_LKA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FE4E6C2F0;
- Fri, 17 Jul 2020 09:27:37 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-237.ams2.redhat.com
- [10.36.114.237])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4542979508;
- Fri, 17 Jul 2020 09:27:32 +0000 (UTC)
-Subject: Re: [PATCH] target/i386: floatx80: avoid compound literals in static
- initializers
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200716144251.23004-1-lersek@redhat.com>
- <87y2njv2to.fsf@linaro.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <d49ed94c-8095-2803-9fef-e7d0396f2ed6@redhat.com>
-Date: Fri, 17 Jul 2020 11:27:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1jwMgj-00065T-KY
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:29:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30908
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1jwMgh-0004GW-Qs
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:29:53 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06H938VJ184275
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 05:29:49 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32b61jwv6j-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 05:29:49 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06H93JWb185383
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 05:29:49 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32b61jwv65-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 17 Jul 2020 05:29:49 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06H99q7j003549;
+ Fri, 17 Jul 2020 09:29:47 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma02fra.de.ibm.com with ESMTP id 327527xqdy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 17 Jul 2020 09:29:47 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 06H9SM4X54985150
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 17 Jul 2020 09:28:22 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 42596AE051;
+ Fri, 17 Jul 2020 09:29:45 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CD3AFAE045;
+ Fri, 17 Jul 2020 09:29:44 +0000 (GMT)
+Received: from marcibm.ibmuc.com (unknown [9.145.17.123])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 17 Jul 2020 09:29:44 +0000 (GMT)
+From: Marc Hartmayer <mhartmay@linux.ibm.com>
+To: <qemu-devel@nongnu.org>
+Subject: [RFC v2 0/3] Enable virtio-fs on s390x
+Date: Fri, 17 Jul 2020 11:29:26 +0200
+Message-Id: <20200717092929.19453-1-mhartmay@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <87y2njv2to.fsf@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-17_04:2020-07-17,
+ 2020-07-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ spamscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999 adultscore=0
+ phishscore=0 priorityscore=1501 impostorscore=0 suspectscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007170066
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mhartmay@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:29:50
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,75 +111,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>,
- Joseph Myers <joseph@codesourcery.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/16/20 18:31, Alex Bennée wrote:
-> 
-> Laszlo Ersek <lersek@redhat.com> writes:
-> 
->> Quoting ISO C99 6.7.8p4, "All the expressions in an initializer for an
->> object that has static storage duration shall be constant expressions or
->> string literals".
->>
->> The compound literal produced by the make_floatx80() macro is not such a
->> constant expression, per 6.6p7-9. (An implementation may accept it,
->> according to 6.6p10, but is not required to.)
->>
->> Therefore using "floatx80_zero" and make_floatx80() for initializing
->> "f2xm1_table" and "fpatan_table" is not portable. And gcc-4.8 in RHEL-7.6
->> actually chokes on them:
->>
->>> target/i386/fpu_helper.c:871:5: error: initializer element is not constant
->>>      { make_floatx80(0xbfff, 0x8000000000000000ULL),
->>>      ^
->>
->> We've had the make_floatx80_init() macro for this purpose since commit
->> 3bf7e40ab914 ("softfloat: fix for C99", 2012-03-17), so let's use that
->> macro again.
->>
->> Fixes: eca30647fc07
->> Fixes: ff57bb7b6326
->> Link: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06566.html
->> Link: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04714.html
->> Cc: Alex Bennée <alex.bennee@linaro.org>
->> Cc: Aurelien Jarno <aurelien@aurel32.net>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: Joseph Myers <joseph@codesourcery.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->> ---
->>
->> Notes:
->>     I can see that there are test cases under "tests/tcg/i386", but I don't
->>     know how to run them.
-> 
-> You can run the TCG tests with:
-> 
->   make check-tcg
-> 
-> or more specifically:
-> 
->   make run-tcg-tests-i386-linux-user
-> 
-> there is also a:
-> 
->   make check-softfloat
-> 
-> although in this case nothing is affected.
-> 
-> softfloat bits:
-> 
-> Acked-by: Alex Bennée <alex.bennee@linaro.org>
+This RFC is about enabling virtio-fs on s390x. For that we need
+ + some shim code (first patch), and we need
+ + libvhost-user to deal with virtio endiannes for non-legacy virtio
+   devices as mandated by the spec.
 
-Thank you!
-Laszlo
+libvhost-access.h is based on hw/virtio/virtio-access.h.
+
+How to use?
+
+For general instructions how to use virtio-fs (on x86) please have a
+look at https://virtio-fs.gitlab.io/howto-qemu.html. Most of the
+instructions can also be applied on s390x.
+
+In short:
+
+1. Install self-compiled QEMU with this patch series applied
+2. Prepare host and guest kernel so they support virtio-fs
+
+Start virtiofsd on the host
+
+ $ virtiofsd -f --socket-path=/tmp/vhostqemu -o source=/tmp/shared
+
+Now you can start QEMU in a separate shell on the host:
+
+ $ qemu-system-s390x -machine type=s390-ccw-virtio,accel=kvm,memory-backend=mem \
+   -object memory-backend-file,id=mem,size=2G,mem-path=/dev/shm/virtiofs,share=on,prealloc=on,prealloc-threads=1 \
+   -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-ccw,queue-size=1024,chardev=char0,tag=myfs \
+   -drive if=virtio,file=disk.qcow2 \
+   -m 2G -smp 2 -nographic
+
+Log into the guest and mount it
+
+ $ mount -t virtiofs myfs /mnt
+
+Changelog:
+ v1->v2:
+  + rebased
+  + drop patch "libvhost-user: print invalid address on vu_panic" as it's not related to this series
+  + drop patch "[RFC 4/4] HACK: Hard-code the libvhost-user.o-cflags for s390x"
+  + patch "virtio: add vhost-user-fs-ccw device": replace qdev_set_parent_bus and object_property_set_bool by qdev_realize
+  + patch "libvhost-user: handle endianness as mandated by the spec":
+    Drop support for legacy virtio devices
+  + add patch to fence legacy virtio devices
+
+Halil Pasic (1):
+  virtio: add vhost-user-fs-ccw device
+
+Marc Hartmayer (2):
+  libvhost-user: handle endianness as mandated by the spec
+  libvhost-user: fence legacy virtio devices
+
+ contrib/libvhost-user/libvhost-access.h |  71 ++++++++++++++
+ contrib/libvhost-user/libvhost-user.c   | 125 +++++++++++++-----------
+ hw/s390x/Makefile.objs                  |   1 +
+ hw/s390x/vhost-user-fs-ccw.c            |  73 ++++++++++++++
+ 4 files changed, 211 insertions(+), 59 deletions(-)
+ create mode 100644 contrib/libvhost-user/libvhost-access.h
+ create mode 100644 hw/s390x/vhost-user-fs-ccw.c
+
+-- 
+2.25.4
 
 
