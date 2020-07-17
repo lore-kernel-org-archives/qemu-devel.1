@@ -2,110 +2,120 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6BBC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B46C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:21:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B02BE206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 319E12070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:21:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBqeIPJk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B02BE206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="E1UZp7Pb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 319E12070E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwRCa-0003FG-Vt
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:19:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49760)
+	id 1jwRF9-0004rp-GI
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:21:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jwRBp-0002nR-Ml
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:18:18 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45835
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jwRBl-0007Q1-PW
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:18:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594995492;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6nG6J4YezlYfGUG0e0ERTOm/9YYwGefzHEeAhTeysKE=;
- b=UBqeIPJk6y0nQEIUYgyEeP49QRyx7IXl0zohE/Twj2Una5pRjbYE7lCYXZHdV/xbkd8E/m
- 7ZD9oCBmAUVSWzTaDxUMnC8Wzki3PPM7IxOFoqMzIMnBvaQZqYGd2mYI6ej9ekQMPY9wje
- jStpnroB/mE2fnggirwpe1hG5Lkx6PQ=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-wMQg4hQ0Ppap9C8w61v_5A-1; Fri, 17 Jul 2020 10:18:10 -0400
-X-MC-Unique: wMQg4hQ0Ppap9C8w61v_5A-1
-Received: by mail-qv1-f69.google.com with SMTP id j4so5591160qvt.20
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 07:18:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=6nG6J4YezlYfGUG0e0ERTOm/9YYwGefzHEeAhTeysKE=;
- b=fK4VthFcXdr+Sl1AvRXF039nrSk4AwJS4tK2PIavL70iZJviGYXjBxa18ses4ZwMwh
- YdDW4uGDQtdybb88eM0Krbb0vc62GntejGI1o+xCdO9z1Uljb2sqHF3WbPTf2VhrjLIg
- g+awT303syURSBeTIcwPKS2SUWOoTRBiWI9QC1PgSD1JAn5uWATh6ZF+sWO6FNbAZsZc
- st8V2U5/11NVg5EbFYOnIgRW6XNlPuSktso0geb/Qhm5JJ9hz9fibrCj0FhT1LNH5Riq
- ys16aPoCKogT1xk/SgAPFqGSHivNN23EmA6QvXj5ggBjtpfmZzbFfRyCRvtV49nw5xR7
- LPgw==
-X-Gm-Message-State: AOAM531G14Xj9jH4YjPDOmp7AEG8OcS7G299asWgR90dOy2krQKK32ef
- 7OqeacZIWI+1QsFftceJySW5m+ecN82/9irhnl18sQyZn/iAStPloRORGdVezvszWe2DNDi8c2E
- 1tYd+Lxbdab+Ci1k=
-X-Received: by 2002:ac8:72c4:: with SMTP id o4mr10294294qtp.270.1594995489754; 
- Fri, 17 Jul 2020 07:18:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw8O0kgglXi1Hac3yJ7GAI71LBCwvxh/hZUdtzeV4+GzOHgW5MefO32di9LUb7wcBpDjhTHEQ==
-X-Received: by 2002:ac8:72c4:: with SMTP id o4mr10294262qtp.270.1594995489398; 
- Fri, 17 Jul 2020 07:18:09 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
- by smtp.gmail.com with ESMTPSA id v184sm10488214qki.12.2020.07.17.07.18.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jul 2020 07:18:08 -0700 (PDT)
-Date: Fri, 17 Jul 2020 10:18:06 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-Message-ID: <20200717141806.GE535743@xz-x1>
-References: <20200707195429.GF88106@xz-x1>
- <5004a059-6eb0-4ef3-40b7-94dfbf9ec08f@redhat.com>
- <20200708141657.GA199122@xz-x1>
- <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
- <20200709141037.GF199122@xz-x1>
- <fb2f8d35-3f04-55ac-e0c0-7eeedbaf2429@redhat.com>
- <20200710133005.GL199122@xz-x1>
- <05bb512c-ca0a-e80e-1eed-446e918ad729@redhat.com>
- <20200716010005.GA535743@xz-x1>
- <b0319440-6e53-f274-59ba-6dbc67de69be@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <b0319440-6e53-f274-59ba-6dbc67de69be@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jwREO-0003wD-7G
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:20:56 -0400
+Received: from mail-eopbgr40090.outbound.protection.outlook.com
+ ([40.107.4.90]:41631 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jwREL-0008Hm-VT
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:20:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TVCKLeg0VUdp1nBOX+i981ujfzRLJy3n15BPjzX3cC7xEH64W5JlXgpR1x9fhexNd03Tt8Uk9yM1Eiy5uUc+YZf1Uo/ZUsJRr6Hq0nuaVMc08YOp+nuWQjf5Ssq2Bq0/+DNM7uvEZ4DM4SX3ziEoLw9gfeqzpbrG5gY05Xc65vqoti7H8I2vfmqHE+bplE7JT2ocunb5ae7IvzTXXXSw9fBAHpYyOE7iwCSLpaqProwtLT9h9vJ9MJXGzZL407bOYAjHy6EmbphHzOmTVmcLvvD/o+uWD0GA0hrOUSAMmNQRWtFPBcFhQ0tq745b4d2SBcJFldR9CUCq5Way5j8T9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ew/JAG6JXLqGZxY9fFsCIEOaB7BPDHNPEj4WMQkiAac=;
+ b=kMknVaR0dIwzKGUCwsrpDovcPG6kTbZL0akUgACMrBDeP691nQszitg5a/Sgb3loZyODQVlfENSVToXUyel7tcwowZXvwH8nu1vuMdwvaNyPcoAnh2B4qySQf+fXsBvO6zhyYDwlfVz4TVoAZF67T2N6Pv8mYMk0wNYhv5JnEMnunq9Zg2liaeMc+2ud7z/dXtV3SoaMFXeVul7J4ZKA09HJcNqHZxxXfKGJk4N/WES2p8fI2wOiBUwzkR0RHimSXmoIObezVqKQQKfaFRz6PWAGQ5bXgS3WjVOtzPwyCroT84HD7+AuN9fWYTqEeJLTmBkxe9ZHFgpgaxkSGyib+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ew/JAG6JXLqGZxY9fFsCIEOaB7BPDHNPEj4WMQkiAac=;
+ b=E1UZp7PbI+EEB2/fggz9RYPPdtKKRSUTy8lmM7mTfqE8dVfWn17Olcr3BLtjombZKuM/zT0739LNA2i8U818Kyl6ZQLDGI7bjBs1kOWryqEsZCPXou2QBzI8FcHSl/YxjgrMLmvb8pWn8O6bTvX/cqjEiBdgg8XqEv5tAbioXd8=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
+ by VE1PR03MB5967.eurprd03.prod.outlook.com (2603:10a6:803:108::33)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Fri, 17 Jul
+ 2020 14:05:49 +0000
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::ad93:b959:82ec:107f]) by VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::ad93:b959:82ec:107f%3]) with mapi id 15.20.3174.027; Fri, 17 Jul 2020
+ 14:05:49 +0000
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] Add support for a group of btrfs ioctls - 2
+Date: Fri, 17 Jul 2020 16:04:29 +0200
+Message-Id: <20200717140433.265599-1-Filip.Bozuta@syrmia.com>
+X-Mailer: git-send-email 2.25.1
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Type: text/plain
+X-ClientProxiedBy: GV0P278CA0026.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:710:28::13) To VE1PR03MB5246.eurprd03.prod.outlook.com
+ (2603:10a6:802:a1::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (147.91.217.239) by
+ GV0P278CA0026.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:28::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3195.18 via Frontend Transport; Fri, 17 Jul 2020 14:05:48 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [147.91.217.239]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8e4d68d9-ecdb-4bb2-5097-08d82a5a820e
+X-MS-TrafficTypeDiagnostic: VE1PR03MB5967:
+X-Microsoft-Antispam-PRVS: <VE1PR03MB5967E55DF0E8D9E1BCFF07DFEB7C0@VE1PR03MB5967.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: v/5/a7mMFXSNbflS8iMUW+5vkoYuBYw5/T2Ixwrimk/fX3gfJZnPbPS3nUTgag3d8+YkOWyHPujbXu5RrJeKjcCS75TyiZOp2Vt4iSGxfDHaztsW3b/kmIrLdmNE+lHwmIJ0jlOc5+n3RQS86V4gAqt5jbHtYOFUn1etxXejGBZomcTAdIA9lyXzKeieRVp2ouLZjbv0rAMHuv3XgHHjQ3eayLzxt9IXhQz51xzQ3Xz7BkKXnAisKraWwKpm5GUDrJQH+eGgOu65o25QnA6ut8f1GBfSDWRRN/Jdp9hK/zAVdu8G52KLrpl3+ETb32PlRt18uySvAbDxqk/U0kyY/81GN+UYGnCLgLWMdEsWvqQJ8bG03Jjvq9Q65mDbWMCjJPSqZYxkCWC5qobJBVbgrfslfNw0kQrXrZDbDeRd0NMVXbw7HMEQuHEVjrD85FpMflK1yi01fwS17wz/PPxmHQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39830400003)(136003)(366004)(346002)(396003)(376002)(2906002)(1076003)(83380400001)(52116002)(8936002)(66946007)(956004)(316002)(66476007)(36756003)(66556008)(508600001)(6512007)(966005)(6916009)(6666004)(2616005)(69590400007)(26005)(8676002)(6486002)(6506007)(16526019)(5660300002)(4326008)(186003)(86362001);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: ScKBD+5Vi3kLxNBObGbMLSYrADvVKR/6QMIm/4XU3ZeiQp1+aH/29SrCvQWtyQS377hY7PrCHx/6WooT8xcqYBUdVgx5wYW+l/I95PNeyrS6NfOtn432YWqSQE9PyIl4jka7mi9DukrPkuBIzLeJr+ZUpW3l+0p/Frxb84d7CoFjisCWrcOM0q59l5PxAY9no4goAHb6xytlpSdNco+zmYkGc4o9TPYItzJtDAl7BdW+EK6wwHaGn6Y2uOLcU29GaArMPu4viVPAkbPLjbEMKbZl5lPPAtIQMveJK7LKGeN4xp0Isxje1whk5xlGbcqigyVwP4o/Je7hI+NKL/mEKMY2hKaF/uiioIMeWZhlKqFg6mkRoWB8fnMBrcLgVxR6WXWeuFE55Mhvr3Gt+Alx2ky4Mrn47ICC5Jgf/1RO05wcdV5fbwGkpjeYU4bA0gF5QxbR2HYjodKOUlGpaFg0NPDAuQDjGaWTmYf4ll5WJ4g=
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e4d68d9-ecdb-4bb2-5097-08d82a5a820e
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 14:05:49.2813 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V4fVy6ciVL28rWWukbPWUaCPJLiLdcC7M2YcnclZg5sexHw2L3Uio2jl/a+b0VHyRWkc3Abj6wMz/zpt0PR2Hg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR03MB5967
+Received-SPF: pass client-ip=40.107.4.90; envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 10:20:51
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,137 +128,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: riku.voipio@iki.fi, laurent@viver.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 16, 2020 at 10:54:31AM +0800, Jason Wang wrote:
-> 
-> On 2020/7/16 上午9:00, Peter Xu wrote:
-> > On Mon, Jul 13, 2020 at 12:04:16PM +0800, Jason Wang wrote:
-> > > On 2020/7/10 下午9:30, Peter Xu wrote:
-> > > > On Fri, Jul 10, 2020 at 02:34:11PM +0800, Jason Wang wrote:
-> > > > > On 2020/7/9 下午10:10, Peter Xu wrote:
-> > > > > > On Thu, Jul 09, 2020 at 01:58:33PM +0800, Jason Wang wrote:
-> > > > > > > > > - If we care the performance, it's better to implement the MAP event for
-> > > > > > > > > vhost, otherwise it could be a lot of IOTLB miss
-> > > > > > > > I feel like these are two things.
-> > > > > > > > 
-> > > > > > > > So far what we are talking about is whether vt-d should have knowledge about
-> > > > > > > > what kind of events one iommu notifier is interested in.  I still think we
-> > > > > > > > should keep this as answered in question 1.
-> > > > > > > > 
-> > > > > > > > The other question is whether we want to switch vhost from UNMAP to MAP/UNMAP
-> > > > > > > > events even without vDMA, so that vhost can establish the mapping even before
-> > > > > > > > IO starts.  IMHO it's doable, but only if the guest runs DPDK workloads.  When
-> > > > > > > > the guest is using dynamic iommu page mappings, I feel like that can be even
-> > > > > > > > slower, because then the worst case is for each IO we'll need to vmexit twice:
-> > > > > > > > 
-> > > > > > > >       - The first vmexit caused by an invalidation to MAP the page tables, so vhost
-> > > > > > > >         will setup the page table before IO starts
-> > > > > > > > 
-> > > > > > > >       - IO/DMA triggers and completes
-> > > > > > > > 
-> > > > > > > >       - The second vmexit caused by another invalidation to UNMAP the page tables
-> > > > > > > > 
-> > > > > > > > So it seems to be worse than when vhost only uses UNMAP like right now.  At
-> > > > > > > > least we only have one vmexit (when UNMAP).  We'll have a vhost translate()
-> > > > > > > > request from kernel to userspace, but IMHO that's cheaper than the vmexit.
-> > > > > > > Right but then I would still prefer to have another notifier.
-> > > > > > > 
-> > > > > > > Since vtd_page_walk has nothing to do with device IOTLB. IOMMU have a
-> > > > > > > dedicated command for flushing device IOTLB. But the check for
-> > > > > > > vtd_as_has_map_notifier is used to skip the device which can do demand
-> > > > > > > paging via ATS or device specific way. If we have two different notifiers,
-> > > > > > > vhost will be on the device iotlb notifier so we don't need it at all?
-> > > > > > But we can still have iommu notifier that only registers to UNMAP even after we
-> > > > > > introduce dev-iotlb notifier?  We don't want to do page walk for them as well.
-> > > > > > TCG should be the only one so far, but I don't know.. maybe there can still be
-> > > > > > new ones?
-> > > > > I think you're right. But looking at the codes, it looks like the check of
-> > > > > vtd_as_has_map_notifier() was only used in:
-> > > > > 
-> > > > > 1) vtd_iommu_replay()
-> > > > > 2) vtd_iotlb_page_invalidate_notify() (PSI)
-> > > > > 
-> > > > > For the replay, it's expensive anyhow. For PSI, I think it's just about one
-> > > > > or few mappings, not sure it will have obvious performance impact.
-> > > > > 
-> > > > > And I had two questions:
-> > > > > 
-> > > > > 1) The codes doesn't check map for DSI or GI, does this match what spec
-> > > > > said? (It looks to me the spec is unclear in this part)
-> > > > Both DSI/GI should cover maps too?  E.g. vtd_sync_shadow_page_table() in
-> > > > vtd_iotlb_domain_invalidate().
-> > > 
-> > > I meant the code doesn't check whether there's an MAP notifier :)
-> > It's actually checked, because it loops over vtd_as_with_notifiers, and only
-> > MAP notifiers register to that. :)
-> 
-> 
-> I may miss something but I don't find the code to block UNMAP notifiers?
-> 
-> vhost_iommu_region_add()
->     memory_region_register_iommu_notifier()
->         memory_region_update_iommu_notify_flags()
->             imrc->notify_flag_changed()
->                 vtd_iommu_notify_flag_changed()
-> 
-> ?
+This series covers support for following btrfs ioctls
 
-Yeah I think you're right.  I might have confused with some previous
-implementations.  Maybe we should also do similar thing for DSI/GI just like
-what we do in PSI.
+    *BTRFS_IOC_DEFAULT_SUBVOL        *BTRFS_IOC_QUOTA_RESCAN
+    *BTRFS_IOC_GET_SUBVOL_ROOTREF    *BTRFS_IOC_QUOTA_RESCAN_WAIT
+    *BTRFS_IOC_QUOTA_CTL             *BTRFS_IOC_SCRUB
+    *BTRFS_IOC_QGROUP_CREATE         *BTRFS_IOC_SCRUB_CANCEL
+    *BTRFS_IOC_QGROUP_ASSIGN         *BTRFS_IOC_SCRUB_PROGRESS
+    *BTRFS_IOC_INO_PATHS             *BTRFS_IOC_QGROUP_LIMIT
+    *BTRFS_IOC_LOGICAL_INO           *BTRFS_IOC_QUOTA_RESCAN_STATUS
+    *BTRFS_IOC_LOGICAL_INO_V2
+    *BTRFS_IOC_INO_LOOKUP_USER
+    *BTRFS_IOC_INO_LOOKUP
 
-> > > > > 2) for the replay() I don't see other implementations (either spapr or
-> > > > > generic one) that did unmap (actually they skip unmap explicitly), any
-> > > > > reason for doing this in intel IOMMU?
-> > > > I could be wrong, but I'd guess it's because vt-d implemented the caching mode
-> > > > by leveraging the same invalidation strucuture, so it's harder to make all
-> > > > things right (IOW, we can't clearly identify MAP with UNMAP when we receive an
-> > > > invalidation request, because MAP/UNMAP requests look the same).
-> > > > 
-> > > > I didn't check others, but I believe spapr is doing it differently by using
-> > > > some hypercalls to deliver IOMMU map/unmap requests, which seems a bit close to
-> > > > what virtio-iommu is doing.  Anyway, the point is if we have explicit MAP/UNMAP
-> > > > from the guest, logically the replay indeed does not need to do any unmap
-> > > > because we don't need to call replay() on an already existing device but only
-> > > > for e.g. hot plug.
-> > > 
-> > > But this looks conflict with what memory_region_iommu_replay( ) did, for
-> > > IOMMU that doesn't have a replay method, it skips UNMAP request:
-> > > 
-> > >      for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
-> > >          iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iommu_idx);
-> > >          if (iotlb.perm != IOMMU_NONE) {
-> > >              n->notify(n, &iotlb);
-> > >          }
-> > > 
-> > > I guess there's no knowledge of whether guest have an explicit MAP/UMAP for
-> > > this generic code. Or replay implies that guest doesn't have explicit
-> > > MAP/UNMAP?
-> > I think it matches exactly with a hot plug case?  Note that when IOMMU_NONE
-> > could also mean the translation does not exist.  So it's actually trying to map
-> > everything that can be translated and then notify().
-> 
-> 
-> Yes, so the question is what's the assumption before calling
-> memory_region_iommu_replay(). If it assumes an empty mapping, there's
-> probably no need for unamp.
+The functionalities of individual ioctls were described in this series
+patch commit messages. Since all of these ioctls are added in kernel
+version 3.9, their definitions in file 'linux-user/ioctls.h' are
+enwrapped in an #ifdef directive.
 
-The only caller of memory_region_iommu_replay() is vfio_listener_region_add(),
-when there's a new vIOMMU memory region detected.  So IIUC that guarantees the
-previous state should be all empty.
+Testing method:
 
-Thanks,
+    Mini test programs were written for these ioctls. These test programs
+    can be found on a repository which is located on the link:
+    https://github.com/bozutaf/btrfs-tests
+
+    These test programs were compiled (sometimes using cross compilers) for
+    following architectures:
+
+         * Intel 64-bit (little endian)
+         * Power pc 32-bit (big endian)
+         * Power pc 64-bit (big endian)
+
+    The corresponding native programs were executed without using QEMU on
+    an intel x86_64 host.
+
+    All applicable compiled programs were in turn executed through QEMU
+    and the results obtained were the same ones gotten for native
+    execution.
+
+Based-on: <20200709155203.21106-1-Filip.Bozuta@syrmia.com>
+
+Filip Bozuta (4):
+  linux-user: Add support for a group of btrfs inode ioctls
+  linux-user: Add support for two btrfs ioctls used for subvolume
+  linux-user: Add support for btrfs ioctls used to manage quota
+  linux-user: Add support for btrfs ioctls used to scrub a filesystem
+
+ linux-user/ioctls.h        | 65 +++++++++++++++++++++++++++
+ linux-user/syscall_defs.h  | 34 ++++++++++++++
+ linux-user/syscall_types.h | 90 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 189 insertions(+)
 
 -- 
-Peter Xu
+2.25.1
 
 
