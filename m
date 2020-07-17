@@ -2,95 +2,67 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA91C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC52C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:12:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 434632071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:11:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65F1F2071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:12:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T1puZXUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434632071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WND1wUgw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65F1F2071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwJb8-0000iE-9h
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 02:11:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60138)
+	id 1jwJbz-0001ul-Me
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 02:12:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3LT8RXwsKCu4XiaYddUceUdWeeWbU.SecgUck-TUlUbdedWdk.ehW@flex--hskinnemoen.bounces.google.com>)
- id 1jwJSy-0003i4-LD
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:03:28 -0400
-Received: from mail-pg1-x549.google.com ([2607:f8b0:4864:20::549]:37628)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3LT8RXwsKCu4XiaYddUceUdWeeWbU.SecgUck-TUlUbdedWdk.ehW@flex--hskinnemoen.bounces.google.com>)
- id 1jwJSx-0005HE-1w
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:03:28 -0400
-Received: by mail-pg1-x549.google.com with SMTP id h5so7200291pgq.4
- for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 23:03:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=frc86mILmkHC+wqWcKw1PPJTa/OZk2Y3JpwlzSnJqMM=;
- b=T1puZXUBXlcMoWFROgqScO4xHSDWK+e87YnMYExRLrvuOElQ1MiJjWpRy9oWD00nYY
- e3TtVfyQq0btj5BpL9h1tTV1DmZzVGXo9203v9qOB8TJZ8rnGPebuQLb2Kk3p134Q6Z1
- ZmsxSzqlv6g77zysQCmoNU1qW9aPtyot4Z5ZFzJIC2wiyhORxU4jnnt6c1st8jaLuL/p
- qm1icrFywU5nfUrMZoYzntgvNw/wnDQ3OqMEDzikN0XG/+w5u+Su/Gq/XUJSkHUcgu+9
- Gyc8suo9S5Ld6gjeKt+tV/4vdUZFNmRF8dXZ2bJk3n5snZVsiasvCeL874XauV1DyrYk
- lVfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=frc86mILmkHC+wqWcKw1PPJTa/OZk2Y3JpwlzSnJqMM=;
- b=BM3TItZxBLBSlXq7NQP9gDkAVBza+illoWn6sfkrUh2RemviqNcWxoZD12Lwr7Fkq3
- Gm9pAwXx5I/2BYSxqHAlhrKXl076EXYARXtxjN1dTgnElnmC1F+Bk4LQ3+7nIAAJFHYk
- F8q62+WcfFHPLYbRNdOUWraa4yts49lRrlEHU1x1eCtDf2U50YYFNOGMYmoi0c+iZkZR
- h22ukT+5+2P73hNtonzR6n+KMWWZir1pVNm0fRKMznG7GPSHnCq0kWu1BJqI8Kqnza3N
- 9LOPXybW3foeeM3mryp5kNFKU3EouFXjBC0b7qbcSYp7Bfv4vkTE7MeaKtQmgnLhjfwo
- eTFg==
-X-Gm-Message-State: AOAM532Hp8SU2YvfCJ3N1jCoqF6ABiJtz6+MO6tz9IBzpyXgcu7RxO7a
- HZa4u1s5tYRjoWZ3WkieDE1zmyEWvjZMKYAkgQkKaIMFcA3quJAT5RrheefmiwxKDdJD06KDRoc
- 1gutfhXR3dUOSqXt85MnUY+LlesAZfUkhiKTMlfh/ODdjZHQDAoD5EQqoRFmGRR2xOYeP7DS6Dg
- ==
-X-Google-Smtp-Source: ABdhPJyJcR0Nj1CMZAmFs/XMLczYOutOsMaasTMgPmxSpuR2lkPCg9vekBOeG1LGukIOwTfdWFEyVZYMrSP7UwdQcg==
-X-Received: by 2002:a17:90b:194f:: with SMTP id
- nk15mr8495696pjb.189.1594965805094; 
- Thu, 16 Jul 2020 23:03:25 -0700 (PDT)
-Date: Thu, 16 Jul 2020 23:02:52 -0700
-In-Reply-To: <20200717060258.1602319-1-hskinnemoen@google.com>
-Message-Id: <20200717060258.1602319-8-hskinnemoen@google.com>
-Mime-Version: 1.0
-References: <20200717060258.1602319-1-hskinnemoen@google.com>
-X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
-Subject: [PATCH v6 07/13] hw/arm: Load -bios image as a boot ROM for npcm7xx
-From: Havard Skinnemoen <hskinnemoen@google.com>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: Avi.Fishman@nuvoton.com, kfting@nuvoton.com, 
- Havard Skinnemoen <hskinnemoen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::549;
- envelope-from=3LT8RXwsKCu4XiaYddUceUdWeeWbU.SecgUck-TUlUbdedWdk.ehW@flex--hskinnemoen.bounces.google.com;
- helo=mail-pg1-x549.google.com
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jwJVR-0007jS-S5; Fri, 17 Jul 2020 02:06:01 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:40057)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jwJVN-0005zR-QL; Fri, 17 Jul 2020 02:06:01 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4B7LG91d2wz9sSt; Fri, 17 Jul 2020 16:05:52 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1594965953;
+ bh=eAfQ2wgxBsJpI2NUHE8LajdX7GszAGlBYtoIZEr9yho=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=WND1wUgwwf/ye4Qe9pRgDbYEll+uC005gI6omAmTVNnqpBn0qlq/IZkmQSIKPbPQx
+ zpGqWiNtax1djXPNsv8kAribM5UxhzpFFqSJ3Hh/fWPVMeYnqtgMmDRSzTK+3vlG3U
+ BY64LI+R79vZxynDDp2/lHeqAw/J/cvr1/IyBt40=
+Date: Fri, 17 Jul 2020 15:47:43 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PULL SUBSYSTEM qemu-pseries] pseries: Update SLOF firmware image
+Message-ID: <20200717054743.GG5607@umbus.fritz.box>
+References: <20200717032705.100809-1-aik@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="+sHJum3is6Tsg7/J"
+Content-Disposition: inline
+In-Reply-To: <20200717032705.100809-1-aik@ozlabs.ru>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,86 +75,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a -bios option is specified on the command line, load the image into
-the internal ROM memory region, which contains the first instructions
-run by the CPU after reset.
 
-If -bios is not specified, the vbootrom included with qemu is loaded by
-default.
+--+sHJum3is6Tsg7/J
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
----
- hw/arm/npcm7xx_boards.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+On Fri, Jul 17, 2020 at 01:27:05PM +1000, Alexey Kardashevskiy wrote:
+> The following changes since commit 1038a309ec829f05a3a3e52a9951cfdb24dfd0=
+2c:
+>=20
+>   spapr: Add a new level of NUMA for GPUs (2020-07-17 10:36:28 +1000)
+>=20
+> are available in the Git repository at:
+>=20
+>   git@github.com:aik/qemu.git tags/qemu-slof-20200717
+>=20
+> for you to fetch changes up to 7f5258dd8327d574de455a2271788474fa25548d:
+>=20
+>   pseries: Update SLOF firmware image (2020-07-17 13:23:00 +1000)
 
-diff --git a/hw/arm/npcm7xx_boards.c b/hw/arm/npcm7xx_boards.c
-index 0b9dce2b35..f32557e0e1 100644
---- a/hw/arm/npcm7xx_boards.c
-+++ b/hw/arm/npcm7xx_boards.c
-@@ -18,12 +18,41 @@
- 
- #include "hw/arm/npcm7xx.h"
- #include "hw/core/cpu.h"
-+#include "hw/loader.h"
- #include "qapi/error.h"
-+#include "qemu-common.h"
- #include "qemu/units.h"
-+#include "sysemu/sysemu.h"
- 
- #define NPCM750_EVB_POWER_ON_STRAPS 0x00001ff7
- #define QUANTA_GSJ_POWER_ON_STRAPS 0x00001fff
- 
-+static const char npcm7xx_default_bootrom[] = "npcm7xx_bootrom.bin";
-+
-+static void npcm7xx_load_bootrom(NPCM7xxState *soc)
-+{
-+    g_autofree char *filename = NULL;
-+    const char *bootrom;
-+    int ret;
-+
-+    if (bios_name) {
-+        bootrom = bios_name;
-+    } else {
-+        bootrom = npcm7xx_default_bootrom;
-+    }
-+
-+    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bootrom);
-+    if (!filename) {
-+        error_report("Could not find ROM image '%s'", bootrom);
-+        exit(1);
-+    }
-+    ret = load_image_mr(filename, &soc->irom);
-+    if (ret < 0) {
-+        error_report("Failed to load ROM image '%s'", filename);
-+        exit(1);
-+    }
-+}
-+
- static void npcm7xx_connect_dram(NPCM7xxState *soc, MemoryRegion *dram)
- {
-     memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, dram);
-@@ -60,6 +89,7 @@ static void npcm750_evb_init(MachineState *machine)
-     npcm7xx_connect_dram(soc, machine->ram);
-     qdev_realize(DEVICE(soc), NULL, &error_fatal);
- 
-+    npcm7xx_load_bootrom(soc);
-     npcm7xx_load_kernel(machine, soc);
- }
- 
-@@ -71,6 +101,7 @@ static void quanta_gsj_init(MachineState *machine)
-     npcm7xx_connect_dram(soc, machine->ram);
-     qdev_realize(DEVICE(soc), NULL, &error_fatal);
- 
-+    npcm7xx_load_bootrom(soc);
-     npcm7xx_load_kernel(machine, soc);
- }
- 
--- 
-2.28.0.rc0.105.gf9edc3c819-goog
+Merged, thanks.
 
+>=20
+> ----------------------------------------------------------------
+> Alexey Kardashevskiy (1):
+>       pseries: Update SLOF firmware image
+>=20
+>  pc-bios/README   |   2 +-
+>  pc-bios/slof.bin | Bin 965112 -> 968368 bytes
+>  roms/SLOF        |   2 +-
+>  3 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+>=20
+> *** Note: this is not for master, this is for pseries
+>=20
+> This adds tcgbios (this was posted earlier [1] but got lost)
+> and fixes FDT update at ibm,client-architecture-support
+> for huge guests.
+>=20
+> The full list of changes:
+>=20
+> Alexey Kardashevskiy (4):
+>       make: Define default rule for .c when V=3D1 or V=3D2
+>       version: update to 20200513
+>       fdt: Avoid recursion when traversing tree
+>       version: update to 20200717
+>=20
+> Gustavo Romero (1):
+>       board-qemu: Fix comment about SLOF start address
+>=20
+> Stefan Berger (6):
+>       tcgbios: Only write logs for PCRs that are allocated
+>       tcgbios: Fix the vendorInfoSize to be of type uint8_t
+>       tcgbios: Add support for SHA3 type of algorithms
+>       elf: Implement elf_get_file_size to determine size of an ELF image
+>       tcgbios: Implement tpm_hash_log_extend_event_buffer
+>       tcgbios: Measure the bootloader file read from disk
+>=20
+> [1] https://patchwork.ozlabs.org/project/qemu-devel/patch/20200513024355.=
+121476-1-aik@ozlabs.ru/
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--+sHJum3is6Tsg7/J
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8RO38ACgkQbDjKyiDZ
+s5KGAxAApyiqrhvKBQEr/3SCHzFJ2TXvaMhxvRkHnsHvsP0ge9RsdcMbrSLQsMax
+vCd2T6avyHMvvBMZ/0x7BSdemxIFfLyy6KqJpgf3t6eFW8KTl0CEpinVHRqWzxmT
+rGozhpU9CyVcvb5fssX08XuKhWb5PL5ULPeTe1jVso94jaAlrvI1lFKLwzSOYRk+
+qi7DPTWOdJYEFk0+4PJfqdVzFggkqPwPbERqz4WxeG0HOs5NpG9nJyNTJk7Smk/d
+XFoUpZTcFRxlQAWuxUS/B6/JohqpNrULPaBOjtsjw1dzpMiPm/q2F6pevvjkgXpT
+X0rDzhGnu3JzmUA4eXckHJC7CRMsX3j9Yj8uDgkMI1etEaM0GT0N5SGKkvAvlRP+
+NYtwKKtBA65iEDeLaJGuktr9vaNpYJ4exiRnUTVnKn6qZx7oEe7gppnM1musHtJZ
+0S8hXYY0NA0s1Yi6qWoV2NJr2MkkY8JzgCH7qQCfMOTGseCcvEnCO2b4d/4BvMkG
+IRaeFXSE5N5xcLNzHnIiqPr+ojkQtdDmx3qVCYZkLSFDlLFGH7NaRd6EtcqRfK0o
++Tif9pqbWzMQbI2iHYSWstgpSELCaF9n+o18YQ+PAOhhqindWXqcYoRdrosweesR
++yv+FILZSadZ+bLDFG42qDunENXia9qvf+WoRsQG1tn5+e8LO9o=
+=nxuT
+-----END PGP SIGNATURE-----
+
+--+sHJum3is6Tsg7/J--
 
