@@ -2,97 +2,88 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DC5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BD9C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79C132065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDDD12076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dM/e69ln"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C132065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bx2iLr45"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDDD12076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwRmV-0007Z4-Pn
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:56:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59518)
+	id 1jwRs2-0002Md-35
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:01:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwRlj-0006Tt-Ep
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:55:23 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42829)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwRlg-0007Tr-SX
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:55:23 -0400
-Received: by mail-wr1-x441.google.com with SMTP id o11so11473021wrv.9
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 07:55:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=fpH98eGmha9+BdK5pRwrIqi06Yz/FKaSVxczydejrKw=;
- b=dM/e69lnE7rr78Wh9CNAJUT9ACRkrrGoDiEPocsAXnr2zSc3nc9mYeKjWFfA7frlqf
- dTgnMgkG9kipl52sQrYMJ4LDTRdMdUf9xbfm20zzXxzIz6F3aADc7nfhF0TjMXP1eajG
- EOofep7hN70TSZnecGcYjWX2/yujelvOeLkyUevihHikUiJc+7o5DKfBeg8i8YMJwRTt
- Z++IuH1WbDUeW2BeU+pWG7c9LRDQj5U+TwFQ+w1znmx+A0LADtYF6n8m87jA/+J4ygvT
- 7Oec2PBcQjhCBHtsByUSLcbNqt4oM6oQJpf51tARTAxu7Cri5ISnFnjKMvGUTpAm/tnq
- /6og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=fpH98eGmha9+BdK5pRwrIqi06Yz/FKaSVxczydejrKw=;
- b=SYUR2U85KejX6kQ92V+Gua6+gEQHUbTNUcm58C0C2nlUBSFINMCOcpxM53mGDxVR8b
- aruAuOh+yyMTupnhXfxAcgDbRojvwvINiiZanvyNLlj0Jpz6hmHVl3FNliNaHyV1sTcw
- hnUkrp0KtFh0CZg8IXEwf0T6oZ4E1C800CX4/1PhG8IJITQQy/g3wuucbgunF2d62de2
- 9DKhMRW7yNdFJyN/kIhDO/LWlONX4CcAHg8ZbbdPQX3tx7OM6iji+fdSyW70o4AiPuou
- eS99Usy/XOmMmrTkCAjuo4K0f5WV3xPCug/jjCZAdusi774tFZ7GX7oQ7v68VCtFkkdJ
- mzyg==
-X-Gm-Message-State: AOAM532LmQl3knWEK7zYBJK4zLsRgSqxPi0TDTWbVgjFFMHhEYTOqHGe
- ePcQl6UrUAWj0gwSkvDrUs58AA==
-X-Google-Smtp-Source: ABdhPJxQ/Srvrl1H/qgEKjXfyDUXOK+cPTo1k1RZzCVsEbOfuacktNl0eQ6PnGNKGAl8+uOkfqMa5A==
-X-Received: by 2002:adf:80c7:: with SMTP id 65mr11036576wrl.246.1594997719066; 
- Fri, 17 Jul 2020 07:55:19 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m4sm13904382wmi.48.2020.07.17.07.55.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jul 2020 07:55:18 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CF80B1FF7E;
- Fri, 17 Jul 2020 15:55:15 +0100 (BST)
-References: <20200717105139.25293-1-alex.bennee@linaro.org>
- <20200717105139.25293-6-alex.bennee@linaro.org>
- <20200717143908.GI244185@redhat.com>
-User-agent: mu4e 1.5.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH  v1 5/5] accel/tcg: better handle memory constrained
- systems
-In-reply-to: <20200717143908.GI244185@redhat.com>
-Date: Fri, 17 Jul 2020 15:55:15 +0100
-Message-ID: <87h7u6ur70.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jwRq6-0001QE-0e
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:59:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36305
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jwRq2-00005P-Pz
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:59:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594997989;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=J2NY/7frN8BTsOiUb4IbJDSeXcfjFIYGhxowUFYVZk0=;
+ b=bx2iLr45QrBuUfVCP8GkGUYxCB9iaBkHN3v1iqrKy6SQ3LRMxFdVe30h6BuJMoWB5QwCEg
+ 23A6c7cEX5dBC+5vh9RB1fugDq8qNpT4gjSV3TQjrX9EdyrSspLJu+bSDXZJCi0+sDoDhW
+ 96fU+48V3wp6vJawAjbybmZlh0bjF0g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-215-NE42i7aeN3OkfU8KGvXG2A-1; Fri, 17 Jul 2020 10:59:45 -0400
+X-MC-Unique: NE42i7aeN3OkfU8KGvXG2A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FE491083E80;
+ Fri, 17 Jul 2020 14:59:43 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB51E19C58;
+ Fri, 17 Jul 2020 14:59:35 +0000 (UTC)
+Date: Fri, 17 Jul 2020 08:59:35 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200717085935.224ffd46@x1.home>
+In-Reply-To: <20200715082040.GA13136@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <20200714102129.GD25187@redhat.com>
+ <20200714101616.5d3a9e75@x1.home> <20200714171946.GL2728@work-vm>
+ <20200714145948.17b95eb3@x1.home>
+ <20200715082040.GA13136@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 03:33:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,69 +97,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>, f4bug@amsat.org,
- cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>, aurelien@aurel32.net,
- Richard Henderson <rth@twiddle.net>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+ corbet@lwn.net, openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn, smooney@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org, "Daniel P.
+ =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, cohuck@redhat.com,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 15 Jul 2020 16:20:41 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+> On Tue, Jul 14, 2020 at 02:59:48PM -0600, Alex Williamson wrote:
+> > On Tue, 14 Jul 2020 18:19:46 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >  =20
+> > > * Alex Williamson (alex.williamson@redhat.com) wrote: =20
+> > > > On Tue, 14 Jul 2020 11:21:29 +0100
+> > > > Daniel P. Berrang=C3=83=C2=A9 <berrange@redhat.com> wrote:
+> > > >    =20
+> > > > > On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote:   =20
+> > > > > > hi folks,
+> > > > > > we are defining a device migration compatibility interface that=
+ helps upper
+> > > > > > layer stack like openstack/ovirt/libvirt to check if two device=
+s are
+> > > > > > live migration compatible.
+> > > > > > The "devices" here could be MDEVs, physical devices, or hybrid =
+of the two.
+> > > > > > e.g. we could use it to check whether
+> > > > > > - a src MDEV can migrate to a target MDEV,
+> > > > > > - a src VF in SRIOV can migrate to a target VF in SRIOV,
+> > > > > > - a src MDEV can migration to a target VF in SRIOV.
+> > > > > >   (e.g. SIOV/SRIOV backward compatibility case)
+> > > > > >=20
+> > > > > > The upper layer stack could use this interface as the last step=
+ to check
+> > > > > > if one device is able to migrate to another device before trigg=
+ering a real
+> > > > > > live migration procedure.
+> > > > > > we are not sure if this interface is of value or help to you. p=
+lease don't
+> > > > > > hesitate to drop your valuable comments.
+> > > > > >=20
+> > > > > >=20
+> > > > > > (1) interface definition
+> > > > > > The interface is defined in below way:
+> > > > > >=20
+> > > > > >              __    userspace
+> > > > > >               /\              \
+> > > > > >              /                 \write
+> > > > > >             / read              \
+> > > > > >    ________/__________       ___\|/_____________
+> > > > > >   | migration_version |     | migration_version |-->check migra=
+tion
+> > > > > >   ---------------------     ---------------------   compatibili=
+ty
+> > > > > >      device A                    device B
+> > > > > >=20
+> > > > > >=20
+> > > > > > a device attribute named migration_version is defined under eac=
+h device's
+> > > > > > sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUI=
+D/migration_version).
+> > > > > > userspace tools read the migration_version as a string from the=
+ source device,
+> > > > > > and write it to the migration_version sysfs attribute in the ta=
+rget device.
+> > > > > >=20
+> > > > > > The userspace should treat ANY of below conditions as two devic=
+es not compatible:
+> > > > > > - any one of the two devices does not have a migration_version =
+attribute
+> > > > > > - error when reading from migration_version attribute of one de=
+vice
+> > > > > > - error when writing migration_version string of one device to
+> > > > > >   migration_version attribute of the other device
+> > > > > >=20
+> > > > > > The string read from migration_version attribute is defined by =
+device vendor
+> > > > > > driver and is completely opaque to the userspace.
+> > > > > > for a Intel vGPU, string format can be defined like
+> > > > > > "parent device PCI ID" + "version of gvt driver" + "mdev type" =
++ "aggregator count".
+> > > > > >=20
+> > > > > > for an NVMe VF connecting to a remote storage. it could be
+> > > > > > "PCI ID" + "driver version" + "configured remote storage URL"
+> > > > > >=20
+> > > > > > for a QAT VF, it may be
+> > > > > > "PCI ID" + "driver version" + "supported encryption set".
+> > > > > >=20
+> > > > > > (to avoid namespace confliction from each vendor, we may prefix=
+ a driver name to
+> > > > > > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg=
+_V5_8-1)   =20
+> > > >=20
+> > > > It's very strange to define it as opaque and then proceed to descri=
+be
+> > > > the contents of that opaque string.  The point is that its contents
+> > > > are defined by the vendor driver to describe the device, driver ver=
+sion,
+> > > > and possibly metadata about the configuration of the device.  One
+> > > > instance of a device might generate a different string from another.
+> > > > The string that a device produces is not necessarily the only string
+> > > > the vendor driver will accept, for example the driver might support
+> > > > backwards compatible migrations.   =20
+> > >=20
+> > > (As I've said in the previous discussion, off one of the patch series)
+> > >=20
+> > > My view is it makes sense to have a half-way house on the opaqueness =
+of
+> > > this string; I'd expect to have an ID and version that are human
+> > > readable, maybe a device ID/name that's human interpretable and then a
+> > > bunch of other cruft that maybe device/vendor/version specific.
+> > >=20
+> > > I'm thinking that we want to be able to report problems and include t=
+he
+> > > string and the user to be able to easily identify the device that was
+> > > complaining and notice a difference in versions, and perhaps also use
+> > > it in compatibility patterns to find compatible hosts; but that does
+> > > get tricky when it's a 'ask the device if it's compatible'. =20
+> >=20
+> > In the reply I just sent to Dan, I gave this example of what a
+> > "compatibility string" might look like represented as json:
+> >=20
+> > {
+> >   "device_api": "vfio-pci",
+> >   "vendor": "vendor-driver-name",
+> >   "version": {
+> >     "major": 0,
+> >     "minor": 1
+> >   },
+> >   "vfio-pci": { // Based on above device_api
+> >     "vendor": 0x1234, // Values for the exposed device
+> >     "device": 0x5678,
+> >       // Possibly further parameters for a more specific match
+> >   },
+> >   "mdev_attrs": [
+> >     { "attribute0": "VALUE" }
+> >   ]
+> > }
+> >=20
+> > Are you thinking that we might allow the vendor to include a vendor
+> > specific array where we'd simply require that both sides have matching
+> > fields and values?  ie.
+> >=20
+> >   "vendor_fields": [
+> >     { "unknown_field0": "unknown_value0" },
+> >     { "unknown_field1": "unknown_value1" },
+> >   ]
+> >=20
+> > We could certainly make that part of the spec, but I can't really
+> > figure the value of it other than to severely restrict compatibility,
+> > which the vendor could already do via the version.major value.  Maybe
+> > they'd want to put a build timestamp, random uuid, or source sha1 into
+> > such a field to make absolutely certain compatibility is only determined
+> > between identical builds?  Thanks,
+> > =20
+> Yes, I agree kernel could expose such sysfs interface to educate
+> openstack how to filter out devices. But I still think the proposed
+> migration_version (or rename to migration_compatibility) interface is
+> still required for libvirt to do double check.
+>=20
+> In the following scenario:=20
+> 1. openstack chooses the target device by reading sysfs interface (of json
+> format) of the source device. And Openstack are now pretty sure the two
+> devices are migration compatible.
+> 2. openstack asks libvirt to create the target VM with the target device
+> and start live migration.
+> 3. libvirt now receives the request. so it now has two choices:
+> (1) create the target VM & target device and start live migration directly
+> (2) double check if the target device is compatible with the source
+> device before doing the remaining tasks.
+>=20
+> Because the factors to determine whether two devices are live migration
+> compatible are complicated and may be dynamically changing, (e.g. driver
+> upgrade or configuration changes), and also because libvirt should not
+> totally rely on the input from openstack, I think the cost for libvirt is
+> relatively lower if it chooses to go (2) than (1). At least it has no
+> need to cancel migration and destroy the VM if it knows it earlier.
+>=20
+> So, it means the kernel may need to expose two parallel interfaces:
+> (1) with json format, enumerating all possible fields and comparing
+> methods, so as to indicate openstack how to find a matching target device
+> (2) an opaque driver defined string, requiring write and test in target,
+> which is used by libvirt to make sure device compatibility, rather than
+> rely on the input accurateness from openstack or rely on kernel driver
+> implementing the compatibility detection immediately after migration
+> start.
+>=20
+> Does it make sense?
 
-> On Fri, Jul 17, 2020 at 11:51:39AM +0100, Alex Benn=C3=A9e wrote:
->> It turns out there are some 64 bit systems that have relatively low
->> amounts of physical memory available to them (typically CI system).
->> Even with swapping available a 1GB translation buffer that fills up
->> can put the machine under increased memory pressure. Detect these low
->> memory situations and reduce tb_size appropriately.
->>=20
->> Fixes: 600e17b261
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Cc: BALATON Zoltan <balaton@eik.bme.hu>
->> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
->> ---
->>  accel/tcg/translate-all.c | 7 ++++++-
->>  1 file changed, 6 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
->> index 2afa46bd2b1..2ff0ba6d19b 100644
->> --- a/accel/tcg/translate-all.c
->> +++ b/accel/tcg/translate-all.c
->> @@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t tb=
-_size)
->>  {
->>      /* Size the buffer.  */
->>      if (tb_size =3D=3D 0) {
->> -        tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
->> +        size_t phys_mem =3D qemu_get_host_physmem();
->> +        if (phys_mem > 0 && phys_mem < (2 * DEFAULT_CODE_GEN_BUFFER_SIZ=
-E)) {
->> +            tb_size =3D phys_mem / 4;
->> +        } else {
->> +            tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
->> +        }
->
-> I'm not convinced this is going to work when running QEMU inside a
-> container environment with RAM cap, because the physmem level is
-> completely unrelated to the RAM the container is permitted to actually
-> use in practice. ie host has 32 GB of RAM, but the container QEMU is
-> in only has 1 GB permitted.
+No, libvirt is not responsible for the success or failure of the
+migration, it's the vendor driver's responsibility to encode
+compatibility information early in the migration stream and error
+should the incoming device prove to be incompatible.  It's not
+libvirt's job to second guess the management engine and I would not
+support a duplicate interface only for that purpose.  Thanks,
 
-What will happen when the mmap happens? Will a capped container limit
-the attempted mmap? I would hope the container case at least gave
-different feedback than a "silent" OOM.
+Alex
 
-> I don't have much of a better suggestion, as I don't think we want
-> to get into reading the cgroups memory limits. It does feel like the
-> assumption we can blindly use a 1GB cache though is invalid even
-> with this patch applied.
->
-> Regards,
-> Daniel
-
-
---=20
-Alex Benn=C3=A9e
 
