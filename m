@@ -2,68 +2,80 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07FA2C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1372C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:12:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFFE52070A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:05:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFFE52070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id B24E720717
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:12:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B24E720717
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwQ3q-0004Ci-1R
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 09:05:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55248)
+	id 1jwQ9r-0002nF-0f
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 09:12:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jwQ2p-0002lo-6t
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:04:55 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:38675)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jwQ2n-0001Sh-1U
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:04:54 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 06HD3qFx032123
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Fri, 17 Jul 2020 09:03:56 -0400
-Date: Fri, 17 Jul 2020 09:03:52 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] gitlab-ci.yml: Add oss-fuzz build tests
-Message-ID: <20200717130352.u5x556xr5aspxgdk@mozz.bu.edu>
-References: <20200716163330.29141-1-alxndr@bu.edu>
- <75839163-5e7c-3ff4-6d89-870d69ea5979@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwQ8o-0002Al-7P
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:11:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33584)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwQ8m-0002vI-7m
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:11:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jwQ8j-0001kw-7d
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 13:11:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 374E32E80EC
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 13:11:01 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <75839163-5e7c-3ff4-6d89-870d69ea5979@redhat.com>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 09:04:52
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Jul 2020 12:56:08 -0000
+From: K <1887854@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: opticron pmaydell
+X-Launchpad-Bug-Reporter: K (opticron)
+X-Launchpad-Bug-Modifier: K (opticron)
+References: <159492817809.19148.14056725236873205625.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159499056811.7835.10631528174607711831.malone@wampee.canonical.com>
+Subject: [Bug 1887854] Re: Spurious Data Abort on qemu-system-aarch64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c8dedd3b76cde47c8519b2ba6b5a05450bff6550
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 08:00:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -72,118 +84,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com
+Reply-To: Bug 1887854 <1887854@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200717 0740, Thomas Huth wrote:
-> On 16/07/2020 18.33, Alexander Bulekov wrote:
-> > This tries to build and run the fuzzers with the same build-script used
-> > by oss-fuzz. This doesn't guarantee that the builds on oss-fuzz will
-> > also succeed, since oss-fuzz provides its own compiler and fuzzer vars,
-> > but it can catch changes that are not compatible with the the
-> > ./scripts/oss-fuzz/build.sh script.
-> > The strange way of finding fuzzer binaries stems from the method used by
-> > oss-fuzz:
-> > https://github.com/google/oss-fuzz/blob/master/infra/base-images/base-runner/targets_list
-> > 
-> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> > ---
-> > 
-> > Similar to Thomas' patch:
-> > 
-> >> Note: This patch needs two other patches merged first to work correctly:
-> > 
-> >> - 'fuzz: Expect the cmdline in a freeable GString' from Alexander
-> > 
-> >> - 'qom: Plug memory leak in "info qom-tree"' from Markus
-> > 
-> > Otherwise the test will fail due to detected memory leaks.
-> > 
-> > Fair warning: I haven't been able to trigger this new job yet. I tried
-> > to run the pipeline with these changes on my forked repo on gitlab, but
-> > did not reach the build-oss-fuzz. I think this is due to some failures
-> > in the Containers-layer-2 stage:
-> > 
-> > ...
-> > Error response from daemon: manifest for
-> > registry.gitlab.com/a1xndr/qemu/qemu/debian-all-test-cross:latest not
-> > found: manifest unknown: manifest unknown
-> > #2 [internal] load .dockerignore
-> > #2 transferring context:
-> > #2 transferring context: 2B 0.1s done
-> > #2 DONE 0.1s
-> > #1 [internal] load build definition from tmpg8j4xoop.docker
-> > #1 transferring dockerfile: 2.21kB 0.1s done
-> > #1 DONE 0.2s
-> > #3 [internal] load metadata for docker.io/qemu/debian10:latest
-> > #3 ERROR: pull access denied, repository does not exist or may require
-> > authorization: server message: insufficient_scope: authorization failed
-> 
-> These look like the problems that we've seen with the main repo until
-> two days ago, too, e.g.:
-> 
->  https://gitlab.com/qemu-project/qemu/-/jobs/640410842
-> 
-> Maybe Alex (Bennée) can comment on how to resolve them?
-> 
-> > 
-> >  .gitlab-ci.yml | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> > 
-> > diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> > index e96f8794b9..a50df420c9 100644
-> > --- a/.gitlab-ci.yml
-> > +++ b/.gitlab-ci.yml
-> > @@ -182,6 +182,20 @@ build-fuzzer:
-> >              || exit 1 ;
-> >        done
-> 
-> As mentioned in my other mail, I think you can replace my build-fuzzer
-> job once this is working.
-> 
-> > +build-oss-fuzz:
-> > +  <<: *native_build_job_definition
-> > +  variables:
-> > +    IMAGE: fedora
-> > +  script:
-> > +    - OUT_DIR="./build" CC=clang-9 CXX=clang++-9 CFLAGS="-fsanitize=address"
-> > +      LIB_FUZZING_ENGINE="-fsanitize=fuzzer" CFL
-> 
-> That "CFL" at the end seems to be a typo (leftover from "CFLAGS")?
+Ok, thanks for rooting this out. I could swear that I checked that
+address several times and I clearly remember 0x4010ca28, but I don't
+remember ever seeing 0x10 ahead of it. I'll dig into it a bit and
+hopefully find the root cause in my code.
 
-oops...
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-> Also the fedora container does not have clang-9 :
-> 
->  https://gitlab.com/huth/qemu/-/jobs/643383032#L28
-> 
-> I think it is at clang 10 already, so maybe just use CC=clang (without
-> version number)?
-> 
-For some reason my local machine doesn't have symlinks for clang and
-clang++, and I forgot to remove the versions when I copied the command.
+-- =
 
-> > +      ./scripts/oss-fuzz/build.sh
-> > +    - for fuzzer in $(find ./build-oss-fuzz/DEST_DIR/ -executable -type f); do
-> > +        grep "LLVMFuzzerTestOneInput" ${fuzzer} > /dev/null 2>&1 || continue ;
-> > +        echo Testing ${fuzzer} ... ;
-> > +        "${fuzzer}" -runs=1000 || exit 1 ;
-> > +      done
-> 
-> Should we exclude the virtio-net tests, since they could leak network
-> traffic to the host?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1887854
 
-Ah good point. I doubt that 1000 runs is enough to generate something
-that slirp will forward, but we should probably skip over these targets
-just to be on the safe side.
+Title:
+  Spurious Data Abort on qemu-system-aarch64
 
--Alex
+Status in QEMU:
+  Invalid
 
->  Thomas
-> 
+Bug description:
+  When running RTEMS test psxndbm01.exe built for AArch64-ilp32 (this code =
+is not yet publically available), the test generates a spurious data abort =
+(the MMU and alignment checks should be disabled according to bits 1, 0 of =
+SCTLR_EL1). The abort information is as follows:
+  Taking exception 4 [Data Abort]
+  ...from EL1 to EL1
+  ...with ESR 0x25/0x96000010
+  ...with FAR 0x104010ca28
+  ...with ELR 0x400195d8
+  ...to EL1 PC 0x40018200 PSTATE 0x3c5
+
+  The ESR indicates that a synchronous external abort has occurred.
+  ESR EC field: 0b100101
+
+  From the ARMv8 technical manual: Data Abort taken without a change in
+  Exception level. Used for MMU faults generated by data accesses,
+  alignment faults other than those caused by Stack Pointer
+  misalignment, and synchronous External aborts, including synchronous
+  parity or ECC errors. Not used for debug related exceptions.
+
+  ESR ISS field: 0b10000
+
+  From the ARMv8 technical manual: Synchronous External abort, not on
+  translation table walk or hardware update of translation table.
+
+  The following command line is used to invoke qemu:
+  qemu-system-aarch64 -machine virt -cpu cortex-a53 -m 256M -no-reboot -nog=
+raphic -serial mon:stdio -kernel build/aarch64/a53_ilp32_qemu/testsuites/ps=
+xtests/psxndbm01.exe -D qemu.log -d in_asm,int,cpu_reset,unimp,guest_errors
+
+  This occurs on Qemu 3.1.0 as distributed via Debian and on Qemu 4.1 as
+  built by the RTEMS source builder (4.1+minor patches).
+
+  Edit: This bug can be worked around by getting and setting SCTLR
+  without changing its value before each data abort would occur. This
+  test needs 6 of these workarounds to operate successfully.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1887854/+subscriptions
 
