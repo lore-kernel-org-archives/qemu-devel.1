@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5DADC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9728DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:56:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D1F42070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FEB52065D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:56:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+mnxty0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D1F42070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaH3RBsf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FEB52065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwOtw-0004GH-Qf
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59498)
+	id 1jwOyb-0006cX-Mo
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:56:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOtC-0003cy-Fe
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:50:54 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57943
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOxy-00060p-UV
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:55:50 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57075
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOt9-0001gA-Kt
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:50:53 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOxx-0005Re-73
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:55:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594986650;
+ s=mimecast20190719; t=1594986948;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=eJS1NvS96UrLyFCSqlZrT5AZeGlmfPcPYXclcJsawo0=;
- b=D+mnxty0DAfDWjq+ck+XPEDpdoZRl1kQS+sBnivDWsZq30BH4WhziGjtQq8EdZEr5i1ci8
- GWHloZbJ0Ts6RQLGhTxGS+E4M97rhP1nZ8TrMjxcY2/wx+QwNqqKHSQ6oeG28JxJ8iedZl
- EkaVvr3Ob3W60I4dkzx4iPsspcxgo/U=
+ bh=TR/t1i7Un1JH98iEFzfWCPgMAjk3+dlkdT53FIROPXk=;
+ b=CaH3RBsfEUjwnRUKqiOunaOGqlcQh5cSdqB9IBIM2G+ldF9ar3/RqIBAmhJtXYnsGsz8fe
+ nIrbXw1ns0qJ/w7AsmPV1Tr389A2LFQXbU4ZoBDtwdDH6cyl2RzBY5rXMpUafmkmukE+zO
+ ON7I4JeDZtoWZl+pf/jogE6xl+scPY8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-XpckwKYvNSaZBnfKkBLuMQ-1; Fri, 17 Jul 2020 07:50:48 -0400
-X-MC-Unique: XpckwKYvNSaZBnfKkBLuMQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-123-C8hTF3ZlOmKcKZDjg5xiag-1; Fri, 17 Jul 2020 07:55:44 -0400
+X-MC-Unique: C8hTF3ZlOmKcKZDjg5xiag-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1338A800597;
- Fri, 17 Jul 2020 11:50:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8251E108A;
+ Fri, 17 Jul 2020 11:55:42 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-123.ams2.redhat.com
  [10.36.113.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FDB972AEC;
- Fri, 17 Jul 2020 11:50:45 +0000 (UTC)
-Subject: Re: [PATCH for-5.1 2/3] file-posix: Fix check_hdev_writable() with
- auto-read-only
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BFAD5D9E7;
+ Fri, 17 Jul 2020 11:55:41 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 3/3] file-posix: Fix leaked fd in
+ raw_open_common() error path
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200717105426.51134-1-kwolf@redhat.com>
- <20200717105426.51134-3-kwolf@redhat.com>
+ <20200717105426.51134-4-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,18 +86,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6edffcd1-ac03-b0ad-dd87-5ba923f4763a@redhat.com>
-Date: Fri, 17 Jul 2020 13:50:44 +0200
+Message-ID: <20e43386-a017-3407-1957-8fd00c6748e7@redhat.com>
+Date: Fri, 17 Jul 2020 13:55:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200717105426.51134-3-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200717105426.51134-4-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="yuGPWKWACmqhuKbhN7MeGnhbdQSJQg9sW"
+ boundary="OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ"
 Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
@@ -108,7 +110,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,58 +129,42 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yuGPWKWACmqhuKbhN7MeGnhbdQSJQg9sW
-Content-Type: multipart/mixed; boundary="dmXSVOmZUq7JUnOWie2PHWPYZ4623qeoH"
+--OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ
+Content-Type: multipart/mixed; boundary="qwElnrCLo2NeNdcyN7e1XpzlbUIUsmHAz"
 
---dmXSVOmZUq7JUnOWie2PHWPYZ4623qeoH
+--qwElnrCLo2NeNdcyN7e1XpzlbUIUsmHAz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 17.07.20 12:54, Kevin Wolf wrote:
-> For Linux block devices, being able to open the device read-write
-> doesn't necessarily mean that the device is actually writable (one
-> example is a read-only LV, as you get with lvchange -pr <device>). We
-> have check_hdev_writable() to check this condition and fail opening the
-> image read-write if it's not actually writable.
->=20
-> However, this check doesn't take auto-read-only into account, but
-> results in a hard failure instead of downgrading to read-only where
-> possible.
->=20
-> Fix this and do the writable check not based on BDRV_O_RDWR, but only
-> when this actually results in opening the file read-write. A second
-> check is inserted in raw_reconfigure_getfd() to have the same check when
-> dynamic auto-read-only upgrades an image file from read-only to
-> read-write.
->=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/file-posix.c | 33 +++++++++++++++++++++------------
->  1 file changed, 21 insertions(+), 12 deletions(-)
+>  block/file-posix.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---dmXSVOmZUq7JUnOWie2PHWPYZ4623qeoH--
+--qwElnrCLo2NeNdcyN7e1XpzlbUIUsmHAz--
 
---yuGPWKWACmqhuKbhN7MeGnhbdQSJQg9sW
+--OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8RkJQACgkQ9AfbAGHV
-z0DNhAgAlDL11iW/L1xdhfa0HU/7tky7lImDnbEPmTqTUA5Gm0xpsNLmJ/KTGVgj
-v95p5jC0ODUHcetdJ6gz/qgcZCUkoRfDC4usSeww+n4PC/TGRF7IyhsOEFsbiV7d
-qRAGKDfEA2rQmLcsYf+GJmhqvRtUblV8o/rh4JgjC/NPMTzaJL9Bjo0RRiSAbxB1
-/qcZN1w3yHvE6JQkC5lma1duDheAFduGV8WN3JurQrkVde3zaDRRjM3qsTyOgqDv
-S5bxOAgTLdNT/OohLnPlvzp6evXroWemcqriNv4CwBhkn5wEFOAn2ebdYMZd8taJ
-fxQgX2tNXnGq3QDVgv2QumEONiJYfw==
-=BdIS
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8RkbsACgkQ9AfbAGHV
+z0AyDwgAkpuMr+Jy7PR5qPpjxRNOV6/jYhjpAvla2XPWvL4cVLLC2HbM2tx9I+c4
+4ZzW4EZKTB7K3bm753/7ybyRt7ygPhOugNKRypKbGUm/XpY4gkIMZJI8NQo55x3d
+9LWwqDjeOfhLlNGjaj/u2wJ6Js3CV+aiDbvMDtCjUmRVG018M6FBPyaFvIXcX36Y
+hRfPsh/TPGl8AgEfEvPGmjKyE/I1FVLedez9AVUuGYebOPNeIQUuvq6l3fDAkZYk
+qHLPSg7k0QGZ8fABAAOplG/9vMl4il3r0Sxo71V/o8ROHHMyc7uygzd38bGthn8L
+kBlSJ556EGrkx/JX2yf216PluL0vmg==
+=03mi
 -----END PGP SIGNATURE-----
 
---yuGPWKWACmqhuKbhN7MeGnhbdQSJQg9sW--
+--OB2iQuYVzNp4am9QV9a3RVzu8cDByGDvJ--
 
 
