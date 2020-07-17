@@ -2,84 +2,83 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC06FC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28999C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:57:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 947D82070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:39:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E524E20684
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 09:57:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BfFXRdWy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 947D82070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cy0rCcBY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E524E20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwMqB-0006SN-Rh
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 05:39:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52862)
+	id 1jwN7A-0003OR-5B
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 05:57:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwMpV-0005zg-Mh
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:38:58 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42065)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwMpT-00069Y-N3
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:38:57 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t4so7504422oij.9
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 02:38:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GSxYfl1Dn9DuIB/h90WXtw1jx920Dz5XjX9RAl4yjZU=;
- b=BfFXRdWyImR+gzPXggD+7mX8gKaJu/eSCQ//JYaTg05ei+Zgk4Y3Bk43D88QHVr7Zx
- ds4ViMJlWH8zS4h7lPKF2rvbdTm9i2z9rz5XdPlbgUtd90bBGmXTJINA2IEHmO2BZCs1
- CdTnuFf4Rt/AIjxgfY6ETasyeIN9ZK0fimocpEW9QvA9LCn4F8FUjiuQkw+r+Ha0vyr2
- NS8U6Ag/+bisPKhdTLIEeDPYI6w5JBTk4IXpEQvMFn2niZmZtAXq6/h5i4+NiYBr6Y8f
- 14aEFMyqABWmbe0VuezJt8gEtDz3AHjccCdDJskzq3NJQUq+NkU7PHPDACs8bhFA+RPS
- /60w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GSxYfl1Dn9DuIB/h90WXtw1jx920Dz5XjX9RAl4yjZU=;
- b=PKlrrpbn4L5YJtUcNGMKMG8+56eUsewQN+xyLSsm7s23kV8QY9dlnKaISTU+Q4oYX1
- Kgb8RKSG30iRTMWQWlZuYYJpe5fje33N5Q91sxt/vjECEq5i+tRpzp8OHb2zJ/Zghvh+
- s9THcJGEvCkoBPK810uzgeOI6Q0QGItK92kyYhlUR/1Txkz0IMIke9rnFIQkiFzNrxvU
- SZkdXVNFBczFq48bhCHYnpvkZwtSIcdxNy6gbwPGy8KajTuFQd5E0JyOd/Ux0Jr3Fk1c
- asXWsRyB7zi1XT+H+ouaQLjamACdDZUYwfjqIm8Ou7Ysit6ATqJgBsI09SzqiXvbNlxQ
- /zxQ==
-X-Gm-Message-State: AOAM531ZnVAtkv0aeLwIx8vkjBLhJVdyYrDEEs1rIndFX3Kp3zCdrCLe
- /q6xI1fKRLnoB9BrpDWI6plPZoxO/kH2OJLDBkqDOw==
-X-Google-Smtp-Source: ABdhPJzo7wPSvxHGwQsUAoAvdEeHc+L64u/++Ec6DpTN9eBZ6or0HvmGBkM7PnP2P3hqcx36Z9U0lmDPrXxSlmfqM0g=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr6383005oix.48.1594978734059;
- Fri, 17 Jul 2020 02:38:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwN6G-0002Fr-K2
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:56:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23819
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwN6D-0001An-Ls
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:56:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594979772;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=yh4hBsKoBUXLVrSekHzHPpyNOBqMQDynT6R0h9wq0Pk=;
+ b=cy0rCcBYJ3KFq15wlm3RBqQDfiKJT0cVOSt4DLgN9ERqS4tcLp0TkJJ2Zcb9iPbKSWICtw
+ JJqXvsueVwq3WtLTpBnww2n9YmcCJ359aIJvQgxgUhEjcLf0TMLlAsVzx3ydZl2cQ6Q1z3
+ n4StRkXZPdNF12TBQqfc/6MSuR/lHug=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-z-JUj1IBObiC3eps0urJlw-1; Fri, 17 Jul 2020 05:56:09 -0400
+X-MC-Unique: z-JUj1IBObiC3eps0urJlw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 536F1106B245;
+ Fri, 17 Jul 2020 09:56:08 +0000 (UTC)
+Received: from thuth.com (ovpn-112-62.ams2.redhat.com [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6212E5C240;
+ Fri, 17 Jul 2020 09:56:07 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: peter.maydell@linaro.org,
+	qemu-devel@nongnu.org
+Subject: [PULL 0/6] Leak fixes for qtests + fuzzer CI
+Date: Fri, 17 Jul 2020 11:55:59 +0200
+Message-Id: <20200717095605.27589-1-thuth@redhat.com>
 MIME-Version: 1.0
-References: <20200716181903.1895314-1-ehabkost@redhat.com>
-In-Reply-To: <20200716181903.1895314-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Jul 2020 10:38:43 +0100
-Message-ID: <CAFEAcA9RFugiZzq9zcdUpSRiKYdf5H_cyReyYJYrSOD=wsieOg@mail.gmail.com>
-Subject: Re: [PULL 0/6] x86 fixes for -rc1
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 23:13:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,43 +92,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Cameron Esfahani <dirty@apple.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Jul 2020 at 19:19, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit ee5128bb00f90dd301991d80d1db5224ce924c84:
->
->   Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2020-07-16 13:12:05 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
->
-> for you to fetch changes up to 818b9f111d64b40661d08f5e23236ac1ca5df505:
->
->   i386: hvf: Explicitly set CR4 guest/host mask (2020-07-16 14:15:13 -0400)
->
-> ----------------------------------------------------------------
-> x86 fixes for -rc1
->
-> Fixes for x86 that missed hard freeze:
-> * Don't trigger warnings for features set by
->   CPU model versions (Xiaoyao Li)
-> * Missing features in Icelake-Server, Skylake-Server,
->   Cascadelake-Server CPU models (Chenyi Qiang)
-> * Fix hvf x86_64 guest boot crash (Roman Bolshakov)
+ Hi Peter,
 
+the following changes since commit 95d1fbabae0cd44156ac4b96d512d143ca7dfd5e:
 
-Applied, thanks.
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20200716-pull-request' into staging (2020-07-16 18:50:51 +0100)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
+are available in the Git repository at:
 
--- PMM
+  https://gitlab.com/huth/qemu.git tags/pull-request-2020-07-17
+
+for you to fetch changes up to b610eba335d5c8ac7484dbb1c886b125e2dea058:
+
+  gitlab-ci.yml: Add fuzzer tests (2020-07-17 10:44:23 +0200)
+
+----------------------------------------------------------------
+* Leak fixes
+* One fix for running with --enable-werror on macOS
+* Add fuzzer test to the Gitlab-CI
+----------------------------------------------------------------
+
+Alexander Bulekov (1):
+      fuzz: Expect the cmdline in a freeable GString
+
+Li Qiang (2):
+      qtest: bios-tables-test: fix a memory leak
+      tests: qmp-cmd-test: fix memory leak
+
+Markus Armbruster (1):
+      qom: Plug memory leak in "info qom-tree"
+
+Thomas Huth (2):
+      configure: Fix for running with --enable-werror on macOS
+      gitlab-ci.yml: Add fuzzer tests
+
+ .gitlab-ci.yml                 | 20 +++++++++++++++++++-
+ configure                      |  2 +-
+ qom/qom-hmp-cmds.c             |  6 ++++--
+ tests/qtest/bios-tables-test.c |  1 +
+ tests/qtest/fuzz/fuzz.c        | 13 ++++++-------
+ tests/qtest/fuzz/fuzz.h        |  6 +++---
+ tests/qtest/fuzz/i440fx_fuzz.c |  4 ++--
+ tests/qtest/fuzz/qos_fuzz.c    |  6 +++---
+ tests/qtest/qmp-cmd-test.c     | 13 +++++++++++++
+ 9 files changed, 52 insertions(+), 19 deletions(-)
+
 
