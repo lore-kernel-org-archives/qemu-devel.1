@@ -2,101 +2,81 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E36C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FF6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:41:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 028F82071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:31:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tZJCwuie"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 028F82071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8ADBB20691
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:41:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ADBB20691
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwLmh-0007tO-5f
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:31:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36100)
+	id 1jwLwF-0002L3-S9
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:41:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwLlm-0007Rt-Qo
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 04:31:02 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55811)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwLvT-0001u0-HF
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 04:41:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36594)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwLlk-00027Z-9u
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 04:31:02 -0400
-Received: by mail-wm1-x341.google.com with SMTP id g75so13775215wme.5
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 01:30:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=HyfrwRU+yKxL945cVypfjoSy5UNVe95kTAIwCSqZHso=;
- b=tZJCwuieRN/cagVpvA0x24Uok2ql4/koMGB5GAo7UTdaMcQ09c6lzoW7l4AghY8+Eg
- jOWHw4lYDuKgt9kKD7niZdQRCHnn2O2Uhu9OrDXkZ4DiggbGwouTGKJdQB4b0Izobp3x
- dfuJ3ElaMpXKa+ijsZrgnpzr0H3VwlEM+CzaxvMHPcRYJ7c3oBuuDKGhEwrAmsuUgcKP
- PBA5Gd5TeBqPWsRjgE+FMXadFuPnhFYXSPXARnvWBLyZ+9Uue7bAyRX067hoNf0qOqmZ
- U7JNLDZqHVUcfxcTlRvDu/CaIvArj/zx+GRmoVz7avJbZqZdASwpEgB5J4HCO7hZzRxo
- sacg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=HyfrwRU+yKxL945cVypfjoSy5UNVe95kTAIwCSqZHso=;
- b=TAd97Mx5hDJMdOXkjHBsCjDOPpEFaJqMmaJHbL9ojAdAuZllS98rHNkbyW4rdrijIG
- 0YFUgtodct//cndaQ0HNvbe+asUWgdojBCEJ3WH+bM94CIlfzqrDKBpFN5H2ptS9FfSb
- NLhcquiJkYKSjsozwQ7zbbbXFG2HMTln5E0pT4ivRqab087Vqi8c/iYYxsiLg2n+fVxj
- pwTrHcMzPZJ78F3X4E3Ie0FBPafU6UrFZ2RKL77iU/IUcxhR0dqkT94Uvwd68TtfccrS
- SQbJNY6dcHdYInmXiq1OiKyU2ZHg2S/Vc6E8rUHb3bfyCkSHos6+olEDTe3GP5V5FH9T
- LV3A==
-X-Gm-Message-State: AOAM530yyN371Ac1kY7DCPdgoNQjVbSE4bLVjcQ5zl8FQUYVCx39MSei
- JkdeBriuFw7j0DJRUzIcMe/dAA==
-X-Google-Smtp-Source: ABdhPJzF+3tCwGLYPW07/BrYCaAN5Ht1zRq7V8NDcin7DnS2qWJr4dPhfTUozkHpO98HgVvAfjlbrw==
-X-Received: by 2002:a05:600c:2154:: with SMTP id
- v20mr8726944wml.185.1594974657474; 
- Fri, 17 Jul 2020 01:30:57 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g82sm12434005wma.37.2020.07.17.01.30.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jul 2020 01:30:56 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id ADD051FF7E;
- Fri, 17 Jul 2020 09:30:55 +0100 (BST)
-References: <20200716163330.29141-1-alxndr@bu.edu>
- <75839163-5e7c-3ff4-6d89-870d69ea5979@redhat.com>
-User-agent: mu4e 1.5.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] gitlab-ci.yml: Add oss-fuzz build tests
-In-reply-to: <75839163-5e7c-3ff4-6d89-870d69ea5979@redhat.com>
-Date: Fri, 17 Jul 2020 09:30:55 +0100
-Message-ID: <87pn8uv8zk.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jwLvQ-00040r-Ok
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 04:41:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jwLvO-00018v-8x
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 08:40:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 410CC2E80EF
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 08:40:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Date: Fri, 17 Jul 2020 08:31:36 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1887303@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr philmd
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <159457987931.19254.12792549057508161525.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159497469605.12332.14889566110217738805.malone@soybean.canonical.com>
+Subject: [Bug 1887303] Re: Assertion failure in *bmdma_active_if
+ `bmdma->bus->retry_unit != (uint8_t)-1' failed.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: fe6922a7d8f50919df111a5fd0b3823fbf4e96a8
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 04:40:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,125 +85,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: darren.kenny@oracle.com, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com
+Reply-To: Bug 1887303 <1887303@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Proposed fix:
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05408.html
 
-Thomas Huth <thuth@redhat.com> writes:
+-- =
 
-> On 16/07/2020 18.33, Alexander Bulekov wrote:
->> This tries to build and run the fuzzers with the same build-script used
->> by oss-fuzz. This doesn't guarantee that the builds on oss-fuzz will
->> also succeed, since oss-fuzz provides its own compiler and fuzzer vars,
->> but it can catch changes that are not compatible with the the
->> ./scripts/oss-fuzz/build.sh script.
->> The strange way of finding fuzzer binaries stems from the method used by
->> oss-fuzz:
->> https://github.com/google/oss-fuzz/blob/master/infra/base-images/base-ru=
-nner/targets_list
->>=20
->> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
->> ---
->>=20
->> Similar to Thomas' patch:
->>=20
->>> Note: This patch needs two other patches merged first to work correctly:
->>=20
->>> - 'fuzz: Expect the cmdline in a freeable GString' from Alexander
->>=20
->>> - 'qom: Plug memory leak in "info qom-tree"' from Markus
->>=20
->> Otherwise the test will fail due to detected memory leaks.
->>=20
->> Fair warning: I haven't been able to trigger this new job yet. I tried
->> to run the pipeline with these changes on my forked repo on gitlab, but
->> did not reach the build-oss-fuzz. I think this is due to some failures
->> in the Containers-layer-2 stage:
->>=20
->> ...
->> Error response from daemon: manifest for
->> registry.gitlab.com/a1xndr/qemu/qemu/debian-all-test-cross:latest not
->> found: manifest unknown: manifest unknown
->> #2 [internal] load .dockerignore
->> #2 transferring context:
->> #2 transferring context: 2B 0.1s done
->> #2 DONE 0.1s
->> #1 [internal] load build definition from tmpg8j4xoop.docker
->> #1 transferring dockerfile: 2.21kB 0.1s done
->> #1 DONE 0.2s
->> #3 [internal] load metadata for docker.io/qemu/debian10:latest
->> #3 ERROR: pull access denied, repository does not exist or may require
->> authorization: server message: insufficient_scope: authorization failed
->
-> These look like the problems that we've seen with the main repo until
-> two days ago, too, e.g.:
->
->  https://gitlab.com/qemu-project/qemu/-/jobs/640410842
->
-> Maybe Alex (Benn=C3=A9e) can comment on how to resolve them?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1887303
 
-It all should be working now the qemu-project container repository has
-been properly seeded:
+Title:
+  Assertion failure in *bmdma_active_if `bmdma->bus->retry_unit !=3D
+  (uint8_t)-1' failed.
 
-  https://gitlab.com/qemu-project/qemu/container_registry
+Status in QEMU:
+  New
 
->
->>=20
->>  .gitlab-ci.yml | 14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>=20
->> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->> index e96f8794b9..a50df420c9 100644
->> --- a/.gitlab-ci.yml
->> +++ b/.gitlab-ci.yml
->> @@ -182,6 +182,20 @@ build-fuzzer:
->>              || exit 1 ;
->>        done
->
-> As mentioned in my other mail, I think you can replace my build-fuzzer
-> job once this is working.
->
->> +build-oss-fuzz:
->> +  <<: *native_build_job_definition
->> +  variables:
->> +    IMAGE: fedora
->> +  script:
->> +    - OUT_DIR=3D"./build" CC=3Dclang-9 CXX=3Dclang++-9 CFLAGS=3D"-fsani=
-tize=3Daddress"
->> +      LIB_FUZZING_ENGINE=3D"-fsanitize=3Dfuzzer" CFL
->
-> That "CFL" at the end seems to be a typo (leftover from "CFLAGS")?
->
-> Also the fedora container does not have clang-9 :
->
->  https://gitlab.com/huth/qemu/-/jobs/643383032#L28
->
-> I think it is at clang 10 already, so maybe just use CC=3Dclang (without
-> version number)?
+Bug description:
+  Hello,
+  Here is a QTest Reproducer:
 
-I think all the clang-10 fixes are in now so yes.
+  cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
+   -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
+   -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
+  outw 0x176 0x3538
+  outw 0x376 0x6007
+  outw 0x376 0x6b6b
+  outw 0x176 0x985c
+  outl 0xcf8 0x80000903
+  outl 0xcfc 0x2f2931
+  outl 0xcf8 0x80000920
+  outb 0xcfc 0x6b
+  outb 0x68 0x7
+  outw 0x176 0x2530
+  EOF
 
->
->> +      ./scripts/oss-fuzz/build.sh
->> +    - for fuzzer in $(find ./build-oss-fuzz/DEST_DIR/ -executable -type=
- f); do
->> +        grep "LLVMFuzzerTestOneInput" ${fuzzer} > /dev/null 2>&1 || con=
-tinue ;
->> +        echo Testing ${fuzzer} ... ;
->> +        "${fuzzer}" -runs=3D1000 || exit 1 ;
->> +      done
->
-> Should we exclude the virtio-net tests, since they could leak network
-> traffic to the host?
->
->  Thomas
+  Here is the call-stack:
 
+      #8 0x7f00e0443091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/ass=
+ert/assert.c:101:3
+      #9 0x55e163f5a1af in bmdma_active_if /home/alxndr/Development/qemu/in=
+clude/hw/ide/pci.h:59:5
+      #10 0x55e163f5a1af in bmdma_prepare_buf /home/alxndr/Development/qemu=
+/hw/ide/pci.c:132:19
+      #11 0x55e163f4f00d in ide_dma_cb /home/alxndr/Development/qemu/hw/ide=
+/core.c:898:17
+      #12 0x55e163de86ad in dma_complete /home/alxndr/Development/qemu/dma-=
+helpers.c:120:9
+      #13 0x55e163de86ad in dma_blk_cb /home/alxndr/Development/qemu/dma-he=
+lpers.c:138:9
+      #14 0x55e1642ade85 in blk_aio_complete /home/alxndr/Development/qemu/=
+block/block-backend.c:1402:9
+      #15 0x55e1642ade85 in blk_aio_complete_bh /home/alxndr/Development/qe=
+mu/block/block-backend.c:1412:5
+      #16 0x55e16443556f in aio_bh_call /home/alxndr/Development/qemu/util/=
+async.c:136:5
+      #17 0x55e16443556f in aio_bh_poll /home/alxndr/Development/qemu/util/=
+async.c:164:13
+      #18 0x55e16440fac3 in aio_dispatch /home/alxndr/Development/qemu/util=
+/aio-posix.c:380:5
+      #19 0x55e164436dac in aio_ctx_dispatch /home/alxndr/Development/qemu/=
+util/async.c:306:5
+      #20 0x7f00e16e29ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e9ed)
+      #21 0x55e164442f2b in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #22 0x55e164442f2b in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #23 0x55e164442f2b in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #24 0x55e164376953 in flush_events /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/fuzz.c:47:9
+      #25 0x55e16437b8fa in general_fuzz /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/general_fuzz.c:544:17
 
---=20
-Alex Benn=C3=A9e
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  Here is the same assertion failure but triggered through a different
+  call-stack:
+
+  cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
+   -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
+   -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
+  outw 0x171 0x2fe9
+  outb 0x177 0xa0
+  outl 0x170 0x928
+  outl 0x170 0x2b923b31
+  outl 0x170 0x800a24d7
+  outl 0xcf8 0x80000903
+  outl 0xcfc 0x842700
+  outl 0xcf8 0x80000920
+  outb 0xcfc 0x5e
+  outb 0x58 0x7
+  outb 0x376 0x5
+  outw 0x376 0x11
+  outw 0x176 0x3538
+  EOF
+
+  Call-stack:
+      #8 0x7f00e0443091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/ass=
+ert/assert.c:101:3
+      #9 0x55e163f5a622 in bmdma_active_if /home/alxndr/Development/qemu/in=
+clude/hw/ide/pci.h:59:5
+      #10 0x55e163f5a622 in bmdma_rw_buf /home/alxndr/Development/qemu/hw/i=
+de/pci.c:187:19
+      #11 0x55e163f57577 in ide_atapi_cmd_read_dma_cb /home/alxndr/Developm=
+ent/qemu/hw/ide/atapi.c:375:13
+      #12 0x55e163f44c55 in ide_buffered_readv_cb /home/alxndr/Development/=
+qemu/hw/ide/core.c:650:9
+      #13 0x55e1642ade85 in blk_aio_complete /home/alxndr/Development/qemu/=
+block/block-backend.c:1402:9
+      #14 0x55e1642ade85 in blk_aio_complete_bh /home/alxndr/Development/qe=
+mu/block/block-backend.c:1412:5
+      #15 0x55e16443556f in aio_bh_call /home/alxndr/Development/qemu/util/=
+async.c:136:5
+      #16 0x55e16443556f in aio_bh_poll /home/alxndr/Development/qemu/util/=
+async.c:164:13
+      #17 0x55e16440fac3 in aio_dispatch /home/alxndr/Development/qemu/util=
+/aio-posix.c:380:5
+      #18 0x55e164436dac in aio_ctx_dispatch /home/alxndr/Development/qemu/=
+util/async.c:306:5
+      #19 0x7f00e16e29ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e9ed)
+      #20 0x55e164442f2b in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #21 0x55e164442f2b in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #22 0x55e164442f2b in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #23 0x55e164376953 in flush_events /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/fuzz.c:47:9
+      #24 0x55e16437b8fa in general_fuzz /home/alxndr/Development/qemu/test=
+s/qtest/fuzz/general_fuzz.c:544:17
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  The first reproducer with -trace ide*:
+  [I 1594579788.601818] OPENED
+  26995@1594579788.617583:ide_reset IDEstate 0x565534a7b898
+  26995@1594579788.617684:ide_reset IDEstate 0x565534a7bc68
+  26995@1594579788.618019:ide_reset IDEstate 0x565534a7c188
+  26995@1594579788.618087:ide_reset IDEstate 0x565534a7c558
+  26995@1594579788.619271:ide_reset IDEstate 0x565534a7c188
+  26995@1594579788.619377:ide_reset IDEstate 0x565534a7c558
+  26995@1594579788.623224:ide_reset IDEstate 0x565534a7b898
+  26995@1594579788.623267:ide_reset IDEstate 0x565534a7bc68
+  26995@1594579788.623273:ide_reset IDEstate 0x565534a7c188
+  26995@1594579788.623275:ide_reset IDEstate 0x565534a7c558
+  [R +0.023386] outw 0x176 0x3538
+  26995@1594579788.625224:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0x38; bus 0x565534a7c100 IDEState 0x565534a7c188
+  26995@1594579788.625228:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0x35; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625230:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; st=
+ate 0x565534a7c558; cmd 0x35
+  [S +0.023416] OK
+  [R +0.023442] outw 0x376 0x6007
+  26995@1594579788.625263:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
+; val 0x07; bus 0x565534a7c100
+  [S +0.023447] OK
+  [R +0.023455] outw 0x376 0x6b6b
+  26995@1594579788.625276:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
+; val 0x6b; bus 0x565534a7c100
+  [S +0.023460] OK
+  [R +0.023464] outw 0x176 0x985c
+  26995@1594579788.625285:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0x5c; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625287:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0x98; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625289:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; st=
+ate 0x565534a7c558; cmd 0x98
+  [S +0.023473] OK
+  [R +0.023477] outl 0xcf8 0x80000903
+  [S +0.023481] OK
+  [R +0.023485] outl 0xcfc 0x2f2931
+  [S +0.023492] OK
+  [R +0.023496] outl 0xcf8 0x80000920
+  [S +0.023498] OK
+  [R +0.023503] outb 0xcfc 0x6b
+  [S +0.023644] OK
+  [R +0.023651] outb 0x68 0x7
+  26995@1594579788.625548:ide_dma_cb IDEState 0x565534a7c558; sector_num=3D=
+1 n=3D255 cmd=3DDMA WRITE
+  [S +0.023809] OK
+  [R +0.023817] outw 0x176 0x2530
+  26995@1594579788.625638:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0x30; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625640:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0x25; bus 0x565534a7c100 IDEState 0x565534a7c558
+  26995@1594579788.625642:ide_exec_cmd IDE exec cmd: bus 0x565534a7c100; st=
+ate 0x565534a7c558; cmd 0x25
+  [S +0.023827] OK
+  qemu-system-i386: /home/alxndr/Development/qemu/include/hw/ide/pci.h:59: =
+IDEState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit =
+!=3D (uint8_t)-1' failed.
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  The second reproducer with -trace ide*:
+
+  [I 1594579681.691528] OPENED
+  8293@1594579681.707423:ide_reset IDEstate 0x55fc044c3898
+  8293@1594579681.707540:ide_reset IDEstate 0x55fc044c3c68
+  8293@1594579681.707902:ide_reset IDEstate 0x55fc044c4188
+  8293@1594579681.707969:ide_reset IDEstate 0x55fc044c4558
+  8293@1594579681.709859:ide_reset IDEstate 0x55fc044c4188
+  8293@1594579681.709976:ide_reset IDEstate 0x55fc044c4558
+  8293@1594579681.714051:ide_reset IDEstate 0x55fc044c3898
+  8293@1594579681.714073:ide_reset IDEstate 0x55fc044c3c68
+  8293@1594579681.714076:ide_reset IDEstate 0x55fc044c4188
+  8293@1594579681.714079:ide_reset IDEstate 0x55fc044c4558
+  [R +0.024386] outw 0x171 0x2fe9
+  8293@1594579681.715950:ide_ioport_write IDE PIO wr @ 0x171 (Features); va=
+l 0xe9; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  8293@1594579681.715955:ide_ioport_write IDE PIO wr @ 0x172 (Sector Count)=
+; val 0x2f; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  OK
+  [S +0.024430] OK
+  [R +0.024436] outb 0x177 0xa0
+  8293@1594579681.715967:ide_ioport_write IDE PIO wr @ 0x177 (Command); val=
+ 0xa0; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  8293@1594579681.715970:ide_exec_cmd IDE exec cmd: bus 0x55fc044c4100; sta=
+te 0x55fc044c4188; cmd 0xa0
+  OK
+  [S +0.024444] OK
+  [R +0.024448] outl 0x170 0x928
+  8293@1594579681.715978:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); v=
+al 0x00000928; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+  OK
+  [S +0.024453] OK
+  [R +0.024456] outl 0x170 0x2b923b31
+  8293@1594579681.715986:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); v=
+al 0x2b923b31; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+  OK
+  [S +0.024460] OK
+  [R +0.024464] outl 0x170 0x800a24d7
+  8293@1594579681.715994:ide_data_writel IDE PIO wr @ 0x170 (Data: Long); v=
+al 0x800a24d7; bus 0x55fc044c4100; IDEState 0x55fc044c4188
+  8293@1594579681.715996:ide_atapi_cmd IDEState: 0x55fc044c4188; cmd: 0x28
+  8293@1594579681.716000:ide_atapi_cmd_packet IDEState: 0x55fc044c4188; lim=
+it=3D0xeb14 packet: 28 09 00 00 31 3b 92 2b d7 24 0a 80
+  8293@1594579681.716004:ide_atapi_cmd_read IDEState: 0x55fc044c4188; read =
+dma: LBA=3D12603 nb_sectors=3D11223
+  OK
+  [S +0.024479] OK
+  [R +0.024483] outl 0xcf8 0x80000903
+  OK
+  [S +0.024485] OK
+  [R +0.024489] outl 0xcfc 0x842700
+  OK
+  [S +0.024604] OK
+  [R +0.024610] outl 0xcf8 0x80000920
+  OK
+  [S +0.024613] OK
+  [R +0.024616] outb 0xcfc 0x5e
+  OK
+  [S +0.024720] OK
+  [R +0.024726] outb 0x58 0x7
+  8293@1594579681.716258:ide_atapi_cmd_read_dma_cb_aio IDEState: 0x55fc044c=
+4188; aio read: lba=3D12603 n=3D64
+  OK
+  [S +0.024786] OK
+  [R +0.024791] outb 0x376 0x5
+  8293@1594579681.716322:ide_cmd_write IDE PIO wr @ 0x376 (Device Control);=
+ val 0x05; bus 0x55fc044c4100
+  OK
+  [S +0.024797] OK
+  [R +0.024800] outw 0x376 0x11
+  8293@1594579681.716330:ide_cmd_write IDE PIO wr @ 0x376 (Device Control);=
+ val 0x11; bus 0x55fc044c4100
+  OK
+  [S +0.024804] OK
+  [R +0.024807] outw 0x176 0x3538
+  8293@1594579681.716337:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head);=
+ val 0x38; bus 0x55fc044c4100 IDEState 0x55fc044c4188
+  8293@1594579681.716340:ide_ioport_write IDE PIO wr @ 0x177 (Command); val=
+ 0x35; bus 0x55fc044c4100 IDEState 0x55fc044c4558
+  8293@1594579681.716342:ide_exec_cmd IDE exec cmd: bus 0x55fc044c4100; sta=
+te 0x55fc044c4558; cmd 0x35
+  8293@1594579681.716388:ide_dma_cb IDEState 0x55fc044c4558; sector_num=3D5=
+04 n=3D257 cmd=3DDMA WRITE
+  OK
+  [S +0.024882] OK
+  qemu-system-i386: /home/alxndr/Development/qemu/include/hw/ide/pci.h:59: =
+IDEState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit =
+!=3D (uint8_t)-1' failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1887303/+subscriptions
 
