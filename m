@@ -2,93 +2,89 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D2EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 05:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D23C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 05:35:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECE37206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 05:33:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C13D20684
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 05:35:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a5BQKT4S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE37206BE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iMDPWn7y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C13D20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwJ0J-0003ij-75
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 01:33:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54564)
+	id 1jwJ1h-0004ct-UG
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 01:35:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jwIzc-0003C7-Cr
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 01:33:08 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25612
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwJ0G-0003om-Ob
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 01:33:48 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49916
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jwIzZ-0004v6-Hm
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 01:33:07 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwJ0E-00058s-Vl
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 01:33:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594963983;
+ s=mimecast20190719; t=1594964026;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=M9kggi+ZEqEOoDN9bqFMB91/EhttHJqL/akxG2l4I1M=;
- b=a5BQKT4SPBjwNirP7GtmmZ+ClIhEJbd8bTb15lENXfPufEPG6QQkWpggZRaf3ocYMZQDjl
- fMrGtUXArUaw71v09BteBmn1LH8QmfIjD/N98904pGJgtnYw4XZ7DubPEcr5upUGb8btyg
- G31rDF/MgeBu5tQeZgKBBd2LuTXn2tQ=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=OlYXEO7WEy59EVfHDigTFR8A/+1MIG8d3lc8eI8xP5I=;
+ b=iMDPWn7yRsL+PqT92SS+ECO9cWN+xwqELVm/wbojWa2xfbdR/9PaT2ZI3Cf3CQbrnqLlFM
+ T8mKLMU4ySl+ywOU8MsZhxaSuz0aC2OXJmik9f3sIbotIYXTgQNiJZEDAESSh7HUW6TW/S
+ NRS5MiQGHWy5XPxUhu7F4FC5DY5+18Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-AVt7XhWCN0ClwNhgV-cpdw-1; Fri, 17 Jul 2020 01:33:02 -0400
-X-MC-Unique: AVt7XhWCN0ClwNhgV-cpdw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-333--kVF1XI6OaiOnHeicPsUVg-1; Fri, 17 Jul 2020 01:33:42 -0400
+X-MC-Unique: -kVF1XI6OaiOnHeicPsUVg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E70E1080;
- Fri, 17 Jul 2020 05:33:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F15F724A9;
- Fri, 17 Jul 2020 05:32:57 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F049611386A6; Fri, 17 Jul 2020 07:32:55 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [RFC PATCH-for-5.2 v2 2/2] block/block-backend: Let
- blk_attach_dev() provide helpful error
-References: <20200716123704.6557-1-f4bug@amsat.org>
- <20200716123704.6557-3-f4bug@amsat.org>
- <20200716130440.GT227735@redhat.com>
-Date: Fri, 17 Jul 2020 07:32:55 +0200
-In-Reply-To: <20200716130440.GT227735@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
- =?utf-8?Q?rrang=C3=A9=22's?=
- message of "Thu, 16 Jul 2020 14:04:40 +0100")
-Message-ID: <87o8oek8oo.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEA4B1888AAD;
+ Fri, 17 Jul 2020 05:33:41 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-62.ams2.redhat.com [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C4F1660C05;
+ Fri, 17 Jul 2020 05:33:31 +0000 (UTC)
+Subject: Re: [PATCH] gitlab-ci.yml: Add fuzzer tests
+To: Alexander Bulekov <alxndr@bu.edu>
+References: <20200716100950.27396-1-thuth@redhat.com>
+ <20200716164557.gmt62pll4aszyknf@mozz.bu.edu>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <899ff957-1840-98e6-bc0c-459556452900@redhat.com>
+Date: Fri, 17 Jul 2020 07:33:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200716164557.gmt62pll4aszyknf@mozz.bu.edu>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:06:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,127 +97,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, xen-devel@lists.xenproject.org,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Bandan Das <bsd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On 16/07/2020 18.46, Alexander Bulekov wrote:
+> On 200716 1209, Thomas Huth wrote:
+>> So far we neither compile-tested nor run any of the new fuzzers in our CI,
+>> which led to some build failures of the fuzzer code in the past weeks.
+>> To avoid this problem, add a job to compile the fuzzer code and run some
+>> loops (which likely don't find any new bugs via fuzzing, but at least we
+>> know that the code can still be run).
+>>
+>> A nice side-effect of this test is that the leak tests are enabled here,
+>> so we should now notice some of the memory leaks in our code base earlier.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> 
+> Thank you for this, Thomas. I just sent a patch to add a job that runs
+> similar tests with the build-script that we use on oss-fuzz
+> Patch: <20200716163330.29141-1-alxndr@bu.edu>
 
-> On Thu, Jul 16, 2020 at 02:37:04PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> Let blk_attach_dev() take an Error* object to return helpful
->> information. Adapt the callers.
->>=20
->>   $ qemu-system-arm -M n800
->>   qemu-system-arm: sd_init failed: cannot attach blk 'sd0' to device 'sd=
--card'
->>   blk 'sd0' is already attached by device 'omap2-mmc'
->>   Drive 'sd0' is already in use because it has been automatically connec=
-ted to another device
->>   (do you need 'if=3Dnone' in the drive options?)
->>=20
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->> v2: Rebased after 668f62ec62 ("error: Eliminate error_propagate()")
->> ---
->>  include/sysemu/block-backend.h   |  2 +-
->>  block/block-backend.c            | 11 ++++++++++-
->>  hw/block/fdc.c                   |  4 +---
->>  hw/block/swim.c                  |  4 +---
->>  hw/block/xen-block.c             |  5 +++--
->>  hw/core/qdev-properties-system.c | 16 +++++++++-------
->>  hw/ide/qdev.c                    |  4 +---
->>  hw/scsi/scsi-disk.c              |  4 +---
->>  8 files changed, 27 insertions(+), 23 deletions(-)
->>=20
->> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backe=
-nd.h
->> index 8203d7f6f9..118fbad0b4 100644
->> --- a/include/sysemu/block-backend.h
->> +++ b/include/sysemu/block-backend.h
->> @@ -113,7 +113,7 @@ BlockDeviceIoStatus blk_iostatus(const BlockBackend =
-*blk);
->>  void blk_iostatus_disable(BlockBackend *blk);
->>  void blk_iostatus_reset(BlockBackend *blk);
->>  void blk_iostatus_set_err(BlockBackend *blk, int error);
->> -int blk_attach_dev(BlockBackend *blk, DeviceState *dev);
->> +int blk_attach_dev(BlockBackend *blk, DeviceState *dev, Error **errp);
->>  void blk_detach_dev(BlockBackend *blk, DeviceState *dev);
->>  DeviceState *blk_get_attached_dev(BlockBackend *blk);
->>  char *blk_get_attached_dev_id(BlockBackend *blk);
->> diff --git a/block/block-backend.c b/block/block-backend.c
->> index 63ff940ef9..b7be0a4619 100644
->> --- a/block/block-backend.c
->> +++ b/block/block-backend.c
->> @@ -884,12 +884,21 @@ void blk_get_perm(BlockBackend *blk, uint64_t *per=
-m, uint64_t *shared_perm)
->> =20
->>  /*
->>   * Attach device model @dev to @blk.
->> + *
->> + * @blk: Block backend
->> + * @dev: Device to attach the block backend to
->> + * @errp: pointer to NULL initialized error object
->> + *
->>   * Return 0 on success, -EBUSY when a device model is attached already.
->>   */
->> -int blk_attach_dev(BlockBackend *blk, DeviceState *dev)
->> +int blk_attach_dev(BlockBackend *blk, DeviceState *dev, Error **errp)
->>  {
->>      trace_blk_attach_dev(blk_name(blk), object_get_typename(OBJECT(dev)=
-));
->>      if (blk->dev) {
->> +        error_setg(errp, "cannot attach blk '%s' to device '%s'",
->> +                   blk_name(blk), object_get_typename(OBJECT(dev)));
->> +        error_append_hint(errp, "blk '%s' is already attached by device=
- '%s'\n",
->> +                          blk_name(blk), object_get_typename(OBJECT(blk=
-->dev)));
->
-> I would have a preference for expanding the main error message and not
-> using a hint.  Any hint is completely thrown away when using QMP :-(
+Good idea! ... but it does not work quite yet, I gave it a try and ended
+up here:
 
-Hints work best in cases like
+ https://gitlab.com/huth/qemu/-/jobs/643353500
 
-    error message
-    hint suggesting things to try to fix it, in CLI syntax
+> I know that these jobs have a lot of overlap, but there are enough
+> quirks in the oss-fuzz build-script that I, personally, don't think
+> they are redundant.
 
-    error message rejecting a configuration value
-    hint listing possible values, in CLI syntax
+I think we should finally go with your approach and compile the fuzzing
+test via the script. But since that seems to need some more work first,
+let's go with my patch now, so that we have something for 5.1-rc1, and
+then when your patch is ready, replace my "build-fuzzer" job with yours, ok?
 
-Why "in CLI syntax"?  Well, we need to use *some* syntax to be useful.
-Hints have always been phrased for the CLI, simply because the hint
-feature grew out of my disgust over the loss of lovingly written CLI
-hints in the conversion to Error.
+>> +build-fuzzer:
+>> +  <<: *native_build_job_definition
+>> +  variables:
+>> +    IMAGE: fedora
+>> +  script:
+>> +    - mkdir build
+>> +    - cd build
+>> +    - ../configure --cc=clang --cxx=clang++ --enable-fuzzing
+>> +                   --target-list=x86_64-softmmu
+> 
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg02310.html
+> When/if this gets merged, enable-fuzzing won't build with
+> AddressSanitizer, by default, so I would add --enable-sanitizers, just
+> to be safe. 
 
-Hints in CLI syntax would be misleading QMP.  We never extended QMP to
-transport hints.
+Ok, thanks, I'll add that.
 
-Hints may tempt you in a case like
+>> +    - make -j"$JOBS" all check-build x86_64-softmmu/fuzz
+>> +    - make check
+>> +    - for fuzzer in i440fx-qos-fork-fuzz i440fx-qos-noreset-fuzz
+>> +        i440fx-qtest-reboot-fuzz virtio-scsi-flags-fuzz virtio-scsi-fuzz ; do
+> 
+> Any reason for these particular fuzzers? I know the virtio-net ones find
+> crashes pretty quickly, but I dont think that causes a non-zero exit.
 
-    error message that is painfully long, because it really tries hard to e=
-xplain, which is laudable in theory, but sadly illegible in practice; also,=
- interminable sentences, meh, this is an error message, not a Joyce novel
+I did not include the virtio-net fuzzers because I read that warning
+"May result in network traffic emitted from the  process. Run in an
+isolated network environment." in the help text ... so I was not sure
+whether they are really suitable for the CI on the gitlab machines?
 
-to get something like
-
-    terse error message
-    Explanation that is rather long, because it really tries hard to
-    explain.  It can be multiple sentences, and lines are wrapped at a
-    reasonable length.
-   =20
-Comes out okay in the CLI, but the explanation is lost in QMP.
-
-I don't have a good solution to offer for errors that genuinely need
-explaining.
+ Thomas
 
 
