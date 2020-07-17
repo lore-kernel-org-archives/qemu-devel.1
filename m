@@ -2,81 +2,91 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3588EC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B020C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3D8A20684
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:01:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7A3920684
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:03:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ou1tX62H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D8A20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="na4sV8gt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7A3920684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwNBM-0000dB-7x
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:01:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57296)
+	id 1jwND3-0002Jh-8a
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:03:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwN6M-0002L3-54
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:56:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51415
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwN6K-0001CO-Ga
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 05:56:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594979779;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=S+NxEYjQhiR7ZlQQLlZcKwhAMkulU6hOsdS2i0RjHSI=;
- b=Ou1tX62HL28ZIOu02w6V1P0F2xu61VpwvMAlgUj98q289HBV0NDTlfbsgq5K2/fhH6GZhn
- aj0p5TWgGQJbcZrJDR210NO+gR/QX6VXAHFNHSjeOjM+hPyApqmBC8EtqGvmXfKKH/Fd8+
- zJt5zrEILS9m0OyQWq4HRRL1Ao4wRe8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-qhCnN9YhMBK88diLrVu2OQ-1; Fri, 17 Jul 2020 05:56:17 -0400
-X-MC-Unique: qhCnN9YhMBK88diLrVu2OQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 508721080;
- Fri, 17 Jul 2020 09:56:16 +0000 (UTC)
-Received: from thuth.com (ovpn-112-62.ams2.redhat.com [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 77C5A5C240;
- Fri, 17 Jul 2020 09:56:15 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL 6/6] gitlab-ci.yml: Add fuzzer tests
-Date: Fri, 17 Jul 2020 11:56:05 +0200
-Message-Id: <20200717095605.27589-7-thuth@redhat.com>
-In-Reply-To: <20200717095605.27589-1-thuth@redhat.com>
-References: <20200717095605.27589-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 05:27:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jwNCS-0001kg-DT
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:02:40 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:34431)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jwNCQ-0002x4-Lw
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:02:40 -0400
+Received: by mail-oi1-x234.google.com with SMTP id e4so7579019oib.1
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 03:02:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fvtL2cEZfTwYxwxU6O/wodby8Mkm2bnZO2ToV9MOAFI=;
+ b=na4sV8gtphwHQBgPZtig7YoDehfkhH5icpro8yMlU6A/zvqCuiutwKfN2Pol+PitoZ
+ Lr2O3HkuCT11VPlRizvjibkspI6fT7/KMkS+2mdLQPZk+81cI92D6Z+vyRfkqDms8kkT
+ v2JWAizKN458jNwa94iNrBE6xOAKPpJEj5b5jvIHSsh9poG4biL5bpFitxoGxvV/l/sL
+ SCKi/kF9Je+bD0jmhp/0YNP3d/TpoXiKorpbfeJefl4Hy0BPsI5hyg3j+lfIu7LMUrCf
+ VB5GbYx1BUFYogJtmvh2kw0tE5c+LQYNaEC+E6FN/JSiGvS2WoWd6EnZxtJWycgS9bP5
+ yNmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fvtL2cEZfTwYxwxU6O/wodby8Mkm2bnZO2ToV9MOAFI=;
+ b=mR36dfj6qJFFlZU22nSA7Chk3EiM0nNwUtiBhiwxfQ4hwVZN2Ywp40FsdBa95MsuOh
+ 9bEguyE8enP/Qk9/ZEv9BSdxHS86e/hqnSP6L9TcPBULsa2e8z6UfVu4aCCLx5n19tpf
+ nKdc32M18WED//lgWHNgBzXo1+hBf98CP+j5diaslFOW3oUXPKRapjEby6onATOgO5GG
+ 1ot/wF3xu47ZDWzKOQltjnmUW4dlqvXscIoE6srbSNXqPL0Sr+xTPuJGwAmgx4ozSoBW
+ exYY/ijNsLKK0r9SigB+Xczmha0rF1a2MSesk4jAOdtBS/U238oOYGTa5DYV+1m1viuq
+ Ryxw==
+X-Gm-Message-State: AOAM531UUlAS9R5tCpxh097+H17H21B3AqAHjCqeURXH/qBW+glGu0Tk
+ vNQS9TJq5q3ogARVUvoDN1edYDAbTLwZ7fTPDxU=
+X-Google-Smtp-Source: ABdhPJwg2ykmR9Ov8MW2FBItIaSuiXIJeNrUyJssUoem0GncDpbff8RtvOL3MwXBGT43ZuTcFQTzO0mQBJrOIPfC5x0=
+X-Received: by 2002:aca:524c:: with SMTP id g73mr6769044oib.150.1594980157118; 
+ Fri, 17 Jul 2020 03:02:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200716192335.1212638-1-ppandit@redhat.com>
+ <CAKXe6SKL3aNiOKKLEMof6GGNjYLcX9fvfSf-0PBSX48rh4--FQ@mail.gmail.com>
+ <20200717012151.tlfmc6hsfia22f4e@mozz.bu.edu>
+ <4e4909ae-db2f-4a32-ae5c-d52149e80a8c@redhat.com>
+ <nycvar.YSQ.7.78.906.2007171016480.950384@xnncv>
+ <3620abab-a464-8e3c-d5b9-0bd80b35e2f1@redhat.com>
+ <nycvar.YSQ.7.78.906.2007171326100.4380@xnncv>
+In-Reply-To: <nycvar.YSQ.7.78.906.2007171326100.4380@xnncv>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Fri, 17 Jul 2020 18:02:00 +0800
+Message-ID: <CAKXe6SJbJaEepRVFtNy=5fhJrw8+Gax=mcwFuhfXrHTgo+wmog@mail.gmail.com>
+Subject: Re: [PATCH] net: check payload length limit for all frames
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::234;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x234.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,60 +99,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Jason Wang <jasowang@redhat.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-So far we neither compile-tested nor run any of the new fuzzers in our CI,
-which led to some build failures of the fuzzer code in the past weeks.
-To avoid this problem, add a job to compile the fuzzer code and run some
-loops (which likely don't find any new bugs via fuzzing, but at least we
-know that the code can still be run).
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8817=E6=97=A5=E5=
+=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=885:09=E5=86=99=E9=81=93=EF=BC=9A
+>
+> +-- On Fri, 17 Jul 2020, Jason Wang wrote --+
+> | Thanks but I don't see a direct relation between 64K limit and this
+> | calltrace. Maybe you can elaborate more on this?
+>
+> The use-after-free is not function of the size per say; The reproducer gi=
+ven
+> sends large(>64k) packets via loopback interface with gso_type=3Dnone(0).=
+ The
+> proposed patch helps to fix it. The large size & payload_len may result i=
+n
+> other oob kind of access issues too I think.
+>
+> @Alex, would it be possible to share the reproduces on the upstream bug
+> LP#1886362?
 
-A nice side-effect of this test is that the leak tests are enabled here,
-so we should now notice some of the memory leaks in our code base earlier.
+The reproducer of LP#1886362 is here:
+--> https://bugs.launchpad.net/qemu/+bug/1886362
 
-Message-Id: <20200716100950.27396-1-thuth@redhat.com>
-Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .gitlab-ci.yml | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+Maybe you mean the reproducer of your patch?
+If you or Alex could share it, I'm glad to analysis this issue.
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 5eeba2791b..41597c3603 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -161,9 +161,27 @@ build-clang:
-     IMAGE: fedora
-     CONFIGURE_ARGS: --cc=clang --cxx=clang++
-     TARGETS: alpha-softmmu arm-softmmu m68k-softmmu mips64-softmmu
--      ppc-softmmu s390x-softmmu x86_64-softmmu arm-linux-user
-+      ppc-softmmu s390x-softmmu arm-linux-user
-     MAKE_CHECK_ARGS: check
- 
-+build-fuzzer:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: fedora
-+  script:
-+    - mkdir build
-+    - cd build
-+    - ../configure --cc=clang --cxx=clang++ --enable-fuzzing
-+                   --enable-sanitizers --target-list=x86_64-softmmu
-+    - make -j"$JOBS" all check-build x86_64-softmmu/fuzz
-+    - make check
-+    - for fuzzer in i440fx-qos-fork-fuzz i440fx-qos-noreset-fuzz
-+        i440fx-qtest-reboot-fuzz virtio-scsi-flags-fuzz virtio-scsi-fuzz ; do
-+          echo Testing ${fuzzer} ... ;
-+          x86_64-softmmu/qemu-fuzz-x86_64 --fuzz-target=${fuzzer} -runs=1000
-+            || exit 1 ;
-+      done
-+
- build-tci:
-   <<: *native_build_job_definition
-   variables:
--- 
-2.18.1
+Thanks,
+Li Qiang
 
+>
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+>
 
