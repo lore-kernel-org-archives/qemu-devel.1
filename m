@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 415B7C433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F792C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:47:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07EDB20717
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:46:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0857D20734
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 14:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="ubv3+rXW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07EDB20717
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="wg+yxnMr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0857D20734
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwRd9-0008RU-6T
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:46:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56994)
+	id 1jwRdl-0000XV-99
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 10:47:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jwRbl-0006mC-IF
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:45:05 -0400
-Received: from mail-eopbgr10133.outbound.protection.outlook.com
- ([40.107.1.133]:52288 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ id 1jwRbi-0006ii-J8
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:45:02 -0400
+Received: from mail-am6eur05on2136.outbound.protection.outlook.com
+ ([40.107.22.136]:50880 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jwRbj-0004y5-OE
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:45:05 -0400
+ id 1jwRbf-0004yI-Tj
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 10:45:02 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Opn2QAcAlnH5VJz3LRSBscV2XUJAfgReMLgmQWDGyie8JrL7P5xbHE/+/GEQCNM20kIrPPNK4DyDADx9fxtoGAbacsqWtGvRiaqR/zUCuIBdnvIgLo82JVlqe1d5/pM67I/Yt+ggvWTPt89cMaagTjSo1sSs7W5NUWyNPIyIJAu80bKyIbhxky0TM3uUEa5963lF63cbQBm3KlJOriJIkmT4y9YDyX+RZsvUik5zxaGzvYEQpEeoz0mNCuVxLRFSdB5kVFawEul0fVGRtGKO8aSzGjNh0Y+jps8KT1Zt9lUACr1f0mezg6HjDDpFdg+zEhwlGns/0mX07E/duDvNKg==
+ b=KYRydbkqDYCErDgEg1ZGwqc5Du6IqIF1Ll30mwbpnvvqo/5oSTLASS9RcEQ41Kv/zgklhUnSwTFT9tZiQF9JzdBsd2LvIkualrtSZW3+OGdUDCFCQgT3kUOugm9C/QcmYuJJK/lMGyNXN770OpM1EVEF2oXfud2ccIXw4R6rwdzb9Sr0wybIywIaScjK8r0gTH380B7kVvAAiuM3DqcIvDfD5YkSDXyQTb05lyVd+Iqke/WACie+54DOqglfciysZTqkOSVgQsqxPyCzG0+WN3r9us1oclDkTxDAuUmSf+mqHulu88NhosDBwGZJo4EWcrKbsXM52pUS5SBxHc3WWA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QlNif+Lsvzu+GFEQYqv/nNx09+o/yvx9BMWNNBtZ/3k=;
- b=AkmGpozvoMkgQGlnUEAP/Q0KwJYv8oDtHd3ApFSne3YiDLa62oQpAvSUhjCmk8ugUkMjIpa8aignsrV5tFORq6Puc8Un4LZv7K5IFPMqOy7FcIm5qVbAJx4JLKWECJT+tmws0Y+5nH2OBfLlCwO9USzzQGfYfXHmso9eivRiEmd/JyQYaKgKfRuiBLdulbTO6aZvwk0A8bw86RqhH3gVYW4/O68IvMXO1ew/ngGiWX7FQ32VxLS8/UT1q+ay7OVUQTDX6XDPLiZbBDy2IkCJxKxLYMwHevYP9N/CXgrDzxaJqsoQUf2YnnPBHbkIibQysC78nnFJ7OoTfGci0M8O4A==
+ bh=ekTjZGCC4scdn4+xd+1rHdafnPeY7H44TRMCOIobEGc=;
+ b=DusV7S0eTfsJwXqYCy6NhpxsHjb6NujqiIk8aR4Csph2PgCUMv0udXyghBtyH361pBQfU5w7jYK2n2RgE9e3nhaK+itzhSJT5bqLKI13Coxy3a7l3stp1XnyTSvWzEWhNNXjQWanudxuEZuEi6DUrNBYNvQGRSzTlQAhbEvf5pkX31qBPqAFMVdCsScgeknlbGlfIISOgyclNzBhdRoxkZCp3bJ41V+w9t2ToBLdQDHZ4v10/hKr0sNTydCtceLqmojUmjZYnmXi5NjVanL9VyZcmLZukB8GxzHn+ljxwtcVcg7v6L8m1fX+Qvpl8RTVVjeR9SzoO7cnRHsIzszqWw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
  dkim=pass header.d=syrmia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QlNif+Lsvzu+GFEQYqv/nNx09+o/yvx9BMWNNBtZ/3k=;
- b=ubv3+rXWU+30ZfPSnRuWpyiiVFG4vKcjxg+gAqzMP4hD6NHliExm+Dqn02jKYUMi1cF3ETzCgnsC/a4ctn5r5FZMrpOOvD9USUG77JDKP+kx5Qr7fGRf49ADVv6bwTfLiBXdLvtxPKDnkHtba0Ud5+EKbc7npc1eLyQcIDjFkK0=
+ bh=ekTjZGCC4scdn4+xd+1rHdafnPeY7H44TRMCOIobEGc=;
+ b=wg+yxnMrsSFeECxsy1VKlySazqW7KJNLmVSgRbAXEq0zNJXVyaBeoqwbSUMVhdzLsKu8W6ZQd30dqk/7UnrpAqIzIa6iv56UCflKkNb5NdWlXm6XH9cx52IryNz30EcocPfwjJLHiDSrkpcGo0vk9q9FTlVuTt4vpv8MFanko5o=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
 Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
- by VI1PR03MB6414.eurprd03.prod.outlook.com (2603:10a6:800:19e::14)
+ by VI1PR0302MB3470.eurprd03.prod.outlook.com (2603:10a6:803:1f::13)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Fri, 17 Jul
- 2020 14:44:55 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.23; Fri, 17 Jul
+ 2020 14:44:57 +0000
 Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
  ([fe80::ad93:b959:82ec:107f]) by VE1PR03MB5246.eurprd03.prod.outlook.com
  ([fe80::ad93:b959:82ec:107f%3]) with mapi id 15.20.3174.027; Fri, 17 Jul 2020
- 14:44:55 +0000
+ 14:44:57 +0000
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/4] linux-user: Add support for two btrfs ioctls used for
- subvolume
-Date: Fri, 17 Jul 2020 16:44:33 +0200
-Message-Id: <20200717144435.268166-3-Filip.Bozuta@syrmia.com>
+Subject: [PATCH v2 4/4] linux-user: Add support for btrfs ioctls used to scrub
+ a filesystem
+Date: Fri, 17 Jul 2020 16:44:35 +0200
+Message-Id: <20200717144435.268166-5-Filip.Bozuta@syrmia.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200717144435.268166-1-Filip.Bozuta@syrmia.com>
 References: <20200717144435.268166-1-Filip.Bozuta@syrmia.com>
@@ -80,37 +80,37 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from localhost.localdomain (147.91.217.239) by
  GV0P278CA0028.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:28::15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3195.17 via Frontend Transport; Fri, 17 Jul 2020 14:44:54 +0000
+ 15.20.3195.17 via Frontend Transport; Fri, 17 Jul 2020 14:44:56 +0000
 X-Mailer: git-send-email 2.25.1
 X-Originating-IP: [147.91.217.239]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cd502941-c4d5-4bbc-e2c0-08d82a5ff854
-X-MS-TrafficTypeDiagnostic: VI1PR03MB6414:
-X-Microsoft-Antispam-PRVS: <VI1PR03MB64140EA59084027C45F9C1DAEB7C0@VI1PR03MB6414.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Office365-Filtering-Correlation-Id: 6108ee74-cc35-4460-6e82-08d82a5ff973
+X-MS-TrafficTypeDiagnostic: VI1PR0302MB3470:
+X-Microsoft-Antispam-PRVS: <VI1PR0302MB347046C4014E82867CF2924FEB7C0@VI1PR0302MB3470.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aHlJgYo4KM2ds+0Dg4igXjzv9qFTeHv5tBcd7sN6lXiuwkozjNg/AfqQlZvB/I+/AxSoMVbHA7OjIPBXPjIqqiN4tA50Iu1nPObZHtdQ6W/UT7I6IcCb5zgieSOWlr/cPgCV6G+NSreF7LCPKdMud/Y1fsqiQF8Q2fXt/sqDE4xOAK9xNgVYEvNrj1P56DJ+NpTMENaf3Um9IlaJjpBJNRO6+eoyErQ4LPK/vcEOtMQ/210F/Jsy/oo0HeiL7aQAmk5sElB/Ybl7iPE0y3DoXEf3i48R1ZTzRtSW4qP49/5NNAit8cbR8xZj1hJ2XjbT/YDIrb4nfvHYbKzJ6NIysM5OrhgNDQx4pFi9jY8wld0OXcH2792hRAewd5Mfj7tJ
+X-Microsoft-Antispam-Message-Info: 1buKHaaJbe9hrTzjJEVpSCBGxGbEzos1en2lYQ0x/KTbRbFjfLSWQ+msraB9taQSOmTkEH7I6yeAG31cQXTa8ff6PtgCpqSUujz1SeKMa/m/9B4yl3z4O69MY+aOEfNCeIz/Qmt83rE+UpYCG3gzS6sskD6Mskpnc7uxm6PBP3XRwP6ARTPXxbqQHUvmMc55Sy2nDyPcWEATdfxDbkLLVQS1Mo2h38/xFFwFlXzFX2rlnA1gZlQPvHqILWr4TU074UhHd0o8pat2buQZOFHsWfLPzLpKGuNqCUWwy+WyhlUXM1RdrsQU32syK+G5XMFn1jVPJoRxm4EEv1GiFpBrCMDWawPYIROHeiRQCTbhasYVGSS/1cR9nRW6qilO0YCrZe3mePuiknr87L7VclQVWp4UK++IUW2tenkj9Fu+CQFfGbsnJ0fBKNaS34DzANcnR4WsyO/M9yE2rqCakDkwow==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(366004)(346002)(136003)(39830400003)(396003)(376002)(508600001)(66556008)(8936002)(8676002)(6512007)(2906002)(4326008)(66946007)(66476007)(5660300002)(26005)(186003)(956004)(6506007)(316002)(6666004)(86362001)(1076003)(6486002)(2616005)(36756003)(16526019)(6916009)(52116002)(69590400007);
+ SFS:(376002)(396003)(39830400003)(366004)(346002)(136003)(956004)(5660300002)(83380400001)(8936002)(66476007)(316002)(1076003)(66556008)(69590400007)(6666004)(66946007)(52116002)(8676002)(6506007)(186003)(966005)(6916009)(2616005)(36756003)(2906002)(4326008)(26005)(16526019)(6486002)(6512007)(86362001)(508600001);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: euTAeEEKmVN0XkuoCfpLayVpEnd8S7jxvwTPQ1zFftYgTSJqHObFFMB4VrXPVptqKFGAAV8Kkl2ZPhWFWcye4KIkdPykspHEWGAU6Rc9uCBTEqNRtroJd3YB4FlL+e0tZ01t4nRDq51XXHUf48RqgavLKh/qnmcE7REw2g9fDEpHd9RoTc3TPv9n2xF6z2WgsSrGsvAMYOxDoGVkVcdUaBgnkt9Bl/428oK7e7bfWQEqTZImmqyxrcHx/v3gFXbkEEJkD4C8ERoCfoP10j1qsriNzkiJIXIjZOHpe5bk/7J4pVRVs7hX6PegssZtPFhRpvddKR7ZsuP6v1B7Lc1AHrFDXn+ucQXsBvBVUmaWV3bWmQTVnPLnjzqGRtzywLgSQgSoPQlox9ebGJVmog9xt61wnX+D0fjDM4zD0Ydg/MD0LSJpejc6LA3uiFOyeTwg6otzUKhX92P+ms4SjLC7ngNRbdVQ5MXRbTuBJl08eIk=
+X-MS-Exchange-AntiSpam-MessageData: 2sqmxvC3F0Z2k3TwTZlmYQ4xYfMsH1FHx8T6ONr1u3b2Zwx9kOhdVdHxMDntydhbfLFRXEJKwWZTvFZlJH7cLyBSWAzz8nqMZGz3BmSk7FE3ZDbeGW1HTbEOUIxtgjCUK4t6wFEn+NUoJNU5dpLEztxsmNuKgBIMUjlw+tX1MJmgOgTZa+GSxVC2fZhDZjCxUpuWPohccD87d+yds0Y3Alm+bbLZbFdRUa0jLxUrMbwlppeDtl8lsERg5RANC1AJsxx8xMiabI4TRYfO4Yd6fBFGonPHVw2OXPlCJW+ALmLIOZTyZ+MFA0ItvKiPL68OloD20lRYAZYR9erFW/kme2C5f3SEUv92e8JldTvjg9dTVSZvcGvl9SMBE5SZ6GEhz+UACmu3zD3o8RjChStFAdIPj3uka8wum57Wfp/5SAIairLGA9PSx7CjHGzYB2pxbC6jXLbdqzTdQp+OTNgBv7zEhGKeE3pL5vVCkIpxaUg=
 X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd502941-c4d5-4bbc-e2c0-08d82a5ff854
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6108ee74-cc35-4460-6e82-08d82a5ff973
 X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 14:44:55.1816 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 14:44:57.0515 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fOwBJs83XI12JXIaPPLtSxHnG+KB2CBbMwVXVhXwpsINJKFnFexlHwuyHVJ1w7zIgUtSip0epmsXPGE/PXyqvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR03MB6414
-Received-SPF: pass client-ip=40.107.1.133;
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9AJmqP1udCh2iHCIF4qa3q9ArkqoETbAh3ZGRwRLTkAYMRHVpzBypvZjQe+WpNzacayTdNixITrwKBv4E3SilQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0302MB3470
+Received-SPF: pass client-ip=40.107.22.136;
  envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 10:44:54
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 10:44:57
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -137,122 +137,133 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionality for following ioctl:
+This patch implements functionality for following ioctls:
 
-BTRFS_IOC_DEFAULT_SUBVOL - Setting a default subvolume
+BTRFS_IOC_SCRUB - Starting a btrfs filesystem scrub
 
-    Set a default subvolume for a btrfs filesystem. The third
-    ioctl's argument is a '__u64' (unsigned long long) which
-    represents the id of a subvolume that is to be set as
-    the default.
+    Start a btrfs filesystem scrub. The third ioctls argument
+    is a pointer to a following type:
 
-BTRFS_IOC_GET_SUBVOL_ROOTREF - Getting tree and directory id of subvolumes
+    struct btrfs_ioctl_scrub_args {
+	__u64 devid;				/* in */
+	__u64 start;				/* in */
+	__u64 end;				/* in */
+	__u64 flags;				/* in */
+	struct btrfs_scrub_progress progress;	/* out */
+	/* pad to 1k */
+	__u64 unused[(1024-32-sizeof(struct btrfs_scrub_progress))/8];
+    };
 
-    Read tree and directory id of subvolumes from a btrfs
-    filesystem. The tree and directory id's are returned in the
-    ioctl's third argument which represents a pointer to a
-    following type:
+    Before calling this ioctl, field 'devid' should be filled
+    with value that represents the device id of the btrfs filesystem
+    for which the scrub is to be started.
 
-    struct btrfs_ioctl_get_subvol_rootref_args {
-		/* in/out, minimum id of rootref's treeid to be searched */
-		__u64 min_treeid;
+BTRFS_IOC_SCRUB_CANCEL - Canceling scrub of a btrfs filesystem
 
-		/* out */
-		struct {
-			__u64 treeid;
-			__u64 dirid;
-		} rootref[BTRFS_MAX_ROOTREF_BUFFER_NUM];
+    Cancel a btrfs filesystem scrub if it is running. The third
+    ioctls argument is ignored.
 
-		/* out, number of found items */
-		__u8 num_items;
-		__u8 align[7];
-     };
+BTRFS_IOC_SCRUB_PROGRESS - Getting status of a running scrub
 
-     Before calling this ioctl, 'min_treeid' field should be filled
-     with value that represent the minimum value for the tree id.
+    Read the status of a running btrfs filesystem scrub. The third
+    ioctls argument is a pointer to the above mentioned
+    'struct btrfs_ioctl_scrub_args'. Similarly as with 'BTRFS_IOC_SCRUB',
+    the 'devid' field should be filled with value that represents the
+    id of the btrfs device for which the scrub has started. The status
+    of a running scrub is returned in the field 'progress' which is
+    of type 'struct btrfs_scrub_progress' and its definition can be
+    found at:
+    https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/btrfs.h#L150
 
-Implementation notes:
+Implementation nots:
 
-    Ioctl BTRFS_IOC_GET_SUBVOL_ROOTREF uses the above mentioned structure
-    type as third argument. That is the reason why a aproppriate thunk
-    structure definition is added in file 'syscall_types.h'.
+    Ioctls in this patch use type 'struct btrfs_ioctl_scrub_args' as their
+    third argument. That is the reason why an aproppriate thunk type
+    definition is added in file 'syscall_types.h'.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 ---
- linux-user/ioctls.h        |  7 +++++++
- linux-user/syscall_defs.h  |  4 ++++
- linux-user/syscall_types.h | 11 +++++++++++
- 3 files changed, 22 insertions(+)
+ linux-user/ioctls.h        | 11 +++++++++++
+ linux-user/syscall_defs.h  |  6 ++++++
+ linux-user/syscall_types.h | 26 ++++++++++++++++++++++++++
+ 3 files changed, 43 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index a7f5664487..2c553103e6 100644
+index 8665f504bf..bf80615438 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -206,6 +206,9 @@
-      IOCTL(BTRFS_IOC_INO_LOOKUP, IOC_RW,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_args)))
+@@ -215,6 +215,17 @@
+ #ifdef BTRFS_IOC_SUBVOL_SETFLAGS
+      IOCTL(BTRFS_IOC_SUBVOL_SETFLAGS, IOC_W, MK_PTR(TYPE_ULONGLONG))
  #endif
-+#ifdef BTRFS_IOC_DEFAULT_SUBVOL
-+     IOCTL(BTRFS_IOC_DEFAULT_SUBVOL, IOC_W, MK_PTR(TYPE_ULONGLONG))
++#ifdef BTRFS_IOC_SCRUB
++     IOCTL(BTRFS_IOC_SCRUB, IOC_RW,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_scrub_args)))
 +#endif
- #ifdef BTRFS_IOC_SUBVOL_GETFLAGS
-      IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
- #endif
-@@ -248,6 +251,10 @@
-      IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
- #endif
-+#ifdef BTRFS_IOC_GET_SUBVOL_ROOTREF
-+     IOCTL(BTRFS_IOC_GET_SUBVOL_ROOTREF, IOC_RW,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_rootref_args)))
++#ifdef BTRFS_IOC_SCRUB_CANCEL
++     IOCTL(BTRFS_IOC_SCRUB_CANCEL, 0, TYPE_NULL)
 +#endif
- #ifdef BTRFS_IOC_INO_LOOKUP_USER
-      IOCTL(BTRFS_IOC_INO_LOOKUP_USER, IOC_RW,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_user_args)))
++#ifdef BTRFS_IOC_SCRUB_PROGRESS
++     IOCTL(BTRFS_IOC_SCRUB_PROGRESS, IOC_RW,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_scrub_args)))
++#endif
+ #ifdef BTRFS_IOC_DEV_INFO
+      IOCTL(BTRFS_IOC_DEV_INFO, IOC_RW,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_dev_info_args)))
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 7bb105428b..f4b4fc4a20 100644
+index 3f771ae5d1..589ec3e9b0 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -984,6 +984,8 @@ struct target_rtc_pll_info {
-                                                15, struct btrfs_ioctl_vol_args)
- #define TARGET_BTRFS_IOC_INO_LOOKUP             TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-                                         18, struct btrfs_ioctl_ino_lookup_args)
-+#define TARGET_BTRFS_IOC_DEFAULT_SUBVOL         TARGET_IOW(BTRFS_IOCTL_MAGIC, \
-+                                                           19, abi_ullong)
- #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, \
+@@ -990,6 +990,12 @@ struct target_rtc_pll_info {
                                                             25, abi_ullong)
  #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, \
-@@ -1006,6 +1008,8 @@ struct target_rtc_pll_info {
-                                        59, struct btrfs_ioctl_logical_ino_args)
- #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IOR(BTRFS_IOCTL_MAGIC, \
-                                    60, struct btrfs_ioctl_get_subvol_info_args)
-+#define TARGET_BTRFS_IOC_GET_SUBVOL_ROOTREF     TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-+                                61, struct btrfs_ioctl_get_subvol_rootref_args)
- #define TARGET_BTRFS_IOC_INO_LOOKUP_USER        TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-                                    62, struct btrfs_ioctl_ino_lookup_user_args)
- 
+                                                            26, abi_ullong)
++#define TARGET_BTRFS_IOC_SCRUB                  TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
++                                             27, struct btrfs_ioctl_scrub_args)
++#define TARGET_BTRFS_IOC_SCRUB_CANCEL           TARGET_IO(BTRFS_IOCTL_MAGIC,  \
++                                                          28)
++#define TARGET_BTRFS_IOC_SCRUB_PROGRESS         TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
++                                             29, struct btrfs_ioctl_scrub_args)
+ #define TARGET_BTRFS_IOC_DEV_INFO               TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
+                                           30, struct btrfs_ioctl_dev_info_args)
+ #define TARGET_BTRFS_IOC_INO_PATHS              TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
 diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 980c29000a..d2f1b30ff3 100644
+index b4f462b5c6..345193270c 100644
 --- a/linux-user/syscall_types.h
 +++ b/linux-user/syscall_types.h
-@@ -381,6 +381,17 @@ STRUCT(btrfs_ioctl_dev_info_args,
-        MK_ARRAY(TYPE_ULONGLONG, 379), /* unused */
-        MK_ARRAY(TYPE_CHAR, BTRFS_DEVICE_PATH_NAME_MAX)) /* path */
+@@ -373,6 +373,32 @@ STRUCT(btrfs_ioctl_ino_lookup_user_args,
+        MK_ARRAY(TYPE_CHAR, BTRFS_VOL_NAME_MAX + 1), /* name */
+        MK_ARRAY(TYPE_CHAR, BTRFS_INO_LOOKUP_USER_PATH_MAX)) /* path */
  
-+STRUCT(rootref,
-+       TYPE_ULONGLONG, /* treeid */
-+       TYPE_ULONGLONG) /* dirid */
++STRUCT(btrfs_scrub_progress,
++       TYPE_ULONGLONG, /* data_extents_scrubbed */
++       TYPE_ULONGLONG, /* tree_extents_scrubbed */
++       TYPE_ULONGLONG, /* data_bytes_scrubbed */
++       TYPE_ULONGLONG, /* tree_bytes_scrubbed */
++       TYPE_ULONGLONG, /* read_errors */
++       TYPE_ULONGLONG, /* csum_errors */
++       TYPE_ULONGLONG, /* verify_errors */
++       TYPE_ULONGLONG, /* no_csum */
++       TYPE_ULONGLONG, /* csum_discards */
++       TYPE_ULONGLONG, /* super_errors */
++       TYPE_ULONGLONG, /* malloc_errors */
++       TYPE_ULONGLONG, /* uncorrectable_errors */
++       TYPE_ULONGLONG, /* corrected_er */
++       TYPE_ULONGLONG, /* last_physical */
++       TYPE_ULONGLONG) /* unverified_errors */
 +
-+STRUCT(btrfs_ioctl_get_subvol_rootref_args,
-+    TYPE_ULONGLONG, /* min_treeid */
-+    MK_ARRAY(MK_STRUCT(STRUCT_rootref),
-+             BTRFS_MAX_ROOTREF_BUFFER_NUM), /* rootref */
-+    TYPE_CHAR, /* num_items */
-+    MK_ARRAY(TYPE_CHAR, 7)) /* align */
++STRUCT(btrfs_ioctl_scrub_args,
++  TYPE_ULONGLONG, /* devid */
++  TYPE_ULONGLONG, /* start */
++  TYPE_ULONGLONG, /* end */
++  TYPE_ULONGLONG, /* flags */
++  MK_STRUCT(STRUCT_btrfs_scrub_progress), /* progress */
++  MK_ARRAY(TYPE_ULONGLONG,
++           (1024 - 32 - sizeof(struct btrfs_scrub_progress)) / 8)) /* unused */
 +
- STRUCT(btrfs_ioctl_get_dev_stats,
+ STRUCT(btrfs_ioctl_dev_info_args,
         TYPE_ULONGLONG, /* devid */
-        TYPE_ULONGLONG, /* nr_items */
+        MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* uuid */
 -- 
 2.25.1
 
