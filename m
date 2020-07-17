@@ -2,73 +2,115 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C3CC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A072C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:16:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 361BF2070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:16:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 361BF2070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2223B2070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:16:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T1PWe3f/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2223B2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwOM0-0005Zj-Bb
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:16:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50654)
+	id 1jwOMH-00060B-Es
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jwOLL-0004qn-P3
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:15:55 -0400
-Resent-Date: Fri, 17 Jul 2020 07:15:55 -0400
-Resent-Message-Id: <E1jwOLL-0004qn-P3@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21706)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOLW-00052I-SI
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:16:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35696
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jwOLJ-0000Yg-1S
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:15:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1594984530; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=VzEB3I1yZ8t9DRyktqCzOOn/dLyTGLwzb+z54awz9qRzeXhyXclxWZfhpn3OFluxa5sQBjgSrRlpeGUB2NENRBviAHjqgPtGkwypcX6WbLB4F1tzljfJcazpHfQydriVY/PMHtFONAiKqlzb1PdQ6erXNBnTRP8a6HmVjae3yuM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1594984530;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=YV3Tkao8tl+x6W3uTpq+PNheZb+oVT2+Cjb8liURHcE=; 
- b=igGvaRCX6KAJEf4+hLkC+A3hZP+I0H7ZWJp50pkNO/C96gkObhXgB3VrQYzwXRtFKjHnQvo/LODqRBNuA6dkKYiMO97lRcMZQIAbZ25DG/bT8vOzJzUztHjd76qBlVJHWftpitr1iAuHiN8Z3lflPunIESrCcdHKNguyPz39PSA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1594984523902676.3150495465196;
- Fri, 17 Jul 2020 04:15:23 -0700 (PDT)
-Subject: Re: [PATCH v2] introduce VFIO-over-socket protocol specificaion
-Message-ID: <159498452266.17162.12805076292561899564@07a7f0d89f7d>
-In-Reply-To: <1594981096-58580-1-git-send-email-thanos.makatos@nutanix.com>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jwOLV-0000aL-9m
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:16:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594984564;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=87hNHDzyCpZtfiSt6vG1lLiPs9g6fdlzFpY5JPFG9hc=;
+ b=T1PWe3f/JBMXZ3dpPnraJWZSG+Zdh8o2Vx3DEgMXAjqBd/SoF/s6L/rEbadwM62CkLtV6j
+ 6Mi8/gin+xmIsRVVmoIpbHkeJ1cY+1bVFZjFobTQXPXwll6K+aj2ytx9YXu40gZ24gTjXK
+ 0wok95psmN9XcNQXgnVeInSfDKogf20=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-k9B69dNMNxiJpl7HOsRXGw-1; Fri, 17 Jul 2020 07:16:00 -0400
+X-MC-Unique: k9B69dNMNxiJpl7HOsRXGw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6130380183C;
+ Fri, 17 Jul 2020 11:15:59 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-123.ams2.redhat.com
+ [10.36.113.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 526DA5C240;
+ Fri, 17 Jul 2020 11:15:58 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 v2 2/2] file-posix: Allow byte-aligned O_DIRECT
+ with NFS
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200716142601.111237-1-kwolf@redhat.com>
+ <20200716142601.111237-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <47600125-fb5d-24a7-a6df-e7103b99e845@redhat.com>
+Date: Fri, 17 Jul 2020 13:15:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: thanos.makatos@nutanix.com
-Date: Fri, 17 Jul 2020 04:15:23 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 06:26:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200716142601.111237-3-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="I0FwIvPOX7HQtxvIFH0lBsHltSvfm8J6S"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 03:33:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,44 +123,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: benjamin.walker@intel.com, elena.ufimtseva@oracle.com, felipe@nutanix.com,
- jag.raman@oracle.com, james.r.harris@intel.com, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, yuvalkashtan@gmail.com, konrad.wilk@oracle.com,
- tina.zhang@intel.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- marcandre.lureau@redhat.com, ismael@linux.com, alex.williamson@redhat.com,
- stefanha@redhat.com, thanos.makatos@nutanix.com, tomassetti.andrea@gmail.com,
- changpeng.liu@intel.com, raphael.norwitz@nutanix.com,
- Kanth.Ghatraju@oracle.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTk0OTgxMDk2LTU4NTgwLTEt
-Z2l0LXNlbmQtZW1haWwtdGhhbm9zLm1ha2F0b3NAbnV0YW5peC5jb20vCgoKCkhpLAoKVGhpcyBz
-ZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1
-dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAx
-NTk0OTgxMDk2LTU4NTgwLTEtZ2l0LXNlbmQtZW1haWwtdGhhbm9zLm1ha2F0b3NAbnV0YW5peC5j
-b20KU3ViamVjdDogW1BBVENIIHYyXSBpbnRyb2R1Y2UgVkZJTy1vdmVyLXNvY2tldCBwcm90b2Nv
-bCBzcGVjaWZpY2Fpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
-IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM2NTdhZTYgaW50cm9kdWNlIFZGSU8tb3Zlci1z
-b2NrZXQgcHJvdG9jb2wgc3BlY2lmaWNhaW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiM0NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogdHJhaWxpbmcgd2hp
-dGVzcGFjZQojOTA1OiBGSUxFOiBkb2NzL2RldmVsL3ZmaW8tb3Zlci1zb2NrZXQucnN0Ojg1NDoK
-KyAgICBndWVzdCB1bm1hc2tzIHRoZSBpbnRlcnJ1cHQuICQKCnRvdGFsOiAxIGVycm9ycywgMSB3
-YXJuaW5ncywgMTE1MSBsaW5lcyBjaGVja2VkCgpDb21taXQgYzY1N2FlNmZiNzU1IChpbnRyb2R1
-Y2UgVkZJTy1vdmVyLXNvY2tldCBwcm90b2NvbCBzcGVjaWZpY2Fpb24pIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzE1OTQ5ODEwOTYtNTg1ODAtMS1naXQtc2VuZC1lbWFpbC10aGFub3MubWFrYXRvc0Bu
-dXRhbml4LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--I0FwIvPOX7HQtxvIFH0lBsHltSvfm8J6S
+Content-Type: multipart/mixed; boundary="ImjSpke34Ur7gOFc2LOrGYy8dRloCsBbT"
+
+--ImjSpke34Ur7gOFc2LOrGYy8dRloCsBbT
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 16.07.20 16:26, Kevin Wolf wrote:
+> Since commit a6b257a08e3 ('file-posix: Handle undetectable alignment'),
+> we assume that if we open a file with O_DIRECT and alignment probing
+> returns 1, we just couldn't find out the real alignment requirement
+> because some filesystems make the requirement only for allocated blocks.
+> In this case, a safe default of 4k is used.
+>=20
+> This is too strict for NFS, which does actually allow byte-aligned
+> requests even with O_DIRECT. Because we can't distinguish both cases
+> with generic code, let's just look at the file system magic and disable
+> s->needs_alignment for NFS. This way, O_DIRECT can still be used on NFS
+> for images that are not aligned to 4k.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/file-posix.c | 26 +++++++++++++++++++++++++-
+>  1 file changed, 25 insertions(+), 1 deletion(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--ImjSpke34Ur7gOFc2LOrGYy8dRloCsBbT--
+
+--I0FwIvPOX7HQtxvIFH0lBsHltSvfm8J6S
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8RiGwACgkQ9AfbAGHV
+z0CtJggApJkzI1Lm/GPQLRj3Nxb3Mnjokzkue+43q1Cjp8CgK2mWfsnmXXxV7T5N
+cn8U3So5Ti3xSwdPa8f7483XsyG38xmW1IpvHxnPDuwZQruLS7dQkxwrEZNog0pG
+XLCIjZ9zkLP50g6pSKhDakSlL/4CveCgyuJ3GtIxdbYnsqahEBDrGcA83Nm3vtdR
+rjfQJmmII8aMVSL2jLROiFTS+91KJSB/2QUKzjThErPsggba5O7Db4nFFXmsyCQl
+c4UsRzBQ4c+tXexHFRvuAtztEflPr0v+16opFCcdvE24qCBgloTxIboScTHQjEVM
+ECyxbtYDHSq51zUKQss90kJPA9S72g==
+=98Ar
+-----END PGP SIGNATURE-----
+
+--I0FwIvPOX7HQtxvIFH0lBsHltSvfm8J6S--
+
 
