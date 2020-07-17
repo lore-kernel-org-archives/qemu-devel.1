@@ -2,102 +2,93 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CD2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1350C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:39:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 406792067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:34:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BF8F20734
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 13:39:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A5r5DsEE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 406792067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ki78wHn8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BF8F20734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwQV8-0004Cr-IK
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 09:34:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34490)
+	id 1jwQaH-0006gh-Ry
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 09:39:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jwQUW-0003gc-Md
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:33:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48596
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jwQUT-0006k5-0n
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 09:33:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594992807;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=3OOmko8daqDpaMRX+ApVwXmLC/XqslQquugbMFnKwOE=;
- b=A5r5DsEEi6OGnZ3rT6xY9ct0GbKJrs5UX1nQh0R1wVC4ry+1kAkQPs1Ag7wnCfJixgR5PS
- FLnw48yZJeza6mbIt1DiJknb7Sh3GQNxsmGHlQLOl6MydN7W91Ui9ITYL066Y6lbQBzPRS
- 9j2cdamUOzvuZGeht7tr4e8tzjZU654=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-TaB4pZBEMvOoRaLtOmM_QQ-1; Fri, 17 Jul 2020 09:33:23 -0400
-X-MC-Unique: TaB4pZBEMvOoRaLtOmM_QQ-1
-Received: by mail-ed1-f72.google.com with SMTP id cn4so5850516edb.9
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 06:33:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jwQZi-0006F0-Ju; Fri, 17 Jul 2020 09:38:54 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39082)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jwQZf-000884-Ue; Fri, 17 Jul 2020 09:38:54 -0400
+Received: by mail-ed1-x541.google.com with SMTP id d18so7711791edv.6;
+ Fri, 17 Jul 2020 06:38:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=dqtqq4r7Ge1UjcYxuCx+TmgiC37E+REjTrnpxMHrirE=;
+ b=ki78wHn8m6TT6jcvcQUOdJpP666Ytuto/Y4Dnb9f9k7eNYwATqIsFLMOoJ8pKPBbWs
+ x4J6IkBB6UnEFfRWALxeaDEQ2/fPbnWzR5gEUOVVJs/e2H/tk90nOgiEGFRtzXnt9y7A
+ JlWG2CJfmuVb2FGeH2KxwUml4d7B5gf0kSjXiJvKxDbrUEbhpyAyl8Xw9TZoWEsTaOAo
+ U5nMIenBzz0g6u2xRwphBrTFMzP2iEFQw4ilikd+/EezM1NKw+HrlGNBschPRqRYz9sM
+ VKGtdLylv7crsA6xGgRxOS0EkucGO03Tjt4qSsD2v9uvnq0I/2CHw7ap+5iS8j2XYGcl
+ iSDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3OOmko8daqDpaMRX+ApVwXmLC/XqslQquugbMFnKwOE=;
- b=gWmdnDfj9nrph56lyMYabTNMJ3N/FAlQtsmr+ZCCW9vPBo9Jh2n6byEDWR3jGiPlGF
- lKLpFuHopxubws1oDgfO9h+KyypDo7QpfMFZ9TsbLBCed0DgOH/eqotUtid0CHGuIlCn
- X946BX4PYWtaitB8KWMSPx6xybozq8pF6KdTKTz713K+Hj7KDDGY9qhZeJR/CFlQ7vdp
- wOtjGK2X/YA9IOvWfVMz2kdX16+OWanBnAUFLNE6n62oqG8hLs5sYOqw9eC/r4oCrCFJ
- g4gXlIli9C9FuLjyd+Us2Y1j2fSCGGqIjqjCcJ8omS/bXIBPZcRiAC9tmUsSL7zkHakI
- zqow==
-X-Gm-Message-State: AOAM533cIfaz0YR9KMqd3LALrJB+RsClQC0FQn3qWvi8Aw6LJZZLg8gZ
- JK3k1+FG7pRiDWsukBmrFjrK4zqc9kLqbFKlLy+FOosmk8haEeHKojd+35Il2A22njYvqyORWCF
- 4ZiW/l3kMsIWb3Szm+Igs0WAzI+Gq6lc=
-X-Received: by 2002:a17:906:e213:: with SMTP id
- gf19mr8474804ejb.433.1594992802363; 
- Fri, 17 Jul 2020 06:33:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwTUZGKp8uyR5WewxET6cYjhjyW+uoR+WeZqk21dz6v/FjfNKz5yMN2N21ew1489JwCWIOZhdKxxn6D7efNYRo=
-X-Received: by 2002:a17:906:e213:: with SMTP id
- gf19mr8474782ejb.433.1594992802063; 
- Fri, 17 Jul 2020 06:33:22 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=dqtqq4r7Ge1UjcYxuCx+TmgiC37E+REjTrnpxMHrirE=;
+ b=UaX/UVON0MWZKxPbnhfq3c4gI5pyyrttWsehlKnJT5AO69YqaCAXty4L6+0rpxPUKg
+ RnHIS/L/5/TqXiGVtHyoTisyzY7yNi991fdPF5tdZCZiy9CYvKzEM8MZCpg9Cvohd57b
+ jOKGCD7mJqNF+DQOXAuQ/QW0PqftvcBHER57S05QcBFNsBH6ria7FJmqMigd9aZFShfg
+ kovD/uXzi6XQCHN1oaqMEWKFg9sHp33DrgdSkdUNPqwnhF9JXYtSIYGxkromDQtObTEq
+ 8S8VWJcHRTrQ9UwAHYq+speRokwokWn5J8P0wC9uPvY8ske7wsZFw4tykt/zgOaUUR2F
+ Imvw==
+X-Gm-Message-State: AOAM5322BNGbumbO1oeuqwQXzEy3pLviq8AMFFwvHzWBB3djLx/sKtXG
+ AKyxgT6s50jtWYaRnssdhZBnPR8TG0U=
+X-Google-Smtp-Source: ABdhPJzJ4wZeCpM7rxoTBHi1U9X0z+1t7Q+7S4BDt/qRikLtIHGKr8XfBylqAyZy5qrRkuiInZGhyA==
+X-Received: by 2002:a05:6402:1ef:: with SMTP id
+ i15mr9287467edy.378.1594993129184; 
+ Fri, 17 Jul 2020 06:38:49 -0700 (PDT)
+Received: from x1w.redhat.com (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id s24sm7898764ejv.110.2020.07.17.06.38.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Jul 2020 06:38:48 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH-for-5.1 v2] hw/ide: Avoid #DIV/0! FPU exception by setting
+ CD-ROM sector count
+Date: Fri, 17 Jul 2020 15:38:47 +0200
+Message-Id: <20200717133847.10974-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <20200706164155.24696-1-pbonzini@redhat.com>
- <20200706164155.24696-29-pbonzini@redhat.com>
- <CAFEAcA-Ha4+ub=QQASREraok747+U2tUcNkSYu6PFnoc29_Jrw@mail.gmail.com>
- <CABgObfaFYmsiR-aYsq5vBEruL5Z2=qD0Z6Zf0d0C2N1cbfq4kQ@mail.gmail.com>
- <CAFEAcA_ncNaas_22k=07RUH-VGwp+pe7hYjt-OVoXdEEzLVXKg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_ncNaas_22k=07RUH-VGwp+pe7hYjt-OVoXdEEzLVXKg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 17 Jul 2020 15:33:09 +0200
-Message-ID: <CABgObfaLuCGZZrqCWrfu2S_jJbEhZ7SQr2A0Jjr78S+fnpbQhw@mail.gmail.com>
-Subject: Re: [PULL 28/53] Makefile: simplify MINIKCONF rules
-To: Peter Maydell <peter.maydell@linaro.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000062fd7e05aaa333cc"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 23:13:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,43 +101,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Corey Minyard <minyard@acm.org>
+Cc: Alexander Bulekov <alxndr@bu.edu>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000062fd7e05aaa333cc
-Content-Type: text/plain; charset="UTF-8"
+libFuzzer found an undefined behavior (#DIV/0!) in ide_set_sector()
+when using a CD-ROM (reproducer available on the BugLink):
 
-Il ven 17 lug 2020, 15:01 Peter Maydell <peter.maydell@linaro.org> ha
-scritto:
+  UndefinedBehaviorSanitizer:DEADLYSIGNAL
+  ==12163==ERROR: UndefinedBehaviorSanitizer: FPE on unknown address 0x5616279cffdc (pc 0x5616279cffdc bp 0x7ffcdaabae90 sp 0x7ffcdaabae30 T12163)
 
-> When you do a "make clean" those .d files get deleted
-> (but the config-devices.mak files do not).
+Fix by initializing the CD-ROM number of sectors in ide_dev_initfn().
 
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Fixes: b2df431407 ("ide scsi: Mess with geometry only for hard disk devices")
+BugLink: https://bugs.launchpad.net/qemu/+bug/1887309
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+Since v1:
+- Allow zero-sized drive images (not sure why we need them)
+  but display a friendly message that this is unsupported
 
-I think that's the bug, both should be removed by "make clean" (since the
-.mak files are built by "make" and not "configure").
+Unrelated but interesting:
+http://www.physics.udel.edu/~watson/scen103/cdsoln.html
+---
+ hw/ide/qdev.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Paolo
-
---00000000000062fd7e05aaa333cc
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il ven 17 lug 2020, 15:01 Peter Maydell &lt;<a href=3D=
-"mailto:peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; ha scrit=
-to:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
-order-left:1px #ccc solid;padding-left:1ex">When you do a &quot;make clean&=
-quot; those .d files get deleted<br>
-(but the config-devices.mak files do not).</blockquote></div></div><div dir=
-=3D"auto"><br></div><div dir=3D"auto">I think that&#39;s the bug, both shou=
-ld be removed by &quot;make clean&quot; (since the .mak files are built by =
-&quot;make&quot; and not &quot;configure&quot;).</div><div dir=3D"auto"><br=
-></div><div dir=3D"auto">Paolo</div></div>
-
---00000000000062fd7e05aaa333cc--
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 27ff1f7f66..005d73bdb9 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -201,6 +201,15 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+                               errp)) {
+             return;
+         }
++    } else {
++        uint64_t nb_sectors;
++
++        blk_get_geometry(dev->conf.blk, &nb_sectors);
++        if (!nb_sectors) {
++            warn_report("Drive image of size zero is unsupported for 'ide-cd', "
++                        "use at your own risk ¯\\_(ツ)_/¯");
++        }
++        dev->conf.secs = nb_sectors;
+     }
+     if (!blkconf_apply_backend_options(&dev->conf, kind == IDE_CD,
+                                        kind != IDE_CD, errp)) {
+-- 
+2.21.3
 
 
