@@ -2,81 +2,99 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B36B2C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52AA8C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8792C2067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:27:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8792C2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0D3C42067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 15:28:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Q3CRvUEY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D3C42067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwSGw-0003Y9-NF
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:27:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39342)
+	id 1jwSHu-0004wL-Ak
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 11:28:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwSF7-0000re-NG
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:25:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37584)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwSF5-00064B-FR
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:25:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jwSF3-0005nU-FP
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 15:25:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6BBA12E80ED
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 15:25:41 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jul 2020 15:18:15 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878642@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr philmd
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <158947186100.17636.13410831714995033672.malonedeb@soybean.canonical.com>
-Message-Id: <159499909591.7592.10146810433082370825.malone@wampee.canonical.com>
-Subject: [Bug 1878642] Re: Assertion failure in pci_bus_get_irq_level
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6f07ef624d2addc88a1ba06a9f30ff004bf7d9c1
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 11:25:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
+ id 1jwSGl-0003b3-Ud
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:27:28 -0400
+Received: from smtpbg511.qq.com ([203.205.250.109]:53399 helo=smtpbg515.qq.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <climber.cui@qq.com>)
+ id 1jwSGd-0006JT-W7
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 11:27:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+ t=1594999628; bh=klf9zfB8Ju2We0IDE/36jiL4zg3vy8Ys9rta7koa7eM=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=Q3CRvUEYP96EVu8GxNG++V0xr4aiZpSYw7NFRWIUH/L+gLlImBEcP+7AEp9bVvK4/
+ eGrUqPbXb0tK/9lvtIwYq2ARCj/LpQeGPfnCA5VBZlcUUDSusQG4dJhbie2gOkqjj9
+ /1OQEibkwT8yMgKZTkJ9GmSqP7T5bLqPfJc/l2IE=
+X-QQ-FEAT: iR1/iWDWKpD3CzIALrCTX0CwFQc4uyT5toWpQB6TmVcRAYzATD9MoBbuHwRM+
+ aW43cS6tJNpOjDb9p2cuLKWSfTX3jonZVSu4vUBCdm1AQPLGgRgTP4lzO5XkNi3xufxIe26
+ KMzThwWpFPS/Uw1jBOu8JKLv+oVNwcW1OK0PsvEV1xUkrOQzoXLZzVa09WAdfxlMKEMSHj7
+ QkcVgIlTwV5JV3ehtxtVsLRsL+84Q5Oa5MTGk/HWcttID4UBMCRaYEmzCF2wzh56z/Y2h4F
+ XamJCOIOdqMbyiWM+uExzDPrA=
+X-QQ-SSF: 00000000000000F000000000000000D
+X-QQ-XMAILINFO: MDGhyPkQpLfNisKekSMqsnknQZKjGsxXGHOTNDOEU0xwMLct8aAfEdZt8LDuvM
+ nng9ki774pdVrdBoDvjD98vu7226UFv79OUJSrRrgEIshRTUUgiajcOPvUkjrXuS4loM+u31q54mJ
+ CfKhu9Q4hFoHwW6O8YteITvcK6JLHD2xXXpwrG2z5rNAZqRwvFHhGgl13oxbXthVMyjFWLKUcJ3DQ
+ 4PfQqxdm2iFf/eHz/+3Mtv/fCVqJ1nbbHAK4LxWqsPYLPsFeFYeGkY5D6XAgTIUfpJvUe5c55dJLH
+ 0832ThGe/QAShJcPHzAqaKk/JGwVINB14D00gSeZkLVN+aEe6sDCRSY/O5R8NhpiJppVREeh6mbRh
+ zIfXnr+c2O7TIFJtZSos3X5P4L2lscci/Zj3xS4gueygU/lmpkAWDekqjpGvFZK6ry7GPTzqjdN/r
+ 6MbEzRF/9bD9TFyQniNvTbvheXrijgwP9+ed5bK15GpHnsqykt5OTNgsuoG9odBA/ANJPpMD35OxA
+ OkNCWD5R0pNY3c6IWo6gDabXoi5800ZZpqfQhoICzvThbTbRGF02J53DtgxdRhe8NdMuDCHxTscMH
+ sSeOn5sqjileWkhxeQnRgxxXWc1q4vl4lRnUloq1kh6q8D5zFna3nmxRbkPhXD8tL6c2ESET3zgic
+ FkVurnDABQer7Z5r/DNC5/KSuGYg==
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 111.199.116.63
+X-QQ-STYLE: 
+X-QQ-mid: webmail725t1594999080t4206870
+From: "=?ISO-8859-1?B?Y2FzbWFj?=" <climber.cui@qq.com>
+To: "=?ISO-8859-1?B?UGhpbGlwcGUgTWF0aGlldS1EYXVk6Q==?=" <f4bug@amsat.org>
+Subject: Re: Implement standard file operation with QEMU
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="----=_NextPart_5F11C128_0F039320_1152F451"
+Content-Transfer-Encoding: 8Bit
+Date: Fri, 17 Jul 2020 23:18:00 +0800
+X-Priority: 3
+Message-ID: <tencent_DF5BA7114FBBA837DEBE64515ABC7CB27809@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Fri, 17 Jul 2020 23:18:01 +0800 (CST)
+Feedback-ID: webmail:qq.com:bgweb:bgweb5
+Received-SPF: pass client-ip=203.205.250.109; envelope-from=climber.cui@qq.com;
+ helo=smtpbg515.qq.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 11:27:08
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FROM_EXCESS_BASE64=0.001, HTML_MESSAGE=0.001, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,140 +103,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878642 <1878642@bugs.launchpad.net>
+Cc: =?ISO-8859-1?B?TGF1cmVudCBWaXZpZXI=?= <lvivier@redhat.com>,
+ =?ISO-8859-1?B?TWFyYy1BbmRy6SBMdXJlYXU=?= <marcandre.lureau@redhat.com>,
+ =?ISO-8859-1?B?QWxleCBCZW5u6WU=?= <alex.bennee@linaro.org>,
+ =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Proposed fix:
-https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05564.html
+This is a multi-part message in MIME format.
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+------=_NextPart_5F11C128_0F039320_1152F451
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
 
--- =
+SGVsbG8gUGhpbCwNCiZuYnNwOyZuYnNwOyBXaGF0IEkgd2FudCB0byByZWFsaXplIGlzIHRv
+IGJlIGFibGUgdG8gY2FsbCBzdGFuZGFyZCBmaWxlIG9wZXJhdGlvbnMgKG9wZW4sIHJlYWQs
+IHdyaXRlIGV0YykgaW4gdGhlIGFwcGxpY2F0aW9uIHByb2dyYW0sIGFuZCBleGVjdXRlIHN1
+Y2ggcHJvZ3JhbXMgaW4gUUVNVS4gQnV0IEkgYW0gYnVpbGRpbmcgdW5kZXIgc3lzdGVtIG1v
+ZGUuDQombmJzcDsmbmJzcDsgVEkgcHJvdmlkZSBjb3BpbGF0aW9uIHRvb2xjaGFpbiBhbmQg
+YSBsaWJyYXJ5IHRoYXQgcHJvdmlkZSBwYXJ0aWFsIGZ1bmN0aW9uYWxpdHkgZnJvbSBsaWJj
+LiBJIGFtIGhvcGluZyB0byB1c2UgVEkncyB0b29sa2l0IHRvIGdlbmVyYXRlIG9iamVjdCBj
+b2RlIHdoaWNoIGNvbnRhaW5zIGNhbGxzIHRvIGhvb2sgZnVuY3Rpb25zLCBhbmQgdGhlbiB1
+c2UgUUVNVSdzIGhvc3QgSS9PIGltcGxlbWVudGF0aW9uIHRvIHJlYWxpemUgbG93LWxldmVs
+IGZpbGUgb3BlcmF0aW9uLiBGb3IgZXhhbXBsZToNCg0KJm5ic3A7ICZuYnNwOyBfc3RyZWFt
+W2ZpbGRlc10tJmd0O1dSSVRFJm5ic3A7IDwtLS1ob29rIHRvIC0tLSZndDsmbmJzcDtxZW11
+X3NlbWlob3N0aW5nX2NvbnNvbGVfb3V0cw0KJm5ic3A7ICZuYnNwO0FyZSB5b3Ugc3VnZ2Vz
+dGluZyB0aGF0IHRoaXMgaXMgZG9uZSBieSBUQ0cgaGVscGVycz8NCg0KDQpiZXN0IHJlZ2Fy
+ZHMsDQp4aWFvbGVpDQombmJzcDsmbmJzcDsgDQoNCg0KDQoNCg0KLS0tLS0tLS0tLS0tLS0t
+LS0tIE9yaWdpbmFsIC0tLS0tLS0tLS0tLS0tLS0tLQ0KRnJvbTogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiUGhp
+bGlwcGUgTWF0aGlldS1EYXVk6SIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZjRi
+dWdAYW1zYXQub3JnJmd0OzsNCkRhdGU6Jm5ic3A7VGh1LCBKdWwgMTYsIDIwMjAgMDM6NTcg
+UE0NClRvOiZuYnNwOyJjYXNtYWMiPGNsaW1iZXIuY3VpQHFxLmNvbSZndDs7InFlbXUtZGV2
+ZWwiPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZyZndDs7IkFsZXggQmVubullIjxhbGV4LmJlbm5l
+ZUBsaW5hcm8ub3JnJmd0OzsiTGF1cmVudCBWaXZpZXIiPGx2aXZpZXJAcmVkaGF0LmNvbSZn
+dDs7Ik1hcmMtQW5kcukgTHVyZWF1IjxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20mZ3Q7
+Ow0KDQpTdWJqZWN0OiZuYnNwO1JlOiBJbXBsZW1lbnQgc3RhbmRhcmQgZmlsZSBvcGVyYXRp
+b24gd2l0aCBRRU1VDQoNCg0KDQpIaSBYaWFvbGVpLA0KDQorTGF1cmVudCAodXNlci1tb2Rl
+KQ0KK0FsZXggKHNlbWlob3N0aW5nKQ0KK01hcmMtQW5kcukgKGNoYXJkZXYpDQoNCk9uIDcv
+MTYvMjAgMjo1MSBBTSwgY2FzbWFjIHdyb3RlOg0KJmd0OyBIaSBhbGwsDQomZ3Q7ICZuYnNw
+OyBJIGFtIHRyeWluZyB0byBpbXBsbWVudCBzdGFuZGFyZCBmaWxlIG9wZXJhdGlvbiAoc3Rk
+aW8pIHdpdGggUUVNVSBmb3INCiZndDsgRFNQIGFyY2hpdGVjdHVyZS4gVGhlIG1hbnVmYWN0
+dXJlIChUSSkgcHJvdmlkZXMgYSBydW50aW1lIGxpYnJhcnkgdGhhdA0KJmd0OyBzdXBwb3J0
+IHBvc2l4IHN0YW5kYXJkIElPLCBidXQgaXQgbGVmdCB0aGUgZGV2aWNlIGxldmVsIGltcGxt
+ZW50YXRpb24gYXMNCiZndDsgaG9vayBmdW5jdGlvbiBjYWxscywgbGlrZSBpbiB0aGUgbGli
+cmFyeSBzb3VyY2UgLCBpdCBjb250YWlucyANCiZndDsgYWRkX2RldmljZSgpIGZ1bmN0aW9u
+LCBhbmQgd3JpdGUoKSxyZWFkKCksb3BlbigpIGFyZSBub3QgaW1wbGVtZW50ZWQ6DQomZ3Q7
+IA0KJmd0OyBpbnQgYWRkX2RldmljZShjaGFyJm5ic3A7ICZuYnNwOyAmbmJzcDsgKm5hbWUs
+DQomZ3Q7ICZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyAmbmJzcDsgJm5ic3A7IHVuc2lnbmVkICZuYnNwOyBmbGFncywNCiZn
+dDsgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7ICZuYnNwOyAmbmJzcDsgKCpkb3Bl
+bikmbmJzcDsgKGNvbnN0IGNoYXIgKnBhdGgsIHVuc2lnbmVkIGZsYWdzLCBpbnQNCiZndDsg
+Zm9vKSwNCiZndDsgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7ICZuYnNwOyAmbmJz
+cDsgKCpkY2xvc2UpIChpbnQgZm5vKSwNCiZndDsgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgaW50
+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgKCpkcmVhZCkmbmJzcDsgKGludCBmbm8sIGNoYXIgKmJ1
+ZiwgdW5zaWduZWQgY291bnQpLA0KJmd0OyAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyBpbnQmbmJz
+cDsgJm5ic3A7ICZuYnNwOyAoKmR3cml0ZSkgKGludCBmbm8sIGNvbnN0IGNoYXIgKmJ1Ziwg
+dW5zaWduZWQNCiZndDsgY291bnQpLA0KJmd0OyAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyBmcG9z
+X3QgJm5ic3A7ICZuYnNwOyAoKmRsc2VlaykgKGludCBmbm8sIGZwb3NfdCBvZmZzZXQsIGlu
+dCBvcmlnaW4pLA0KJmd0OyAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyBpbnQmbmJzcDsgJm5ic3A7
+ICZuYnNwOyAoKmR1bmxpbmspKGNvbnN0IGNoYXIgKnBhdGgpLA0KJmd0OyAmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5i
+c3A7ICZuYnNwOyBpbnQmbmJzcDsgJm5ic3A7ICZuYnNwOyAoKmRyZW5hbWUpKGNvbnN0IGNo
+YXIgKm9sZF9uYW1lLCBjb25zdCBjaGFyDQomZ3Q7ICpuZXdfbmFtZSkpDQomZ3Q7IHsNCiZn
+dDsgJm5ic3A7Jm5ic3A7IF9ERVZJQ0UgKmR0Ow0KJmd0OyANCiZndDsgJm5ic3A7Jm5ic3A7
+IHN0cm5jcHkoZHQtJmd0O25hbWUsbmFtZSw4KTsNCiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZn
+dDtuYW1lWzhdID0gJ1wwJzsNCiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZndDtmbGFncyAmbmJz
+cDsgPSBmbGFnczsNCiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZndDtPUEVOJm5ic3A7ICZuYnNw
+OyA9IGRvcGVuOw0KJmd0OyAmbmJzcDsmbmJzcDsgZHQtJmd0O0NMT1NFICZuYnNwOyA9IGRj
+bG9zZTsNCiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZndDtSRUFEJm5ic3A7ICZuYnNwOyA9IGRy
+ZWFkOw0KJmd0OyAmbmJzcDsmbmJzcDsgZHQtJmd0O1dSSVRFICZuYnNwOyA9IGR3cml0ZTsN
+CiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZndDtMU0VFSyAmbmJzcDsgPSBkbHNlZWs7DQomZ3Q7
+ICZuYnNwOyZuYnNwOyBkdC0mZ3Q7VU5MSU5LJm5ic3A7ID0gZHVubGluazsNCiZndDsgJm5i
+c3A7Jm5ic3A7IGR0LSZndDtSRU5BTUUmbmJzcDsgPSBkcmVuYW1lOw0KJmd0OyB9DQomZ3Q7
+IA0KJmd0OyBpbnQgd3JpdGUoaW50Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7ICZuYnNwOyAmbmJzcDsgZmlsZGVzLA0KJmd0OyAmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsgJm5ic3A7ICZuYnNwOyBjb25zdCBjaGFyICZuYnNwOyAqYnVmcHRyLA0KJmd0
+OyAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyB1bnNpZ25l
+ZCZuYnNwOyAmbmJzcDsgJm5ic3A7IGNudCkNCiZndDsgew0KJmd0OyAmbmJzcDsgDQomZ3Q7
+IC8qLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tKi8NCiZndDsgJm5ic3A7Jm5ic3A7IC8qIENBTEwgRlVO
+Q1RJT04gRlJPTSBERVZJQ0UgVEFCTEUgVE8gUEVSRk9STSBXUklURSBGT1IgVEhJUw0KJmd0
+OyBERVZJQ0UvRklMRSZuYnNwOyAqLw0KJmd0OyAmbmJzcDsgDQomZ3Q7IC8qLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tKi8NCiZndDsgJm5ic3A7Jm5ic3A7IHJldHVybiAoKihfc3RyZWFtW2ZpbGRl
+c10tJmd0O1dSSVRFKSkgKGZpbGRlcyxidWZwdHIsY250KTsNCiZndDsgfQ0KJmd0OyANCiZn
+dDsgJm5ic3A7Jm5ic3A7IFRoZW4sIGhvdyBjYW4gd2UgdXNlIHRoaXMgcnVudGltZSBsaWJy
+YXJ5IHRvZ2V0aGVyIHdpdGggUUVNdSB0bw0KJmd0OyBpbXBsZW1lbnQgZnVsbC1zdGFjayBm
+aWxlIG9lcmF0aW9ucz8mbmJzcDsgSSByZWFsbHkgYXBwcmVhY2lhdGUgYW55IGFkdmljZS4N
+Cg0KVHJ5aW5nIHRvIHVuZGVyc3RhbmQuLi4NCg0KQXJlIHlvdSB0cnlpbmcgdG8gYXNrICJo
+b3cgdG8gaW1wbGVtZW50IHNlbWlob3N0aW5nIGZvciBteQ0KcWVtdS11c2VyLXRpZHNwIGZv
+cmsiPw0KDQpIYXZlIGEgbG9vayBhdCAiaHcvc2VtaWhvc3RpbmcvY29uc29sZS5oIiBhbmQg
+dGhlIGltcGxlbWVudGF0aW9uDQooc28gZmFyIG9ubHkgQVJNKSBvZiBxZW11X3NlbWlob3N0
+aW5nX2NvbnNvbGVfW2luL291dF0uDQpUaGlzIG1pZ2h0IGhlbHAgdG8gcGx1ZyByZWFkL3dy
+aXRlLiBVc2luZyBvdGhlciBzdHJlYW0gdGhhbg0Kc3RkaW4vc3Rkb3V0IGlzIG5vdCBzdXBw
+b3J0ZWQgKGJ1dCB5b3UgY2FuIGFkZCBzdXBwb3J0KSBzbw0Kb3Blbi9sc2Vlay9jbG9zZS9y
+ZW5hbWUvdW5saW5rIGFyZSBub3QgY29uc2lkZXJlZC4NCg0KKGZvciBRRU1VICdjb25zb2xl
+JyBpcyB0aGUgc3RkaW4vc3Rkb3V0IHN1YnNldCBvZiBzdGRpbykuDQoNCllvdSBjYW4gcmVk
+aXJlY3Qgc2VtaWhvc3RlZCBmaWxlcyB3aXRoIGFueSBob3N0IGNoYXJkZXYsDQp0aGlzIGlz
+IGRvbmUgaW4gcWVtdV9zZW1paG9zdGluZ19jb25uZWN0X2NoYXJkZXZzKCkuDQoNCllvdSBt
+aWdodCBhbHNvIGhhdmUgYSBsb29rIGF0IHRoZSBmdW5jdGlvbnMgZGVjbGFyZWQgaW4NCiJo
+dy9zZW1paG9zdGluZy9zZW1paG9zdC5oIiBhbmQgaG93IHRoZSBkaWZmZXJlbnQgVENHIGhl
+bHBlcnMNCnVzZSB0aGVtLg0KDQpSZWdhcmRzLA0KDQpQaGlsLg==
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878642
+------=_NextPart_5F11C128_0F039320_1152F451
+Content-Type: text/html;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
 
-Title:
-  Assertion failure in pci_bus_get_irq_level
+PG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNo
+YXJzZXQ9R0IxODAzMCI+PGRpdj5IZWxsbyBQaGlsLDwvZGl2PjxkaXY+Jm5ic3A7Jm5ic3A7
+IFdoYXQgSSB3YW50IHRvIHJlYWxpemUgaXMgdG8gYmUgYWJsZSB0byBjYWxsIHN0YW5kYXJk
+IGZpbGUgb3BlcmF0aW9ucyAob3BlbiwgcmVhZCwgd3JpdGUgZXRjKSBpbiB0aGUgYXBwbGlj
+YXRpb24gcHJvZ3JhbSwgYW5kIGV4ZWN1dGUgc3VjaCBwcm9ncmFtcyBpbiBRRU1VLiBCdXQg
+SSBhbSBidWlsZGluZyB1bmRlciBzeXN0ZW0gbW9kZS48L2Rpdj48ZGl2PiZuYnNwOyZuYnNw
+OyBUSSBwcm92aWRlIGNvcGlsYXRpb24gdG9vbGNoYWluIGFuZCBhIGxpYnJhcnkgdGhhdCBw
+cm92aWRlIHBhcnRpYWwgZnVuY3Rpb25hbGl0eSBmcm9tIGxpYmMuIEkgYW0gaG9waW5nIHRv
+IHVzZSBUSSdzIHRvb2xraXQgdG8gZ2VuZXJhdGUgb2JqZWN0IGNvZGUgd2hpY2ggY29udGFp
+bnMgY2FsbHMgdG8gaG9vayBmdW5jdGlvbnMsIGFuZCB0aGVuIHVzZSBRRU1VJ3MgaG9zdCBJ
+L08gaW1wbGVtZW50YXRpb24gdG8gcmVhbGl6ZSBsb3ctbGV2ZWwgZmlsZSBvcGVyYXRpb24u
+IEZvciBleGFtcGxlOjxicj48L2Rpdj48ZGl2PiZuYnNwOyAmbmJzcDsgX3N0cmVhbVtmaWxk
+ZXNdLSZndDtXUklURSZuYnNwOyAmbHQ7LS0taG9vayB0byAtLS0mZ3Q7Jm5ic3A7cWVtdV9z
+ZW1paG9zdGluZ19jb25zb2xlX291dHM8L2Rpdj48ZGl2PiZuYnNwOyAmbmJzcDtBcmUgeW91
+IHN1Z2dlc3RpbmcgdGhhdCB0aGlzIGlzIGRvbmUgYnkgVENHIGhlbHBlcnM/PC9kaXY+PGRp
+dj48YnI+PC9kaXY+PGRpdj5iZXN0IHJlZ2FyZHMsPC9kaXY+PGRpdj54aWFvbGVpPC9kaXY+
+PGRpdj4mbmJzcDsmbmJzcDsgPGJyPjwvZGl2PjxkaXY+PGRpdj48YnI+PC9kaXY+PGRpdj48
+YnI+PC9kaXY+PGRpdiBzdHlsZT0iZm9udC1zaXplOiAxMnB4O2ZvbnQtZmFtaWx5OiBBcmlh
+bCBOYXJyb3c7cGFkZGluZzoycHggMCAycHggMDsiPi0tLS0tLS0tLS0tLS0tLS0tLSBPcmln
+aW5hbCAtLS0tLS0tLS0tLS0tLS0tLS08L2Rpdj48ZGl2IHN0eWxlPSJmb250LXNpemU6IDEy
+cHg7YmFja2dyb3VuZDojZWZlZmVmO3BhZGRpbmc6OHB4OyI+PGRpdj48Yj5Gcm9tOjwvYj4g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAiUGhpbGlwcGUgTWF0aGlldS1EYXVk6SIgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAmbHQ7ZjRidWdAYW1zYXQub3JnJmd0Ozs8L2Rpdj48ZGl2PjxiPkRhdGU6
+PC9iPiZuYnNwO1RodSwgSnVsIDE2LCAyMDIwIDAzOjU3IFBNPC9kaXY+PGRpdj48Yj5Ubzo8
+L2I+Jm5ic3A7ImNhc21hYyImbHQ7Y2xpbWJlci5jdWlAcXEuY29tJmd0OzsicWVtdS1kZXZl
+bCImbHQ7cWVtdS1kZXZlbEBub25nbnUub3JnJmd0OzsiQWxleCBCZW5u6WUiJmx0O2FsZXgu
+YmVubmVlQGxpbmFyby5vcmcmZ3Q7OyJMYXVyZW50IFZpdmllciImbHQ7bHZpdmllckByZWRo
+YXQuY29tJmd0OzsiTWFyYy1BbmRy6SBMdXJlYXUiJmx0O21hcmNhbmRyZS5sdXJlYXVAcmVk
+aGF0LmNvbSZndDs7PHdicj48L2Rpdj48ZGl2PjwvZGl2PjxkaXY+PGI+U3ViamVjdDo8L2I+
+Jm5ic3A7UmU6IEltcGxlbWVudCBzdGFuZGFyZCBmaWxlIG9wZXJhdGlvbiB3aXRoIFFFTVU8
+L2Rpdj48L2Rpdj48ZGl2Pjxicj48L2Rpdj5IaSBYaWFvbGVpLDxicj48YnI+K0xhdXJlbnQg
+KHVzZXItbW9kZSk8YnI+K0FsZXggKHNlbWlob3N0aW5nKTxicj4rTWFyYy1BbmRy6SAoY2hh
+cmRldik8YnI+PGJyPk9uIDcvMTYvMjAgMjo1MSBBTSwgY2FzbWFjIHdyb3RlOjxicj4mZ3Q7
+IEhpIGFsbCw8YnI+Jmd0OyAmbmJzcDsgSSBhbSB0cnlpbmcgdG8gaW1wbG1lbnQgc3RhbmRh
+cmQgZmlsZSBvcGVyYXRpb24gKHN0ZGlvKSB3aXRoIFFFTVUgZm9yPGJyPiZndDsgRFNQIGFy
+Y2hpdGVjdHVyZS4gVGhlIG1hbnVmYWN0dXJlIChUSSkgcHJvdmlkZXMgYSBydW50aW1lIGxp
+YnJhcnkgdGhhdDxicj4mZ3Q7IHN1cHBvcnQgcG9zaXggc3RhbmRhcmQgSU8sIGJ1dCBpdCBs
+ZWZ0IHRoZSBkZXZpY2UgbGV2ZWwgaW1wbG1lbnRhdGlvbiBhczxicj4mZ3Q7IGhvb2sgZnVu
+Y3Rpb24gY2FsbHMsIGxpa2UgaW4gdGhlIGxpYnJhcnkgc291cmNlICwgaXQgY29udGFpbnMg
+PGJyPiZndDsgYWRkX2RldmljZSgpIGZ1bmN0aW9uLCBhbmQgd3JpdGUoKSxyZWFkKCksb3Bl
+bigpIGFyZSBub3QgaW1wbGVtZW50ZWQ6PGJyPiZndDsgPGJyPiZndDsgaW50IGFkZF9kZXZp
+Y2UoY2hhciZuYnNwOyAmbmJzcDsgJm5ic3A7ICpuYW1lLDxicj4mZ3Q7ICZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJz
+cDsgJm5ic3A7IHVuc2lnbmVkICZuYnNwOyBmbGFncyw8YnI+Jmd0OyAmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7
+ICZuYnNwOyBpbnQmbmJzcDsgJm5ic3A7ICZuYnNwOyAoKmRvcGVuKSZuYnNwOyAoY29uc3Qg
+Y2hhciAqcGF0aCwgdW5zaWduZWQgZmxhZ3MsIGludDxicj4mZ3Q7IGZvbyksPGJyPiZndDsg
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7ICZuYnNwOyAmbmJzcDsgKCpkY2xvc2Up
+IChpbnQgZm5vKSw8YnI+Jmd0OyAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZuYnNwOyBpbnQmbmJzcDsgJm5i
+c3A7ICZuYnNwOyAoKmRyZWFkKSZuYnNwOyAoaW50IGZubywgY2hhciAqYnVmLCB1bnNpZ25l
+ZCBjb3VudCksPGJyPiZndDsgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7ICZuYnNw
+OyAmbmJzcDsgKCpkd3JpdGUpIChpbnQgZm5vLCBjb25zdCBjaGFyICpidWYsIHVuc2lnbmVk
+PGJyPiZndDsgY291bnQpLDxicj4mZ3Q7ICZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgJm5ic3A7IGZwb3NfdCAm
+bmJzcDsgJm5ic3A7ICgqZGxzZWVrKSAoaW50IGZubywgZnBvc190IG9mZnNldCwgaW50IG9y
+aWdpbiksPGJyPiZndDsgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyAmbmJzcDsgaW50Jm5ic3A7ICZuYnNwOyAm
+bmJzcDsgKCpkdW5saW5rKShjb25zdCBjaGFyICpwYXRoKSw8YnI+Jmd0OyAmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5i
+c3A7ICZuYnNwOyBpbnQmbmJzcDsgJm5ic3A7ICZuYnNwOyAoKmRyZW5hbWUpKGNvbnN0IGNo
+YXIgKm9sZF9uYW1lLCBjb25zdCBjaGFyPGJyPiZndDsgKm5ld19uYW1lKSk8YnI+Jmd0OyB7
+PGJyPiZndDsgJm5ic3A7Jm5ic3A7IF9ERVZJQ0UgKmR0Ozxicj4mZ3Q7IDxicj4mZ3Q7ICZu
+YnNwOyZuYnNwOyBzdHJuY3B5KGR0LSZndDtuYW1lLG5hbWUsOCk7PGJyPiZndDsgJm5ic3A7
+Jm5ic3A7IGR0LSZndDtuYW1lWzhdID0gJ1wwJzs8YnI+Jmd0OyAmbmJzcDsmbmJzcDsgZHQt
+Jmd0O2ZsYWdzICZuYnNwOyA9IGZsYWdzOzxicj4mZ3Q7ICZuYnNwOyZuYnNwOyBkdC0mZ3Q7
+T1BFTiZuYnNwOyAmbmJzcDsgPSBkb3Blbjs8YnI+Jmd0OyAmbmJzcDsmbmJzcDsgZHQtJmd0
+O0NMT1NFICZuYnNwOyA9IGRjbG9zZTs8YnI+Jmd0OyAmbmJzcDsmbmJzcDsgZHQtJmd0O1JF
+QUQmbmJzcDsgJm5ic3A7ID0gZHJlYWQ7PGJyPiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZndDtX
+UklURSAmbmJzcDsgPSBkd3JpdGU7PGJyPiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZndDtMU0VF
+SyAmbmJzcDsgPSBkbHNlZWs7PGJyPiZndDsgJm5ic3A7Jm5ic3A7IGR0LSZndDtVTkxJTksm
+bmJzcDsgPSBkdW5saW5rOzxicj4mZ3Q7ICZuYnNwOyZuYnNwOyBkdC0mZ3Q7UkVOQU1FJm5i
+c3A7ID0gZHJlbmFtZTs8YnI+Jmd0OyB9PGJyPiZndDsgPGJyPiZndDsgaW50IHdyaXRlKGlu
+dCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgJm5ic3A7IGZp
+bGRlcyw8YnI+Jmd0OyAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7ICZu
+YnNwOyBjb25zdCBjaGFyICZuYnNwOyAqYnVmcHRyLDxicj4mZ3Q7ICZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyAmbmJzcDsgJm5ic3A7IHVuc2lnbmVkJm5ic3A7ICZuYnNwOyAm
+bmJzcDsgY250KTxicj4mZ3Q7IHs8YnI+Jmd0OyAmbmJzcDsgPGJyPiZndDsgLyotLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0qLzxicj4mZ3Q7ICZuYnNwOyZuYnNwOyAvKiBDQUxMIEZVTkNUSU9OIEZS
+T00gREVWSUNFIFRBQkxFIFRPIFBFUkZPUk0gV1JJVEUgRk9SIFRISVM8YnI+Jmd0OyBERVZJ
+Q0UvRklMRSZuYnNwOyAqLzxicj4mZ3Q7ICZuYnNwOyA8YnI+Jmd0OyAvKi0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLSovPGJyPiZndDsgJm5ic3A7Jm5ic3A7IHJldHVybiAoKihfc3RyZWFtW2ZpbGRl
+c10tJmd0O1dSSVRFKSkgKGZpbGRlcyxidWZwdHIsY250KTs8YnI+Jmd0OyB9PGJyPiZndDsg
+PGJyPiZndDsgJm5ic3A7Jm5ic3A7IFRoZW4sIGhvdyBjYW4gd2UgdXNlIHRoaXMgcnVudGlt
+ZSBsaWJyYXJ5IHRvZ2V0aGVyIHdpdGggUUVNdSB0bzxicj4mZ3Q7IGltcGxlbWVudCBmdWxs
+LXN0YWNrIGZpbGUgb2VyYXRpb25zPyZuYnNwOyBJIHJlYWxseSBhcHByZWFjaWF0ZSBhbnkg
+YWR2aWNlLjxicj48YnI+VHJ5aW5nIHRvIHVuZGVyc3RhbmQuLi48YnI+PGJyPkFyZSB5b3Ug
+dHJ5aW5nIHRvIGFzayAiaG93IHRvIGltcGxlbWVudCBzZW1paG9zdGluZyBmb3IgbXk8YnI+
+cWVtdS11c2VyLXRpZHNwIGZvcmsiPzxicj48YnI+SGF2ZSBhIGxvb2sgYXQgImh3L3NlbWlo
+b3N0aW5nL2NvbnNvbGUuaCIgYW5kIHRoZSBpbXBsZW1lbnRhdGlvbjxicj4oc28gZmFyIG9u
+bHkgQVJNKSBvZiBxZW11X3NlbWlob3N0aW5nX2NvbnNvbGVfW2luL291dF0uPGJyPlRoaXMg
+bWlnaHQgaGVscCB0byBwbHVnIHJlYWQvd3JpdGUuIFVzaW5nIG90aGVyIHN0cmVhbSB0aGFu
+PGJyPnN0ZGluL3N0ZG91dCBpcyBub3Qgc3VwcG9ydGVkIChidXQgeW91IGNhbiBhZGQgc3Vw
+cG9ydCkgc288YnI+b3Blbi9sc2Vlay9jbG9zZS9yZW5hbWUvdW5saW5rIGFyZSBub3QgY29u
+c2lkZXJlZC48YnI+PGJyPihmb3IgUUVNVSAnY29uc29sZScgaXMgdGhlIHN0ZGluL3N0ZG91
+dCBzdWJzZXQgb2Ygc3RkaW8pLjxicj48YnI+WW91IGNhbiByZWRpcmVjdCBzZW1paG9zdGVk
+IGZpbGVzIHdpdGggYW55IGhvc3QgY2hhcmRldiw8YnI+dGhpcyBpcyBkb25lIGluIHFlbXVf
+c2VtaWhvc3RpbmdfY29ubmVjdF9jaGFyZGV2cygpLjxicj48YnI+WW91IG1pZ2h0IGFsc28g
+aGF2ZSBhIGxvb2sgYXQgdGhlIGZ1bmN0aW9ucyBkZWNsYXJlZCBpbjxicj4iaHcvc2VtaWhv
+c3Rpbmcvc2VtaWhvc3QuaCIgYW5kIGhvdyB0aGUgZGlmZmVyZW50IFRDRyBoZWxwZXJzPGJy
+PnVzZSB0aGVtLjxicj48YnI+UmVnYXJkcyw8YnI+PGJyPlBoaWwuPGJyPjwvZGl2Pg==
 
-Status in QEMU:
-  Confirmed
+------=_NextPart_5F11C128_0F039320_1152F451--
 
-Bug description:
-  Hello,
-  I found an input which triggers an assertion failure in pci_bus_get_irq_l=
-evel:
-
-  qemu-system-i386: /home/alxndr/Development/qemu/hw/pci/pci.c:268: int pci=
-_bus_get_irq_level(PCIBus *, int): Assertion `irq_num < bus->nirq' failed.
-  Aborted
-  #0  0x00007ffff686d761 in __GI_raise (sig=3Dsig@entry=3D0x6) at ../sysdep=
-s/unix/sysv/linux/raise.c:50
-  #1  0x00007ffff685755b in __GI_abort () at abort.c:79
-  #2  0x00007ffff685742f in __assert_fail_base (fmt=3D0x7ffff69bdb48 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", assertion=3D0x555557f9bca0 <str> "ir=
-q_num < bus->nirq", file=3D0x555557f9bbe0 <str> "/home/alxndr/Development/q=
-emu/hw/pci/pci.c", line=3D0x10c, function=3D<optimized out>) at assert.c:92
-  #3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555557f9bca0 =
-<str> "irq_num < bus->nirq", file=3D0x555557f9bbe0 <str> "/home/alxndr/Deve=
-lopment/qemu/hw/pci/pci.c", line=3D0x10c, function=3D0x555557f9bc40 <__PRET=
-TY_FUNCTION__.pci_bus_get_irq_level> "int pci_bus_get_irq_level(PCIBus *, i=
-nt)") at assert.c:101
-  #4  0x0000555557060c34 in pci_bus_get_irq_level (bus=3D0x61d000096080, ir=
-q_num=3D0xef) at /home/alxndr/Development/qemu/hw/pci/pci.c:268
-  #5  0x0000555556657391 in ich9_lpc_update_apic (lpc=3D0x62a000006200, gsi=
-=3D0xff) at /home/alxndr/Development/qemu/hw/isa/lpc_ich9.c:249
-  #6  0x0000555556658ea7 in ich9_set_sci (opaque=3D0x62a000006200, irq_num=
-=3D0x0, level=3D0x1) at /home/alxndr/Development/qemu/hw/isa/lpc_ich9.c:354
-  #7  0x0000555556ccefc6 in qemu_set_irq (irq=3D0x60600002af80, level=3D0x1=
-) at /home/alxndr/Development/qemu/hw/core/irq.c:44
-  #8  0x0000555556bc06fd in acpi_update_sci (regs=3D0x62a000006c80, irq=3D0=
-x60600002af80) at /home/alxndr/Development/qemu/hw/acpi/core.c:723
-  #9  0x0000555556bccb08 in ich9_pm_update_sci_fn (regs=3D0x62a000006c80) a=
-t /home/alxndr/Development/qemu/hw/acpi/ich9.c:56
-  #10 0x0000555556bc10ee in acpi_pm_evt_write (opaque=3D0x62a000006c80, add=
-r=3D0x2, val=3D0x2049, width=3D0x2) at /home/alxndr/Development/qemu/hw/acp=
-i/core.c:456
-  #11 0x00005555564938b5 in memory_region_write_accessor (mr=3D0x62a000006d=
-b0, addr=3D0x2, value=3D0x7fffffff9c70, size=3D0x2, shift=3D0x0, mask=3D0xf=
-fff, attrs=3D...) at /home/alxndr/Development/qemu/memory.c:483
-  #12 0x000055555649328a in access_with_adjusted_size (addr=3D0x2, value=3D=
-0x7fffffff9c70, size=3D0x2, access_size_min=3D0x1, access_size_max=3D0x4, a=
-ccess_fn=3D0x555556493360 <memory_region_write_accessor>, mr=3D0x62a000006d=
-b0, attrs=3D...) at /home/alxndr/Development/qemu/memory.c:544
-  #13 0x0000555556491df6 in memory_region_dispatch_write (mr=3D0x62a000006d=
-b0, addr=3D0x2, data=3D0x2049, op=3DMO_16, attrs=3D...) at /home/alxndr/Dev=
-elopment/qemu/memory.c:1476
-  #14 0x00005555562cbbf4 in flatview_write_continue (fv=3D0x606000033fe0, a=
-ddr=3D0x5d02, attrs=3D..., ptr=3D0x7fffffffa4e0, len=3D0x4, addr1=3D0x2, l=
-=3D0x2, mr=3D0x62a000006db0) at /home/alxndr/Development/qemu/exec.c:3137
-  #15 0x00005555562bbad9 in flatview_write (fv=3D0x606000033fe0, addr=3D0x5=
-d02, attrs=3D..., buf=3D0x7fffffffa4e0, len=3D0x4) at /home/alxndr/Developm=
-ent/qemu/exec.c:3177
-  #16 0x00005555562bb609 in address_space_write (as=3D0x55555968f940 <addre=
-ss_space_io>, addr=3D0x5d02, attrs=3D..., buf=3D0x7fffffffa4e0, len=3D0x4) =
-at /home/alxndr/Development/qemu/exec.c:3268
-  #17 0x0000555556478c0a in cpu_outl (addr=3D0x5d02, val=3D0xedf82049) at /=
-home/alxndr/Development/qemu/ioport.c:80
-  #18 0x000055555648166f in qtest_process_command (chr=3D0x555559691d00 <qt=
-est_chr>, words=3D0x60300009ef20) at /home/alxndr/Development/qemu/qtest.c:=
-396
-  #19 0x000055555647f187 in qtest_process_inbuf (chr=3D0x555559691d00 <qtes=
-t_chr>, inbuf=3D0x61900000f680) at /home/alxndr/Development/qemu/qtest.c:710
-  #20 0x000055555647e8b4 in qtest_read (opaque=3D0x555559691d00 <qtest_chr>=
-, buf=3D0x7fffffffca40 "outl 0xcf8 0x8400f841\noutl 0xcfc 0xebed205d\noutl =
-0x5d02 0xedf82049\n-M pc-q35-5.0 -device intel-hda,id=3Dhda0 -device hda-ou=
-tput,bus=3Dhda0.0 -device hda-micro,bus=3Dhda0.0 -device hda-duplex,bus=3Dh=
-da0.0 -display none -nodefaults -nographic\n", size=3D0xe9) at /home/alxndr=
-/Development/qemu/qtest.c:722
-  #21 0x00005555579c260c in qemu_chr_be_write_impl (s=3D0x60f000001f30, buf=
-=3D0x7fffffffca40 "outl 0xcf8 0x8400f841\noutl 0xcfc 0xebed205d\noutl 0x5d0=
-2 0xedf82049\n-M pc-q35-5.0 -device intel-hda,id=3Dhda0 -device hda-output,=
-bus=3Dhda0.0 -device hda-micro,bus=3Dhda0.0 -device hda-duplex,bus=3Dhda0.0=
- -display none -nodefaults -nographic\n", len=3D0xe9) at /home/alxndr/Devel=
-opment/qemu/chardev/char.c:183
-  #22 0x00005555579c275b in qemu_chr_be_write (s=3D0x60f000001f30, buf=3D0x=
-7fffffffca40 "outl 0xcf8 0x8400f841\noutl 0xcfc 0xebed205d\noutl 0x5d02 0xe=
-df82049\n-M pc-q35-5.0 -device intel-hda,id=3Dhda0 -device hda-output,bus=
-=3Dhda0.0 -device hda-micro,bus=3Dhda0.0 -device hda-duplex,bus=3Dhda0.0 -d=
-isplay none -nodefaults -nographic\n", len=3D0xe9) at /home/alxndr/Developm=
-ent/qemu/chardev/char.c:195
-  #23 0x00005555579cb97a in fd_chr_read (chan=3D0x6080000026a0, cond=3DG_IO=
-_IN, opaque=3D0x60f000001f30) at /home/alxndr/Development/qemu/chardev/char=
--fd.c:68
-  #24 0x0000555557a530ea in qio_channel_fd_source_dispatch (source=3D0x60c0=
-0002ef00, callback=3D0x5555579cb540 <fd_chr_read>, user_data=3D0x60f000001f=
-30) at /home/alxndr/Development/qemu/io/channel-watch.c:84
-  #25 0x00007ffff7ca8898 in g_main_context_dispatch () at /usr/lib/x86_64-l=
-inux-gnu/libglib-2.0.so.0
-  #26 0x0000555557c10b85 in glib_pollfds_poll () at /home/alxndr/Developmen=
-t/qemu/util/main-loop.c:219
-  #27 0x0000555557c0f57e in os_host_main_loop_wait (timeout=3D0x0) at /home=
-/alxndr/Development/qemu/util/main-loop.c:242
-  #28 0x0000555557c0f177 in main_loop_wait (nonblocking=3D0x0) at /home/alx=
-ndr/Development/qemu/util/main-loop.c:518
-  #29 0x000055555689fd1e in qemu_main_loop () at /home/alxndr/Development/q=
-emu/softmmu/vl.c:1664
-  #30 0x0000555557a6a29d in main (argc=3D0x17, argv=3D0x7fffffffe148, envp=
-=3D0x7fffffffe208) at /home/alxndr/Development/qemu/softmmu/main.c:49
-
-  I can reproduce this in qemu 5.0 using these qtest commands:
-
-  cat << EOF | ./qemu-system-i386 \
-  -qtest stdio -nographic -monitor none -serial none \
-  -M pc-q35-5.0
-  outl 0xcf8 0x8400f841
-  outl 0xcfc 0xebed205d
-  outl 0x5d02 0xedf82049
-  EOF
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878642/+subscriptions
 
