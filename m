@@ -2,96 +2,87 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FFAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D0BC433E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9998720734
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 399E2206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:52:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nibep0JQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9998720734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TJGgDigW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 399E2206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwNvv-0003J8-Tz
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:49:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43152)
+	id 1jwNyk-0005B3-DT
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:52:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jwNvK-0002pO-8K; Fri, 17 Jul 2020 06:49:02 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:34209)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwNxE-00046M-1k
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:00 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33603)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jwNvI-0003Fh-Of; Fri, 17 Jul 2020 06:49:01 -0400
-Received: by mail-ej1-x642.google.com with SMTP id y10so10262252eje.1;
- Fri, 17 Jul 2020 03:49:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6aVyHH7l5KzLnYteuefcNp89RgKZlledU/BNuMdkoDE=;
- b=Nibep0JQzrSx9D8wfXT8NcnJhXJrLmTbGh2ey3wtLc3pg2OjYcumJqvzIIauwNKV6D
- EJG1QoeKZ3GF4eL3RVDfJVrbi1BqZQIsQ3XMYJRpL8BmxTDEanIXNHqE4cohEyGh7lNe
- c1Jb5G26Az/DjuiEFE1JGpi5DeH3rKYo2HoYJ7rC9hceKVeLb/SCXpv4w9vyV3m+5Jtt
- 1jDZli3oRM6yfzAhldZVqdehc4gUSnvtvHIKv1YhSLTc2mkMtvlQxZRe0P1KsXZQtNUp
- Jp01wBT6ldSwTqTLyj653Nq4/jh1Uu42qrc5u43gQZ3LLr7JArwb0iC/XMCdVN0KfQCF
- Iseg==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwNxC-0003im-Cc
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:50:59 -0400
+Received: by mail-ot1-x344.google.com with SMTP id h13so6565234otr.0
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 03:50:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=NWY3zkF1M6hKTA2sE5Tnn3/05iw5/fl9oYymANXDgco=;
+ b=TJGgDigWI1dBUW3Qd23z7wFPiiF21C7edt9/Ivm0j0zoW5PHOj1X8doDC89APvDcCC
+ n7oXQ4kPJkWlN4sybKkDXQtDo5LS95Ebcibr+WUiWFLF9rIa81rb7RBWZ45yfWnBbHRu
+ aK+Geosq79PDOaLDJLLJaiCPc7yh012g4WNmHF/N/tkvzChDPZfnKx1YBgf/YUCV19SC
+ LNPGG8y0gnMfkaM8SACDLLWZYV7z9x8gcvJuZhJ9MEe55GIFHc0AbXgXqhxeq5Z/NTWy
+ BgPIUvDGstKxEIFFniPCCqnyZkUi6ky48GOVPWSx7w/Oj/XQ450vB1kEybvs7bh5ZjV0
+ BPVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6aVyHH7l5KzLnYteuefcNp89RgKZlledU/BNuMdkoDE=;
- b=YJTMZ5/OOARiNk4/XyC3oPWqGe8wbpYfVg0Awv6PphNBfXxA4xq4denChibi9K/DZJ
- uBS2SixghBAg7oN4f5M3oCo2GUKQzcvzCy0nI5ZcUyvoLZrGfQgt3mcspvuL0j65FYqe
- E8NrQmMFjavHV2EBbrh7210aLJaxBK0wVYNO+IXmfzhndPJsL1hgFo0K6g8T4jF1FIWO
- ZoQVlwtHGeSC6v8/wlbgXzpF5vblJp0qMCf2HbmckhLtGP0sjYZ1xm51Pjr8aNcr7HUt
- lZBf8vVYmX18aLYuUQBVEZZbE6cll+ZyGxaxRzTZIwE5CmHXx/aSL/1QQW1BYXNZt0Ql
- PVlA==
-X-Gm-Message-State: AOAM532uCXD1RtmSWpn+YyNtj+ZSl7AbObvmEb9TV/wBiOErZ3CpnGT5
- DB+f7lyjbhDCsRysBrfP5ctl3qpZWIY=
-X-Google-Smtp-Source: ABdhPJzYY/iLnLEgfySGPsRdQqYKc1k9Jos0/Ie5toRTdSLxd9fgct33MG5H/uM7k1vhMgjKPcdEDw==
-X-Received: by 2002:a17:906:69d3:: with SMTP id
- g19mr8328126ejs.402.1594982938698; 
- Fri, 17 Jul 2020 03:48:58 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id cq7sm7957148edb.66.2020.07.17.03.48.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Jul 2020 03:48:57 -0700 (PDT)
-Subject: Re: [RFC PATCH-for-5.1] hw/ide: Avoid #DIV/0! FPU exception by
- setting CD-ROM sector count
-To: qemu-devel@nongnu.org
-References: <20200717101659.20031-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <76c86b18-e14c-dc65-71f0-bb9fbd9e988f@amsat.org>
-Date: Fri, 17 Jul 2020 12:48:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=NWY3zkF1M6hKTA2sE5Tnn3/05iw5/fl9oYymANXDgco=;
+ b=YNeaXIPVPGReLW8FmbSa0bLlasgkhwKXiLunEpMma19e0IR0cS3osYuNFs6uIIQVXe
+ 70Gy4SBJX849S3rhV0xOoWOgARk4/YCz+t4UDNAW1VNmO1JuSn1JdIoFWPPKNI+MQyv4
+ LqcWdYSOPPZCKirYdchvn54hBTax5OKxt9uXc+uKzuBaYr7gZoX0hoRDzgUazrib1UMI
+ +N4q34ni/k23iBR4L7bGBJjWkhCyjbCFzlLt2tooWelJ5VJ0pjgPNVstrXZSGsLU/bsB
+ Z6akKT/B8vfLJ5v1V35EwvL80WzjgPTeKXYLIXsM0HHpfV4sqccuXqLThy4RD1v1Xvos
+ Cqmw==
+X-Gm-Message-State: AOAM532WnDvz7UtkNiXRRAdJO6XzfFTQSa/1Yx1BxFIf93ZT1D+6OV/T
+ pGAdBZxKhSOej3rNGlMA4l8HbCoCwRzTS287qym/rw==
+X-Google-Smtp-Source: ABdhPJyR82d6VkNt6ZjOtam892mE1DEx4YKXdEjaeFVn+1KkQ6vGDXAg8WXNuERxSIR/wcKEgQajiko+bcbLklCVr44=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr8160438ota.91.1594983055825; 
+ Fri, 17 Jul 2020 03:50:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200717101659.20031-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
+References: <20200716174900.GL3235@minyard.net>
+ <CAFEAcA-UWJBpM_-G2RAe9B-WcPzBaKGZTas1njehQ7gcjsMpew@mail.gmail.com>
+ <20200716222601.GM3235@minyard.net>
+In-Reply-To: <20200716222601.GM3235@minyard.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Jul 2020 11:50:44 +0100
+Message-ID: <CAFEAcA_5M8MD+2s_r1jjcgDY0LX69iZRkUP1kbUQTQYEuSN1Nw@mail.gmail.com>
+Subject: Re: [GIT PULL] I2C updates
+To: Corey Minyard <minyard@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,56 +95,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/20 12:16 PM, Philippe Mathieu-Daudé wrote:
-> libFuzzer found an undefined behavior (#DIV/0!) in ide_set_sector()
-> when using a CD-ROM (reproducer available on the BugLink):
-> 
->   UndefinedBehaviorSanitizer:DEADLYSIGNAL
->   ==12163==ERROR: UndefinedBehaviorSanitizer: FPE on unknown address 0x5616279cffdc (pc 0x5616279cffdc bp 0x7ffcdaabae90 sp 0x7ffcdaabae30 T12163)
-> 
-> Fix by initializing the CD-ROM number of sectors in ide_dev_initfn().
-> 
-> Reported-by: Alexander Bulekov <alxndr@bu.edu>
-> Fixes: b2df431407 ("ide scsi: Mess with geometry only for hard disk devices")
-> BugLink: https://bugs.launchpad.net/qemu/+bug/1887309
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/ide/qdev.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-> index 27ff1f7f66..6ce7fc317c 100644
-> --- a/hw/ide/qdev.c
-> +++ b/hw/ide/qdev.c
-> @@ -201,6 +201,15 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
->                                errp)) {
->              return;
->          }
-> +    } else {
-> +        uint64_t nb_sectors;
-> +
-> +        blk_get_geometry(dev->conf.blk, &nb_sectors);
-> +        if (!nb_sectors) {
-> +            error_setg(errp, "CD-ROM size can not be zero");
+On Thu, 16 Jul 2020 at 23:26, Corey Minyard <minyard@acm.org> wrote:
+>
+> On Thu, Jul 16, 2020 at 09:45:41PM +0100, Peter Maydell wrote:
+> > Hi; this failed to build on x86-64 Linux (incremental build):
+>
+> Hmm, I did test this, and I just rebuilt, then rebased on the end of
+> master and rebuilt, without issue.
+>
+> It looks like the smbus code is not being included, but I don't see how
+> that can be.
 
-Hmm this doesn't work because for some machines configure_blockdev()
-creates blocks of zero size under your feet:
+I was wrong about which config failed, sorry. Incremental builds
+are fine, but the build that does "make -C builddir clean" first
+fails.
 
-    default_drive(default_cdrom, snapshot,
-machine_class->block_default_type, 2,
-                  CDROM_OPTS);
+It looks like the problem is that in the created config-devices.mak
+files, CONFIG_SMBUS_EEPROM is set, but CONFIG_SMBUS is not.
+So presumably the problem is in the change
+"hw/i2c/Kconfig: Add an entry for the SMBus", or it is a more
+general issue with changes to Kconfig files not correctly
+resulting in rebuilds of config-devices.mak.
 
-> +            return;
-> +        }
-> +        dev->conf.secs = nb_sectors;
->      }
->      if (!blkconf_apply_backend_options(&dev->conf, kind == IDE_CD,
->                                         kind != IDE_CD, errp)) {
-> 
+thanks
+-- PMM
 
