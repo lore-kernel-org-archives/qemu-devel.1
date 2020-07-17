@@ -2,74 +2,73 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D25C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C52DCC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C68D20775
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:02:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DA2920717
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:12:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4npMGtV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C68D20775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cMy08T0H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DA2920717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwP4Q-0000j4-Lb
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:02:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35018)
+	id 1jwPE0-0003PM-OO
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:12:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwP3Z-0008CD-LB
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:01:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22164
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1jwPD3-0002xP-93
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:11:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36784
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jwP3Y-0000Ij-1c
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:01:37 -0400
+ (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1jwPD1-0007AC-3b
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:11:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594987294;
+ s=mimecast20190719; t=1594987881;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7cjmXmMnw3Ue/cOI7T57yHVRBZIQGBUMUyGg+N8Fiwc=;
- b=H4npMGtVTXdt71MjPpVifIhgDl7j48LPxoXmx1aow3KF1zNHWnS2eHW9kcb8em6Mu28zpj
- qMDCuHm2zmtFuJ4/mOccs3jcdyaXjKIr8BjRcNL3C46Xe+EPJk1OxdCsI245KL/2EFfmGF
- NE98WSuC2TTK1KlScSbS46Ef1ZTwSi4=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=H3H8YjmpoyKxtLK06epui9u6h9h9Mli4SIBjn+mzGuk=;
+ b=cMy08T0H/xn1dZ0kQaTNDUx+QdF5GJ9tWWE9d5bK/a1cteq9U7U9HpjVZNsvYsSS5vNTpf
+ GLvPDsByxnprA7tHug/cybENLctLKbZEKL8SiQghiw0raDcmYjbNsyYMVJyh4DWgIrUWlr
+ WoLdckTxQ5AUOj7fj/VyVY/par31kj8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-Rwh9HIDZPdC2oquBoxhWRA-1; Fri, 17 Jul 2020 08:01:30 -0400
-X-MC-Unique: Rwh9HIDZPdC2oquBoxhWRA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-228-Y6FEcIQrME21Jn64wnqRFA-1; Fri, 17 Jul 2020 08:11:19 -0400
+X-MC-Unique: Y6FEcIQrME21Jn64wnqRFA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30BC11E00;
- Fri, 17 Jul 2020 12:01:23 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-80.ams2.redhat.com [10.36.113.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7294478A52;
- Fri, 17 Jul 2020 12:01:21 +0000 (UTC)
-Date: Fri, 17 Jul 2020 14:01:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v3 for-5.1 0/2] Fix crash due to NBD export leak
-Message-ID: <20200717120119.GC4550@linux.fritz.box>
-References: <20200714162234.13113-1-vsementsov@virtuozzo.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EAC51009616
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 12:11:18 +0000 (UTC)
+Received: from toolbox.redhat.com (ovpn-112-29.rdu2.redhat.com [10.10.112.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 78E1D5C1D3;
+ Fri, 17 Jul 2020 12:11:11 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] virtiofsd: Remove "norace" from cmdline help and docs
+Date: Fri, 17 Jul 2020 14:11:10 +0200
+Message-Id: <20200717121110.50580-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200714162234.13113-1-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/16 23:13:19
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=slp@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -77,7 +76,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,37 +89,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: Miklos Szeredi <mszeredi@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 14.07.2020 um 18:22 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Hi all!
-> 
-> We've faced crash bug, which is reproducing on master branch as well.
-> The case is described in 01, where fix is suggested.
-> New iotest in 02 crashes without that fix.
-> 
-> v3: resend for convenience, as all preparatory patches are merged.
-> 01-02: add Eric's r-b and t-b marks
-> 
-> ====
-> 
-> This is a crash-fix, so it would be good to fix in 5.1. Still neither
-> Eric nor I are sure in patch 01: is AIO_WAIT_WHILE used correctly?
+Commit 93bb3d8d4cda ("virtiofsd: remove symlink fallbacks") removed
+the implementation of the "norace" option, so remove it from the
+cmdline help and the documentation too.
 
-Anything specific you had doubts about?
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+v2:
+ * Drop "norace" from the documentation too (Stefano Garzarella)
+---
+ docs/tools/virtiofsd.rst | 3 ---
+ tools/virtiofsd/helper.c | 2 --
+ 2 files changed, 5 deletions(-)
 
-At first sight it looks good to me. It's always called in the main loop
-and we don't hold any AioContext locks, so using NULL as the context is
-fine. You also made sure to use aio_wait_kick() so that we won't hang
-even though the condition has become false.
-
-I'm applying this to my block branch now. If your doubts were about
-something more subtle that I missed, we can unstage/revert the patch.
-
-Kevin
+diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+index 824e713491..58666a4495 100644
+--- a/docs/tools/virtiofsd.rst
++++ b/docs/tools/virtiofsd.rst
+@@ -63,9 +63,6 @@ Options
+     Print only log messages matching LEVEL or more severe.  LEVEL is one of
+     ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
+ 
+-  * norace -
+-    Disable racy fallback.  The default is false.
+-
+   * posix_lock|no_posix_lock -
+     Enable/disable remote POSIX locks.  The default is ``posix_lock``.
+ 
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 3105b6c23a..7bc5d7dc5a 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -159,8 +159,6 @@ void fuse_cmdline_help(void)
+            "    -o max_idle_threads        the maximum number of idle worker "
+            "threads\n"
+            "                               allowed (default: 10)\n"
+-           "    -o norace                  disable racy fallback\n"
+-           "                               default: false\n"
+            "    -o posix_lock|no_posix_lock\n"
+            "                               enable/disable remote posix lock\n"
+            "                               default: posix_lock\n"
+-- 
+2.26.2
 
 
