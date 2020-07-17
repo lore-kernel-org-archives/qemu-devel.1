@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7678C433EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 680C0C433ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D30B20737
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:06:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3212C20737
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:10:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dohL1hHg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D30B20737
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I+Cp5qx6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3212C20737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwLNk-000759-Ov
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:06:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58166)
+	id 1jwLSB-00009E-Go
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:10:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jwLN5-0006WG-9N; Fri, 17 Jul 2020 04:05:31 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:42659)
+ id 1jwLRb-0007xC-Sr; Fri, 17 Jul 2020 04:10:11 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:36949)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jwLN2-0005c0-W5; Fri, 17 Jul 2020 04:05:31 -0400
-Received: by mail-ed1-x544.google.com with SMTP id z17so6975494edr.9;
- Fri, 17 Jul 2020 01:05:28 -0700 (PDT)
+ id 1jwLRa-0006Lq-Cz; Fri, 17 Jul 2020 04:10:11 -0400
+Received: by mail-ej1-x644.google.com with SMTP id lx13so9860584ejb.4;
+ Fri, 17 Jul 2020 01:10:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CRx8UAMFJpCu+/l7XQzF05CxtVqE14/wHpiubEoKPPI=;
- b=dohL1hHgOzkvRk3N+2iz6+wp86uqY0yheXJbgV6nhXxrVFILRDJIJheWTQUH710Noe
- sWIJZL7Rnt7zlns4SgOvHVSJomQFFD6HFyLEuvd9NuBYKApyHf2dpNIu/aZXJqL1hP35
- u26K1Ap43A4XqG/fBr/fCOCXUKG6iAhnglsq6lW5AjmMLnL0GLdHUEyPOyWGyk6dm/3A
- fLBSoVV9BQYlfQD+ZA5BBkFsBiHLHD6qFEqB0VSR1ssyI3oSnPsXcpXYowWouijV2lOg
- vh9NkR3KoB4Yc5nWQkLKCO2WPmkw1SuhJeKucxdmXqky/QO5yXYi3bHaJpTrqmGeiD5l
- /GFg==
+ bh=1rLsucYSazwups+3sxbPn4vlbmq9LgJeurMTfNn3444=;
+ b=I+Cp5qx6Vs5rMdwvkbGCtItSGEBSjNW3S5LKbjBJ5IFCZVlFlOAw98SN2nsA6hTVLS
+ T6o21FYxuwwPYMgfsLJDi99/Y1TZJ3ldj/LgF72EKwVmcHw27gP6QLGpzlfO3/kK3fpf
+ CkkYC3/TLNwpOSAqWHSoLTLEDbaAs2QQxEkPAzswr4+OIyoP7K0pEnwuH9nThA+T0KwY
+ qh5+SOZA1NRAtbxa9EHiuuPNKrzsnbVwI8uP07I0dYCHtaUldai0YlSAy87XOI8CaZgd
+ ysKLDTseyb7I9Sabf/k0XH4uOCBBeIhYz08t4RGOyLjZJqbxdTCtBVoPP5o+qlXaLXJH
+ 29FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=CRx8UAMFJpCu+/l7XQzF05CxtVqE14/wHpiubEoKPPI=;
- b=ZQiNwNYF5fWxjyvWdJ4KkEHe7G5WGBBcmrnh18LBIOZX29e7lDRkXHIpVFoZbutAWE
- eO+28m64FonFOx79C+TvR6C+9lxulSRL4avKOr+o4vdJRD3DEKg9V/7ELDVOuWoGSdW5
- WPkRsVCXScxtvmxQaKYIyIDZOG6kNo8v4aul/8R/pZvO4/yddpoCXRLhI3GnfQN4nPUa
- WfAZ0tYJPiVRQoHHQ4xFXMenQO70Hk7jUg5b9VChUuU7vzrndHT7rNsW2HRPrxOklRn2
- IB8knVgM9GfihpQdZWwN85JBqHyrtKLAwwzyxVkyyRwtJPUeLvfOItXZ/upXdSzYCD1J
- pIcg==
-X-Gm-Message-State: AOAM530aKI6Vtxr9vg+nlpg3GP7oh2nOOZwljMmoGQDXE2dOIuG5Mm8j
- 4jZMq1E55EdhdMHkpaLHBTo=
-X-Google-Smtp-Source: ABdhPJwNUsQCbhn1uddxhcoi+S0d2zUk2Pmlvgi6vhSz00y64jGtKnWJAagd+a13ZegfLQU3LINQ+A==
-X-Received: by 2002:a50:ab53:: with SMTP id t19mr8254412edc.179.1594973127008; 
- Fri, 17 Jul 2020 01:05:27 -0700 (PDT)
+ bh=1rLsucYSazwups+3sxbPn4vlbmq9LgJeurMTfNn3444=;
+ b=UIilX1c9gdHg4QXlNgrmv8SHHVoEPHmNOeTWUAUya41b5cIoP5IrT34quFWJYiZdiD
+ iCFw4fUZmsn6/rL4eKC4VtTNA50RmjhDp6kkj3+I9nELXzICfHIJLuQlNX3DSWl1Vg1F
+ 32lhgtgsYbuN5oxW8zaZ59kCW+HeLEfQ110dXFDJsJPeqA4M5cT8szyP4Abq9ZYharsk
+ cRLewMT8yOUcvKlzEAd7Fde28ttmCZIINp+ftiEz/E1XDHYv2cHjEiLFXDIvOT0N9IUe
+ aNbLhvITIZggC2n2r7nhivLfUR4H86bfbQlzxQXC3nrp58ML3YbcyUb3eDuivjyKgecv
+ pSLQ==
+X-Gm-Message-State: AOAM533iUX000y/HB0DedNnkcneMEiGCB+4hCCfQ3DbstUvrpfeMN45U
+ IjvOKZR/Z6ugss/dW/a+HWs=
+X-Google-Smtp-Source: ABdhPJw14qnyI2ltD1nnQ3neUSkGt3EQZWDQhhqml7kc4dgCGvQR2aZQecTeI3QHprKLC36u2Dth0w==
+X-Received: by 2002:a17:906:e215:: with SMTP id
+ gf21mr7228217ejb.310.1594973408219; 
+ Fri, 17 Jul 2020 01:10:08 -0700 (PDT)
 Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id l15sm7157293ejd.100.2020.07.17.01.05.25
+ by smtp.gmail.com with ESMTPSA id u5sm7173847ejz.15.2020.07.17.01.10.06
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Jul 2020 01:05:26 -0700 (PDT)
+ Fri, 17 Jul 2020 01:10:07 -0700 (PDT)
 Subject: Re: [PATCH v6 03/13] hw/timer: Add NPCM7xx Timer device model
 To: Havard Skinnemoen <hskinnemoen@google.com>, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
 References: <20200717060258.1602319-1-hskinnemoen@google.com>
  <20200717060258.1602319-4-hskinnemoen@google.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3b9c0875-514c-8b3d-c27d-bf607665d62d@amsat.org>
-Date: Fri, 17 Jul 2020 10:05:25 +0200
+Message-ID: <c8786cce-6555-d4c4-ada9-7dec05b0853c@amsat.org>
+Date: Fri, 17 Jul 2020 10:10:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
 In-Reply-To: <20200717060258.1602319-4-hskinnemoen@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -135,114 +136,30 @@ On 7/17/20 8:02 AM, Havard Skinnemoen wrote:
 >  create mode 100644 hw/timer/npcm7xx_timer.c
 ...
 
-> +static hwaddr npcm7xx_tcsr_index(hwaddr reg)
+> +/*
+> + * Raise the interrupt line if there's a pending interrupt and interrupts are
+> + * enabled for this timer. If not, lower it.
+> + */
+> +static void npcm7xx_timer_check_interrupt(NPCM7xxTimer *t)
 > +{
-> +    switch (reg) {
-> +    case NPCM7XX_TIMER_TCSR0:
-> +        return 0;
-> +    case NPCM7XX_TIMER_TCSR1:
-> +        return 1;
-> +    case NPCM7XX_TIMER_TCSR2:
-> +        return 2;
-> +    case NPCM7XX_TIMER_TCSR3:
-> +        return 3;
-> +    case NPCM7XX_TIMER_TCSR4:
-> +        return 4;
-> +    default:
-> +        g_assert_not_reached();
+> +    NPCM7xxTimerCtrlState *tc = t->ctrl;
+> +    int index = npcm7xx_timer_index(tc, t);
+> +
+> +    if ((t->tcsr & NPCM7XX_TCSR_IE) && (tc->tisr & BIT(index))) {
+> +        qemu_irq_raise(t->irq);
+> +        trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, 1);
+> +    } else {
+> +        qemu_irq_lower(t->irq);
+> +        trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, 0);
 > +    }
-> +}
-> +
-> +static hwaddr npcm7xx_ticr_index(hwaddr reg)
-> +{
-> +    switch (reg) {
-> +    case NPCM7XX_TIMER_TICR0:
-> +        return 0;
-> +    case NPCM7XX_TIMER_TICR1:
-> +        return 1;
-> +    case NPCM7XX_TIMER_TICR2:
-> +        return 2;
-> +    case NPCM7XX_TIMER_TICR3:
-> +        return 3;
-> +    case NPCM7XX_TIMER_TICR4:
-> +        return 4;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
-> +static hwaddr npcm7xx_tdr_index(hwaddr reg)
-> +{
-> +    switch (reg) {
-> +    case NPCM7XX_TIMER_TDR0:
-> +        return 0;
-> +    case NPCM7XX_TIMER_TDR1:
-> +        return 1;
-> +    case NPCM7XX_TIMER_TDR2:
-> +        return 2;
-> +    case NPCM7XX_TIMER_TDR3:
-> +        return 3;
-> +    case NPCM7XX_TIMER_TDR4:
-> +        return 4;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
-> +static uint64_t npcm7xx_timer_read(void *opaque, hwaddr offset, unsigned size)
-> +{
-> +    NPCM7xxTimerCtrlState *s = opaque;
-> +    uint64_t value = 0;
-> +    hwaddr reg;
-> +
-> +    reg = offset / sizeof(uint32_t);
-> +    switch (reg) {
-> +    case NPCM7XX_TIMER_TCSR0:
-> +    case NPCM7XX_TIMER_TCSR1:
-> +    case NPCM7XX_TIMER_TCSR2:
-> +    case NPCM7XX_TIMER_TCSR3:
-> +    case NPCM7XX_TIMER_TCSR4:
-> +        value = s->timer[npcm7xx_tcsr_index(reg)].tcsr;
-> +        break;
-> +
-> +    case NPCM7XX_TIMER_TICR0:
-> +    case NPCM7XX_TIMER_TICR1:
-> +    case NPCM7XX_TIMER_TICR2:
-> +    case NPCM7XX_TIMER_TICR3:
-> +    case NPCM7XX_TIMER_TICR4:
-> +        value = s->timer[npcm7xx_ticr_index(reg)].ticr;
-> +        break;
-> +
-> +    case NPCM7XX_TIMER_TDR0:
-> +    case NPCM7XX_TIMER_TDR1:
-> +    case NPCM7XX_TIMER_TDR2:
-> +    case NPCM7XX_TIMER_TDR3:
-> +    case NPCM7XX_TIMER_TDR4:
-> +        value = npcm7xx_timer_read_tdr(&s->timer[npcm7xx_tdr_index(reg)]);
-> +        break;
 
-Thanks for adding the register index getters, I'm not sure this is a
-matter of taste, but I find it easier to review.
+Maybe simpler:
 
-> +
-> +    case NPCM7XX_TIMER_TISR:
-> +        value = s->tisr;
-> +        break;
-> +
-> +    case NPCM7XX_TIMER_WTCR:
-> +        value = s->wtcr;
-> +        break;
-> +
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: invalid offset 0x%04" HWADDR_PRIx "\n",
-> +                      __func__, offset);
-> +        break;
-> +    }
-> +
-> +    trace_npcm7xx_timer_read(DEVICE(s)->canonical_path, offset, value);
-> +
-> +    return value;
-> +}
-...
+  bool pending = (t->tcsr & NPCM7XX_TCSR_IE) && (tc->tisr & BIT(index));
+
+  trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, pending);
+  qemu_set_irq(t->irq, pending);
+
+Anyway,
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
