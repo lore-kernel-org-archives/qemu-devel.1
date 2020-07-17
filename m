@@ -2,43 +2,46 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9910C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69937C433DF
 	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:16:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C056F20737
+	by mail.kernel.org (Postfix) with ESMTPS id 3DBC220737
 	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 08:16:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C056F20737
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DBC220737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwLXe-0003if-W5
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:16:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60442)
+	id 1jwLXe-0003gM-CW
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 04:16:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jwLWP-0001rH-R8; Fri, 17 Jul 2020 04:15:09 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49978 helo=relay3.sw.ru)
+ id 1jwLWN-0001pf-3Q; Fri, 17 Jul 2020 04:15:07 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49984 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jwLWK-0007JO-DD; Fri, 17 Jul 2020 04:15:09 -0400
+ id 1jwLWK-0007JN-9h; Fri, 17 Jul 2020 04:15:06 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jwLWC-0003cP-F6; Fri, 17 Jul 2020 11:14:56 +0300
+ id 1jwLWC-0003cP-LN; Fri, 17 Jul 2020 11:14:56 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v11 00/11] iotests: Dump QCOW2 dirty bitmaps metadata
-Date: Fri, 17 Jul 2020 11:14:48 +0300
-Message-Id: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v11 05/11] qcow2_format.py: Dump bitmap directory information
+Date: Fri, 17 Jul 2020 11:14:53 +0300
+Message-Id: <1594973699-781898-6-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Received-SPF: pass client-ip=185.231.240.75;
  envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 04:15:01
@@ -66,34 +69,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add dirty bitmap information to QCOW2 metadata dump in the qcow2_format.py.
+Read and dump entries from the bitmap directory of QCOW2 image.
 
-v10:
-  01: Fixing of issues in QCOW2 extension classes noted by Vladimir.
-  02: Reading bitmap tables was moved into Qcow2BitmapTable class.
-  03: Handling '-j' key was moved into "if __name__" section.
-  04: Making copy of __dict__ was replaced with the method to_dict().
-  05: Qcow2HeaderExtensionsDoc is introduced in the separate patch.
+Header extension:
+magic                     0x23852875 (Bitmaps)
+...
+Bitmap name               bitmap-1
+bitmap_table_offset       0xf0000
+bitmap_table_size         1
+flags                     0x2 (['auto'])
+type                      1
+granularity_bits          16
+name_size                 8
+extra_data_size           0
 
-Andrey Shinkevich (11):
-  qcow2: Fix capitalization of header extension constant.
-  qcow2_format.py: make printable data an extension class member
-  qcow2_format.py: change Qcow2BitmapExt initialization method
-  qcow2_format.py: dump bitmap flags in human readable way.
-  qcow2_format.py: Dump bitmap directory information
-  qcow2_format.py: pass cluster size to substructures
-  qcow2_format.py: Dump bitmap table serialized entries
-  qcow2.py: Introduce '-j' key to dump in JSON format
-  qcow2_format.py: collect fields to dump in JSON format
-  qcow2_format.py: introduce Qcow2HeaderExtensionsDoc class
-  qcow2_format.py: support dumping metadata in JSON format
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/qcow2_format.py | 47 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
- block/qcow2.c                      |   2 +-
- docs/interop/qcow2.txt             |   2 +-
- tests/qemu-iotests/qcow2.py        |  18 ++-
- tests/qemu-iotests/qcow2_format.py | 221 ++++++++++++++++++++++++++++++++++---
- 4 files changed, 220 insertions(+), 23 deletions(-)
-
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index b447344..05a8aa9 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -134,6 +134,53 @@ class Qcow2BitmapExt(Qcow2Struct):
+         tail = struct.calcsize(self.fmt) % 8
+         if tail:
+             fd.seek(8 - tail, 1)
++        position = fd.tell()
++        self.read_bitmap_directory(fd)
++        fd.seek(position)
++
++    def read_bitmap_directory(self, fd):
++        fd.seek(self.bitmap_directory_offset)
++        self.bitmap_directory = \
++            [Qcow2BitmapDirEntry(fd) for _ in range(self.nb_bitmaps)]
++
++    def dump(self):
++        super().dump()
++        for entry in self.bitmap_directory:
++            print()
++            entry.dump()
++
++
++class Qcow2BitmapDirEntry(Qcow2Struct):
++
++    fields = (
++        ('u64', '{:#x}', 'bitmap_table_offset'),
++        ('u32', '{}', 'bitmap_table_size'),
++        ('u32', BitmapFlags, 'flags'),
++        ('u8',  '{}', 'type'),
++        ('u8',  '{}', 'granularity_bits'),
++        ('u16', '{}', 'name_size'),
++        ('u32', '{}', 'extra_data_size')
++    )
++
++    def __init__(self, fd):
++        super().__init__(fd=fd)
++        # Seek relative to the current position in the file
++        fd.seek(self.extra_data_size, 1)
++        bitmap_name = fd.read(self.name_size)
++        self.name = bitmap_name.decode('ascii')
++        # Move position to the end of the entry in the directory
++        entry_raw_size = self.bitmap_dir_entry_raw_size()
++        padding = ((entry_raw_size + 7) & ~7) - entry_raw_size
++        fd.seek(padding, 1)
++
++    def bitmap_dir_entry_raw_size(self):
++        return struct.calcsize(self.fmt) + self.name_size + \
++            self.extra_data_size
++
++    def dump(self):
++        print(f'{"Bitmap name":<25} {self.name}')
++        super(Qcow2BitmapDirEntry, self).dump()
++
+ 
+ QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
+ 
 -- 
 1.8.3.1
 
