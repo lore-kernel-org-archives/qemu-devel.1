@@ -2,69 +2,99 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECE4C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43618C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:08:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 453AE206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00A98206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 06:08:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lIbqaXIm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453AE206BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bUskrMdn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00A98206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwJXL-0002Tv-Gj
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 02:07:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60782)
+	id 1jwJYA-00040q-9k
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 02:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60070)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jwJVS-0007kD-03; Fri, 17 Jul 2020 02:06:02 -0400
-Received: from ozlabs.org ([203.11.71.1]:55615)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jwJVN-0005zS-OD; Fri, 17 Jul 2020 02:06:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B7LG92GyWz9sRk; Fri, 17 Jul 2020 16:05:53 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1594965953;
- bh=uv2K4WfVLFNWRxRu2em8SFafmKAbhkPI0HjrBoZ591M=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=lIbqaXImsDz7cZ7NIZWAsoriFrPKkRHJjAHi41B2R8yXh3xVpC8PDTUjjB6aW/QtQ
- es2KGPPMLX0MAmJOTSO7iIW9WEvJT9BYvcY3P3npSls9Lx1me6/pPQ19ckkHMxd0r6
- vj65ZxPzi+etUXCdDysL3/05olOdGX+ff4qPlZU0=
-Date: Fri, 17 Jul 2020 15:58:18 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v4 for-5.2 2/2] spapr: Forbid nested KVM-HV in pre-power9
- compat mode
-Message-ID: <20200717055818.GI5607@umbus.fritz.box>
-References: <159491945918.188975.4358645698778061430.stgit@bahia.lan>
- <159491948127.188975.9621435875869177751.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="rCb8EA+9TsBVtA92"
-Content-Disposition: inline
-In-Reply-To: <159491948127.188975.9621435875869177751.stgit@bahia.lan>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 02:05:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from
+ <3Jj8RXwsKCucQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com>)
+ id 1jwJSu-0003XQ-9O
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:03:24 -0400
+Received: from mail-pl1-x649.google.com ([2607:f8b0:4864:20::649]:49185)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from
+ <3Jj8RXwsKCucQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com>)
+ id 1jwJSr-0005Fq-1v
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 02:03:23 -0400
+Received: by mail-pl1-x649.google.com with SMTP id p4so5941500pls.16
+ for <qemu-devel@nongnu.org>; Thu, 16 Jul 2020 23:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc:content-transfer-encoding;
+ bh=E+lY6xeBY55G5SogqOYyjK4EaTCBDMXPYX8p9j4OOpw=;
+ b=bUskrMdni+jMBtG0AkHtBH00no6GUo/RdDGElZebpzaFTZFFcNqMaCdIk8hwz6S3qx
+ i8zueKNdvka4u0Shml50J0Pknsm+3lbP2y7gHtslZFJxGmnjexbM5Hp1a0lVFd45V1EU
+ qXkoedA2y1Km9Fk7jBWP//S1F6GRd8wgK7Z3r/OkLdQmft/MXnUtbeGLaCNGm7XHK5Pm
+ jpBbhdAeT9jehLCHi7Twce3V5P6MJnFkB/NDUGYGGYuSmHoHF6Xa3IQLe4oL5QiHf3zB
+ KfVocSXh/TNiqsOksncNzmm6xqnZ5PpmLKybFuEA4whf+8vQCtFk8sf84G0AbPGOhzpo
+ dsSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc:content-transfer-encoding;
+ bh=E+lY6xeBY55G5SogqOYyjK4EaTCBDMXPYX8p9j4OOpw=;
+ b=QmakrftgwN+NUgNHWK11XlZe7cMDwJxolxnYf/P69lxS6Dfygl7hdOdgO0PqTDojfV
+ 4AiR9BBqwiAp5jXZNtv3Xr3+yZnWBzj2yycdzc1jc1o/kNxvauTvfrR14JS3xs3XhteU
+ LWCChvm6ygKGtgrElg4tToTXsnmmmRBPa5ambU4np9pQd4LRDtr+/PqYSrJQ5jF5kbiz
+ LqjnQBqJlsruYdXNs8fbjlmdRoMq1jkFSYPkRuv6G6UWXJ5ve/8S/W2dEf1jKTXxnQyv
+ rxwE+Y+fwaDkwf8sCJdU/AHB2SNsoGCq0obOWBDoFA9DW9SgAl9ORo2ovKpWws36hzSY
+ FtBQ==
+X-Gm-Message-State: AOAM531m7bUQpu6jbbLbLta42fBOszbHHQTlENixf18lO7K8KYtKeicm
+ 8aqkzH2pfRuVQoFldv84/URGZrbIwyPzX4M9/BS5BuHL2RfdzkmkQMihsHC6oVdERjUv5+924OU
+ duOdRb3FLveYwjYKZ06Zt3ZNO5eZSksEZjv8e45+ttHwqwW5TFv6B9aHH/PbIWAVjTL7VQf0Rlg
+ ==
+X-Google-Smtp-Source: ABdhPJxGpiIIP0JGBT6UT8LwXfNMeR4WUk91c76/jD0qwhly25ttdNwk4bMcfNLPwMzem0BORVndB6TDvZ5BBR7KLA==
+X-Received: by 2002:a17:90a:6c97:: with SMTP id
+ y23mr8465868pjj.28.1594965798906; 
+ Thu, 16 Jul 2020 23:03:18 -0700 (PDT)
+Date: Thu, 16 Jul 2020 23:02:49 -0700
+In-Reply-To: <20200717060258.1602319-1-hskinnemoen@google.com>
+Message-Id: <20200717060258.1602319-5-hskinnemoen@google.com>
+Mime-Version: 1.0
+References: <20200717060258.1602319-1-hskinnemoen@google.com>
+X-Mailer: git-send-email 2.28.0.rc0.105.gf9edc3c819-goog
+Subject: [PATCH v6 04/13] hw/arm: Add NPCM730 and NPCM750 SoC models
+From: Havard Skinnemoen <hskinnemoen@google.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: Avi.Fishman@nuvoton.com, kfting@nuvoton.com, 
+ Havard Skinnemoen <hskinnemoen@google.com>, Joel Stanley <joel@jms.id.au>, 
+ "=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::649;
+ envelope-from=3Jj8RXwsKCucQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com;
+ helo=mail-pl1-x649.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -105
+X-Spam_score: -10.6
+X-Spam_bar: ----------
+X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001,
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,97 +107,676 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-ppc@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The Nuvoton NPCM7xx SoC family are used to implement Baseboard
+Management Controllers in servers. While the family includes four SoCs,
+this patch implements limited support for two of them: NPCM730 (targeted
+for Data Center applications) and NPCM750 (targeted for Enterprise
+applications).
 
---rCb8EA+9TsBVtA92
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch includes little more than the bare minimum needed to boot a
+Linux kernel built with NPCM7xx support in direct-kernel mode:
 
-On Thu, Jul 16, 2020 at 07:11:21PM +0200, Greg Kurz wrote:
-> Nested KVM HV only works if the kernel is using the radix MMU mode, ie.
-> the CPU is POWER9 and it is not running in some pre-power9 compat mode.
-> Otherwise, the KVM HV module fails to load in the guest with -ENODEV.
-> It might be painful for a user to discover this late that nested cannot
-> work with their setup. Erroring out at machine init instead seems to be
-> the best we can do.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+  - Two Cortex-A9 CPU cores with built-in periperhals.
+  - Global Configuration Registers.
+  - Clock Management.
+  - 3 Timer Modules with 5 timers each.
+  - 4 serial ports.
 
-Applied to ppc-for-5.2.
+The chips themselves have a lot more features, some of which will be
+added to the model at a later stage.
 
-> ---
->  hw/ppc/spapr_caps.c |   10 ++++++++++
->  1 file changed, 10 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 275f5bd0342c..10a80a8159f4 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -382,6 +382,8 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState=
- *spapr,
->                                      uint8_t val, Error **errp)
->  {
->      ERRP_GUARD();
-> +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> +
->      if (!val) {
->          /* capability disabled by default */
->          return;
-> @@ -391,6 +393,14 @@ static void cap_nested_kvm_hv_apply(SpaprMachineStat=
-e *spapr,
->          error_setg(errp, "No Nested KVM-HV support in TCG");
->          error_append_hint(errp, "Try appending -machine cap-nested-hv=3D=
-off\n");
->      } else if (kvm_enabled()) {
-> +        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> +                              spapr->max_compat_pvr)) {
-> +            error_setg(errp, "Nested KVM-HV only supported on POWER9");
-> +            error_append_hint(errp,
-> +                              "Try appending -machine max-cpu-compat=3Dp=
-ower9\n");
-> +            return;
-> +        }
-> +
->          if (!kvmppc_has_cap_nested_kvm_hv()) {
->              error_setg(errp,
->                         "KVM implementation does not support Nested KVM-H=
-V");
->=20
->=20
+Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+---
+ include/hw/arm/npcm7xx.h |  85 ++++++++
+ hw/arm/npcm7xx.c         | 407 +++++++++++++++++++++++++++++++++++++++
+ hw/arm/Kconfig           |   5 +
+ hw/arm/Makefile.objs     |   1 +
+ 4 files changed, 498 insertions(+)
+ create mode 100644 include/hw/arm/npcm7xx.h
+ create mode 100644 hw/arm/npcm7xx.c
 
+diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
+new file mode 100644
+index 0000000000..e68d9c79e6
+--- /dev/null
++++ b/include/hw/arm/npcm7xx.h
+@@ -0,0 +1,85 @@
++/*
++ * Nuvoton NPCM7xx SoC family.
++ *
++ * Copyright 2020 Google LLC
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++#ifndef NPCM7XX_H
++#define NPCM7XX_H
++
++#include "hw/boards.h"
++#include "hw/cpu/a9mpcore.h"
++#include "hw/misc/npcm7xx_clk.h"
++#include "hw/misc/npcm7xx_gcr.h"
++#include "hw/timer/npcm7xx_timer.h"
++#include "target/arm/cpu.h"
++
++#define NPCM7XX_MAX_NUM_CPUS    (2)
++
++/* The first half of the address space is reserved for DDR4 DRAM. */
++#define NPCM7XX_DRAM_BA         (0x00000000)
++#define NPCM7XX_DRAM_SZ         (2 * GiB)
++
++/* Magic addresses for setting up direct kernel booting and SMP boot stubs=
+. */
++#define NPCM7XX_LOADER_START            (0x00000000)  /* Start of SDRAM */
++#define NPCM7XX_SMP_LOADER_START        (0xffff0000)  /* Boot ROM */
++#define NPCM7XX_SMP_BOOTREG_ADDR        (0xf080013c)  /* GCR.SCRPAD */
++#define NPCM7XX_GIC_CPU_IF_ADDR         (0xf03fe100)  /* GIC within A9 */
++
++typedef struct NPCM7xxState {
++    DeviceState         parent;
++
++    ARMCPU              cpu[NPCM7XX_MAX_NUM_CPUS];
++    A9MPPrivState       a9mpcore;
++
++    MemoryRegion        sram;
++    MemoryRegion        irom;
++    MemoryRegion        ram3;
++    MemoryRegion        *dram;
++
++    NPCM7xxGCRState     gcr;
++    NPCM7xxCLKState     clk;
++    NPCM7xxTimerCtrlState tim[3];
++} NPCM7xxState;
++
++#define TYPE_NPCM7XX    "npcm7xx"
++#define NPCM7XX(obj)    OBJECT_CHECK(NPCM7xxState, (obj), TYPE_NPCM7XX)
++
++#define TYPE_NPCM730    "npcm730"
++#define TYPE_NPCM750    "npcm750"
++
++typedef struct NPCM7xxClass {
++    DeviceClass         parent;
++
++    /* Bitmask of modules that are permanently disabled on this chip. */
++    uint32_t            disabled_modules;
++    /* Number of CPU cores enabled in this SoC class (may be 1 or 2). */
++    uint32_t            num_cpus;
++} NPCM7xxClass;
++
++#define NPCM7XX_CLASS(klass)                                            \
++    OBJECT_CLASS_CHECK(NPCM7xxClass, (klass), TYPE_NPCM7XX)
++#define NPCM7XX_GET_CLASS(obj)                                          \
++    OBJECT_GET_CLASS(NPCM7xxClass, (obj), TYPE_NPCM7XX)
++
++/**
++ * npcm7xx_load_kernel - Loads memory with everything needed to boot
++ * @machine - The machine containing the SoC to be booted.
++ * @soc - The SoC containing the CPU to be booted.
++ *
++ * This will set up the ARM boot info structure for the specific NPCM7xx
++ * derivative and call arm_load_kernel() to set up loading of the kernel, =
+etc.
++ * into memory, if requested by the user.
++ */
++void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc);
++
++#endif /* NPCM7XX_H */
+diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+new file mode 100644
+index 0000000000..9669ac5fa0
+--- /dev/null
++++ b/hw/arm/npcm7xx.c
+@@ -0,0 +1,407 @@
++/*
++ * Nuvoton NPCM7xx SoC family.
++ *
++ * Copyright 2020 Google LLC
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++
++#include "qemu/osdep.h"
++
++#include "exec/address-spaces.h"
++#include "hw/arm/boot.h"
++#include "hw/arm/npcm7xx.h"
++#include "hw/char/serial.h"
++#include "hw/loader.h"
++#include "hw/misc/unimp.h"
++#include "hw/qdev-properties.h"
++#include "qapi/error.h"
++#include "qemu/units.h"
++#include "sysemu/sysemu.h"
++
++/*
++ * This covers the whole MMIO space. We'll use this to catch any MMIO acce=
+sses
++ * that aren't handled by any device.
++ */
++#define NPCM7XX_MMIO_BA         (0x80000000)
++#define NPCM7XX_MMIO_SZ         (0x7ffd0000)
++
++/* Core system modules. */
++#define NPCM7XX_L2C_BA          (0xf03fc000)
++#define NPCM7XX_CPUP_BA         (0xf03fe000)
++#define NPCM7XX_GCR_BA          (0xf0800000)
++#define NPCM7XX_CLK_BA          (0xf0801000)
++
++/* Internal AHB SRAM */
++#define NPCM7XX_RAM3_BA         (0xc0008000)
++#define NPCM7XX_RAM3_SZ         (4 * KiB)
++
++/* Memory blocks at the end of the address space */
++#define NPCM7XX_RAM2_BA         (0xfffd0000)
++#define NPCM7XX_RAM2_SZ         (128 * KiB)
++#define NPCM7XX_ROM_BA          (0xffff0000)
++#define NPCM7XX_ROM_SZ          (64 * KiB)
++
++/*
++ * Interrupt lines going into the GIC. This does not include internal Cort=
+ex-A9
++ * interrupts.
++ */
++enum NPCM7xxInterrupt {
++    NPCM7XX_UART0_IRQ           =3D 2,
++    NPCM7XX_UART1_IRQ,
++    NPCM7XX_UART2_IRQ,
++    NPCM7XX_UART3_IRQ,
++    NPCM7XX_TIMER0_IRQ          =3D 32,   /* Timer Module 0 */
++    NPCM7XX_TIMER1_IRQ,
++    NPCM7XX_TIMER2_IRQ,
++    NPCM7XX_TIMER3_IRQ,
++    NPCM7XX_TIMER4_IRQ,
++    NPCM7XX_TIMER5_IRQ,                 /* Timer Module 1 */
++    NPCM7XX_TIMER6_IRQ,
++    NPCM7XX_TIMER7_IRQ,
++    NPCM7XX_TIMER8_IRQ,
++    NPCM7XX_TIMER9_IRQ,
++    NPCM7XX_TIMER10_IRQ,                /* Timer Module 2 */
++    NPCM7XX_TIMER11_IRQ,
++    NPCM7XX_TIMER12_IRQ,
++    NPCM7XX_TIMER13_IRQ,
++    NPCM7XX_TIMER14_IRQ,
++};
++
++/* Total number of GIC interrupts, including internal Cortex-A9 interrupts=
+. */
++#define NPCM7XX_NUM_IRQ         (160)
++
++/* Register base address for each Timer Module */
++static const hwaddr npcm7xx_tim_addr[] =3D {
++    0xf0008000,
++    0xf0009000,
++    0xf000a000,
++};
++
++/* Register base address for each 16550 UART */
++static const hwaddr npcm7xx_uart_addr[] =3D {
++    0xf0001000,
++    0xf0002000,
++    0xf0003000,
++    0xf0004000,
++};
++
++static void npcm7xx_write_secondary_boot(ARMCPU *cpu,
++                                         const struct arm_boot_info *info)
++{
++    /*
++     * The default smpboot stub halts the secondary CPU with a 'wfi'
++     * instruction, but the arch/arm/mach-npcm/platsmp.c in the Linux kern=
+el
++     * does not send an IPI to wake it up, so the second CPU fails to boot=
+. So
++     * we need to provide our own smpboot stub that can not use 'wfi', it =
+has
++     * to spin the secondary CPU until the first CPU writes to the SCRPAD =
+reg.
++     */
++    uint32_t smpboot[] =3D {
++        0xe59f2018,     /* ldr r2, bootreg_addr */
++        0xe3a00000,     /* mov r0, #0 */
++        0xe5820000,     /* str r0, [r2] */
++        0xe320f002,     /* wfe */
++        0xe5921000,     /* ldr r1, [r2] */
++        0xe1110001,     /* tst r1, r1 */
++        0x0afffffb,     /* beq <wfe> */
++        0xe12fff11,     /* bx r1 */
++        NPCM7XX_SMP_BOOTREG_ADDR,
++    };
++    int i;
++
++    for (i =3D 0; i < ARRAY_SIZE(smpboot); i++) {
++        smpboot[i] =3D tswap32(smpboot[i]);
++    }
++
++    rom_add_blob_fixed("smpboot", smpboot, sizeof(smpboot),
++                       NPCM7XX_SMP_LOADER_START);
++}
++
++static struct arm_boot_info npcm7xx_binfo =3D {
++    .loader_start           =3D NPCM7XX_LOADER_START,
++    .smp_loader_start       =3D NPCM7XX_SMP_LOADER_START,
++    .smp_bootreg_addr       =3D NPCM7XX_SMP_BOOTREG_ADDR,
++    .gic_cpu_if_addr        =3D NPCM7XX_GIC_CPU_IF_ADDR,
++    .write_secondary_boot   =3D npcm7xx_write_secondary_boot,
++    .board_id               =3D -1,
++};
++
++void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
++{
++    NPCM7xxClass *sc =3D NPCM7XX_GET_CLASS(soc);
++
++    npcm7xx_binfo.ram_size =3D machine->ram_size;
++    npcm7xx_binfo.nb_cpus =3D sc->num_cpus;
++
++    arm_load_kernel(&soc->cpu[0], machine, &npcm7xx_binfo);
++}
++
++static qemu_irq npcm7xx_irq(NPCM7xxState *s, int n)
++{
++    return qdev_get_gpio_in(DEVICE(&s->a9mpcore), n);
++}
++
++static void npcm7xx_init(Object *obj)
++{
++    NPCM7xxState *s =3D NPCM7XX(obj);
++    int i;
++
++    for (i =3D 0; i < NPCM7XX_MAX_NUM_CPUS; i++) {
++        object_initialize_child(obj, "cpu[*]", &s->cpu[i],
++                                ARM_CPU_TYPE_NAME("cortex-a9"));
++    }
++
++    object_initialize_child(obj, "a9mpcore", &s->a9mpcore, TYPE_A9MPCORE_P=
+RIV);
++    object_initialize_child(obj, "gcr", &s->gcr, TYPE_NPCM7XX_GCR);
++    object_property_add_alias(obj, "power-on-straps", OBJECT(&s->gcr),
++                              "power-on-straps");
++    object_initialize_child(obj, "clk", &s->clk, TYPE_NPCM7XX_CLK);
++
++    for (i =3D 0; i < ARRAY_SIZE(s->tim); i++) {
++        object_initialize_child(obj, "tim[*]", &s->tim[i], TYPE_NPCM7XX_TI=
+MER);
++    }
++}
++
++static void npcm7xx_realize(DeviceState *dev, Error **errp)
++{
++    NPCM7xxState *s =3D NPCM7XX(dev);
++    NPCM7xxClass *nc =3D NPCM7XX_GET_CLASS(s);
++    int i;
++
++    if (memory_region_size(s->dram) > NPCM7XX_DRAM_SZ) {
++        error_setg(errp, "%s: NPCM7xx cannot address more than %" PRIu64
++                   " MiB of DRAM", __func__, NPCM7XX_DRAM_SZ / MiB);
++        return;
++    }
++
++    /* CPUs */
++    for (i =3D 0; i < nc->num_cpus; i++) {
++        object_property_set_int(OBJECT(&s->cpu[i]), "mp-affinity",
++                                arm_cpu_mp_affinity(i, NPCM7XX_MAX_NUM_CPU=
+S),
++                                &error_abort);
++        object_property_set_int(OBJECT(&s->cpu[i]), "reset-cbar",
++                                NPCM7XX_GIC_CPU_IF_ADDR, &error_abort);
++        object_property_set_bool(OBJECT(&s->cpu[i]), "reset-hivecs", true,
++                                 &error_abort);
++
++        /* Disable security extensions. */
++        object_property_set_bool(OBJECT(&s->cpu[i]), "has_el3", false,
++                                 &error_abort);
++
++        if (!qdev_realize(DEVICE(&s->cpu[i]), NULL, errp)) {
++            return;
++        }
++    }
++
++    /* A9MPCORE peripherals. Can only fail if we pass bad parameters here.=
+ */
++    object_property_set_int(OBJECT(&s->a9mpcore), "num-cpu", nc->num_cpus,
++                            &error_abort);
++    object_property_set_int(OBJECT(&s->a9mpcore), "num-irq", NPCM7XX_NUM_I=
+RQ,
++                            &error_abort);
++    sysbus_realize(SYS_BUS_DEVICE(&s->a9mpcore), &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->a9mpcore), 0, NPCM7XX_CPUP_BA);
++
++    for (i =3D 0; i < nc->num_cpus; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->a9mpcore), i,
++                           qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_IR=
+Q));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->a9mpcore), i + nc->num_cpus,
++                           qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_FI=
+Q));
++    }
++
++    /* L2 cache controller */
++    sysbus_create_simple("l2x0", NPCM7XX_L2C_BA, NULL);
++
++    /* System Global Control Registers (GCR). Can fail due to user input. =
+*/
++    object_property_set_int(OBJECT(&s->gcr), "disabled-modules",
++                            nc->disabled_modules, &error_abort);
++    object_property_add_const_link(OBJECT(&s->gcr), "dram-mr", OBJECT(s->d=
+ram));
++    if (!sysbus_realize(SYS_BUS_DEVICE(&s->gcr), errp)) {
++        return;
++    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gcr), 0, NPCM7XX_GCR_BA);
++
++    /* Clock Control Registers (CLK). Cannot fail. */
++    sysbus_realize(SYS_BUS_DEVICE(&s->clk), &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->clk), 0, NPCM7XX_CLK_BA);
++
++    /* Timer Modules (TIM). Cannot fail. */
++    QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) !=3D ARRAY_SIZE(s->tim)=
+);
++    for (i =3D 0; i < ARRAY_SIZE(s->tim); i++) {
++        SysBusDevice *sbd =3D SYS_BUS_DEVICE(&s->tim[i]);
++        int first_irq;
++        int j;
++
++        sysbus_realize(sbd, &error_abort);
++        sysbus_mmio_map(sbd, 0, npcm7xx_tim_addr[i]);
++
++        first_irq =3D NPCM7XX_TIMER0_IRQ + i * NPCM7XX_TIMERS_PER_CTRL;
++        for (j =3D 0; j < NPCM7XX_TIMERS_PER_CTRL; j++) {
++            qemu_irq irq =3D npcm7xx_irq(s, first_irq + j);
++            sysbus_connect_irq(sbd, j, irq);
++        }
++    }
++
++    /* UART0..3 (16550 compatible) */
++    for (i =3D 0; i < ARRAY_SIZE(npcm7xx_uart_addr); i++) {
++        serial_mm_init(get_system_memory(), npcm7xx_uart_addr[i], 2,
++                       npcm7xx_irq(s, NPCM7XX_UART0_IRQ + i), 115200,
++                       serial_hd(i), DEVICE_LITTLE_ENDIAN);
++    }
++
++    /* RAM2 (SRAM) */
++    memory_region_init_ram(&s->sram, OBJECT(dev), "ram2",
++                           NPCM7XX_RAM2_SZ, &error_abort);
++    memory_region_add_subregion(get_system_memory(), NPCM7XX_RAM2_BA, &s->=
+sram);
++
++    /* RAM3 (SRAM) */
++    memory_region_init_ram(&s->ram3, OBJECT(dev), "ram3",
++                           NPCM7XX_RAM3_SZ, &error_abort);
++    memory_region_add_subregion(get_system_memory(), NPCM7XX_RAM3_BA, &s->=
+ram3);
++
++    /* Internal ROM */
++    memory_region_init_rom(&s->irom, OBJECT(dev), "irom", NPCM7XX_ROM_SZ,
++                           &error_abort);
++    memory_region_add_subregion(get_system_memory(), NPCM7XX_ROM_BA, &s->i=
+rom);
++
++    create_unimplemented_device("npcm7xx.shm",          0xc0001000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.vdmx",         0xe0800000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.pcierc",       0xe1000000,  64 * =
+KiB);
++    create_unimplemented_device("npcm7xx.kcs",          0xf0007000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.rng",          0xf000b000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.adc",          0xf000c000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gfxi",         0xf000e000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[0]",      0xf0010000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[1]",      0xf0011000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[2]",      0xf0012000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[3]",      0xf0013000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[4]",      0xf0014000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[5]",      0xf0015000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[6]",      0xf0016000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gpio[7]",      0xf0017000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[0]",     0xf0080000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[1]",     0xf0081000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[2]",     0xf0082000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[3]",     0xf0083000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[4]",     0xf0084000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[5]",     0xf0085000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[6]",     0xf0086000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[7]",     0xf0087000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[8]",     0xf0088000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[9]",     0xf0089000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[10]",    0xf008a000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[11]",    0xf008b000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[12]",    0xf008c000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[13]",    0xf008d000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[14]",    0xf008e000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.smbus[15]",    0xf008f000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.espi",         0xf009f000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.peci",         0xf0100000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.siox[1]",      0xf0101000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.siox[2]",      0xf0102000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.pwm[0]",       0xf0103000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.pwm[1]",       0xf0104000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[0]",       0xf0180000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[1]",       0xf0181000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[2]",       0xf0182000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[3]",       0xf0183000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[4]",       0xf0184000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[5]",       0xf0185000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[6]",       0xf0186000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mft[7]",       0xf0187000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.pspi1",        0xf0200000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.pspi2",        0xf0201000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.ahbpci",       0xf0400000,   1 * =
+MiB);
++    create_unimplemented_device("npcm7xx.mcphy",        0xf05f0000,  64 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gmac1",        0xf0802000,   8 * =
+KiB);
++    create_unimplemented_device("npcm7xx.gmac2",        0xf0804000,   8 * =
+KiB);
++    create_unimplemented_device("npcm7xx.ehci",         0xf0806000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.ohci",         0xf0807000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.vcd",          0xf0810000,  64 * =
+KiB);
++    create_unimplemented_device("npcm7xx.ece",          0xf0820000,   8 * =
+KiB);
++    create_unimplemented_device("npcm7xx.vdma",         0xf0822000,   8 * =
+KiB);
++    create_unimplemented_device("npcm7xx.emc1",         0xf0825000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.emc2",         0xf0826000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[0]",      0xf0830000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[1]",      0xf0831000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[2]",      0xf0832000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[3]",      0xf0833000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[4]",      0xf0834000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[5]",      0xf0835000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[6]",      0xf0836000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[7]",      0xf0837000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[8]",      0xf0838000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.usbd[9]",      0xf0839000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.sd",           0xf0840000,   8 * =
+KiB);
++    create_unimplemented_device("npcm7xx.mmc",          0xf0842000,   8 * =
+KiB);
++    create_unimplemented_device("npcm7xx.pcimbx",       0xf0848000, 512 * =
+KiB);
++    create_unimplemented_device("npcm7xx.aes",          0xf0858000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.des",          0xf0859000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.sha",          0xf085a000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.secacc",       0xf085b000,   4 * =
+KiB);
++    create_unimplemented_device("npcm7xx.spixcs0",      0xf8000000,  16 * =
+MiB);
++    create_unimplemented_device("npcm7xx.spixcs1",      0xf9000000,  16 * =
+MiB);
++    create_unimplemented_device("npcm7xx.spix",         0xfb001000,   4 * =
+KiB);
++}
++
++static Property npcm7xx_properties[] =3D {
++    DEFINE_PROP_LINK("dram-mr", NPCM7xxState, dram, TYPE_MEMORY_REGION,
++                     MemoryRegion *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void npcm7xx_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(oc);
++
++    dc->realize =3D npcm7xx_realize;
++    dc->user_creatable =3D false;
++    device_class_set_props(dc, npcm7xx_properties);
++}
++
++static void npcm730_class_init(ObjectClass *oc, void *data)
++{
++    NPCM7xxClass *nc =3D NPCM7XX_CLASS(oc);
++
++    /* NPCM730 is optimized for data center use, so no graphics, etc. */
++    nc->disabled_modules =3D 0x00300395;
++    nc->num_cpus =3D 2;
++}
++
++static void npcm750_class_init(ObjectClass *oc, void *data)
++{
++    NPCM7xxClass *nc =3D NPCM7XX_CLASS(oc);
++
++    /* NPCM750 has 2 cores and a full set of peripherals */
++    nc->disabled_modules =3D 0x00000000;
++    nc->num_cpus =3D 2;
++}
++
++static const TypeInfo npcm7xx_soc_types[] =3D {
++    {
++        .name           =3D TYPE_NPCM7XX,
++        .parent         =3D TYPE_DEVICE,
++        .instance_size  =3D sizeof(NPCM7xxState),
++        .instance_init  =3D npcm7xx_init,
++        .class_size     =3D sizeof(NPCM7xxClass),
++        .class_init     =3D npcm7xx_class_init,
++        .abstract       =3D true,
++    }, {
++        .name           =3D TYPE_NPCM730,
++        .parent         =3D TYPE_NPCM7XX,
++        .class_init     =3D npcm730_class_init,
++    }, {
++        .name           =3D TYPE_NPCM750,
++        .parent         =3D TYPE_NPCM7XX,
++        .class_init     =3D npcm750_class_init,
++    },
++};
++
++DEFINE_TYPES(npcm7xx_soc_types);
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 192a8dec3b..a31d0d282f 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -356,6 +356,11 @@ config XLNX_VERSAL
+=20
+ config NPCM7XX
+     bool
++    select A9MPCORE
++    select ARM_GIC
++    select PL310  # cache controller
++    select SERIAL
++    select UNIMP
+=20
+ config FSL_IMX25
+     bool
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 534a6a119e..13d163a599 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -41,6 +41,7 @@ obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o
+ obj-$(CONFIG_STM32F405_SOC) +=3D stm32f405_soc.o
+ obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zynqmp.o xlnx-zcu102.o
+ obj-$(CONFIG_XLNX_VERSAL) +=3D xlnx-versal.o xlnx-versal-virt.o
++obj-$(CONFIG_NPCM7XX) +=3D npcm7xx.o
+ obj-$(CONFIG_FSL_IMX25) +=3D fsl-imx25.o imx25_pdk.o
+ obj-$(CONFIG_FSL_IMX31) +=3D fsl-imx31.o kzm.o
+ obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+2.28.0.rc0.105.gf9edc3c819-goog
 
---rCb8EA+9TsBVtA92
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8RPfkACgkQbDjKyiDZ
-s5JdchAAqwHe235vhx/s211Dp0oO8EbHBQt7n2TMBR8NP1uOxh8xXvP1mIKaf5mi
-qf9A0nOK0z6sZf6MRqUgGWQ2LbYDMXVtBLaFx8OeaHR6+nUFSCxgnSXwTtkWia5i
-W9FEUMwqj1lR3JruyUG7Cuocuzm9GXJe5JVnEQndKgPWQDDU/dBmNZe5p4pB6Q6T
-N4C6mdUQPeGsdpiBePUeGiiEPMYShd7wbOhj0wvRftYM1O7zTth/Cytcnd4FtyAu
-DE5jURud8laMrRkzMyLthyyb7nzSqmrq9yOi6fPPH9JxW/pr8fZPbxuuG7EEe83Z
-GUyZdsey2CI1hNUcn/3vC0dgnP5LwjJb7QpUmcsAsebrFlGXidJOSiMfl8exUwXH
-EvW74qtwdfef7670WpuDJrq3gr8PN03LYuA8sQfoV88a9jtwXF2v/xlk+F9KVPYP
-+R2UIbKp+D+A0WmRksWtoOGvyFfQjj8ZaeLDiGOjhXdPGUtjrrK1t4/sdeAkHElX
-S7t0y+SIeBmvtA5jsI5opiBe3HdNGD0iFXX5i6F8UZ86cjL4p9+bnf+7fj5ZQtC2
-6qoFTAXX065QCJRZYTRjdLCE9J9mhZIo2Rn8oTaIZnsFAgtv9uBex7AyEfo+Qp8A
-YY/j11XKJ0o0WfHF/wZd9TyrkH+PQtbdTqnPEsrOT8QOlZe0PAM=
-=xkhM
------END PGP SIGNATURE-----
-
---rCb8EA+9TsBVtA92--
 
