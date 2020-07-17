@@ -2,88 +2,73 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=unavailable
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FCCC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DBA7C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:21:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4CF720717
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:19:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfXkPeeh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4CF720717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 01D0920684
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 12:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D0920684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwPKR-00071Z-79
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:19:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39404)
+	id 1jwPMg-00089Y-Ad
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 08:21:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jwPJd-0006J2-1M
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:18:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46860
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jwPJY-0000SB-Ca
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:18:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1594988287;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=EKaaIdn7SJuolsNdi21NTxBjrqMA3dgIvN6+Vw3eLwQ=;
- b=PfXkPeehpVDAPd5ZIcvdvKOjSP+95rFJBCJMImpXMbEYiF99b6l6STMCLVPzv8Blgek86g
- wSQYCqxhtU+lPTuC2BYf5BTHcR5rYj2pRrlNMsOKqpKdjDPexPku4cwyLAqqu6wvIyTtoH
- 3DaWI7oqdcUufxqWcKIpvnp5LuAMMPk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-QzPGE8ZeOAaxlyhH2oYrJQ-1; Fri, 17 Jul 2020 08:18:04 -0400
-X-MC-Unique: QzPGE8ZeOAaxlyhH2oYrJQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DA7EE921;
- Fri, 17 Jul 2020 12:18:02 +0000 (UTC)
-Received: from localhost (ovpn-114-107.ams2.redhat.com [10.36.114.107])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8855572AC7;
- Fri, 17 Jul 2020 12:17:54 +0000 (UTC)
-Date: Fri, 17 Jul 2020 13:17:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Thanos Makatos <thanos.makatos@nutanix.com>
-Subject: Re: [PATCH] introduce VFIO-over-socket protocol specificaion
-Message-ID: <20200717121753.GK128195@stefanha-x1.localdomain>
-References: <1594913503-52271-1-git-send-email-thanos.makatos@nutanix.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jwPLz-0007fn-41
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:20:39 -0400
+Received: from 17.mo3.mail-out.ovh.net ([87.98.178.58]:34364)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jwPLv-00011V-Jw
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 08:20:38 -0400
+Received: from player770.ha.ovh.net (unknown [10.108.54.172])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 96D8E25D701
+ for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 14:20:31 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player770.ha.ovh.net (Postfix) with ESMTPSA id 64B261486BCEA;
+ Fri, 17 Jul 2020 12:20:23 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-100R0036d196503-e7a1-48de-8f8b-adc2f4076e4c,EDCDB8C856EF0F0B0CA5B21EBB7B009702C7510A)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v6 04/13] hw/arm: Add NPCM730 and NPCM750 SoC models
+To: Havard Skinnemoen <hskinnemoen@google.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <20200717060258.1602319-1-hskinnemoen@google.com>
+ <20200717060258.1602319-5-hskinnemoen@google.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <99db91b7-60e2-7212-abd2-a6505aee5d3d@kaod.org>
+Date: Fri, 17 Jul 2020 14:20:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <1594913503-52271-1-git-send-email-thanos.makatos@nutanix.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="enGqbSaueFq5omEL"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 01:33:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, WEIRD_QUOTING=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200717060258.1602319-5-hskinnemoen@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 10920947623444581316
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrfeeigdeglecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeffvddtudegieefudeugffhjefgieegieegleettdehgfeiieevueeihfegfefgnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejtddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=87.98.178.58; envelope-from=clg@kaod.org;
+ helo=17.mo3.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 08:20:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,1244 +81,587 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: benjamin.walker@intel.com, elena.ufimtseva@oracle.com,
- tomassetti.andrea@gmail.com, John G Johnson <john.g.johnson@oracle.com>,
- jag.raman@oracle.com, james.r.harris@intel.com, swapnil.ingle@nutanix.com,
- konrad.wilk@oracle.com, yuvalkashtan@gmail.com, qemu-devel@nongnu.org,
- raphael.norwitz@nutanix.com, ismael@linux.com, alex.williamson@redhat.com,
- Kanth.Ghatraju@oracle.com, felipe@nutanix.com, marcandre.lureau@redhat.com,
- tina.zhang@intel.com, changpeng.liu@intel.com, dgilbert@redhat.com
+Cc: kfting@nuvoton.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Avi.Fishman@nuvoton.com, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---enGqbSaueFq5omEL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jul 16, 2020 at 08:31:43AM -0700, Thanos Makatos wrote:
-> This patch introduces the VFIO-over-socket protocol specification, which
-> is designed to allow devices to be emulated outside QEMU, in a separate
-> process. VFIO-over-socket reuses the existing VFIO defines, structs and
-> concepts.
->=20
-> It has been earlier discussed as an RFC in:
-> "RFC: use VFIO over a UNIX domain socket to implement device offloading"
->=20
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Thanos Makatos <thanos.makatos@nutanix.com>
+On 7/17/20 8:02 AM, Havard Skinnemoen wrote:
+> The Nuvoton NPCM7xx SoC family are used to implement Baseboard
+> Management Controllers in servers. While the family includes four SoCs,
+> this patch implements limited support for two of them: NPCM730 (targeted
+> for Data Center applications) and NPCM750 (targeted for Enterprise
+> applications).
+> 
+> This patch includes little more than the bare minimum needed to boot a
+> Linux kernel built with NPCM7xx support in direct-kernel mode:
+> 
+>   - Two Cortex-A9 CPU cores with built-in periperhals.
+>   - Global Configuration Registers.
+>   - Clock Management.
+>   - 3 Timer Modules with 5 timers each.
+>   - 4 serial ports.
+> 
+> The chips themselves have a lot more features, some of which will be
+> added to the model at a later stage.
+> 
+> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+> Reviewed-by: Joel Stanley <joel@jms.id.au>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 > ---
->  docs/devel/vfio-over-socket.rst | 1135 +++++++++++++++++++++++++++++++++=
-++++++
->  1 files changed, 1135 insertions(+), 0 deletions(-)
->  create mode 100644 docs/devel/vfio-over-socket.rst
-
-This is exciting! The spec is clear enough that I feel I could start
-writing a client/server. There is enough functionality here to implement
-real-world devices. Can you share links to client/server
-implementations?
-
-It would be useful to introduce a standard way of enumerating,
-launching, and controlling device emulation processes. That doesn't need
-to be part of this specification document though. In vhost-user there
-are conventions for command-line parameters, process lifecycle, etc that
-make it easier for management tools to run device processes (the
-"Backend program conventions" section in vhost-user.rst).
-
-> diff --git a/docs/devel/vfio-over-socket.rst b/docs/devel/vfio-over-socke=
-t.rst
+>  include/hw/arm/npcm7xx.h |  85 ++++++++
+>  hw/arm/npcm7xx.c         | 407 +++++++++++++++++++++++++++++++++++++++
+>  hw/arm/Kconfig           |   5 +
+>  hw/arm/Makefile.objs     |   1 +
+>  4 files changed, 498 insertions(+)
+>  create mode 100644 include/hw/arm/npcm7xx.h
+>  create mode 100644 hw/arm/npcm7xx.c
+> 
+> diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
 > new file mode 100644
-> index 0000000..723b944
+> index 0000000000..e68d9c79e6
 > --- /dev/null
-> +++ b/docs/devel/vfio-over-socket.rst
-> @@ -0,0 +1,1135 @@
-> +***************************************
-> +VFIO-over-socket Protocol Specification
-> +***************************************
-> +
-> +Version 0.1
-
-Please include a reference to the section below explaining how
-versioning works.
-
-Also, are there rules about noting versions when updating the spec? For
-example:
-
-  When making a change to this specification, the protocol version
-  number must be included:
-
-    The `foo` field contains ... Added in version 1.3.
-
-> +
-> +Introduction
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +VFIO-over-socket, also known as vfio-user, is a protocol that allows a d=
-evice
-
-vfio-user is shorted. Now is the best time to start consistently using
-"vfio-user" as the name for this protocol. Want to drop the name
-VFIO-over-socket?
-
-> +to be virtualized in a separate process outside of QEMU. VFIO-over-socke=
-t
-
-Is there anything QEMU-specific about this protocol?
-
-I think the scope of this protocol is more general and it could be
-described as:
-
-  allows device emulation in a separate process outside of a Virtual
-  Machine Monitor (VMM).
-
-(Or "emulator" instead of VMM, if you prefer.)
-
-> +devices consist of a generic VFIO device type, living inside QEMU, which=
- we
-
-s/QEMU/the VMM/
-
-> +call the client, and the core device implementation, living outside QEMU=
-, which
-> +we call the server. VFIO-over-socket can be the main transport mechanism=
- for
-> +multi-process QEMU, however it can be used by other applications offerin=
-g
-> +device virtualization. Explaining the advantages of a
-> +disaggregated/multi-process QEMU, and device virtualization outside QEMU=
- in
-> +general, is beyond the scope of this document.
-> +
-> +This document focuses on specifying the VFIO-over-socket protocol. VFIO =
-has
-> +been chosen for the following reasons:
-
-It's a little subtle here that "VFIO" means the Linux VFIO ioctl
-interface. Expanding it a bit makes the rest of the text clearer:
-
-  The `Linux VFIO ioctl
-  interface
-  <https://www.kernel.org/doc/html/latest/driver-api/vfio.html>`_ has
-  been chosen as the base for this protocol for the following reasons:
-
-> +
-> +1) It is a mature and stable API, backed by an extensively used framewor=
-k.
-> +2) The existing VFIO client implementation (qemu/hw/vfio/) can be largel=
-y
-> +   reused.
-> +
-> +In a proof of concept implementation it has been demonstrated that using=
- VFIO
-> +over a UNIX domain socket is a viable option. VFIO-over-socket is design=
-ed with
-> +QEMU in mind, however it could be used by other client applications. The
-> +VFIO-over-socket protocol does not require that QEMU's VFIO client
-> +implementation is used in QEMU. None of the VFIO kernel modules are requ=
-ired
-> +for supporting the protocol, neither in the client nor the server, only =
-the
-> +source header files are used.
-
-In the long run only the last sentence in this paragraph needs to be in
-the specification.
-
-The proof of concept and QEMU-specific info is good to know for the
-discussion right now, but I don't think this needs to be in the
-specification.
-
-> +
-> +The main idea is to allow a virtual device to function in a separate pro=
-cess in
-> +the same host over a UNIX domain socket. A UNIX domain socket (AF_UNIX) =
-is
-> +chosen because we can trivially send file descriptors over it, which in =
-turn
-> +allows:
-> +
-> +* Sharing of guest memory for DMA with the virtual device process.
-
-Should the spec start consistently using "server" instead of various
-terms like "virtual device process"?
-
-> +* Sharing of virtual device memory with the guest for fast MMIO.
-
-The VIRTIO spec restricts itself to the terms "device" and "driver" so
-that the scope isn't too specific to virtualization of software devices.
-I think the same might be good here because who knows how
-VFIO-over-socket will be used in the future. Maybe it will be used
-outside the context of traditional guests. For example, it's a great
-interface for writing device emulation tests and fuzzers!
-
-I suggest consistently using "client" (for the guest) and "server" (for
-the device emulation process). That way the spec isn't focussed on a
-specific use case.
-
-> +* Efficient sharing of eventfd's for triggering interrupts.
-> +
-> +However, other socket types could be used which allows the virtual devic=
-e
-> +process to run in a separate guest in the same host (AF_VSOCK) or remote=
-ly
-> +(AF_INET). Theoretically the underlying transport doesn't necessarily ha=
-ve to
-> +be a socket, however we don't examine such alternatives. In this documen=
-t we
-> +focus on using a UNIX domain socket and introduce basic support for the =
-other
-> +two types of sockets without considering performance implications.
-
-This is a good place to be explicit about the protocol requirements:
-
-Is file-descriptor passing necessary?
-
-Is shared-memory necessary?
-
-Is there always an in-band message-passing fallback for any operation
-that can be optimized via fd passing?
-
-By stating something about this in the spec it's easier to ensure that
-the protocol continues to follow these design parameters in the future
-when other people make modifications.
-
-> +This document does not yet describe any internal details of the server-s=
-ide
-> +implementation, however QEMU's VFIO client implementation will have to b=
-e
-> +adapted according to this protocol in order to support VFIO-over-socket =
-virtual
-> +devices.
-
-This paragraph about the QEMU implementation status can be dropped from
-the specification.
-
-> +
-> +VFIO
-> +=3D=3D=3D=3D
-> +VFIO is a framework that allows a physical device to be securely passed =
-through
-> +to a user space process; the kernel does not drive the device at all.
-> +Typically, the user space process is a VM and the device is passed throu=
-gh to
-> +it in order to achieve high performance. VFIO provides an API and the re=
-quired
-> +functionality in the kernel. QEMU has adopted VFIO to allow a guest virt=
-ual
-> +machine to directly access physical devices, instead of emulating them i=
-n
-> +software
-
-s/software/software./
-
-> +
-> +VFIO-over-socket reuses the core VFIO concepts defined in its API, but
-> +implements them as messages to be sent over a UNIX-domain socket. It doe=
-s not
-
-Can "UNIX-domain" be dropped here? If the protocol design is intended to
-support other transports then it helps to avoid mentioning a specific
-transport even if only AF_UNIX will be implemented in the beginning.
-
-> +change the kernel-based VFIO in any way, in fact none of the VFIO kernel
-> +modules need to be loaded to use VFIO-over-socket. It is also possible f=
-or QEMU
-> +to concurrently use the current kernel-based VFIO for one guest device, =
-and use
-> +VFIO-over-socket for another device in the same guest.
-> +
-> +VFIO Device Model
-> +-----------------
-> +A device under VFIO presents a standard VFIO model to the user process. =
-Many
-
-I'm not sure what the meaning of the first sentence is.
-
-s/standard VFIO model/standard interface/ ?
-
-> +of the VFIO operations in the existing kernel model use the ioctl() syst=
-em
-> +call, and references to the existing model are called the ioctl()
-> +implementation in this document.
-> +
-> +The following sections describe the set of messages that implement the V=
-FIO
-> +device model over a UNIX domain socket. In many cases, the messages are =
-direct
-> +translations of data structures used in the ioctl() implementation. Mess=
-ages
-> +derived from ioctl()s will have a name derived from the ioctl() command =
-name.
-> +E.g., the VFIO_GET_INFO ioctl() command becomes a VFIO_USER_GET_INFO mes=
-sage.
-> +The purpose for this reuse is to share as much code as feasible with the
-> +ioctl() implementation.
-> +
-> +Client and Server
-> +^^^^^^^^^^^^^^^^^
-> +The socket connects two processes together: a client process and a serve=
-r
-> +process. In the context of this document, the client process is the proc=
-ess
-> +emulating a guest virtual machine, such as QEMU. The server process is a
-> +process that provides device emulation.
-> +
-> +Connection Initiation
-> +^^^^^^^^^^^^^^^^^^^^^
-> +After the client connects to the server, the initial server message is
-> +VFIO_USER_VERSION to propose a protocol version and set of capabilities =
-to
-> +apply to the session. The client replies with a compatible version and s=
-et of
-> +capabilities it will support, or closes the connection if it cannot supp=
-ort the
-> +advertised version.
-> +
-> +Guest Memory Configuration
-> +^^^^^^^^^^^^^^^^^^^^^^^^^^
-> +The client uses VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP messages to in=
-form
-> +the server of the valid guest DMA ranges that the server can access on b=
-ehalf
-> +of a device. Guest memory may be accessed by the server via VFIO_USER_DM=
-A_READ
-> +and VFIO_USER_DMA_WRITE messages over the socket.
-
-"Guest" is a virtualization term. "DMA Memory Configuration" and "DMA
-memory may be accessed ..." would be more general.
-
-> +
-> +An optimization for server access to guest memory is for the client to p=
-rovide
-> +file descriptors the server can mmap() to directly access guest memory. =
-Note
-> +that mmap() privileges cannot be revoked by the client, therefore file
-> +descriptors should only be exported in environments where the client tru=
-sts the
-> +server not to corrupt guest memory.
-> +
-> +Device Information
-> +^^^^^^^^^^^^^^^^^^
-> +The client uses a VFIO_USER_DEVICE_GET_INFO message to query the server =
-for
-> +information about the device. This information includes:
-> +
-> +* The device type and capabilities,
-> +* the number of memory regions, and
-
-VFIO calls them "device regions", which is clearer:
-1. It cannot be confused with "DMA Memory Regions"
-2. It allows for I/O space in additional to Memory space
-
-I suggest using "device regions" consistently.
-
-> +* the device presents to the guest the number of interrupt types the dev=
-ice
-> +  supports.
-> +
-> +Region Information
-> +^^^^^^^^^^^^^^^^^^
-> +The client uses VFIO_USER_DEVICE_GET_REGION_INFO messages to query the s=
-erver
-> +for information about the device's memory regions. This information desc=
-ribes:
-> +
-> +* Read and write permissions, whether it can be memory mapped, and wheth=
-er it
-> +  supports additional capabilities.
-> +* Region index, size, and offset.
-> +
-> +When a region can be mapped by the client, the server provides a file
-> +descriptor which the client can mmap(). The server is responsible for po=
-lling
-> +for client updates to memory mapped regions.
-> +
-> +Region Capabilities
-> +"""""""""""""""""""
-> +Some regions have additional capabilities that cannot be described adequ=
-ately
-> +by the region info data structure. These capabilities are returned in th=
-e
-> +region info reply in a list similar to PCI capabilities in a PCI device'=
-s
-> +configuration space.=20
-> +
-> +Sparse Regions
-> +""""""""""""""
-> +A region can be memory-mappable in whole or in part. When only a subset =
-of a
-> +region can be mapped by the client, a VFIO_REGION_INFO_CAP_SPARSE_MMAP
-> +capability is included in the region info reply. This capability describ=
-es
-> +which portions can be mapped by the client.
-> +
-> +For example, in a virtual NVMe controller, sparse regions can be used so=
- that
-> +accesses to the NVMe registers (found in the beginning of BAR0) are trap=
-ped (an
-> +infrequent an event), while allowing direct access to the doorbells (an
-> +extremely frequent event as every I/O submission requires a write to BAR=
-0),
-> +found right after the NVMe registers in BAR0.
-> +
-> +Interrupts
-> +^^^^^^^^^^
-> +The client uses VFIO_USER_DEVICE_GET_IRQ_INFO messages to query the serv=
-er for
-> +the device's interrupt types. The interrupt types are specific to the bu=
-s the
-> +device is attached to, and the client is expected to know the capabiliti=
-es of
-> +each interrupt type. The server can signal an interrupt either with
-> +VFIO_USER_VM_INTERRUPT messages over the socket, or can directly inject
-> +interrupts into the guest via an event file descriptor. The client confi=
-gures
-> +how the server signals an interrupt with VFIO_USER_SET_IRQS messages.
-> +
-> +Device Read and Write
-> +^^^^^^^^^^^^^^^^^^^^^
-> +When the guest executes load or store operations to device memory, the c=
-lient
-> +forwards these operations to the server with VFIO_USER_REGION_READ or
-> +VFIO_USER_REGION_WRITE messages. The server will reply with data from th=
-e
-> +device on read operations or an acknowledgement on write operations.
-> +
-> +DMA
-> +^^^
-> +When a device performs DMA accesses to guest memory, the server will for=
-ward
-> +them to the client with VFIO_USER_DMA_READ and VFIO_USER_DMA_WRITE messa=
-ges.
-> +These messages can only be used to access guest memory the client has
-> +configured into the server.
-> +
-> +Protocol Specification
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +To distinguish from the base VFIO symbols, all VFIO-over-socket symbols =
-are
-> +prefixed with vfio_user or VFIO_USER. In revision 0.1, all data is in th=
-e
-> +little-endian format, although this may be relaxed in future revision in=
- cases
-> +where the client and server are both big-endian. The messages are format=
-ted
-> +for seamless reuse of the native VFIO structs. A server can serve:
-> +
-> +1) multiple clients, and/or
-> +2) multiple virtual devices, belonging to one or more clients.
-> +
-> +Therefore each message requires a header that uniquely identifies the vi=
-rtual
-> +device. It is a server-side implementation detail whether a single serve=
-r
-> +handles multiple virtual devices from the same or multiple guests.
-> +
-> +Socket
-> +------
-> +A single UNIX domain socket is assumed to be used for each device. The l=
-ocation
-> +of the socket is implementation-specific. Multiplexing clients, devices,=
- and
-> +servers over the same socket is not supported in this version of the pro=
-tocol,
-> +but a device ID field exists in the message header so that a future supp=
-ort can
-> +be added without a major version change.
-
-There is a version negotiation mechanism for making protocol changes.
-I'm not sure there is any advantage to including the multiplexing header
-now? I suggest keeping it simple and dropping the unused header.
-
-> +
-> +Authentication
-> +--------------
-> +For AF_UNIX, we rely on OS mandatory access controls on the socket files=
-,
-> +therefore it is up to the management layer to set up the socket as requi=
-red.
-> +Socket types than span guests or hosts will require a proper authenticat=
-ion
-> +mechanism. Defining that mechanism is deferred to a future version of th=
-e
-> +protocol.
-> +
-> +Request Concurrency
-> +-------------------
-> +There can be multiple outstanding requests per virtual device, e.g. a
-> +frame buffer where the guest does multiple stores to the virtual device.=
- The
-> +server can execute and reorder non-conflicting requests in parallel, dep=
-ending
-> +on the device semantics.
-
-The word "request" has not been used up to this point in the spec. What
-does "request" mean here?
-
-I'm not sure if this section is talking about vfio-user protocol message
-exchanges (e.g. a client->server message followed by a server->client
-message) or something else?
-
-What about the ordering semantics at the vfio-user protocol level? For
-example, if a client sends multiple VFIO_USER_DMA_MAP/UNMAP messages
-then the order matters. What are the rules? I wonder if maybe
-concurrency is a special case and really only applies to a subset of
-protocol commands?
-
-I'm not sure how a client would exploit parallelism in this protocol.
-Can you give an example of a case where there would be multiple commands
-pending on a single device?
-
-> +
-> +Socket Disconnection Behavior
-> +-----------------------------
-> +The server and the client can disconnect from each other, either intenti=
-onally
-> +or unexpectedly. Both the client and the server need to know how to hand=
-le such
-> +events.
-> +
-> +Server Disconnection
-> +^^^^^^^^^^^^^^^^^^^^
-> +A server disconnecting from the client may indicate that:
-> +
-> +1) A virtual device has been restarted, either intentionally (e.g. becau=
-se of a
-> +device update) or unintentionally (e.g. because of a crash). In any case=
-, the
-> +virtual device will come back so the client should not do anything (e.g.=
- simply
-> +reconnect and retry failed operations).
-> +
-> +2) A virtual device has been shut down with no intention to be restarted=
-.
-> +
-> +It is impossible for the client to know whether or not a failure is
-> +intermittent or innocuous and should be retried, therefore the client sh=
-ould
-> +attempt to reconnect to the socket. Since an intentional server restart =
-(e.g.
-> +due to an upgrade) might take some time, a reasonable timeout should be =
-used.
-> +In cases where the disconnection is expected (e.g. the guest shutting do=
-wn), no
-> +new requests will be sent anyway so this situation doesn't pose a proble=
-m. The
-> +control stack will clean up accordingly.
-> +
-> +Parametrizing this behaviour by having the virtual device advertise a
-
-s/Parametrizing/Parameterizing/
-
-> +reasonable reconnect is deferred to a future version of the protocol.
-
-No mention is made of recovering state or how disconnect maps to VFIO
-device types (PCI, etc.). Does a disconnect mean that the device has
-been reset?
-
-> +
-> +Client Disconnection
-> +^^^^^^^^^^^^^^^^^^^^
-> +The client disconnecting from the server primarily means that the QEMU p=
-rocess
-> +has exited. Currently this means that the guest is shut down so the devi=
-ce is
-> +no longer needed therefore the server can automatically exit. However, t=
-here
-> +can be cases where a client disconnect should not result in a server exi=
-t:
-> +
-> +1) A single server serving multiple clients.
-> +2) A multi-process QEMU upgrading itself step by step, which isn't yet
-> +   implemented.
-> +
-> +Therefore in order for the protocol to be forward compatible the server =
-should
-> +take no action when the client disconnects. If anything happens to the c=
-lient
-> +process the control stack will know about it and can clean up resources
-> +accordingly.
-> +
-> +Request Retry and Response Timeout
-> +^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> +QEMU's VFIO retries certain operations if they fail. While this makes se=
-nse for
-> +real HW, we don't know for sure whether it makes sense for virtual devic=
-es. A
-> +failed request is a request that has been successfully sent and has been
-> +responded to with an error code. Failure to send the request in the firs=
-t place
-> +(e.g. because the socket is disconnected) is a different type of error e=
-xamined
-> +earlier in the disconnect section.
-> +
-> +Defining a retry and timeout scheme if deferred to a future version of t=
-he
-> +protocol.
-> +
-> +Commands
-> +--------
-> +The following table lists the VFIO message command IDs, and whether the
-> +message request is sent from the client or the server.
-> +
-> ++----------------------------------+---------+-------------------+
-> +| Name                             | Command | Request Direction |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| VFIO_USER_VERSION                | 1       | server ???????? client   =
-|
-
-Unicode issues? I see "????????" instead of the characters that were
-supposed to be here.
-
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DMA_MAP                | 2       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DMA_UNMAP              | 3       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DEVICE_GET_INFO        | 4       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DEVICE_GET_REGION_INFO | 5       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DEVICE_GET_IRQ_INFO    | 6       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DEVICE_SET_IRQS        | 7       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_REGION_READ            | 8       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_REGION_WRITE           | 9       | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DMA_READ               | 10      | server ???????? client   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_DMA_READ               | 11      | server ???????? client   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_USER_VM_INTERRUPT           | 12      | server ???????? client   =
-|
-> ++----------------------------------+---------+-------------------+
-> +| VFIO_DEVICE_RESET                | 13      | client ???????? server   =
-|
-> ++----------------------------------+---------+-------------------+
-
-Why is this command named VFIO_DEVICE_RESET and not
-VFIO_USER_DEVICE_RESET?
-
-> +
-> +Header
-> +------
-> +All messages are preceded by a 16 byte header that contains basic inform=
-ation
-
-I suggest dropping "16 byte" here because the table already shows this
-and it is easy to forget to update the text when changing the table.
-
-> +about the message. The header is followed by message-specific data descr=
-ibed
-> +in the sections below.
-> +
-> ++----------------+--------+-------------+
-> +| Name           | Offset | Size        |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=
-=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID      | 0      | 2           |
-> ++----------------+--------+-------------+
-> +| Message ID     | 2      | 2           |
-> ++----------------+--------+-------------+
-> +| Command        | 4      | 4           |
-> ++----------------+--------+-------------+
-> +| Message size   | 8      | 4           |
-> ++----------------+--------+-------------+
-> +| Flags          | 12     | 4           |
-> ++----------------+--------+-------------+
-> +|                | +-----+------------+ |
-> +|                | | Bit | Definition | |
-> +|                | +=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-+ |
-> +|                | | 0   | Reply      | |
-> +|                | +-----+------------+ |
-> +|                | | 1   | No_reply   | |
-> +|                | +-----+------------+ |=20
-> ++----------------+--------+-------------+
-> +| <message data> | 16     | variable    |
-> ++----------------+--------+-------------+
-> +
-> +* Device ID identifies the destination device of the message. This field=
- is
-> +  reserved when the server only supports one device per socket.
-
-Clearer:
-s/is reserved/must be 0/
-
-> +* Message ID identifies the message, and is used in the message acknowle=
-dgement.
-
-Are Message IDs global or per-device?
-
-> +* Command specifies the command to be executed, listed in the Command Ta=
-ble.
-> +* Message size contains the size of the entire message, including the he=
-ader.
-> +* Flags contains attributes of the message:
-> +
-> +  * The reply bit differentiates request messages from reply messages. A=
- reply
-> +    message acknowledges a previous request with the same message ID.
-> +  * No_reply indicates that no reply is needed for this request. This is
-> +    commonly used when multiple requests are sent, and only the last nee=
-ds
-> +    acknowledgement.
-
-Is_Reply and Dont_Reply are more self-explanatory to me, but this is
-probably subjective.
-
-> +
-> +VFIO_USER_VERSION
-> +-----------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+------------------------+
-> +| Name         | Value                  |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | 0                      |
-> ++--------------+------------------------+
-
-The Device ID is always 0 and this message is sent just once regardless
-of the number of devices? Please describe this explicitly so it's clear
-that this message is per-session and not per-device.
-
-There could also be a special NO_DEVICE (0xff) value but I don't think
-it matters.
-
-> +| Message ID   | <ID>                   |
-> ++--------------+------------------------+
-> +| Command      | 1                      |
-> ++--------------+------------------------+
-> +| Message size | 16 + version length    |
-> ++--------------+------------------------+
-> +| Flags        | Reply bit set in reply |
-> ++--------------+------------------------+
-> +| Version      | JSON byte array        |
-> ++--------------+------------------------+
-> +
-> +This is the initial message sent by the server after the socket connecti=
-on is
-> +established. The version is in JSON format, and the following objects mu=
-st be
-> +included:
-> +
-> ++--------------+--------+-----------------------------------------------=
-----+
-> +| Name         | Type   | Description                                   =
-    |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D+=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-+
-> +| version      | object | {???????major????????: <number>, ???????minor?=
-???????: <number>}            |
-
-More Unicode issues.
-
-> +|              |        | Version supported by the sender, e.g. ???????0=
-.1????????.      |
-> ++--------------+--------+-----------------------------------------------=
-----+
-> +| type         | string | Fixed to ???????vfio-user????????.            =
-                 |
-> ++--------------+--------+-----------------------------------------------=
-----+
-> +| capabilities | array  | Reserved. Can be omitted for v0.1, otherwise m=
-ust |
-> +|              |        | be empty.                                     =
-    |
-> ++--------------+--------+-----------------------------------------------=
-----+
-
-s/array/array of strings/ ?
-
-> +
-> +Versioning and Feature Support
-> +^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> +Upon accepting a connection, the server must send a VFIO_USER_VERSION me=
-ssage
-> +proposing a protocol version and a set of capabilities. The client compa=
-res
-> +these with the versions and capabilities it supports and sends a
-> +VFIO_USER_VERSION reply according to the following rules.
-> +
-> +* The major version in the reply must be the same as proposed. If the cl=
-ient
-> +  does not support the proposed major, it closes the connection.
-> +* The minor version in the reply must be equal to or less than the minor
-> +  version proposed.
-> +* The capability list must be a subset of those proposed. If the client
-> +  requires a capability the server did not include, it closes the connec=
-tion.
-> +* If type is not ???????vfio-user????????, the client closes the connect=
-ion.
-
-Is there a rationale for this field? In order to get to the point where
-this JSON is parsed we must already implement the vfio-user protocol
-(e.g. parse the header).
-
-> +
-> +The protocol major version will only change when incompatible protocol c=
-hanges
-> +are made, such as changing the message format. The minor version may cha=
-nge
-> +when compatible changes are made, such as adding new messages or capabil=
-ities,
-> +Both the client and server must support all minor versions less than the
-> +maximum minor version it supports. E.g., an implementation that supports
-> +version 1.3 must also support 1.0 through 1.2.
-> +
-> +VFIO_USER_DMA_MAP
-> +-----------------
-> +
-> +VFIO_USER_DMA_UNMAP
-> +-------------------
-> +
-> +Message Format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+------------------------+
-> +| Name         | Value                  |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | 0                      |
-> ++--------------+------------------------+
-
-Is this message per-session instead of per-device?
-
-This has implications on IOMMU semantics. Two different devices sharing
-a connection have access to the same DMA memory?
-
-> +| Message ID   | <ID>                   |
-> ++--------------+------------------------+
-> +| Command      | MAP=3D2, UNMAP=3D3         |
-> ++--------------+------------------------+
-> +| Message size | 16 + table size        |
-> ++--------------+------------------------+
-> +| Flags        | Reply bit set in reply |
-> ++--------------+------------------------+
-> +| Table        | array of table entries |
-> ++--------------+------------------------+
-> +
-> +This message is sent by the client to the server to inform it of the gue=
-st
-> +memory regions the device can access. It must be sent before the device =
-can
-> +perform any DMA to the guest. It is normally sent directly after the ver=
-sion
-> +handshake is completed, but may also occur when memory is added or subtr=
-acted
-> +in the guest.
-> +
-> +The table is an array of the following structure. This structure is 32 b=
-ytes
-> +in size, so the message size will be 16 + (# of table entries * 32). If =
-a
-> +region being added can be directly mapped by the server, an array of fil=
-e
-> +descriptors will be sent as part of the message meta-data. Each region e=
-ntry
-> +will have a corresponding file descriptor. On AF_UNIX sockets, the file
-> +descriptors will be passed as SCM_RIGHTS type ancillary data.
-> +
-> +Table entry format
-> +^^^^^^^^^^^^^^^^^^
-> +
-> ++-------------+--------+-------------+
-> +| Name        | Offset | Size        |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Address     | 0      | 8           |
-> ++-------------+--------+-------------+
-> +| Size        | 8      | 8           |
-> ++-------------+--------+-------------+
-> +| Offset      | 16     | 8           |
-> ++-------------+--------+-------------+
-> +| Protections | 24     | 4           |
-> ++-------------+--------+-------------+
-> +| Flags       | 28     | 4           |
-> ++-------------+--------+-------------+
-> +|             | +-----+------------+ |
-> +|             | | Bit | Definition | |
-> +|             | +=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+ |
-> +|             | | 0   | Mappable   | |
-> +|             | +-----+------------+ |
-> ++-------------+--------+-------------+
-> +
-> +* Address is the base DMA address of the region.
-> +* Size is the size of the region.
-> +* Offset is the file offset of the region with respect to the associated=
- file
-> +  descriptor.
-> +* Protections are the region's protection attributes as encoded in
-> +  ``<sys/mman.h>``.
-> +* Flags contain the following region attributes:
-> +
-> +  * Mappable indicate the region can be mapped via the mmap() system cal=
-l using
-> +    the file descriptor provided in the message meta-data.
-
-What are the semantics of map/unmap with respect to mapping over
-existing regions, unmapping a subset of an existing region, etc?
-
-What are the concerns for MAP/UNMAP while the device is operational and
-may be performing DMA? Should this command be combined into a single
-VFIO_USER_SET_DMA_REGIONS command with Flags Bit 1 indicating Add/Delete
-so that a single message can atomically add and delete DMA regions?
-
-What is the format of the reply to this message?
-
-> +
-> +VFIO_USER_DEVICE_GET_INFO
-> +-------------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+----------------------------+
-> +| Name         | Value                      |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | <ID>                       |
-> ++--------------+----------------------------+
-> +| Message ID   | <ID>                       |
-> ++--------------+----------------------------+
-> +| Command      | 4                          |
-> ++--------------+----------------------------+
-> +| Message size | 16 in request, 32 in reply |
-> ++--------------+----------------------------+
-> +| Flags        | Reply bit set in reply     |
-> ++--------------+----------------------------+
-> +| Device info  | VFIO device info           |
-> ++--------------+----------------------------+
-> +
-> +This message is sent by the client to the server to query for basic info=
-rmation
-> +about the device. Only the message header is needed in the request messa=
-ge.
-> +The VFIO device info structure is defined in ``<sys/vfio.h>`` (``struct
-> +vfio_device_info``).
-> +
-> +VFIO device info format
-> +^^^^^^^^^^^^^^^^^^^^^^^
-> +
-> ++-------------+--------+--------------------------+
-> +| Name        | Offset | Size                     |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| argsz       | 16     | 4                        |
-> ++-------------+--------+--------------------------+
-> +| flags       | 20     | 4                        |
-> ++-------------+--------+--------------------------+
-> +|             | +-----+-------------------------+ |
-> +|             | | Bit | Definition              | |
-> +|             | +=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+ |
-> +|             | | 0   | VFIO_DEVICE_FLAGS_RESET | |
-> +|             | +-----+-------------------------+ |
-> +|             | | 1   | VFIO_DEVICE_FLAGS_PCI   | |
-> +|             | +-----+-------------------------+ |
-> ++-------------+--------+--------------------------+
-> +| num_regions | 24     | 4                        |
-> ++-------------+--------+--------------------------+
-> +| num_irqs    | 28     | 4                        |
-> ++-------------+--------+--------------------------+
-> +
-> +* argz is reserved in vfio-user, it is only used in the ioctl() VFIO
-> +  implementation.
-> +* flags contains the following device attributes.
-> +
-> +  * VFIO_DEVICE_FLAGS_RESET indicates the device supports the
-> +    VFIO_USER_DEVICE_RESET message.
-
-Why is VFIO_USER_DEVICE_RESET support optional?
-
-> +  * VFIO_DEVICE_FLAGS_PCI indicates the device is a PCI device.
-> +
-> +* num_regions is the number of memory regions the device exposes.
-> +* num_irqs is the number of distinct interrupt types the device supports=
-.
-> +
-> +This version of the protocol only supports PCI devices. Additional devic=
-es may
-> +be supported in future versions.=20
-> +
-> +VFIO_USER_DEVICE_GET_REGION_INFO
-> +--------------------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+------------------+
-> +| Name         | Value            |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | <ID>             |
-> ++--------------+------------------+
-> +| Message ID   | <ID>             |
-> ++--------------+------------------+
-> +| Command      | 5                |=20
-> ++--------------+------------------+
-> +| Message size | 48 + any caps    |
-> ++--------------+------------------+
-
-The client does not know how much space capabilities need when sending
-the request. Should the client send a 48-byte request and expect the
-server to reply with a 48+ byte response?
-
-> +DMA Read/Write Data
-> +^^^^^^^^^^^^^^^^^^^
-> +
-> ++---------+--------+----------+
-> +| Name    | Offset | Size     |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D+
-> +| Address | 16     | 8        |
-> ++---------+--------+----------+
-> +| Count   | 24     | 4        |
-> ++---------+--------+----------+
-> +| Data    | 28     | variable |
-> ++---------+--------+----------+
-> +
-> +* Address is the area of guest memory being accessed. This address must =
-have
-> +  been exported to the server with a VFIO_USER_DMA_MAP message.
-> +* Count is the size of the data to be transferred.
-> +* Data is the data to be read or written.
-> +
-> +Address and count can also be accessed as ``struct iovec`` from ``<sys/u=
-io.h>``.
-
-This seems to be incorrect since the count field is 4 bytes but struct
-iovec::iov_len is size_t (64-bit on 64-bit hosts).
-
-> +
-> +VFIO_USER_REGION_READ
-> +---------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+------------------------+
-> +| Name         | Value                  |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | <ID>                   |
-> ++--------------+------------------------+
-> +| Message ID   | <ID>                   |
-> ++--------------+------------------------+
-> +| Command      | 8                      |
-> ++--------------+------------------------+
-> +| Message size | 32 + data size         |
-> ++--------------+------------------------+
-> +| Flags Reply  | bit set in reply       |
-> ++--------------+------------------------+
-> +| Read info    | REGION read/write data |
-> ++--------------+------------------------+
-> +
-> +This request is sent from the client to the server to read from device m=
-emory.
-> +In the request messages, there will be no data, and the count field will=
- be the
-> +amount of data to be read. The reply will include the data read, and its=
- count
-> +field will be the amount of data read.
-> +
-> +VFIO_USER_REGION_WRITE
-> +----------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+------------------------+
-> +| Name         | Value                  |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | <ID>                   |
-> ++--------------+------------------------+
-> +| Message ID   | <ID>                   |
-> ++--------------+------------------------+
-> +| Command      | 9                      |
-> ++--------------+------------------------+
-> +| Message size | 32 + data size         |
-> ++--------------+------------------------+
-> +| Flags        | Reply bit set in reply |
-> ++--------------+------------------------+
-> +| Write info   | REGION read write data |
-> ++--------------+------------------------+
-> +
-> +This request is sent from the client to the server to write to device me=
-mory.
-> +The request message will contain the data to be written, and its count f=
-ield
-> +will contain the amount of write data. The count field in the reply will=
- be
-> +zero.
-> +
-> +VFIO_USER_DMA_READ
-> +------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+---------------------+
-> +| Name         | Value               |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | <ID>                |
-> ++--------------+---------------------+
-> +| Message ID   | <ID>                |
-> ++--------------+---------------------+
-> +| Command      | 10                  |
-> ++--------------+---------------------+
-> +| Message size | 28 + data size      |
-> ++--------------+---------------------+
-> +| Flags Reply  | bit set in reply    |
-> ++--------------+---------------------+
-> +| DMA info     | DMA read/write data |
-> ++--------------+---------------------+
-> +
-> +This request is sent from the server to the client to read from guest me=
-mory.
-> +In the request messages, there will be no data, and the count field will=
- be the
-> +amount of data to be read. The reply will include the data read, and its=
- count
-> +field will be the amount of data read.
-> +
-> +VFIO_USER_DMA_WRITE
-> +-------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+------------------------+
-> +| Name         | Value                  |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | <ID>                   |
-> ++--------------+------------------------+
-> +| Message ID   | <ID>                   |
-> ++--------------+------------------------+
-> +| Command      | 11                     |
-> ++--------------+------------------------+
-> +| Message size | 28 + data size         |
-> ++--------------+------------------------+
-> +| Flags        | Reply bit set in reply |
-> ++--------------+------------------------+
-> +| DMA info     | DMA read/write data    |
-> ++--------------+------------------------+
-> +
-> +This request is sent from the server to the client to write to guest mem=
-ory.
-> +The request message will contain the data to be written, and its count f=
-ield
-> +will contain the amount of write data. The count field in the reply will=
- be
-> +zero.
-> +
-> +VFIO_USER_VM_INTERRUPT
-> +----------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++----------------+------------------------+
-> +| Name           | Value                  |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID      | <ID>                   |
-> ++----------------+------------------------+
-> +| Message ID     | <ID>                   |
-> ++----------------+------------------------+
-> +| Command        | 12                     |
-> ++----------------+------------------------+
-> +| Message size   | 24                     |
-> ++----------------+------------------------+
-> +| Flags          | Reply bit set in reply |
-> ++----------------+------------------------+
-> +| Interrupt info | <interrupt>            |
-> ++----------------+------------------------+
-> +
-> +This request is sent from the server to the client to signal the device =
-has
-> +raised an interrupt.
-> +
-> +Interrupt info format
-> +^^^^^^^^^^^^^^^^^^^^^
-> +
-> ++----------+--------+------+
-> +| Name     | Offset | Size |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=
-=3D+
-> +| Index    | 16     | 4    |
-> ++----------+--------+------+
-> +| Subindex | 20     | 4    |
-> ++----------+--------+------+
-> +
-> +* Index is the interrupt index; it is the same value used in VFIO_USER_S=
-ET_IRQS.
-> +* Subindex is relative to the index, e.g., the vector number used in PCI=
- MSI/X
-> +  type interrupts.
-> +
-> +VFIO_USER_DEVICE_RESET
-> +----------------------
-> +
-> +Message format
-> +^^^^^^^^^^^^^^
-> +
-> ++--------------+------------------------+
-> +| Name         | Value                  |
-> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
-> +| Device ID    | <ID>                   |
-> ++--------------+------------------------+
-> +| Message ID   | <ID>                   |
-> ++--------------+------------------------+
-> +| Command      | 13                     |
-> ++--------------+------------------------+
-> +| Message size | 16                     |
-> ++--------------+------------------------+
-> +| Flags        | Reply bit set in reply |
-> ++--------------+------------------------+
-> +
-> +This request is sent from the client to the server to reset the device.
-
-How are errors treated in any of these commands? For example, if memory
-addresses are out-of-bounds?
-
---enGqbSaueFq5omEL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8RlvEACgkQnKSrs4Gr
-c8gZ9wf+N9XTRTbBmjcKUJ6TbD4HONpoqxD2JVyRy3M66hZ3uQqHhXkzUZkCHcRM
-ikHA8T+aOYrzYWh+8rwmO2oMCtyC0UpLmK8aNkLvrTB9QyXkeI4JLyzEVBqM5uQ+
-/GQ2NvmA0jgsVLwDSDdac6Ezl/1on/4KlQFHqlWlA8AalaJMciTojigpAhCIzkfC
-FD0EDi9a9dPQuaG8hrsUNSyE2H2GSqX57bGCnf0bIQHh7jL0N1cLyIcuZiHJT9aB
-Izuby4njDPGyRSNvFN05lLgy+u1NyU1eo6sRJ9WDQWng15qYZ+i3fg4Qbw2Iyktz
-ixR10dBe3oPAWoGWMijLMTqUEoFR7w==
-=PjqZ
------END PGP SIGNATURE-----
-
---enGqbSaueFq5omEL--
+> +++ b/include/hw/arm/npcm7xx.h
+> @@ -0,0 +1,85 @@
+> +/*
+> + * Nuvoton NPCM7xx SoC family.
+> + *
+> + * Copyright 2020 Google LLC
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License as published by the
+> + * Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+> + * for more details.
+> + */
+> +#ifndef NPCM7XX_H
+> +#define NPCM7XX_H
+> +
+> +#include "hw/boards.h"
+> +#include "hw/cpu/a9mpcore.h"
+> +#include "hw/misc/npcm7xx_clk.h"
+> +#include "hw/misc/npcm7xx_gcr.h"
+> +#include "hw/timer/npcm7xx_timer.h"
+> +#include "target/arm/cpu.h"
+> +
+> +#define NPCM7XX_MAX_NUM_CPUS    (2)
+> +
+> +/* The first half of the address space is reserved for DDR4 DRAM. */
+> +#define NPCM7XX_DRAM_BA         (0x00000000)
+> +#define NPCM7XX_DRAM_SZ         (2 * GiB)
+> +
+> +/* Magic addresses for setting up direct kernel booting and SMP boot stubs. */
+> +#define NPCM7XX_LOADER_START            (0x00000000)  /* Start of SDRAM */
+> +#define NPCM7XX_SMP_LOADER_START        (0xffff0000)  /* Boot ROM */
+> +#define NPCM7XX_SMP_BOOTREG_ADDR        (0xf080013c)  /* GCR.SCRPAD */
+> +#define NPCM7XX_GIC_CPU_IF_ADDR         (0xf03fe100)  /* GIC within A9 */
+> +
+> +typedef struct NPCM7xxState {
+> +    DeviceState         parent;
+> +
+> +    ARMCPU              cpu[NPCM7XX_MAX_NUM_CPUS];
+> +    A9MPPrivState       a9mpcore;
+> +
+> +    MemoryRegion        sram;
+> +    MemoryRegion        irom;
+> +    MemoryRegion        ram3;
+> +    MemoryRegion        *dram;
+> +
+> +    NPCM7xxGCRState     gcr;
+> +    NPCM7xxCLKState     clk;
+> +    NPCM7xxTimerCtrlState tim[3];
+> +} NPCM7xxState;
+> +
+> +#define TYPE_NPCM7XX    "npcm7xx"
+> +#define NPCM7XX(obj)    OBJECT_CHECK(NPCM7xxState, (obj), TYPE_NPCM7XX)
+> +
+> +#define TYPE_NPCM730    "npcm730"
+> +#define TYPE_NPCM750    "npcm750"
+> +
+> +typedef struct NPCM7xxClass {
+> +    DeviceClass         parent;
+> +
+> +    /* Bitmask of modules that are permanently disabled on this chip. */
+> +    uint32_t            disabled_modules;
+> +    /* Number of CPU cores enabled in this SoC class (may be 1 or 2). */
+> +    uint32_t            num_cpus;
+> +} NPCM7xxClass;
+> +
+> +#define NPCM7XX_CLASS(klass)                                            \
+> +    OBJECT_CLASS_CHECK(NPCM7xxClass, (klass), TYPE_NPCM7XX)
+> +#define NPCM7XX_GET_CLASS(obj)                                          \
+> +    OBJECT_GET_CLASS(NPCM7xxClass, (obj), TYPE_NPCM7XX)
+> +
+> +/**
+> + * npcm7xx_load_kernel - Loads memory with everything needed to boot
+> + * @machine - The machine containing the SoC to be booted.
+> + * @soc - The SoC containing the CPU to be booted.
+> + *
+> + * This will set up the ARM boot info structure for the specific NPCM7xx
+> + * derivative and call arm_load_kernel() to set up loading of the kernel, etc.
+> + * into memory, if requested by the user.
+> + */
+> +void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc);
+> +
+> +#endif /* NPCM7XX_H */
+> diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+> new file mode 100644
+> index 0000000000..9669ac5fa0
+> --- /dev/null
+> +++ b/hw/arm/npcm7xx.c
+> @@ -0,0 +1,407 @@
+> +/*
+> + * Nuvoton NPCM7xx SoC family.
+> + *
+> + * Copyright 2020 Google LLC
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License as published by the
+> + * Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+> + * for more details.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "exec/address-spaces.h"
+> +#include "hw/arm/boot.h"
+> +#include "hw/arm/npcm7xx.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/loader.h"
+> +#include "hw/misc/unimp.h"
+> +#include "hw/qdev-properties.h"
+> +#include "qapi/error.h"
+> +#include "qemu/units.h"
+> +#include "sysemu/sysemu.h"
+> +
+> +/*
+> + * This covers the whole MMIO space. We'll use this to catch any MMIO accesses
+> + * that aren't handled by any device.
+> + */
+> +#define NPCM7XX_MMIO_BA         (0x80000000)
+> +#define NPCM7XX_MMIO_SZ         (0x7ffd0000)
+> +
+> +/* Core system modules. */
+> +#define NPCM7XX_L2C_BA          (0xf03fc000)
+> +#define NPCM7XX_CPUP_BA         (0xf03fe000)
+> +#define NPCM7XX_GCR_BA          (0xf0800000)
+> +#define NPCM7XX_CLK_BA          (0xf0801000)
+> +
+> +/* Internal AHB SRAM */
+> +#define NPCM7XX_RAM3_BA         (0xc0008000)
+> +#define NPCM7XX_RAM3_SZ         (4 * KiB)
+> +
+> +/* Memory blocks at the end of the address space */
+> +#define NPCM7XX_RAM2_BA         (0xfffd0000)
+> +#define NPCM7XX_RAM2_SZ         (128 * KiB)
+> +#define NPCM7XX_ROM_BA          (0xffff0000)
+> +#define NPCM7XX_ROM_SZ          (64 * KiB)
+> +
+> +/*
+> + * Interrupt lines going into the GIC. This does not include internal Cortex-A9
+> + * interrupts.
+> + */
+> +enum NPCM7xxInterrupt {
+> +    NPCM7XX_UART0_IRQ           = 2,
+> +    NPCM7XX_UART1_IRQ,
+> +    NPCM7XX_UART2_IRQ,
+> +    NPCM7XX_UART3_IRQ,
+> +    NPCM7XX_TIMER0_IRQ          = 32,   /* Timer Module 0 */
+> +    NPCM7XX_TIMER1_IRQ,
+> +    NPCM7XX_TIMER2_IRQ,
+> +    NPCM7XX_TIMER3_IRQ,
+> +    NPCM7XX_TIMER4_IRQ,
+> +    NPCM7XX_TIMER5_IRQ,                 /* Timer Module 1 */
+> +    NPCM7XX_TIMER6_IRQ,
+> +    NPCM7XX_TIMER7_IRQ,
+> +    NPCM7XX_TIMER8_IRQ,
+> +    NPCM7XX_TIMER9_IRQ,
+> +    NPCM7XX_TIMER10_IRQ,                /* Timer Module 2 */
+> +    NPCM7XX_TIMER11_IRQ,
+> +    NPCM7XX_TIMER12_IRQ,
+> +    NPCM7XX_TIMER13_IRQ,
+> +    NPCM7XX_TIMER14_IRQ,
+> +};
+> +
+> +/* Total number of GIC interrupts, including internal Cortex-A9 interrupts. */
+> +#define NPCM7XX_NUM_IRQ         (160)
+> +
+> +/* Register base address for each Timer Module */
+> +static const hwaddr npcm7xx_tim_addr[] = {
+> +    0xf0008000,
+> +    0xf0009000,
+> +    0xf000a000,
+> +};
+> +
+> +/* Register base address for each 16550 UART */
+> +static const hwaddr npcm7xx_uart_addr[] = {
+> +    0xf0001000,
+> +    0xf0002000,
+> +    0xf0003000,
+> +    0xf0004000,
+> +};
+> +
+> +static void npcm7xx_write_secondary_boot(ARMCPU *cpu,
+> +                                         const struct arm_boot_info *info)
+> +{
+> +    /*
+> +     * The default smpboot stub halts the secondary CPU with a 'wfi'
+> +     * instruction, but the arch/arm/mach-npcm/platsmp.c in the Linux kernel
+> +     * does not send an IPI to wake it up, so the second CPU fails to boot. So
+> +     * we need to provide our own smpboot stub that can not use 'wfi', it has
+> +     * to spin the secondary CPU until the first CPU writes to the SCRPAD reg.
+> +     */
+> +    uint32_t smpboot[] = {
+> +        0xe59f2018,     /* ldr r2, bootreg_addr */
+> +        0xe3a00000,     /* mov r0, #0 */
+> +        0xe5820000,     /* str r0, [r2] */
+> +        0xe320f002,     /* wfe */
+> +        0xe5921000,     /* ldr r1, [r2] */
+> +        0xe1110001,     /* tst r1, r1 */
+> +        0x0afffffb,     /* beq <wfe> */
+> +        0xe12fff11,     /* bx r1 */
+> +        NPCM7XX_SMP_BOOTREG_ADDR,
+> +    };
+> +    int i;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(smpboot); i++) {
+> +        smpboot[i] = tswap32(smpboot[i]);
+> +    }
+> +
+> +    rom_add_blob_fixed("smpboot", smpboot, sizeof(smpboot),
+> +                       NPCM7XX_SMP_LOADER_START);
+> +}
+> +
+> +static struct arm_boot_info npcm7xx_binfo = {
+> +    .loader_start           = NPCM7XX_LOADER_START,
+> +    .smp_loader_start       = NPCM7XX_SMP_LOADER_START,
+> +    .smp_bootreg_addr       = NPCM7XX_SMP_BOOTREG_ADDR,
+> +    .gic_cpu_if_addr        = NPCM7XX_GIC_CPU_IF_ADDR,
+> +    .write_secondary_boot   = npcm7xx_write_secondary_boot,
+> +    .board_id               = -1,
+> +};
+> +
+> +void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
+> +{
+> +    NPCM7xxClass *sc = NPCM7XX_GET_CLASS(soc);
+> +
+> +    npcm7xx_binfo.ram_size = machine->ram_size;
+> +    npcm7xx_binfo.nb_cpus = sc->num_cpus;
+> +
+> +    arm_load_kernel(&soc->cpu[0], machine, &npcm7xx_binfo);
+> +}
+> +
+> +static qemu_irq npcm7xx_irq(NPCM7xxState *s, int n)
+> +{
+> +    return qdev_get_gpio_in(DEVICE(&s->a9mpcore), n);
+> +}
+> +
+> +static void npcm7xx_init(Object *obj)
+> +{
+> +    NPCM7xxState *s = NPCM7XX(obj);
+> +    int i;
+> +
+> +    for (i = 0; i < NPCM7XX_MAX_NUM_CPUS; i++) {
+> +        object_initialize_child(obj, "cpu[*]", &s->cpu[i],
+> +                                ARM_CPU_TYPE_NAME("cortex-a9"));
+> +    }
+> +
+> +    object_initialize_child(obj, "a9mpcore", &s->a9mpcore, TYPE_A9MPCORE_PRIV);
+> +    object_initialize_child(obj, "gcr", &s->gcr, TYPE_NPCM7XX_GCR);
+> +    object_property_add_alias(obj, "power-on-straps", OBJECT(&s->gcr),
+> +                              "power-on-straps");
+> +    object_initialize_child(obj, "clk", &s->clk, TYPE_NPCM7XX_CLK);
+> +
+> +    for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+> +        object_initialize_child(obj, "tim[*]", &s->tim[i], TYPE_NPCM7XX_TIMER);
+> +    }
+> +}
+> +
+> +static void npcm7xx_realize(DeviceState *dev, Error **errp)
+> +{
+> +    NPCM7xxState *s = NPCM7XX(dev);
+> +    NPCM7xxClass *nc = NPCM7XX_GET_CLASS(s);
+> +    int i;
+> +
+> +    if (memory_region_size(s->dram) > NPCM7XX_DRAM_SZ) {
+> +        error_setg(errp, "%s: NPCM7xx cannot address more than %" PRIu64
+> +                   " MiB of DRAM", __func__, NPCM7XX_DRAM_SZ / MiB);
+> +        return;
+> +    }
+> +
+> +    /* CPUs */
+> +    for (i = 0; i < nc->num_cpus; i++) {
+> +        object_property_set_int(OBJECT(&s->cpu[i]), "mp-affinity",
+> +                                arm_cpu_mp_affinity(i, NPCM7XX_MAX_NUM_CPUS),
+> +                                &error_abort);
+> +        object_property_set_int(OBJECT(&s->cpu[i]), "reset-cbar",
+> +                                NPCM7XX_GIC_CPU_IF_ADDR, &error_abort);
+> +        object_property_set_bool(OBJECT(&s->cpu[i]), "reset-hivecs", true,
+> +                                 &error_abort);
+> +
+> +        /* Disable security extensions. */
+> +        object_property_set_bool(OBJECT(&s->cpu[i]), "has_el3", false,
+> +                                 &error_abort);
+> +
+> +        if (!qdev_realize(DEVICE(&s->cpu[i]), NULL, errp)) {
+> +            return;
+> +        }
+> +    }
+> +
+> +    /* A9MPCORE peripherals. Can only fail if we pass bad parameters here. */
+> +    object_property_set_int(OBJECT(&s->a9mpcore), "num-cpu", nc->num_cpus,
+> +                            &error_abort);
+> +    object_property_set_int(OBJECT(&s->a9mpcore), "num-irq", NPCM7XX_NUM_IRQ,
+> +                            &error_abort);
+> +    sysbus_realize(SYS_BUS_DEVICE(&s->a9mpcore), &error_abort);
+
+shouldn't we test the return value and use errp ? I don't know what
+was agreed upon. 
+
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->a9mpcore), 0, NPCM7XX_CPUP_BA);
+> +
+> +    for (i = 0; i < nc->num_cpus; i++) {
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->a9mpcore), i,
+> +                           qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_IRQ));
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->a9mpcore), i + nc->num_cpus,
+> +                           qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_FIQ));
+> +    }
+> +
+> +    /* L2 cache controller */
+> +    sysbus_create_simple("l2x0", NPCM7XX_L2C_BA, NULL);
+> +
+> +    /* System Global Control Registers (GCR). Can fail due to user input. */
+> +    object_property_set_int(OBJECT(&s->gcr), "disabled-modules",
+> +                            nc->disabled_modules, &error_abort);
+> +    object_property_add_const_link(OBJECT(&s->gcr), "dram-mr", OBJECT(s->dram));
+> +    if (!sysbus_realize(SYS_BUS_DEVICE(&s->gcr), errp)) {
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gcr), 0, NPCM7XX_GCR_BA);
+> +
+> +    /* Clock Control Registers (CLK). Cannot fail. */
+> +    sysbus_realize(SYS_BUS_DEVICE(&s->clk), &error_abort);
+
+same here.
+
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->clk), 0, NPCM7XX_CLK_BA);
+> +
+> +    /* Timer Modules (TIM). Cannot fail. */
+> +    QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) != ARRAY_SIZE(s->tim));
+> +    for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+> +        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->tim[i]);
+> +        int first_irq;
+> +        int j;
+> +
+> +        sysbus_realize(sbd, &error_abort);
+
+and here.
+
+> +        sysbus_mmio_map(sbd, 0, npcm7xx_tim_addr[i]);
+> +
+> +        first_irq = NPCM7XX_TIMER0_IRQ + i * NPCM7XX_TIMERS_PER_CTRL;
+> +        for (j = 0; j < NPCM7XX_TIMERS_PER_CTRL; j++) {
+> +            qemu_irq irq = npcm7xx_irq(s, first_irq + j);
+> +            sysbus_connect_irq(sbd, j, irq);
+> +        }
+> +    }
+> +
+> +    /* UART0..3 (16550 compatible) */
+> +    for (i = 0; i < ARRAY_SIZE(npcm7xx_uart_addr); i++) {
+> +        serial_mm_init(get_system_memory(), npcm7xx_uart_addr[i], 2,
+> +                       npcm7xx_irq(s, NPCM7XX_UART0_IRQ + i), 115200,
+> +                       serial_hd(i), DEVICE_LITTLE_ENDIAN);
+> +    }
+> +
+> +    /* RAM2 (SRAM) */
+> +    memory_region_init_ram(&s->sram, OBJECT(dev), "ram2",
+> +                           NPCM7XX_RAM2_SZ, &error_abort);
+> +    memory_region_add_subregion(get_system_memory(), NPCM7XX_RAM2_BA, &s->sram);
+> +
+> +    /* RAM3 (SRAM) */
+> +    memory_region_init_ram(&s->ram3, OBJECT(dev), "ram3",
+> +                           NPCM7XX_RAM3_SZ, &error_abort);
+> +    memory_region_add_subregion(get_system_memory(), NPCM7XX_RAM3_BA, &s->ram3);
+> +
+> +    /* Internal ROM */
+> +    memory_region_init_rom(&s->irom, OBJECT(dev), "irom", NPCM7XX_ROM_SZ,
+> +                           &error_abort);
+> +    memory_region_add_subregion(get_system_memory(), NPCM7XX_ROM_BA, &s->irom);
+> +
+> +    create_unimplemented_device("npcm7xx.shm",          0xc0001000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.vdmx",         0xe0800000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.pcierc",       0xe1000000,  64 * KiB);
+> +    create_unimplemented_device("npcm7xx.kcs",          0xf0007000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.rng",          0xf000b000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.adc",          0xf000c000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gfxi",         0xf000e000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[0]",      0xf0010000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[1]",      0xf0011000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[2]",      0xf0012000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[3]",      0xf0013000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[4]",      0xf0014000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[5]",      0xf0015000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[6]",      0xf0016000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.gpio[7]",      0xf0017000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[0]",     0xf0080000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[1]",     0xf0081000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[2]",     0xf0082000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[3]",     0xf0083000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[4]",     0xf0084000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[5]",     0xf0085000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[6]",     0xf0086000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[7]",     0xf0087000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[8]",     0xf0088000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[9]",     0xf0089000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[10]",    0xf008a000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[11]",    0xf008b000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[12]",    0xf008c000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[13]",    0xf008d000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[14]",    0xf008e000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.smbus[15]",    0xf008f000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.espi",         0xf009f000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.peci",         0xf0100000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.siox[1]",      0xf0101000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.siox[2]",      0xf0102000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.pwm[0]",       0xf0103000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.pwm[1]",       0xf0104000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[0]",       0xf0180000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[1]",       0xf0181000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[2]",       0xf0182000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[3]",       0xf0183000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[4]",       0xf0184000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[5]",       0xf0185000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[6]",       0xf0186000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.mft[7]",       0xf0187000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.pspi1",        0xf0200000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.pspi2",        0xf0201000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.ahbpci",       0xf0400000,   1 * MiB);
+> +    create_unimplemented_device("npcm7xx.mcphy",        0xf05f0000,  64 * KiB);
+> +    create_unimplemented_device("npcm7xx.gmac1",        0xf0802000,   8 * KiB);
+> +    create_unimplemented_device("npcm7xx.gmac2",        0xf0804000,   8 * KiB);
+> +    create_unimplemented_device("npcm7xx.ehci",         0xf0806000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.ohci",         0xf0807000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.vcd",          0xf0810000,  64 * KiB);
+> +    create_unimplemented_device("npcm7xx.ece",          0xf0820000,   8 * KiB);
+> +    create_unimplemented_device("npcm7xx.vdma",         0xf0822000,   8 * KiB);
+> +    create_unimplemented_device("npcm7xx.emc1",         0xf0825000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.emc2",         0xf0826000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[0]",      0xf0830000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[1]",      0xf0831000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[2]",      0xf0832000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[3]",      0xf0833000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[4]",      0xf0834000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[5]",      0xf0835000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[6]",      0xf0836000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[7]",      0xf0837000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[8]",      0xf0838000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.usbd[9]",      0xf0839000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.sd",           0xf0840000,   8 * KiB);
+> +    create_unimplemented_device("npcm7xx.mmc",          0xf0842000,   8 * KiB);
+> +    create_unimplemented_device("npcm7xx.pcimbx",       0xf0848000, 512 * KiB);
+> +    create_unimplemented_device("npcm7xx.aes",          0xf0858000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.des",          0xf0859000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.sha",          0xf085a000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.secacc",       0xf085b000,   4 * KiB);
+> +    create_unimplemented_device("npcm7xx.spixcs0",      0xf8000000,  16 * MiB);
+> +    create_unimplemented_device("npcm7xx.spixcs1",      0xf9000000,  16 * MiB);
+> +    create_unimplemented_device("npcm7xx.spix",         0xfb001000,   4 * KiB);
+> +}
+> +
+> +static Property npcm7xx_properties[] = {
+> +    DEFINE_PROP_LINK("dram-mr", NPCM7xxState, dram, TYPE_MEMORY_REGION,
+> +                     MemoryRegion *),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void npcm7xx_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    dc->realize = npcm7xx_realize;
+> +    dc->user_creatable = false;
+> +    device_class_set_props(dc, npcm7xx_properties);
+> +}
+> +
+> +static void npcm730_class_init(ObjectClass *oc, void *data)
+> +{
+> +    NPCM7xxClass *nc = NPCM7XX_CLASS(oc);
+> +
+> +    /* NPCM730 is optimized for data center use, so no graphics, etc. */
+> +    nc->disabled_modules = 0x00300395;
+> +    nc->num_cpus = 2;
+> +}
+> +
+> +static void npcm750_class_init(ObjectClass *oc, void *data)
+> +{
+> +    NPCM7xxClass *nc = NPCM7XX_CLASS(oc);
+> +
+> +    /* NPCM750 has 2 cores and a full set of peripherals */
+> +    nc->disabled_modules = 0x00000000;
+> +    nc->num_cpus = 2;
+> +}
+> +
+> +static const TypeInfo npcm7xx_soc_types[] = {
+> +    {
+> +        .name           = TYPE_NPCM7XX,
+> +        .parent         = TYPE_DEVICE,
+> +        .instance_size  = sizeof(NPCM7xxState),
+> +        .instance_init  = npcm7xx_init,
+> +        .class_size     = sizeof(NPCM7xxClass),
+> +        .class_init     = npcm7xx_class_init,
+> +        .abstract       = true,
+> +    }, {
+> +        .name           = TYPE_NPCM730,
+> +        .parent         = TYPE_NPCM7XX,
+> +        .class_init     = npcm730_class_init,
+> +    }, {
+> +        .name           = TYPE_NPCM750,
+> +        .parent         = TYPE_NPCM7XX,
+> +        .class_init     = npcm750_class_init,
+> +    },
+> +};
+> +
+> +DEFINE_TYPES(npcm7xx_soc_types);
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 192a8dec3b..a31d0d282f 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -356,6 +356,11 @@ config XLNX_VERSAL
+>  
+>  config NPCM7XX
+>      bool
+> +    select A9MPCORE
+> +    select ARM_GIC
+> +    select PL310  # cache controller
+> +    select SERIAL
+> +    select UNIMP
+>  
+>  config FSL_IMX25
+>      bool
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index 534a6a119e..13d163a599 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -41,6 +41,7 @@ obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
+>  obj-$(CONFIG_STM32F405_SOC) += stm32f405_soc.o
+>  obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
+>  obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o xlnx-versal-virt.o
+> +obj-$(CONFIG_NPCM7XX) += npcm7xx.o
+>  obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
+>  obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+>  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o
+> 
 
 
