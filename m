@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FC9C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:54:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF348C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:54:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DDC6206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:54:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C9E2206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 10:54:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TIsgKk+7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DDC6206BE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T48STVcB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C9E2206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwO0a-0000KW-Mu
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:54:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44016)
+	id 1jwO0b-0000MQ-Pb
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 06:54:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwNy6-0004ct-OZ
+ id 1jwNy6-0004cU-7h
  for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:54 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35700)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53429)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jwNy3-0003sB-BS
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:54 -0400
-Received: by mail-wr1-x442.google.com with SMTP id z2so10539549wrp.2
+ id 1jwNy4-0003ry-5o
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 06:51:53 -0400
+Received: by mail-wm1-x343.google.com with SMTP id j18so14175404wmi.3
  for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 03:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KVJaVP/ZQ17vhjW05uiIXG4G85am9cMHX0FIzvUa6Gc=;
- b=TIsgKk+7hM/o3q1rcPINasp0D3y3YY7fmPqK+eUpDIjnY8yEsLNi6ZHjTVaScsxRab
- gSBtqT5xLA/2ClouJBexXk9NnHrmYBFCaxX6uCmkuCtSrNN9KFn7OY8X18/GnL6DxviQ
- mGXYxL1+URFB45O5Uwy/IBK0LGoGjGWcfZzu7P7Dl1Y0f2M+qyZvSwnj4mRsYi5ntk2U
- sUdOq4m8oAbYtvuYB3T6vDvh5KVR4PR6LtWYHA1RKmevmlx3h4KP7eFMfKUKReRUh/OX
- brnfUUVD6k/IJKidftnVoc93zDoxWB2alwQInixtDBJthDlz4xUW7LgpGrtk3AmBgyXM
- azew==
+ bh=n7oJYPppjNHv+Hb+2CTlnOn4o/FtAViKxPV8Et6uZ+E=;
+ b=T48STVcBAfjMmpoC0BBaizTYrf6BozevIBtRpuzIDspw/dQOPxQrXoLevWLI0QW4Ft
+ adXOFRfNanG4cjwSMqESkI4IxusefDyJm0T1p8mY4KOYm0dXElmaMUpPrl7QqsdZ+I3D
+ bvikUtKmBae+4IvJsmcEozhbf+S1+NNwrhO4r4jiHaYBpukbpAM7Fsus8thbhZOrq3hC
+ SrA78EM3GBgYxM4WTs5iv5SsQIr3CCgWvAtKIRod86ky4BNp+MyMvSQZi4LHT67vaqNC
+ 6wjmarLLTQPXgyXGHEEs5sZjYmeziPnkWyTHPCm+yJQPAEPFQcNIoTg1raR+CyrYSKBI
+ A8rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KVJaVP/ZQ17vhjW05uiIXG4G85am9cMHX0FIzvUa6Gc=;
- b=TORdoFQVLJRPc++k6hbrs7pEon/XbQ7VS50hfGkMnos8qjv5YlUozFVMBLeXlZw8Qf
- pjfwnaXxAp0hJsXyRdQcTunux1swUuV7hmc5H1RDNQHQu8awAH3VYZlnxGpwiDkfasj7
- j2djw0nU6/fH41f0gqvqzLH602j57exTKXaq+vyOd5h5YEBg1HqcxSyI4VPjMtFwtHEK
- YIZByfS8OR99KptUs3OMyF7DbV/+qPzpNHUg2LZs5MavAWaFpBLQq1D5sWt1AxbJ7COT
- +Xoedyj2mZgiGkyjhFDrptBEOLujvmo6hJYmeaVrGbY9hnCvYj9F8Fk+fOVjzSs0vBDW
- YMpg==
-X-Gm-Message-State: AOAM53268o031PSWuYv/WeUAdqIeVqJMubP4av8BCoXhZSjO6JMHRhq2
- zYaFw58DlH73LwAYmgI/UTKWgA==
-X-Google-Smtp-Source: ABdhPJwzBflR/rTnGfoL9M2+KTqfN9wYlFd/SsM6RgDTvjAqKdYh+NRhzl3o22Fnmdp2M+TT9ZyJPw==
-X-Received: by 2002:adf:f504:: with SMTP id q4mr9479420wro.163.1594983107713; 
- Fri, 17 Jul 2020 03:51:47 -0700 (PDT)
+ bh=n7oJYPppjNHv+Hb+2CTlnOn4o/FtAViKxPV8Et6uZ+E=;
+ b=bhr5RgPu/Ia/uca9YeIviev3JX3RRsBQNFcrAcv38Kwabsb4V1M0KbB51z+eWdJq4d
+ gmk3wE/XKrz2wRPt3j/7AsPrOQN51Hc34OaecsGK+b09k5ji5BTAabO9s7QtNH5LraOG
+ 1/yz8xLwayeB0tL1ATKjxwNt14E3ZjVSmGZXryNbxv5l+VHLOflfINL6mshiIruTCyn9
+ vuE7PpASTUqVuuM4ZHykfq5RvZVIs5GqpjqS+jsBmT3OPs6TxvQ5a4VCgkitVBBnIxNm
+ 0LEcCQuUAyluym+iFt3dj1QSOO+d3dAAa5PUC80GGPL0BjUuwoc8Kr6PL0BL8Yzjt4Uw
+ gxZA==
+X-Gm-Message-State: AOAM5314O8TyaTgAcPLHDZl7tJ5haTxZVSwCHR1paWYRpDbHSl7TQX3d
+ xfZZ1NO5T5MTPfmtzLDVOO4k4g==
+X-Google-Smtp-Source: ABdhPJxBD+XYa+aWamzNymFw2wA9vK/E6L++kYOwkecxL8AmW5JpUFzFXHZPd5xDww1yC38ckeQM3g==
+X-Received: by 2002:a1c:2e57:: with SMTP id u84mr9224980wmu.52.1594983105639; 
+ Fri, 17 Jul 2020 03:51:45 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z16sm13486743wrr.35.2020.07.17.03.51.41
+ by smtp.gmail.com with ESMTPSA id j75sm15298926wrj.22.2020.07.17.03.51.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 17 Jul 2020 03:51:43 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 121B31FF91;
- Fri, 17 Jul 2020 11:51:40 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id F06701FF90;
+ Fri, 17 Jul 2020 11:51:39 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 5/5] accel/tcg: better handle memory constrained systems
-Date: Fri, 17 Jul 2020 11:51:39 +0100
-Message-Id: <20200717105139.25293-6-alex.bennee@linaro.org>
+Subject: [PATCH  v1 4/5] util: add qemu_get_host_physmem utility function
+Date: Fri, 17 Jul 2020 11:51:38 +0100
+Message-Id: <20200717105139.25293-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200717105139.25293-1-alex.bennee@linaro.org>
 References: <20200717105139.25293-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,44 +107,81 @@ Cc: fam@euphon.net, berrange@redhat.com,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  richard.henderson@linaro.org, f4bug@amsat.org,
  Christian Ehrhardt <christian.ehrhardt@canonical.com>, cota@braap.org,
- Paolo Bonzini <pbonzini@redhat.com>, aurelien@aurel32.net,
- Richard Henderson <rth@twiddle.net>
+ Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It turns out there are some 64 bit systems that have relatively low
-amounts of physical memory available to them (typically CI system).
-Even with swapping available a 1GB translation buffer that fills up
-can put the machine under increased memory pressure. Detect these low
-memory situations and reduce tb_size appropriately.
+This will be used in a future patch. For POSIX systems _SC_PHYS_PAGES
+isn't standardised but at least appears in the man pages for
+Open/FreeBSD. The result is advisory so any users of it shouldn't just
+fail if we can't work it out.
 
-Fixes: 600e17b261
+The win32 stub currently returns 0 until someone with a Windows system
+can develop and test a patch.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Cc: BALATON Zoltan <balaton@eik.bme.hu>
 Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
 ---
- accel/tcg/translate-all.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/qemu/osdep.h | 10 ++++++++++
+ util/oslib-posix.c   | 11 +++++++++++
+ util/oslib-win32.c   |  6 ++++++
+ 3 files changed, 27 insertions(+)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 2afa46bd2b1..2ff0ba6d19b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t tb_size)
- {
-     /* Size the buffer.  */
-     if (tb_size == 0) {
--        tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
-+        size_t phys_mem = qemu_get_host_physmem();
-+        if (phys_mem > 0 && phys_mem < (2 * DEFAULT_CODE_GEN_BUFFER_SIZE)) {
-+            tb_size = phys_mem / 4;
-+        } else {
-+            tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
-+        }
-     }
-     if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
-         tb_size = MIN_CODE_GEN_BUFFER_SIZE;
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 4841b5c6b5f..7ff209983e2 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -665,4 +665,14 @@ static inline void qemu_reset_optind(void)
+  */
+ char *qemu_get_host_name(Error **errp);
+ 
++/**
++ * qemu_get_host_physmem:
++ *
++ * Operating system agnostiv way of querying host memory.
++ *
++ * Returns amount of physical memory on the system. This is purely
++ * advisery and may return 0 if we can't work it out.
++ */
++size_t qemu_get_host_physmem(void);
++
+ #endif
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 36bf8593f8c..d9da782b896 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -839,3 +839,14 @@ char *qemu_get_host_name(Error **errp)
+ 
+     return g_steal_pointer(&hostname);
+ }
++
++size_t qemu_get_host_physmem(void)
++{
++#ifdef _SC_PHYS_PAGES
++    long pages = sysconf(_SC_PHYS_PAGES);
++    if (pages > 0) {
++        return pages * qemu_real_host_page_size;
++    }
++#endif
++    return 0;
++}
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+index 7eedbe5859a..31030463cc9 100644
+--- a/util/oslib-win32.c
++++ b/util/oslib-win32.c
+@@ -828,3 +828,9 @@ char *qemu_get_host_name(Error **errp)
+ 
+     return g_utf16_to_utf8(tmp, size, NULL, NULL, NULL);
+ }
++
++size_t qemu_get_host_physmem(void)
++{
++    /* currently unimplemented */
++    return 0;
++}
 -- 
 2.20.1
 
