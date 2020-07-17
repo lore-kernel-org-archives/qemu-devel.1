@@ -2,86 +2,73 @@ Return-Path: <SRS0=LOIU=A4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA29C433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C3CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74A232070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:07:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q+CLiGWT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74A232070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 361BF2070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Jul 2020 11:16:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 361BF2070E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwOD2-0002aD-PI
-	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:07:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47438)
+	id 1jwOM0-0005Zj-Bb
+	for qemu-devel@archiver.kernel.org; Fri, 17 Jul 2020 07:16:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwO8z-0000Ju-NT
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:03:09 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:45503)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwO8x-0006Ml-OR
- for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:03:09 -0400
-Received: by mail-ot1-x333.google.com with SMTP id h1so6561031otq.12
- for <qemu-devel@nongnu.org>; Fri, 17 Jul 2020 04:03:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=O6CZsI+625lXhasW/yNh1JhZqNPQ06L4VkDOMyWz8Mo=;
- b=Q+CLiGWTa5WH+75RMOZidrB34/1mlbQSwBQi/TUtqclSfahpXhh29BR1wAnYWqLm3s
- oFIeKZ61uwsWT6Fs51UwJIuUUxIjYBCgc6LMx2Ev8w4+KJHRckKjjYnZSzbB2kN6WDAK
- JPQnB4uK0CfPbpwc8K0s/nF/8tNjWQs39b8BB/peL/qRtXZWBNWG/wfeDVn4ajjLEErS
- xjZX14qE0it4VELpa9dfuQMGk+QJIFSeTG/5Yc/PvDw1YDR6H28+wX6UfaWpPD0oMkjl
- VxZpqoeUe+L0jJlyTbtZKQ4GXy59Zb6+5CyEK9Tari3j1Oe8gIeM4L3dif4pdXLYONFn
- r/1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=O6CZsI+625lXhasW/yNh1JhZqNPQ06L4VkDOMyWz8Mo=;
- b=HN3V60aR5DMtUj2QrOwLo0RmyGzh33seS9nD6+kkmwMsrqt72xdROrgbg+7gLb25p7
- uH5MUz2Y70OQKXM2utujvav0gl+T4Tl5mo4bxV/xvWxo3JdMmD5qWq4FTfdSlodNiU3N
- R26We+4UnA2ja4S0+y6ktqwvM8ZLfauIo3eXhnA2MYah45a3w6XMfx+6SqFgBfrSGVIz
- k2NLbxMGGnmqWDd5Aqz23vubOL6bdf5wDUMvFIxXQLFMx5ngLqDFQetf4ghJMCthSCes
- c46Bx9A20VF3Dn+yUJwNQpK2HUMy36EoJw7KXCGyBgduPC5FukDHDL8XQ/je17SWnEsN
- Gh3g==
-X-Gm-Message-State: AOAM532O3u9tVfgYk2rpAzCW8JZFyhd+THEx4ihEITD/YupczOENxrEf
- KHuXZc8O8y2mxuVO9LHuRZAVL+TgV1qJeCdYXJ+7Aw==
-X-Google-Smtp-Source: ABdhPJzgh92hucMlCCsVkbVzaX1vwO+Mk8FCwujoi8ouTr5oMNDAoZlUavRi7cOTtSD1WUI8X73DLxIyfwp/fsE1Vug=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr8536266oto.135.1594983786247; 
- Fri, 17 Jul 2020 04:03:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jwOLL-0004qn-P3
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:15:55 -0400
+Resent-Date: Fri, 17 Jul 2020 07:15:55 -0400
+Resent-Message-Id: <E1jwOLL-0004qn-P3@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21706)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jwOLJ-0000Yg-1S
+ for qemu-devel@nongnu.org; Fri, 17 Jul 2020 07:15:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1594984530; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=VzEB3I1yZ8t9DRyktqCzOOn/dLyTGLwzb+z54awz9qRzeXhyXclxWZfhpn3OFluxa5sQBjgSrRlpeGUB2NENRBviAHjqgPtGkwypcX6WbLB4F1tzljfJcazpHfQydriVY/PMHtFONAiKqlzb1PdQ6erXNBnTRP8a6HmVjae3yuM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1594984530;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=YV3Tkao8tl+x6W3uTpq+PNheZb+oVT2+Cjb8liURHcE=; 
+ b=igGvaRCX6KAJEf4+hLkC+A3hZP+I0H7ZWJp50pkNO/C96gkObhXgB3VrQYzwXRtFKjHnQvo/LODqRBNuA6dkKYiMO97lRcMZQIAbZ25DG/bT8vOzJzUztHjd76qBlVJHWftpitr1iAuHiN8Z3lflPunIESrCcdHKNguyPz39PSA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1594984523902676.3150495465196;
+ Fri, 17 Jul 2020 04:15:23 -0700 (PDT)
+Subject: Re: [PATCH v2] introduce VFIO-over-socket protocol specificaion
+Message-ID: <159498452266.17162.12805076292561899564@07a7f0d89f7d>
+In-Reply-To: <1594981096-58580-1-git-send-email-thanos.makatos@nutanix.com>
 MIME-Version: 1.0
-References: <20200706164155.24696-1-pbonzini@redhat.com>
- <20200706164155.24696-29-pbonzini@redhat.com>
-In-Reply-To: <20200706164155.24696-29-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Jul 2020 12:02:54 +0100
-Message-ID: <CAFEAcA-Ha4+ub=QQASREraok747+U2tUcNkSYu6PFnoc29_Jrw@mail.gmail.com>
-Subject: Re: [PULL 28/53] Makefile: simplify MINIKCONF rules
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thanos.makatos@nutanix.com
+Date: Fri, 17 Jul 2020 04:15:23 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/17 06:26:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,67 +81,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Corey Minyard <minyard@acm.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: benjamin.walker@intel.com, elena.ufimtseva@oracle.com, felipe@nutanix.com,
+ jag.raman@oracle.com, james.r.harris@intel.com, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, yuvalkashtan@gmail.com, konrad.wilk@oracle.com,
+ tina.zhang@intel.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ marcandre.lureau@redhat.com, ismael@linux.com, alex.williamson@redhat.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, tomassetti.andrea@gmail.com,
+ changpeng.liu@intel.com, raphael.norwitz@nutanix.com,
+ Kanth.Ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Jul 2020 at 18:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> There is no reason to write MINIKCONF_DEPS manually, since minikconf.py
-> emits a dependency file, and also no reason to list multiple Kconfig
-> files on the command line since they can be included from a master file
-> in the top-level source directory.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Hi Paolo. With this change Make seems no longer to realise
-that a change to a Kconfig file means it needs to rebuild
-the config-devices.mak, which means that we tend to get
-weird compile failures for changes which update Kconfig files.
-
-Specifically, this is preventing me getting a clean set of
-builds for Corey's latest i2c pullreq. Reverting this
-commit allows the pullreq to build on all configs.
-
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -404,7 +404,7 @@ endif
->  # This has to be kept in sync with Kconfig.host.
->  MINIKCONF_ARGS = \
->      $(CONFIG_MINIKCONF_MODE) \
-> -    $@ $*/config-devices.mak.d $< $(MINIKCONF_INPUTS) \
-> +    $@ $*/config-devices.mak.d $< $(SRC_PATH)/Kconfig \
->      CONFIG_TCG=$(CONFIG_TCG) \
->      CONFIG_KVM=$(CONFIG_KVM) \
->      CONFIG_SPICE=$(CONFIG_SPICE) \
-> @@ -419,15 +419,9 @@ MINIKCONF_ARGS = \
->      CONFIG_LINUX=$(CONFIG_LINUX) \
->      CONFIG_PVRDMA=$(CONFIG_PVRDMA)
->
-> -MINIKCONF_INPUTS = $(SRC_PATH)/Kconfig.host \
-> -                   $(SRC_PATH)/backends/Kconfig \
-> -                   $(SRC_PATH)/accel/Kconfig \
-> -                   $(SRC_PATH)/hw/Kconfig
-> -MINIKCONF_DEPS = $(MINIKCONF_INPUTS) \
-> -                 $(wildcard $(SRC_PATH)/hw/*/Kconfig)
->  MINIKCONF = $(PYTHON) $(SRC_PATH)/scripts/minikconf.py
->
-> -$(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(MINIKCONF_DEPS) $(BUILD_DIR)/config-host.mak
-> +$(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(SRC_PATH)/Kconfig $(BUILD_DIR)/config-host.mak
-
-Specifically here, the $(MINIKCONF_DEPS) long list of Kconfig
-files has been removed from the dependency list of
-config-devices.mak.
-
-There doesn't seem to be any machinery for creating .d
-files for make to include to tell it that Kconfig has a
-dependency on hw/Kconfig which has a dependency on hw/i2c/Kconfig etc.
-How is this intended to work ?
-
-For 5.1, should we just revert this commit ?
-
-thanks
--- PMM
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTk0OTgxMDk2LTU4NTgwLTEt
+Z2l0LXNlbmQtZW1haWwtdGhhbm9zLm1ha2F0b3NAbnV0YW5peC5jb20vCgoKCkhpLAoKVGhpcyBz
+ZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1
+dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAx
+NTk0OTgxMDk2LTU4NTgwLTEtZ2l0LXNlbmQtZW1haWwtdGhhbm9zLm1ha2F0b3NAbnV0YW5peC5j
+b20KU3ViamVjdDogW1BBVENIIHYyXSBpbnRyb2R1Y2UgVkZJTy1vdmVyLXNvY2tldCBwcm90b2Nv
+bCBzcGVjaWZpY2Fpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
+IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM2NTdhZTYgaW50cm9kdWNlIFZGSU8tb3Zlci1z
+b2NrZXQgcHJvdG9jb2wgc3BlY2lmaWNhaW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiM0NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogdHJhaWxpbmcgd2hp
+dGVzcGFjZQojOTA1OiBGSUxFOiBkb2NzL2RldmVsL3ZmaW8tb3Zlci1zb2NrZXQucnN0Ojg1NDoK
+KyAgICBndWVzdCB1bm1hc2tzIHRoZSBpbnRlcnJ1cHQuICQKCnRvdGFsOiAxIGVycm9ycywgMSB3
+YXJuaW5ncywgMTE1MSBsaW5lcyBjaGVja2VkCgpDb21taXQgYzY1N2FlNmZiNzU1IChpbnRyb2R1
+Y2UgVkZJTy1vdmVyLXNvY2tldCBwcm90b2NvbCBzcGVjaWZpY2Fpb24pIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzE1OTQ5ODEwOTYtNTg1ODAtMS1naXQtc2VuZC1lbWFpbC10aGFub3MubWFrYXRvc0Bu
+dXRhbml4LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
