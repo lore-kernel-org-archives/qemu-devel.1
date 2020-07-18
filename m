@@ -2,92 +2,86 @@ Return-Path: <SRS0=NumX=A5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD63DC433E5
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 20:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BB1C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 22:59:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D1982176B
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 20:51:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C841E2076D
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 22:59:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="J2OD5Zll"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1982176B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vOe9D99H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C841E2076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwtoE-0006gV-Sk
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 16:51:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39258)
+	id 1jwvnt-0005xK-1F
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 18:59:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jwtnd-0006G8-Hz
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 16:51:13 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:34853)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwvnL-0005YO-Br
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 18:59:03 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35846)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jwtnb-0000CI-Jz
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 16:51:13 -0400
-Received: by mail-qk1-x742.google.com with SMTP id 11so2456027qkn.2
- for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 13:51:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=hzUMdhk1hufZ5XTRdMW+awgy4vyAd0OR5FMydA2VXic=;
- b=J2OD5ZllsECzDGtz4ATGDWEzyNIosJ9Dt7QibxwX8IwFuXc0tCmZ7Dww2oLcNGX2Ie
- 8bewn3lvpJiWbZjK3ENKpGs9u/QtxxFLQ3he/eNd9DmmPkRiDlQ5ep+O2wP9E66WfsLu
- nKyrfgDsPxj88DWnWiN0aHRzI0Vi9zlQ27aHjdyQC6xWTDmLmY7FH0skQOwVKGs6fjRw
- FmAPaJVuWeEjMwPB4MML0qhZiZ6snMWZ7ZT/SDZas9aFdDXaBdCC6c55taBrwMrAI2yH
- yovKM7jLwPtmRSjtJSn+tMvCwilD32bcchrwJq64Ne0Q6stBVYodAgPv3FrPh17J8pc0
- s2MA==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwvnI-0000lh-Tb
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 18:59:02 -0400
+Received: by mail-oi1-x243.google.com with SMTP id h17so11260812oie.3
+ for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 15:59:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=k2z/J7I/91BotfY0gJ5Z5JbxHGl12U2srWijKMRqr5E=;
+ b=vOe9D99HF9OYV9m+GbMeH1pBUdNFUHAEI6n3B+QJG8H4PEyLoI8j6aPWAH7etAX3I5
+ P9vgJJjCmxE90YUQaX6qsAlKMFsmj/vveIShtYRkeefAzy/fZ41L1IhXm70qJfszYJB1
+ IUibOdeb1As0PMNhl/SeZ7WrQ21Z/DZtzoeADhXtG8NF3SJsF+/Nor1Krm01Jn74eCNS
+ L95u/oMrHxlWToVxrn4fj+xZYCJNPkSLuetQFSxkWiGyjvyC1Zfgkc1/tPO54p6ZI0HJ
+ 0GWDhW4R7AXGiXwd+n8+bV4WERREqPxPdwTjoS2MSDWtTiU8HpfIjgjNW7Mu5nDehzN8
+ R6LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=hzUMdhk1hufZ5XTRdMW+awgy4vyAd0OR5FMydA2VXic=;
- b=s3re5UwzI7ImRAypJXqBXuQcnrtfXv7UxXBxxDCq+qZdYF4E6byvhTBBfAN22mlFMH
- uBI82RYleSUuBfst3ydUh+Y64FJEOUUNfltpoBZ2maSCj6zs0haqUQENEZfmY8LG7ipX
- UYyOq7sE7vmVyCIRAO8KFWGS4qMP4Ri9LmxrcrUILxvnaf2z6LipfxlYvWFpnALKDf4F
- WjMyWb3efFBojCyLpfUZ6X7fHTprDMwVek3CH3fmimYmjfB9zDJcPS5M8YM/xGhudUxx
- 8DKcsdBZR5L5/Vaoiwflh5GyDywOuu+DpsEsvGGYOGiQw7W3RvvrE5W97uELFz1YKZdS
- F1bg==
-X-Gm-Message-State: AOAM530K86PBxfEg3lNx0WNU+QDcd4umgMzm/+6/UP75051HiKCt3PWi
- uzx2th49AOffXuPZs0rJR7j8LA==
-X-Google-Smtp-Source: ABdhPJzI1rnuh9zzTj7QTb1P0Zat3wgLhzbEtbKghYSznuUBV6aA+lhVm/RWbR1kR/MgHAKG5xoKsg==
-X-Received: by 2002:a37:8243:: with SMTP id e64mr14162410qkd.262.1595105469916; 
- Sat, 18 Jul 2020 13:51:09 -0700 (PDT)
-Received: from localhost ([86.106.143.31])
- by smtp.gmail.com with ESMTPSA id x13sm14462556qts.57.2020.07.18.13.51.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Jul 2020 13:51:09 -0700 (PDT)
-Date: Sat, 18 Jul 2020 16:51:07 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH  v2 06/11] cputlb: ensure we save the IOTLB data in case
- of reset
-Message-ID: <20200718205107.GA994221@sff>
-References: <20200713200415.26214-1-alex.bennee@linaro.org>
- <20200713200415.26214-7-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=k2z/J7I/91BotfY0gJ5Z5JbxHGl12U2srWijKMRqr5E=;
+ b=Ms4un3vPEgI7yamA7pOXmgRrXO38grrHBW7+D9KafYQB9UOsLpFXC+jQDpiTATJFFk
+ xT8yVpfVlCuVi6tK8lMOuY1gSevKiU0xMN2kjUpNhWCAwdvrJEshknSuWPDfgpldMK1X
+ BP0EXvDP9WZs9XlsS7gwWirMMnHDSn2BlYLe/cgiceQgzfhPwk2tb79wo4G8nTvM7us9
+ JUO0DlBt2NfUpYWTvcsPxXEvEfrCzlXj0K0CsWdyyN+T1xUfd33hKGxLaG5wdCT8VUnP
+ VqoNqm23LI1YPtcNEH/nzmW5J5Rn9Ml/DJiViM5MBUNzAT/vEUbzoTapahcc7DRgM41b
+ fV0Q==
+X-Gm-Message-State: AOAM533yPFNsyAMFZw1bit90nhXpUiFnkq3KkBWP5bXa7t2qKAFkVJez
+ 5AHdZ09b6i/jAEuVPv+7vmiSyP2FIBjzT2/eO6C/Bg==
+X-Google-Smtp-Source: ABdhPJx9TUUUdfHoRbjRos7ckn8JVHQL4dy8eR1hHupoiV4uyQu4302iIkAWMshgzEYDlvvnLcyNXtMJtJn7QqlZ320=
+X-Received: by 2002:aca:54c9:: with SMTP id
+ i192mr12712960oib.163.1595113139578; 
+ Sat, 18 Jul 2020 15:58:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200713200415.26214-7-alex.bennee@linaro.org>
-Received-SPF: softfail client-ip=2607:f8b0:4864:20::742;
- envelope-from=cota@braap.org; helo=mail-qk1-x742.google.com
+References: <20200717151446.655571-1-eblake@redhat.com>
+In-Reply-To: <20200717151446.655571-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 18 Jul 2020 23:58:48 +0100
+Message-ID: <CAFEAcA80KdFODWRpa2fOt71B7kfqKNUpA-N=D+8LcE_UxAOJSA@mail.gmail.com>
+Subject: Re: [PULL 0/1] bitmaps patches for 2020-07-17 [-rc1]
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,60 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
- f4bug@amsat.org, aaron@os.amperecomputing.com,
- Paolo Bonzini <pbonzini@redhat.com>, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
- aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 13, 2020 at 21:04:10 +0100, Alex Bennée wrote:
-> Any write to a device might cause a re-arrangement of memory
-> triggering a TLB flush and potential re-size of the TLB invalidating
-> previous entries. This would cause users of qemu_plugin_get_hwaddr()
-> to see the warning:
-> 
->   invalid use of qemu_plugin_get_hwaddr
-> 
-> because of the failed tlb_lookup which should always succeed. To
-> prevent this we save the IOTLB data in case it is later needed by a
-> plugin doing a lookup.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-(snip)
-> +/*
-> + * Save a potentially trashed IOTLB entry for later lookup by plugin.
-> + *
-> + * We also need to track the thread storage address because the RCU
-> + * cleanup that runs when we leave the critical region (the current
-> + * execution) is actually in a different thread.
+On Fri, 17 Jul 2020 at 16:17, Eric Blake <eblake@redhat.com> wrote:
+>
+> The following changes since commit 151f76c689b1ff4c2c59e6d8469a0d4fe5346f55:
+>
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2020-07-16 21:46:18 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://repo.or.cz/qemu/ericb.git tags/pull-bitmaps-2020-07-17
+>
+> for you to fetch changes up to 7cb015197b383a62f5729d2c92b1050db0185c1c:
+>
+>   migration/block-dirty-bitmap: fix add_bitmaps_to_list (2020-07-17 08:18:51 -0500)
+>
+> I had been waiting to see if I had more than one patch to bundle, but
+> given that we are now coming up on -rc1 and this is a bugfix, it's time
+> for the pull request of this in isolation.
+>
+> ----------------------------------------------------------------
+> bitmaps patches for 2020-07-17
+>
+> - improve corner-case of bitmap migration
+>
+> ----------------------------------------------------------------
+> Vladimir Sementsov-Ogievskiy (1):
+>       migration/block-dirty-bitmap: fix add_bitmaps_to_list
 
-As I mentioned in the previous iteration of this series, this comment is
-outdated -- there is no thread storage nor RCU to worry about here.
 
-> + * This almost never fails as the memory access being instrumented
-> + * should have just filled the TLB. The one corner case is io_writex
-> + * which can cause TLB flushes and potential resizing of the TLBs
-> + * loosing the information we need. In those cases we need to recover
-> + * data from a copy of the io_tlb entry.
->   */
+Applied, thanks.
 
-s/loosing/losing/
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-About the approach in this patch: it works as long as the caller is in
-the same vCPU thread, otherwise we'd need a seqlock to avoid races
-between readers and the writing vCPU. I see that qemu_plugin_get_hwaddr
-does not even take a vCPU index, so this should be OK -- as long as this
-is called only from a mem callback, it's in the same vCPU thread and it's
-therefore safe.
-
-With the above comments fixed,
-
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-
-Thanks,
-		Emilio
+-- PMM
 
