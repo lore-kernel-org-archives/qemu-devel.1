@@ -2,86 +2,83 @@ Return-Path: <SRS0=NumX=A5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BB1C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 22:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF805C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 23:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C841E2076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 22:59:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vOe9D99H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C841E2076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7BF1B21741
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 23:24:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BF1B21741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwvnt-0005xK-1F
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 18:59:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54272)
+	id 1jwwBy-0001aB-Nu
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 19:24:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwvnL-0005YO-Br
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 18:59:03 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35846)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jwvnI-0000lh-Tb
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 18:59:02 -0400
-Received: by mail-oi1-x243.google.com with SMTP id h17so11260812oie.3
- for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 15:59:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=k2z/J7I/91BotfY0gJ5Z5JbxHGl12U2srWijKMRqr5E=;
- b=vOe9D99HF9OYV9m+GbMeH1pBUdNFUHAEI6n3B+QJG8H4PEyLoI8j6aPWAH7etAX3I5
- P9vgJJjCmxE90YUQaX6qsAlKMFsmj/vveIShtYRkeefAzy/fZ41L1IhXm70qJfszYJB1
- IUibOdeb1As0PMNhl/SeZ7WrQ21Z/DZtzoeADhXtG8NF3SJsF+/Nor1Krm01Jn74eCNS
- L95u/oMrHxlWToVxrn4fj+xZYCJNPkSLuetQFSxkWiGyjvyC1Zfgkc1/tPO54p6ZI0HJ
- 0GWDhW4R7AXGiXwd+n8+bV4WERREqPxPdwTjoS2MSDWtTiU8HpfIjgjNW7Mu5nDehzN8
- R6LQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=k2z/J7I/91BotfY0gJ5Z5JbxHGl12U2srWijKMRqr5E=;
- b=Ms4un3vPEgI7yamA7pOXmgRrXO38grrHBW7+D9KafYQB9UOsLpFXC+jQDpiTATJFFk
- xT8yVpfVlCuVi6tK8lMOuY1gSevKiU0xMN2kjUpNhWCAwdvrJEshknSuWPDfgpldMK1X
- BP0EXvDP9WZs9XlsS7gwWirMMnHDSn2BlYLe/cgiceQgzfhPwk2tb79wo4G8nTvM7us9
- JUO0DlBt2NfUpYWTvcsPxXEvEfrCzlXj0K0CsWdyyN+T1xUfd33hKGxLaG5wdCT8VUnP
- VqoNqm23LI1YPtcNEH/nzmW5J5Rn9Ml/DJiViM5MBUNzAT/vEUbzoTapahcc7DRgM41b
- fV0Q==
-X-Gm-Message-State: AOAM533yPFNsyAMFZw1bit90nhXpUiFnkq3KkBWP5bXa7t2qKAFkVJez
- 5AHdZ09b6i/jAEuVPv+7vmiSyP2FIBjzT2/eO6C/Bg==
-X-Google-Smtp-Source: ABdhPJx9TUUUdfHoRbjRos7ckn8JVHQL4dy8eR1hHupoiV4uyQu4302iIkAWMshgzEYDlvvnLcyNXtMJtJn7QqlZ320=
-X-Received: by 2002:aca:54c9:: with SMTP id
- i192mr12712960oib.163.1595113139578; 
- Sat, 18 Jul 2020 15:58:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
+ id 1jwwBR-0001Ag-Dj
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 19:23:57 -0400
+Received: from regular1.263xmail.com ([211.150.70.198]:60810)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
+ id 1jwwBO-0003WW-R0
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 19:23:57 -0400
+Received: from localhost (unknown [192.168.167.13])
+ by regular1.263xmail.com (Postfix) with ESMTP id 4EE574AB;
+ Sun, 19 Jul 2020 07:23:44 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED4: 1
+X-ANTISPAM-LEVEL: 2
+X-SKE-CHECKED: 1
+X-ABS-CHECKED: 1
+Received: from [192.168.1.17] (unknown [223.72.78.183])
+ by smtp.263.net (postfix) whith ESMTP id
+ P17845T139821028726528S1595114623509895_; 
+ Sun, 19 Jul 2020 07:23:44 +0800 (CST)
+X-UNIQUE-TAG: <65ea31153528f2e7a3d1ce0117f766f8>
+X-RL-SENDER: chengang@emindsoft.com.cn
+X-SENDER: chengang@emindsoft.com.cn
+X-LOGIN-NAME: chengang@emindsoft.com.cn
+X-FST-TO: qemu-devel@nongnu.org
+X-SENDER-IP: 223.72.78.183
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+X-System-Flag: 0
+Subject: Re: [PATCH] linux-user: syscall: ioctls: support
+ DRM_IOCTL_I915_GETPARAM
+To: Laurent Vivier <laurent@vivier.eu>, riku.voipio@iki.fi
+References: <20200712034102.23355-1-chengang@emindsoft.com.cn>
+ <1e64eed1-509f-3b8d-112f-58c02794496a@vivier.eu>
+From: Chen Gang <chengang@emindsoft.com.cn>
+Message-ID: <a97fd023-9f5f-3cca-0502-0e3f06105dc4@emindsoft.com.cn>
+Date: Sun, 19 Jul 2020 07:23:43 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20200717151446.655571-1-eblake@redhat.com>
-In-Reply-To: <20200717151446.655571-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 18 Jul 2020 23:58:48 +0100
-Message-ID: <CAFEAcA80KdFODWRpa2fOt71B7kfqKNUpA-N=D+8LcE_UxAOJSA@mail.gmail.com>
-Subject: Re: [PULL 0/1] bitmaps patches for 2020-07-17 [-rc1]
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <1e64eed1-509f-3b8d-112f-58c02794496a@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=211.150.70.198;
+ envelope-from=chengang@emindsoft.com.cn; helo=regular1.263xmail.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/18 19:23:45
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -28
+X-Spam_score: -2.9
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,43 +91,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jul 2020 at 16:17, Eric Blake <eblake@redhat.com> wrote:
->
-> The following changes since commit 151f76c689b1ff4c2c59e6d8469a0d4fe5346f55:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2020-07-16 21:46:18 +0100)
->
-> are available in the Git repository at:
->
->   https://repo.or.cz/qemu/ericb.git tags/pull-bitmaps-2020-07-17
->
-> for you to fetch changes up to 7cb015197b383a62f5729d2c92b1050db0185c1c:
->
->   migration/block-dirty-bitmap: fix add_bitmaps_to_list (2020-07-17 08:18:51 -0500)
->
-> I had been waiting to see if I had more than one patch to bundle, but
-> given that we are now coming up on -rc1 and this is a bugfix, it's time
-> for the pull request of this in isolation.
->
-> ----------------------------------------------------------------
-> bitmaps patches for 2020-07-17
->
-> - improve corner-case of bitmap migration
->
-> ----------------------------------------------------------------
-> Vladimir Sementsov-Ogievskiy (1):
->       migration/block-dirty-bitmap: fix add_bitmaps_to_list
+On 2020/7/14 上午2:46, Laurent Vivier wrote:
+>> +    gparam->value = lock_user(VERIFY_WRITE, target_gparam->value,
+>> +                             sizeof(*gparam->value), 0);
+> 
+> I don't think you should use directly the guest memory.
+> You should have something like that:
+> 
+>      int value;
+> 
+>      gparam->value = &value;
+> 
+>> +    if (!gparam->value) {
+>> +        unlock_user_struct(target_gparam, arg, 0);
+>> +        return -TARGET_EFAULT;
+>> +    }
+>> +
+>> +    ret = get_errno(safe_ioctl(fd, ie->host_cmd, gparam));
+> 
+> and then:
+> 
+> put_user_s32(value, target_gparam->value);
+> 
+
+OK, thanks. It will be better.
+
+>> +
+>> +    unlock_user(gparam->value, target_gparam->value, sizeof(*gparam->value));
+>> +    unlock_user_struct(target_gparam, arg, 0);
+>> +    return ret;
+>> +}
+>> +
+>> +static abi_long do_ioctl_drm_i915(const IOCTLEntry *ie, uint8_t *buf_temp,
+>> +                                  int fd, int cmd, abi_long arg)
+>> +{
+>> +    switch (ie->host_cmd) {
+>> +    case DRM_IOCTL_I915_GETPARAM:
+>> +        return do_ioctl_drm_i915_getparam(ie,
+>> +                                          (struct drm_i915_getparam *)buf_temp,
+>> +                                          fd, arg);
+>> +    default:
+>> +        return -TARGET_ENOSYS;
+>> +    }
+>> +}
+> 
+> There is a better way to register a struct with convertion functions:
+> you might use STRUCT_SPECIAL() to declare the structure rather than
+> IOCTL_SPECIAL() to declare the ioctl command.
+> (I think STRUCT_SPECIAL() could also be used with DRM_IOCTL_VERSION)
+> 
+
+For me, STRUCT_SPECIAL sounds good for the complex structures, but for
+drm_i915_getparam which is simple enough, it is not quite suitable.
+
+For me, STRUCT_SPECIAL is much suitable for DRM_IOCTL_VERSION.
+
+Welcome your additional ideas.
+
+>>  
+>>  static IOCTLEntry ioctl_entries[] = {
+>> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+>> index 3c261cff0e..9082f6c2bc 100644
+>> --- a/linux-user/syscall_defs.h
+>> +++ b/linux-user/syscall_defs.h
+>> @@ -1170,6 +1170,9 @@ struct target_rtc_pll_info {
+>>  /* drm ioctls */
+>>  #define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
+>>  
+>> +/* drm i915 ioctls */
+>> +#define TARGET_DRM_IOCTL_I915_GETPARAM              TARGET_IOWRU('d', 0x46)
+> 
+> why do you use the U variant?
+> 
+> TARGET_IOWR('d', 0x46, struct target_drm_i915_getparam)
+> 
+
+Because qemu will automatically set the size with the target structure
+size in syscall_init(). It'll be more easier. e.g. usb ioctls and device
+mapper ioctls also do like this.
 
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
-
--- PMM
 
