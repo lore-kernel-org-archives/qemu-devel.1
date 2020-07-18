@@ -2,91 +2,89 @@ Return-Path: <SRS0=NumX=A5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EFCC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 08:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5124BC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 09:31:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2770E2073E
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 08:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15DF52070E
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 09:31:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=livius-net.20150623.gappssmtp.com header.i=@livius-net.20150623.gappssmtp.com header.b="howMDJVO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2770E2073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=livius.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cK3jB+LK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15DF52070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwiBv-0005um-93
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 04:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37778)
+	id 1jwjBd-0005Cm-6X
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 05:31:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1jwiBH-0005Br-1H
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 04:26:51 -0400
-Received: from mail-ej1-x62c.google.com ([2a00:1450:4864:20::62c]:34558)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwjAq-0004gi-Bm
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 05:30:28 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:34450)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1jwiBF-00073Y-6J
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 04:26:50 -0400
-Received: by mail-ej1-x62c.google.com with SMTP id y10so13285528eje.1
- for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 01:26:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=livius-net.20150623.gappssmtp.com; s=20150623;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=Am5CUqmKpyGWr6oxn5dv5qUF34Ei1+z0p6EziGYaZo0=;
- b=howMDJVOHUYcxqWB7zoHedkfBxwSzMCIy9HY815JfObzFadNDqDG3DOvz3MNuTmO3O
- CiWoHPEgjVMy7i51wXMiDDbbfGEsD07eXX6UIpYQ6f5wwt4EegtGT/lrGG95bg3c4L39
- L6/7PdCIua55I1YmejaBQzuky8qNikRyOwAWf76NKtZz+kCIWA6pvQDiOvMER9tGYcG4
- DgkFF3fVQXvFTOdPMd61lc1+Fm5P4nFfDHlz60slmDPkCeR8UznjGjnS/EIeOHbHogcR
- Vhlr44KaeE+jcXzMLmsx/8McDL4F24eKZulTWpRmLFUMEEGkpzPpJ9rcHQNWI886E/O2
- 5xDg==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwjAn-0007zP-M6
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 05:30:28 -0400
+Received: by mail-ot1-x332.google.com with SMTP id e90so8669459ote.1
+ for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 02:30:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=sUcEXwI2+atRClXFkEGkDgaUwA6gk8T8ioGojvNblcc=;
+ b=cK3jB+LKLQkc4PfQxW07UOtCOWZHXmzKZge8rJnRZDYluD9byVko+KGWJxUlhZabVe
+ Ojv8L4ZCo1WeizLBBM7Ebl7qwdHuBd27J55ggiucqZhX6tTw1j9p8S37w1Pv1bAR7heY
+ uS7A0t14WgvhkQfSaESHE0tP/KW+FpVJMQOUfIQ3U4ToDezwEBqcc1+a6nV8jNnU0SC5
+ XvWZXwaK5tFJfQmndbywODFzlnhUHScc71q8TPhqwG/N+nRoxUemx/f18BzglOkGfhQ4
+ x2CzMDJCxewfzvE7/uk8YPRLt8MC5SZjCb5y9yZw6vVHDo3Zd5QhXKsq13X/L4ZF4K5r
+ b9RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=Am5CUqmKpyGWr6oxn5dv5qUF34Ei1+z0p6EziGYaZo0=;
- b=HzRoe3LVMtbJoEMQUm0JX0To57NviQvDOIAi7GhDzTPpISaaf6xAT7pYOdSt/TxFOf
- dmrmHDX2debnLFZdX/1UM1OgF434rxDwAbK6X0zeayowK4Cx+jnL+vY0WTEUuAwi3WLy
- i4n8a7si+XQVD2lkJa/CVoi0D32+8/2cFSr/xOsXtZf08rfF0KNHRpTWgUFW0Y7LPJCg
- CE+xweb13rCg7tUllFgNt6MDicIczM1SDdrEKKOQAIIKDTaUrckkTwPP2Qw6+krJUsVU
- 4EA3H4fgv6MMLa7eY9bprE3J/4xiGcLbSwPyBSr6UyvYyFrcs1PhKHajmbeDKfQIlLm3
- PiXg==
-X-Gm-Message-State: AOAM532M7SXvm7fTmM+M4LpdWMX4LSlVrLa3EwI+JqG69JZWQxYCDrio
- LS26EFS2vwOkHW9n2w2rYHSrEw==
-X-Google-Smtp-Source: ABdhPJyzr9IaK16nQzsiRT/jMIzz+PjPtggOovldHvjXomNn2+XutoJZMdLLOhRaR6qw9CFb/fYRag==
-X-Received: by 2002:a17:906:b217:: with SMTP id
- p23mr12518059ejz.98.1595060806146; 
- Sat, 18 Jul 2020 01:26:46 -0700 (PDT)
-Received: from wks.local ([188.26.49.79])
- by smtp.gmail.com with ESMTPSA id 23sm10699468edx.75.2020.07.18.01.26.45
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 18 Jul 2020 01:26:45 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: instance_init() and the realize() functions
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <CA+aXn+E2r1ZFyd1AZnwyvnxB1VsStkJC8vqkhmqZ4JDE_0LwMg@mail.gmail.com>
-Date: Sat, 18 Jul 2020 11:26:44 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FEBB6630-0908-4097-BA78-ACB12932703A@livius.net>
-References: <CA+aXn+E2r1ZFyd1AZnwyvnxB1VsStkJC8vqkhmqZ4JDE_0LwMg@mail.gmail.com>
-To: Pratik Parvati <pratikp@vayavyalabs.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.1)
-Received-SPF: none client-ip=2a00:1450:4864:20::62c;
- envelope-from=ilg@livius.net; helo=mail-ej1-x62c.google.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=sUcEXwI2+atRClXFkEGkDgaUwA6gk8T8ioGojvNblcc=;
+ b=X3exEDqHfhvgprbzC1ryehR8TMcHq/DFHfcUnfX+IXcf+P/StTMpY2d+7v+WFbzBUD
+ wyUV7eUgx7RNQ9hvAZPkXAXpvcGGWKAd/dAXzc280dRXdPuDVLA8fD6fMXYww0cj+khD
+ 9IHF6PmthYxx/DYkAndyXpIddKDxqp8dBnnbxxi/hOdoHWUKZdbNB69MW1zsCXw+nWBq
+ hooM8a4wsreYhQHLNjzzWulGjKltD75z64dfIiSM+310HEtbpzJQdyYV1bQ8WSSigb4y
+ 7d3NQ/5XHzP+agx3It+S2hOSYnSDptW2pglMqe7T5IjwzzFAGLOz2MvNaCtxC12KPR6c
+ MUXA==
+X-Gm-Message-State: AOAM532mterXX5Uzau29oZLylvIsVHkhXUk3QfJy5NeAbrxOx60UJO7Z
+ gZwmFa/y5XIQBGrAykTh1qaL97U8+GuXiQF2dlIV+A==
+X-Google-Smtp-Source: ABdhPJwJQFfJjP24CH87StOrHBO2huPO7fi42obN2NYxYRWHAKYE2FsD6dS8X/1VCO1WyaRe/XX11FOJ5K+Z7/eOeyo=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr12015318ota.91.1595064624271; 
+ Sat, 18 Jul 2020 02:30:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAFEAcA8iKKDKEdq8TtbZNwqfsH=ZO78eEXWfrVbYTDjdy9DYDw@mail.gmail.com>
+ <890eb42e-cd77-2a63-c441-61637ac5094f@redhat.com>
+ <42c71a79-4911-dc47-d983-783d98e819c5@redhat.com>
+ <89f309c2-9909-f306-2f2b-93fc1b8adc17@redhat.com>
+In-Reply-To: <89f309c2-9909-f306-2f2b-93fc1b8adc17@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 18 Jul 2020 10:30:13 +0100
+Message-ID: <CAFEAcA8k50qCcxwp99fF2xOL13jP1unNMbVFEYXy119u00wJcg@mail.gmail.com>
+Subject: Re: tests/vm infrastructure fails to notice that QEMU dying is a
+ failure
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x332.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,76 +97,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Robert Foley <robert.foley@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 17 Jul 2020 at 23:24, John Snow <jsnow@redhat.com> wrote:
+> - The real problem, though: Why is QEMU hanging? It might need a longer
+> timeout, or it might be having problems with the console socket again.
 
+The host machine seemed to be under really heavy I/O load at the time.
 
-> On 18 Jul 2020, at 10:09, Pratik Parvati <pratikp@vayavyalabs.com> =
-wrote:
->=20
-> The class_init() function is straight forward (it is similar to the =
-constructor in C++ OOP
-
-The C++ constructor initialises class **instances**, i.e. C++ objects, =
-not C++ classes.
-
-In QEMU, the OOP functionality is implemented with nested structures =
-used to store class and instance definitions, and callbacks as virtual =
-methods.
-
-
-The .class_init callbacks are called early, by a mechanism similar to =
-C++ static constructors, and they initialise the structures used to =
-store the class definitions. They are recursively chained, i.e. first =
-the parent callback is called to initialise the parent structure =
-members, then the current callback is called, to fill in its own =
-members.
-
-The .instance_init callback are automatically called when new =
-**instances** of a class are created. Similarly, they are also =
-recursively chained.
-
-.instance_init may also create children objects, recursively.
-
-
-.realize is a bit trickier. If .instance_init is the very first thing =
-automatically called when creating an object, .realize is the very last =
-thing, it is called manually when the whole hierarchy of objects is =
-created and it signals that everything is ready, a kind of 'rien ne va =
-plus'.
-
-.realize usually has to manually call the parent .realize.
-
----
-
-For me it was difficult to draw a line of what initialisations should be =
-done in .instance_init and what in .realize, but given that .realise is =
-called when the whole hierarchy is ready, it might do links between =
-objects, which are not available when .instance_init is called.
-
-A simple rule would be for .instance_init to ensure that all members =
-have default values and properties associated with them, and defer all =
-functional initialisations to .realize.
-
-
-Hope this helps,
-
-Liviu
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+thanks
+-- PMM
 
