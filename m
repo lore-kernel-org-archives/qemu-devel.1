@@ -2,89 +2,86 @@ Return-Path: <SRS0=NumX=A5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A16C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 14:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B7EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 14:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3F562073A
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 14:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A06472070E
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 14:19:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="agQqSNtv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F562073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z4Yri8mX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A06472070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwnjg-0001b1-1M
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 10:22:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51128)
+	id 1jwng8-0000SK-UP
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 10:19:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwnj7-0001CL-GG
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 10:22:09 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26669
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jwnj4-0005ij-GS
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 10:22:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595082124;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=CgYCHe5dlVqzGkGHy5oCmdZPNUZmtS7nOyEohSeUBxI=;
- b=agQqSNtvVzROXuS+sCPFXWfWy+X8rdmsLNCKH70VNDFhD/giNt2HAo/E5RjTdpxDtWvPO1
- nO2zibM5AGeu7Fmi2tmqjMCSKNIvukP8PHcA1wvgjkCkDbk2MvhvMaKRIsgNI1MxxAW/m0
- lPbWOR5nQ2+KR3WlK65hu0PdTY33jJY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-icYoae31NfyI-2sDBjEp0g-1; Sat, 18 Jul 2020 10:22:02 -0400
-X-MC-Unique: icYoae31NfyI-2sDBjEp0g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 130F58C4142;
- Sat, 18 Jul 2020 14:22:01 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-84.ams2.redhat.com [10.36.112.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 22963724A9;
- Sat, 18 Jul 2020 14:21:59 +0000 (UTC)
-Subject: Re: instance_init() and the realize() functions
-To: Pratik Parvati <pratikp@vayavyalabs.com>, qemu-devel@nongnu.org
-References: <CA+aXn+E2r1ZFyd1AZnwyvnxB1VsStkJC8vqkhmqZ4JDE_0LwMg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <cebfe1ec-40d9-ee2e-fd69-f20beec69ce7@redhat.com>
-Date: Sat, 18 Jul 2020 16:21:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwnfH-0008CV-8y
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 10:18:12 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34506)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jwnfE-0004df-1W
+ for qemu-devel@nongnu.org; Sat, 18 Jul 2020 10:18:10 -0400
+Received: by mail-ot1-x341.google.com with SMTP id e90so8978655ote.1
+ for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 07:18:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ALTmyTbkrboopNee/5LGQVDdqqrDjvus0ZMXWnu1kbQ=;
+ b=z4Yri8mX0sWkse7rh/K9Ed8xmWBOBC5lbrcmnLs+3d1s1UUm2qjBqcV9vsMOTUBS8U
+ 0EvdfIJDIfy/ucDXSWuRTtpCwEVyXSWcQ1a8jpFvCcerhT7aD1p5Tcg237hEQXN2F7p/
+ 6Z5aAI1G00vtscI9lBpLNkKvIrvCM9qvEgciQ324Qj3taSYjKn9oSKpVFpRS3pZDCXxy
+ vIWq8FqLbIh5noQ0lu18Hghevuv054F+9uJOrmgMoWbquOiOgYLUYSH905ur2DBS0fsc
+ /q0Q7IW6vDaD+XmE3z2hPSGVJQoXhal/7AvhbGeIn4EfHC2PzqwUw91lFikvCHsEcYS8
+ Vq5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ALTmyTbkrboopNee/5LGQVDdqqrDjvus0ZMXWnu1kbQ=;
+ b=F1AFui78h100wN29HfKFyNj7o08vo5oJQPU/Qmrmjt9ePW0ukJnYSjrFUcn2VJT16A
+ arqpi/6zFXwe5bqWowQ3OnlNg7t/u863HAPyky3LWmw+ClYxfHmPk+T6aQtiw9oVbx3S
+ OhibgpXwwJ5x6xSwqId60cbnJVtA1JDJpwZpfUYXDM23Y22vSjZQRoFy8a4j/9cTZHXS
+ cuTx3l+v0ehXR6d73+obs95IeoqEfA0hd+pWHUxHzkCOgUXw1iYZp85uOiWCHwptE5vF
+ FneBpwOEOWu1XCwfr6H+V9KsxPbkAopu7TB1KM1EckKCHh4+/B0aDVl+wCAFdzCracNf
+ 72Fw==
+X-Gm-Message-State: AOAM531pBQySJjmg1woI8KD3HbG4DYuxHJWi5yVf9qpm/AGcA3jn7ZeN
+ ZGxiwaFczjZsAJ890wsEJ4sSEUlxY08lQU7xGD+atA==
+X-Google-Smtp-Source: ABdhPJxZ4d+NpEJiul55RA4p9DaNAYWnOE+ocmzKTg7XfziWw8Gc5wv+9geY5vLi/4ILWDj2OC56r48oiqr5nS9sCQQ=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr12784404ota.91.1595081885763; 
+ Sat, 18 Jul 2020 07:18:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CA+aXn+E2r1ZFyd1AZnwyvnxB1VsStkJC8vqkhmqZ4JDE_0LwMg@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/18 10:22:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <CA+XhMqzHPG5ezqY-YxbA+tMoadA3VDFWBX8_LaLC5YsQOMrz+A@mail.gmail.com>
+In-Reply-To: <CA+XhMqzHPG5ezqY-YxbA+tMoadA3VDFWBX8_LaLC5YsQOMrz+A@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 18 Jul 2020 15:17:54 +0100
+Message-ID: <CAFEAcA88cskF-PP48Z2Lnj7rYoKObkV7kD-VdB1XONSzRX=9Pw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] contrib: ivshmem client and server build fix for
+ SunOS.
+To: David CARLIER <devnexen@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,27 +95,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/07/2020 09.09, Pratik Parvati wrote:
-> Hi team,
-> 
-> Could someone please guild me to understand the difference
-> between *instance_init()* and the*realize()* functions? The
-> *class_init() *function is straight forward (it is similar to the
-> constructor in C++ OOP); But I am, finding hard to quote the difference
-> between *instance_init()* and *realize()*.
-> 
-> What is the code flow when both functions are defined?
+On Sat, 18 Jul 2020 at 14:22, David CARLIER <devnexen@gmail.com> wrote:
+>
+> From 1c5225132a01ad67c87d603659ef4e4bcd46a16d Mon Sep 17 00:00:00 2001
+> From: David Carlier <devnexen@gmail.com>
+> Date: Sat, 18 Jul 2020 13:32:47 +0100
+> Subject: [PATCH 3/3] contrib: ivshmem client and server build fix for SunOS.
+>
+> sun is a macro on these systems, thus renaming the variables on the
+>  client and server.
+>
+> Signed-off-by: David Carlier <devnexen@gmail.com>
+> ---
+>  contrib/ivshmem-client/ivshmem-client.c | 12 ++++++------
+>  contrib/ivshmem-server/ivshmem-server.c | 12 ++++++------
+>  2 files changed, 12 insertions(+), 12 deletions(-)
 
-Beside the other good answers that you've already got, maybe this helps
-a little bit, too:
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
- http://people.redhat.com/~thuth/blog/qemu/2018/09/10/instance-init-realize.html
-
- Cheers,
-  Thomas
-
+thanks
+-- PMM
 
