@@ -2,81 +2,90 @@ Return-Path: <SRS0=NumX=A5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C1EC433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 15:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22852C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 15:24:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EE5D20656
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 15:00:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE5D20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DC89520657
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Jul 2020 15:24:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSIYTu4c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC89520657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jwoJx-0005Em-JN
-	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 11:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36036)
+	id 1jwohW-0001bj-Ve
+	for qemu-devel@archiver.kernel.org; Sat, 18 Jul 2020 11:24:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwoJK-0004nS-4d
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 10:59:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38070)
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1jwogU-0000sZ-W0; Sat, 18 Jul 2020 11:23:31 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:37203)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jwoJI-00053u-AA
- for qemu-devel@nongnu.org; Sat, 18 Jul 2020 10:59:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jwoJG-0003qY-Sy
- for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 14:59:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C8AE32E80F0
- for <qemu-devel@nongnu.org>; Sat, 18 Jul 2020 14:59:30 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1jwogT-0001YR-Co; Sat, 18 Jul 2020 11:23:30 -0400
+Received: by mail-ej1-x641.google.com with SMTP id lx13so13910835ejb.4;
+ Sat, 18 Jul 2020 08:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=F5Oo4QoL7isQPRP2CO/3Qz1kPuTDuOwqdsQHLJ14pOs=;
+ b=TSIYTu4cR1/0w/Fzzu0PBiVDXTENCVyjKjGbntKbuRy8nU783Yr3TPMe7gYD9yqofj
+ IOiedLv2Gu+Lv5olJJM/DxFk/i3k/hXgF0aftiSF6JPdStL6V9dtjOZ5x0xD0+eOOf+a
+ oruJSLPu4/2bq71qGnQa8KZiA54yAFCvJMjkM6tCwmMzk83I4DGS/8cfyzntGUUUaTLc
+ EuprQsoS050FBwJ55ehYPy0wcP1R59oeeNHKfjQ32gNPD/xh3SDZOHs05Tbr5HXck9nJ
+ iwFynO7HRBTGUK7RvElaBdRRXz2n2Hcxk3ywle31wVqIYUuS9x4U3fX0C4Ks1gbzd5VU
+ IE0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=F5Oo4QoL7isQPRP2CO/3Qz1kPuTDuOwqdsQHLJ14pOs=;
+ b=QtVGoy8FxDCC9z02npZpUQziT4YWYtN3NvmNGvDdAEakEpwQkYjPznahPHr4RCCoFk
+ C8kEUSwJjLntUBV5TM8w48F4Qe27/c+0V+kHqUr0bd6Pa5eh4eW4EVhDYrhwgfLnLycj
+ 6m00z7I4yl5pdoUyZaP4FnSpMeqLNwovu+tK74hBV5bHmX3Mh8TVPwJSuEMT2HikzQMt
+ Y9kpNnsU2SKStk0oGaxIA5O2uIhbHFITa1uHT72rFzVuxANuXOmlkFdNAcqM98GpwOC4
+ KAP35Ss50SrcRnUqcpi/EZcEatPQfdBFaGVYZ9Gb1G9XwWMfIhUVdHqarqq5PvUH4z9F
+ zTrQ==
+X-Gm-Message-State: AOAM530KxKZCGFKbQUIrDygbZrAcVeACM/WUTyb4+xRFV9lHIbPaW3Wx
+ 70R2h+LnHNTXN/ZIodonueMAugNtFSPDrllT6iQ=
+X-Google-Smtp-Source: ABdhPJxakUueOZP62zuhmyUSrTI8Y5gcniQ8VKSm964qAknNlL8IqGxL2pqW6m1lTMBdkIH/RKz/1tJTP0tdzfcro4I=
+X-Received: by 2002:a17:906:57c5:: with SMTP id
+ u5mr12794349ejr.311.1595085807555; 
+ Sat, 18 Jul 2020 08:23:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 18 Jul 2020 14:47:48 -0000
-From: Thomas Huth <1603970@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-mair-g th-huth
-X-Launchpad-Bug-Reporter: Kilian Ries (7-mair-g)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20160718121144.22648.14707.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159508366851.11965.9099636484095060713.malone@soybean.canonical.com>
-Subject: [Bug 1603970] Re: KVM freezes after live migration (AMD 4184 -> 4234)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: daa5ff2ecfff69d3ffd14b93ec498c294b3e4587
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/18 10:41:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <CA+XhMqwtUrSpCqNGEETBijewzvmpno8OAX_PKSShDP_gUQ-3VQ@mail.gmail.com>
+ <CAFEAcA96mh_4EkKz31HgzfPOEQvhta8VTcvMV=An8Us0+x=NfQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA96mh_4EkKz31HgzfPOEQvhta8VTcvMV=An8Us0+x=NfQ@mail.gmail.com>
+From: David CARLIER <devnexen@gmail.com>
+Date: Sat, 18 Jul 2020 16:23:16 +0100
+Message-ID: <CA+XhMqwxEB7XpEqdxnqmwaTtMsD-qSu0pvPuXwMz1MssNV-Fiw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] exec: posix_madvise usage on SunOS.
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=devnexen@gmail.com; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,94 +94,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1603970 <1603970@bugs.launchpad.net>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
+It probably does not indeed (maybe Solaris madvise does not provide
+but memcntl ?), I was just trying to fix the build only :-)
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1603970
-
-Title:
-  KVM freezes after live migration (AMD 4184 -> 4234)
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi,
-
-  i have two host systems with different CPU types:
-
-  Host A:
-  AMD Opteron(tm) Processor 4234
-
-  Host B:
-  AMD Opteron(tm) Processor 4184
-
-  Live migration from B -> A works as expected, migration from A -> B
-  always ends in a freezed KVM. If the KVM is frozen, VNC output is
-  still present, however, you can't type anything. CPU usage is always
-  at 100% for one core (so if i set two cores, one is at 100% the other
-  one at 0% usage).
-
-  My command to launch the KVM is the following:
-
-  /usr/bin/kvm -id 104 -chardev socket,id=3Dqmp,path=3D/var/run/qemu-
-  server/104.qmp,server,nowait -mon chardev=3Dqmp,mode=3Dcontrol -pidfile
-  /var/run/qemu-server/104.pid -daemonize -smbios
-  type=3D1,uuid=3D26dd83a9-b9bd-4641-8016-c55f255f1bdf -name kilian-test
-  -smp 1,sockets=3D1,cores=3D1,maxcpus=3D1 -nodefaults -boot menu=3Don,stri=
-ct=3Don
-  ,reboot-timeout=3D1000 -vga cirrus -vnc unix:/var/run/qemu-
-  server/104.vnc,x509,password -cpu
-  kvm64,+lahf_lm,+sep,+kvm_pv_unhalt,+kvm_pv_eoi,enforce -m 512 -object
-  memory-backend-ram,id=3Dram-node0,size=3D512M -numa
-  node,nodeid=3D0,cpus=3D0,memdev=3Dram-node0 -k de -device pci-
-  bridge,id=3Dpci.2,chassis_nr=3D2,bus=3Dpci.0,addr=3D0x1f -device pci-
-  bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1e -device piix3-us=
-b-
-  uhci,id=3Duhci,bus=3Dpci.0,addr=3D0x1.0x2 -device usb-
-  tablet,id=3Dtablet,bus=3Duhci.0,port=3D1 -device virtio-balloon-
-  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x3 -iscsi initiator-
-  name=3Diqn.1993-08.org.debian:01:5ca1e9d334b2 -drive
-  file=3D/mnt/pve/nfs_synology/images/104/vm-104-disk-2.qcow2,if=3Dnone,id
-  =3Ddrive-virtio0,format=3Dqcow2,cache=3Dnone,aio=3Dnative,detect-zeroes=
-=3Don
-  -device virtio-blk-pci,drive=3Ddrive-
-  virtio0,id=3Dvirtio0,bus=3Dpci.0,addr=3D0xa,bootindex=3D100 -netdev
-  type=3Dtap,id=3Dnet0,ifname=3Dtap104i0,script=3D/var/lib/qemu-server/pve-
-  bridge,downscript=3D/var/lib/qemu-server/pve-bridgedown,vhost=3Don -device
-  virtio-net-
-  pci,mac=3D66:33:31:36:35:36,netdev=3Dnet0,bus=3Dpci.0,addr=3D0x12,id=3Dne=
-t0,bootindex=3D300
-
-  =
-
-  KVM / QEMU version: QEMU emulator version 2.5.1.1
-
-  I have tried to set different CPU types, but no one works (qemu64,
-  vm64, Opteron_G1, ...).
-
-  =
-
-  I have found an email from 2014 where another user reports exactly the sa=
-me problem:
-
-  http://lists.gnu.org/archive/html/qemu-discuss/2014-02/msg00002.html
-
-  Greets
-  Kilian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1603970/+subscriptions
+On Sat, 18 Jul 2020 at 15:15, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Sat, 18 Jul 2020 at 14:21, David CARLIER <devnexen@gmail.com> wrote:
+> >
+> > From a9e3cced279ae55a59847ba232f7828bc2479367 Mon Sep 17 00:00:00 2001
+> > From: David Carlier <devnexen@gmail.com>
+> > Date: Sat, 18 Jul 2020 13:29:44 +0100
+> > Subject: [PATCH 2/3] exec: posix_madvise usage on SunOS.
+> >
+> > with _XOPEN_SOURCE set, the older mman.h API based on caddr_t handling
+> > is not accessible thus using posix_madvise here.
+> >
+> > Signed-off-by: David Carlier <devnexen@gmail.com>
+> > ---
+> >  exec.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/exec.c b/exec.c
+> > index 6f381f98e2..0466a75b89 100644
+> > --- a/exec.c
+> > +++ b/exec.c
+> > @@ -3964,7 +3964,15 @@ int ram_block_discard_range(RAMBlock *rb,
+> > uint64_t start, size_t length)
+> >               * fallocate'd away).
+> >               */
+> >  #if defined(CONFIG_MADVISE)
+> > +#if !defined(CONFIG_SOLARIS)
+> >              ret =  madvise(host_startaddr, length, MADV_DONTNEED);
+> > +#else
+> > +        /*
+> > +         * mmap and its caddr_t based api is not accessible
+> > +         * with _XOPEN_SOURCE set on illumos
+> > +         */
+> > +            ret =  posix_madvise(host_startaddr, length, POSIX_MADV_DONTNEED);
+> > +#endif
+>
+> Hi. I'm not sure this patch will do the right thing, because
+> I don't think that Solaris's POSIX_MADV_DONTNEED provides
+> the semantics that this QEMU function says it needs. The
+> comment at the top of the function says:
+>
+>  * Unmap pages of memory from start to start+length such that
+>  * they a) read as 0, b) Trigger whatever fault mechanism
+>  * the OS provides for postcopy.
+>  * The pages must be unmapped by the end of the function.
+>
+> (Aside: the use of 'unmap' in this comment is a bit confusing,
+> because it clearly doesn't mean 'unmap' if it wants read-as-0.
+> And the reference to faults on postcopy is incomprehensible
+> to me: if memory is read-as-0 it isn't going to fault.)
+>
+> Linux's madvise(MADV_DONTNEED) does guarantee us this
+> read-as-zero behaviour. (It's a silly API choice that Linux
+> put this behaviour behind madvise, which is supposed to be
+> merely advisory, but that's how it is.) The Solaris
+> posix_madvise() manpage says it is merely advisory and
+> doesn't affect the behaviour of accesses to the memory.
+>
+> If posix_madvise() behaviour was OK in this function, the
+> right way to fix this would be to use qemu_madvise()
+> instead, which already provides this "if host has
+> madvise(), use it, otherwise use posix_madvise()" logic.
+> But I suspect that the direct madvise() here is deliberate.
+>
+> Side note: not sure the current code is correct for the
+> BSDs either -- they have madvise() but don't provide
+> Linux's really-read-as-zero guarantee for MADV_DONTNEED.
+> So we should probably be doing something else there, and
+> whatever that something-else is is probably also what
+> Solaris wants.
+>
+> We use ram_block_discard_range() only in migration and
+> in virtio-balloon and virtio-mem; I've cc'd some people
+> who hopefully understand what the requirements on this
+> function are and might have a view on what the not-Linux
+> implementation should look like. (David Gilbert: git
+> blame says you wrote this code :-))
+>
+> thanks
+> -- PMM
 
