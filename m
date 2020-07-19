@@ -2,70 +2,85 @@ Return-Path: <SRS0=x6dg=A6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3F6C433E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 17:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 182BFC433E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 18:24:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4770120B1F
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 17:35:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4770120B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
+	by mail.kernel.org (Postfix) with ESMTPS id D979820B1F
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 18:24:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uCImcpbV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D979820B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxDDR-0001ic-AM
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jul 2020 13:35:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40846)
+	id 1jxDz3-0001MD-1H
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jul 2020 14:24:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <svens@stackframe.org>)
- id 1jxDAK-00012z-SO
- for qemu-devel@nongnu.org; Sun, 19 Jul 2020 13:31:57 -0400
-Received: from smtp.duncanthrax.net ([178.63.180.169]:56504)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <svens@stackframe.org>)
- id 1jxDAG-00025B-BF
- for qemu-devel@nongnu.org; Sun, 19 Jul 2020 13:31:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=duncanthrax.net; s=dkim; h=In-Reply-To:Content-Type:MIME-Version:References
- :Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding
- :Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
- Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
- List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=2kjDwBLi2v8gGqDOQ1dBSu/xLqQ4iBlQlbJuVW5OfOg=; b=OboWt+5UjSBc4X6s44UXzdXriP
- Hti551xtdgi7OksKoa3jOH94zPltl/IM/qjQLlSWbjxeAWd9mGpbTt50sEp035VAIsgBClwP961bM
- ePoU4inz2plCgALkY4MdpDBCF6mhVJ+tmdPzsXUMWAoIKQ96Tzod4e8oeNzatszOxS5o=;
-Received: from hsi-kbw-091-089-248-125.hsi2.kabel-badenwuerttemberg.de
- ([91.89.248.125] helo=t470p.stackframe.org)
- by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>)
- id 1jxDAC-0004q7-6Z; Sun, 19 Jul 2020 19:31:48 +0200
-Date: Sun, 19 Jul 2020 19:31:47 +0200
-From: svens@stackframe.org
-To: Bug 1880287 <1880287@bugs.launchpad.net>
-Subject: Re: [Bug 1880287] Re: gcc crashes in hppa emulation
-Message-ID: <20200719173147.GB14403@t470p.stackframe.org>
-References: <159022297856.20775.958724179871171148.malonedeb@soybean.canonical.com>
- <159502121068.13621.18184835876951101397.malone@gac.canonical.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxDyH-0000il-TT
+ for qemu-devel@nongnu.org; Sun, 19 Jul 2020 14:23:33 -0400
+Received: from mail-oo1-xc35.google.com ([2607:f8b0:4864:20::c35]:45018)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxDyG-0007KE-B4
+ for qemu-devel@nongnu.org; Sun, 19 Jul 2020 14:23:33 -0400
+Received: by mail-oo1-xc35.google.com with SMTP id o36so2758429ooi.11
+ for <qemu-devel@nongnu.org>; Sun, 19 Jul 2020 11:23:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pt60wHKfwxD9/5sGrjX2ejJkmo2yeA/Dc+kD6RA7mG4=;
+ b=uCImcpbVveD9RalyXlDcGBb+MMLcnvUUpzgoNMx5S3TB+vXybDB++VYnboGEAVKkOA
+ zbncWSJzTYA9xJliZfTuveIiVtFLiq+mxSaQP4rbAHhF0si0vdsRU9SyDB+Ju45oCXFg
+ lPDBTPk9u5MeXOplw9GRrS6drxyyPIuW6jwC/n83dRN0VpX0+77AlC4YO+GjsZspXTY4
+ ppUVdzHPRTlbWr2DEKJQl1Xz0ca4DzCJrGJ0ytV+U2zh+ujF+btl6vMLb7OLp8rDteLX
+ G3j0H75lYCbNvEpFKI61lBh9umlhnT1IqIZ+xqsnTYS4WB0HcEt0tbtwbo13uXF+R08Q
+ tMRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pt60wHKfwxD9/5sGrjX2ejJkmo2yeA/Dc+kD6RA7mG4=;
+ b=OdGogzZJSDztbX0GzOCju3M8jfh3xHRvN/7Molp75UQ5pkf9ffglqqyACLGndnMzf6
+ b3x/WiaV7fP7Hu+4YmiG8PEH2n0T2iPLtE/xrkJ6Lhv5/AExsOQ+n33fRgXORcheIkgF
+ Rs/w+uUQWG+4LkMEoVcdP17/+BxxBvNqPiOxeHHdZjtdvMKYQkXzfXpW2E02JwnJ6DXO
+ CxeAb9mA8aob9MDD9hwigXIHXFcmH5b+Q4B3Q8z+N4BA65B+69wiv7rePgadc6BDtmx9
+ QRETq5lVwIIxiTbtesFU8dY6ihalYx1nAQW6lpp9qmyjC0ccNAs+pmgmP5g2z3TemBD5
+ mfdA==
+X-Gm-Message-State: AOAM532iBdNbBRbaeNNd0m7Ak+pVdWu3sJ70Nr7ReuKLoa7DI+HNLudE
+ 1i2S2WJx8dKbRpZljJ+zKz+YugKYYqCNdgaRcjdagw==
+X-Google-Smtp-Source: ABdhPJwtyTQe7YCpdJKWKtxtoP1oiX/FdoeDWWW39mcAS1k7IINlOe46ig01pr0tSCSG7w+qUBCWV2kyq6VofKN1J5M=
+X-Received: by 2002:a4a:8784:: with SMTP id b4mr16636725ooi.69.1595183010524; 
+ Sun, 19 Jul 2020 11:23:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <159502121068.13621.18184835876951101397.malone@gac.canonical.com>
-Received-SPF: none client-ip=178.63.180.169; envelope-from=svens@stackframe.org;
- helo=smtp.duncanthrax.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 13:31:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200717181623.2742758-1-richard.henderson@linaro.org>
+In-Reply-To: <20200717181623.2742758-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 19 Jul 2020 19:23:19 +0100
+Message-ID: <CAFEAcA8H-APE_Xttiz-J2HLkrys0zgcndv3tbmP7F1w3EY1xYA@mail.gmail.com>
+Subject: Re: [PULL for-5.1 0/3] tcg patch queue
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c35;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc35.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,84 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 17, 2020 at 09:26:50PM -0000, Helge Deller wrote:
-> Test still crashes the VM and chroot with up-to-date debian chroot,
-> including updated gcc-9.3.0-14.
-> 
-> -- 
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1880287
-> 
-> Title:
->   gcc crashes in hppa emulation
-> 
-> Status in QEMU:
->   New
-> 
-> Bug description:
->   There seems to be a translation bug in the qemu-hppa (qemu v5.0.0) emulation:
->   A stripped down testcase (taken from Linux kernel build) is attached.
-> 
->   In there is "a.sh", a shell script which calls gcc-9 (fails with both
->   debian gcc-9.3.0-11 or gcc-9.3.0-12). and "a.iii", the preprocessed
->   source.
-> 
->   When starting a.sh, in the emulation gcc crashes with segfault.
->   On real hardware gcc succeeds to compile the source.
-> 
->   In a hppa-user chroot running "apt update && apt install gcc-9" should
->   be sufficient to get the needed reproducer environment.
-> 
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1880287/+subscriptions
-> 
+On Fri, 17 Jul 2020 at 19:16, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit 95d1fbabae0cd44156ac4b96d512d143ca7dfd5e:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20200716-pull-request' into staging (2020-07-16 18:50:51 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20200717
+>
+> for you to fetch changes up to ba3c35d9c4026361fd380b269dc6def9510b7166:
+>
+>   tcg/cpu-exec: precise single-stepping after an interrupt (2020-07-17 11:09:34 -0700)
+>
+> ----------------------------------------------------------------
+> Fix vector min/max fallback expansion
+> Fix singlestep from exception and interrupt
 
-I reproduced this here and it looks like we're running out of TCG temps:
+Applied, thanks.
 
-hread 3 "qemu-system-hpp" received signal SIGABRT, Aborted.
-[Switching to Thread 0x7fcb5ffff700 (LWP 3208)]
-__GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
-50	../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-(gdb) bt
-#0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:50
-#1  0x00007fcb680a455b in __GI_abort () at abort.c:79
-#2  0x00007fcb680a442f in __assert_fail_base
-    (fmt=0x7fcb6820ab48 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=0x55cc6120e68c "n < 512", file=0x55cc6120c569 "/home/svens/qemu/tcg/tcg.c", line=1156, function=<optimized out>) at assert.c:92
-#3  0x00007fcb680b3092 in __GI___assert_fail
-    (assertion=0x55cc6120e68c "n < 512", file=0x55cc6120c569 "/home/svens/qemu/tcg/tcg.c", line=1156, function=0x55cc6120f768 <__PRETTY_FUNCTION__.37440> "tcg_temp_alloc") at assert.c:101
-#4  0x000055cc60cd57ae in tcg_temp_alloc (s=0x7fcad0000b60) at /home/svens/qemu/tcg/tcg.c:1156
-#5  0x000055cc60cd5bd6 in tcg_temp_new_internal (type=TCG_TYPE_I32, temp_local=false) at /home/svens/qemu/tcg/tcg.c:1273
-#6  0x000055cc60dda222 in tcg_temp_new_i32 () at /home/svens/qemu/include/tcg/tcg.h:899
-#7  0x000055cc60de760c in do_sub (ctx=0x7fcb5fffe2e0, rt=2, in1=0x430, in2=0x9e0, is_tsv=false, is_b=false, is_tc=false, cf=0) at /home/svens/qemu/target/hppa/translate.c:1247
-#8  0x000055cc60de7a04 in do_sub_reg (ctx=0x7fcb5fffe2e0, a=0x7fcb5fffe1d0, is_tsv=false, is_b=false, is_tc=false) at /home/svens/qemu/target/hppa/translate.c:1313
-#9  0x000055cc60deaca9 in trans_sub (ctx=0x7fcb5fffe2e0, a=0x7fcb5fffe1d0) at /home/svens/qemu/target/hppa/translate.c:2647
-#10 0x000055cc60de18aa in decode (ctx=0x7fcb5fffe2e0, insn=193070082) at target/hppa/decode.inc.c:1699
-#11 0x000055cc60def6db in hppa_tr_translate_insn (dcbase=0x7fcb5fffe2e0, cs=0x55cc62065bf0) at /home/svens/qemu/target/hppa/translate.c:4255
-#12 0x000055cc60d47d6f in translator_loop (ops=0x55cc614789c0 <hppa_tr_ops>, db=0x7fcb5fffe2e0, cpu=0x55cc62065bf0, tb=0x7fcb2f02e180 <code_gen_buffer+386064723>, max_insns=512)
-    at /home/svens/qemu/accel/tcg/translator.c:102
-#13 0x000055cc60defb9d in gen_intermediate_code (cs=0x55cc62065bf0, tb=0x7fcb2f02e180 <code_gen_buffer+386064723>, max_insns=512) at /home/svens/qemu/target/hppa/translate.c:4389
-#14 0x000055cc60d45eeb in tb_gen_code (cpu=0x55cc62065bf0, pc=3161101733888, cs_base=3161095929860, flags=262915, cflags=-16777216) at /home/svens/qemu/accel/tcg/translate-all.c:1738
-#15 0x000055cc60d42452 in tb_find (cpu=0x55cc62065bf0, last_tb=0x0, tb_exit=0, cf_mask=0) at /home/svens/qemu/accel/tcg/cpu-exec.c:407
-#16 0x000055cc60d42d30 in cpu_exec (cpu=0x55cc62065bf0) at /home/svens/qemu/accel/tcg/cpu-exec.c:731
-#17 0x000055cc60dbe7d1 in tcg_cpu_exec (cpu=0x55cc62065bf0) at /home/svens/qemu/softmmu/cpus.c:1356
-#18 0x000055cc60dbeade in qemu_tcg_rr_cpu_thread_fn (arg=0x55cc62065bf0) at /home/svens/qemu/softmmu/cpus.c:1458
-#19 0x000055cc611c98f0 in qemu_thread_start (args=0x55cc6207f6b0) at util/qemu-thread-posix.c:521
-#20 0x00007fcb6824cf27 in start_thread (arg=<optimized out>) at pthread_create.c:479
-#21 0x00007fcb6817c31f in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-(gdb)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-TCG_MAX_INSN is 512, and TCG_MAX_TEMPS also. Given the complexity of emulating the
-parisc conditions and nullifications, i guess a 1:1 ratio is just not sufficient.
-Increasing TCG_MAX_TEMPS to 1024 solves the issue. I haven't checked how big
-the TB is, and how much temps it allocates then.
-
-Regards
-Sven
-
+-- PMM
 
