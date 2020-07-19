@@ -2,129 +2,105 @@ Return-Path: <SRS0=x6dg=A6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FORGED_YAHOO_RCVD,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67527C433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 13:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F6FC433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 14:17:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 330212080D
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 13:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54E0021775
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 14:17:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yx4DLQCx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330212080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Rex/jIsK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E0021775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jx9km-0002Dr-HQ
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jul 2020 09:53:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59826)
+	id 1jxA8V-0006Mm-H4
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jul 2020 10:17:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jx9jn-00014y-MV
- for qemu-devel@nongnu.org; Sun, 19 Jul 2020 09:52:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40172
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jx9jk-0000JV-VM
- for qemu-devel@nongnu.org; Sun, 19 Jul 2020 09:52:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595166733;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=RrqRYutXoXp9yhJpjSxvnnEa3x2dFnF1brfHYNUFls8=;
- b=Yx4DLQCxb12brOcxPGpMG+u1r+C/Dp0NZzf+JTa3CukCpUg6wTRZvGOhmB05+5+gkKeCAo
- +tWy01DiUpW9TW4IU5D+xdw5bRQ/nLhBMhe0nPZ6bVuoLNNbnu/JlWVrt76pJjiKez9KBY
- JsJKV97+fNcLzl63q1boB6+O0FgHSUU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-1NYOCCgPNZ2IjlyjSImoqg-1; Sun, 19 Jul 2020 09:52:12 -0400
-X-MC-Unique: 1NYOCCgPNZ2IjlyjSImoqg-1
-Received: by mail-wm1-f71.google.com with SMTP id b13so13159159wme.9
- for <qemu-devel@nongnu.org>; Sun, 19 Jul 2020 06:52:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=RrqRYutXoXp9yhJpjSxvnnEa3x2dFnF1brfHYNUFls8=;
- b=IEQZHZkf7wvvgASWSHZoXx+8KRIckOa/7V5U0R6mr36PtAgfDMVKT6RpqGSICML9GO
- Z0u3i/nLU4M9rsZN9TGBDOrgBIALsoIk007vgORmWQ9AjSvWYCcycIhDu1heTvYLuMmm
- IWVLt1af02o3EtyhnUKwzjBuXjaKdGqk6zP9aSIpiQDi2s408PV9YHK65AKUTeBeqF9A
- 5ed2FcFt8nUwbi5uF/vToQNmWGxi0VOwqEJKM2jhl1SCoPZczQauxEwmY/810yHMtYfI
- 96Fg2TR/EE4MLhJE/7CE8yKmdtbaTEbYPWZUiHJws0mfRIlzhOtfv+K51DWJciVBeK9q
- HfgQ==
-X-Gm-Message-State: AOAM531TYLZOI+0IR8jdYs20m3WGbylnPMfxzZ2t47/CJHVThVXJS2r7
- N+G1C6CU6CMlBbiMH9doQ77mt869W7bKNVEhAkYK2vEZFr5xrUdZsW5QZENjQIvjUIs9M4khJws
- TWxLzp1JVl6F4N08=
-X-Received: by 2002:adf:a4cf:: with SMTP id h15mr19794327wrb.229.1595166730861; 
- Sun, 19 Jul 2020 06:52:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxP8OpYgtS75y9NWBmJeIYpx0kISeATSyKO3XqrxUwMzk5P/RdWY280gjz48fITw8roXCqXqA==
-X-Received: by 2002:adf:a4cf:: with SMTP id h15mr19794310wrb.229.1595166730567; 
- Sun, 19 Jul 2020 06:52:10 -0700 (PDT)
-Received: from [192.168.1.43] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id e23sm24619824wme.35.2020.07.19.06.52.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 19 Jul 2020 06:52:09 -0700 (PDT)
-Subject: Re: [PATCH v2 1/4] scripts/tracetool: Fix dtrace generation for macOS
-To: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
-References: <20200717093517.73397-1-r.bolshakov@yadro.com>
- <20200717093517.73397-2-r.bolshakov@yadro.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <34c236c5-e047-6f15-6bb6-d0df65129622@redhat.com>
-Date: Sun, 19 Jul 2020 15:52:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <pr0f3ss0r1492@yahoo.com>)
+ id 1jxA6w-00056x-P3
+ for qemu-devel@nongnu.org; Sun, 19 Jul 2020 10:16:14 -0400
+Received: from sonic301-31.consmr.mail.ne1.yahoo.com ([66.163.184.200]:42781)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pr0f3ss0r1492@yahoo.com>)
+ id 1jxA6s-0002tx-Oy
+ for qemu-devel@nongnu.org; Sun, 19 Jul 2020 10:16:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
+ t=1595168169; bh=WOt8dJchIfDquG/bNZO+cYESBv6KD7jFc2tinXm5uOU=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From:Subject;
+ b=Rex/jIsKlkFX6JbpdYKkwxHmscKMo2Uo0XDo3YHZNG+Uva9kaDdONxBj9ZgZCaqswmnxaGaItoHQO2QkIc3zA6PS46iylwHc7lHidht9qUMiASeU397PCFwMoAlZsJ477VPKjpo3boQq56M+k0y/taA/V/590e4RyHkxeQUjwKVdNcyJ8tAiMlexYj0oE1Z2gAxpEXwrbkEZeamX3JbhV70w+sFVZbLDeOI/MMCssWYkGrAzvWFyCs055zi1x5rJ6pGglqSP3O8gYvD5LYXtOVVEOXelAiUDO4Ib2Z1Z3pOla3EG1vi2BL0jmNgBVzveKqisv9i7IgVTiNKg5vxQyw==
+X-YMail-OSG: iU0imdEVM1ntpds.qxHq6bdNS0WOmSWOCXjAA5hqeZ9eFc6vTZ_8nPqIqWGefL_
+ v8tXI_nkgsCQ_ml7kfoWcNr2YsDjnu16XRL8P3XfhLw6oViph9bZVTY.uO1UdQfAIFLCgSTMblu0
+ 1mZCXZ6Ive.Ld8MlTH5t4V8SNH8hyaYlLLQenPaw1KzMBr_0RPvGj2aSOv7ScC189UfXt1.mL.mO
+ 6kcE2d3HQcfa_ZsFgEF3qLVOiGeI6AoNMpRSTgMbtjzSHjBqmO_Z9WGfa6m7bsgRe9.hbyPB_Cdx
+ lxout2ofP4L4_B3myMdIXWwlNlbdDCIqoQ2xi1BIxelOjLny3QHj1VpMz6LjECVXe7zkoWVdBE__
+ _VZeVgx0GLrtbQX8AVxfUERgeUV5kXpGDV8om3xicLqN_Jx2TV_6FHR5uHsjO3UuYddZxPeoua0A
+ pSBFJA2lGJ_UPGvQKbMmJcsyDe7xd_qbaKx_xSqiTxq4DJYaOVtC2EDj8Mgdh8L6lxv7tSRwwToM
+ lYGWmWnn03V0k5DFNv..qQCDQIk4dKVvHZfp49K271otbd2oZ3UjyNopObZCuogYt9Shu3zS4Vvn
+ 7RtUkrvJV709QTrLmRJdmlklXb1FzPDBZ2saaB44z1bSz3OjvFTlgoQ1c120YoD9i5BHPxylwsMu
+ Ncqfi7CtxEIUHs617ouqzM6id4xwt5aL.T2Hmv4F1ABzAa.nNpT5bfVgOJqfKCMP0ZaSdgAW0NLx
+ CK1QiN8y3cY_lrEIiKhBidKyAqzARit9rsdcGy_1ktAHJkEdw52VdwJBOx4DtEIuLBfeCJ5UnsmM
+ Ua9RklQpMPa4RwKchjd8HOUUHg1hgKcHnOY5yOBHNXr7_7GokE18zMPnzhShAKkD51rRLV74Aj6Z
+ q4TDinDy4JlI6vt1HKli8Ndke2q2eP9LSivTP6ipQD_mHfnpURBUysYpIeihEFuytmchbEIhNVPo
+ ldAcQPhTzXZE.VMFhJ3PYz3_4VBuU_nNy9pwlR2bWBog08GBcBx0VFNwlYlnklW6JQjoxr_e9Qlm
+ Tku3QZ8uU_dPcfd4LY8k6BN05f_82NYKxFmpcDK39uwhoIGDICO1wJ4OL7t821KoqBEgyTV5mkus
+ 6QomwrI8IXawv_YbMqu3NHSHwHjcaX4KLmqT.yV6gm1xskXr6glhoiTXJuPpJvOOWHdZSkPbyzmo
+ sxO.BtPeoE9hNt59h1qhsIKqmv_OT4ugVRCqHO73S1aBOm0lgXyp4S.3F.YjStqbj4U9bBntaqwO
+ 7jXMDTrPjyI1SrKKxJGnBB7Lvt0w06e9naZ.KOsqxB1BZ.HC1E_5TzftEAA9ny3guvuFyfYx6HU4
+ hHHLgyvat_lfPVfxUoucMNYH3Gy3dy43V1aK.7FrqmlO8Xs5C2ypx4MLTw2N2UpCmAELMX4Atcj1
+ _ctrymodhpzNKMSIP6wol8L5Zsjkzn2CucA--
+Received: from sonic.gate.mail.ne1.yahoo.com by
+ sonic301.consmr.mail.ne1.yahoo.com with HTTP; Sun, 19 Jul 2020 14:16:09 +0000
+Received: by smtp416.mail.ne1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA
+ ID 236211cb25ae2a4e2662dbfc9a230aa0; 
+ Sun, 19 Jul 2020 14:16:07 +0000 (UTC)
+Received: by mail-pl1-f172.google.com with SMTP id b9so7499730plx.6
+ for <samuel.thibault@gnu.org>; Sun, 19 Jul 2020 07:16:07 -0700 (PDT)
+X-Gm-Message-State: AOAM533UYzAj7GoNxJaDI4gYX5bw5juemO7UP0xZZXW1T8YnaL52PS2I
+ DPFKa5X9U4s+4Vni1gCbl6vCr657bxfUrMuXPXs=
+X-Google-Smtp-Source: ABdhPJxO+fLTqnV6bFfWikJdNBb3u82fVCN+6nUsxtDmLVpj/uNRm8zkDKxwT+9Vu5rmyHWRCzibKDAr07bI4ND/PZg=
+X-Received: by 2002:a17:902:a388:: with SMTP id
+ x8mr14318624pla.48.1595168166736; 
+ Sun, 19 Jul 2020 07:16:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200717093517.73397-2-r.bolshakov@yadro.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 06:55:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <CAEJNuHy+CqveTjiCxpjiLX-D=NczSveUSDSAZyz=D5F0XvL5QQ@mail.gmail.com>
+ <CAEJNuHze25wdA_Kjw8ryi+hmg0eLP8nhZMR50_2yqXPu_Jir9A@mail.gmail.com>
+ <20200719025055.kkjjiegyn4t6x64v@function>
+ <CAEJNuHyYR1Vj4VaDVPLUG1dkSdzHjzbiCqq=Q+2j1tjy7kYBCw@mail.gmail.com>
+ <20200719111602.2xeu4ise6zlbvf4c@function>
+In-Reply-To: <20200719111602.2xeu4ise6zlbvf4c@function>
+From: Ottavio Caruso <ottavio2006-usenet2012@yahoo.com>
+Date: Sun, 19 Jul 2020 15:15:50 +0100
+X-Gmail-Original-Message-ID: <CAEJNuHy7s+GqUaZ_sVgr03J6ZGzK9PwZZBsu6t0Znf6p4x6+8Q@mail.gmail.com>
+Message-ID: <CAEJNuHy7s+GqUaZ_sVgr03J6ZGzK9PwZZBsu6t0Znf6p4x6+8Q@mail.gmail.com>
+Subject: Re: Is traceroute supposed to work in user mode networking (slirp) ?
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: WebService/1.1.16271 hermes_yahoo Apache-HttpAsyncClient/4.1.4
+ (Java/11.0.7)
+Received-SPF: pass client-ip=66.163.184.200;
+ envelope-from=pr0f3ss0r1492@yahoo.com;
+ helo=sonic301-31.consmr.mail.ne1.yahoo.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 08:17:23
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,73 +113,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/20 11:35 AM, Roman Bolshakov wrote:
-> dtrace USDT is fully supported since OS X 10.6. There are a few
-> peculiarities compared to other dtrace flavors.
-> 
-> 1. It doesn't accept empty files.
-> 2. It doesn't recognize bool type but accepts C99 _Bool.
-> 3. It converts int8_t * in probe points to char * in
->    header files and introduces [-Wpointer-sign] warning.
-> 
-> Cc: Cameron Esfahani <dirty@apple.com>
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
->  scripts/tracetool/format/d.py | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/tracetool/format/d.py b/scripts/tracetool/format/d.py
-> index 0afb5f3f47..353722f89c 100644
-> --- a/scripts/tracetool/format/d.py
-> +++ b/scripts/tracetool/format/d.py
-> @@ -13,6 +13,7 @@ __email__      = "stefanha@redhat.com"
->  
->  
->  from tracetool import out
-> +from sys import platform
->  
->  
->  # Reserved keywords from
-> @@ -34,7 +35,8 @@ def generate(events, backend, group):
->  
->      # SystemTap's dtrace(1) warns about empty "provider qemu {}" but is happy
->      # with an empty file.  Avoid the warning.
-> -    if not events:
-> +    # But dtrace on macOS can't deal with empty files.
-> +    if not events and platform != "darwin":
+On Sun, 19 Jul 2020 at 12:16, Samuel Thibault <samuel.thibault@gnu.org> wrote:
+>
+> Ottavio Caruso, le dim. 19 juil. 2020 12:07:21 +0100, a ecrit:
+> > On Sun, 19 Jul 2020 at 03:50, Samuel Thibault <samuel.thibault@gnu.org> wrote:
+> > > Ottavio Caruso, le mar. 14 juil. 2020 12:15:48 +0100, a ecrit:
+> > > > I cannot get traceroute to work with standard udp from any of my
+> > > > guests.
+> > > >
+> > > > $ traceroute 8.8.8.8
+> > > > traceroute to 8.8.8.8 (8.8.8.8), 64 hops max, 40 byte packets
+> > > >  1  * * *
+> > >
+> > > That was because
+> > >
+> > > - libslirp was not forwarding the ttl value, thus always set to 64 hops
+> > > - libslirp was not reporting icmp errors.
+> > >
+> > > I had a try at both, and that indeed seems to be fixing the issue:
+> > > https://gitlab.freedesktop.org/slirp/libslirp/-/merge_requests/48
+> > > https://gitlab.freedesktop.org/slirp/libslirp/-/merge_requests/49
+> > >
+> > > > Any clues? Is this intended behaviour? Any workarounds that don't
+> > > > involve tap/tun/bridges?
+> > >
+> > > Not without updating libslirp with the abovementioned patches.
+> >
+> > Thanks Samuel. I've added a comment on the portal, but for the benefit
+> > of qemu-devel:
+> >
+> > Applying this patch on the latest qemu (5.0.90),
+>
+> Did you also apply
+> https://gitlab.freedesktop.org/slirp/libslirp/-/merge_requests/48 ?
 
-or?
+No, because I thought that 49 would include 48. Let me give a try and
+come back. Updates on Gitlab.
 
->          return
->  
->      out('/* This file is autogenerated by tracetool, do not edit. */'
-> @@ -44,6 +46,17 @@ def generate(events, backend, group):
->      for e in events:
->          args = []
->          for type_, name in e.args:
-> +            if platform == "darwin":
-> +                # macOS dtrace accepts only C99 _Bool
 
-Why not do that for all platforms?
 
-> +                if type_ == 'bool':
-> +                    type_ = '_Bool'
-> +                if type_ == 'bool *':
-> +                    type_ = '_Bool *'
-> +                # It converts int8_t * in probe points to char * in header
-> +                # files and introduces [-Wpointer-sign] warning.
-> +                # Avoid it by changing probe type to signed char * beforehand.
-> +                if type_ == 'int8_t *':
-> +                    type_ = 'signed char *'
->              if name in RESERVED_WORDS:
->                  name += '_'
->              args.append(type_ + ' ' + name)
-> 
-
+-- 
+Ottavio Caruso
 
