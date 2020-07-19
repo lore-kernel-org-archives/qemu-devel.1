@@ -2,105 +2,68 @@ Return-Path: <SRS0=x6dg=A6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FORGED_YAHOO_RCVD,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F6FC433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 14:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A704C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 14:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E0021775
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 14:17:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25E8C2080D
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Jul 2020 14:38:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Rex/jIsK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E0021775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="E5FI6FtW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25E8C2080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxA8V-0006Mm-H4
-	for qemu-devel@archiver.kernel.org; Sun, 19 Jul 2020 10:17:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36374)
+	id 1jxASo-0002jJ-F9
+	for qemu-devel@archiver.kernel.org; Sun, 19 Jul 2020 10:38:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pr0f3ss0r1492@yahoo.com>)
- id 1jxA6w-00056x-P3
- for qemu-devel@nongnu.org; Sun, 19 Jul 2020 10:16:14 -0400
-Received: from sonic301-31.consmr.mail.ne1.yahoo.com ([66.163.184.200]:42781)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pr0f3ss0r1492@yahoo.com>)
- id 1jxA6s-0002tx-Oy
- for qemu-devel@nongnu.org; Sun, 19 Jul 2020 10:16:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
- t=1595168169; bh=WOt8dJchIfDquG/bNZO+cYESBv6KD7jFc2tinXm5uOU=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From:Subject;
- b=Rex/jIsKlkFX6JbpdYKkwxHmscKMo2Uo0XDo3YHZNG+Uva9kaDdONxBj9ZgZCaqswmnxaGaItoHQO2QkIc3zA6PS46iylwHc7lHidht9qUMiASeU397PCFwMoAlZsJ477VPKjpo3boQq56M+k0y/taA/V/590e4RyHkxeQUjwKVdNcyJ8tAiMlexYj0oE1Z2gAxpEXwrbkEZeamX3JbhV70w+sFVZbLDeOI/MMCssWYkGrAzvWFyCs055zi1x5rJ6pGglqSP3O8gYvD5LYXtOVVEOXelAiUDO4Ib2Z1Z3pOla3EG1vi2BL0jmNgBVzveKqisv9i7IgVTiNKg5vxQyw==
-X-YMail-OSG: iU0imdEVM1ntpds.qxHq6bdNS0WOmSWOCXjAA5hqeZ9eFc6vTZ_8nPqIqWGefL_
- v8tXI_nkgsCQ_ml7kfoWcNr2YsDjnu16XRL8P3XfhLw6oViph9bZVTY.uO1UdQfAIFLCgSTMblu0
- 1mZCXZ6Ive.Ld8MlTH5t4V8SNH8hyaYlLLQenPaw1KzMBr_0RPvGj2aSOv7ScC189UfXt1.mL.mO
- 6kcE2d3HQcfa_ZsFgEF3qLVOiGeI6AoNMpRSTgMbtjzSHjBqmO_Z9WGfa6m7bsgRe9.hbyPB_Cdx
- lxout2ofP4L4_B3myMdIXWwlNlbdDCIqoQ2xi1BIxelOjLny3QHj1VpMz6LjECVXe7zkoWVdBE__
- _VZeVgx0GLrtbQX8AVxfUERgeUV5kXpGDV8om3xicLqN_Jx2TV_6FHR5uHsjO3UuYddZxPeoua0A
- pSBFJA2lGJ_UPGvQKbMmJcsyDe7xd_qbaKx_xSqiTxq4DJYaOVtC2EDj8Mgdh8L6lxv7tSRwwToM
- lYGWmWnn03V0k5DFNv..qQCDQIk4dKVvHZfp49K271otbd2oZ3UjyNopObZCuogYt9Shu3zS4Vvn
- 7RtUkrvJV709QTrLmRJdmlklXb1FzPDBZ2saaB44z1bSz3OjvFTlgoQ1c120YoD9i5BHPxylwsMu
- Ncqfi7CtxEIUHs617ouqzM6id4xwt5aL.T2Hmv4F1ABzAa.nNpT5bfVgOJqfKCMP0ZaSdgAW0NLx
- CK1QiN8y3cY_lrEIiKhBidKyAqzARit9rsdcGy_1ktAHJkEdw52VdwJBOx4DtEIuLBfeCJ5UnsmM
- Ua9RklQpMPa4RwKchjd8HOUUHg1hgKcHnOY5yOBHNXr7_7GokE18zMPnzhShAKkD51rRLV74Aj6Z
- q4TDinDy4JlI6vt1HKli8Ndke2q2eP9LSivTP6ipQD_mHfnpURBUysYpIeihEFuytmchbEIhNVPo
- ldAcQPhTzXZE.VMFhJ3PYz3_4VBuU_nNy9pwlR2bWBog08GBcBx0VFNwlYlnklW6JQjoxr_e9Qlm
- Tku3QZ8uU_dPcfd4LY8k6BN05f_82NYKxFmpcDK39uwhoIGDICO1wJ4OL7t821KoqBEgyTV5mkus
- 6QomwrI8IXawv_YbMqu3NHSHwHjcaX4KLmqT.yV6gm1xskXr6glhoiTXJuPpJvOOWHdZSkPbyzmo
- sxO.BtPeoE9hNt59h1qhsIKqmv_OT4ugVRCqHO73S1aBOm0lgXyp4S.3F.YjStqbj4U9bBntaqwO
- 7jXMDTrPjyI1SrKKxJGnBB7Lvt0w06e9naZ.KOsqxB1BZ.HC1E_5TzftEAA9ny3guvuFyfYx6HU4
- hHHLgyvat_lfPVfxUoucMNYH3Gy3dy43V1aK.7FrqmlO8Xs5C2ypx4MLTw2N2UpCmAELMX4Atcj1
- _ctrymodhpzNKMSIP6wol8L5Zsjkzn2CucA--
-Received: from sonic.gate.mail.ne1.yahoo.com by
- sonic301.consmr.mail.ne1.yahoo.com with HTTP; Sun, 19 Jul 2020 14:16:09 +0000
-Received: by smtp416.mail.ne1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA
- ID 236211cb25ae2a4e2662dbfc9a230aa0; 
- Sun, 19 Jul 2020 14:16:07 +0000 (UTC)
-Received: by mail-pl1-f172.google.com with SMTP id b9so7499730plx.6
- for <samuel.thibault@gnu.org>; Sun, 19 Jul 2020 07:16:07 -0700 (PDT)
-X-Gm-Message-State: AOAM533UYzAj7GoNxJaDI4gYX5bw5juemO7UP0xZZXW1T8YnaL52PS2I
- DPFKa5X9U4s+4Vni1gCbl6vCr657bxfUrMuXPXs=
-X-Google-Smtp-Source: ABdhPJxO+fLTqnV6bFfWikJdNBb3u82fVCN+6nUsxtDmLVpj/uNRm8zkDKxwT+9Vu5rmyHWRCzibKDAr07bI4ND/PZg=
-X-Received: by 2002:a17:902:a388:: with SMTP id
- x8mr14318624pla.48.1595168166736; 
- Sun, 19 Jul 2020 07:16:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAEJNuHy+CqveTjiCxpjiLX-D=NczSveUSDSAZyz=D5F0XvL5QQ@mail.gmail.com>
- <CAEJNuHze25wdA_Kjw8ryi+hmg0eLP8nhZMR50_2yqXPu_Jir9A@mail.gmail.com>
- <20200719025055.kkjjiegyn4t6x64v@function>
- <CAEJNuHyYR1Vj4VaDVPLUG1dkSdzHjzbiCqq=Q+2j1tjy7kYBCw@mail.gmail.com>
- <20200719111602.2xeu4ise6zlbvf4c@function>
-In-Reply-To: <20200719111602.2xeu4ise6zlbvf4c@function>
-From: Ottavio Caruso <ottavio2006-usenet2012@yahoo.com>
-Date: Sun, 19 Jul 2020 15:15:50 +0100
-X-Gmail-Original-Message-ID: <CAEJNuHy7s+GqUaZ_sVgr03J6ZGzK9PwZZBsu6t0Znf6p4x6+8Q@mail.gmail.com>
-Message-ID: <CAEJNuHy7s+GqUaZ_sVgr03J6ZGzK9PwZZBsu6t0Znf6p4x6+8Q@mail.gmail.com>
-Subject: Re: Is traceroute supposed to work in user mode networking (slirp) ?
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: WebService/1.1.16271 hermes_yahoo Apache-HttpAsyncClient/4.1.4
- (Java/11.0.7)
-Received-SPF: pass client-ip=66.163.184.200;
- envelope-from=pr0f3ss0r1492@yahoo.com;
- helo=sonic301-31.consmr.mail.ne1.yahoo.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 08:17:23
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+ (Exim 4.90_1)
+ (envelope-from <4035f3a28461ba21ab5e24c843556b0ec06246ab@lizzy.crudebyte.com>)
+ id 1jxASH-0002KS-Ij
+ for qemu-devel@nongnu.org; Sun, 19 Jul 2020 10:38:17 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:55645)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <4035f3a28461ba21ab5e24c843556b0ec06246ab@lizzy.crudebyte.com>)
+ id 1jxASF-00056x-A0
+ for qemu-devel@nongnu.org; Sun, 19 Jul 2020 10:38:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=7iKv69YKBDLCXhLkpD1pAugss9sS+3fhzMWHoLN0FtA=; b=E5FI6
+ FtWsUl+Vo+J/2lqHf/S3PHU3UfFVcx7uYfIoY/ZiL7w6J9/sqqCTm8PVWm+fca6SmOYCPBGA9q1h0
+ zKKy9gXDIXmGzyZJmCFEwb2nznH5VrFMU3rWkX+n50fygzoDZOV2H/i1i9krhI/45hXF+kLiFJ8rn
+ opBCF9MZN3vv/YcpX9C1Xvxz5h6BnVcrW8UibE0z79GT1s08N9zS45SMl5m/aIjAVrBylxPo3Kktx
+ AAQkQ68+a3HgeuiQUFc3qJ6SrFUgzzON7fuajBLmHohqaWCLQsfqZJwZKvu/JNcYe+gg4S0PQGgSw
+ GtIpXfE0ONJr+ONIqqz5WUz1JFWPw==;
+Message-Id: <4035f3a28461ba21ab5e24c843556b0ec06246ab.1595166227.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1595166227.git.qemu_oss@crudebyte.com>
+References: <cover.1595166227.git.qemu_oss@crudebyte.com>
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Sun, 19 Jul 2020 14:29:13 +0200
+Subject: [PATCH v7 3/6] 9pfs: add new function v9fs_co_readdir_many()
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Received-SPF: none client-ip=91.194.90.13;
+ envelope-from=4035f3a28461ba21ab5e24c843556b0ec06246ab@lizzy.crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 10:12:15
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,45 +80,293 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 19 Jul 2020 at 12:16, Samuel Thibault <samuel.thibault@gnu.org> wrote:
->
-> Ottavio Caruso, le dim. 19 juil. 2020 12:07:21 +0100, a ecrit:
-> > On Sun, 19 Jul 2020 at 03:50, Samuel Thibault <samuel.thibault@gnu.org> wrote:
-> > > Ottavio Caruso, le mar. 14 juil. 2020 12:15:48 +0100, a ecrit:
-> > > > I cannot get traceroute to work with standard udp from any of my
-> > > > guests.
-> > > >
-> > > > $ traceroute 8.8.8.8
-> > > > traceroute to 8.8.8.8 (8.8.8.8), 64 hops max, 40 byte packets
-> > > >  1  * * *
-> > >
-> > > That was because
-> > >
-> > > - libslirp was not forwarding the ttl value, thus always set to 64 hops
-> > > - libslirp was not reporting icmp errors.
-> > >
-> > > I had a try at both, and that indeed seems to be fixing the issue:
-> > > https://gitlab.freedesktop.org/slirp/libslirp/-/merge_requests/48
-> > > https://gitlab.freedesktop.org/slirp/libslirp/-/merge_requests/49
-> > >
-> > > > Any clues? Is this intended behaviour? Any workarounds that don't
-> > > > involve tap/tun/bridges?
-> > >
-> > > Not without updating libslirp with the abovementioned patches.
-> >
-> > Thanks Samuel. I've added a comment on the portal, but for the benefit
-> > of qemu-devel:
-> >
-> > Applying this patch on the latest qemu (5.0.90),
->
-> Did you also apply
-> https://gitlab.freedesktop.org/slirp/libslirp/-/merge_requests/48 ?
+The newly added function v9fs_co_readdir_many() retrieves multiple
+directory entries with a single fs driver request. It is intended to
+replace uses of v9fs_co_readdir(), the latter only retrives a single
+directory entry per fs driver request instead.
 
-No, because I thought that 49 would include 48. Let me give a try and
-come back. Updates on Gitlab.
+The reason for this planned replacement is that for every fs driver
+request the coroutine is dispatched from main I/O thread to a
+background I/O thread and eventually dispatched back to main I/O
+thread. Hopping between threads adds latency. So if a 9pfs Treaddir
+request reads a large amount of directory entries, this currently
+sums up to huge latencies of several hundred ms or even more. So
+using v9fs_co_readdir_many() instead of v9fs_co_readdir() will
+provide significant performance improvements.
 
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+---
+ hw/9pfs/9p.h    |  22 ++++++
+ hw/9pfs/codir.c | 196 +++++++++++++++++++++++++++++++++++++++++++++---
+ hw/9pfs/coth.h  |   3 +
+ 3 files changed, 210 insertions(+), 11 deletions(-)
 
-
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index 561774e843..93b7030edf 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -215,6 +215,28 @@ static inline void v9fs_readdir_init(V9fsDir *dir)
+     qemu_co_mutex_init(&dir->readdir_mutex);
+ }
+ 
++/**
++ * Type for 9p fs drivers' (a.k.a. 9p backends) result of readdir requests,
++ * which is a chained list of directory entries.
++ */
++typedef struct V9fsDirEnt {
++    /* mandatory (must not be NULL) information for all readdir requests */
++    struct dirent *dent;
++    /*
++     * optional (may be NULL): A full stat of each directory entry is just
++     * done if explicitly told to fs driver.
++     */
++    struct stat *st;
++    /*
++     * instead of an array, directory entries are always returned as
++     * chained list, that's because the amount of entries retrieved by fs
++     * drivers is dependent on the individual entries' name (since response
++     * messages are size limited), so the final amount cannot be estimated
++     * before hand
++     */
++    struct V9fsDirEnt *next;
++} V9fsDirEnt;
++
+ /*
+  * Filled by fs driver on open and other
+  * calls.
+diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
+index 73f9a751e1..07da5d8d70 100644
+--- a/hw/9pfs/codir.c
++++ b/hw/9pfs/codir.c
+@@ -18,28 +18,202 @@
+ #include "qemu/main-loop.h"
+ #include "coth.h"
+ 
++/*
++ * This is solely executed on a background IO thread.
++ */
++static int do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, struct dirent **dent)
++{
++    int err = 0;
++    V9fsState *s = pdu->s;
++    struct dirent *entry;
++
++    errno = 0;
++    entry = s->ops->readdir(&s->ctx, &fidp->fs);
++    if (!entry && errno) {
++        *dent = NULL;
++        err = -errno;
++    } else {
++        *dent = entry;
++    }
++    return err;
++}
++
++/*
++ * TODO: This will be removed for performance reasons.
++ * Use v9fs_co_readdir_many() instead.
++ */
+ int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
+                                  struct dirent **dent)
+ {
+     int err;
+-    V9fsState *s = pdu->s;
+ 
+     if (v9fs_request_cancelled(pdu)) {
+         return -EINTR;
+     }
+-    v9fs_co_run_in_worker(
+-        {
+-            struct dirent *entry;
++    v9fs_co_run_in_worker({
++        err = do_readdir(pdu, fidp, dent);
++    });
++    return err;
++}
++
++/*
++ * This is solely executed on a background IO thread.
++ *
++ * See v9fs_co_readdir_many() (as its only user) below for details.
++ */
++static int do_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
++                           struct V9fsDirEnt **entries, off_t offset,
++                           int32_t maxsize, bool dostat)
++{
++    V9fsState *s = pdu->s;
++    V9fsString name;
++    int len, err = 0;
++    int32_t size = 0;
++    off_t saved_dir_pos;
++    struct dirent *dent;
++    struct V9fsDirEnt *e = NULL;
++    V9fsPath path;
++    struct stat stbuf;
++
++    *entries = NULL;
++    v9fs_path_init(&path);
++
++    /*
++     * TODO: Here should be a warn_report_once() if lock failed.
++     *
++     * With a good 9p client we should not get into concurrency here,
++     * because a good client would not use the same fid for concurrent
++     * requests. We do the lock here for safety reasons though. However
++     * the client would then suffer performance issues, so better log that
++     * issue here.
++     */
++    v9fs_readdir_lock(&fidp->fs.dir);
++
++    /* seek directory to requested initial position */
++    if (offset == 0) {
++        s->ops->rewinddir(&s->ctx, &fidp->fs);
++    } else {
++        s->ops->seekdir(&s->ctx, &fidp->fs, offset);
++    }
++
++    /* save the directory position */
++    saved_dir_pos = s->ops->telldir(&s->ctx, &fidp->fs);
++    if (saved_dir_pos < 0) {
++        err = saved_dir_pos;
++        goto out;
++    }
++
++    while (true) {
++        /* get directory entry from fs driver */
++        err = do_readdir(pdu, fidp, &dent);
++        if (err || !dent) {
++            break;
++        }
+ 
+-            errno = 0;
+-            entry = s->ops->readdir(&s->ctx, &fidp->fs);
+-            if (!entry && errno) {
++        /*
++         * stop this loop as soon as it would exceed the allowed maximum
++         * response message size for the directory entries collected so far,
++         * because anything beyond that size would need to be discarded by
++         * 9p controller (main thread / top half) anyway
++         */
++        v9fs_string_init(&name);
++        v9fs_string_sprintf(&name, "%s", dent->d_name);
++        len = v9fs_readdir_response_size(&name);
++        v9fs_string_free(&name);
++        if (size + len > maxsize) {
++            /* this is not an error case actually */
++            break;
++        }
++
++        /* append next node to result chain */
++        if (!e) {
++            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
++        } else {
++            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
++        }
++        e->dent = g_malloc0(sizeof(struct dirent));
++        memcpy(e->dent, dent, sizeof(struct dirent));
++
++        /* perform a full stat() for directory entry if requested by caller */
++        if (dostat) {
++            err = s->ops->name_to_path(
++                &s->ctx, &fidp->path, dent->d_name, &path
++            );
++            if (err < 0) {
+                 err = -errno;
+-            } else {
+-                *dent = entry;
+-                err = 0;
++                break;
+             }
+-        });
++
++            err = s->ops->lstat(&s->ctx, &path, &stbuf);
++            if (err < 0) {
++                err = -errno;
++                break;
++            }
++
++            e->st = g_malloc0(sizeof(struct stat));
++            memcpy(e->st, &stbuf, sizeof(struct stat));
++        }
++
++        size += len;
++        saved_dir_pos = dent->d_off;
++    }
++
++    /* restore (last) saved position */
++    s->ops->seekdir(&s->ctx, &fidp->fs, saved_dir_pos);
++
++out:
++    v9fs_readdir_unlock(&fidp->fs.dir);
++    v9fs_path_free(&path);
++    if (err < 0) {
++        return err;
++    }
++    return size;
++}
++
++/**
++ * @brief Reads multiple directory entries in one rush.
++ *
++ * Retrieves the requested (max. amount of) directory entries from the fs
++ * driver. This function must only be called by the main IO thread (top half).
++ * Internally this function call will be dispatched to a background IO thread
++ * (bottom half) where it is eventually executed by the fs driver.
++ *
++ * @discussion Acquiring multiple directory entries in one rush from the fs
++ * driver, instead of retrieving each directory entry individually, is very
++ * beneficial from performance point of view. Because for every fs driver
++ * request latency is added, which in practice could lead to overall
++ * latencies of several hundred ms for reading all entries (of just a single
++ * directory) if every directory entry was individually requested from fs
++ * driver.
++ *
++ * @note You must @b ALWAYS call @c v9fs_free_dirents(entries) after calling
++ * v9fs_co_readdir_many(), both on success and on error cases of this
++ * function, to avoid memory leaks once @p entries are no longer needed.
++ *
++ * @param pdu - the causing 9p (T_readdir) client request
++ * @param fidp - already opened directory where readdir shall be performed on
++ * @param entries - output for directory entries (must not be NULL)
++ * @param offset - initial position inside the directory the function shall
++ *                 seek to before retrieving the directory entries
++ * @param maxsize - maximum result message body size (in bytes)
++ * @param dostat - whether a stat() should be performed and returned for
++ *                 each directory entry
++ * @returns resulting response message body size (in bytes) on success,
++ *          negative error code otherwise
++ */
++int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
++                                      struct V9fsDirEnt **entries,
++                                      off_t offset, int32_t maxsize,
++                                      bool dostat)
++{
++    int err = 0;
++
++    if (v9fs_request_cancelled(pdu)) {
++        return -EINTR;
++    }
++    v9fs_co_run_in_worker({
++        err = do_readdir_many(pdu, fidp, entries, offset, maxsize, dostat);
++    });
+     return err;
+ }
+ 
+diff --git a/hw/9pfs/coth.h b/hw/9pfs/coth.h
+index c2cdc7a9ea..fd4a45bc7c 100644
+--- a/hw/9pfs/coth.h
++++ b/hw/9pfs/coth.h
+@@ -49,6 +49,9 @@
+ void co_run_in_worker_bh(void *);
+ int coroutine_fn v9fs_co_readlink(V9fsPDU *, V9fsPath *, V9fsString *);
+ int coroutine_fn v9fs_co_readdir(V9fsPDU *, V9fsFidState *, struct dirent **);
++int coroutine_fn v9fs_co_readdir_many(V9fsPDU *, V9fsFidState *,
++                                      struct V9fsDirEnt **, off_t, int32_t,
++                                      bool);
+ off_t coroutine_fn v9fs_co_telldir(V9fsPDU *, V9fsFidState *);
+ void coroutine_fn v9fs_co_seekdir(V9fsPDU *, V9fsFidState *, off_t);
+ void coroutine_fn v9fs_co_rewinddir(V9fsPDU *, V9fsFidState *);
 -- 
-Ottavio Caruso
+2.20.1
+
 
