@@ -2,134 +2,87 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11333C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9E4C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:25:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE16220709
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3924A20709
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:25:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DBElooxI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE16220709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="GBrCqeeK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3924A20709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxR2A-0006Na-3d
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:20:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33858)
+	id 1jxR6q-0007ci-DM
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:25:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR1Z-0005sz-Ng
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:19:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31085
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR1X-00010b-86
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:19:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595233186;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3OlNOx/znAVnZnHnQPxV8B6rb00jhqG6mhxqE/Xzp0A=;
- b=DBElooxIuR7Bp6Lo+vucHyIlhQ0Z/N0l9izatK/CJpu/3E+dyZ4E/hMp/SLQWBJeTkEORP
- g6mY7P1oa4hSfv2emcGu0z8IRpED46xRHhFOO+SynhFUMAHcjM+RqyH0eUpG4jnM89wbsr
- vphuMlLE69yM6iHyQx+NgZw+p//X5vI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-QzEHOzK3NTqYePUmjNBUbA-1; Mon, 20 Jul 2020 04:19:45 -0400
-X-MC-Unique: QzEHOzK3NTqYePUmjNBUbA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 590D78017FB;
- Mon, 20 Jul 2020 08:19:43 +0000 (UTC)
-Received: from [10.36.114.91] (ovpn-114-91.ams2.redhat.com [10.36.114.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 27FD01A8F7;
- Mon, 20 Jul 2020 08:19:37 +0000 (UTC)
-Subject: Re: [PATCH v4 4/8] s390/sclp: read sccb from mem based on sccb length
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <20200624202312.28349-1-walling@linux.ibm.com>
- <20200624202312.28349-5-walling@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <cf1c33ea-2a2a-8400-a56b-384de356cf05@redhat.com>
-Date: Mon, 20 Jul 2020 10:19:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1jxR4h-000726-Sv; Mon, 20 Jul 2020 04:23:04 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44655)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1jxR4f-0001ZO-E4; Mon, 20 Jul 2020 04:23:03 -0400
+Received: by mail-ej1-x643.google.com with SMTP id ga4so17113816ejb.11;
+ Mon, 20 Jul 2020 01:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ps9sxJqWf6+f62TxYNrCyTGHKofiYB1akozfykT/4iI=;
+ b=GBrCqeeK74Q7AYZVaJASz1oFBRHsfOI9QJJiE0DZrzuQAfGt9vEjMu6TkrK9h7G4Jf
+ DMHUS3jWTmRtF0QAc4NJqlzvIyKBgsEDoX1IfKWUzlVjZFT0Oim/+//55D68aWH2nkzG
+ nUegZsz9WDQWHK5Tv1GurBWJnjoGyLzEiV0vY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ps9sxJqWf6+f62TxYNrCyTGHKofiYB1akozfykT/4iI=;
+ b=cOiszoppoCYY1l2h6HLRe7F91XixosTZ3ozuNmb24M2J3A2osqSbf5wsDrW70Vh8vd
+ gWunVPGzXwBeULrYlh1eAWCFT8KcJwUbpr6iTi7YNKu/or0gj3c/xGGX27MvHTZkH6wk
+ 5M9mKs8Lrd/qn6S427xx5G/QNcLPdN5ql/K63r7oQQi2D5Hs+hl+DcqVAuEKyrrDgZJP
+ g3oai1b6842QHU3n4Cu+3RTO2esFrUvK/WzI94HtefYPf6AwdzmTQTQMavsj8fR5WRhk
+ yt78R5Psk32yrTzHJHOfzhmAN5MQLEHyg6CmUU4XEno6Q3bPTO0YZH+Zdiv6mQdpLHKY
+ s2Hg==
+X-Gm-Message-State: AOAM532jF+7KD/q048KMPhDPrXvab7h2zQema4jP2lf7NOCHa+qe4F01
+ egW6a4Sp7l8zka27UExM+MEhfRSWXaU96tLlaJk=
+X-Google-Smtp-Source: ABdhPJwaCB1bUKylXeAy43b1IdKuzUk86dKIgvkk73Nbh7JoTudWtZulkLLUIeZqErOPd+ZsjDiMTc/CBsdRzkBhbfY=
+X-Received: by 2002:a17:906:cce6:: with SMTP id
+ ot38mr19453646ejb.266.1595233378570; 
+ Mon, 20 Jul 2020 01:22:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200624202312.28349-5-walling@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:11:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200717060258.1602319-1-hskinnemoen@google.com>
+ <20200717060258.1602319-14-hskinnemoen@google.com>
+ <f098aa02-28cd-f86b-1641-5e164ba5ca7f@kaod.org>
+In-Reply-To: <f098aa02-28cd-f86b-1641-5e164ba5ca7f@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 20 Jul 2020 08:22:46 +0000
+Message-ID: <CACPK8Xe_COP0sLCZnjnRYgA13W73BPnw9g0B5u6DK4++MDy5-A@mail.gmail.com>
+Subject: Re: [PATCH v6 13/13] tests/acceptance: console boot tests for
+ quanta-gsj
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=joel.stan@gmail.com; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,88 +95,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
- pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Havard Skinnemoen <hskinnemoen@google.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, CS20 KFTing <kfting@nuvoton.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Avi Fishman <Avi.Fishman@nuvoton.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.06.20 22:23, Collin Walling wrote:
-> The header of the SCCB contains the actual length of the SCCB. Instead
-> of using a static 4K size, let's allow for a variable size determined
-> by the value set in the header. The proper checks are already in place
-> to ensure the SCCB length is sufficent to store a full response, and
-> that the length does not cross any explicitly-set boundaries.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/s390x/sclp.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index 5899c1e3b8..1feba6f692 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -251,9 +251,8 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
->      SCLPDevice *sclp = get_sclp_device();
->      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
->      SCCB work_sccb;
-> -    hwaddr sccb_len = sizeof(SCCB);
->  
-> -    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
-> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sizeof(SCCBHeader));
->  
->      if (!sclp_command_code_valid(code)) {
->          work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-> @@ -264,6 +263,9 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
->          goto out_write;
->      }
->  
-> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb,
-> +                         be16_to_cpu(work_sccb.h.length));
-> +
->      sclp_c->execute(sclp, &work_sccb, code);
->  out_write:
->      s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
-> @@ -278,8 +280,6 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
->      SCCB work_sccb;
->  
-> -    hwaddr sccb_len = sizeof(SCCB);
-> -
->      /* first some basic checks on program checks */
->      if (env->psw.mask & PSW_MASK_PSTATE) {
->          return -PGM_PRIVILEGED;
-> @@ -297,7 +297,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->       * from playing dirty tricks by modifying the memory content after
->       * the host has checked the values
->       */
-> -    cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
-> +    cpu_physical_memory_read(sccb, &work_sccb, sizeof(SCCBHeader));
->  
->      /* Valid sccb sizes */
->      if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
-> @@ -313,6 +313,9 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->          goto out_write;
->      }
->  
-> +    /* the header contains the actual length of the sccb */
-> +    cpu_physical_memory_read(sccb, &work_sccb, be16_to_cpu(work_sccb.h.length));
-> +
->      sclp_c->execute(sclp, &work_sccb, code);
->  out_write:
->      cpu_physical_memory_write(sccb, &work_sccb,
-> 
+On Fri, 17 Jul 2020 at 12:33, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> On 7/17/20 8:02 AM, Havard Skinnemoen wrote:
+> > This adds two acceptance tests for the quanta-gsj machine.
+> >
+> > One test downloads a lightly patched openbmc flash image from github an=
+d
+> > verifies that it boots all the way to the login prompt.
+> >
+> > The other test downloads a kernel, initrd and dtb built from the same
+> > openbmc source and verifies that the kernel detects all CPUs and boots
+> > to the point where it can't find the root filesystem (because we have n=
+o
+> > flash image in this case).
+> >
+> > Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+>
+> It looks good but I am not sure it's a good idea to have tests
+> point to URLs like :
+>
+> https://github.com/hskinnemoen/openbmc/releases/download/20200711-gsj-qem=
+u-0/obmc-phosphor-initramfs-gsj.cpio.xz
+>
+> Philippe, Peter, is that OK ?
+>
+>
+> If so, Joel, Andrew, could we host FW images on the OpenBMC github ?
+> and do the same for Aspeed.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Yeah, we can do that if it would be preferred.
 
--- 
-Thanks,
+Nice work on adding a test Havard. I have been meaning to do the same
+for the aspeed machines for a while.
 
-David / dhildenb
-
+>
+> Thanks,
+>
+> C.
+>
+> > ---
+> >  tests/acceptance/boot_linux_console.py | 65 ++++++++++++++++++++++++++
+> >  1 file changed, 65 insertions(+)
+> >
+> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
+boot_linux_console.py
+> > index 73cc69c499..1d82fc7ff8 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -569,6 +569,71 @@ class BootLinuxConsole(LinuxKernelTest):
+> >                                                  'sda')
+> >          # cubieboard's reboot is not functioning; omit reboot test.
+> >
+> > +    def test_arm_quanta_gsj(self):
+> > +        """
+> > +        :avocado: tags=3Darch:arm
+> > +        :avocado: tags=3Dmachine:quanta-gsj
+> > +        """
+> > +        # 25 MiB compressed, 32 MiB uncompressed.
+> > +        image_url =3D (
+> > +                'https://github.com/hskinnemoen/openbmc/releases/downl=
+oad/'
+> > +                '20200711-gsj-qemu-0/obmc-phosphor-image-gsj.static.mt=
+d.gz')
+> > +        image_hash =3D '14895e634923345cb5c8776037ff7876df96f6b1'
+> > +        image_path_gz =3D self.fetch_asset(image_url, asset_hash=3Dima=
+ge_hash)
+> > +        image_name =3D os.path.splitext(os.path.basename(image_path_gz=
+))[0]
+> > +        image_path =3D os.path.join(self.workdir, image_name)
+> > +        archive.gzip_uncompress(image_path_gz, image_path)
+> > +
+> > +        self.vm.set_console()
+> > +        drive_args =3D 'file=3D' + image_path + ',if=3Dmtd,bus=3D0,uni=
+t=3D0'
+> > +        self.vm.add_args('-drive', drive_args)
+> > +        self.vm.launch()
+> > +
+> > +        self.wait_for_console_pattern('> BootBlock by Nuvoton')
+> > +        self.wait_for_console_pattern('>Device: Poleg BMC NPCM730')
+> > +        self.wait_for_console_pattern('>Skip DDR init.')
+> > +        self.wait_for_console_pattern('U-Boot ')
+> > +        self.wait_for_console_pattern('Booting Linux on physical CPU 0=
+x0')
+> > +        self.wait_for_console_pattern('CPU1: thread -1, cpu 1, socket =
+0')
+> > +        self.wait_for_console_pattern('OpenBMC Project Reference Distr=
+o')
+> > +        self.wait_for_console_pattern('gsj login:')
+> > +
+> > +    def test_arm_quanta_gsj_initrd(self):
+> > +        """
+> > +        :avocado: tags=3Darch:arm
+> > +        :avocado: tags=3Dmachine:quanta-gsj
+> > +        """
+> > +        initrd_url =3D (
+> > +                'https://github.com/hskinnemoen/openbmc/releases/downl=
+oad/'
+> > +                '20200711-gsj-qemu-0/obmc-phosphor-initramfs-gsj.cpio.=
+xz')
+> > +        initrd_hash =3D '98fefe5d7e56727b1eb17d5c00311b1b5c945300'
+> > +        initrd_path =3D self.fetch_asset(initrd_url, asset_hash=3Dinit=
+rd_hash)
+> > +        kernel_url =3D (
+> > +                'https://github.com/hskinnemoen/openbmc/releases/downl=
+oad/'
+> > +                '20200711-gsj-qemu-0/uImage-gsj.bin')
+> > +        kernel_hash =3D 'fa67b2f141d56d39b3c54305c0e8a899c99eb2c7'
+> > +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
+el_hash)
+> > +        dtb_url =3D (
+> > +                'https://github.com/hskinnemoen/openbmc/releases/downl=
+oad/'
+> > +                '20200711-gsj-qemu-0/nuvoton-npcm730-gsj.dtb')
+> > +        dtb_hash =3D '18315f7006d7b688d8312d5c727eecd819aa36a4'
+> > +        dtb_path =3D self.fetch_asset(dtb_url, asset_hash=3Ddtb_hash)
+> > +
+> > +        self.vm.set_console()
+> > +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> > +                               'console=3DttyS0,115200n8 '
+> > +                               'earlycon=3Duart8250,mmio32,0xf0001000'=
+)
+> > +        self.vm.add_args('-kernel', kernel_path,
+> > +                         '-initrd', initrd_path,
+> > +                         '-dtb', dtb_path,
+> > +                         '-append', kernel_command_line)
+> > +        self.vm.launch()
+> > +
+> > +        self.wait_for_console_pattern('Booting Linux on physical CPU 0=
+x0')
+> > +        self.wait_for_console_pattern('CPU1: thread -1, cpu 1, socket =
+0')
+> > +        self.wait_for_console_pattern(
+> > +                'Give root password for system maintenance')
+> > +
+> >      def test_arm_orangepi(self):
+> >          """
+> >          :avocado: tags=3Darch:arm
+> >
+>
 
